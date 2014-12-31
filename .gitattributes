@@ -1,0 +1,6 @@
+.gitattributes text
+.gitignore text
+*.cpp text
+*.h text
+*.bat eol=crlf
+*.md text
