@@ -92,7 +92,7 @@ void postCommand(int command, int flag) {
 			outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL) ? L"soloed" : L"unsoloed");
 			break;
 
-		case 9: case 817:
+		case 40294:
 			// Arm/unarm tracks
 			track = GetLastTouchedTrack();
 			if (!track)
