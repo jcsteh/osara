@@ -93,8 +93,8 @@ void postCommand(int command, int flag) {
 	wstringstream s;
 
 	switch (command) {
-		case 40285: case 40286:
-			// Go to nex/previous track
+		case 40285: case 40286: case 40001:
+			// Go to track
 			fakeFocus = FOCUS_TRACK;
 			if (!(track = currentTrack = GetLastTouchedTrack()))
 				return;
