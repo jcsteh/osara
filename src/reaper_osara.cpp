@@ -17,6 +17,10 @@
 #define REAPERAPI_WANT_TimeMap2_timeToBeats
 #define REAPERAPI_WANT_GetCursorPosition
 #define REAPERAPI_WANT_GetContextMenu
+#define REAPERAPI_WANT_GetSelectedMediaItem
+#define REAPERAPI_WANT_GetSetMediaItemInfo
+#define REAPERAPI_WANT_GetActiveTake
+#define REAPERAPI_WANT_GetTakeName
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -34,6 +38,7 @@ int oldBeatPercent = 0;
 enum {
 	FOCUS_NONE = 0,
 	FOCUS_TRACK,
+	FOCUS_ITEM,
 	FOCUS_RULER,
 } fakeFocus = FOCUS_NONE;
 MediaTrack* currentTrack = NULL;
@@ -55,11 +60,35 @@ void outputMessage(wstringstream& message) {
 	outputMessage(message.str().c_str());
 }
 
+wstring formatCursorPosition() {
+	wostringstream s;
+	int measure;
+	double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
+	measure += 1;
+	int wholeBeat = (int)beat + 1;
+	int beatPercent = (int)(beat * 100) % 100;
+	if (measure != oldMeasure) {
+		s << L"bar " << measure << L" ";
+		oldMeasure = measure;
+	}
+	if (wholeBeat != oldBeat) {
+		s << L"beat " << wholeBeat << L" ";
+		oldBeat = wholeBeat;
+	}
+	if (beatPercent != oldBeatPercent) {
+		s << beatPercent << L"%";
+		oldBeatPercent = beatPercent;
+	}
+	return s.str();
+}
+
 /* Report messages, etc. after actions are executed.
  * This is where the majority of the work is done.
  */
 void postCommand(int command, int flag) {
 	MediaTrack* track;
+	MediaItem* item;
+	MediaItem_Take* take;
 	char* stringVal;
 	wstringstream s;
 
@@ -121,23 +150,18 @@ void postCommand(int command, int flag) {
 		case 40042: case 40043:
 			// Cursor movement
 			fakeFocus = FOCUS_RULER;
-			int measure;
-			double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
-			measure += 1;
-			int wholeBeat = (int)beat + 1;
-			int beatPercent = (int)(beat * 100) % 100;
-			if (measure != oldMeasure) {
-				s << L"bar " << measure << L" ";
-				oldMeasure = measure;
-			}
-			if (wholeBeat != oldBeat) {
-				s << L"beat " << wholeBeat << L" ";
-				oldBeat = wholeBeat;
-			}
-			if (beatPercent != oldBeatPercent) {
-				s << beatPercent << L"%";
-				oldBeatPercent = beatPercent;
-			}
+			outputMessage(formatCursorPosition().c_str());
+			break;
+
+		case 40416: case 40417:
+			// Select and move to next/previous item
+			fakeFocus = FOCUS_ITEM;
+			if (!(item = GetSelectedMediaItem(0, 0)))
+				return;
+			s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
+			if (take = GetActiveTake(item))
+				s << L" " << GetTakeName(take);
+			s << L" " << formatCursorPosition();
 			outputMessage(s);
 			break;
 	}
@@ -188,6 +212,9 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 					if (hwnd)
 						PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
 				}
+				break;
+			case FOCUS_ITEM:
+				TrackPopupMenu(GetContextMenu(1), 0, 0, 0, 0, mainHwnd, NULL);
 				break;
 			case FOCUS_RULER:
 				TrackPopupMenu(GetContextMenu(2), 0, 0, 0, 0, mainHwnd, NULL);
