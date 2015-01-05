@@ -96,8 +96,7 @@ void postCommand(int command, int flag) {
 		case 40285: case 40286:
 			// Go to nex/previous track
 			fakeFocus = FOCUS_TRACK;
-			track = currentTrack = GetLastTouchedTrack();
-			if (!track)
+			if (!(track = currentTrack = GetLastTouchedTrack()))
 				return;
 			s << (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 			if (stringVal = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
@@ -107,32 +106,28 @@ void postCommand(int command, int flag) {
 
 		case 40280:
 			// Mute/unmute tracks
-			track = GetLastTouchedTrack();
-			if (!track)
+			if (!(track = GetLastTouchedTrack()))
 				return;
 			outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL) ? L"muted" : L"unmuted");
 			break;
 
 		case 40281:
 			// Solo/unsolo tracks
-			track = GetLastTouchedTrack();
-			if (!track)
+			if (!(track = GetLastTouchedTrack()))
 				return;
 			outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL) ? L"soloed" : L"unsoloed");
 			break;
 
 		case 40294:
 			// Arm/unarm tracks
-			track = GetLastTouchedTrack();
-			if (!track)
+			if (!(track = GetLastTouchedTrack()))
 				return;
 			outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL) ? L"armed" : L"unarmed");
 			break;
 
 		case 40495:
 			// Cycle track record monitor
-			track = GetLastTouchedTrack();
-			if (!track)
+			if (!(track = GetLastTouchedTrack()))
 				return;
 			switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
 				case 0:
