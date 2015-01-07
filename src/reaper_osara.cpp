@@ -101,6 +101,14 @@ void postCommand(int command, int flag) {
 			s << (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 			if (stringVal = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
 				s << L" " << stringVal;
+			if (*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL))
+				s << L" muted";
+			if (*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL))
+				s << L" soloed";
+			if (*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL))
+				s << L" armed";
+			if (*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL))
+				s << L" phase inverted";
 			outputMessage(s);
 			break;
 
