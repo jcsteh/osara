@@ -141,6 +141,13 @@ void postCommand(int command, int flag) {
 			}
 			break;
 
+		case 40282:
+			// Invert track phase
+			if (!(track = GetLastTouchedTrack()))
+				return;
+			outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL) ? L"phase inverted" : L"phase normal");
+			break;
+
 		case 40104: case 40105: case 41042: case 41043: case 41044: case 41045:
 		case 40042: case 40043:
 			// Cursor movement
