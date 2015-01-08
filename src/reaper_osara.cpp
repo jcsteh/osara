@@ -82,6 +82,26 @@ wstring formatCursorPosition() {
 	return s.str();
 }
 
+const wchar_t* formatFolderState(int state, bool reportTrack=true) {
+	if (state == 0)
+		return reportTrack ? L"track" : NULL;
+	else if (state == 1)
+		return L"folder";
+	return L"end of folder";
+}
+
+const wchar_t* getFolderCompacting(MediaTrack* track) {
+	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
+		case 0:
+			return L"open";
+		case 1:
+			return L"small";
+		case 2:
+			return L"closed";
+	}
+	return L""; // Should never happen.
+}
+
 /* Report messages, etc. after actions are executed.
  * This is where the majority of the work is done.
  */
@@ -90,6 +110,8 @@ void postCommand(int command, int flag) {
 	MediaItem* item;
 	MediaItem_Take* take;
 	char* stringVal;
+	int intVal;
+	const wchar_t* message;
 	wstringstream s;
 
 	switch (command) {
@@ -99,6 +121,11 @@ void postCommand(int command, int flag) {
 			if (!(track = currentTrack = GetLastTouchedTrack()))
 				return;
 			s << (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+			intVal = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
+			if (intVal == 1) // Folder
+				s << L" " << getFolderCompacting(track);
+			if (message = formatFolderState(intVal, false))
+				s << L" " << message;
 			if (stringVal = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
 				s << L" " << stringVal;
 			if (*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL))
@@ -173,6 +200,20 @@ void postCommand(int command, int flag) {
 				s << L" " << GetTakeName(take);
 			s << L" " << formatCursorPosition();
 			outputMessage(s);
+			break;
+
+		case 1041:
+			// Cycle track folder state
+			if (!(track = GetLastTouchedTrack()))
+				return;
+			outputMessage(formatFolderState(*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL)));
+			break;
+
+		case 1042:
+			// Cycle folder collapsed state
+			if (!(track = GetLastTouchedTrack()))
+				return;
+			outputMessage(getFolderCompacting(track));
 			break;
 	}
 }
