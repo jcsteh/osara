@@ -21,6 +21,8 @@
 #define REAPERAPI_WANT_GetSetMediaItemInfo
 #define REAPERAPI_WANT_GetActiveTake
 #define REAPERAPI_WANT_GetTakeName
+#define REAPERAPI_WANT_Main_OnCommand
+#define REAPERAPI_WANT_CountTracks
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -115,12 +117,31 @@ void postCommand(int command, int flag) {
 	wstringstream s;
 
 	switch (command) {
-		case 40285: case 40286: case 40001:
+		case 40285: case 40286: case 40001: {
 			// Go to track
 			fakeFocus = FOCUS_TRACK;
 			if (!(track = currentTrack = GetLastTouchedTrack()))
 				return;
-			s << (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+			int trackNum = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+			MediaTrack* parentTrack = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
+			if (parentTrack
+				&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERDEPTH", NULL) == 1
+				&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERCOMPACT", NULL) == 2
+			) {
+				// This track is inside a closed folder, so skip it.
+				if (command != 40286 && trackNum == CountTracks(0)) {
+					// We're moving forward and we're on the last track.
+					// Therefore, go backward.
+					// Note that this can't happen when the user moves backward
+					// because the first track can never be inside a folder.
+					command = 40286;
+				}
+				if (command == 40001) // Inserting a track
+					command = 40285; // Skip by moving forward.
+				Main_OnCommand(command, 0);
+				return;
+			}
+			s << trackNum;
 			intVal = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 			if (intVal == 1) // Folder
 				s << L" " << getFolderCompacting(track);
@@ -138,6 +159,7 @@ void postCommand(int command, int flag) {
 				s << L" phase inverted";
 			outputMessage(s);
 			break;
+		}
 
 		case 40280:
 			// Mute/unmute tracks
