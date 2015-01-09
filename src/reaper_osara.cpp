@@ -1,7 +1,8 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
+ * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014 James Teh
+ * Copyright 2014-2015 James Teh
  * License: GNU General Public License version 2.0
  */
 
