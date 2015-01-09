@@ -11,6 +11,7 @@
 #include <oleacc.h>
 #include <string>
 #include <sstream>
+#include <map>
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -300,6 +301,33 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 	return 0;
 }
 
+/*** Our commands/commands we want to intercept.
+ * Each command should have a function and should be added to the COMMANDS array below.
+ */
+
+#define DEFACCEL {0, 0, 0}
+typedef struct Command {
+	gaccel_register_t gaccel;
+	const char* id;
+	void (*execute)(Command*);
+} Command;
+
+Command COMMANDS[] = {
+	{{}, NULL},
+};
+map<int, Command*> commandsMap;
+
+/*** Initialisation, termination and inner workings. */
+
+bool handleCommand(int command, int flag) {
+	const auto it = commandsMap.find(command);
+	if (it != commandsMap.end()) {
+		it->second->execute(it->second);
+		return true;
+	}
+	return false;
+}
+
 accelerator_register_t accelReg = {
 	handleAccel,
 	true,
@@ -320,6 +348,15 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		rec->Register("hookpostcommand", postCommand);
 		rec->Register("accelerator", &accelReg);
+
+		for (int i = 0; COMMANDS[i].id; ++i) {
+			int cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+			COMMANDS[i].gaccel.accel.cmd = cmd;
+			commandsMap.insert(make_pair(cmd, &COMMANDS[i]));
+			rec->Register("gaccel", &COMMANDS[i].gaccel);
+		}
+		rec->Register("hookcommand", handleCommand);
+
 		return 1;
 
 	} else {
