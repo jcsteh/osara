@@ -48,6 +48,8 @@ enum {
 } fakeFocus = FOCUS_NONE;
 MediaTrack* currentTrack = NULL;
 
+/*** Utilities */
+
 void outputMessage(const wchar_t* message) {
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO* guiThreadInfo = new GUITHREADINFO;
@@ -61,7 +63,7 @@ void outputMessage(const wchar_t* message) {
 	delete guiThreadInfo;
 }
 
-void outputMessage(wstringstream& message) {
+void outputMessage(wostringstream& message) {
 	outputMessage(message.str().c_str());
 }
 
@@ -107,141 +109,164 @@ const wchar_t* getFolderCompacting(MediaTrack* track) {
 	return L""; // Should never happen.
 }
 
-/* Report messages, etc. after actions are executed.
- * This is where the majority of the work is done.
+/*** Code to execute after existing actions.
+ * This is used to report messages regarding the effect of the command, etc.
  */
-void postCommand(int command, int flag) {
-	MediaTrack* track;
-	MediaItem* item;
-	MediaItem_Take* take;
-	char* stringVal;
-	int intVal;
-	const wchar_t* message;
-	wstringstream s;
 
-	switch (command) {
-		case 40285: case 40286: case 40001: {
-			// Go to track
-			fakeFocus = FOCUS_TRACK;
-			if (!(track = currentTrack = GetLastTouchedTrack()))
-				return;
-			int trackNum = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-			MediaTrack* parentTrack = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
-			if (parentTrack
-				&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERDEPTH", NULL) == 1
-				&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERCOMPACT", NULL) == 2
-			) {
-				// This track is inside a closed folder, so skip it.
-				if (command != 40286 && trackNum == CountTracks(0)) {
-					// We're moving forward and we're on the last track.
-					// Therefore, go backward.
-					// Note that this can't happen when the user moves backward
-					// because the first track can never be inside a folder.
-					command = 40286;
-				}
-				if (command == 40001) // Inserting a track
-					command = 40285; // Skip by moving forward.
-				Main_OnCommand(command, 0);
-				return;
-			}
-			s << trackNum;
-			intVal = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-			if (intVal == 1) // Folder
-				s << L" " << getFolderCompacting(track);
-			if (message = formatFolderState(intVal, false))
-				s << L" " << message;
-			if (stringVal = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
-				s << L" " << stringVal;
-			if (*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL))
-				s << L" muted";
-			if (*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL))
-				s << L" soloed";
-			if (*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL))
-				s << L" armed";
-			if (*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL))
-				s << L" phase inverted";
-			outputMessage(s);
-			break;
+void postGoToTrack(int command) {
+	fakeFocus = FOCUS_TRACK;
+	MediaTrack* track = currentTrack = GetLastTouchedTrack();
+	if (!track)
+		return;
+	int trackNum = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	MediaTrack* parentTrack = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
+	if (parentTrack
+		&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERDEPTH", NULL) == 1
+		&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERCOMPACT", NULL) == 2
+	) {
+		// This track is inside a closed folder, so skip it.
+		if (command != 40286 && trackNum == CountTracks(0)) {
+			// We're moving forward and we're on the last track.
+			// Therefore, go backward.
+			// Note that this can't happen when the user moves backward
+			// because the first track can never be inside a folder.
+			command = 40286;
 		}
+		if (command == 40001) // Inserting a track
+			command = 40285; // Skip by moving forward.
+		Main_OnCommand(command, 0);
+		return;
+	}
 
-		case 40280:
-			// Mute/unmute tracks
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL) ? L"muted" : L"unmuted");
-			break;
+	wostringstream s;
+	s << trackNum;
+	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
+	if (folderDepth == 1) // Folder
+		s << L" " << getFolderCompacting(track);
+	const wchar_t* message = formatFolderState(folderDepth, false);
+	if (message)
+		s << L" " << message;
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+	if (trackName)
+		s << L" " << trackName;
+	if (*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL))
+		s << L" muted";
+	if (*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL))
+		s << L" soloed";
+	if (*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL))
+		s << L" armed";
+	if (*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL))
+		s << L" phase inverted";
+	outputMessage(s);
+}
 
-		case 40281:
-			// Solo/unsolo tracks
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL) ? L"soloed" : L"unsoloed");
-			break;
+void postToggleTrackMute(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL) ? L"muted" : L"unmuted");
+}
 
-		case 40294:
-			// Arm/unarm tracks
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL) ? L"armed" : L"unarmed");
-			break;
+void postToggleTrackSolo(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL) ? L"soloed" : L"unsoloed");
+}
 
-		case 40495:
-			// Cycle track record monitor
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
-				case 0:
-					outputMessage(L"record monitor off");
-					break;
-				case 1:
-					outputMessage(L"normal");
-					break;
-				case 2:
-					outputMessage(L"not when playing");
-			}
-			break;
+void postToggleTrackArm(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL) ? L"armed" : L"unarmed");
+}
 
-		case 40282:
-			// Invert track phase
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL) ? L"phase inverted" : L"phase normal");
+void postCycleTrackMonitor(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
+		case 0:
+			outputMessage(L"record monitor off");
 			break;
-
-		case 40104: case 40105: case 41042: case 41043: case 41044: case 41045:
-		case 40042: case 40043:
-			// Cursor movement
-			fakeFocus = FOCUS_RULER;
-			outputMessage(formatCursorPosition().c_str());
+		case 1:
+			outputMessage(L"normal");
 			break;
-
-		case 40416: case 40417:
-			// Select and move to next/previous item
-			fakeFocus = FOCUS_ITEM;
-			if (!(item = GetSelectedMediaItem(0, 0)))
-				return;
-			s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
-			if (take = GetActiveTake(item))
-				s << L" " << GetTakeName(take);
-			s << L" " << formatCursorPosition();
-			outputMessage(s);
-			break;
-
-		case 1041:
-			// Cycle track folder state
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(formatFolderState(*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL)));
-			break;
-
-		case 1042:
-			// Cycle folder collapsed state
-			if (!(track = GetLastTouchedTrack()))
-				return;
-			outputMessage(getFolderCompacting(track));
-			break;
+		case 2:
+			outputMessage(L"not when playing");
 	}
 }
+
+void postInvertTrackPhase(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL) ? L"phase inverted" : L"phase normal");
+}
+
+void postCursorMovement(int command) {
+	fakeFocus = FOCUS_RULER;
+	outputMessage(formatCursorPosition().c_str());
+}
+
+void postMoveToItem(int command) {
+	fakeFocus = FOCUS_ITEM;
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return;
+	wostringstream s;
+	s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
+	MediaItem_Take* take = GetActiveTake(item);
+	if (take)
+		s << L" " << GetTakeName(take);
+	s << L" " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void postCycleTrackFolderState(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(formatFolderState(*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL)));
+}
+
+void postCycleTrackFolderCollapsed(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	outputMessage(getFolderCompacting(track));
+}
+
+typedef void (*PostCommandExecute)(int);
+typedef struct PostCommand {
+	int cmd;
+	PostCommandExecute execute;
+} PostCommand;
+
+PostCommand POST_COMMANDS[] = {
+	{40285, postGoToTrack}, // Track: Go to next track
+	{40286, postGoToTrack}, // Track: Go to previous track
+	{40001, postGoToTrack}, // Track: Insert new track
+	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
+	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
+	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
+	{40282, postInvertTrackPhase}, // Track: Invert track phase
+	{40104, postCursorMovement}, // View: Move cursor left one pixel
+	{40105, postCursorMovement}, // View: Move cursor right one pixel
+	{40042, postCursorMovement}, // Transport: Go to start of project
+	{40043, postCursorMovement}, // Transport: Go to end of project
+	{41042, postCursorMovement}, // Go forward one measure
+	{41043, postCursorMovement}, // Go back one measure
+	{41044, postCursorMovement}, // Go forward one beat
+	{41045, postCursorMovement}, // Go back one beat
+	{40416, postMoveToItem}, // Item navigation: Select and move to previous item
+	{40417, postMoveToItem}, // Item navigation: Select and move to next item
+	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
+	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
+	{0},
+};
+map<int, PostCommandExecute> postCommandsMap;
 
 // A capturing lambda can't be passed as a Windows callback, hence the struct.
 typedef struct {
@@ -319,6 +344,12 @@ map<int, Command*> commandsMap;
 
 /*** Initialisation, termination and inner workings. */
 
+void postCommand(int command, int flag) {
+	const auto it = postCommandsMap.find(command);
+	if (it != postCommandsMap.end())
+		it->second(command);
+}
+
 bool handleCommand(int command, int flag) {
 	const auto it = commandsMap.find(command);
 	if (it != commandsMap.end()) {
@@ -346,8 +377,10 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0;
 		mainHwnd = rec->hwnd_main;
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
+
+		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
+			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 		rec->Register("hookpostcommand", postCommand);
-		rec->Register("accelerator", &accelReg);
 
 		for (int i = 0; COMMANDS[i].id; ++i) {
 			int cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
@@ -357,6 +390,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		}
 		rec->Register("hookcommand", handleCommand);
 
+		rec->Register("accelerator", &accelReg);
 		return 1;
 
 	} else {
