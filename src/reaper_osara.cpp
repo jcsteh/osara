@@ -29,6 +29,7 @@
 
 using namespace std;
 
+HINSTANCE pluginHInstance;
 HWND mainHwnd;
 DWORD guiThread;
 IAccPropServices* accPropServices = NULL;
@@ -312,6 +313,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		if (rec->caller_version != REAPER_PLUGIN_VERSION || !rec->GetFunc || REAPERAPI_LoadAPI(rec->GetFunc) != 0)
 			return 0; // Incompatible.
 
+		pluginHInstance = hInstance;
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)
 			return 0;
 		mainHwnd = rec->hwnd_main;
