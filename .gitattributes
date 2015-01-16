@@ -4,3 +4,4 @@
 *.h text
 *.bat eol=crlf
 *.md text
+*.rc text

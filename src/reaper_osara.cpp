@@ -9,6 +9,8 @@
 #include <windows.h>
 #include <initguid.h>
 #include <oleacc.h>
+#include <Windowsx.h>
+#include <Commctrl.h>
 #include <string>
 #include <sstream>
 #include <map>
@@ -25,8 +27,17 @@
 #define REAPERAPI_WANT_GetTakeName
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_CountTracks
+#define REAPERAPI_WANT_GetTrack
+#define REAPERAPI_WANT_TrackFX_GetNumParams
+#define REAPERAPI_WANT_TrackFX_GetParamName
+#define REAPERAPI_WANT_TrackFX_GetCount
+#define REAPERAPI_WANT_TrackFX_GetFXName
+#define REAPERAPI_WANT_TrackFX_GetParam
+#define REAPERAPI_WANT_TrackFX_GetParameterStepSizes
+#define REAPERAPI_WANT_TrackFX_SetParam
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
+#include "resource.h"
 
 using namespace std;
 
@@ -337,7 +348,98 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 
+int fxParams_fx;
+int fxParams_param;
+double fxParams_valMin, fxParams_valMax, fxParams_valStep;
+
+int fxParams_paramToSlider(double val) {
+	return (int)((val - fxParams_valMin) / (fxParams_valMax - fxParams_valMin) * 1000);
+}
+
+void fxParams_onParamChange(HWND dialog, HWND params) {
+	fxParams_param = ComboBox_GetCurSel(params);
+	double curVal;
+	curVal = TrackFX_GetParam(currentTrack, fxParams_fx, fxParams_param, 
+		&fxParams_valMin, &fxParams_valMax);
+	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
+	SendMessage(slider, TBM_SETPOS, TRUE,
+		fxParams_paramToSlider(curVal));
+	TrackFX_GetParameterStepSizes(currentTrack, fxParams_fx, fxParams_param,
+		&fxParams_valStep, NULL, NULL, NULL);
+	SendMessage(slider, TBM_SETLINESIZE, 0,
+		fxParams_paramToSlider(fxParams_valStep));
+}
+
+void fxParams_onSliderChange(HWND slider) {
+	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
+	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param,
+		(double)sliderVal / 1000 * (fxParams_valMax - fxParams_valMin) + fxParams_valMin);
+}
+
+INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+		case WM_COMMAND:
+			if (LOWORD(wParam) == ID_FX_PARAM && HIWORD(wParam) == CBN_SELCHANGE)
+				fxParams_onParamChange((HWND)dialog, (HWND)lParam);
+			else if (LOWORD(wParam) == IDCANCEL) {
+				DestroyWindow(dialog);
+				return 1;
+			}
+		case WM_HSCROLL:
+			if (GetWindowLong((HWND)lParam, GWL_ID) == ID_FX_PARAM_VAL_SLIDER)
+				fxParams_onSliderChange((HWND)lParam);
+			return 1;
+		case WM_CLOSE:
+			DestroyWindow(dialog);
+			return 1;
+	}
+	return FALSE;
+}
+
+void cmdFxParams(Command* command) {
+	if (!currentTrack)
+		return;
+	int fxCount = TrackFX_GetCount(currentTrack);
+	if (fxCount == 0)
+		return;
+	char name[256];
+	// Present a menu of effects.
+	HMENU effects = CreatePopupMenu();
+	MENUITEMINFO itemInfo;
+	itemInfo.cbSize = sizeof(MENUITEMINFO);
+	for (int f = 0; f < fxCount; ++f) {
+		TrackFX_GetFXName(currentTrack, 0, name, sizeof(name));
+		itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+		itemInfo.fType = MFT_STRING;
+		itemInfo.wID = f + 1;
+		itemInfo.dwTypeData = name;
+		itemInfo.cch = sizeof(name);
+		InsertMenuItem(effects, f, false, &itemInfo);
+	}
+	int fxParams_fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
+	DestroyMenu(effects);
+	if (fxParams_fx == -1)
+		return; // Cancelled.
+
+	int numParams = TrackFX_GetNumParams(currentTrack, fxParams_fx);
+	if (numParams == 0)
+		return;
+	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_FX_PARAMS_DLG), mainHwnd, fxParams_dialogProc);
+	HWND params = GetDlgItem(dialog, ID_FX_PARAM);
+	// Populate the parameter list.
+	for (int p = 0; p < numParams; ++p) {
+		TrackFX_GetParamName(currentTrack, fxParams_fx, p, name, sizeof(name));
+		ComboBox_AddString(params, name);
+	}
+	ComboBox_SetCurSel(params, 0); // Select the first initially.
+	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
+	SendMessage(slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1000));
+	fxParams_onParamChange(dialog, params);
+	ShowWindow(dialog, SW_SHOWNORMAL);
+}
+
 Command COMMANDS[] = {
+	{{DEFACCEL, "View FX parameter list for current track"}, "OSARA_FXPARAMS", cmdFxParams},
 	{{}, NULL},
 };
 map<int, Command*> commandsMap;

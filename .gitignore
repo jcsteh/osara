@@ -2,3 +2,4 @@
 *.exp
 *.lib
 *.obj
+*.res
