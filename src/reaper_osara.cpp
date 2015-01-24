@@ -221,10 +221,10 @@ void postCursorMovement(int command) {
 }
 
 void postMoveToItem(int command) {
-	fakeFocus = FOCUS_ITEM;
 	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
-		return;
+	if (!item || (MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", NULL) != currentTrack)
+		return; // No item in this direction on this track.
+	fakeFocus = FOCUS_ITEM;
 	wostringstream s;
 	s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
 	MediaItem_Take* take = GetActiveTake(item);
