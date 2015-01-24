@@ -33,8 +33,8 @@
 #define REAPERAPI_WANT_TrackFX_GetCount
 #define REAPERAPI_WANT_TrackFX_GetFXName
 #define REAPERAPI_WANT_TrackFX_GetParam
-#define REAPERAPI_WANT_TrackFX_GetParameterStepSizes
 #define REAPERAPI_WANT_TrackFX_SetParam
+#define REAPERAPI_WANT_TrackFX_FormatParamValue
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include "resource.h"
@@ -348,32 +348,68 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 
+const int FXPARAMS_SLIDER_RANGE = 1000;
 int fxParams_fx;
 int fxParams_param;
-double fxParams_valMin, fxParams_valMax, fxParams_valStep;
+double fxParams_val, fxParams_valMin, fxParams_valMax;
+// The raw value adjustment for an adjustment of 1 on the slider.
+double fxParams_valStep;
+const int FXPARAMS_VAL_TEXT_SIZE = 50;
+// We cache the value text for later comparison.
+char fxParams_valText[FXPARAMS_VAL_TEXT_SIZE];
 
-int fxParams_paramToSlider(double val) {
-	return (int)((val - fxParams_valMin) / (fxParams_valMax - fxParams_valMin) * 1000);
+void fxParams_updateValueText(HWND slider) {
+	// Convert to Unicode.
+	wostringstream s;
+	s << fxParams_valText;
+	// Set the slider's accessible value to this text.
+	accPropServices->SetHwndPropStr(slider, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_VALUE,
+		s.str().c_str());
+}
+
+void fxParams_updateSlider(HWND slider) {
+	SendMessage(slider, TBM_SETPOS, TRUE,
+		(int)((fxParams_val - fxParams_valMin) / fxParams_valStep));
+	if (TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
+		fxParams_updateValueText(slider);
 }
 
 void fxParams_onParamChange(HWND dialog, HWND params) {
 	fxParams_param = ComboBox_GetCurSel(params);
-	double curVal;
-	curVal = TrackFX_GetParam(currentTrack, fxParams_fx, fxParams_param, 
+	fxParams_val = TrackFX_GetParam(currentTrack, fxParams_fx, fxParams_param, 
 		&fxParams_valMin, &fxParams_valMax);
+	fxParams_valStep = (fxParams_valMax - fxParams_valMin) / FXPARAMS_SLIDER_RANGE;
 	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
-	SendMessage(slider, TBM_SETPOS, TRUE,
-		fxParams_paramToSlider(curVal));
-	TrackFX_GetParameterStepSizes(currentTrack, fxParams_fx, fxParams_param,
-		&fxParams_valStep, NULL, NULL, NULL);
-	SendMessage(slider, TBM_SETLINESIZE, 0,
-		fxParams_paramToSlider(fxParams_valStep));
+	fxParams_updateSlider(slider);
 }
 
 void fxParams_onSliderChange(HWND slider) {
 	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
-	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param,
-		(double)sliderVal / 1000 * (fxParams_valMax - fxParams_valMin) + fxParams_valMin);
+	double newVal = sliderVal * fxParams_valStep;
+	if (newVal == fxParams_val)
+		return; // This is due to our own snapping call (below).
+	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param, newVal);
+	int step = (newVal > fxParams_val) ? 1 : -1;
+	fxParams_val = newVal;
+
+	// If the value text (if any) doesn't change, the value change is insignificant.
+	// Snap to the next change in value text.
+	// todo: Optimise; perhaps a binary search?
+	for (; 0 <= sliderVal && sliderVal <= FXPARAMS_SLIDER_RANGE; sliderVal += step) {
+		// Continually adding to a float accumulates inaccuracy,
+		// so calculate the value from scratch each time.
+		newVal = sliderVal * fxParams_valStep;
+		char testText[FXPARAMS_VAL_TEXT_SIZE];
+		if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
+			break; // Formatted values not supported.
+		if (strncmp(testText, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE) != 0) {
+			// The value text is different, so this chang eis significant.
+			// Snap to this value.
+			fxParams_val = newVal;
+			fxParams_updateSlider(slider);
+			break;
+		}
+	}
 }
 
 INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -433,7 +469,8 @@ void cmdFxParams(Command* command) {
 	}
 	ComboBox_SetCurSel(params, 0); // Select the first initially.
 	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
-	SendMessage(slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, 1000));
+	SendMessage(slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, FXPARAMS_SLIDER_RANGE));
+	SendMessage(slider, TBM_SETLINESIZE, 0, 1);
 	fxParams_onParamChange(dialog, params);
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
