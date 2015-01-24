@@ -453,9 +453,9 @@ void fxParams_onParamChange(HWND dialog, HWND params) {
 void fxParams_onSliderChange(HWND slider) {
 	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
 	double newVal = sliderVal * fxParams_valStep;
+	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param, newVal);
 	if (newVal == fxParams_val)
 		return; // This is due to our own snapping call (below).
-	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param, newVal);
 	int step = (newVal > fxParams_val) ? 1 : -1;
 	fxParams_val = newVal;
 
