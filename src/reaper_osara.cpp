@@ -435,27 +435,32 @@ INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARA
 void cmdFxParams(Command* command) {
 	if (!currentTrack)
 		return;
+	char name[256];
+
 	int fxCount = TrackFX_GetCount(currentTrack);
 	if (fxCount == 0)
 		return;
-	char name[256];
-	// Present a menu of effects.
-	HMENU effects = CreatePopupMenu();
-	MENUITEMINFO itemInfo;
-	itemInfo.cbSize = sizeof(MENUITEMINFO);
-	for (int f = 0; f < fxCount; ++f) {
-		TrackFX_GetFXName(currentTrack, 0, name, sizeof(name));
-		itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
-		itemInfo.fType = MFT_STRING;
-		itemInfo.wID = f + 1;
-		itemInfo.dwTypeData = name;
-		itemInfo.cch = sizeof(name);
-		InsertMenuItem(effects, f, false, &itemInfo);
+	else if (fxCount == 1)
+		fxParams_fx = 0;
+	else {
+		// Present a menu of effects.
+		HMENU effects = CreatePopupMenu();
+		MENUITEMINFO itemInfo;
+		itemInfo.cbSize = sizeof(MENUITEMINFO);
+		for (int f = 0; f < fxCount; ++f) {
+			TrackFX_GetFXName(currentTrack, f, name, sizeof(name));
+			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+			itemInfo.fType = MFT_STRING;
+			itemInfo.wID = f + 1;
+			itemInfo.dwTypeData = name;
+			itemInfo.cch = sizeof(name);
+			InsertMenuItem(effects, f, false, &itemInfo);
+		}
+		fxParams_fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
+		DestroyMenu(effects);
+		if (fxParams_fx == -1)
+			return; // Cancelled.
 	}
-	int fxParams_fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
-	DestroyMenu(effects);
-	if (fxParams_fx == -1)
-		return; // Cancelled.
 
 	int numParams = TrackFX_GetNumParams(currentTrack, fxParams_fx);
 	if (numParams == 0)
