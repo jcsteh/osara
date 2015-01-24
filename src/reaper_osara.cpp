@@ -373,9 +373,23 @@ HWND getCurrentTrackVu() {
 	return data.retHwnd;
 }
 
+bool shouldOverrideContextMenu() {
+	GUITHREADINFO info;
+	info.cbSize = sizeof(GUITHREADINFO);
+	GetGUIThreadInfo(guiThread, &info);
+	if (!info.hwndFocus)
+		return false;
+	wchar_t className[22];
+	wostringstream s;
+	return GetClassNameW(info.hwndFocus, className,  ARRAYSIZE(className)) && (
+			wcscmp(className, L"REAPERTrackListWindow") == 0
+			|| wcscmp(className, L"REAPERtrackvu") == 0
+	);
+}
+
 // Handle keyboard keys which can't be bound to actions.
 int handleAccel(MSG* msg, accelerator_register_t* ctx) {
-	if (msg->message == WM_KEYUP && msg->wParam == VK_APPS) {
+	if (msg->message == WM_KEYUP && msg->wParam == VK_APPS && shouldOverrideContextMenu()) {
 		// Reaper doesn't usually handle the applications key.
 		// Unfortunately, binding an action to this key succeeds but doesn't work.
 		// Display the appropriate context menu depending no fake focus.
