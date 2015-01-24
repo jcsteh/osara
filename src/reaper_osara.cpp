@@ -35,6 +35,8 @@
 #define REAPERAPI_WANT_TrackFX_GetParam
 #define REAPERAPI_WANT_TrackFX_SetParam
 #define REAPERAPI_WANT_TrackFX_FormatParamValue
+#define REAPERAPI_WANT_GetLastMarkerAndCurRegion
+#define REAPERAPI_WANT_EnumProjectMarkers
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include "resource.h"
@@ -248,6 +250,34 @@ void postCycleTrackFolderCollapsed(int command) {
 	outputMessage(getFolderCompacting(track));
 }
 
+void postGoToMarker(int command) {
+	wostringstream s;
+	int marker, region;
+	double markerPos;
+	double cursorPos = GetCursorPosition();
+	GetLastMarkerAndCurRegion(0, cursorPos, &marker, &region);
+	const char* name;
+	int number;
+	if (marker >= 0) {
+		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
+		if (markerPos == cursorPos)
+			if (name[0])
+				s << name << L" marker" << L" ";
+			else
+				s << L"marker " << number << L" ";
+	}
+	if (region >= 0) {
+		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
+		if (name[0])
+			s << name << L" region ";
+		else
+			s << L"region " << number << L" ";
+	}
+	s << formatCursorPosition();
+	if (s.tellp() > 0)
+		outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -275,6 +305,28 @@ PostCommand POST_COMMANDS[] = {
 	{40417, postMoveToItem}, // Item navigation: Select and move to next item
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
+	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
+	{40173, postGoToMarker}, // Markers: Go to next marker/project end
+	{40161, postGoToMarker}, // Markers: Go to marker 01
+	{40162, postGoToMarker}, // Markers: Go to marker 02
+	{40163, postGoToMarker}, // Markers: Go to marker 03
+	{40164, postGoToMarker}, // Markers: Go to marker 04
+	{40165, postGoToMarker}, // Markers: Go to marker 05
+	{40166, postGoToMarker}, // Markers: Go to marker 06
+	{40167, postGoToMarker}, // Markers: Go to marker 07
+	{40168, postGoToMarker}, // Markers: Go to marker 08
+	{40169, postGoToMarker}, // Markers: Go to marker 09
+	{40160, postGoToMarker}, // Markers: Go to marker 10
+	{41761, postGoToMarker}, // Regions: Go to region 01 after current region finishes playing (smooth seek)
+	{41762, postGoToMarker}, // Regions: Go to region 02 after current region finishes playing (smooth seek)
+	{41763, postGoToMarker}, // Regions: Go to region 03 after current region finishes playing (smooth seek)
+	{41764, postGoToMarker}, // Regions: Go to region 04 after current region finishes playing (smooth seek)
+	{41765, postGoToMarker}, // Regions: Go to region 05 after current region finishes playing (smooth seek)
+	{41766, postGoToMarker}, // Regions: Go to region 06 after current region finishes playing (smooth seek)
+	{41767, postGoToMarker}, // Regions: Go to region 07 after current region finishes playing (smooth seek)
+	{41768, postGoToMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
+	{41769, postGoToMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
+	{41760, postGoToMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
 	{0},
 };
 map<int, PostCommandExecute> postCommandsMap;
