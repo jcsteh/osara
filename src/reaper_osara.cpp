@@ -37,6 +37,8 @@
 #define REAPERAPI_WANT_TrackFX_FormatParamValue
 #define REAPERAPI_WANT_GetLastMarkerAndCurRegion
 #define REAPERAPI_WANT_EnumProjectMarkers
+#define REAPERAPI_WANT_GetSelectedEnvelope
+#define REAPERAPI_WANT_GetEnvelopeName
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include "resource.h"
@@ -278,6 +280,17 @@ void postGoToMarker(int command) {
 		outputMessage(s);
 }
 
+void postSelectEnvelope(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	wostringstream s;
+	s << name << L" envelope selected";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -327,6 +340,8 @@ PostCommand POST_COMMANDS[] = {
 	{41768, postGoToMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
 	{41769, postGoToMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
 	{41760, postGoToMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
+	{41863, postSelectEnvelope}, // Track: Select previous envelope
+	{41864, postSelectEnvelope}, // Track: Select next envelope
 	{0},
 };
 map<int, PostCommandExecute> postCommandsMap;
