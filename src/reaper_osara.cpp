@@ -67,15 +67,14 @@ MediaTrack* currentTrack = NULL;
 
 void outputMessage(const wchar_t* message) {
 	// Tweak the MSAA accName for the current focus.
-	GUITHREADINFO* guiThreadInfo = new GUITHREADINFO;
-	guiThreadInfo->cbSize = sizeof(GUITHREADINFO);
-	GetGUIThreadInfo(guiThread, guiThreadInfo);
-	if (guiThreadInfo->hwndFocus) {
-		accPropServices->SetHwndPropStr(guiThreadInfo->hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, message);
+	GUITHREADINFO guiThreadInfo;
+	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
+	GetGUIThreadInfo(guiThread, &guiThreadInfo);
+	if (guiThreadInfo.hwndFocus) {
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, message);
 		// Fire a nameChange event so ATs will report this text.
-		NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo->hwndFocus, OBJID_CLIENT, CHILDID_SELF);
+		NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
 	}
-	delete guiThreadInfo;
 }
 
 void outputMessage(wostringstream& message) {
