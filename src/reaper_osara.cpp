@@ -465,7 +465,7 @@ void fxParams_onParamChange(HWND dialog, HWND params) {
 
 void fxParams_onSliderChange(HWND slider) {
 	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
-	double newVal = sliderVal * fxParams_valStep;
+	double newVal = sliderVal * fxParams_valStep + fxParams_valMin;
 	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param, newVal);
 	if (newVal == fxParams_val)
 		return; // This is due to our own snapping call (below).
@@ -478,7 +478,7 @@ void fxParams_onSliderChange(HWND slider) {
 	for (; 0 <= sliderVal && sliderVal <= FXPARAMS_SLIDER_RANGE; sliderVal += step) {
 		// Continually adding to a float accumulates inaccuracy,
 		// so calculate the value from scratch each time.
-		newVal = sliderVal * fxParams_valStep;
+		newVal = sliderVal * fxParams_valStep + fxParams_valMin;
 		char testText[FXPARAMS_VAL_TEXT_SIZE];
 		if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
 			break; // Formatted values not supported.
