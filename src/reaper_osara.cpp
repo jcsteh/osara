@@ -439,6 +439,12 @@ const int FXPARAMS_VAL_TEXT_SIZE = 50;
 char fxParams_valText[FXPARAMS_VAL_TEXT_SIZE];
 
 void fxParams_updateValueText(HWND slider) {
+	if (!fxParams_valText[0]) {
+		// No value text.
+		accPropServices->ClearHwndProps(slider, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_VALUE, 1);
+		return;
+	}
+
 	// Convert to Unicode.
 	wostringstream s;
 	s << fxParams_valText;
@@ -450,8 +456,9 @@ void fxParams_updateValueText(HWND slider) {
 void fxParams_updateSlider(HWND slider) {
 	SendMessage(slider, TBM_SETPOS, TRUE,
 		(int)((fxParams_val - fxParams_valMin) / fxParams_valStep));
-	if (TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
-		fxParams_updateValueText(slider);
+	if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
+		fxParams_valText[0] = '\0';
+	fxParams_updateValueText(slider);
 }
 
 void fxParams_onParamChange(HWND dialog, HWND params) {
