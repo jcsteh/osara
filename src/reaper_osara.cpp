@@ -490,7 +490,7 @@ void fxParams_onSliderChange(HWND slider) {
 		if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
 			break; // Formatted values not supported.
 		if (strncmp(testText, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE) != 0) {
-			// The value text is different, so this chang eis significant.
+			// The value text is different, so this change is significant.
 			// Snap to this value.
 			fxParams_val = newVal;
 			fxParams_updateSlider(slider);
