@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <iomanip>
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -39,8 +40,10 @@
 #define REAPERAPI_WANT_EnumProjectMarkers
 #define REAPERAPI_WANT_GetSelectedEnvelope
 #define REAPERAPI_WANT_GetEnvelopeName
+#define REAPERAPI_WANT_NamedCommandLookup
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
+#include <WDL/db2val.h>
 #include "resource.h"
 
 using namespace std;
@@ -290,11 +293,26 @@ void postSelectEnvelope(int command) {
 	outputMessage(s);
 }
 
+void postChangeTrackVolume(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	wostringstream s;
+	s << fixed << setprecision(1);
+	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
 } PostCommand;
+// For commands registered by other plug-ins.
+typedef struct {
+	char* id;
+	PostCommandExecute execute;
+} PostCustomCommand;
 
 PostCommand POST_COMMANDS[] = {
 	{40285, postGoToTrack}, // Track: Go to next track
@@ -341,7 +359,14 @@ PostCommand POST_COMMANDS[] = {
 	{41760, postGoToMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
 	{41863, postSelectEnvelope}, // Track: Select previous envelope
 	{41864, postSelectEnvelope}, // Track: Select next envelope
+	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
+	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
 	{0},
+};
+PostCustomCommand POST_CUSTOM_COMMANDS[] = {
+	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
+	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
+	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
 
@@ -590,6 +615,16 @@ bool handleCommand(int command, int flag) {
 	return false;
 }
 
+// Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
+// e.g. because it depends on stuff registered by other plug-ins.
+VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
+		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
+		if (cmd)
+			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
+	}
+}
+
 accelerator_register_t accelReg = {
 	handleAccel,
 	true,
@@ -622,6 +657,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcommand", handleCommand);
 
 		rec->Register("accelerator", &accelReg);
+		SetTimer(NULL, NULL, 0, delayedInit);
 		return 1;
 
 	} else {
