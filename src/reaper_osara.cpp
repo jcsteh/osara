@@ -527,19 +527,23 @@ void fxParams_onSliderChange(HWND slider) {
 INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_COMMAND:
-			if (LOWORD(wParam) == ID_FX_PARAM && HIWORD(wParam) == CBN_SELCHANGE)
+			if (LOWORD(wParam) == ID_FX_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
 				fxParams_onParamChange((HWND)dialog, (HWND)lParam);
-			else if (LOWORD(wParam) == IDCANCEL) {
+				return TRUE;
+			} else if (LOWORD(wParam) == IDCANCEL) {
 				DestroyWindow(dialog);
-				return 1;
+				return TRUE;
 			}
+			break;
 		case WM_HSCROLL:
-			if (GetWindowLong((HWND)lParam, GWL_ID) == ID_FX_PARAM_VAL_SLIDER)
+			if (GetWindowLong((HWND)lParam, GWL_ID) == ID_FX_PARAM_VAL_SLIDER) {
 				fxParams_onSliderChange((HWND)lParam);
-			return 1;
+				return TRUE;
+			}
+			break;
 		case WM_CLOSE:
 			DestroyWindow(dialog);
-			return 1;
+			return TRUE;
 	}
 	return FALSE;
 }
