@@ -41,6 +41,8 @@
 #define REAPERAPI_WANT_GetSelectedEnvelope
 #define REAPERAPI_WANT_GetEnvelopeName
 #define REAPERAPI_WANT_NamedCommandLookup
+#define REAPERAPI_WANT_GetMasterTrack
+#define REAPERAPI_WANT_Track_GetPeakInfo
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -596,8 +598,159 @@ void cmdFxParams(Command* command) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
+MediaTrack* peakWatcher_track = NULL;
+bool peakWatcher_followTrack = false;
+// What the user can choose to watch.
+enum {
+	PWT_DISABLED,
+	PWT_FOLLOW,
+	PWT_MASTER,
+	PWT_CURRENT,
+	PWT_PREVSPEC,
+};
+double peakWatcher_level = 0;
+struct {
+	bool notify;
+	double peak;
+} peakWatcher_channels[2] = {{true, -150}, {true, -150}};
+UINT_PTR peakWatcher_timer = 0;
+
+void peakWatcher_reset() {
+	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c)
+		peakWatcher_channels[c].peak = -150;
+}
+
+VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+	if (!peakWatcher_track && !peakWatcher_followTrack)
+		return; // Disabled.
+	if (peakWatcher_followTrack && peakWatcher_track != currentTrack) {
+		// We're following the current track and it changed.
+		peakWatcher_track = currentTrack;
+		peakWatcher_reset();
+	}
+
+	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
+		double newPeak = VAL2DB(Track_GetPeakInfo(peakWatcher_track, c));
+		if (newPeak > peakWatcher_channels[c].peak) {
+			peakWatcher_channels[c].peak = newPeak;
+			if (peakWatcher_channels[c].notify && newPeak > peakWatcher_level) {
+				wostringstream s;
+				s << fixed << setprecision(1);
+				s << L"chan " << c + 1 << ": " << newPeak;
+				outputMessage(s);
+			}
+		}
+	}
+
+	peakWatcher_timer = SetTimer(NULL, peakWatcher_timer, 30, peakWatcher_watcher);
+}
+
+void peakWatcher_onOk(HWND dialog) {
+	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
+	// Set up according to what track the user chose to watch.
+	// If the track is changing, reset peaks.
+	int sel = ComboBox_GetCurSel(track);
+	switch(sel) {
+		case PWT_DISABLED:
+			peakWatcher_track = NULL;
+			peakWatcher_followTrack = false;
+			KillTimer(NULL, peakWatcher_timer);
+			peakWatcher_timer = 0;
+			return;
+		case PWT_FOLLOW:
+			if (!peakWatcher_followTrack)
+				peakWatcher_reset();
+			peakWatcher_followTrack = true;
+			peakWatcher_track = NULL;
+			break;
+		case PWT_MASTER: {
+			MediaTrack* master = GetMasterTrack(0);
+			if (peakWatcher_track != master)
+				peakWatcher_reset();
+			peakWatcher_track = master;
+			peakWatcher_followTrack = false;
+			break;
+		}
+		case PWT_CURRENT:
+			if (peakWatcher_track != currentTrack)
+				peakWatcher_reset();
+			peakWatcher_track = currentTrack;
+			peakWatcher_followTrack = false;
+			break;
+		// PWT_PREVSPEC means to keep watching some previously specified track; no change.
+	}
+
+	if (!peakWatcher_timer) // Previously disabled.
+		peakWatcher_timer = SetTimer(NULL, 0, 30, peakWatcher_watcher);
+}
+
+INT_PTR CALLBACK peakWatcher_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+		case WM_COMMAND:
+			if (LOWORD(wParam) == ID_PEAK_RESET) {
+				peakWatcher_reset();
+				DestroyWindow(dialog);
+				return TRUE;
+			} else if (LOWORD(wParam) == IDOK) {
+				peakWatcher_onOk(dialog);
+				DestroyWindow(dialog);
+				return TRUE;
+			} else if (LOWORD(wParam) == IDCANCEL) {
+				DestroyWindow(dialog);
+				return TRUE;
+			}
+			break;
+		case WM_CLOSE:
+			DestroyWindow(dialog);
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void cmdPeakWatcher(Command* command) {
+	if (!currentTrack)
+		return;
+	ostringstream s;
+	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), mainHwnd, peakWatcher_dialogProc);
+	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
+
+	// Populate the list of what ot watch.
+	char* name;
+	ComboBox_AddString(track, "Disabled");
+	if (!peakWatcher_followTrack && !peakWatcher_track)
+		ComboBox_SetCurSel(track, PWT_DISABLED);
+	ComboBox_AddString(track, "Follow current track");
+	if (peakWatcher_followTrack)
+		ComboBox_SetCurSel(track, PWT_FOLLOW);
+	ComboBox_AddString(track, "Master");
+	MediaTrack* master = GetMasterTrack(0);
+	if (peakWatcher_track == master)
+		ComboBox_SetCurSel(track, PWT_MASTER);
+	s << (int)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
+	if (name = (char*)GetSetMediaTrackInfo(currentTrack, "P_NAME", NULL))
+		s << ": " << name;
+	ComboBox_AddString(track, s.str().c_str());
+	if (!peakWatcher_followTrack && peakWatcher_track == currentTrack)
+		ComboBox_SetCurSel(track, PWT_CURRENT);
+	s.str("");
+	if (peakWatcher_track && !peakWatcher_followTrack && peakWatcher_track != master && peakWatcher_track != currentTrack) {
+		// Watching a previously specified track.
+		s << (int)GetSetMediaTrackInfo(peakWatcher_track, "IP_TRACKNUMBER", NULL);
+		if (name = (char*)GetSetMediaTrackInfo(peakWatcher_track, "P_NAME", NULL))
+			s << ": " << name;
+		ComboBox_AddString(track, s.str().c_str());
+		ComboBox_SetCurSel(track, PWT_PREVSPEC);
+		s.str("");
+	}
+
+	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
+	SendMessage(level, TBM_SETPOS, TRUE, 50);
+	ShowWindow(dialog, SW_SHOWNORMAL);
+}
+
 Command COMMANDS[] = {
 	{{DEFACCEL, "View FX parameter list for current track"}, "OSARA_FXPARAMS", cmdFxParams},
+	{{DEFACCEL, "Peak WATCHER"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{{}, NULL},
 };
 map<int, Command*> commandsMap;
