@@ -646,9 +646,23 @@ VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD tim
 }
 
 void peakWatcher_onOk(HWND dialog) {
-	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
+	// Retrieve the notification state for channels.
+	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
+		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
+		peakWatcher_channels[c].notify = Button_GetCheck(channel) == BST_CHECKED;
+	}
+
+	// Retrieve the entered maximum level.
+	char levelText[7];
+	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, levelText, ARRAYSIZE(levelText)) > 0) {
+		peakWatcher_level = atof(levelText);
+		// Restrict the range.
+		peakWatcher_level = max(min(peakWatcher_level, 40), -40);
+	}
+
 	// Set up according to what track the user chose to watch.
 	// If the track is changing, reset peaks.
+	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
 	int sel = ComboBox_GetCurSel(track);
 	switch(sel) {
 		case PWT_DISABLED:
@@ -743,8 +757,16 @@ void cmdPeakWatcher(Command* command) {
 		s.str("");
 	}
 
+	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
+		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
+		Button_SetCheck(channel, peakWatcher_channels[c].notify ? BST_CHECKED : BST_UNCHECKED);
+	}
+
 	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
-	SendMessage(level, TBM_SETPOS, TRUE, 50);
+	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
+	s << fixed << setprecision(2);
+	s << peakWatcher_level;
+	SendMessage(level, WM_SETTEXT, 0, (LPARAM)s.str().c_str());
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
