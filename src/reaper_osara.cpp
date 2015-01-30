@@ -612,7 +612,9 @@ double peakWatcher_level = 0;
 struct {
 	bool notify;
 	double peak;
-} peakWatcher_channels[2] = {{true, -150}, {true, -150}};
+	DWORD time;
+} peakWatcher_channels[2] = {{true, -150, 0}, {true, -150, 0}};
+int peakWatcher_hold = 0;
 UINT_PTR peakWatcher_timer = 0;
 
 void peakWatcher_reset() {
@@ -631,8 +633,12 @@ VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD tim
 
 	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
 		double newPeak = VAL2DB(Track_GetPeakInfo(peakWatcher_track, c));
-		if (newPeak > peakWatcher_channels[c].peak) {
+		if (peakWatcher_hold == -1 // Hold disabled
+			|| newPeak > peakWatcher_channels[c].peak
+			|| (peakWatcher_hold != 0 && time > peakWatcher_channels[c].time + peakWatcher_hold)
+		) {
 			peakWatcher_channels[c].peak = newPeak;
+			peakWatcher_channels[c].time = time;
 			if (peakWatcher_channels[c].notify && newPeak > peakWatcher_level) {
 				wostringstream s;
 				s << fixed << setprecision(1);
@@ -652,12 +658,19 @@ void peakWatcher_onOk(HWND dialog) {
 		peakWatcher_channels[c].notify = Button_GetCheck(channel) == BST_CHECKED;
 	}
 
+	char inText[7];
 	// Retrieve the entered maximum level.
-	char levelText[7];
-	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, levelText, ARRAYSIZE(levelText)) > 0) {
-		peakWatcher_level = atof(levelText);
+	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, ARRAYSIZE(inText)) > 0) {
+		peakWatcher_level = atof(inText);
 		// Restrict the range.
 		peakWatcher_level = max(min(peakWatcher_level, 40), -40);
+	}
+
+	// Retrieve the entered hold time.
+	if (GetDlgItemText(dialog, ID_PEAK_HOLD, inText, ARRAYSIZE(inText)) > 0) {
+		peakWatcher_hold = atoi(inText);
+		// Restrict the range.
+		peakWatcher_hold = max(min(peakWatcher_hold, 20000), -1);
 	}
 
 	// Set up according to what track the user chose to watch.
@@ -767,6 +780,13 @@ void cmdPeakWatcher(Command* command) {
 	s << fixed << setprecision(2);
 	s << peakWatcher_level;
 	SendMessage(level, WM_SETTEXT, 0, (LPARAM)s.str().c_str());
+	s.str("");
+
+	HWND hold = GetDlgItem(dialog, ID_PEAK_HOLD);
+	SendMessage(hold, EM_SETLIMITTEXT, 5, 0);
+	s << peakWatcher_hold;
+	SendMessage(hold, WM_SETTEXT, 0, (LPARAM)s.str().c_str());
+
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 

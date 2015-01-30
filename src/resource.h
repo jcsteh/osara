@@ -16,5 +16,6 @@
 #define ID_PEAK_TRACK 201
 #define ID_PEAK_LEVEL 202
 #define ID_PEAK_RESET 203
+#define ID_PEAK_HOLD 204
 #define ID_PEAK_CHAN1 210
 #define ID_PEAK_CHAN2 211
