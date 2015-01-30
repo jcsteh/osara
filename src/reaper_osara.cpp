@@ -770,9 +770,25 @@ void cmdPeakWatcher(Command* command) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
+void cmdReportPeakWatcher(Command* command) {
+	if (!peakWatcher_track && !peakWatcher_followTrack) {
+		outputMessage(L"Peak watcher is disabled");
+		return;
+	}
+	wostringstream s;
+	s << fixed << setprecision(1);
+	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
+		if (c != 0)
+			s << L", ";
+		s << c + 1 << L": " << peakWatcher_channels[c].peak;
+	}
+	outputMessage(s);
+}
+
 Command COMMANDS[] = {
 	{{DEFACCEL, "View FX parameter list for current track"}, "OSARA_FXPARAMS", cmdFxParams},
-	{{DEFACCEL, "Peak WATCHER"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{{DEFACCEL, "View peak watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{{DEFACCEL, "Report peak watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{{}, NULL},
 };
 map<int, Command*> commandsMap;
