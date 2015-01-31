@@ -5,6 +5,7 @@
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
+It was heavily inspired by and based on the concepts of the ReaAccess extension, but was created as a potential replacement because ReaAccess seems to have been abandoned and was not developed openly.
 Currently, it runs only on Windows.
 
 Features:
@@ -31,6 +32,12 @@ However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate informa
 - If you are using a 64 bit version of REAPER, the file you need is reaper_osara64.dll.
 - Copy this file into the Plugins folder inside your REAPER program folder; e.g. C:\Program Files\REAPER\Plugins.
  Alternatively, you can copy it into the UserPlugins folder inside your REAPER user configuration; e.g. %appdata%\REAPER\UserPlugins.
+
+## A Note for ReaAccess Users
+Some of the actions in ReaAccess were specific to ReaAccess and will not work with OSARA.
+In particular, this includes arming tracks and item navigation.
+Please see below for a list of the exact actions supported.
+You will need to use these actions in order for OSARA to provide feedback.
 
 ## Usage
 
