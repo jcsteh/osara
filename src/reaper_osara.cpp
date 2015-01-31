@@ -806,9 +806,9 @@ void cmdReportPeakWatcher(Command* command) {
 }
 
 Command COMMANDS[] = {
-	{{DEFACCEL, "View FX parameter list for current track"}, "OSARA_FXPARAMS", cmdFxParams},
-	{{DEFACCEL, "View peak watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{{DEFACCEL, "Report peak watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
+	{{DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParams},
+	{{DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{{DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{{}, NULL},
 };
 map<int, Command*> commandsMap;
