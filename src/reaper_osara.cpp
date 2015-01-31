@@ -43,6 +43,7 @@
 #define REAPERAPI_WANT_NamedCommandLookup
 #define REAPERAPI_WANT_GetMasterTrack
 #define REAPERAPI_WANT_Track_GetPeakInfo
+#define REAPERAPI_WANT_GetHZoomLevel
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -305,6 +306,13 @@ void postChangeTrackVolume(int command) {
 	outputMessage(s);
 }
 
+void postChangeHorizontalZoom(int command) {
+	wostringstream s;
+	s << fixed << setprecision(3);
+	s << GetHZoomLevel() << " pixels/second";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -363,6 +371,8 @@ PostCommand POST_COMMANDS[] = {
 	{41864, postSelectEnvelope}, // Track: Select next envelope
 	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
 	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
+	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
+	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

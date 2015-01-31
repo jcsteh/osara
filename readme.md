@@ -98,6 +98,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Select previous envelope
 - Track: Select next envelope
 
+#### Zoom
+- Zoom out horizontal
+- Zoom in horizontal
+
 ### FX Parameter List
 Many effects are unfortunately either partially or completely inaccessible.
 However, most effects make their parameters available for automation in a standard way.
