@@ -55,6 +55,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Nudge track volume down
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down
+- Track: Nudge track pan left
+- Track: Nudge track pan right
 
 #### Edit Cursor Movement
 - View: Move cursor left one pixel

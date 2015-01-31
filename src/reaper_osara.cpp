@@ -15,6 +15,7 @@
 #include <sstream>
 #include <map>
 #include <iomanip>
+#include <math.h>
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -313,6 +314,21 @@ void postChangeHorizontalZoom(int command) {
 	outputMessage(s);
 }
 
+void postChangeTrackPan(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	double pan = *(double*)GetSetMediaTrackInfo(track, "D_PAN", NULL) * 100;
+	wostringstream s;
+	if (pan == 0)
+		s << L"center";
+	else if (pan < 0)
+		s << -pan << L"% left";
+	else
+		s << pan << L"% right";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -373,6 +389,8 @@ PostCommand POST_COMMANDS[] = {
 	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
 	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
 	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
+	{40283, postChangeTrackPan}, // Track: Nudge track pan left
+	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
