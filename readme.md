@@ -27,6 +27,12 @@ OSARA requires REAPER 4.71 or later.
 It has only been tested with the NVDA screen reader.
 However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
 
+## Downloading
+For now, here are links to the latest versions of the plug-in files:
+
+- [32 bit dll](https://dl.dropboxusercontent.com/u/28976681/reaper_osara32.dll?dl=1)
+- [64 bit dll](https://dl.dropboxusercontent.com/u/28976681/reaper_osara64.dll?dl=1)
+
 ## Installation
 - If you are using a 32 bit version of REAPER, the file you need is reaper_osara32.dll.
 - If you are using a 64 bit version of REAPER, the file you need is reaper_osara64.dll.
