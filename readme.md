@@ -160,15 +160,11 @@ Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
 ## Building
 This section is for those interested in building OSARA from source code.
 
-There is no proper build system yet.
+You will need:
 
-You will need Microsoft Visual Studio 2012 or later for Windows Desktop.
-The Express edition is fine.
+- Microsoft Visual Studio 2012 or later for Windows Desktop.
+ The Express edition is fine.
+- [SCons](http://www.scons.org/), version 2.3.2 or later
 
-To build OSARA:
-
-1. Start the Visual Studio command prompt appropriate to the architecture for which you want to build.
- For example, for a 32 bit version, use the "VS2012 x86 Native Tools Command Prompt" shortcut.
-2. Change to the src directory inside the OSARA checkout.
-3. Run the build.bat script with an argument of either 32 or 64 according to the desired architecture; e.g. build 32
-4. The file will be placed in the current directory; e.g. reaper_osara32.dll.
+To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
+The resulting dll files can be found at build\x86\reaper_osara32.dll and build\x86_64\reaper_osara64.dll.

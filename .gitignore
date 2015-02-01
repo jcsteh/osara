@@ -3,3 +3,5 @@
 *.lib
 *.obj
 *.res
+.sconsign.dblite
+build

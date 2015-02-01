@@ -5,3 +5,5 @@
 *.bat eol=crlf
 *.md text
 *.rc text
+sconstruct text
+*sconscript text

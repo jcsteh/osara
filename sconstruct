@@ -1,0 +1,15 @@
+# OSARA: Open Source Accessibility for the REAPER Application
+# SConstruct
+# Author: James Teh <jamie@jantrid.net>
+# Copyright 2015 James Teh
+# License: GNU General Public License version 2.0
+
+env = Environment(HOST_ARCH="x86")
+# Hack around an odd bug where some tool after msvc states that static and shared objects are different.
+env["STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME"] = 1
+
+for arch, suffix in (("x86", "32"), ("x86_64", "64")):
+	archEnv = env.Clone(TARGET_ARCH=arch, dllSuffix=suffix)
+	archEnv.SConscript("src/archBuild_sconscript",
+		exports={"env": archEnv},
+		variant_dir="build/%s" % arch)
