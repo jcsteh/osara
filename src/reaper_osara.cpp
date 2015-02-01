@@ -513,8 +513,8 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
  * Each command should have a function and should be added to the COMMANDS array below.
  */
 
-#define DEFACCEL {0, 0, 0}
 typedef struct Command {
+	int section;
 	gaccel_register_t gaccel;
 	const char* id;
 	void (*execute)(Command*);
@@ -900,16 +900,20 @@ void cmdReportPeakWatcher(Command* command) {
 	outputMessage(s);
 }
 
+#define DEFACCEL {0, 0, 0}
+const int MAIN_SECTION = 0;
+const int MIDI_EVENT_LIST_SECTION = 32061;
+
 Command COMMANDS[] = {
 	// Commands we want to intercept.
-	{{{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
-	{{{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
+	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
+	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	// Our own commands.
-	{{DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
-	{{DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-	{{DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{{DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
-	{{}, NULL, NULL},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
+	{0, {}, NULL, NULL},
 };
 map<int, Command*> commandsMap;
 
@@ -922,7 +926,7 @@ void postCommand(int command, int flag) {
 }
 
 bool isHandlingCommand = false;
-bool handleCommand(int command, int flag) {
+bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	const auto it = commandsMap.find(command);
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
@@ -971,12 +975,20 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		for (int i = 0; COMMANDS[i].execute; ++i) {
 			if (COMMANDS[i].id) {
 				// This is our own command.
-				COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
-				rec->Register("gaccel", &COMMANDS[i].gaccel);
+				if (COMMANDS[i].section == MAIN_SECTION) {
+					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+					rec->Register("gaccel", &COMMANDS[i].gaccel);
+				} else {
+					custom_action_register_t action;
+					action.uniqueSectionId = COMMANDS[i].section;
+					action.idStr = COMMANDS[i].id;
+					action.name = COMMANDS[i].gaccel.desc;
+					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
+				}
 			}
 			commandsMap.insert(make_pair(COMMANDS[i].gaccel.accel.cmd, &COMMANDS[i]));
 		}
-		rec->Register("hookcommand", handleCommand);
+		rec->Register("hookcommand2", handleCommand);
 
 		rec->Register("accelerator", &accelReg);
 		SetTimer(NULL, NULL, 0, delayedInit);
