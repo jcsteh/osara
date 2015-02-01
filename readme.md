@@ -40,7 +40,7 @@ For now, here are links to the latest versions of the plug-in files:
  Alternatively, you can copy it into the UserPlugins folder inside your REAPER user configuration; e.g. %appdata%\REAPER\UserPlugins.
 
 ## A Note for ReaAccess Users
-Some of the actions in ReaAccess were specific to ReaAccess and will not work with OSARA.
+Some of the actions in ReaAccess are specific to ReaAccess and will not work with OSARA.
 In particular, this includes arming tracks and item navigation.
 Please see below for a list of the exact actions supported.
 You will need to use these actions in order for OSARA to provide feedback.
@@ -50,6 +50,7 @@ You will need to use these actions in order for OSARA to provide feedback.
 ### Supported REAPER and Extension Actions
 OSARA supports reporting of information for the following actions.
 Most of these are actions built into REAPER, but a few are very useful actions from the popular SWS extension.
+If keyboard shortcuts aren't bound to them already, you will need to do this yourself.
 
 #### Track Navigation/Management
 - Track: Go to next track
