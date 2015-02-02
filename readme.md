@@ -118,6 +118,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Zoom out horizontal
 - Zoom in horizontal
 
+#### Options
+- Options: Cycle ripple editing mode
+
 ### FX Parameter List
 Many effects are unfortunately either partially or completely inaccessible.
 However, most effects make their parameters available for automation in a standard way.

@@ -45,6 +45,7 @@
 #define REAPERAPI_WANT_GetMasterTrack
 #define REAPERAPI_WANT_Track_GetPeakInfo
 #define REAPERAPI_WANT_GetHZoomLevel
+#define REAPERAPI_WANT_GetToggleCommandState
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -329,6 +330,18 @@ void postChangeTrackPan(int command) {
 	outputMessage(s);
 }
 
+void postCycleRippleMode(int command) {
+	wostringstream s;
+	s << L"ripple ";
+	if (GetToggleCommandState(40310))
+		s << L"per-track";
+	else if (GetToggleCommandState(40311))
+		s << L"all tracks";
+	else
+		s << L"off";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -391,6 +404,7 @@ PostCommand POST_COMMANDS[] = {
 	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
+	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
