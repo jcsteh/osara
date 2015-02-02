@@ -164,6 +164,9 @@ You will probably want to add a keyboard shortcut for this action so you can acc
 ## Reporting Issues
 Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
 
+## Donations
+Donations are gratefully accepted via [PayPal](http://www.paypal.com/) to jamie@jantrid.net.
+
 ## Building
 This section is for those interested in building OSARA from source code.
 
