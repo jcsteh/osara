@@ -62,6 +62,7 @@ IAccPropServices* accPropServices = NULL;
 int oldMeasure = 0;
 int oldBeat = 0;
 int oldBeatPercent = 0;
+int oldMinute = 0;
 // We maintain our own idea of focus for context sensitivity.
 enum {
 	FOCUS_NONE = 0,
@@ -89,25 +90,39 @@ void outputMessage(wostringstream& message) {
 	outputMessage(message.str().c_str());
 }
 
-wstring formatCursorPosition() {
+wstring formatCursorPosition(bool useMeasure=false) {
 	wostringstream s;
-	int measure;
-	double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
-	measure += 1;
-	int wholeBeat = (int)beat + 1;
-	int beatPercent = (int)(beat * 100) % 100;
-	if (measure != oldMeasure) {
-		s << L"bar " << measure << L" ";
-		oldMeasure = measure;
-	}
-	if (wholeBeat != oldBeat) {
-		s << L"beat " << wholeBeat << L" ";
-		oldBeat = wholeBeat;
-	}
-	if (beatPercent != oldBeatPercent) {
-		s << beatPercent << L"%";
-		oldBeatPercent = beatPercent;
-	}
+	if (useMeasure) {
+		int measure;
+		double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
+		measure += 1;
+		int wholeBeat = (int)beat + 1;
+		int beatPercent = (int)(beat * 100) % 100;
+		if (measure != oldMeasure) {
+			s << L"bar " << measure << L" ";
+			oldMeasure = measure;
+		}
+		if (wholeBeat != oldBeat) {
+			s << L"beat " << wholeBeat << L" ";
+			oldBeat = wholeBeat;
+		}
+		if (beatPercent != oldBeatPercent) {
+			s << beatPercent << L"%";
+			oldBeatPercent = beatPercent;
+		}
+	} else if (GetToggleCommandState(40365)) {
+		// Minutes:seconds
+		double second = GetCursorPosition();
+		int minute = second / 60;
+		second = fmod(second, 60);
+		if (oldMinute != minute) {
+			s << minute << L" min ";
+			oldMinute = minute;
+		}
+		s << fixed << setprecision(3);
+		s << second << L" sec";
+	} else
+		return formatCursorPosition(true);
 	return s.str();
 }
 
@@ -229,6 +244,11 @@ void postInvertTrackPhase(int command) {
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	outputMessage(formatCursorPosition().c_str());
+}
+
+void postCursorMovementMeasure(int command) {
+	fakeFocus = FOCUS_RULER;
+	outputMessage(formatCursorPosition(true).c_str());
 }
 
 void postMoveToItem(int command) {
@@ -366,10 +386,10 @@ PostCommand POST_COMMANDS[] = {
 	{40105, postCursorMovement}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
-	{41042, postCursorMovement}, // Go forward one measure
-	{41043, postCursorMovement}, // Go back one measure
-	{41044, postCursorMovement}, // Go forward one beat
-	{41045, postCursorMovement}, // Go back one beat
+	{41042, postCursorMovementMeasure}, // Go forward one measure
+	{41043, postCursorMovementMeasure}, // Go back one measure
+	{41044, postCursorMovementMeasure}, // Go forward one beat
+	{41045, postCursorMovementMeasure}, // Go back one beat
 	{40416, postMoveToItem}, // Item navigation: Select and move to previous item
 	{40417, postMoveToItem}, // Item navigation: Select and move to next item
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
