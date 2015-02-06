@@ -129,9 +129,9 @@ OSARA can display a list of parameters for an effect and allow you to check and 
 
 To do this:
 
-1. Select a track with at least one effect.
-2. Run the "OSARA: View FX parameters for current track" action.
+1. Select a track with at least one effect. Then, run the "OSARA: View FX parameters for current track" action.
  You will probably want to add a keyboard shortcut for this action so you can access it quickly.
+2. Alternatively, run the "OSARA: View FX parameters for master track" action.
 3. If there is more than one effect on the track, select the desired effect from the menu.
 4. Once the FX Parameters dialog appears, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
 5. When you are done, press the Close button.

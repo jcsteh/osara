@@ -498,6 +498,7 @@ typedef struct Command {
 } Command;
 
 const int FXPARAMS_SLIDER_RANGE = 1000;
+MediaTrack* fxParams_track;
 int fxParams_fx;
 int fxParams_param;
 double fxParams_val, fxParams_valMin, fxParams_valMax;
@@ -525,14 +526,14 @@ void fxParams_updateValueText(HWND slider) {
 void fxParams_updateSlider(HWND slider) {
 	SendMessage(slider, TBM_SETPOS, TRUE,
 		(int)((fxParams_val - fxParams_valMin) / fxParams_valStep));
-	if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
+	if (!TrackFX_FormatParamValue(fxParams_track, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
 		fxParams_valText[0] = '\0';
 	fxParams_updateValueText(slider);
 }
 
 void fxParams_onParamChange(HWND dialog, HWND params) {
 	fxParams_param = ComboBox_GetCurSel(params);
-	fxParams_val = TrackFX_GetParam(currentTrack, fxParams_fx, fxParams_param, 
+	fxParams_val = TrackFX_GetParam(fxParams_track, fxParams_fx, fxParams_param, 
 		&fxParams_valMin, &fxParams_valMax);
 	fxParams_valStep = (fxParams_valMax - fxParams_valMin) / FXPARAMS_SLIDER_RANGE;
 	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
@@ -542,7 +543,7 @@ void fxParams_onParamChange(HWND dialog, HWND params) {
 void fxParams_onSliderChange(HWND slider) {
 	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
 	double newVal = sliderVal * fxParams_valStep + fxParams_valMin;
-	TrackFX_SetParam(currentTrack, fxParams_fx, fxParams_param, newVal);
+	TrackFX_SetParam(fxParams_track, fxParams_fx, fxParams_param, newVal);
 	if (newVal == fxParams_val)
 		return; // This is due to our own snapping call (below).
 	int step = (newVal > fxParams_val) ? 1 : -1;
@@ -556,7 +557,7 @@ void fxParams_onSliderChange(HWND slider) {
 		// so calculate the value from scratch each time.
 		newVal = sliderVal * fxParams_valStep + fxParams_valMin;
 		char testText[FXPARAMS_VAL_TEXT_SIZE];
-		if (!TrackFX_FormatParamValue(currentTrack, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
+		if (!TrackFX_FormatParamValue(fxParams_track, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
 			break; // Formatted values not supported.
 		if (strncmp(testText, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE) != 0) {
 			// The value text is different, so this change is significant.
@@ -592,12 +593,11 @@ INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARA
 	return FALSE;
 }
 
-void cmdFxParams(Command* command) {
-	if (!currentTrack)
-		return;
+void fxParams_begin(MediaTrack* track) {
+	fxParams_track = track;
 	char name[256];
 
-	int fxCount = TrackFX_GetCount(currentTrack);
+	int fxCount = TrackFX_GetCount(fxParams_track);
 	if (fxCount == 0)
 		return;
 	else if (fxCount == 1)
@@ -608,7 +608,7 @@ void cmdFxParams(Command* command) {
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(MENUITEMINFO);
 		for (int f = 0; f < fxCount; ++f) {
-			TrackFX_GetFXName(currentTrack, f, name, sizeof(name));
+			TrackFX_GetFXName(fxParams_track, f, name, sizeof(name));
 			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = f + 1;
@@ -622,14 +622,14 @@ void cmdFxParams(Command* command) {
 			return; // Cancelled.
 	}
 
-	int numParams = TrackFX_GetNumParams(currentTrack, fxParams_fx);
+	int numParams = TrackFX_GetNumParams(fxParams_track, fxParams_fx);
 	if (numParams == 0)
 		return;
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_FX_PARAMS_DLG), mainHwnd, fxParams_dialogProc);
 	HWND params = GetDlgItem(dialog, ID_FX_PARAM);
 	// Populate the parameter list.
 	for (int p = 0; p < numParams; ++p) {
-		TrackFX_GetParamName(currentTrack, fxParams_fx, p, name, sizeof(name));
+		TrackFX_GetParamName(fxParams_track, fxParams_fx, p, name, sizeof(name));
 		ComboBox_AddString(params, name);
 	}
 	ComboBox_SetCurSel(params, 0); // Select the first initially.
@@ -638,6 +638,16 @@ void cmdFxParams(Command* command) {
 	SendMessage(slider, TBM_SETLINESIZE, 0, 1);
 	fxParams_onParamChange(dialog, params);
 	ShowWindow(dialog, SW_SHOWNORMAL);
+}
+
+void cmdFxParamsCurrentTrack(Command* command) {
+	if (!currentTrack)
+		return;
+	fxParams_begin(currentTrack);
+}
+
+void cmdFxParamsMaster(Command* command) {
+	fxParams_begin(GetMasterTrack(0));
 }
 
 MediaTrack* peakWatcher_track = NULL;
@@ -848,7 +858,8 @@ void cmdReportPeakWatcher(Command* command) {
 }
 
 Command COMMANDS[] = {
-	{{DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParams},
+	{{DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
+	{{DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{{DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{{DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{{}, NULL},
