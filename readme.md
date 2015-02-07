@@ -168,6 +168,12 @@ To use Peak Watcher:
 At any time, you can report the current peak level for the track being watched by running the "OSARA: Report Peak Watcher peaks" action.
 You will probably want to add a keyboard shortcut for this action so you can access it quickly.
 
+### Miscellaneous Actions
+OSARA also includes some other miscellaneous actions.
+
+#### MIDI Event List Editor
+- OSARA: Focus MIDI event nearest edit cursor
+
 ## Reporting Issues
 Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
 

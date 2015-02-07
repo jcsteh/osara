@@ -49,6 +49,7 @@
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_Undo_CanUndo2
 #define REAPERAPI_WANT_Undo_CanRedo2
+#define REAPERAPI_WANT_parse_timestr_pos
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -900,6 +901,36 @@ void cmdReportPeakWatcher(Command* command) {
 	outputMessage(s);
 }
 
+void cmdFocusNearestMidiEvent(Command* command) {
+	GUITHREADINFO guiThreadInfo;
+	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
+	GetGUIThreadInfo(guiThread, &guiThreadInfo);
+	if (!guiThreadInfo.hwndFocus)
+		return;
+	double cursorPos = GetCursorPosition();
+	for (int i = 0; i < ListView_GetItemCount(guiThreadInfo.hwndFocus); ++i) {
+		char text[50];
+		// Get the text from the position column (1).
+		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, text, ARRAYSIZE(text));
+		// Convert this to project time. text is always in measures.beats.
+		double eventPos = parse_timestr_pos(text, 2);
+		if (eventPos >= cursorPos) {
+			// This item is at or just after the cursor.
+			int oldFocus = ListView_GetNextItem(guiThreadInfo.hwndFocus, -1, LVNI_FOCUSED);
+			// Focus and select this item.
+			ListView_SetItemState(guiThreadInfo.hwndFocus, i,
+				LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+			ListView_EnsureVisible (guiThreadInfo.hwndFocus, i, false);
+			if (oldFocus != -1 && oldFocus != i) {
+				// Unselect the previously focused item.
+				ListView_SetItemState(guiThreadInfo.hwndFocus, oldFocus,
+					0, LVIS_SELECTED);
+			}
+			break;
+		}
+	}
+}
+
 #define DEFACCEL {0, 0, 0}
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
@@ -913,6 +944,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
+	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus MIDI event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
 };
 map<int, Command*> commandsMap;
