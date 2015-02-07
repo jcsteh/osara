@@ -46,6 +46,9 @@
 #define REAPERAPI_WANT_Track_GetPeakInfo
 #define REAPERAPI_WANT_GetHZoomLevel
 #define REAPERAPI_WANT_GetToggleCommandState
+#define REAPERAPI_WANT_Main_OnCommand
+#define REAPERAPI_WANT_Undo_CanUndo2
+#define REAPERAPI_WANT_Undo_CanRedo2
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -517,6 +520,26 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 
+void cmdUndo(Command* command) {
+	const char* text = Undo_CanUndo2(0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (!text)
+		return;
+	wostringstream s;
+	s << L"Undo " << text;
+	outputMessage(s);
+}
+
+void cmdRedo(Command* command) {
+	const char* text = Undo_CanRedo2(0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (!text)
+		return;
+	wostringstream s;
+	s << L"Redo " << text;
+	outputMessage(s);
+}
+
 const int FXPARAMS_SLIDER_RANGE = 1000;
 MediaTrack* fxParams_track;
 int fxParams_fx;
@@ -878,11 +901,15 @@ void cmdReportPeakWatcher(Command* command) {
 }
 
 Command COMMANDS[] = {
+	// Commands we want to intercept.
+	{{{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
+	{{{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
+	// Our own commands.
 	{{DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{{DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{{DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{{DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
-	{{}, NULL},
+	{{}, NULL, NULL},
 };
 map<int, Command*> commandsMap;
 
@@ -894,10 +921,15 @@ void postCommand(int command, int flag) {
 		it->second(command);
 }
 
+bool isHandlingCommand = false;
 bool handleCommand(int command, int flag) {
 	const auto it = commandsMap.find(command);
+	if (isHandlingCommand)
+		return false; // Prevent re-entrance.
 	if (it != commandsMap.end()) {
+		isHandlingCommand = true;
 		it->second->execute(it->second);
+		isHandlingCommand = false;
 		return true;
 	}
 	return false;
@@ -936,11 +968,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 		rec->Register("hookpostcommand", postCommand);
 
-		for (int i = 0; COMMANDS[i].id; ++i) {
-			int cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
-			COMMANDS[i].gaccel.accel.cmd = cmd;
-			commandsMap.insert(make_pair(cmd, &COMMANDS[i]));
-			rec->Register("gaccel", &COMMANDS[i].gaccel);
+		for (int i = 0; COMMANDS[i].execute; ++i) {
+			if (COMMANDS[i].id) {
+				// This is our own command.
+				COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+				rec->Register("gaccel", &COMMANDS[i].gaccel);
+			}
+			commandsMap.insert(make_pair(COMMANDS[i].gaccel.accel.cmd, &COMMANDS[i]));
 		}
 		rec->Register("hookcommand", handleCommand);
 
