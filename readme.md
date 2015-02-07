@@ -172,7 +172,7 @@ You will probably want to add a keyboard shortcut for this action so you can acc
 OSARA also includes some other miscellaneous actions.
 
 #### MIDI Event List Editor
-- OSARA: Focus MIDI event nearest edit cursor
+- OSARA: Focus event nearest edit cursor
 
 ## Reporting Issues
 Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
