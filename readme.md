@@ -125,6 +125,17 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Edit: Undo
 - Edit: Redo
 
+### Context Menus
+There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
+OSARA enables keyboard access for the track, track area, item and ruler context menus.
+
+Pressing the applications key will open the context menu for the element you are working with.
+For example, if you have just moved to a track, it will open the context menu for the track.
+If you have just moved the edit cursor, it will open the context menu for the ruler.
+
+For tracks, there are two context menus.
+You access the second by pressing control+applications.
+
 ### FX Parameter List
 Many effects are unfortunately either partially or completely inaccessible.
 However, most effects make their parameters available for automation in a standard way.
