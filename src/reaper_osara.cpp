@@ -50,6 +50,7 @@
 #define REAPERAPI_WANT_Undo_CanUndo2
 #define REAPERAPI_WANT_Undo_CanRedo2
 #define REAPERAPI_WANT_parse_timestr_pos
+#define REAPERAPI_WANT_GetMasterTrackVisibility
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -448,6 +449,8 @@ typedef struct {
 HWND getCurrentTrackVu() {
 	GetCurrentTrackVuData data;
 	data.index = (int)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
+	if (GetMasterTrackVisibility() & 1)
+		data.index += 1;
 	data.retHwnd = NULL;
 	data.foundCount = 0;
 	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
