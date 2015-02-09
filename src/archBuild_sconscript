@@ -15,5 +15,6 @@ env.SharedLibrary(
 	LIBS=[
 		"user32",
 		"ole32",
+		"oleacc",
 	],
 )

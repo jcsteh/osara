@@ -51,6 +51,7 @@
 #define REAPERAPI_WANT_Undo_CanRedo2
 #define REAPERAPI_WANT_parse_timestr_pos
 #define REAPERAPI_WANT_GetMasterTrackVisibility
+#define REAPERAPI_WANT_SetMasterTrackVisibility
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -444,17 +445,19 @@ typedef struct {
 	int index;
 	int foundCount;
 	HWND retHwnd;
-} GetCurrentTrackVuData;
+} GetTrackVuData;
 // Get the track VU window for the current track.
-HWND getCurrentTrackVu() {
-	GetCurrentTrackVuData data;
-	data.index = (int)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
+HWND getTrackVu(MediaTrack* track) {
+	GetTrackVuData data;
+	data.index = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	if (data.index == -1) // Master
+		data.index = 0;
 	if (GetMasterTrackVisibility() & 1)
 		data.index += 1;
 	data.retHwnd = NULL;
 	data.foundCount = 0;
 	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
-		GetCurrentTrackVuData* data = (GetCurrentTrackVuData*)lParam;
+		GetTrackVuData* data = (GetTrackVuData*)lParam;
 		wchar_t className[14];
 		if (GetClassNameW(testHwnd, className, 14) != 0
 			&& wcscmp(className, L"REAPERtrackvu") == 0
@@ -496,7 +499,7 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 					TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
 				else {
 					// This menu can't be retrieved with GetContextMenu.
-					HWND hwnd = getCurrentTrackVu();
+					HWND hwnd = getTrackVu(currentTrack);
 					if (hwnd)
 						PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
 				}
@@ -904,6 +907,35 @@ void cmdReportPeakWatcher(Command* command) {
 	outputMessage(s);
 }
 
+void cmdIoMaster(Command* command) {
+	// If the master track isn't visible, make it so temporarily.
+	int prevVisible = GetMasterTrackVisibility();
+	if (!(prevVisible & 1))
+		SetMasterTrackVisibility(prevVisible | 1);
+	HWND hwnd = getTrackVu(GetMasterTrack(0));
+	if (!hwnd)
+		return; // Really shouldn't happen.
+	// Use MSAA to get the location of the I/O button.
+	hwnd = GetAncestor(hwnd, GA_PARENT);
+	IAccessible* acc = NULL;
+	VARIANT varChild;
+	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, 5, &acc, &varChild) != S_OK)
+		return;
+	long l, t, w, h;
+	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
+	acc->Release();
+	if (res != S_OK)
+		return;
+	// Click it!
+	POINT point = {l, t};
+	ScreenToClient(hwnd, &point);
+	SendMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+	SendMessage(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
+	// Restore master invisibility if appropriate.
+	if (!(prevVisible & 1))
+		SetMasterTrackVisibility(prevVisible);
+}
+
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -947,6 +979,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
 };

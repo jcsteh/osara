@@ -182,6 +182,9 @@ You will probably want to add a keyboard shortcut for this action so you can acc
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 
+#### Main
+- OSARA: View I/O for master track
+
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor
 
