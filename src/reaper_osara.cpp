@@ -52,6 +52,7 @@
 #define REAPERAPI_WANT_parse_timestr_pos
 #define REAPERAPI_WANT_GetMasterTrackVisibility
 #define REAPERAPI_WANT_SetMasterTrackVisibility
+#define REAPERAPI_WANT_GetAppVersion
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -919,7 +920,12 @@ void cmdIoMaster(Command* command) {
 	hwnd = GetAncestor(hwnd, GA_PARENT);
 	IAccessible* acc = NULL;
 	VARIANT varChild;
-	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, 5, &acc, &varChild) != S_OK)
+	DWORD childId;
+	if (GetAppVersion()[0] <= '4')
+		childId = 7;
+	else
+		childId = 5;
+	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, childId, &acc, &varChild) != S_OK)
 		return;
 	long l, t, w, h;
 	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
