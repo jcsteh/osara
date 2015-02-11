@@ -369,6 +369,10 @@ void postCycleRippleMode(int command) {
 	outputMessage(s);
 }
 
+void postToggleRepeat(int command) {
+	outputMessage(GetToggleCommandState(command) ? L"repeat on" : L"repeat off");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -432,6 +436,7 @@ PostCommand POST_COMMANDS[] = {
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
+	{1068, postToggleRepeat}, // Transport: Toggle repeat
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
