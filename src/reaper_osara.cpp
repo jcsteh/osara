@@ -761,8 +761,6 @@ VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD tim
 			}
 		}
 	}
-
-	peakWatcher_timer = SetTimer(NULL, peakWatcher_timer, 30, peakWatcher_watcher);
 }
 
 void peakWatcher_onOk(HWND dialog) {
@@ -1034,6 +1032,7 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		if (cmd)
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
+	KillTimer(NULL, event);
 }
 
 accelerator_register_t accelReg = {
