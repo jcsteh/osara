@@ -77,7 +77,6 @@ enum {
 	FOCUS_ITEM,
 	FOCUS_RULER,
 } fakeFocus = FOCUS_NONE;
-MediaTrack* currentTrack = NULL;
 
 /*** Utilities */
 
@@ -159,7 +158,7 @@ const wchar_t* getFolderCompacting(MediaTrack* track) {
 
 void postGoToTrack(int command) {
 	fakeFocus = FOCUS_TRACK;
-	MediaTrack* track = currentTrack = GetLastTouchedTrack();
+	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	int trackNum = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
@@ -260,7 +259,7 @@ void postCursorMovementMeasure(int command) {
 
 void postMoveToItem(int command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item || (MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", NULL) != currentTrack)
+	if (!item || (MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", NULL) != GetLastTouchedTrack())
 		return; // No item in this direction on this track.
 	fakeFocus = FOCUS_ITEM;
 	wostringstream s;
@@ -505,7 +504,10 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 					TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
 				else {
 					// This menu can't be retrieved with GetContextMenu.
-					HWND hwnd = getTrackVu(currentTrack);
+					MediaTrack* track = GetLastTouchedTrack();
+					if (!track)
+						return 0;
+					HWND hwnd = getTrackVu(track);
 					if (hwnd)
 						PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
 				}
@@ -697,6 +699,7 @@ void fxParams_begin(MediaTrack* track) {
 }
 
 void cmdFxParamsCurrentTrack(Command* command) {
+	MediaTrack* currentTrack = GetLastTouchedTrack();
 	if (!currentTrack)
 		return;
 	fxParams_begin(currentTrack);
@@ -733,10 +736,13 @@ void peakWatcher_reset() {
 VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	if (!peakWatcher_track && !peakWatcher_followTrack)
 		return; // Disabled.
+	MediaTrack* currentTrack = GetLastTouchedTrack();
 	if (peakWatcher_followTrack && peakWatcher_track != currentTrack) {
 		// We're following the current track and it changed.
 		peakWatcher_track = currentTrack;
 		peakWatcher_reset();
+		if (!currentTrack)
+			return; // No current track, so nothing to do.
 	}
 
 	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
@@ -807,6 +813,7 @@ void peakWatcher_onOk(HWND dialog) {
 			break;
 		}
 		case PWT_CURRENT:
+			MediaTrack* currentTrack = GetLastTouchedTrack();
 			if (peakWatcher_track != currentTrack)
 				peakWatcher_reset();
 			peakWatcher_track = currentTrack;
@@ -843,6 +850,7 @@ INT_PTR CALLBACK peakWatcher_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LP
 }
 
 void cmdPeakWatcher(Command* command) {
+	MediaTrack* currentTrack = GetLastTouchedTrack();
 	if (!currentTrack)
 		return;
 	ostringstream s;
