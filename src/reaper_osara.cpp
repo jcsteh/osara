@@ -53,6 +53,7 @@
 #define REAPERAPI_WANT_GetMasterTrackVisibility
 #define REAPERAPI_WANT_SetMasterTrackVisibility
 #define REAPERAPI_WANT_GetAppVersion
+#define REAPERAPI_WANT_SetCursorContext
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -158,6 +159,7 @@ const wchar_t* getFolderCompacting(MediaTrack* track) {
 
 void postGoToTrack(int command) {
 	fakeFocus = FOCUS_TRACK;
+	SetCursorContext(0, NULL);
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -262,6 +264,7 @@ void postMoveToItem(int command) {
 	if (!item || (MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", NULL) != GetLastTouchedTrack())
 		return; // No item in this direction on this track.
 	fakeFocus = FOCUS_ITEM;
+	SetCursorContext(1, NULL);
 	wostringstream s;
 	s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
 	MediaItem_Take* take = GetActiveTake(item);

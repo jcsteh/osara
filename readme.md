@@ -22,7 +22,7 @@ Features:
 - Ability to watch and report track peak meters
 
 ## Requirements
-OSARA requires REAPER 4.71 or later.
+OSARA requires REAPER 4.75 or later.
 
 It has only been tested with the NVDA screen reader.
 However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
