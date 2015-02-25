@@ -54,6 +54,8 @@
 #define REAPERAPI_WANT_SetMasterTrackVisibility
 #define REAPERAPI_WANT_GetAppVersion
 #define REAPERAPI_WANT_SetCursorContext
+#define REAPERAPI_WANT_GetPlayPosition
+#define REAPERAPI_WANT_SetEditCurPos
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -272,6 +274,9 @@ void postMoveToItem(int command) {
 		s << L" " << GetTakeName(take);
 	s << L" " << formatCursorPosition();
 	outputMessage(s);
+	double cursorPos = GetCursorPosition();
+	if (GetPlayPosition() != cursorPos)
+		SetEditCurPos(cursorPos, true, true); // Seek playback.
 }
 
 void postCycleTrackFolderState(int command) {
