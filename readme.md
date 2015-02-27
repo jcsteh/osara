@@ -187,6 +187,7 @@ OSARA also includes some other miscellaneous actions.
 
 #### Main
 - OSARA: View I/O for master track
+- OSARA: Report ripple editing mode
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor
