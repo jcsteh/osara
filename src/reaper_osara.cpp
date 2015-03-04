@@ -56,6 +56,7 @@
 #define REAPERAPI_WANT_SetCursorContext
 #define REAPERAPI_WANT_GetPlayPosition
 #define REAPERAPI_WANT_SetEditCurPos
+#define REAPERAPI_WANT_CountMediaItems
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -563,6 +564,15 @@ void cmdRedo(Command* command) {
 	outputMessage(s);
 }
 
+void cmdSplitItems(Command* command) {
+	int oldCount = CountMediaItems(0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = CountMediaItems(0) - oldCount;
+	wostringstream s;
+	s << added << (added == 1 ? L" item" : L" items") << L" added";
+	outputMessage(s);
+}
+
 const int FXPARAMS_SLIDER_RANGE = 1000;
 MediaTrack* fxParams_track;
 int fxParams_fx;
@@ -1003,6 +1013,8 @@ Command COMMANDS[] = {
 	// Commands we want to intercept.
 	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
+	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
+	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},

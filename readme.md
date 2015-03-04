@@ -85,6 +85,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 #### Items
 - Item navigation: Select and move to previous item
 - Item navigation: Select and move to next item
+- Item: Split items at edit or play cursor
+- Item: Split items at time selection
 
 #### Markers and Regions
 - Markers: Go to previous marker/project start
