@@ -975,6 +975,21 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
+void cmdReportArmedTracks(Command* command) {
+	wostringstream s;
+	for (int i = 0; i < CountTracks(0); ++i) {
+		if (*(int*)GetSetMediaTrackInfo(GetTrack(0, i), "I_RECARM", NULL)) {
+			if (s.tellp() > 0)
+				s << L", " << i + 1;
+			else
+				s << L"Armed: " << i + 1;
+		}
+	}
+	if ((int)s.tellp() == 0)
+		s << L"No armed tracks";
+	outputMessage(s);
+}
+
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -1022,6 +1037,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report record armed tracks"}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
 };
