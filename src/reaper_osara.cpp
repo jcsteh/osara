@@ -84,16 +84,28 @@ enum {
 
 /*** Utilities */
 
+wstring lastMessage;
 void outputMessage(const wchar_t* message) {
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
 	GetGUIThreadInfo(guiThread, &guiThreadInfo);
-	if (guiThreadInfo.hwndFocus) {
+	if (!guiThreadInfo.hwndFocus)
+		return;
+	if (lastMessage.compare(message) == 0) {
+		// The last message was the same.
+		// Clients may ignore a nameChange event if the name didn't change.
+		// Append a space to make it different.
+		wstring procMessage = message;
+		procMessage += L' ';
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, procMessage.c_str());
+		lastMessage = procMessage;
+	} else {
 		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, message);
-		// Fire a nameChange event so ATs will report this text.
-		NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
+		lastMessage = message;
 	}
+	// Fire a nameChange event so ATs will report this text.
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
 }
 
 void outputMessage(wostringstream& message) {
