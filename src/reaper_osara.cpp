@@ -57,6 +57,7 @@
 #define REAPERAPI_WANT_GetPlayPosition
 #define REAPERAPI_WANT_SetEditCurPos
 #define REAPERAPI_WANT_CountMediaItems
+#define REAPERAPI_WANT_GetSet_LoopTimeRange
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -585,6 +586,32 @@ void cmdSplitItems(Command* command) {
 	outputMessage(s);
 }
 
+void cmdRemoveTracks(Command* command) {
+	int oldCount = CountTracks(0);
+	Main_OnCommand(40005, 0); // Track: Remove tracks
+	int removed = oldCount - CountTracks(0);
+	wostringstream s;
+	s << removed << (removed == 1 ? L" track" : L" tracks") << L" removed";
+	outputMessage(s);
+}
+
+void cmdRemoveItems(Command* command) {
+	int oldCount = CountMediaItems(0);
+	Main_OnCommand(40006, 0); // Item: Remove items
+	int removed = oldCount - CountMediaItems(0);
+	wostringstream s;
+	s << removed << (removed == 1 ? L" item" : L" items") << L" removed";
+	outputMessage(s);
+}
+
+void cmdRemoveTimeSelection(Command* command) {
+	double start, end;
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
+	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
+	if (start != end)
+		outputMessage(L"Contents of time selection removed");
+}
+
 const int FXPARAMS_SLIDER_RANGE = 1000;
 MediaTrack* fxParams_track;
 int fxParams_fx;
@@ -1002,6 +1029,19 @@ void cmdReportArmedTracks(Command* command) {
 	outputMessage(s);
 }
 
+void cmdRemoveFocus(Command* command) {
+	switch (fakeFocus) {
+		case FOCUS_TRACK:
+			cmdRemoveTracks(NULL);
+			break;
+		case FOCUS_ITEM:
+			cmdRemoveItems(NULL);
+			break;
+		default:
+			cmdRemoveTimeSelection(NULL);
+	}
+}
+
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -1042,6 +1082,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
 	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
+	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
+	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
+	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
@@ -1050,6 +1093,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report record armed tracks"}, "OSARA_REPORTARMED", cmdReportArmedTracks},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
 };

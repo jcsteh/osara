@@ -58,6 +58,7 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Track: Insert new track
 - Track: Cycle track folder state
 - Track: Cycle track folder collapsed state
+- Track: Remove tracks
 
 #### Adjusting Track Parameters
 - Track: Mute/unmute tracks
@@ -87,6 +88,7 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item navigation: Select and move to next item
 - Item: Split items at edit or play cursor
 - Item: Split items at time selection
+- Item: Remove items
 
 #### Markers and Regions
 - Markers: Go to previous marker/project start
@@ -129,6 +131,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 
 #### Transport
 - Transport: Toggle repeat
+
+#### Time Selection
+- Time selection: Remove contents of time selection (moving later items)
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -191,6 +196,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: View I/O for master track
 - OSARA: Report ripple editing mode
 - OSARA: Report record armed tracks
+- OSARA: Remove items/tracks/contents of time selection (depending on focus)
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor
