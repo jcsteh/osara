@@ -58,6 +58,7 @@
 #define REAPERAPI_WANT_SetEditCurPos
 #define REAPERAPI_WANT_CountMediaItems
 #define REAPERAPI_WANT_GetSet_LoopTimeRange
+#define REAPERAPI_WANT_CountTrackMediaItems
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -218,6 +219,8 @@ void postGoToTrack(int command) {
 		s << L" armed";
 	if (*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL))
 		s << L" phase inverted";
+	int itemCount = CountTrackMediaItems(track);
+	s << L" " << itemCount << (itemCount == 1 ? L" item" : L" items");
 	outputMessage(s);
 }
 
