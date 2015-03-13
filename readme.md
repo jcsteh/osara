@@ -90,6 +90,10 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item: Split items at time selection
 - Item: Remove items
 
+#### Takes
+- Take: Switch items to next take
+- Take: Switch items to previous take
+
 #### Markers and Regions
 - Markers: Go to previous marker/project start
 - Markers: Go to next marker/project end

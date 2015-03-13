@@ -59,6 +59,7 @@
 #define REAPERAPI_WANT_CountMediaItems
 #define REAPERAPI_WANT_GetSet_LoopTimeRange
 #define REAPERAPI_WANT_CountTrackMediaItems
+#define REAPERAPI_WANT_GetSetMediaItemTakeInfo
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -397,6 +398,19 @@ void postToggleRepeat(int command) {
 	outputMessage(GetToggleCommandState(command) ? L"repeat on" : L"repeat off");
 }
 
+void postSwitchToTake(int command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return;
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take)
+		return;
+	wostringstream s;
+	s << (int)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << L" "
+		<< GetTakeName(take);
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -461,6 +475,8 @@ PostCommand POST_COMMANDS[] = {
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
 	{1068, postToggleRepeat}, // Transport: Toggle repeat
+	{40125, postSwitchToTake}, // Take: Switch items to next take
+	{40126, postSwitchToTake}, // Take: Switch items to previous take
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
