@@ -89,6 +89,12 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item: Split items at edit or play cursor
 - Item: Split items at time selection
 - Item: Remove items
+- Item edit: Move items/envelope points right
+- Item edit: Move items/envelope points left
+- Item edit: Grow left edge of items
+- Item edit: Shrink left edge of items
+- Item edit: Shrink right edge of items
+- Item edit: Grow right edge of items
 
 #### Takes
 - Take: Switch items to next take

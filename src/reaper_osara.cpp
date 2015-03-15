@@ -60,6 +60,7 @@
 #define REAPERAPI_WANT_GetSet_LoopTimeRange
 #define REAPERAPI_WANT_CountTrackMediaItems
 #define REAPERAPI_WANT_GetSetMediaItemTakeInfo
+#define REAPERAPI_WANT_kbd_getTextFromCmd
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -169,6 +170,21 @@ const wchar_t* getFolderCompacting(MediaTrack* track) {
 			return L"closed";
 	}
 	return L""; // Should never happen.
+}
+
+void reportActionName(int command) {
+	const char* name = kbd_getTextFromCmd(command, NULL);
+	const char* start;
+	// Skip the category before the colon (if any).
+	for (start = name; *start; ++start) {
+		if (*start == ':') {
+			name = start + 2;
+			break;
+		}
+	}
+	wostringstream s;
+	s << name;
+	outputMessage(s);
 }
 
 /*** Code to execute after existing actions.
@@ -629,6 +645,23 @@ void cmdRemoveTimeSelection(Command* command) {
 	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
 	if (start != end)
 		outputMessage(L"Contents of time selection removed");
+}
+
+void cmdMoveItems(Command* command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	double oldPos, oldLen;
+	if (item) {
+		oldPos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		oldLen = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", NULL);
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (!item)
+		return;
+	// Only report if something actually happened.
+	double newPos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+	double newLen = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", NULL);
+	if (newPos != oldPos || newLen != oldLen)
+		reportActionName(command->gaccel.accel.cmd);
 }
 
 const int FXPARAMS_SLIDER_RANGE = 1000;
@@ -1104,6 +1137,12 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
+	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
+	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
+	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
