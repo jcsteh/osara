@@ -302,7 +302,7 @@ void postMoveToItem(int command) {
 	fakeFocus = FOCUS_ITEM;
 	SetCursorContext(1, NULL);
 	wostringstream s;
-	s << L"item " << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
+	s << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
 	MediaItem_Take* take = GetActiveTake(item);
 	if (take)
 		s << L" " << GetTakeName(take);
