@@ -1155,7 +1155,7 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
 };
-map<int, Command*> commandsMap;
+map<pair<int, int>, Command*> commandsMap;
 
 /*** Initialisation, termination and inner workings. */
 
@@ -1167,9 +1167,9 @@ void postCommand(int command, int flag) {
 
 bool isHandlingCommand = false;
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
-	const auto it = commandsMap.find(command);
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
+	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
 	if (it != commandsMap.end()) {
 		isHandlingCommand = true;
 		it->second->execute(it->second);
@@ -1227,7 +1227,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
 				}
 			}
-			commandsMap.insert(make_pair(COMMANDS[i].gaccel.accel.cmd, &COMMANDS[i]));
+			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
 		rec->Register("hookcommand2", handleCommand);
 
