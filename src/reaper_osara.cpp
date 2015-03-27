@@ -1093,11 +1093,15 @@ void reportTracksWithState(const wchar_t* prefix, TrackStateCheck checkState) {
 	s << prefix << L": ";
 	int count = 0;
 	for (int i = 0; i < CountTracks(0); ++i) {
-		if (checkState(GetTrack(0, i))) {
+		MediaTrack* track = GetTrack(0, i);
+		if (checkState(track)) {
 			++count;
 			if (count > 1)
 				s << L", ";
 			s << i + 1;
+			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+			if (name && name[0])
+				s << L" " << name;
 		}
 	}
 	if (count == 0)
