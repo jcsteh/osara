@@ -205,7 +205,11 @@ OSARA also includes some other miscellaneous actions.
 #### Main
 - OSARA: View I/O for master track
 - OSARA: Report ripple editing mode
+- OSARA: Report muted tracks
+- OSARA: Report soloed tracks
 - OSARA: Report record armed tracks
+- OSARA: Report tracks with record monitor on
+- OSARA: Report tracks with phase inverted
 - OSARA: Remove items/tracks/contents of time selection (depending on focus)
 
 #### MIDI Event List Editor

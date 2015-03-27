@@ -187,6 +187,28 @@ void reportActionName(int command) {
 	outputMessage(s);
 }
 
+typedef bool(*TrackStateCheck)(MediaTrack* track);
+
+bool isTrackMuted(MediaTrack* track) {
+	return *(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL);
+}
+
+bool isTrackSoloed(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
+}
+
+bool isTrackArmed(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL);
+}
+
+bool isTrackMonitored(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL);
+}
+
+bool isTrackPhaseInverted(MediaTrack* track) {
+	return *(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL);
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -228,13 +250,13 @@ void postGoToTrack(int command) {
 	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 	if (trackName)
 		s << L" " << trackName;
-	if (*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL))
+	if (isTrackMuted(track))
 		s << L" muted";
-	if (*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL))
+	if (isTrackSoloed(track))
 		s << L" soloed";
-	if (*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL))
+	if (isTrackArmed(track))
 		s << L" armed";
-	if (*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL))
+	if (isTrackPhaseInverted(track))
 		s << L" phase inverted";
 	int itemCount = CountTrackMediaItems(track);
 	s << L" " << itemCount << (itemCount == 1 ? L" item" : L" items");
@@ -245,21 +267,21 @@ void postToggleTrackMute(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL) ? L"muted" : L"unmuted");
+	outputMessage(isTrackMuted(track) ? L"muted" : L"unmuted");
 }
 
 void postToggleTrackSolo(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL) ? L"soloed" : L"unsoloed");
+	outputMessage(isTrackSoloed(track) ? L"soloed" : L"unsoloed");
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(*(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL) ? L"armed" : L"unarmed");
+	outputMessage(isTrackArmed(track) ? L"armed" : L"unarmed");
 }
 
 void postCycleTrackMonitor(int command) {
@@ -282,7 +304,7 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL) ? L"phase inverted" : L"phase normal");
+	outputMessage(isTrackPhaseInverted(track) ? L"phase inverted" : L"phase normal");
 }
 
 void postCursorMovement(int command) {
@@ -1066,19 +1088,41 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-void cmdReportArmedTracks(Command* command) {
+void reportTracksWithState(const wchar_t* prefix, TrackStateCheck checkState) {
 	wostringstream s;
+	s << prefix << L": ";
+	int count = 0;
 	for (int i = 0; i < CountTracks(0); ++i) {
-		if (*(int*)GetSetMediaTrackInfo(GetTrack(0, i), "I_RECARM", NULL)) {
-			if (s.tellp() > 0)
-				s << L", " << i + 1;
-			else
-				s << L"Armed: " << i + 1;
+		if (checkState(GetTrack(0, i))) {
+			++count;
+			if (count > 1)
+				s << L", ";
+			s << i + 1;
 		}
 	}
-	if ((int)s.tellp() == 0)
-		s << L"No armed tracks";
+	if (count == 0)
+		s << L"none";
 	outputMessage(s);
+}
+
+void cmdReportMutedTracks(Command* command) {
+	reportTracksWithState(L"Muted", isTrackMuted);
+}
+
+void cmdReportSoloedTracks(Command* command) {
+	reportTracksWithState(L"Soloed", isTrackSoloed);
+}
+
+void cmdReportArmedTracks(Command* command) {
+	reportTracksWithState(L"Armed", isTrackArmed);
+}
+
+void cmdReportMonitoredTracks(Command* command) {
+	reportTracksWithState(L"Monitored", isTrackMonitored);
+}
+
+void cmdReportPhaseInvertedTracks(Command* command) {
+	reportTracksWithState(L"Phase inverted", isTrackPhaseInverted);
 }
 
 void cmdRemoveFocus(Command* command) {
@@ -1150,7 +1194,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report record armed tracks"}, "OSARA_REPORTARMED", cmdReportArmedTracks},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 	{0, {}, NULL, NULL},
