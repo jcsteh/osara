@@ -1218,10 +1218,24 @@ void postCommand(int command, int flag) {
 }
 
 bool isHandlingCommand = false;
+
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
+	if (it != commandsMap.end()) {
+		isHandlingCommand = true;
+		it->second->execute(it->second);
+		isHandlingCommand = false;
+		return true;
+	}
+	return false;
+}
+
+bool handleMainCommandFallback(int command, int flag) {
+	if (isHandlingCommand)
+		return false; // Prevent re-entrance.
+	const auto it = commandsMap.find(make_pair(MAIN_SECTION, command));
 	if (it != commandsMap.end()) {
 		isHandlingCommand = true;
 		it->second->execute(it->second);
@@ -1281,7 +1295,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
+		// hookcommand can only handle actions for the main section, so we need hookcommand2.
+		// According to SWS, hookcommand2 must be registered before hookcommand.
 		rec->Register("hookcommand2", handleCommand);
+		// #29: Unfortunately, actions triggered by user-defined actions don't trigger hookcommand2,
+		// but they do trigger hookcommand. IMO, this is a REAPER bug.
+		// Register hookcommand as well so custom actions at least work for the main section.
+		rec->Register("hookcommand", handleMainCommandFallback);
 
 		rec->Register("accelerator", &accelReg);
 		SetTimer(NULL, NULL, 0, delayedInit);
