@@ -89,6 +89,7 @@ enum {
 /*** Utilities */
 
 wstring lastMessage;
+HWND lastMessageHwnd = NULL;
 void outputMessage(const wchar_t* message) {
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
@@ -110,6 +111,7 @@ void outputMessage(const wchar_t* message) {
 	}
 	// Fire a nameChange event so ATs will report this text.
 	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
+	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
 
 void outputMessage(wostringstream& message) {
@@ -1256,6 +1258,16 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(NULL, event);
 }
 
+void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
+	if (event == EVENT_OBJECT_FOCUS && lastMessageHwnd && hwnd != lastMessageHwnd) {
+		// Focus is moving. Clear our tweak to accName for the previous focus.
+		// This avoids problems such as the last message repeating when a new project is opened (#17).
+		accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
+		lastMessageHwnd = NULL;
+	}
+}
+HWINEVENTHOOK winEventHook = NULL;
+
 accelerator_register_t accelReg = {
 	handleAccel,
 	true,
@@ -1274,6 +1286,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0;
 		mainHwnd = rec->hwnd_main;
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
+		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
@@ -1309,6 +1322,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 	} else {
 		// Unload.
+		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 		return 0;
 	}
