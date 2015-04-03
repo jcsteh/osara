@@ -138,6 +138,8 @@ wstring formatCursorPosition(bool useMeasure=false) {
 			s << beatPercent << L"%";
 			oldBeatPercent = beatPercent;
 		}
+		// #31: Clear cache for other units to avoid confusion if they are used later.
+		oldMinute = 0;
 	} else if (GetToggleCommandState(40365)) {
 		// Minutes:seconds
 		double second = GetCursorPosition();
@@ -149,6 +151,8 @@ wstring formatCursorPosition(bool useMeasure=false) {
 		}
 		s << fixed << setprecision(3);
 		s << second << L" sec";
+		// #31: Clear cache for other units to avoid confusion if they are used later.
+		oldMeasure = oldBeat = oldBeatPercent = 0;
 	} else
 		return formatCursorPosition(true);
 	return s.str();
