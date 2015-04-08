@@ -825,7 +825,11 @@ void fxParams_begin(MediaTrack* track) {
 	// Populate the parameter list.
 	for (int p = 0; p < numParams; ++p) {
 		TrackFX_GetParamName(fxParams_track, fxParams_fx, p, name, sizeof(name));
-		ComboBox_AddString(params, name);
+		// Append the parameter number to facilitate efficient navigation
+		// and to ensure reporting where two consecutive parameters have the same name (#32).
+		ostringstream ns;
+		ns << name << " (" << p + 1 << ")";
+		ComboBox_AddString(params, ns.str().c_str());
 	}
 	ComboBox_SetCurSel(params, 0); // Select the first initially.
 	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
