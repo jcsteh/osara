@@ -6,6 +6,7 @@
  * License: GNU General Public License version 2.0
  */
 
+#define UNICODE
 #include <windows.h>
 #include <initguid.h>
 #include <oleacc.h>
@@ -16,6 +17,7 @@
 #include <map>
 #include <iomanip>
 #include <math.h>
+#include <codecvt>
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -88,9 +90,17 @@ enum {
 
 /*** Utilities */
 
-wstring lastMessage;
+wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
+wstring widen(const string& text) {
+	return utf8Utf16.from_bytes(text);
+}
+string narrow(const wstring& text) {
+	return utf8Utf16.to_bytes(text);
+}
+
+string lastMessage;
 HWND lastMessageHwnd = NULL;
-void outputMessage(const wchar_t* message) {
+void outputMessage(const string& message) {
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -101,12 +111,12 @@ void outputMessage(const wchar_t* message) {
 		// The last message was the same.
 		// Clients may ignore a nameChange event if the name didn't change.
 		// Append a space to make it different.
-		wstring procMessage = message;
-		procMessage += L' ';
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, procMessage.c_str());
+		string procMessage = message;
+		procMessage += ' ';
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, message);
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
 		lastMessage = message;
 	}
 	// Fire a nameChange event so ATs will report this text.
@@ -114,12 +124,12 @@ void outputMessage(const wchar_t* message) {
 	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
 
-void outputMessage(wostringstream& message) {
-	outputMessage(message.str().c_str());
+void outputMessage(ostringstream& message) {
+	outputMessage(message.str());
 }
 
-wstring formatCursorPosition(bool useMeasure=false) {
-	wostringstream s;
+string formatCursorPosition(bool useMeasure=false) {
+	ostringstream s;
 	if (useMeasure) {
 		int measure;
 		double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
@@ -127,15 +137,15 @@ wstring formatCursorPosition(bool useMeasure=false) {
 		int wholeBeat = (int)beat + 1;
 		int beatPercent = (int)(beat * 100) % 100;
 		if (measure != oldMeasure) {
-			s << L"bar " << measure << L" ";
+			s << "bar " << measure << " ";
 			oldMeasure = measure;
 		}
 		if (wholeBeat != oldBeat) {
-			s << L"beat " << wholeBeat << L" ";
+			s << "beat " << wholeBeat << " ";
 			oldBeat = wholeBeat;
 		}
 		if (beatPercent != oldBeatPercent) {
-			s << beatPercent << L"%";
+			s << beatPercent << "%";
 			oldBeatPercent = beatPercent;
 		}
 		// #31: Clear cache for other units to avoid confusion if they are used later.
@@ -146,11 +156,11 @@ wstring formatCursorPosition(bool useMeasure=false) {
 		int minute = second / 60;
 		second = fmod(second, 60);
 		if (oldMinute != minute) {
-			s << minute << L" min ";
+			s << minute << " min ";
 			oldMinute = minute;
 		}
 		s << fixed << setprecision(3);
-		s << second << L" sec";
+		s << second << " sec";
 		// #31: Clear cache for other units to avoid confusion if they are used later.
 		oldMeasure = oldBeat = oldBeatPercent = 0;
 	} else
@@ -158,24 +168,24 @@ wstring formatCursorPosition(bool useMeasure=false) {
 	return s.str();
 }
 
-const wchar_t* formatFolderState(int state, bool reportTrack=true) {
+const char* formatFolderState(int state, bool reportTrack=true) {
 	if (state == 0)
-		return reportTrack ? L"track" : NULL;
+		return reportTrack ? "track" : NULL;
 	else if (state == 1)
-		return L"folder";
-	return L"end of folder";
+		return "folder";
+	return "end of folder";
 }
 
-const wchar_t* getFolderCompacting(MediaTrack* track) {
+const char* getFolderCompacting(MediaTrack* track) {
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
 		case 0:
-			return L"open";
+			return "open";
 		case 1:
-			return L"small";
+			return "small";
 		case 2:
-			return L"closed";
+			return "closed";
 	}
-	return L""; // Should never happen.
+	return ""; // Should never happen.
 }
 
 void reportActionName(int command) {
@@ -188,7 +198,7 @@ void reportActionName(int command) {
 			break;
 		}
 	}
-	wostringstream s;
+	ostringstream s;
 	s << name;
 	outputMessage(s);
 }
@@ -245,27 +255,27 @@ void postGoToTrack(int command) {
 		return;
 	}
 
-	wostringstream s;
+	ostringstream s;
 	s << trackNum;
 	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 	if (folderDepth == 1) // Folder
-		s << L" " << getFolderCompacting(track);
-	const wchar_t* message = formatFolderState(folderDepth, false);
+		s << " " << getFolderCompacting(track);
+	const char* message = formatFolderState(folderDepth, false);
 	if (message)
-		s << L" " << message;
+		s << " " << message;
 	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 	if (trackName)
-		s << L" " << trackName;
+		s << " " << trackName;
 	if (isTrackMuted(track))
-		s << L" muted";
+		s << " muted";
 	if (isTrackSoloed(track))
-		s << L" soloed";
+		s << " soloed";
 	if (isTrackArmed(track))
-		s << L" armed";
+		s << " armed";
 	if (isTrackPhaseInverted(track))
-		s << L" phase inverted";
+		s << " phase inverted";
 	int itemCount = CountTrackMediaItems(track);
-	s << L" " << itemCount << (itemCount == 1 ? L" item" : L" items");
+	s << " " << itemCount << (itemCount == 1 ? " item" : " items");
 	outputMessage(s);
 }
 
@@ -273,21 +283,21 @@ void postToggleTrackMute(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackMuted(track) ? L"muted" : L"unmuted");
+	outputMessage(isTrackMuted(track) ? "muted" : "unmuted");
 }
 
 void postToggleTrackSolo(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackSoloed(track) ? L"soloed" : L"unsoloed");
+	outputMessage(isTrackSoloed(track) ? "soloed" : "unsoloed");
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackArmed(track) ? L"armed" : L"unarmed");
+	outputMessage(isTrackArmed(track) ? "armed" : "unarmed");
 }
 
 void postCycleTrackMonitor(int command) {
@@ -296,13 +306,13 @@ void postCycleTrackMonitor(int command) {
 		return;
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
 		case 0:
-			outputMessage(L"record monitor off");
+			outputMessage("record monitor off");
 			break;
 		case 1:
-			outputMessage(L"normal");
+			outputMessage("norma");
 			break;
 		case 2:
-			outputMessage(L"not when playing");
+			outputMessage("not when playing");
 	}
 }
 
@@ -310,7 +320,7 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackPhaseInverted(track) ? L"phase inverted" : L"phase normal");
+	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase norma");
 }
 
 void postCursorMovement(int command) {
@@ -329,12 +339,12 @@ void postMoveToItem(int command) {
 		return; // No item in this direction on this track.
 	fakeFocus = FOCUS_ITEM;
 	SetCursorContext(1, NULL);
-	wostringstream s;
+	ostringstream s;
 	s << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
 	MediaItem_Take* take = GetActiveTake(item);
 	if (take)
-		s << L" " << GetTakeName(take);
-	s << L" " << formatCursorPosition();
+		s << " " << GetTakeName(take);
+	s << " " << formatCursorPosition();
 	outputMessage(s);
 	double cursorPos = GetCursorPosition();
 	if (GetPlayPosition() != cursorPos)
@@ -356,7 +366,7 @@ void postCycleTrackFolderCollapsed(int command) {
 }
 
 void postGoToMarker(int command) {
-	wostringstream s;
+	ostringstream s;
 	int marker, region;
 	double markerPos;
 	double cursorPos = GetCursorPosition();
@@ -367,16 +377,16 @@ void postGoToMarker(int command) {
 		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
 		if (markerPos == cursorPos)
 			if (name[0])
-				s << name << L" marker" << L" ";
+				s << name << " marker" << " ";
 			else
-				s << L"marker " << number << L" ";
+				s << "marker " << number << " ";
 	}
 	if (region >= 0) {
 		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
 		if (name[0])
-			s << name << L" region ";
+			s << name << " region ";
 		else
-			s << L"region " << number << L" ";
+			s << "region " << number << " ";
 	}
 	s << formatCursorPosition();
 	if (s.tellp() > 0)
@@ -389,8 +399,8 @@ void postSelectEnvelope(int command) {
 		return;
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
-	wostringstream s;
-	s << name << L" envelope selected";
+	ostringstream s;
+	s << name << " envelope selected";
 	outputMessage(s);
 }
 
@@ -398,14 +408,14 @@ void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	wostringstream s;
+	ostringstream s;
 	s << fixed << setprecision(2);
-	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
+	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VO", NULL));
 	outputMessage(s);
 }
 
 void postChangeHorizontalZoom(int command) {
-	wostringstream s;
+	ostringstream s;
 	s << fixed << setprecision(3);
 	s << GetHZoomLevel() << " pixels/second";
 	outputMessage(s);
@@ -416,30 +426,30 @@ void postChangeTrackPan(int command) {
 	if (!track)
 		return;
 	double pan = *(double*)GetSetMediaTrackInfo(track, "D_PAN", NULL) * 100;
-	wostringstream s;
+	ostringstream s;
 	if (pan == 0)
-		s << L"center";
+		s << "center";
 	else if (pan < 0)
-		s << -pan << L"% left";
+		s << -pan << "% left";
 	else
-		s << pan << L"% right";
+		s << pan << "% right";
 	outputMessage(s);
 }
 
 void postCycleRippleMode(int command) {
-	wostringstream s;
-	s << L"ripple ";
+	ostringstream s;
+	s << "ripple ";
 	if (GetToggleCommandState(40310))
-		s << L"per-track";
+		s << "per-track";
 	else if (GetToggleCommandState(40311))
-		s << L"all tracks";
+		s << "all tracks";
 	else
-		s << L"off";
+		s << "off";
 	outputMessage(s);
 }
 
 void postToggleRepeat(int command) {
-	outputMessage(GetToggleCommandState(command) ? L"repeat on" : L"repeat off");
+	outputMessage(GetToggleCommandState(command) ? "repeat on" : "repeat off");
 }
 
 void postSwitchToTake(int command) {
@@ -449,8 +459,8 @@ void postSwitchToTake(int command) {
 	MediaItem_Take* take = GetActiveTake(item);
 	if (!take)
 		return;
-	wostringstream s;
-	s << (int)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << L" "
+	ostringstream s;
+	s << (int)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
 		<< GetTakeName(take);
 	outputMessage(s);
 }
@@ -548,8 +558,8 @@ HWND getTrackVu(MediaTrack* track) {
 	data.foundCount = 0;
 	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
 		GetTrackVuData* data = (GetTrackVuData*)lParam;
-		wchar_t className[14];
-		if (GetClassNameW(testHwnd, className, 14) != 0
+		WCHAR className[14];
+		if (GetClassName(testHwnd, className, 14) != 0
 			&& wcscmp(className, L"REAPERtrackvu") == 0
 			&& ++data->foundCount == data->index
 		)  {
@@ -568,9 +578,9 @@ bool shouldOverrideContextMenu() {
 	GetGUIThreadInfo(guiThread, &info);
 	if (!info.hwndFocus)
 		return false;
-	wchar_t className[22];
-	wostringstream s;
-	return GetClassNameW(info.hwndFocus, className,  ARRAYSIZE(className)) && (
+	WCHAR className[22];
+	ostringstream s;
+	return GetClassName(info.hwndFocus, className,  ARRAYSIZE(className)) && (
 			wcscmp(className, L"REAPERTrackListWindow") == 0
 			|| wcscmp(className, L"REAPERtrackvu") == 0
 	);
@@ -625,8 +635,8 @@ void cmdUndo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	wostringstream s;
-	s << L"Undo " << text;
+	ostringstream s;
+	s << "Undo " << text;
 	outputMessage(s);
 }
 
@@ -635,8 +645,8 @@ void cmdRedo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	wostringstream s;
-	s << L"Redo " << text;
+	ostringstream s;
+	s << "Redo " << text;
 	outputMessage(s);
 }
 
@@ -644,8 +654,8 @@ void cmdSplitItems(Command* command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	int added = CountMediaItems(0) - oldCount;
-	wostringstream s;
-	s << added << (added == 1 ? L" item" : L" items") << L" added";
+	ostringstream s;
+	s << added << (added == 1 ? " item" : " items") << " added";
 	outputMessage(s);
 }
 
@@ -653,8 +663,8 @@ void cmdRemoveTracks(Command* command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(40005, 0); // Track: Remove tracks
 	int removed = oldCount - CountTracks(0);
-	wostringstream s;
-	s << removed << (removed == 1 ? L" track" : L" tracks") << L" removed";
+	ostringstream s;
+	s << removed << (removed == 1 ? " track" : " tracks") << " removed";
 	outputMessage(s);
 }
 
@@ -662,8 +672,8 @@ void cmdRemoveItems(Command* command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(40006, 0); // Item: Remove items
 	int removed = oldCount - CountMediaItems(0);
-	wostringstream s;
-	s << removed << (removed == 1 ? L" item" : L" items") << L" removed";
+	ostringstream s;
+	s << removed << (removed == 1 ? " item" : " items") << " removed";
 	outputMessage(s);
 }
 
@@ -672,7 +682,7 @@ void cmdRemoveTimeSelection(Command* command) {
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
 	if (start != end)
-		outputMessage(L"Contents of time selection removed");
+		outputMessage("Contents of time selection removed");
 }
 
 void cmdMoveItems(Command* command) {
@@ -711,11 +721,11 @@ void fxParams_updateValueText(HWND slider) {
 	}
 
 	// Convert to Unicode.
-	wostringstream s;
+	ostringstream s;
 	s << fxParams_valText;
 	// Set the slider's accessible value to this text.
 	accPropServices->SetHwndPropStr(slider, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_VALUE,
-		s.str().c_str());
+		widen(s.str()).c_str());
 }
 
 void fxParams_updateSlider(HWND slider) {
@@ -807,8 +817,8 @@ void fxParams_begin(MediaTrack* track) {
 			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = f + 1;
-			itemInfo.dwTypeData = name;
-			itemInfo.cch = sizeof(name);
+			itemInfo.dwTypeData = (wchar_t*)widen(name).c_str();
+			itemInfo.cch = ARRAYSIZE(name);
 			InsertMenuItem(effects, f, false, &itemInfo);
 		}
 		fxParams_fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
@@ -829,7 +839,7 @@ void fxParams_begin(MediaTrack* track) {
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
 		ostringstream ns;
 		ns << name << " (" << p + 1 << ")";
-		ComboBox_AddString(params, ns.str().c_str());
+		ComboBox_AddString(params, widen(ns.str()).c_str());
 	}
 	ComboBox_SetCurSel(params, 0); // Select the first initially.
 	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
@@ -895,9 +905,9 @@ VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD tim
 			peakWatcher_channels[c].peak = newPeak;
 			peakWatcher_channels[c].time = time;
 			if (peakWatcher_channels[c].notify && newPeak > peakWatcher_level) {
-				wostringstream s;
+				ostringstream s;
 				s << fixed << setprecision(1);
-				s << L"chan " << c + 1 << ": " << newPeak;
+				s << "chan " << c + 1 << ": " << newPeak;
 				outputMessage(s);
 			}
 		}
@@ -911,17 +921,17 @@ void peakWatcher_onOk(HWND dialog) {
 		peakWatcher_channels[c].notify = Button_GetCheck(channel) == BST_CHECKED;
 	}
 
-	char inText[7];
+	WCHAR inText[7];
 	// Retrieve the entered maximum level.
 	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, ARRAYSIZE(inText)) > 0) {
-		peakWatcher_level = atof(inText);
+		peakWatcher_level = _wtof(inText);
 		// Restrict the range.
 		peakWatcher_level = max(min(peakWatcher_level, 40), -40);
 	}
 
 	// Retrieve the entered hold time.
 	if (GetDlgItemText(dialog, ID_PEAK_HOLD, inText, ARRAYSIZE(inText)) > 0) {
-		peakWatcher_hold = atoi(inText);
+		peakWatcher_hold = _wtoi(inText);
 		// Restrict the range.
 		peakWatcher_hold = max(min(peakWatcher_hold, 20000), -1);
 	}
@@ -996,22 +1006,22 @@ void cmdPeakWatcher(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), mainHwnd, peakWatcher_dialogProc);
 	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
 
-	// Populate the list of what ot watch.
+	// Populate the list of what to watch.
 	char* name;
-	ComboBox_AddString(track, "Disabled");
+	ComboBox_AddString(track, L"Disabled");
 	if (!peakWatcher_followTrack && !peakWatcher_track)
 		ComboBox_SetCurSel(track, PWT_DISABLED);
-	ComboBox_AddString(track, "Follow current track");
+	ComboBox_AddString(track, L"Follow current track");
 	if (peakWatcher_followTrack)
 		ComboBox_SetCurSel(track, PWT_FOLLOW);
-	ComboBox_AddString(track, "Master");
+	ComboBox_AddString(track, L"Master");
 	MediaTrack* master = GetMasterTrack(0);
 	if (peakWatcher_track == master)
 		ComboBox_SetCurSel(track, PWT_MASTER);
 	s << (int)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
 	if (name = (char*)GetSetMediaTrackInfo(currentTrack, "P_NAME", NULL))
 		s << ": " << name;
-	ComboBox_AddString(track, s.str().c_str());
+	ComboBox_AddString(track, widen(s.str()).c_str());
 	if (!peakWatcher_followTrack && peakWatcher_track == currentTrack)
 		ComboBox_SetCurSel(track, PWT_CURRENT);
 	s.str("");
@@ -1020,7 +1030,7 @@ void cmdPeakWatcher(Command* command) {
 		s << (int)GetSetMediaTrackInfo(peakWatcher_track, "IP_TRACKNUMBER", NULL);
 		if (name = (char*)GetSetMediaTrackInfo(peakWatcher_track, "P_NAME", NULL))
 			s << ": " << name;
-		ComboBox_AddString(track, s.str().c_str());
+		ComboBox_AddString(track, widen(s.str()).c_str());
 		ComboBox_SetCurSel(track, PWT_PREVSPEC);
 		s.str("");
 	}
@@ -1034,28 +1044,28 @@ void cmdPeakWatcher(Command* command) {
 	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
 	s << fixed << setprecision(2);
 	s << peakWatcher_level;
-	SendMessage(level, WM_SETTEXT, 0, (LPARAM)s.str().c_str());
+	SendMessage(level, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
 	s.str("");
 
 	HWND hold = GetDlgItem(dialog, ID_PEAK_HOLD);
 	SendMessage(hold, EM_SETLIMITTEXT, 5, 0);
 	s << peakWatcher_hold;
-	SendMessage(hold, WM_SETTEXT, 0, (LPARAM)s.str().c_str());
+	SendMessage(hold, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
 void cmdReportPeakWatcher(Command* command) {
 	if (!peakWatcher_track && !peakWatcher_followTrack) {
-		outputMessage(L"Peak watcher is disabled");
+		outputMessage("Peak watcher is disabled");
 		return;
 	}
-	wostringstream s;
+	ostringstream s;
 	s << fixed << setprecision(1);
 	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
 		if (c != 0)
-			s << L", ";
-		s << c + 1 << L": " << peakWatcher_channels[c].peak;
+			s << ", ";
+		s << c + 1 << ": " << peakWatcher_channels[c].peak;
 	}
 	outputMessage(s);
 }
@@ -1098,45 +1108,45 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-void reportTracksWithState(const wchar_t* prefix, TrackStateCheck checkState) {
-	wostringstream s;
-	s << prefix << L": ";
+void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
+	ostringstream s;
+	s << prefix << ": ";
 	int count = 0;
 	for (int i = 0; i < CountTracks(0); ++i) {
 		MediaTrack* track = GetTrack(0, i);
 		if (checkState(track)) {
 			++count;
 			if (count > 1)
-				s << L", ";
+				s << ", ";
 			s << i + 1;
 			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 			if (name && name[0])
-				s << L" " << name;
+				s << " " << name;
 		}
 	}
 	if (count == 0)
-		s << L"none";
+		s << "none";
 	outputMessage(s);
 }
 
 void cmdReportMutedTracks(Command* command) {
-	reportTracksWithState(L"Muted", isTrackMuted);
+	reportTracksWithState("Muted", isTrackMuted);
 }
 
 void cmdReportSoloedTracks(Command* command) {
-	reportTracksWithState(L"Soloed", isTrackSoloed);
+	reportTracksWithState("Soloed", isTrackSoloed);
 }
 
 void cmdReportArmedTracks(Command* command) {
-	reportTracksWithState(L"Armed", isTrackArmed);
+	reportTracksWithState("Armed", isTrackArmed);
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState(L"Monitored", isTrackMonitored);
+	reportTracksWithState("Monitored", isTrackMonitored);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState(L"Phase inverted", isTrackPhaseInverted);
+	reportTracksWithState("Phase inverted", isTrackPhaseInverted);
 }
 
 void cmdRemoveFocus(Command* command) {
@@ -1160,11 +1170,11 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		return;
 	double cursorPos = GetCursorPosition();
 	for (int i = 0; i < ListView_GetItemCount(guiThreadInfo.hwndFocus); ++i) {
-		char text[50];
+		WCHAR textW[50];
 		// Get the text from the position column (1).
-		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, text, ARRAYSIZE(text));
+		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, textW, ARRAYSIZE(textW));
 		// Convert this to project time. text is always in measures.beats.
-		double eventPos = parse_timestr_pos(text, 2);
+		double eventPos = parse_timestr_pos(narrow(textW).c_str(), 2);
 		if (eventPos >= cursorPos) {
 			// This item is at or just after the cursor.
 			int oldFocus = ListView_GetNextItem(guiThreadInfo.hwndFocus, -1, LVNI_FOCUSED);
@@ -1305,7 +1315,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				// This is our own command.
 				if (COMMANDS[i].section == MAIN_SECTION) {
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
-					rec->Register("gaccel", &COMMANDS[i].gaccel);
+					rec->Register("gacce", &COMMANDS[i].gaccel);
 				} else {
 					custom_action_register_t action;
 					action.uniqueSectionId = COMMANDS[i].section;
