@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConstruct
-# Author: James Teh <jamie@jantrid.net>
-# Copyright 2015 James Teh
+# Author: James Teh <jamie@nvaccess.org>
+# Copyright 2015 NV Access Limited
 # License: GNU General Public License version 2.0
 
 for arch, suffix in (("x86", "32"), ("x86_64", "64")):

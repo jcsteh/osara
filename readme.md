@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
-- Author: James Teh &lt;jamie@jantrid.net&gt;
-- Copyright: 2014-2015 James Teh
+- Author: James Teh &lt;jamie@nvaccess.org&gt;
+- Copyright: 2014-2015 NV Access Limited
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -30,8 +30,8 @@ However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate informa
 ## Downloading
 For now, here are links to the latest versions of the plug-in files:
 
-- [32 bit dll](https://dl.dropboxusercontent.com/u/28976681/reaper_osara32.dll?dl=1)
-- [64 bit dll](https://dl.dropboxusercontent.com/u/28976681/reaper_osara64.dll?dl=1)
+- [32 bit dll](http://www.nvaccess.org/files/osara/reaper_osara32.dll)
+- [64 bit dll](http://www.nvaccess.org/files/osara/reaper_osara64.dll)
 
 ## Installation
 - If you are using a 32 bit version of REAPER, the file you need is reaper_osara32.dll.
@@ -219,10 +219,10 @@ OSARA also includes some other miscellaneous actions.
 If you need help, please subscribe to the [http://bluegrasspals.com/mailman/listinfo/rwp](Reapers Without Peepers mailing list) and ask your questions there.
 
 ## Reporting Issues
-Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
+Issues should be reported [on GitHub](https://github.com/nvaccess/osara/issues).
 
 ## Donations
-Donations are gratefully accepted via [PayPal](http://www.paypal.com/) to jamie@jantrid.net.
+If you find OSARA useful and want it to continue to improve, please consider [donating to NV Access](http://www.nvaccess.org/donate/).
 
 ## Building
 This section is for those interested in building OSARA from source code.
