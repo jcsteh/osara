@@ -410,7 +410,7 @@ void postChangeTrackVolume(int command) {
 		return;
 	ostringstream s;
 	s << fixed << setprecision(2);
-	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VO", NULL));
+	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
 	outputMessage(s);
 }
 
