@@ -309,7 +309,7 @@ void postCycleTrackMonitor(int command) {
 			outputMessage("record monitor off");
 			break;
 		case 1:
-			outputMessage("norma");
+			outputMessage("normal");
 			break;
 		case 2:
 			outputMessage("not when playing");
@@ -320,7 +320,7 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase norma");
+	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase normal");
 }
 
 void postCursorMovement(int command) {
@@ -1315,7 +1315,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				// This is our own command.
 				if (COMMANDS[i].section == MAIN_SECTION) {
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
-					rec->Register("gacce", &COMMANDS[i].gaccel);
+					rec->Register("gaccel", &COMMANDS[i].gaccel);
 				} else {
 					custom_action_register_t action;
 					action.uniqueSectionId = COMMANDS[i].section;
