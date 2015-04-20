@@ -8,10 +8,12 @@
 
 #define UNICODE
 #include <windows.h>
+#ifdef _WIN32
 #include <initguid.h>
 #include <oleacc.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
+#endif
 #include <string>
 #include <sstream>
 #include <map>
@@ -72,8 +74,10 @@ using namespace std;
 
 HINSTANCE pluginHInstance;
 HWND mainHwnd;
+#ifdef _WIN32
 DWORD guiThread;
 IAccPropServices* accPropServices = NULL;
+#endif
 
 // We cache the last reported time so we can report just the components which have changed.
 int oldMeasure = 0;
@@ -98,6 +102,7 @@ string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
 }
 
+#ifdef _WIN32
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
@@ -123,6 +128,7 @@ void outputMessage(const string& message) {
 	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
 	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
+#endif // _WIN32
 
 void outputMessage(ostringstream& message) {
 	outputMessage(message.str());
@@ -540,6 +546,8 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 };
 map<int, PostCommandExecute> postCommandsMap;
 
+#ifdef _WIN32
+
 // A capturing lambda can't be passed as a Windows callback, hence the struct.
 typedef struct {
 	int index;
@@ -618,6 +626,8 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 	}
 	return 0;
 }
+
+#endif // _WIN32
 
 /*** Our commands/commands we want to intercept.
  * Each command should have a function and should be added to the COMMANDS array below.
@@ -702,6 +712,7 @@ void cmdMoveItems(Command* command) {
 		reportActionName(command->gaccel.accel.cmd);
 }
 
+#ifdef _WIN32
 const int FXPARAMS_SLIDER_RANGE = 1000;
 MediaTrack* fxParams_track;
 int fxParams_fx;
@@ -1104,6 +1115,8 @@ void cmdIoMaster(Command* command) {
 		SetMasterTrackVisibility(prevVisible);
 }
 
+#endif // _WIN32
+
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
@@ -1162,6 +1175,7 @@ void cmdRemoveFocus(Command* command) {
 	}
 }
 
+#ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -1191,6 +1205,7 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		}
 	}
 }
+#endif // _WIN32
 
 #define DEFACCEL {0, 0, 0}
 const int MAIN_SECTION = 0;
@@ -1212,11 +1227,13 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
 	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
 	// Our own commands.
+#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
+#endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
@@ -1224,7 +1241,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
+#ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
+#endif
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
@@ -1267,6 +1286,7 @@ bool handleMainCommandFallback(int command, int flag) {
 
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
+#ifdef _WIN32
 VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
@@ -1275,6 +1295,9 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	KillTimer(NULL, event);
 }
+#endif // _WIN32
+
+#ifdef _WIN32
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS && lastMessageHwnd && hwnd != lastMessageHwnd) {
@@ -1291,6 +1314,8 @@ accelerator_register_t accelReg = {
 	true,
 };
 
+#endif // _WIN32
+
 extern "C" {
 
 REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
@@ -1300,11 +1325,14 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0; // Incompatible.
 
 		pluginHInstance = hInstance;
+		mainHwnd = rec->hwnd_main;
+
+#ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)
 			return 0;
-		mainHwnd = rec->hwnd_main;
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
+#endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
@@ -1335,13 +1363,17 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcommand", handleMainCommandFallback);
 
 		rec->Register("accelerator", &accelReg);
+#ifdef _WIN32
 		SetTimer(NULL, NULL, 0, delayedInit);
+#endif
 		return 1;
 
 	} else {
 		// Unload.
+#ifdef _WIN32
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
+#endif
 		return 0;
 	}
 }
