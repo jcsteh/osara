@@ -216,7 +216,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Focus event nearest edit cursor
 
 ## Support
-If you need help, please subscribe to the [http://bluegrasspals.com/mailman/listinfo/rwp](Reapers Without Peepers mailing list) and ask your questions there.
+If you need help, please subscribe to the [Reapers Without Peepers mailing list](http://bluegrasspals.com/mailman/listinfo/rwp) and ask your questions there.
 
 ## Reporting Issues
 Issues should be reported [on GitHub](https://github.com/nvaccess/osara/issues).
