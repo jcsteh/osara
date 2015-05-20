@@ -19,7 +19,10 @@
 #include <map>
 #include <iomanip>
 #include <math.h>
+#ifdef _WIN32
+// We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
+#endif
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -94,6 +97,8 @@ enum {
 
 /*** Utilities */
 
+#ifdef _WIN32
+
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
 wstring widen(const string& text) {
 	return utf8Utf16.from_bytes(text);
@@ -102,7 +107,6 @@ string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
 }
 
-#ifdef _WIN32
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
@@ -128,6 +132,7 @@ void outputMessage(const string& message) {
 	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
 	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
+
 #endif // _WIN32
 
 void outputMessage(ostringstream& message) {
