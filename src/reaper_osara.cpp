@@ -246,7 +246,8 @@ void postGoToTrack(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	int trackNum = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	// Need to cast to size_t first to avoid "loses information" error with clang.
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	MediaTrack* parentTrack = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
 	if (parentTrack
 		&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERDEPTH", NULL) == 1
@@ -351,7 +352,8 @@ void postMoveToItem(int command) {
 	fakeFocus = FOCUS_ITEM;
 	SetCursorContext(1, NULL);
 	ostringstream s;
-	s << (int)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
+	// Need to cast to size_t first to avoid "loses information" error with clang.
+	s << (int)(size_t)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
 	MediaItem_Take* take = GetActiveTake(item);
 	if (take)
 		s << " " << GetTakeName(take);
@@ -471,7 +473,8 @@ void postSwitchToTake(int command) {
 	if (!take)
 		return;
 	ostringstream s;
-	s << (int)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
+	// Need to cast to size_t first to avoid "loses information" error with clang.
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
 		<< GetTakeName(take);
 	outputMessage(s);
 }
