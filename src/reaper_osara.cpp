@@ -388,11 +388,12 @@ void postGoToMarker(int command) {
 	int number;
 	if (marker >= 0) {
 		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
-		if (markerPos == cursorPos)
+		if (markerPos == cursorPos) {
 			if (name[0])
 				s << name << " marker" << " ";
 			else
 				s << "marker " << number << " ";
+		}
 	}
 	if (region >= 0) {
 		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
@@ -486,7 +487,7 @@ typedef struct PostCommand {
 } PostCommand;
 // For commands registered by other plug-ins.
 typedef struct {
-	char* id;
+	const char* id;
 	PostCommandExecute execute;
 } PostCustomCommand;
 
@@ -1344,7 +1345,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
-		rec->Register("hookpostcommand", postCommand);
+		rec->Register("hookpostcommand", (void*)postCommand);
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
 			if (COMMANDS[i].id) {
@@ -1364,11 +1365,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		}
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
-		rec->Register("hookcommand2", handleCommand);
+		rec->Register("hookcommand2", (void*)handleCommand);
 		// #29: Unfortunately, actions triggered by user-defined actions don't trigger hookcommand2,
 		// but they do trigger hookcommand. IMO, this is a REAPER bug.
 		// Register hookcommand as well so custom actions at least work for the main section.
-		rec->Register("hookcommand", handleMainCommandFallback);
+		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
 		rec->Register("accelerator", &accelReg);
 #ifdef _WIN32
