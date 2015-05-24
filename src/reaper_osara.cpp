@@ -133,6 +133,11 @@ void outputMessage(const string& message) {
 	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
 
+#else // _WIN32
+
+void outputMessage(const string& message) {
+}
+
 #endif // _WIN32
 
 void outputMessage(ostringstream& message) {
