@@ -1376,8 +1376,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
-		rec->Register("accelerator", &accelReg);
 #ifdef _WIN32
+		rec->Register("accelerator", &accelReg);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #endif
 		return 1;
