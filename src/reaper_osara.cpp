@@ -22,6 +22,8 @@
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
+#else
+#include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
@@ -136,6 +138,7 @@ void outputMessage(const string& message) {
 #else // _WIN32
 
 void outputMessage(const string& message) {
+	NSA11yWrapper::osxa11y_announce(message);
 }
 
 #endif // _WIN32
@@ -1346,6 +1349,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0;
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
+#else
+		NSA11yWrapper::init();
 #endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
@@ -1387,6 +1392,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
+#else
+		NSA11yWrapper::destroy();
 #endif
 		return 0;
 	}
