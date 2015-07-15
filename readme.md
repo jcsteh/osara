@@ -1,6 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
-- Author: James Teh &lt;jamie@nvaccess.org&gt;
+- Author: James Teh &lt;jamie@nvaccess.org&gt; & other contributors
 - Copyright: 2014-2015 NV Access Limited
 - License: GNU General Public License version 2.0
 
@@ -242,3 +242,8 @@ You will need:
 
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
 The resulting dll files can be found at build\x86\reaper_osara32.dll and build\x86_64\reaper_osara64.dll.
+
+## Contributors
+- NV Access Limited
+- James Teh
+- Victor Tsaran
