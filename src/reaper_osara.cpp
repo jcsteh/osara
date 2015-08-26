@@ -96,6 +96,7 @@ enum {
 	FOCUS_ITEM,
 	FOCUS_RULER,
 } fakeFocus = FOCUS_NONE;
+bool isShortcutHelpEnabled = false;
 
 /*** Utilities */
 
@@ -207,14 +208,16 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-void reportActionName(int command) {
+void reportActionName(int command, bool skipCategory=true) {
 	const char* name = kbd_getTextFromCmd(command, NULL);
 	const char* start;
-	// Skip the category before the colon (if any).
-	for (start = name; *start; ++start) {
-		if (*start == ':') {
-			name = start + 2;
-			break;
+	if (skipCategory) {
+		// Skip the category before the colon (if any).
+		for (start = name; *start; ++start) {
+			if (*start == ':') {
+				name = start + 2;
+				break;
+			}
 		}
 	}
 	ostringstream s;
@@ -1192,6 +1195,11 @@ void cmdRemoveFocus(Command* command) {
 	}
 }
 
+void cmdShortcutHelp(Command* command) {
+	isShortcutHelpEnabled = !isShortcutHelpEnabled;
+	outputMessage(isShortcutHelpEnabled ? "input help on" : "input help off");
+}
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
@@ -1258,6 +1266,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
@@ -1279,10 +1288,16 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
-	if (it != commandsMap.end()) {
+	if (it != commandsMap.end()
+		// Allow shortcut help to be disabled.
+		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
+	) {
 		isHandlingCommand = true;
 		it->second->execute(it->second);
 		isHandlingCommand = false;
+		return true;
+	} else if (isShortcutHelpEnabled) {
+		reportActionName(command, false);
 		return true;
 	}
 	return false;

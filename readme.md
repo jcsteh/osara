@@ -206,6 +206,15 @@ To use Peak Watcher:
 At any time, you can report the current peak level for the track being watched by running the "OSARA: Report Peak Watcher peaks" action.
 You will probably want to add a keyboard shortcut for this action so you can access it quickly.
 
+### Shortcut Help
+It is possible to have REAPER list all shortcuts and to search for individual shortcuts in the Action List.
+However, it is sometimes convenient to be able to simply press a shortcut and immediately learn what action it will perform.
+This is especially useful if you have forgotten an exact shortcut but do have some idea of what it might be.
+You can achieve this using OSARA's shortcut help mode.
+
+You can turn shortcut help on and off using the "OSARA: Toggle shortcut help" action.
+While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
+
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 
