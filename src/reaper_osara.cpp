@@ -247,6 +247,10 @@ bool isTrackPhaseInverted(MediaTrack* track) {
 	return *(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL);
 }
 
+bool isTrackFxBypassed(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "I_FXEN", NULL) == 0;
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -297,6 +301,8 @@ void postGoToTrack(int command) {
 		s << " armed";
 	if (isTrackPhaseInverted(track))
 		s << " phase inverted";
+	if (isTrackFxBypassed(track))
+		s << " FX bypassed";
 	int itemCount = CountTrackMediaItems(track);
 	s << " " << itemCount << (itemCount == 1 ? " item" : " items");
 	outputMessage(s);
@@ -344,6 +350,21 @@ void postInvertTrackPhase(int command) {
 	if (!track)
 		return;
 	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase normal");
+}
+
+void postToggleTrackFxBypass(MediaTrack* track) {
+	outputMessage(isTrackFxBypassed(track) ? "FX bypassed" : "FX active");
+}
+
+void postToggleTrackFxBypass(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	postToggleTrackFxBypass(track);
+}
+
+void postToggleMasterTrackFxBypass(int command) {
+	postToggleTrackFxBypass(GetMasterTrack(0));
 }
 
 void postCursorMovement(int command) {
@@ -511,6 +532,9 @@ PostCommand POST_COMMANDS[] = {
 	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
+	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
+	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
+	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
 	{40104, postCursorMovement}, // View: Move cursor left one pixel
 	{40105, postCursorMovement}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project

@@ -73,6 +73,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Toggle record arming for current (last touched) track
 - Track: Cycle track record monitor
 - Track: Invert track phase
+- Track: Toggle FX bypass for current track
+- Track: Toggle FX bypass for master track
+- Track: toggle FX bypass on all tracks
 - Track: Nudge track volume up
 - Track: Nudge track volume down
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up
