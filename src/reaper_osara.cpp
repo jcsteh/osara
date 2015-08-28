@@ -743,7 +743,7 @@ void cmdPaste(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	ostringstream s;
 	int added;
-	 if ((added = CountTracks(0) - oldTracks) > 0)
+	if ((added = CountTracks(0) - oldTracks) > 0)
 		s << added << (added == 1 ? " track" : " tracks") << " added";
 	else if ((added = CountMediaItems(0) - oldItems) > 0)
 		s << added << (added == 1 ? " item" : " items") << " added";
