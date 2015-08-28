@@ -155,6 +155,13 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 #### Time Selection
 - Time selection: Remove contents of time selection (moving later items)
 
+#### Clipboard
+- Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
+- Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut)
+- Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
+- Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
+- Item: Paste items/tracks
+
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track, track area, item and ruler context menus.

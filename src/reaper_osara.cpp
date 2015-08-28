@@ -70,6 +70,10 @@
 #define REAPERAPI_WANT_CountTrackMediaItems
 #define REAPERAPI_WANT_GetSetMediaItemTakeInfo
 #define REAPERAPI_WANT_kbd_getTextFromCmd
+// GetCursorContext always seems to return 1.
+#define REAPERAPI_WANT_GetCursorContext2
+#define REAPERAPI_WANT_CountSelectedMediaItems
+#define REAPERAPI_WANT_CountSelectedTracks
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 #include <WDL/db2val.h>
@@ -512,6 +516,24 @@ void postSwitchToTake(int command) {
 	outputMessage(s);
 }
 
+void postCopy(int command) {
+	ostringstream s;
+	int count;
+	switch (GetCursorContext2(true)) {
+		case 0: // Track
+			if ((count = CountSelectedTracks(0)) > 0)
+				s << count << (count == 1 ? " track" : " tracks") << " copied";
+			break;
+		case 1: // Item
+			if ((count = CountSelectedMediaItems(0)) > 0)
+				s << count << (count == 1 ? " item" : " items") << " copied";
+			break;
+		default:
+			return;
+	}
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -581,6 +603,8 @@ PostCommand POST_COMMANDS[] = {
 	{1068, postToggleRepeat}, // Transport: Toggle repeat
 	{40125, postSwitchToTake}, // Take: Switch items to next take
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
+	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
+	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -713,22 +737,56 @@ void cmdSplitItems(Command* command) {
 	outputMessage(s);
 }
 
-void cmdRemoveTracks(Command* command) {
+void cmdPaste(Command* command) {
+	int oldItems = CountMediaItems(0);
+	int oldTracks = CountTracks(0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	ostringstream s;
+	int added;
+	 if ((added = CountTracks(0) - oldTracks) > 0)
+		s << added << (added == 1 ? " track" : " tracks") << " added";
+	else if ((added = CountMediaItems(0) - oldItems) > 0)
+		s << added << (added == 1 ? " item" : " items") << " added";
+	else
+		s << "nothing pasted";
+	outputMessage(s);
+}
+
+void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
-	Main_OnCommand(40005, 0); // Track: Remove tracks
+	Main_OnCommand(command, 0);
 	int removed = oldCount - CountTracks(0);
 	ostringstream s;
 	s << removed << (removed == 1 ? " track" : " tracks") << " removed";
 	outputMessage(s);
 }
 
-void cmdRemoveItems(Command* command) {
+void cmdRemoveTracks(Command* command) {
+	cmdhRemoveTracks(command->gaccel.accel.cmd);
+}
+
+void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
-	Main_OnCommand(40006, 0); // Item: Remove items
+	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
 	ostringstream s;
 	s << removed << (removed == 1 ? " item" : " items") << " removed";
 	outputMessage(s);
+}
+
+void cmdRemoveItems(Command* command) {
+	cmdhRemoveItems(command->gaccel.accel.cmd);
+}
+
+void cmdCut(Command* command) {
+	switch (GetCursorContext2(true)) {
+		case 0: // Track
+			cmdhRemoveTracks(command->gaccel.accel.cmd);
+			return;
+		case 1: // Item
+			cmdhRemoveItems(command->gaccel.accel.cmd);
+			return;
+	}
 }
 
 void cmdRemoveTimeSelection(Command* command) {
@@ -1209,10 +1267,10 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 void cmdRemoveFocus(Command* command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
-			cmdRemoveTracks(NULL);
+			cmdhRemoveTracks(40005); // Track: Remove tracks
 			break;
 		case FOCUS_ITEM:
-			cmdRemoveItems(NULL);
+			cmdhRemoveItems(40006); // Item: Remove items
 			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
@@ -1266,8 +1324,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
 	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
+	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
+	{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
+	{MAIN_SECTION, {{0, 0, 41384}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut)
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
 	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
