@@ -1279,7 +1279,7 @@ void cmdRemoveFocus(Command* command) {
 
 void cmdShortcutHelp(Command* command) {
 	isShortcutHelpEnabled = !isShortcutHelpEnabled;
-	outputMessage(isShortcutHelpEnabled ? "input help on" : "input help off");
+	outputMessage(isShortcutHelpEnabled ? "shortcut help on" : "shortcut help off");
 }
 
 #ifdef _WIN32
