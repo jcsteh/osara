@@ -6,7 +6,11 @@
 
 Import("env")
 env.Append(CPPFLAGS="/EHsc", CPPPATH=("#include", "#include/WDL"))
+# We always want debug symbols.
 env.Append(PDB="${TARGET}.pdb")
+# having symbols usually turns this off, but we have no need for unused symbols.
+env.Append(LINKFLAGS='/OPT:REF')
+
 env.SharedLibrary(
 	target="reaper_osara%s" % env["dllSuffix"],
 	source=[
