@@ -6,6 +6,7 @@
 
 Import("env")
 env.Append(CPPFLAGS="/EHsc", CPPPATH=("#include", "#include/WDL"))
+env.Append(PDB="${TARGET}.pdb")
 env.SharedLibrary(
 	target="reaper_osara%s" % env["dllSuffix"],
 	source=[
