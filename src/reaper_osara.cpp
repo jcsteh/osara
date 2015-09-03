@@ -377,10 +377,6 @@ void postToggleTrackFxBypass(int command) {
 	postToggleTrackFxBypass(track);
 }
 
-void postToggleMasterTrackFxBypass(int command) {
-	postToggleTrackFxBypass(GetMasterTrack(0));
-}
-
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	outputMessage(formatCursorPosition().c_str());
@@ -565,7 +561,6 @@ PostCommand POST_COMMANDS[] = {
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
-	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
 	{40104, postCursorMovement}, // View: Move cursor left one pixel
 	{40105, postCursorMovement}, // View: Move cursor right one pixel
@@ -822,6 +817,12 @@ void cmdMoveItems(Command* command) {
 	double newLen = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", NULL);
 	if (newPos != oldPos || newLen != oldLen)
 		reportActionName(command->gaccel.accel.cmd);
+}
+
+void cmdToggleMasterTrackFxBypass(Command* command) {
+	// #42: This really should be a post command, but hookpostcommand doesn't fire.
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	postToggleTrackFxBypass(GetMasterTrack(0));
 }
 
 #ifdef _WIN32
@@ -1346,6 +1347,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
 	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
 	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	// Our own commands.
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
