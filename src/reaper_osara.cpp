@@ -108,7 +108,17 @@ bool isShortcutHelpEnabled = false;
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
 wstring widen(const string& text) {
-	return utf8Utf16.from_bytes(text);
+	try {
+		return utf8Utf16.from_bytes(text);
+	} catch (range_error) {
+		// #38: Invalid UTF-8. This really shouldn't happen,
+		// but it seems REAPER/extensions sometimes use ANSI strings instead of UTF-8.
+		// This hack just widens the string without any encoding conversion.
+		// This may result in strange characters, but it's better than a crash.
+		wostringstream s;
+		s << text.c_str();
+		return s.str();
+	}
 }
 string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
