@@ -147,7 +147,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 	ReaperObjPanParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
 		this->min = -1;
 		this->max = 1;
-		this->step = 0.005;
+		this->step = 0.01;
 	}
 
 	double getValue() {
