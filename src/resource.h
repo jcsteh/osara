@@ -6,11 +6,10 @@
  * License: GNU General Public License version 2.0
  */
 
-#define ID_FX_PARAMS_DLG 100
-#define ID_FX_PARAM 101
-#define ID_FX_PARAM_VAL_TEXT 102
-#define ID_FX_PARAM_VAL_SLIDER 103
-#define ID_FX_PARAM_VAL_CHOICE 104
+#define ID_PARAMS_DLG 100
+#define ID_PARAM 101
+#define ID_PARAM_VAL_TEXT 102
+#define ID_PARAM_VAL_SLIDER 103
 
 #define ID_PEAK_WATCHER_DLG 200
 #define ID_PEAK_TRACK 201

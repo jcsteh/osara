@@ -25,59 +25,11 @@
 #else
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
-#define REAPERAPI_MINIMAL
 #define REAPERAPI_IMPLEMENT
-#define REAPERAPI_WANT_GetLastTouchedTrack
-#define REAPERAPI_WANT_GetSetMediaTrackInfo
-#define REAPERAPI_WANT_TimeMap2_timeToBeats
-#define REAPERAPI_WANT_GetCursorPosition
-#define REAPERAPI_WANT_GetContextMenu
-#define REAPERAPI_WANT_GetSelectedMediaItem
-#define REAPERAPI_WANT_GetSetMediaItemInfo
-#define REAPERAPI_WANT_GetActiveTake
-#define REAPERAPI_WANT_GetTakeName
-#define REAPERAPI_WANT_Main_OnCommand
-#define REAPERAPI_WANT_CountTracks
-#define REAPERAPI_WANT_GetTrack
-#define REAPERAPI_WANT_TrackFX_GetNumParams
-#define REAPERAPI_WANT_TrackFX_GetParamName
-#define REAPERAPI_WANT_TrackFX_GetCount
-#define REAPERAPI_WANT_TrackFX_GetFXName
-#define REAPERAPI_WANT_TrackFX_GetParam
-#define REAPERAPI_WANT_TrackFX_SetParam
-#define REAPERAPI_WANT_TrackFX_FormatParamValue
-#define REAPERAPI_WANT_GetLastMarkerAndCurRegion
-#define REAPERAPI_WANT_EnumProjectMarkers
-#define REAPERAPI_WANT_GetSelectedEnvelope
-#define REAPERAPI_WANT_GetEnvelopeName
-#define REAPERAPI_WANT_NamedCommandLookup
-#define REAPERAPI_WANT_GetMasterTrack
-#define REAPERAPI_WANT_Track_GetPeakInfo
-#define REAPERAPI_WANT_GetHZoomLevel
-#define REAPERAPI_WANT_GetToggleCommandState
-#define REAPERAPI_WANT_Main_OnCommand
-#define REAPERAPI_WANT_Undo_CanUndo2
-#define REAPERAPI_WANT_Undo_CanRedo2
-#define REAPERAPI_WANT_parse_timestr_pos
-#define REAPERAPI_WANT_GetMasterTrackVisibility
-#define REAPERAPI_WANT_SetMasterTrackVisibility
-#define REAPERAPI_WANT_GetAppVersion
-#define REAPERAPI_WANT_SetCursorContext
-#define REAPERAPI_WANT_GetPlayPosition
-#define REAPERAPI_WANT_SetEditCurPos
-#define REAPERAPI_WANT_CountMediaItems
-#define REAPERAPI_WANT_GetSet_LoopTimeRange
-#define REAPERAPI_WANT_CountTrackMediaItems
-#define REAPERAPI_WANT_GetSetMediaItemTakeInfo
-#define REAPERAPI_WANT_kbd_getTextFromCmd
-// GetCursorContext always seems to return 1.
-#define REAPERAPI_WANT_GetCursorContext2
-#define REAPERAPI_WANT_CountSelectedMediaItems
-#define REAPERAPI_WANT_CountSelectedTracks
-#include <reaper/reaper_plugin.h>
-#include <reaper/reaper_plugin_functions.h>
+#include "osara.h"
 #include <WDL/db2val.h>
 #include "resource.h"
+#include "paramsUi.h"
 
 using namespace std;
 
@@ -706,13 +658,6 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
  * Each command should have a function and should be added to the COMMANDS array below.
  */
 
-typedef struct Command {
-	int section;
-	gaccel_register_t gaccel;
-	const char* id;
-	void (*execute)(Command*);
-} Command;
-
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -826,164 +771,6 @@ void cmdToggleMasterTrackFxBypass(Command* command) {
 }
 
 #ifdef _WIN32
-const int FXPARAMS_SLIDER_RANGE = 1000;
-MediaTrack* fxParams_track;
-int fxParams_fx;
-int fxParams_param;
-double fxParams_val, fxParams_valMin, fxParams_valMax;
-// The raw value adjustment for an adjustment of 1 on the slider.
-double fxParams_valStep;
-const int FXPARAMS_VAL_TEXT_SIZE = 50;
-// We cache the value text for later comparison.
-char fxParams_valText[FXPARAMS_VAL_TEXT_SIZE];
-
-void fxParams_updateValueText(HWND slider) {
-	if (!fxParams_valText[0]) {
-		// No value text.
-		accPropServices->ClearHwndProps(slider, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_VALUE, 1);
-		return;
-	}
-
-	// Convert to Unicode.
-	ostringstream s;
-	s << fxParams_valText;
-	// Set the slider's accessible value to this text.
-	accPropServices->SetHwndPropStr(slider, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_VALUE,
-		widen(s.str()).c_str());
-}
-
-void fxParams_updateSlider(HWND slider) {
-	SendMessage(slider, TBM_SETPOS, TRUE,
-		(int)((fxParams_val - fxParams_valMin) / fxParams_valStep));
-	if (!TrackFX_FormatParamValue(fxParams_track, fxParams_fx, fxParams_param, fxParams_val, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE))
-		fxParams_valText[0] = '\0';
-	fxParams_updateValueText(slider);
-}
-
-void fxParams_onParamChange(HWND dialog, HWND params) {
-	fxParams_param = ComboBox_GetCurSel(params);
-	fxParams_val = TrackFX_GetParam(fxParams_track, fxParams_fx, fxParams_param, 
-		&fxParams_valMin, &fxParams_valMax);
-	fxParams_valStep = (fxParams_valMax - fxParams_valMin) / FXPARAMS_SLIDER_RANGE;
-	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
-	fxParams_updateSlider(slider);
-}
-
-void fxParams_onSliderChange(HWND slider) {
-	int sliderVal = SendMessage(slider, TBM_GETPOS, 0, 0);
-	double newVal = sliderVal * fxParams_valStep + fxParams_valMin;
-	TrackFX_SetParam(fxParams_track, fxParams_fx, fxParams_param, newVal);
-	if (newVal == fxParams_val)
-		return; // This is due to our own snapping call (below).
-	int step = (newVal > fxParams_val) ? 1 : -1;
-	fxParams_val = newVal;
-
-	// If the value text (if any) doesn't change, the value change is insignificant.
-	// Snap to the next change in value text.
-	// todo: Optimise; perhaps a binary search?
-	for (; 0 <= sliderVal && sliderVal <= FXPARAMS_SLIDER_RANGE; sliderVal += step) {
-		// Continually adding to a float accumulates inaccuracy,
-		// so calculate the value from scratch each time.
-		newVal = sliderVal * fxParams_valStep + fxParams_valMin;
-		char testText[FXPARAMS_VAL_TEXT_SIZE];
-		if (!TrackFX_FormatParamValue(fxParams_track, fxParams_fx, fxParams_param, newVal, testText, FXPARAMS_VAL_TEXT_SIZE))
-			break; // Formatted values not supported.
-		if (strncmp(testText, fxParams_valText, FXPARAMS_VAL_TEXT_SIZE) != 0) {
-			// The value text is different, so this change is significant.
-			// Snap to this value.
-			fxParams_val = newVal;
-			fxParams_updateSlider(slider);
-			break;
-		}
-	}
-}
-
-INT_PTR CALLBACK fxParams_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
-	switch (msg) {
-		case WM_COMMAND:
-			if (LOWORD(wParam) == ID_FX_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
-				fxParams_onParamChange((HWND)dialog, (HWND)lParam);
-				return TRUE;
-			} else if (LOWORD(wParam) == IDCANCEL) {
-				DestroyWindow(dialog);
-				return TRUE;
-			}
-			break;
-		case WM_HSCROLL:
-			if (GetWindowLong((HWND)lParam, GWL_ID) == ID_FX_PARAM_VAL_SLIDER) {
-				fxParams_onSliderChange((HWND)lParam);
-				return TRUE;
-			}
-			break;
-		case WM_CLOSE:
-			DestroyWindow(dialog);
-			return TRUE;
-	}
-	return FALSE;
-}
-
-void fxParams_begin(MediaTrack* track) {
-	fxParams_track = track;
-	char name[256];
-
-	int fxCount = TrackFX_GetCount(fxParams_track);
-	if (fxCount == 0)
-		return;
-	else if (fxCount == 1)
-		fxParams_fx = 0;
-	else {
-		// Present a menu of effects.
-		HMENU effects = CreatePopupMenu();
-		MENUITEMINFO itemInfo;
-		itemInfo.cbSize = sizeof(MENUITEMINFO);
-		for (int f = 0; f < fxCount; ++f) {
-			TrackFX_GetFXName(fxParams_track, f, name, sizeof(name));
-			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
-			itemInfo.fType = MFT_STRING;
-			itemInfo.wID = f + 1;
-			itemInfo.dwTypeData = (wchar_t*)widen(name).c_str();
-			itemInfo.cch = ARRAYSIZE(name);
-			InsertMenuItem(effects, f, false, &itemInfo);
-		}
-		fxParams_fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
-		DestroyMenu(effects);
-		if (fxParams_fx == -1)
-			return; // Cancelled.
-	}
-
-	int numParams = TrackFX_GetNumParams(fxParams_track, fxParams_fx);
-	if (numParams == 0)
-		return;
-	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_FX_PARAMS_DLG), mainHwnd, fxParams_dialogProc);
-	HWND params = GetDlgItem(dialog, ID_FX_PARAM);
-	// Populate the parameter list.
-	for (int p = 0; p < numParams; ++p) {
-		TrackFX_GetParamName(fxParams_track, fxParams_fx, p, name, sizeof(name));
-		// Append the parameter number to facilitate efficient navigation
-		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ostringstream ns;
-		ns << name << " (" << p + 1 << ")";
-		ComboBox_AddString(params, widen(ns.str()).c_str());
-	}
-	ComboBox_SetCurSel(params, 0); // Select the first initially.
-	HWND slider = GetDlgItem(dialog, ID_FX_PARAM_VAL_SLIDER);
-	SendMessage(slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, FXPARAMS_SLIDER_RANGE));
-	SendMessage(slider, TBM_SETLINESIZE, 0, 1);
-	fxParams_onParamChange(dialog, params);
-	ShowWindow(dialog, SW_SHOWNORMAL);
-}
-
-void cmdFxParamsCurrentTrack(Command* command) {
-	MediaTrack* currentTrack = GetLastTouchedTrack();
-	if (!currentTrack)
-		return;
-	fxParams_begin(currentTrack);
-}
-
-void cmdFxParamsMaster(Command* command) {
-	fxParams_begin(GetMasterTrack(0));
-}
-
 MediaTrack* peakWatcher_track = NULL;
 bool peakWatcher_followTrack = false;
 // What the user can choose to watch.

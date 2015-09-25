@@ -15,6 +15,7 @@ env.SharedLibrary(
 	target="reaper_osara%s" % env["dllSuffix"],
 	source=[
 		"reaper_osara.cpp",
+		"paramsUi.cpp",
 		env.RES("reaper_osara.rc"),
 	],
 	LIBS=[
