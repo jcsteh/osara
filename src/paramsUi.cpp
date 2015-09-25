@@ -42,6 +42,134 @@ class ParamSource {
 	virtual Param* getParam(int param) = 0;
 };
 
+class ReaperObjParamSource;
+
+typedef struct {
+	const char* displayName;
+	const char* name;
+	Param*(*makeParam)(ReaperObjParamSource& source, const char* name);
+} ReaperObjParamData;
+
+class ReaperObjParam: public Param {
+	protected:
+	ReaperObjParamSource& source;
+	const char* name;
+
+	ReaperObjParam(ReaperObjParamSource& source, const char* name): source(source), name(name) {
+	}
+
+};
+
+class ReaperObjParamSource: public ParamSource {
+	protected:
+	const ReaperObjParamData* params;
+	int count;
+
+	public:
+
+	virtual void* getSetValue(const char* name, void* newValue) = 0;
+
+	int getParamCount() {
+		return this->count;
+	}
+
+	string getParamName(int param) {
+		return this->params[param].displayName;
+	}
+
+	Param* getParam(int param) {
+		const ReaperObjParamData& data = this->params[param];
+		return data.makeParam(*this, data.name);
+	}
+
+};
+
+class ReaperObjToggleParam: public ReaperObjParam {
+
+	public:
+	ReaperObjToggleParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+		this->min = 0;
+		this->max = 1;
+		this->step = 1;
+	}
+
+	double getValue() {
+		return (double)*(bool*)this->source.getSetValue(this->name, NULL);
+	}
+
+	string getValueText(double value) {
+		return value ? "on" : "off";
+	}
+
+	void setValue(double value) {
+		bool val = (bool)value;
+		this->source.getSetValue(this->name, (void*)&val);
+	}
+
+	static Param* make(ReaperObjParamSource& source, const char* name) {
+		return new ReaperObjToggleParam(source, name);
+	}
+
+};
+
+class ReaperObjVolParam: public ReaperObjParam {
+
+	public:
+	ReaperObjVolParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+		this->min = 0;
+		this->max = 4;
+		this->step = 0.001;
+	}
+
+	double getValue() {
+		return *(double*)this->source.getSetValue(this->name, NULL);
+	}
+
+	string getValueText(double value) {
+		char out[64];
+		mkvolstr(out, value);
+		return out;
+	}
+
+	void setValue(double value) {
+		this->source.getSetValue(this->name, (void*)&value);
+	}
+
+	static Param* make(ReaperObjParamSource& source, const char* name) {
+		return new ReaperObjVolParam(source, name);
+	}
+
+};
+
+class ReaperObjPanParam: public ReaperObjParam {
+
+	public:
+	ReaperObjPanParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+		this->min = -1;
+		this->max = 1;
+		this->step = 0.005;
+	}
+
+	double getValue() {
+		return *(double*)this->source.getSetValue(this->name, NULL);
+	}
+
+	string getValueText(double value) {
+		char out[64];
+		mkpanstr(out, value);
+		return out;
+	}
+
+	void setValue(double value) {
+		this->source.getSetValue(this->name, (void*)&value);
+	}
+
+	static Param* make(ReaperObjParamSource& source, const char* name) {
+		return new ReaperObjPanParam(source, name);
+	}
+
+};
+
 #ifdef _WIN32
 
 class ParamsDialog {
@@ -171,6 +299,90 @@ class ParamsDialog {
 	}
 
 };
+
+#endif
+
+class TrackParams: public ReaperObjParamSource {
+	private:
+	MediaTrack* track;
+
+	public:
+	TrackParams(MediaTrack* track): track(track) {
+		static ReaperObjParamData params[] = {
+			{"Volume", "D_VOL", ReaperObjVolParam::make},
+			{"Pan", "D_PAN", ReaperObjPanParam::make},
+			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
+		};
+		this->params = params;
+		this->count = ARRAYSIZE(params);
+	}
+
+	string getTitle() {
+		return "Track Parameters";
+	}
+
+	void* getSetValue(const char* name, void* newValue) {
+		return GetSetMediaTrackInfo(this->track, name, newValue);
+	}
+
+};
+
+class ItemParams: public ReaperObjParamSource {
+	private:
+	MediaItem* item;
+
+	public:
+	ItemParams(MediaItem* item): item(item) {
+		static ReaperObjParamData params[] = {
+			{"Item volume", "D_VOL", ReaperObjVolParam::make},
+			{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
+			{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
+			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
+		};
+		this->params = params;
+		this->count = ARRAYSIZE(params);
+	}
+
+	string getTitle() {
+		return "Item Parameters";
+	}
+
+	void* getSetValue(const char* name, void* newValue) {
+		if (strncmp(name, "t:", 2) == 0) {
+			// Take property.
+			name = &name[2];
+			MediaItem_Take* take = GetActiveTake(item);
+			return GetSetMediaItemTakeInfo(take, name, newValue);
+		}
+		return GetSetMediaItemInfo(this->item, name, newValue);
+	}
+
+};
+
+#ifdef _WIN32
+
+void cmdParamsFocus(Command* command) {
+	ParamSource* source;
+	switch (fakeFocus) {
+		case FOCUS_TRACK: {
+			MediaTrack* track = GetLastTouchedTrack();
+			if (!track)
+				return;
+			source = new TrackParams(track);
+			break;
+		}
+		case FOCUS_ITEM: {
+			MediaItem* item = GetSelectedMediaItem(0, 0);
+			if (!item)
+				return;
+			source = new ItemParams(item);
+			break;
+		}
+		default:
+			return;
+	}
+	new ParamsDialog(source);
+}
 
 #endif
 

@@ -60,6 +60,8 @@
 #define REAPERAPI_WANT_GetCursorContext2
 #define REAPERAPI_WANT_CountSelectedMediaItems
 #define REAPERAPI_WANT_CountSelectedTracks
+#define REAPERAPI_WANT_mkvolstr
+#define REAPERAPI_WANT_mkpanstr
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -72,6 +74,15 @@ typedef struct Command {
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;
+
+// We maintain our own idea of focus for context sensitivity.
+enum FakeFocus {
+	FOCUS_NONE = 0,
+	FOCUS_TRACK,
+	FOCUS_ITEM,
+	FOCUS_RULER,
+};
+extern enum FakeFocus fakeFocus;
 
 #ifdef _WIN32
 #include <string>

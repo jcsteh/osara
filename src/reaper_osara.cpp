@@ -45,13 +45,7 @@ int oldMeasure = 0;
 int oldBeat = 0;
 int oldBeatPercent = 0;
 int oldMinute = 0;
-// We maintain our own idea of focus for context sensitivity.
-enum {
-	FOCUS_NONE = 0,
-	FOCUS_TRACK,
-	FOCUS_ITEM,
-	FOCUS_RULER,
-} fakeFocus = FOCUS_NONE;
+FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 
 /*** Utilities */
@@ -1137,6 +1131,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	// Our own commands.
 #ifdef _WIN32
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},

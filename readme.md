@@ -173,23 +173,35 @@ If you have just moved the edit cursor, it will open the context menu for the ru
 For tracks, there are two context menus.
 You access the second by pressing control+applications.
 
-### FX Parameter List
+### Parameter Lists
+OSARA can display a list of parameters for various elements such as tracks, items and effects.
+You can then check and change the values of these parameters.
+This is useful for parameters which are tedious or impossible to access otherwise.
+
+#### Track/Item Parameters
+To access the parameter list for a track or an item, select the track or item you wish to work with.
+Then, run the "OSARA: View parameters for current track/item (depending on focus)" action.
+You will probably want to add a keyboard shortcut for this action so you can access it quickly.
+
+#### FX Parameters
 Many effects are unfortunately either partially or completely inaccessible.
 However, most effects make their parameters available for automation in a standard way.
 This can also be used to make them at least partially accessible.
-OSARA can display a list of parameters for an effect and allow you to check and change the values of these parameters.
+Thus, the FX parameter list is particular useful and is the only way to access some effects.
 
-To do this:
+To access it:
 
 1. Select a track with at least one effect. Then, run the "OSARA: View FX parameters for current track" action.
  You will probably want to add a keyboard shortcut for this action so you can access it quickly.
 2. Alternatively, run the "OSARA: View FX parameters for master track" action.
 3. If there is more than one effect on the track, select the desired effect from the menu.
-4. Once the FX Parameters dialog appears, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
-5. When you are done, press the Close button.
- Alternatively, you can press enter or escape.
 
 Note that only some effects expose easily readable values, while others expose only percentages.
+
+#### Using Parameter Lists
+Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
+When you are done, press the Close button.
+Alternatively, you can press enter or escape.
 
 ### Peak Watcher
 Peak watcher allows you to read the level of audio peaks in a specified track.

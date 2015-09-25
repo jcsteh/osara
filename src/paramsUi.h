@@ -11,4 +11,5 @@
 #ifdef _WIN32
 void cmdFxParamsCurrentTrack(Command* command);
 void cmdFxParamsMaster(Command* command);
+void cmdParamsFocus(Command* command);
 #endif
