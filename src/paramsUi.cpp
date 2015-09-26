@@ -196,8 +196,14 @@ class ParamsDialog {
 	}
 
 	void updateSlider() {
+		double sliderVal = (this->val - this->param->min) / this->param->step;
+		// This should be very close to an integer, but we can get values like 116.999...
+		// Casting to int just truncates the decimal.
+		// Nudge the number a bit to compensate for this.
+		// nearbyint would be better, but MSVC doesn't have this.
+		sliderVal += sliderVal > 0 ? 0.1 : -0.1;
 		SendMessage(this->slider, TBM_SETPOS, TRUE,
-			(int)((this->val - this->param->min) / this->param->step));
+			(int)sliderVal);
 		this->valText = this->param->getValueText(this->val);
 		this->updateValueText();
 	}
