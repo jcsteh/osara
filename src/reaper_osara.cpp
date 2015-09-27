@@ -519,6 +519,46 @@ void postCopy(int command) {
 	outputMessage(s);
 }
 
+void postMoveToEnvelopePoint(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	// GetEnvelopePointByTime often returns the point before instead of right at the position.
+	// Increment the cursor position a bit to work around this.
+	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
+	if (point < 0)
+		return;
+	double value;
+	bool selected;
+	GetEnvelopePoint(envelope, point, NULL, &value, NULL, NULL, &selected);
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	ostringstream s;
+	s << "point " << point + 1 << " value ";
+	char out[64];
+	if (strcmp(name, "Volume") == 0) {
+		mkvolstr(out, value);
+		s << out;
+	} else if (strcmp(name, "Pan") == 0) {
+		// The sign is wrong for some reason. Flip it.
+		mkpanstr(out, -value);
+		s << out;
+	} else {
+		s << fixed << setprecision(2);
+		s << value;
+	}
+	if (selected)
+		s << " " << "selected";
+	s << " " << formatCursorPosition();
+	int numSel = 0;
+	for (point = 0; point < CountEnvelopePoints(envelope); ++point) {
+		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
+		if (selected)
+			++numSel;
+	}
+	if (numSel > 0)
+		s << ", " << numSel << " selected";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -594,6 +634,12 @@ PostCommand POST_COMMANDS[] = {
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
 	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
+	{"_SWS_BRMOVEEDITTOPREVENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point
+	{"_SWS_BRMOVEEDITTONEXTENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point
+	{"_SWS_BRMOVEEDITSELPREVENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point and select it
+	{"_SWS_BRMOVEEDITSELNEXTENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and select it
+	{"_SWS_BRMOVEEDITTOPREVENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point and add to selection
+	{"_SWS_BRMOVEEDITTONEXTENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and add to selection
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;

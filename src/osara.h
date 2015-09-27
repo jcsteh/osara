@@ -65,6 +65,9 @@
 #define REAPERAPI_WANT_parsepanstr
 #define REAPERAPI_WANT_GetExtState
 #define REAPERAPI_WANT_SetExtState
+#define REAPERAPI_WANT_GetEnvelopePoint
+#define REAPERAPI_WANT_GetEnvelopePointByTime
+#define REAPERAPI_WANT_CountEnvelopePoints
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

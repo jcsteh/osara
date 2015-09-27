@@ -22,7 +22,7 @@ Features:
 - Ability to watch and report track peak meters
 
 ## Requirements
-OSARA requires REAPER 4.75 or later.
+OSARA requires REAPER 5.0 or later.
 
 It has only been tested with the NVDA screen reader.
 However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
@@ -137,6 +137,12 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 #### Envelopes
 - Track: Select previous envelope
 - Track: Select next envelope
+- (SWS extension) SWS/BR: Move edit cursor to previous envelope point
+- (SWS extension) SWS/BR: Move edit cursor to next envelope point
+- (SWS extension) SWS/BR: Move edit cursor to previous envelope point and select it
+- (SWS extension) SWS/BR: Move edit cursor to next envelope point and select it
+- (SWS extension) SWS/BR: Move edit cursor to previous envelope point and add to selection
+- (SWS extension) SWS/BR: Move edit cursor to next envelope point and add to selection
 
 #### Zoom
 - Zoom out horizontal
