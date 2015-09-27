@@ -334,9 +334,16 @@ void postToggleTrackFxBypass(int command) {
 	postToggleTrackFxBypass(track);
 }
 
+bool shouldReportScrub = true;
+
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	outputMessage(formatCursorPosition().c_str());
+}
+
+void postCursorMovementScrub(int command) {
+	if (shouldReportScrub)
+		postCursorMovement(command);
 }
 
 void postCursorMovementMeasure(int command) {
@@ -534,8 +541,8 @@ PostCommand POST_COMMANDS[] = {
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
 	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
-	{40104, postCursorMovement}, // View: Move cursor left one pixel
-	{40105, postCursorMovement}, // View: Move cursor right one pixel
+	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
+	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{41042, postCursorMovementMeasure}, // Go forward one measure
@@ -1109,6 +1116,9 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(formatCursorPosition(tf, false));
 }
 
+// See the Configuration section of the code below.
+void cmdConfig(Command* command);
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
@@ -1182,12 +1192,58 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
+
+/*** Configuration
+ * For new settings, appropriate code needs to be added to loadConfig, config_onOk and cmdConfig.
+ ***/
+
+const char CONFIG_SECTION[] = "osara";
+
+void loadConfig() {
+	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
+	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
+}
+
+void config_onOk(HWND dialog) {
+	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
+	shouldReportScrub = Button_GetCheck(control) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
+}
+
+INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
+	switch (msg) {
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDOK) {
+				config_onOk(dialog);
+				DestroyWindow(dialog);
+				return TRUE;
+			} else if (LOWORD(wParam) == IDCANCEL) {
+				DestroyWindow(dialog);
+				return TRUE;
+			}
+			break;
+		case WM_CLOSE:
+			DestroyWindow(dialog);
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void cmdConfig(Command* command) {
+	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
+
+	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
+	Button_SetCheck(control, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+
+	ShowWindow(dialog, SW_SHOWNORMAL);
+}
 
 /*** Initialisation, termination and inner workings. */
 
@@ -1283,6 +1339,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		pluginHInstance = hInstance;
 		mainHwnd = rec->hwnd_main;
+		loadConfig();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)

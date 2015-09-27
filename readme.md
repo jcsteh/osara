@@ -244,6 +244,16 @@ You can achieve this using OSARA's shortcut help mode.
 You can turn shortcut help on and off using the "OSARA: Toggle shortcut help" action.
 While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
 
+### Configuration
+OSARA includes a Configuration dialog to adjust various settings.
+You open this dialog using the "OSARA: Configuration" action.
+
+The dialog contains the following option:
+
+- Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
+
+When you are done, press the OK button to accept any changes or the Cancel button to discard them.
+
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 

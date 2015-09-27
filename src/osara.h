@@ -63,6 +63,8 @@
 #define REAPERAPI_WANT_mkvolstr
 #define REAPERAPI_WANT_mkpanstr
 #define REAPERAPI_WANT_parsepanstr
+#define REAPERAPI_WANT_GetExtState
+#define REAPERAPI_WANT_SetExtState
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
