@@ -10,6 +10,8 @@
 #include <windows.h>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 #ifdef _WIN32
 #include <initguid.h>
 #include <Windowsx.h>
@@ -182,6 +184,9 @@ class ParamsDialog {
 	HWND dialog;
 	HWND paramCombo;
 	HWND slider;
+	int paramCount;
+	string filter;
+	vector<int> visibleParams;
 	Param* param;
 	double val;
 	int sliderRange;
@@ -215,7 +220,8 @@ class ParamsDialog {
 	void onParamChange() {
 		if (this->param)
 			delete this->param;
-		this->param = this->source->getParam(ComboBox_GetCurSel(this->paramCombo));
+		int paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
+		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
 		this->sliderRange = (int)((this->param->max - this->param->min) / this->param->step);
 		SendMessage(this->slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, this->sliderRange));
@@ -261,6 +267,9 @@ class ParamsDialog {
 				if (LOWORD(wParam) == ID_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
 					dialog->onParamChange();
 					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
+					dialog->onFilterChange();
+					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					DestroyWindow(dialogHwnd);
 					delete dialog;
@@ -289,9 +298,55 @@ class ParamsDialog {
 		delete this->source;
 	}
 
+	bool shouldIncludeParam(string name) {
+		if (filter.empty())
+			return true;
+		// Convert param name to lower case for match.
+		transform(name.begin(), name.end(), name.begin(), tolower);
+		return name.find(filter) != string::npos;
+	}
+
+	void updateParamList() {
+		int prevSelParam;
+		if (this->visibleParams.empty())
+			prevSelParam = -1;
+		else
+			prevSelParam = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
+		this->visibleParams.clear();
+		// Use the first item if the previously selected param gets filtered out.
+		int newComboSel = 0;
+		ComboBox_ResetContent(this->paramCombo);
+		for (int p = 0; p < this->paramCount; ++p) {
+			string& name = source->getParamName(p);
+			if (!this->shouldIncludeParam(name))
+				continue;
+			this->visibleParams.push_back(p);
+			ComboBox_AddString(this->paramCombo, widen(name).c_str());
+			if (p == prevSelParam)
+				newComboSel = this->visibleParams.size() - 1;
+		}
+		ComboBox_SetCurSel(this->paramCombo, newComboSel);
+		if (this->visibleParams.empty()) {
+			EnableWindow(this->slider, FALSE);
+			return;
+		}
+		EnableWindow(this->slider, TRUE);
+		this->onParamChange();
+	}
+
+	void onFilterChange() {
+		WCHAR rawText[100];
+		GetDlgItemText(this->dialog, ID_PARAM_FILTER, rawText, ARRAYSIZE(rawText));
+		string& text = narrow(rawText);
+		if (this->filter.compare(text) == 0)
+			return; // No change.
+		this->filter = text;
+		this->updateParamList();
+	}
+
 	ParamsDialog(ParamSource* source): source(source), param(NULL) {
-		int nParams = source->getParamCount();
-		if (nParams == 0) {
+		this->paramCount = source->getParamCount();
+		if (this->paramCount == 0) {
 			delete this;
 			return;
 		}
@@ -300,13 +355,7 @@ class ParamsDialog {
 		SetWindowText(this->dialog, widen(source->getTitle()).c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
-		// Populate the parameter list.
-		for (int p = 0; p < nParams; ++p) {
-			string& name = source->getParamName(p);
-			ComboBox_AddString(this->paramCombo, widen(name).c_str());
-		}
-		ComboBox_SetCurSel(this->paramCombo, 0); // Select the first initially.
-		this->onParamChange();
+		this->updateParamList();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 	}
 

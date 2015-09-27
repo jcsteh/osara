@@ -200,7 +200,12 @@ Note that only some effects expose easily readable values, while others expose o
 
 #### Using Parameter Lists
 Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
-When you are done, press the Close button.
+
+The Filter field allows you to narrow the list to only contain parameters which include the entered text.
+For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
+Clearing the text in the Filter field shows the entire list.
+
+When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
 
 ### Peak Watcher
