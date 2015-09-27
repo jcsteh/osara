@@ -108,34 +108,46 @@ void outputMessage(ostringstream& message) {
 	outputMessage(message.str());
 }
 
-string formatCursorPosition(bool useMeasure=false) {
+typedef enum {
+	TF_RULER,
+	TF_MEASURE,
+	TF_MINSEC
+} TimeFormat;
+
+string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
 	ostringstream s;
-	if (useMeasure) {
+	if (format == TF_RULER) {
+		if (GetToggleCommandState(40365))
+			format = TF_MINSEC;
+		else
+			format = TF_MEASURE;
+	}
+	if (format == TF_MEASURE) {
 		int measure;
 		double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
 		measure += 1;
 		int wholeBeat = (int)beat + 1;
 		int beatPercent = (int)(beat * 100) % 100;
-		if (measure != oldMeasure) {
+		if (!useCache || measure != oldMeasure) {
 			s << "bar " << measure << " ";
 			oldMeasure = measure;
 		}
-		if (wholeBeat != oldBeat) {
+		if (!useCache || wholeBeat != oldBeat) {
 			s << "beat " << wholeBeat << " ";
 			oldBeat = wholeBeat;
 		}
-		if (beatPercent != oldBeatPercent) {
+		if (!useCache || beatPercent != oldBeatPercent) {
 			s << beatPercent << "%";
 			oldBeatPercent = beatPercent;
 		}
 		// #31: Clear cache for other units to avoid confusion if they are used later.
 		oldMinute = 0;
-	} else if (GetToggleCommandState(40365)) {
+	} else if (format == TF_MINSEC) {
 		// Minutes:seconds
 		double second = GetCursorPosition();
 		int minute = second / 60;
 		second = fmod(second, 60);
-		if (oldMinute != minute) {
+		if (!useCache || oldMinute != minute) {
 			s << minute << " min ";
 			oldMinute = minute;
 		}
@@ -143,8 +155,7 @@ string formatCursorPosition(bool useMeasure=false) {
 		s << second << " sec";
 		// #31: Clear cache for other units to avoid confusion if they are used later.
 		oldMeasure = oldBeat = oldBeatPercent = 0;
-	} else
-		return formatCursorPosition(true);
+	}
 	return s.str();
 }
 
@@ -330,7 +341,7 @@ void postCursorMovement(int command) {
 
 void postCursorMovementMeasure(int command) {
 	fakeFocus = FOCUS_RULER;
-	outputMessage(formatCursorPosition(true).c_str());
+	outputMessage(formatCursorPosition(TF_MEASURE).c_str());
 }
 
 void postMoveToItem(int command) {
@@ -1089,6 +1100,15 @@ void cmdShortcutHelp(Command* command) {
 	outputMessage(isShortcutHelpEnabled ? "shortcut help on" : "shortcut help off");
 }
 
+void cmdReportCursorPosition(Command* command) {
+	TimeFormat tf;
+	if (lastCommandRepeatCount == 0)
+		tf = TF_RULER;
+	else if (GetToggleCommandState(40366)) // Rule unit is measures/min:sec
+		tf = TF_MINSEC;
+	outputMessage(formatCursorPosition(tf, false));
+}
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
@@ -1161,6 +1181,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
@@ -1177,6 +1198,9 @@ void postCommand(int command, int flag) {
 }
 
 bool isHandlingCommand = false;
+Command* lastCommand = NULL;
+DWORD lastCommandTime = 0;
+int lastCommandRepeatCount;
 
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
@@ -1187,7 +1211,14 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
 	) {
 		isHandlingCommand = true;
+		DWORD now = GetTickCount();
+		if (it->second == lastCommand && now - lastCommandTime < 500)
+			++lastCommandRepeatCount;
+		else
+			lastCommandRepeatCount = 0;
+		lastCommandTime = now;
 		it->second->execute(it->second);
+		lastCommand = it->second;
 		isHandlingCommand = false;
 		return true;
 	} else if (isShortcutHelpEnabled) {

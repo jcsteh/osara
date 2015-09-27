@@ -72,6 +72,7 @@ typedef struct Command {
 	const char* id;
 	void (*execute)(Command*);
 } Command;
+extern int lastCommandRepeatCount;
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;
