@@ -27,6 +27,7 @@ class Param {
 	double min;
 	double max;
 	double step;
+	double largeStep;
 
 	virtual double getValue() = 0;
 	virtual string getValueText(double value) = 0;
@@ -91,6 +92,7 @@ class ReaperObjToggleParam: public ReaperObjParam {
 		this->min = 0;
 		this->max = 1;
 		this->step = 1;
+		this->largeStep = 1;
 	}
 
 	double getValue() {
@@ -118,7 +120,8 @@ class ReaperObjVolParam: public ReaperObjParam {
 	ReaperObjVolParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
 		this->min = 0;
 		this->max = 4;
-		this->step = 0.001;
+		this->step = 0.002;
+		this->largeStep = 0.1;
 	}
 
 	double getValue() {
@@ -148,6 +151,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->min = -1;
 		this->max = 1;
 		this->step = 0.01;
+		this->largeStep = 0.1;
 	}
 
 	double getValue() {
@@ -216,6 +220,8 @@ class ParamsDialog {
 		this->sliderRange = (int)((this->param->max - this->param->min) / this->param->step);
 		SendMessage(this->slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, this->sliderRange));
 		SendMessage(this->slider, TBM_SETLINESIZE, 0, 1);
+		SendMessage(this->slider, TBM_SETPAGESIZE, 0,
+			(int)(this->param->largeStep / this->param->step));
 		this->updateSlider();
 	}
 
@@ -437,6 +443,7 @@ class TrackFxParam: public Param {
 	TrackFxParam(TrackFxParams& source, int param): source(source), param(param) {
 		TrackFX_GetParam(source.track, source.fx, param, &this->min, &this->max);
 		this->step = (this->max - this->min) / 1000;
+		this->largeStep = this->step * 20;
 	}
 
 	double getValue() {
