@@ -390,6 +390,21 @@ void postGoToMarker(int command) {
 		else
 			s << "region " << number << " ";
 	}
+	double start, end;
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
+	if (start != end) {
+		if (cursorPos == start)
+			s << "selection start ";
+		if (cursorPos == end)
+			s << "selection end ";
+	}
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	if (start != end) {
+		if (cursorPos == start)
+			s << "loop start ";
+		if (cursorPos == end)
+			s << "loop end ";
+	}
 	s << formatCursorPosition();
 	if (s.tellp() > 0)
 		outputMessage(s);
