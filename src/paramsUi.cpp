@@ -12,11 +12,13 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 #ifdef _WIN32
 #include <initguid.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
 #endif
+#include <WDL/db2val.h>
 #include "osara.h"
 #include "resource.h"
 
@@ -30,15 +32,23 @@ class Param {
 	double max;
 	double step;
 	double largeStep;
+	bool isEditable;
+
+	Param(): isEditable(false) {
+	}
 
 	virtual double getValue() = 0;
 	virtual string getValueText(double value) = 0;
+	virtual string getValueForEditing() {
+		return "";
+	}
 	virtual void setValue(double value) = 0;
+	virtual void setValueFromEdited(const string& text) {
+	}
 };
 
 class ParamSource {
 	public:
-	ParamSource() {};
 	virtual string getTitle() = 0;
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
@@ -58,7 +68,7 @@ class ReaperObjParam: public Param {
 	ReaperObjParamSource& source;
 	const char* name;
 
-	ReaperObjParam(ReaperObjParamSource& source, const char* name): source(source), name(name) {
+	ReaperObjParam(ReaperObjParamSource& source, const char* name): Param(), source(source), name(name) {
 	}
 
 };
@@ -124,6 +134,7 @@ class ReaperObjVolParam: public ReaperObjParam {
 		this->max = 4;
 		this->step = 0.002;
 		this->largeStep = 0.1;
+		this->isEditable = true;
 	}
 
 	double getValue() {
@@ -136,8 +147,21 @@ class ReaperObjVolParam: public ReaperObjParam {
 		return out;
 	}
 
+	string getValueForEditing() {
+		return this->getValueText(this->getValue());
+	}
+
 	void setValue(double value) {
 		this->source.getSetValue(this->name, (void*)&value);
+	}
+
+	void setValueFromEdited(const string& text) {
+		if (text.compare(0, 4, "-inf") == 0) {
+			this->setValue(0);
+			return;
+		}
+		double db = atof(text.c_str());
+		this->setValue(DB2VAL(db));
 	}
 
 	static Param* make(ReaperObjParamSource& source, const char* name) {
@@ -154,6 +178,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->max = 1;
 		this->step = 0.01;
 		this->largeStep = 0.1;
+		this->isEditable = true;
 	}
 
 	double getValue() {
@@ -166,8 +191,16 @@ class ReaperObjPanParam: public ReaperObjParam {
 		return out;
 	}
 
+	string getValueForEditing() {
+		return this->getValueText(this->getValue());
+	}
+
 	void setValue(double value) {
 		this->source.getSetValue(this->name, (void*)&value);
+	}
+
+	void setValueFromEdited(const string& text) {
+		this->setValue(parsepanstr(text.c_str()));
 	}
 
 	static Param* make(ReaperObjParamSource& source, const char* name) {
@@ -184,6 +217,7 @@ class ParamsDialog {
 	HWND dialog;
 	HWND paramCombo;
 	HWND slider;
+	HWND valueEdit;
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
@@ -204,7 +238,7 @@ class ParamsDialog {
 			widen(this->valText).c_str());
 	}
 
-	void updateSlider() {
+	void updateValue() {
 		double sliderVal = (this->val - this->param->min) / this->param->step;
 		// This should be very close to an integer, but we can get values like 116.999...
 		// Casting to int just truncates the decimal.
@@ -215,6 +249,10 @@ class ParamsDialog {
 			(int)sliderVal);
 		this->valText = this->param->getValueText(this->val);
 		this->updateValueText();
+		if (this->param->isEditable) {
+			SendMessage(this->valueEdit, WM_SETTEXT, 0,
+				(LPARAM)widen(this->param->getValueForEditing()).c_str());
+		}
 	}
 
 	void onParamChange() {
@@ -228,13 +266,13 @@ class ParamsDialog {
 		SendMessage(this->slider, TBM_SETLINESIZE, 0, 1);
 		SendMessage(this->slider, TBM_SETPAGESIZE, 0,
 			(int)(this->param->largeStep / this->param->step));
-		this->updateSlider();
+		EnableWindow(this->valueEdit, this->param->isEditable);
+		this->updateValue();
 	}
 
 	void onSliderChange() {
 		int sliderVal = SendMessage(this->slider, TBM_GETPOS, 0, 0);
 		double newVal = sliderVal * this->param->step + this->param->min;
-		this->param->setValue(newVal);
 		if (newVal == this->val)
 			return; // This is due to our own snapping call (below).
 		int step = (newVal > this->val) ? 1 : -1;
@@ -254,10 +292,20 @@ class ParamsDialog {
 				// The value text is different, so this change is significant.
 				// Snap to this value.
 				this->val = newVal;
-				this->updateSlider();
 				break;
 			}
 		}
+		this->param->setValue(this->val);
+		this->updateValue();
+	}
+
+	void onValueEdited() {
+		WCHAR rawText[30];
+		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, ARRAYSIZE(rawText)) == 0)
+			return;
+		this->param->setValueFromEdited(narrow(rawText));
+		this->val = this->param->getValue();
+		this->updateValue();
 	}
 
 	static INT_PTR CALLBACK dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -269,6 +317,9 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
 					dialog->onFilterChange();
+					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_VAL_EDIT && HIWORD(wParam) ==EN_KILLFOCUS) {
+					dialog->onValueEdited();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					DestroyWindow(dialogHwnd);
@@ -355,6 +406,7 @@ class ParamsDialog {
 		SetWindowText(this->dialog, widen(source->getTitle()).c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->updateParamList();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 	}
@@ -489,10 +541,11 @@ class TrackFxParam: public Param {
 
 	public:
 
-	TrackFxParam(TrackFxParams& source, int param): source(source), param(param) {
+	TrackFxParam(TrackFxParams& source, int param): Param(), source(source), param(param) {
 		TrackFX_GetParam(source.track, source.fx, param, &this->min, &this->max);
 		this->step = (this->max - this->min) / 1000;
 		this->largeStep = this->step * 20;
+		this->isEditable = true;
 	}
 
 	double getValue() {
@@ -506,8 +559,19 @@ class TrackFxParam: public Param {
 		return "";
 	}
 
+	string getValueForEditing() {
+		ostringstream s;
+		s << fixed << setprecision(4);
+		s << TrackFX_GetParam(this->source.track, this->source.fx, this->param, NULL, NULL);
+		return s.str();
+	}
+	
 	void setValue(double value) {
 		TrackFX_SetParam(this->source.track, this->source.fx, this->param, value);
+	}
+
+	void setValueFromEdited(const string& text) {
+		this->setValue(atof(text.c_str()));
 	}
 
 };

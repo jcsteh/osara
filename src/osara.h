@@ -62,6 +62,7 @@
 #define REAPERAPI_WANT_CountSelectedTracks
 #define REAPERAPI_WANT_mkvolstr
 #define REAPERAPI_WANT_mkpanstr
+#define REAPERAPI_WANT_parsepanstr
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

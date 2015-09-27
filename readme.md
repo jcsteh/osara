@@ -197,9 +197,11 @@ To access it:
 3. If there is more than one effect on the track, select the desired effect from the menu.
 
 Note that only some effects expose easily readable values, while others expose only percentages.
+Even for effects that do expose easily readable values, the editable text is an internal number and probably won't correspond to the readable value on the slider.
 
 #### Using Parameter Lists
 Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
+For parameters which support it, there is also an editable text field which allows you to edit the value textually.
 
 The Filter field allows you to narrow the list to only contain parameters which include the entered text.
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
