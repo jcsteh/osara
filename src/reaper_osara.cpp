@@ -439,14 +439,22 @@ void postSelectEnvelope(int command) {
 	outputMessage(s);
 }
 
-void postChangeTrackVolume(int command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
-		return;
+void postChangeTrackVolume(MediaTrack* track) {
 	ostringstream s;
 	s << fixed << setprecision(2);
 	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
 	outputMessage(s);
+}
+
+void postChangeTrackVolume(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	postChangeTrackVolume(track);
+}
+
+void postChangeMasterTrackVolume(int command) {
+	postChangeTrackVolume(GetMasterTrack(0));
 }
 
 void postChangeHorizontalZoom(int command) {
@@ -619,6 +627,8 @@ PostCommand POST_COMMANDS[] = {
 	{41864, postSelectEnvelope}, // Track: Select next envelope
 	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
 	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
+	{40743, postChangeMasterTrackVolume}, // Track: Nudge master track volume up
+	{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
 	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
 	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left

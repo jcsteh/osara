@@ -80,6 +80,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Track: Nudge track volume down
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down
+- Track: Nudge master track volume up
+- Track: Nudge master track volume down
 - Track: Nudge track pan left
 - Track: Nudge track pan right
 
