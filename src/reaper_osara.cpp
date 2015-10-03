@@ -226,6 +226,7 @@ bool isTrackFxBypassed(MediaTrack* track) {
  * This is used to report messages regarding the effect of the command, etc.
  */
 
+bool shouldReportFx = false;
 void postGoToTrack(int command) {
 	fakeFocus = FOCUS_TRACK;
 	SetCursorContext(0, NULL);
@@ -276,6 +277,17 @@ void postGoToTrack(int command) {
 		s << " FX bypassed";
 	int itemCount = CountTrackMediaItems(track);
 	s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+	int count;
+	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
+		s << "; FX: ";
+		char name[256];
+		for (int f = 0; f < count; ++f) {
+			if (f > 0)
+				s << ", ";
+			TrackFX_GetFXName(track, f, name, sizeof(name));
+			s << name;
+		}
+	}
 	outputMessage(s);
 }
 
@@ -1265,12 +1277,16 @@ const char CONFIG_SECTION[] = "osara";
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
 	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
+	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 }
 
 void config_onOk(HWND dialog) {
 	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
 	shouldReportScrub = Button_GetCheck(control) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
+	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
+	shouldReportFx = Button_GetCheck(control) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -1297,6 +1313,8 @@ void cmdConfig(Command* command) {
 
 	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
 	Button_SetCheck(control, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
+	Button_SetCheck(control, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
