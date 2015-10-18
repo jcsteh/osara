@@ -41,10 +41,10 @@ IAccPropServices* accPropServices = NULL;
 #endif
 
 // We cache the last reported time so we can report just the components which have changed.
-int oldMeasure = 0;
-int oldBeat = 0;
-int oldBeatPercent = 0;
-int oldMinute = 0;
+int oldMeasure;
+int oldBeat;
+int oldBeatPercent;
+int oldMinute;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 
@@ -108,13 +108,7 @@ void outputMessage(ostringstream& message) {
 	outputMessage(message.str());
 }
 
-typedef enum {
-	TF_RULER,
-	TF_MEASURE,
-	TF_MINSEC
-} TimeFormat;
-
-string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
+string formatTime(double time, TimeFormat format, bool isLength, bool useCache) {
 	ostringstream s;
 	if (format == TF_RULER) {
 		if (GetToggleCommandState(40365))
@@ -124,16 +118,25 @@ string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
 	}
 	if (format == TF_MEASURE) {
 		int measure;
-		double beat = TimeMap2_timeToBeats(NULL, GetCursorPosition(), &measure, NULL, NULL, NULL);
-		measure += 1;
-		int wholeBeat = (int)beat + 1;
+		double beat = TimeMap2_timeToBeats(NULL, time, &measure, NULL, NULL, NULL);
+		int wholeBeat = (int)beat;
+		if (!isLength) {
+			++measure;
+			++wholeBeat;
+		}
 		int beatPercent = (int)(beat * 100) % 100;
 		if (!useCache || measure != oldMeasure) {
-			s << "bar " << measure << " ";
+			if (isLength)
+				s << measure << (measure == 1 ? " bar " : " bars ");
+			else
+				s << "bar " << measure << " ";
 			oldMeasure = measure;
 		}
 		if (!useCache || wholeBeat != oldBeat) {
-			s << "beat " << wholeBeat << " ";
+			if (isLength)
+				s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
+			else
+				s << "beat " << wholeBeat << " ";
 			oldBeat = wholeBeat;
 		}
 		if (!useCache || beatPercent != oldBeatPercent) {
@@ -144,19 +147,31 @@ string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
 		oldMinute = 0;
 	} else if (format == TF_MINSEC) {
 		// Minutes:seconds
-		double second = GetCursorPosition();
-		int minute = second / 60;
-		second = fmod(second, 60);
+		int minute = time / 60;
+		time = fmod(time, 60);
 		if (!useCache || oldMinute != minute) {
 			s << minute << " min ";
 			oldMinute = minute;
 		}
 		s << fixed << setprecision(3);
-		s << second << " sec";
+		s << time << " sec";
 		// #31: Clear cache for other units to avoid confusion if they are used later.
 		oldMeasure = oldBeat = oldBeatPercent = 0;
 	}
 	return s.str();
+}
+
+void resetTimeCache() {
+	oldMeasure = 0;
+	oldBeat = 0;
+	// Ensure percent gets reported even if it is 0.
+	// Otherwise, we would initially report nothing for a length of 0.
+	oldBeatPercent = -1;
+	oldMinute = 0;
+}
+
+string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
+	return formatTime(GetCursorPosition(), format, false, useCache);
 }
 
 const char* formatFolderState(int state, bool reportTrack=true) {
@@ -1414,6 +1429,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		pluginHInstance = hInstance;
 		mainHwnd = rec->hwnd_main;
 		loadConfig();
+		resetTimeCache();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)

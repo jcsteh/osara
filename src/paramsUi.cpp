@@ -209,6 +209,56 @@ class ReaperObjPanParam: public ReaperObjParam {
 
 };
 
+class ReaperObjLenParam: public ReaperObjParam {
+
+	public:
+	ReaperObjLenParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+		this->min = 0;
+		this->max = 500;
+		this->step = 0.02;
+		this->largeStep = 10;
+		this->isEditable = true;
+		resetTimeCache();
+	}
+
+	double getValue() {
+		return *(double*)this->source.getSetValue(this->name, NULL);
+	}
+
+	string getValueText(double value) {
+		static double lastVal;
+		static string lastText;
+		if (value == lastVal) {
+			// We can be called twice with the same value.
+			// Calling formatTime again would return nothing, since nothing changed.
+			// Therefore, we cache the text and return it here.
+			return lastText;
+		}
+		lastVal = value;
+		lastText = formatTime(value, TF_RULER, true);
+		return lastText;
+	}
+
+	string getValueForEditing() {
+		char out[64];
+		format_timestr_pos(this->getValue(), out, ARRAYSIZE(out), -1);
+		return out;
+	}
+
+	void setValue(double value) {
+		this->source.getSetValue(this->name, (void*)&value);
+	}
+
+	void setValueFromEdited(const string& text) {
+		this->setValue(parse_timestr_pos(text.c_str(), -1));
+	}
+
+	static Param* make(ReaperObjParamSource& source, const char* name) {
+		return new ReaperObjLenParam(source, name);
+	}
+
+};
+
 #ifdef _WIN32
 
 class ParamsDialog {
@@ -450,7 +500,9 @@ class ItemParams: public ReaperObjParamSource {
 			{"Item volume", "D_VOL", ReaperObjVolParam::make},
 			{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
 			{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
-			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
+			{"Mute", "B_MUTE", ReaperObjToggleParam::make},
+			{"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make},
+			{"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make}
 		};
 		this->params = params;
 		this->count = ARRAYSIZE(params);

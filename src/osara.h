@@ -11,6 +11,7 @@
 
 #define UNICODE
 #include <windows.h>
+#include <string>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -68,6 +69,7 @@
 #define REAPERAPI_WANT_GetEnvelopePoint
 #define REAPERAPI_WANT_GetEnvelopePointByTime
 #define REAPERAPI_WANT_CountEnvelopePoints
+#define REAPERAPI_WANT_format_timestr_pos
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -90,6 +92,14 @@ enum FakeFocus {
 	FOCUS_RULER,
 };
 extern enum FakeFocus fakeFocus;
+
+typedef enum {
+	TF_RULER,
+	TF_MEASURE,
+	TF_MINSEC
+} TimeFormat;
+std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true);
+void resetTimeCache();
 
 #ifdef _WIN32
 #include <string>
