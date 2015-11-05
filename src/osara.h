@@ -70,6 +70,7 @@
 #define REAPERAPI_WANT_GetEnvelopePointByTime
 #define REAPERAPI_WANT_CountEnvelopePoints
 #define REAPERAPI_WANT_format_timestr_pos
+#define REAPERAPI_WANT_GetPlayState
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

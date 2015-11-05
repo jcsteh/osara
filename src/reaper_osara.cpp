@@ -1196,7 +1196,8 @@ void cmdReportCursorPosition(Command* command) {
 		tf = TF_RULER;
 	else if (GetToggleCommandState(40366)) // Rule unit is measures/min:sec
 		tf = TF_MINSEC;
-	outputMessage(formatCursorPosition(tf, false));
+	double pos = GetPlayState() & 1 ? GetPlayPosition() : GetCursorPosition();
+	outputMessage(formatTime(pos, tf, false, false));
 }
 
 // See the Configuration section of the code below.
@@ -1274,7 +1275,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
