@@ -1296,6 +1296,8 @@ void loadConfig() {
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 }
 
+#ifdef _WIN32
+
 void config_onOk(HWND dialog) {
 	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
 	shouldReportScrub = Button_GetCheck(control) == BST_CHECKED;
@@ -1334,6 +1336,8 @@ void cmdConfig(Command* command) {
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
+
+#endif // _WIN32
 
 /*** Initialisation, termination and inner workings. */
 
