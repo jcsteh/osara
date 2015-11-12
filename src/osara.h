@@ -71,6 +71,7 @@
 #define REAPERAPI_WANT_CountEnvelopePoints
 #define REAPERAPI_WANT_format_timestr_pos
 #define REAPERAPI_WANT_GetPlayState
+#define REAPERAPI_WANT_TimeMap_curFrameRate
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -95,12 +96,17 @@ enum FakeFocus {
 extern enum FakeFocus fakeFocus;
 
 typedef enum {
-	TF_RULER,
+	TF_NONE,
 	TF_MEASURE,
-	TF_MINSEC
+	TF_MINSEC,
+	TF_SEC,
+	TF_FRAME,
+	TF_HMSF,
+	TF_SAMPLE
 } TimeFormat;
+const TimeFormat TF_RULER = TF_NONE;
 std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true);
-void resetTimeCache();
+void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 
 #ifdef _WIN32
 #include <string>

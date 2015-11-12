@@ -45,6 +45,9 @@ int oldMeasure;
 int oldBeat;
 int oldBeatPercent;
 int oldMinute;
+int oldFrame;
+int oldSecond;
+int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 
@@ -113,61 +116,129 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache) 
 	if (format == TF_RULER) {
 		if (GetToggleCommandState(40365))
 			format = TF_MINSEC;
+		else if (GetToggleCommandState(40368))
+			format = TF_SEC;
+		else if (GetToggleCommandState(41973))
+			format = TF_FRAME;
+		else if (GetToggleCommandState(40370))
+			format = TF_HMSF;
+		else if (GetToggleCommandState(40369))
+			format = TF_SAMPLE;
 		else
 			format = TF_MEASURE;
 	}
-	if (format == TF_MEASURE) {
-		int measure;
-		double beat = TimeMap2_timeToBeats(NULL, time, &measure, NULL, NULL, NULL);
-		int wholeBeat = (int)beat;
-		if (!isLength) {
-			++measure;
-			++wholeBeat;
+	switch (format) {
+		case TF_MEASURE: {
+			int measure;
+			double beat = TimeMap2_timeToBeats(NULL, time, &measure, NULL, NULL, NULL);
+			int wholeBeat = (int)beat;
+			if (!isLength) {
+				++measure;
+				++wholeBeat;
+			}
+			int beatPercent = (int)(beat * 100) % 100;
+			if (!useCache || measure != oldMeasure) {
+				if (isLength)
+					s << measure << (measure == 1 ? " bar " : " bars ");
+				else
+					s << "bar " << measure << " ";
+				oldMeasure = measure;
+			}
+			if (!useCache || wholeBeat != oldBeat) {
+				if (isLength)
+					s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
+				else
+					s << "beat " << wholeBeat << " ";
+				oldBeat = wholeBeat;
+			}
+			if (!useCache || beatPercent != oldBeatPercent) {
+				s << beatPercent << "%";
+				oldBeatPercent = beatPercent;
+			}
+			break;
 		}
-		int beatPercent = (int)(beat * 100) % 100;
-		if (!useCache || measure != oldMeasure) {
-			if (isLength)
-				s << measure << (measure == 1 ? " bar " : " bars ");
-			else
-				s << "bar " << measure << " ";
-			oldMeasure = measure;
+		case TF_MINSEC: {
+			// Minutes:seconds
+			int minute = time / 60;
+			time = fmod(time, 60);
+			if (!useCache || oldMinute != minute) {
+				s << minute << " min ";
+				oldMinute = minute;
+			}
+			s << fixed << setprecision(3);
+			s << time << " sec";
+			break;
 		}
-		if (!useCache || wholeBeat != oldBeat) {
-			if (isLength)
-				s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
-			else
-				s << "beat " << wholeBeat << " ";
-			oldBeat = wholeBeat;
+		case TF_SEC: {
+			// Seconds
+			s << fixed << setprecision(3);
+			s << time << " sec";
+			break;
 		}
-		if (!useCache || beatPercent != oldBeatPercent) {
-			s << beatPercent << "%";
-			oldBeatPercent = beatPercent;
+		case TF_FRAME: {
+			// Frames
+			int frame = time * TimeMap_curFrameRate(0, NULL);
+			if (!useCache || oldFrame != frame) {
+				s << frame << (frame == 1 ? " frame" : " frames");
+				oldFrame = frame;
+			}
+			break;
 		}
-		// #31: Clear cache for other units to avoid confusion if they are used later.
-		oldMinute = 0;
-	} else if (format == TF_MINSEC) {
-		// Minutes:seconds
-		int minute = time / 60;
-		time = fmod(time, 60);
-		if (!useCache || oldMinute != minute) {
-			s << minute << " min ";
-			oldMinute = minute;
+		case TF_HMSF: {
+			// Hours:minutes:seconds:frames
+			int hour = time / 3600;
+			time = fmod(time, 3600);
+			if (!useCache || oldHour != hour) {
+				s << hour << (hour == 1 ? " hour " : " hours ");
+				oldHour = hour;
+			}
+			int minute = time / 60;
+			time = fmod(time, 60);
+			if (!useCache || oldMinute != minute) {
+				s << minute << " min ";
+				oldMinute = minute;
+			}
+			int second = time;
+			if (!useCache || oldSecond != second) {
+				s << second << " sec ";
+				oldSecond = second;
+			}
+			time = time - int(time);
+			int frame = time * TimeMap_curFrameRate(0, NULL);
+			if (!useCache || oldFrame != frame) {
+				s << frame << (frame == 1 ? " frame" : " frames");
+				oldFrame = frame;
+			}
+			break;
 		}
-		s << fixed << setprecision(3);
-		s << time << " sec";
-		// #31: Clear cache for other units to avoid confusion if they are used later.
-		oldMeasure = oldBeat = oldBeatPercent = 0;
+		case TF_SAMPLE: {
+			char buf[20];
+			format_timestr_pos(time, buf, ARRAYSIZE(buf), 4);
+			s << buf << " samples";
+			break;
+		}
 	}
+	// #31: Clear cache for other units to avoid confusion if they are used later.
+	resetTimeCache(format);
 	return s.str();
 }
 
-void resetTimeCache() {
-	oldMeasure = 0;
-	oldBeat = 0;
-	// Ensure percent gets reported even if it is 0.
-	// Otherwise, we would initially report nothing for a length of 0.
-	oldBeatPercent = -1;
-	oldMinute = 0;
+void resetTimeCache(TimeFormat excludeFormat) {
+	if (excludeFormat != TF_MEASURE) {
+		oldMeasure = 0;
+		oldBeat = 0;
+		// Ensure percent gets reported even if it is 0.
+		// Otherwise, we would initially report nothing for a length of 0.
+		oldBeatPercent = -1;
+	}
+	if (excludeFormat != TF_MINSEC && excludeFormat != TF_HMSF)
+		oldMinute = 0;
+	if (excludeFormat != TF_FRAME && excludeFormat != TF_HMSF)
+		oldFrame = 0;
+	if (excludeFormat != TF_HMSF) {
+		oldSecond = 0;
+		oldHour = 0;
+	}
 }
 
 string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true) {
@@ -1194,7 +1265,7 @@ void cmdReportCursorPosition(Command* command) {
 	TimeFormat tf;
 	if (lastCommandRepeatCount == 0)
 		tf = TF_RULER;
-	else if (GetToggleCommandState(40366)) // Rule unit is measures/min:sec
+	else if (GetToggleCommandState(40366) || GetToggleCommandState(41918)) // Rule unit is measures/min:sec
 		tf = TF_MINSEC;
 	double pos = GetPlayState() & 1 ? GetPlayPosition() : GetCursorPosition();
 	outputMessage(formatTime(pos, tf, false, false));
