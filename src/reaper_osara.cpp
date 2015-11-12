@@ -1243,6 +1243,63 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 	reportTracksWithState("Phase inverted", isTrackPhaseInverted);
 }
 
+void cmdReportSelection(Command* command) {
+	ostringstream s;
+	int count = 0;
+	int t;
+	MediaTrack* track;
+	switch (fakeFocus) {
+		case FOCUS_TRACK: {
+			for (t = 0; t < CountTracks(0); ++t) {
+				track = GetTrack(0, t);
+				if (*(int*)GetSetMediaTrackInfo(track, "I_SELECTED", NULL)) {
+					++count;
+					if (count > 1)
+						s << ", ";
+					s << t + 1;
+					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+					if (name && name[0])
+						s << " " << name;
+				}
+			}
+			break;
+		}
+		case FOCUS_ITEM: {
+			for (t = 0; t < CountTracks(0); ++t) {
+				track = GetTrack(0, t);
+				for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+					MediaItem* item = GetTrackMediaItem(track, i);
+					if (*(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL)) {
+						++count;
+						if (count > 1)
+							s << ", ";
+						s << t + 1 << "." << i + 1;
+						MediaItem_Take* take = GetActiveTake(item);
+						if (take)
+							s << " " << GetTakeName(take);
+					}
+				}
+			}
+			break;
+		}
+		case FOCUS_RULER: {
+			double start, end;
+			GetSet_LoopTimeRange(false, false, &start, &end, false);
+			if (start != end) {
+				s << "start " << formatTime(start, TF_RULER, false, false) << ", "
+					<< "end " << formatTime(end, TF_RULER, false, false) << ", "
+					<< "length " << formatTime(end - start, TF_RULER, true, false);
+				count = 1;
+				resetTimeCache();
+			}
+			break;
+		}
+	}
+	if (count == 0)
+		s << "No selection";
+	outputMessage(s);
+}
+
 void cmdRemoveFocus(Command* command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
@@ -1345,6 +1402,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report record armed tracks"}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},

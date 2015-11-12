@@ -72,6 +72,7 @@
 #define REAPERAPI_WANT_format_timestr_pos
 #define REAPERAPI_WANT_GetPlayState
 #define REAPERAPI_WANT_TimeMap_curFrameRate
+#define REAPERAPI_WANT_GetTrackMediaItem
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
