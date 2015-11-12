@@ -1271,10 +1271,10 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(formatTime(pos, tf, false, false));
 }
 
+#ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
-#ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -1304,6 +1304,7 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		}
 	}
 }
+
 #endif // _WIN32
 
 #define DEFACCEL {0, 0, 0}
@@ -1347,8 +1348,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 #ifdef _WIN32
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
 	{0, {}, NULL, NULL},
