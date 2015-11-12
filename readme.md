@@ -256,7 +256,7 @@ While shortcut help is enabled, pressing any shortcut will report the action ass
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog using the "OSARA: Configuration" action.
 
-The dialog contains the following option:
+The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report FX when moving to tracks: When enabled, OSARA will report the names of any effects on a track when you move to it.
