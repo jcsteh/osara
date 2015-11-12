@@ -203,7 +203,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache) 
 				s << second << " sec ";
 				oldSecond = second;
 			}
-			time = time - int(time);
+			time = time - int(time); // Strip whole seconds.
 			int frame = time * TimeMap_curFrameRate(0, NULL);
 			if (!useCache || oldFrame != frame) {
 				s << frame << (frame == 1 ? " frame" : " frames");
