@@ -213,7 +213,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache) 
 		}
 		case TF_SAMPLE: {
 			char buf[20];
-			format_timestr_pos(time, buf, ARRAYSIZE(buf), 4);
+			format_timestr_pos(time, buf, sizeof(buf), 4);
 			s << buf << " samples";
 			break;
 		}
