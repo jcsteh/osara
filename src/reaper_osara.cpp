@@ -339,6 +339,12 @@ void postGoToTrack(int command) {
 	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 	if (trackName)
 		s << " " << trackName;
+	if (isTrackSelected(track)) {
+		// One selected track is the norm, so don't report selected in this case.
+		if (CountSelectedTracks(0) > 1)
+			s << " selected";
+	} else
+		s << " unselected";
 	if (isTrackMuted(track))
 		s << " muted";
 	if (isTrackSoloed(track))
@@ -866,6 +872,9 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 			GetSetMediaTrackInfo(GetMasterTrack(0), "I_SELECTED", &int0);
 		}
 		// Always select so this will become the last touched track.
+		// The track might already be selected,
+		// so we must first unselected.
+		GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
 		if (!select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
@@ -882,6 +891,14 @@ void cmdGoToNextTrack(Command* command) {
 
 void cmdGoToPrevTrack(Command* command) {
 	moveToTrack(-1);
+}
+
+void cmdGoToNextTrackKeepSel(Command* command) {
+	moveToTrack(1, false);
+}
+
+void cmdGoToPrevTrackKeepSel(Command* command) {
+	moveToTrack(-1, false);
 }
 
 void cmdUndo(Command* command) {
@@ -1421,6 +1438,8 @@ Command COMMANDS[] = {
 	// Commands we want to intercept.
 	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
 	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
+	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
+	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor

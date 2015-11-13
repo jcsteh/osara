@@ -62,6 +62,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 #### Track Navigation/Management
 - Track: Go to next track
 - Track: Go to previous track
+- Track: Go to next track (leaving other tracks selected)
+- Track: Go to previous track (leaving other tracks selected)
 - Track: Insert new track
 - Track: Cycle track folder state
 - Track: Cycle track folder collapsed state
