@@ -20,6 +20,7 @@ Features:
 - Reports markers when you navigate to them
 - Facility to adjust of automatable FX parameters
 - Ability to watch and report track peak meters
+- Noncontiguous selection fo tracks
 
 ## Requirements
 OSARA requires REAPER 5.0 or later.
@@ -253,6 +254,22 @@ You can achieve this using OSARA's shortcut help mode.
 
 You can turn shortcut help on and off using the "OSARA: Toggle shortcut help" action.
 While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
+
+### Noncontiguous Selection
+Usually, selection is done contiguously; e.g. you might select tracks 1 through 4.
+Sometimes, it is desirable to select noncontiguously; e.g. you might want too select tracks 1, 3 and 5.
+
+You can do this as follows:
+
+1. Move to the track you want to start with.
+2. Optionally, select some other contiguous tracks.
+3. Run the "OSARA: Enable noncontiguous selection/toggle selection of current track" action to switch to noncontiguous selection.
+4. Move through tracks leaving other tracks selected; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
+ These tracks will not be selected, but any previously selected tracks will remain selected.
+5. When you reach a track you want to select, run the "OSARA: Enable noncontiguous selection/toggle selection of current track" action.
+ You can also use this if you want to unselect a previously selected track.
+
+Selection will revert to contiguous selection the next time you move to a track without leaving other tracks selected.
 
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.

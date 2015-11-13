@@ -50,6 +50,7 @@ int oldSecond;
 int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
+bool isSelectionContiguous = true;
 
 /*** Utilities */
 
@@ -369,6 +370,10 @@ void postGoToTrack(int command) {
 		}
 	}
 	outputMessage(s);
+	if (command) {
+		// This command replaces the selection , so revert to contiguous selection.
+		isSelectionContiguous = true;
+	}
 }
 
 void postToggleTrackMute(int command) {
@@ -864,19 +869,21 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		}
 		if (newNum == origNum)
 			break;
+		bool wasSelected = isTrackSelected(track);
 		if (clearSelection || select)
 			Undo_BeginBlock();
 		if (clearSelection) {
 			Main_OnCommand(40297, 0); // Track: Unselect all tracks
 			// The master track has to be unselected separately.
 			GetSetMediaTrackInfo(GetMasterTrack(0), "I_SELECTED", &int0);
+			isSelectionContiguous = true;
 		}
 		// Always select so this will become the last touched track.
 		// The track might already be selected,
 		// so we must first unselected.
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
-		if (!select)
+		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		if (clearSelection || select)
 			Undo_EndBlock("Change Track Selection", 0);
@@ -894,11 +901,11 @@ void cmdGoToPrevTrack(Command* command) {
 }
 
 void cmdGoToNextTrackKeepSel(Command* command) {
-	moveToTrack(1, false);
+	moveToTrack(1, false, isSelectionContiguous);
 }
 
 void cmdGoToPrevTrackKeepSel(Command* command) {
-	moveToTrack(-1, false);
+	moveToTrack(-1, false, isSelectionContiguous);
 }
 
 void cmdUndo(Command* command) {
@@ -1394,6 +1401,26 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(formatTime(pos, tf, false, false));
 }
 
+void cmdToggleSelection(Command* command) {
+	if (isSelectionContiguous) {
+		isSelectionContiguous = false;
+		outputMessage("noncontiguous selection");
+		return;
+	}
+	bool select;
+	switch (fakeFocus) {
+		case FOCUS_TRACK: {
+			MediaTrack* track = GetLastTouchedTrack();
+			if (!track)
+				return;
+			select = !isTrackSelected(track);
+			GetSetMediaTrackInfo(track, "I_SELECTED", (select ? &int1 : &int0));
+			break;
+		}
+	}
+	outputMessage(select ? "selected" : "unselected");
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -1476,6 +1503,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track"}, "OSARA_TOGGLESEL", cmdToggleSelection},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
