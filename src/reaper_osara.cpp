@@ -308,6 +308,10 @@ bool isTrackFxBypassed(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_FXEN", NULL) == 0;
 }
 
+bool isTrackSelected(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", NULL);
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -319,29 +323,13 @@ void postGoToTrack(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
+	ostringstream s;
 	// Need to cast to size_t first to avoid "loses information" error with clang.
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	MediaTrack* parentTrack = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
-	if (parentTrack
-		&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERDEPTH", NULL) == 1
-		&& *(int*)GetSetMediaTrackInfo(parentTrack, "I_FOLDERCOMPACT", NULL) == 2
-	) {
-		// This track is inside a closed folder, so skip it.
-		if (command != 40286 && trackNum == CountTracks(0)) {
-			// We're moving forward and we're on the last track.
-			// Therefore, go backward.
-			// Note that this can't happen when the user moves backward
-			// because the first track can never be inside a folder.
-			command = 40286;
-		}
-		if (command == 40001) // Inserting a track
-			command = 40285; // Skip by moving forward.
-		Main_OnCommand(command, 0);
-		return;
-	}
-
-	ostringstream s;
-	s << trackNum;
+	if (trackNum <= 0)
+		s << "master";
+	else
+		s << trackNum;
 	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 	if (folderDepth == 1) // Folder
 		s << " " << getFolderCompacting(track);
@@ -677,8 +665,6 @@ typedef struct {
 } PostCustomCommand;
 
 PostCommand POST_COMMANDS[] = {
-	{40285, postGoToTrack}, // Track: Go to next track
-	{40286, postGoToTrack}, // Track: Go to previous track
 	{40001, postGoToTrack}, // Track: Insert new track
 	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
@@ -838,6 +824,65 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 /*** Our commands/commands we want to intercept.
  * Each command should have a function and should be added to the COMMANDS array below.
  */
+
+int int0 = 0;
+int int1 = 1;
+
+void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
+	int origNum = (int)(size_t)GetSetMediaTrackInfo(GetLastTouchedTrack(), "IP_TRACKNUMBER", NULL);
+	if (origNum >= 0) // Not master
+		--origNum; // We need 0-based.
+	int count = CountTracks(0);
+	// We use -1 for the master track.
+	for (int newNum = origNum + direction; -1 <= newNum && newNum < count; newNum += direction) {
+		MediaTrack* track;
+		if (newNum == -1)
+			track = GetMasterTrack(0);
+		else {
+			track = GetTrack(0, newNum);
+			MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
+			if (parent
+				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
+				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
+			) {
+				// This track is inside a closed folder, so skip it.
+				if (direction == 1 && newNum == count - 1) {
+					// We're moving forward and we're on the last track.
+					// Therefore, go backward.
+					// Note that this can't happen when the user moves backward
+					// because the first track can never be inside a folder.
+					direction = -1;
+				}
+				continue;
+			}
+		}
+		if (newNum == origNum)
+			break;
+		if (clearSelection || select)
+			Undo_BeginBlock();
+		if (clearSelection) {
+			Main_OnCommand(40297, 0); // Track: Unselect all tracks
+			// The master track has to be unselected separately.
+			GetSetMediaTrackInfo(GetMasterTrack(0), "I_SELECTED", &int0);
+		}
+		// Always select so this will become the last touched track.
+		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
+		if (!select)
+			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
+		if (clearSelection || select)
+			Undo_EndBlock("Change Track Selection", 0);
+		postGoToTrack(0);
+		return;
+	}
+}
+
+void cmdGoToNextTrack(Command* command) {
+	moveToTrack(1);
+}
+
+void cmdGoToPrevTrack(Command* command) {
+	moveToTrack(-1);
+}
 
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
@@ -1250,9 +1295,13 @@ void cmdReportSelection(Command* command) {
 	MediaTrack* track;
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
+			if (isTrackSelected(GetMasterTrack(0))) {
+				s << "master";
+				count = 1;
+			}
 			for (t = 0; t < CountTracks(0); ++t) {
 				track = GetTrack(0, t);
-				if (*(int*)GetSetMediaTrackInfo(track, "I_SELECTED", NULL)) {
+				if (isTrackSelected(track)) {
 					++count;
 					if (count > 1)
 						s << ", ";
@@ -1370,6 +1419,8 @@ const int MIDI_EVENT_LIST_SECTION = 32061;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
+	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
+	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
 	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor

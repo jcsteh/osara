@@ -73,6 +73,8 @@
 #define REAPERAPI_WANT_GetPlayState
 #define REAPERAPI_WANT_TimeMap_curFrameRate
 #define REAPERAPI_WANT_GetTrackMediaItem
+#define REAPERAPI_WANT_Undo_BeginBlock
+#define REAPERAPI_WANT_Undo_EndBlock
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
