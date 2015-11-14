@@ -823,10 +823,20 @@ int int0 = 0;
 int int1 = 1;
 
 void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
-	int origNum = (int)(size_t)GetSetMediaTrackInfo(GetLastTouchedTrack(), "IP_TRACKNUMBER", NULL);
-	if (origNum >= 0) // Not master
-		--origNum; // We need 0-based.
 	int count = CountTracks(0);
+	if (count == 0)
+		return;
+	int origNum;
+	MediaTrack* track = GetLastTouchedTrack();
+	if (track) {
+		origNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+		if (origNum >= 0) // Not master
+			--origNum; // We need 0-based.
+	} else {
+		// #47: Deleting the last track results in no last touched track.
+		// Therefore, navigate to the last track.
+		origNum = direction == 1 ? count - 2 : count - 1;
+	}
 	// We use -1 for the master track.
 	for (int newNum = origNum + direction; -1 <= newNum && newNum < count; newNum += direction) {
 		MediaTrack* track;
