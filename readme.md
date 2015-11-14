@@ -20,7 +20,7 @@ Features:
 - Reports markers when you navigate to them
 - Facility to adjust of automatable FX parameters
 - Ability to watch and report track peak meters
-- Noncontiguous selection fo tracks
+- Noncontiguous selection of tracks/items
 
 ## Requirements
 OSARA requires REAPER 5.0 or later.
@@ -261,15 +261,15 @@ Sometimes, it is desirable to select noncontiguously; e.g. you might want too se
 
 You can do this as follows:
 
-1. Move to the track you want to start with.
-2. Optionally, select some other contiguous tracks.
-3. Run the "OSARA: Enable noncontiguous selection/toggle selection of current track" action to switch to noncontiguous selection.
-4. Move through tracks leaving other tracks selected; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
- These tracks will not be selected, but any previously selected tracks will remain selected.
+1. Move to the track or item you want to start with.
+2. Optionally, select some other contiguous tracks or items.
+3. Run the "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)" action to switch to noncontiguous selection.
+4. Move through tracks/items leaving other tracks/items selected; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
+ These tracks/items will not be selected, but any previously selected tracks/items will remain selected.
 5. When you reach a track you want to select, run the "OSARA: Enable noncontiguous selection/toggle selection of current track" action.
- You can also use this if you want to unselect a previously selected track.
+ You can also use this if you want to unselect a previously selected track/item.
 
-Selection will revert to contiguous selection the next time you move to a track without leaving other tracks selected.
+Selection will revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
 
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
@@ -286,6 +286,8 @@ When you are done, press the OK button to accept any changes or the Cancel butto
 OSARA also includes some other miscellaneous actions.
 
 #### Main
+- OSARA: Move to next item (leaving other items selected)
+- OSARA: Move to previous item (leaving other items selected)
 - OSARA: View I/O for master track
 - OSARA: Report ripple editing mode
 - OSARA: Report muted tracks

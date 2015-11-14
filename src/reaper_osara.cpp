@@ -313,6 +313,10 @@ bool isTrackSelected(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", NULL);
 }
 
+bool isItemSelected(MediaItem* item) {
+	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -446,25 +450,6 @@ void postCursorMovementScrub(int command) {
 void postCursorMovementMeasure(int command) {
 	fakeFocus = FOCUS_RULER;
 	outputMessage(formatCursorPosition(TF_MEASURE).c_str());
-}
-
-void postMoveToItem(int command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item || (MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", NULL) != GetLastTouchedTrack())
-		return; // No item in this direction on this track.
-	fakeFocus = FOCUS_ITEM;
-	SetCursorContext(1, NULL);
-	ostringstream s;
-	// Need to cast to size_t first to avoid "loses information" error with clang.
-	s << (int)(size_t)GetSetMediaItemInfo(item, "IP_ITEMNUMBER", NULL) + 1;
-	MediaItem_Take* take = GetActiveTake(item);
-	if (take)
-		s << " " << GetTakeName(take);
-	s << " " << formatCursorPosition();
-	outputMessage(s);
-	double cursorPos = GetCursorPosition();
-	if (GetPlayPosition() != cursorPos)
-		SetEditCurPos(cursorPos, true, true); // Seek playback.
 }
 
 void postCycleTrackFolderState(int command) {
@@ -692,8 +677,6 @@ PostCommand POST_COMMANDS[] = {
 	{41043, postCursorMovementMeasure}, // Go back one measure
 	{41044, postCursorMovementMeasure}, // Go forward one beat
 	{41045, postCursorMovementMeasure}, // Go back one beat
-	{40416, postMoveToItem}, // Item navigation: Select and move to previous item
-	{40417, postMoveToItem}, // Item navigation: Select and move to next item
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
@@ -908,6 +891,81 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
+bool bFalse = false;
+bool bTrue = true;
+
+MediaItem* currentItem = NULL;
+void moveToItem(int direction, bool clearSelection=true, bool select=true) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	double cursor = GetCursorPosition();
+	int count = CountTrackMediaItems(track);
+	double pos;
+	int start = direction == 1 ? 0 : count - 1;
+	if (currentItem && (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track) {
+		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", NULL);
+		if (direction == 1 ? pos <= cursor : pos >= cursor) {
+			// The cursor is right at or has moved past the item to which the user last moved.
+			// Therefore, start at the adjacent item.
+			// This is faster and also allows the user to move to items which start at the same position.
+			// Need to cast to size_t first to avoid "loses information" error with clang.
+			start = (int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", NULL) + direction;
+			if (start < 0 || start >= count) {
+				// There's no adjacent item in this direction,
+				// so move to the current one again.
+				start -= direction;
+			}
+		}
+	} else
+		currentItem = NULL; // Invalid.
+
+	for (int i = start; 0 <= i && i < count; i += direction) {
+		MediaItem* item = GetTrackMediaItem(track, i);
+		pos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		if (direction == 1 ? pos < cursor : pos > cursor)
+			continue; // Not the right direction.
+		currentItem = item;
+		if (clearSelection || select)
+			Undo_BeginBlock();
+		if (clearSelection) {
+			Main_OnCommand(40289, 0); // Item: Unselect all items
+			isSelectionContiguous = true;
+		}
+		if (select)
+			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
+		if (clearSelection || select)
+			Undo_EndBlock("Change Item Selection", 0);
+		SetEditCurPos(pos, true, true); // Seek playback.
+
+		// Report the item.
+		fakeFocus = FOCUS_ITEM;
+		SetCursorContext(1, NULL);
+		ostringstream s;
+		s << i + 1;
+		MediaItem_Take* take = GetActiveTake(item);
+		if (take)
+			s << " " << GetTakeName(take);
+		if (isItemSelected(item)) {
+			// One selected item is the norm, so don't report selected in this case.
+			if (CountSelectedMediaItems(0) > 1)
+				s << " selected";
+		} else
+			s << " unselected";
+		s << " " << formatCursorPosition();
+		outputMessage(s);
+		return;
+	}
+}
+
+void cmdMoveToNextItem(Command* command) {
+	moveToItem(1);
+}
+
+void cmdMoveToPrevItem(Command* command) {
+	moveToItem(-1);
+}
+
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -1018,6 +1076,14 @@ void cmdToggleMasterTrackFxBypass(Command* command) {
 	// #42: This really should be a post command, but hookpostcommand doesn't fire.
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	postToggleTrackFxBypass(GetMasterTrack(0));
+}
+
+void cmdMoveToNextItemKeepSel(Command* command) {
+	moveToItem(1, false, isSelectionContiguous);
+}
+
+void cmdMoveToPrevItemKeepSel(Command* command) {
+	moveToItem(-1, false, isSelectionContiguous);
 }
 
 #ifdef _WIN32
@@ -1342,7 +1408,7 @@ void cmdReportSelection(Command* command) {
 				track = GetTrack(0, t);
 				for (int i = 0; i < CountTrackMediaItems(track); ++i) {
 					MediaItem* item = GetTrackMediaItem(track, i);
-					if (*(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL)) {
+					if (isItemSelected(item)) {
 						++count;
 						if (count > 1)
 							s << ", ";
@@ -1417,6 +1483,14 @@ void cmdToggleSelection(Command* command) {
 			GetSetMediaTrackInfo(track, "I_SELECTED", (select ? &int1 : &int0));
 			break;
 		}
+		case FOCUS_ITEM:
+			if (!currentItem)
+				return;
+			select = !isItemSelected(currentItem);
+			GetSetMediaItemInfo(currentItem, "B_UISEL", (select ? &bTrue : &bFalse));
+			break;
+		default:
+			return;
 	}
 	outputMessage(select ? "selected" : "unselected");
 }
@@ -1467,6 +1541,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
 	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
+	{MAIN_SECTION, {{0, 0, 40417}, NULL}, NULL, cmdMoveToNextItem}, // Item navigation: Select and move to next item
+	{MAIN_SECTION, {{0, 0, 40416}, NULL}, NULL, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
 	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
@@ -1485,6 +1561,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	// Our own commands.
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
@@ -1503,7 +1581,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track"}, "OSARA_TOGGLESEL", cmdToggleSelection},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
