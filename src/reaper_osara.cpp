@@ -333,17 +333,18 @@ void postGoToTrack(int command) {
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	if (trackNum <= 0)
 		s << "master";
-	else
+	else {
 		s << trackNum;
 	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 	if (folderDepth == 1) // Folder
 		s << " " << getFolderCompacting(track);
-	const char* message = formatFolderState(folderDepth, false);
-	if (message)
-		s << " " << message;
-	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-	if (trackName)
-		s << " " << trackName;
+		const char* message = formatFolderState(folderDepth, false);
+		if (message)
+			s << " " << message;
+		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+		if (trackName)
+			s << " " << trackName;
+	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
 		if (CountSelectedTracks(0) > 1)
@@ -360,8 +361,10 @@ void postGoToTrack(int command) {
 		s << " phase inverted";
 	if (isTrackFxBypassed(track))
 		s << " FX bypassed";
-	int itemCount = CountTrackMediaItems(track);
-	s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+	if (trackNum > 0) { // Not master
+		int itemCount = CountTrackMediaItems(track);
+		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
 		s << "; FX: ";
