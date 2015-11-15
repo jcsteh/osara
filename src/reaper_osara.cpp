@@ -840,9 +840,11 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	// We use -1 for the master track.
 	for (int newNum = origNum + direction; -1 <= newNum && newNum < count; newNum += direction) {
 		MediaTrack* track;
-		if (newNum == -1)
+		if (newNum == -1) {
+			if (!(GetMasterTrackVisibility() & 1))
+				continue; // Invisible.
 			track = GetMasterTrack(0);
-		else {
+		} else {
 			track = GetTrack(0, newNum);
 			MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
 			if (parent
@@ -860,6 +862,8 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 				continue;
 			}
 		}
+		if (!IsTrackVisible(track, false))
+			continue;
 		if (newNum == origNum)
 			break;
 		bool wasSelected = isTrackSelected(track);
