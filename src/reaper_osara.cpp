@@ -884,9 +884,9 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		if (clearSelection || select)
 			Undo_EndBlock("Change Track Selection", 0);
-		postGoToTrack(0);
-		return;
+		break;
 	}
+	postGoToTrack(0);
 }
 
 void cmdGoToNextTrack(Command* command) {
