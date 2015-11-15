@@ -286,10 +286,18 @@ void reportActionName(int command, bool skipCategory=true) {
 typedef bool(*TrackStateCheck)(MediaTrack* track);
 
 bool isTrackMuted(MediaTrack* track) {
+	if (track == GetMasterTrack(0)) {
+		// Method for normal tracks doesn't seem to work for master.
+		return GetMasterMuteSoloFlags() & 1;
+	}
 	return *(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL);
 }
 
 bool isTrackSoloed(MediaTrack* track) {
+	if (track == GetMasterTrack(0)) {
+		// Method for normal tracks doesn't seem to work for master.
+		return GetMasterMuteSoloFlags() & 2;
+	}
 	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
 }
 

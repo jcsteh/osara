@@ -76,6 +76,7 @@
 #define REAPERAPI_WANT_Undo_BeginBlock
 #define REAPERAPI_WANT_Undo_EndBlock
 #define REAPERAPI_WANT_IsTrackVisible
+#define REAPERAPI_WANT_GetMasterMuteSoloFlags
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
