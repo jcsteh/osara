@@ -777,26 +777,23 @@ HWND getTrackVu(MediaTrack* track) {
 	return data.retHwnd;
 }
 
-bool shouldOverrideContextMenu() {
-	GUITHREADINFO info;
-	info.cbSize = sizeof(GUITHREADINFO);
-	GetGUIThreadInfo(guiThread, &info);
-	if (!info.hwndFocus)
-		return false;
-	WCHAR className[22];
-	ostringstream s;
-	return GetClassName(info.hwndFocus, className,  ARRAYSIZE(className)) && (
-			wcscmp(className, L"REAPERTrackListWindow") == 0
-			|| wcscmp(className, L"REAPERtrackvu") == 0
-	);
-}
-
 // Handle keyboard keys which can't be bound to actions.
-int handleAccel(MSG* msg, accelerator_register_t* ctx) {
-	if (msg->message == WM_KEYUP && msg->wParam == VK_APPS && shouldOverrideContextMenu()) {
-		// Reaper doesn't usually handle the applications key.
-		// Unfortunately, binding an action to this key succeeds but doesn't work.
-		// Display the appropriate context menu depending no fake focus.
+// REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
+LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
+	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN) {
+		// Return early if we're not interested in the key.
+		return CallNextHookEx(NULL, code, wParam, lParam);
+	}
+	HWND focus = GetFocus();
+	WCHAR className[22] = L"\0";
+	if (focus)
+		GetClassName(focus, className, ARRAYSIZE(className));
+	if (wParam == VK_APPS && lParam & 0x80000000 && (
+		wcscmp(className, L"REAPERTrackListWindow") == 0
+		|| wcscmp(className, L"REAPERtrackvu") == 0
+	)) {
+		// Reaper doesn't handle the applications key for these windows.
+		// Display the appropriate context menu depending on fakeFocus.
 		switch (fakeFocus) {
 			// todo: Fix positioning when TrackPopupContextMenu is used.
 			case FOCUS_TRACK:
@@ -820,9 +817,35 @@ int handleAccel(MSG* msg, accelerator_register_t* ctx) {
 				break;
 		}
 		return 1;
+	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
+		&& !(lParam & 0x80000000) // Key down
+		&& wcscmp(className, L"SysListView32") == 0
+	) {
+		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
+		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
+		if (item != -1) {
+			RECT rect;
+			ListView_GetItemRect(focus, item, &rect, LVIR_BOUNDS);
+			POINT point = {rect.left + 10, rect.top + 10};
+			ClientToScreen(focus, &point);
+			SetCursorPos(point.x, point.y);
+			if (wParam == VK_APPS) {
+				// Applications key right clicks.
+				mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
+				mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
+			} else {
+				// Control+enter double clicks.
+				mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+				mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+				mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+				mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+			}
+			return 1;
+		}
 	}
-	return 0;
+	return CallNextHookEx(NULL, code, wParam, lParam);
 }
+HHOOK keyboardHook = NULL;
 
 #endif // _WIN32
 
@@ -1722,9 +1745,10 @@ bool handleMainCommandFallback(int command, int flag) {
 	return false;
 }
 
+#ifdef _WIN32
+
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
-#ifdef _WIN32
 VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
@@ -1733,9 +1757,6 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	KillTimer(NULL, event);
 }
-#endif // _WIN32
-
-#ifdef _WIN32
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS && lastMessageHwnd && hwnd != lastMessageHwnd) {
@@ -1746,11 +1767,6 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 	}
 }
 HWINEVENTHOOK winEventHook = NULL;
-
-accelerator_register_t accelReg = {
-	handleAccel,
-	true,
-};
 
 #endif // _WIN32
 
@@ -1805,14 +1821,15 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
 #ifdef _WIN32
-		rec->Register("accelerator", &accelReg);
 		SetTimer(NULL, NULL, 0, delayedInit);
+		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
 #endif
 		return 1;
 
 	} else {
 		// Unload.
 #ifdef _WIN32
+		UnhookWindowsHookEx(keyboardHook);
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 #else
