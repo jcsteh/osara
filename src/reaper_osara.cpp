@@ -860,33 +860,34 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	int count = CountTracks(0);
 	if (count == 0)
 		return;
-	int origNum;
-	MediaTrack* track = GetLastTouchedTrack();
-	if (track) {
-		origNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-		if (origNum >= 0) // Not master
-			--origNum; // We need 0-based.
+	int num;
+	MediaTrack* origTrack = GetLastTouchedTrack();
+	if (origTrack) {
+		num = (int)(size_t)GetSetMediaTrackInfo(origTrack, "IP_TRACKNUMBER", NULL);
+		if (num >= 0) // Not master
+			--num; // We need 0-based.
+		num += direction;
 	} else {
 		// #47: Deleting the last track results in no last touched track.
 		// Therefore, navigate to the last track.
-		origNum = direction == 1 ? count - 2 : count - 1;
+		num = count - 1;
 	}
+	MediaTrack* track = origTrack;
 	// We use -1 for the master track.
-	for (int newNum = origNum + direction; -1 <= newNum && newNum < count; newNum += direction) {
-		MediaTrack* track;
-		if (newNum == -1) {
+	for (; -1 <= num && num < count; num += direction) {
+		if (num == -1) {
 			if (!(GetMasterTrackVisibility() & 1))
 				continue; // Invisible.
 			track = GetMasterTrack(0);
 		} else {
-			track = GetTrack(0, newNum);
+			track = GetTrack(0, num);
 			MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
 			if (parent
 				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
 				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
 			) {
 				// This track is inside a closed folder, so skip it.
-				if (direction == 1 && newNum == count - 1) {
+				if (direction == 1 && num == count - 1) {
 					// We're moving forward and we're on the last track.
 					// Therefore, go backward.
 					// Note that this can't happen when the user moves backward
@@ -895,12 +896,15 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 				}
 				continue;
 			}
+			if (!IsTrackVisible(track, false))
+				continue;
 		}
-		if (!IsTrackVisible(track, false))
-			continue;
-		if (newNum == origNum)
-			break;
-		bool wasSelected = isTrackSelected(track);
+		break;
+	}
+	bool wasSelected = isTrackSelected(track);
+	if (!select || track != origTrack || !wasSelected) {
+		// We're moving to a different track
+		// or we're on the same track but it's unselected.
 		if (clearSelection || select)
 			Undo_BeginBlock();
 		if (clearSelection) {
@@ -918,7 +922,6 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		if (clearSelection || select)
 			Undo_EndBlock("Change Track Selection", 0);
-		break;
 	}
 	postGoToTrack(0);
 }
