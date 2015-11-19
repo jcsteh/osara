@@ -460,6 +460,8 @@ void postCursorMovement(int command) {
 void postCursorMovementScrub(int command) {
 	if (shouldReportScrub)
 		postCursorMovement(command);
+	else
+		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
 void postCursorMovementMeasure(int command) {
