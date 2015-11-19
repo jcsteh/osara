@@ -77,6 +77,7 @@
 #define REAPERAPI_WANT_Undo_EndBlock
 #define REAPERAPI_WANT_IsTrackVisible
 #define REAPERAPI_WANT_GetMasterMuteSoloFlags
+#define REAPERAPI_WANT_CountProjectMarkers
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -97,6 +98,8 @@ enum FakeFocus {
 	FOCUS_TRACK,
 	FOCUS_ITEM,
 	FOCUS_RULER,
+	FOCUS_MARKER,
+	FOCUS_REGION
 };
 extern enum FakeFocus fakeFocus;
 

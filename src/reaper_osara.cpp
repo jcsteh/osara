@@ -488,6 +488,7 @@ void postGoToMarker(int command) {
 	if (marker >= 0) {
 		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
 		if (markerPos == cursorPos) {
+			fakeFocus = FOCUS_MARKER;
 			if (name[0])
 				s << name << " marker" << " ";
 			else
@@ -496,6 +497,7 @@ void postGoToMarker(int command) {
 	}
 	if (region >= 0) {
 		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
+		fakeFocus = FOCUS_REGION;
 		if (name[0])
 			s << name << " region ";
 		else
@@ -1129,6 +1131,20 @@ void cmdToggleMasterTrackFxBypass(Command* command) {
 	postToggleTrackFxBypass(GetMasterTrack(0));
 }
 
+void cmdDeleteMarker(Command* command) {
+	int count = CountProjectMarkers(0, NULL, NULL);
+	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
+	if (CountProjectMarkers(0, NULL, NULL) != count)
+		outputMessage("marker deleted");
+}
+
+void cmdDeleteRegion(Command* command) {
+	int count = CountProjectMarkers(0, NULL, NULL);
+	Main_OnCommand(40615, 0); // Markers: Delete region near cursor
+	if (CountProjectMarkers(0, NULL, NULL) != count)
+		outputMessage("region deleted");
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1498,6 +1514,12 @@ void cmdRemoveFocus(Command* command) {
 		case FOCUS_ITEM:
 			cmdhRemoveItems(40006); // Item: Remove items
 			break;
+		case FOCUS_MARKER:
+			cmdDeleteMarker(NULL);
+			break;
+		case FOCUS_REGION:
+			cmdDeleteRegion(NULL);
+			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
 	}
@@ -1611,6 +1633,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
 	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
+	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
+	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
@@ -1629,7 +1653,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
