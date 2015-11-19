@@ -81,6 +81,8 @@
 #define REAPERAPI_WANT_CountTempoTimeSigMarkers
 #define REAPERAPI_WANT_FindTempoTimeSigMarker
 #define REAPERAPI_WANT_GetTempoTimeSigMarker
+#define REAPERAPI_WANT_GetTakeNumStretchMarkers
+#define REAPERAPI_WANT_GetTakeStretchMarker
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -103,7 +105,8 @@ enum FakeFocus {
 	FOCUS_RULER,
 	FOCUS_MARKER,
 	FOCUS_REGION,
-	FOCUS_TIMESIG
+	FOCUS_TIMESIG,
+	FOCUS_STRETCH
 };
 extern enum FakeFocus fakeFocus;
 

@@ -110,6 +110,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item edit: Shrink left edge of items
 - Item edit: Shrink right edge of items
 - Item edit: Grow right edge of items
+- Item: go to next stretch marker
+- Item: go to previous stretch marker
+- Item: remove stretch marker at current position
 
 #### Takes
 - Take: Switch items to next take

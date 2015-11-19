@@ -677,6 +677,33 @@ void postMoveToTimeSig(int command) {
 	outputMessage(s);
 }
 
+void postGoToStretch(int command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return;
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take)
+		return;
+	double cursor = GetCursorPosition();
+	// Stretch marker positions are relative to the start of the item.
+	double cursorRel = cursor - *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+	if (cursorRel < 0)
+		return;
+	int index = GetTakeStretchMarker(take, -1, &cursorRel, NULL);
+	// Get the real position; pos wasn't written.
+	double stretchRel;
+	GetTakeStretchMarker(take, index, &stretchRel, NULL);
+	ostringstream s;
+	if (index >= 0 && stretchRel == cursorRel) {
+		fakeFocus = FOCUS_STRETCH;
+		s << "stretch marker " << index + 1 << " ";
+	}
+	s << formatCursorPosition();
+	outputMessage(s);
+	if (GetPlayPosition() != cursor)
+		SetEditCurPos(cursor, true, true); // Seek playback.
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -747,6 +774,8 @@ PostCommand POST_COMMANDS[] = {
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
 	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
 	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
+	{41860, postGoToStretch}, // Item: go to next stretch marker
+	{41861, postGoToStretch}, // Item: go to previous stretch marker
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -1169,6 +1198,19 @@ void cmdDeleteTimeSig(Command* command) {
 		outputMessage("time signature deleted");
 }
 
+void cmdRemoveStretch(Command* command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return;
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take)
+		return;
+	int count = GetTakeNumStretchMarkers(take);
+	Main_OnCommand(41859, 0); // Item: remove stretch marker at current position
+	if (GetTakeNumStretchMarkers(take) != count)
+		outputMessage("stretch marker deleted");
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1547,6 +1589,9 @@ void cmdRemoveFocus(Command* command) {
 		case FOCUS_TIMESIG:
 			cmdDeleteTimeSig(NULL);
 			break;
+		case FOCUS_STRETCH:
+			cmdRemoveStretch(NULL);
+			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
 	}
@@ -1663,6 +1708,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
+	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
