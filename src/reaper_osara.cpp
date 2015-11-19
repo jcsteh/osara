@@ -443,6 +443,10 @@ void postToggleTrackFxBypass(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
+	if (track == GetMasterTrack(0)) {
+		// Make this work for the master track. It doesn't out of the box.
+		Main_OnCommand(16, 0); // Track: Toggle FX bypass for master track
+	}
 	postToggleTrackFxBypass(track);
 }
 
@@ -704,6 +708,21 @@ void postGoToStretch(int command) {
 		SetEditCurPos(cursor, true, true); // Seek playback.
 }
 
+void postTrackFxChain(int command) {
+	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
+		// Make this work for the master track. It doesn't out of the box.
+		Main_OnCommand(40846, 0); // Track: View FX chain for master track
+	}
+}
+
+void cmdIoMaster(Command* command);
+void postTrackIo(int command) {
+	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
+		// Make this work for the master track. It doesn't out of the box.
+		cmdIoMaster(NULL);
+	}
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -776,6 +795,8 @@ PostCommand POST_COMMANDS[] = {
 	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
 	{41860, postGoToStretch}, // Item: go to next stretch marker
 	{41861, postGoToStretch}, // Item: go to previous stretch marker
+	{40291, postTrackFxChain}, // Track: View FX chain for current track
+	{40293, postTrackIo}, // Track: View I/O for current track
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
