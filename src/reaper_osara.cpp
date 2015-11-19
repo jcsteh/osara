@@ -662,6 +662,21 @@ void postMoveToEnvelopePoint(int command) {
 	outputMessage(s);
 }
 
+void postMoveToTimeSig(int command) {
+	double cursor = GetCursorPosition();
+	int marker = FindTempoTimeSigMarker(0, cursor);
+	double pos, bpm;
+	int sigNum, sigDenom;
+	GetTempoTimeSigMarker(0, marker, &pos, NULL, NULL, &bpm, &sigNum, &sigDenom, NULL);
+	if (pos != cursor)
+		return;
+	fakeFocus = FOCUS_TIMESIG;
+	ostringstream s;
+	s << "tempo " << bpm << " time sig " << sigNum << "/" << sigDenom;
+	s << formatCursorPosition();
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -730,6 +745,8 @@ PostCommand POST_COMMANDS[] = {
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
 	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
+	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
+	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -1145,6 +1162,13 @@ void cmdDeleteRegion(Command* command) {
 		outputMessage("region deleted");
 }
 
+void cmdDeleteTimeSig(Command* command) {
+	int count = CountTempoTimeSigMarkers(0);
+	Main_OnCommand(40617, 0); // Markers: Delete time signature marker near cursor
+	if (CountTempoTimeSigMarkers(0) != count)
+		outputMessage("time signature deleted");
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1520,6 +1544,9 @@ void cmdRemoveFocus(Command* command) {
 		case FOCUS_REGION:
 			cmdDeleteRegion(NULL);
 			break;
+		case FOCUS_TIMESIG:
+			cmdDeleteTimeSig(NULL);
+			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
 	}
@@ -1635,6 +1662,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
+	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},

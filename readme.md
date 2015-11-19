@@ -141,6 +141,11 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Regions: Go to region 09 after current region finishes playing (smooth seek)
 - Regions: Go to region 10 after current region finishes playing (smooth seek)
 
+#### Time Signature/Tempo Markers
+- Move edit cursor to previous tempo or time signature change
+- Move edit cursor to next tempo or time signature change
+- Markers: Delete time signature marker near cursor
+
 #### Envelopes
 - Track: Select previous envelope
 - Track: Select next envelope

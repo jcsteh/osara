@@ -78,6 +78,9 @@
 #define REAPERAPI_WANT_IsTrackVisible
 #define REAPERAPI_WANT_GetMasterMuteSoloFlags
 #define REAPERAPI_WANT_CountProjectMarkers
+#define REAPERAPI_WANT_CountTempoTimeSigMarkers
+#define REAPERAPI_WANT_FindTempoTimeSigMarker
+#define REAPERAPI_WANT_GetTempoTimeSigMarker
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -99,7 +102,8 @@ enum FakeFocus {
 	FOCUS_ITEM,
 	FOCUS_RULER,
 	FOCUS_MARKER,
-	FOCUS_REGION
+	FOCUS_REGION,
+	FOCUS_TIMESIG
 };
 extern enum FakeFocus fakeFocus;
 
