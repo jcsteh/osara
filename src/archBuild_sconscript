@@ -22,5 +22,6 @@ env.SharedLibrary(
 		"user32",
 		"ole32",
 		"oleacc",
+		"OleAut32",
 	],
 )

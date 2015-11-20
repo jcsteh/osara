@@ -848,6 +848,80 @@ HWND getTrackVu(MediaTrack* track) {
 	return data.retHwnd;
 }
 
+HWND getSendContainer(HWND hwnd) {
+	WCHAR className[21] = L"\0";
+	GetClassName(hwnd, className, ARRAYSIZE(className));
+	if (wcscmp(className, L"Button") != 0)
+		return NULL;
+	hwnd = GetWindow(hwnd, GW_HWNDPREV);
+	if (!hwnd)
+		return NULL;
+	GetClassName(hwnd, className, ARRAYSIZE(className));
+	if (wcscmp(className, L"Static") != 0)
+		return NULL;
+	hwnd = GetAncestor(hwnd, GA_PARENT);
+	if (!hwnd)
+		return NULL;
+	GetClassName(hwnd, className, ARRAYSIZE(className));
+	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
+		return NULL;
+	return hwnd;
+}
+
+void sendMenu(HWND sendWindow) {
+	// #24: The controls are exposed via MSAA,
+	// but this is difficult for most users to use, especially with the broken MSAA implementation.
+	// Present them in a menu.
+	IAccessible* acc = NULL;
+	VARIANT child;
+	if (AccessibleObjectFromEvent(sendWindow, OBJID_CLIENT, CHILDID_SELF, &acc, &child) != S_OK)
+		return;
+	long count = 0;
+	if (acc->get_accChildCount(&count) != S_OK || count == 0) {
+		acc->Release();
+		return;
+	}
+	HMENU menu = CreatePopupMenu();
+	MENUITEMINFO itemInfo;
+	itemInfo.cbSize = sizeof(MENUITEMINFO);
+	itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+	itemInfo.fType = MFT_STRING;
+	child.vt = VT_I4;
+	int item = 0;
+	for (long c = 1; c <= count; ++c, ++item) {
+		child.lVal = c;
+		VARIANT role;
+		if (acc->get_accRole(child, &role) != S_OK || role.vt != VT_I4)
+			continue;
+		if (role.lVal != ROLE_SYSTEM_PUSHBUTTON && role.lVal != ROLE_SYSTEM_COMBOBOX)
+			continue;
+		BSTR name = NULL;
+		if (acc->get_accName(child, &name) != S_OK || !name)
+			continue;
+		itemInfo.wID = c;
+		itemInfo.dwTypeData = name;
+		itemInfo.cch = SysStringLen(name);
+		InsertMenuItem(menu, item, true, &itemInfo);
+		SysFreeString(name);
+	}
+	child.lVal = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL);
+	DestroyMenu(menu);
+	if (child.lVal == -1) {
+		acc->Release();
+		return;
+	}
+	// Click the selected control.
+	long l, t, w, h;
+	HRESULT res = acc->accLocation(&l, &t, &w, &h, child);
+	acc->Release();
+	if (res != S_OK)
+		return;
+	POINT point = {l, t};
+	ScreenToClient(sendWindow, &point);
+	SendMessage(sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -856,38 +930,44 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
 	HWND focus = GetFocus();
+	if (!focus)
+		return CallNextHookEx(NULL, code, wParam, lParam);
 	WCHAR className[22] = L"\0";
-	if (focus)
-		GetClassName(focus, className, ARRAYSIZE(className));
-	if (wParam == VK_APPS && lParam & 0x80000000 && (
-		wcscmp(className, L"REAPERTrackListWindow") == 0
-		|| wcscmp(className, L"REAPERtrackvu") == 0
-	)) {
-		// Reaper doesn't handle the applications key for these windows.
-		// Display the appropriate context menu depending on fakeFocus.
-		switch (fakeFocus) {
-			// todo: Fix positioning when TrackPopupContextMenu is used.
-			case FOCUS_TRACK:
-				if (GetKeyState(VK_CONTROL) & 0x8000) // Secondary
-					TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
-				else {
-					// This menu can't be retrieved with GetContextMenu.
-					MediaTrack* track = GetLastTouchedTrack();
-					if (!track)
-						return 0;
-					HWND hwnd = getTrackVu(track);
-					if (hwnd)
-						PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
-				}
-				break;
-			case FOCUS_ITEM:
-				TrackPopupMenu(GetContextMenu(1), 0, 0, 0, 0, mainHwnd, NULL);
-				break;
-			case FOCUS_RULER:
-				TrackPopupMenu(GetContextMenu(2), 0, 0, 0, 0, mainHwnd, NULL);
-				break;
+	GetClassName(focus, className, ARRAYSIZE(className));
+	HWND window;
+	if (wParam == VK_APPS && lParam & 0x80000000) {
+		if (wcscmp(className, L"REAPERTrackListWindow") == 0
+			|| wcscmp(className, L"REAPERtrackvu") == 0
+		) {
+			// Reaper doesn't handle the applications key for these windows.
+			// Display the appropriate context menu depending on fakeFocus.
+			switch (fakeFocus) {
+				// todo: Fix positioning when TrackPopupContextMenu is used.
+				case FOCUS_TRACK:
+					if (GetKeyState(VK_CONTROL) & 0x8000) // Secondary
+						TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
+					else {
+						// This menu can't be retrieved with GetContextMenu.
+						MediaTrack* track = GetLastTouchedTrack();
+						if (!track)
+							return 0;
+						HWND hwnd = getTrackVu(track);
+						if (hwnd)
+							PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
+					}
+					break;
+				case FOCUS_ITEM:
+					TrackPopupMenu(GetContextMenu(1), 0, 0, 0, 0, mainHwnd, NULL);
+					break;
+				case FOCUS_RULER:
+					TrackPopupMenu(GetContextMenu(2), 0, 0, 0, 0, mainHwnd, NULL);
+					break;
+			}
+			return 1;
+		} else if (window = getSendContainer(focus)) {
+			sendMenu(window);
+			return 1;
 		}
-		return 1;
 	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
 		&& !(lParam & 0x80000000) // Key down
 		&& wcscmp(className, L"SysListView32") == 0
@@ -1883,11 +1963,31 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 }
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
-	if (event == EVENT_OBJECT_FOCUS && lastMessageHwnd && hwnd != lastMessageHwnd) {
-		// Focus is moving. Clear our tweak to accName for the previous focus.
-		// This avoids problems such as the last message repeating when a new project is opened (#17).
-		accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
-		lastMessageHwnd = NULL;
+	if (event == EVENT_OBJECT_FOCUS) {
+		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
+			// Focus is moving. Clear our tweak to accName for the previous focus.
+			// This avoids problems such as the last message repeating when a new project is opened (#17).
+			accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
+			lastMessageHwnd = NULL;
+		}
+		HWND tempWindow;
+		if (tempWindow = getSendContainer(hwnd)) {
+			// #24: This is a button for a send in the Track I/O window.
+			// Tweak the name so the user knows what send it's for.
+			// Unfortunately, we can't annotate the accessible for the container.
+			// First, get the name of the send.
+			HWND child = GetTopWindow(tempWindow);
+			WCHAR name[50];
+			if (GetWindowText(child, name, ARRAYSIZE(name)) == 0)
+				return;
+			wostringstream focusName;
+			focusName << name;
+			// Now, get the original name of the button.
+			if (GetWindowText(hwnd, name, ARRAYSIZE(name)) == 0)
+				return;
+			focusName << L": " << name;
+			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+		}
 	}
 }
 HWINEVENTHOOK winEventHook = NULL;

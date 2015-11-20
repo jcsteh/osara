@@ -281,6 +281,13 @@ You can do this as follows:
 
 Selection will revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
 
+### Accessing Controls for Sends/Receives/Outputs in the Track I/O Window
+In the Track I/O window, there are various controls for each send, receive or hardware output.
+Unfortunately, these controls cannot be reached with the tab key and it is tedious at best to access these with screen raeder review functions.
+
+When you tab to the Delete button for a send/receive/output, the name of the send/receive/output will first be reported.
+You can then press the Applications key to access a menu of additional options.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog using the "OSARA: Configuration" action.
