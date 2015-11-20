@@ -683,35 +683,49 @@ void postMoveToTimeSig(int command) {
 	outputMessage(s);
 }
 
-MediaItem_Take* lastStretchTake = NULL;
-int lastStretchIndex = -1;
+int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart) {
+	// Stretch marker positions are relative to the start of the item.
+	double posRel = pos - itemStart;
+	if (posRel < 0)
+		return -1;
+	int index = GetTakeStretchMarker(take, -1, &posRel, NULL);
+	if (index < 0)
+		return -1;
+	double stretchRel;
+	// Get the real position; pos wasn't written.
+	GetTakeStretchMarker(take, index, &stretchRel, NULL);
+	if (stretchRel != posRel)
+		return -1; // Marker not right at pos.
+	return index;
+}
+
+double lastStretchPos = -1;
 
 void postGoToStretch(int command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
-		return;
-	MediaItem_Take* take = GetActiveTake(item);
-	if (!take)
+	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0)
 		return;
 	double cursor = GetCursorPosition();
-	// Stretch marker positions are relative to the start of the item.
-	double cursorRel = cursor - *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-	if (cursorRel < 0)
-		return;
-	lastStretchIndex = -1;
-	ostringstream s;
-	int index = GetTakeStretchMarker(take, -1, &cursorRel, NULL);
-	if (index >= 0) {
-		double stretchRel;
-		// Get the real position; pos wasn't written.
-		GetTakeStretchMarker(take, index, &stretchRel, NULL);
-		if (stretchRel == cursorRel) {
-			fakeFocus = FOCUS_STRETCH;
-			s << "stretch marker " << index + 1 << " ";
-			lastStretchTake = take;
-			lastStretchIndex = index;
+	// Check whether there is actually a stretch marker at this position,
+	// as these commands also move to the start/end of items regardless of markers.
+	bool found = false;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take)
+			continue;
+		if (getStretchAtPos(take, cursor, *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL)) != -1) {
+			found = true;
+			break;
 		}
 	}
+	ostringstream s;
+	if (found) {
+		fakeFocus = FOCUS_STRETCH;
+		lastStretchPos = cursor;
+		s << "stretch marker ";
+	} else
+		lastStretchPos = -1;
 	s << formatCursorPosition();
 	outputMessage(s);
 	if (GetPlayPosition() != cursor)
@@ -1752,15 +1766,29 @@ void cmdToggleSelection(Command* command) {
 }
 
 void cmdMoveStretch(Command* command) {
-	if (lastStretchIndex == -1)
+	if (lastStretchPos == -1)
 		return;
-	MediaItem* item = (MediaItem*)GetSetMediaItemTakeInfo(lastStretchTake, "P_ITEM", NULL);
-	if (!item)
+	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0)
 		return;
-	// Stretch marker positions are relative to the start of the item.
-	double destPos = GetCursorPosition() - *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-	SetTakeStretchMarker(lastStretchTake, lastStretchIndex, destPos, NULL);
-	outputMessage("stretch marker moved");
+	double cursor = GetCursorPosition();
+	bool done = false;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take)
+			continue;
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		int index = getStretchAtPos(take, lastStretchPos, itemStart);
+		if (index == -1)
+			continue;
+		// Stretch marker positions are relative to the start of the item.
+		double destPos = cursor - itemStart;
+		SetTakeStretchMarker(take, index, destPos, NULL);
+		done = true;
+	}
+	if (done)
+		outputMessage("stretch marker moved");
 }
 
 #ifdef _WIN32
