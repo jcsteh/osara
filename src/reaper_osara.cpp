@@ -683,6 +683,9 @@ void postMoveToTimeSig(int command) {
 	outputMessage(s);
 }
 
+MediaItem_Take* lastStretchTake = NULL;
+int lastStretchIndex = -1;
+
 void postGoToStretch(int command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	if (!item)
@@ -695,14 +698,19 @@ void postGoToStretch(int command) {
 	double cursorRel = cursor - *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
 	if (cursorRel < 0)
 		return;
-	int index = GetTakeStretchMarker(take, -1, &cursorRel, NULL);
-	// Get the real position; pos wasn't written.
-	double stretchRel;
-	GetTakeStretchMarker(take, index, &stretchRel, NULL);
+	lastStretchIndex = -1;
 	ostringstream s;
-	if (index >= 0 && stretchRel == cursorRel) {
-		fakeFocus = FOCUS_STRETCH;
-		s << "stretch marker " << index + 1 << " ";
+	int index = GetTakeStretchMarker(take, -1, &cursorRel, NULL);
+	if (index >= 0) {
+		double stretchRel;
+		// Get the real position; pos wasn't written.
+		GetTakeStretchMarker(take, index, &stretchRel, NULL);
+		if (stretchRel == cursorRel) {
+			fakeFocus = FOCUS_STRETCH;
+			s << "stretch marker " << index + 1 << " ";
+			lastStretchTake = take;
+			lastStretchIndex = index;
+		}
 	}
 	s << formatCursorPosition();
 	outputMessage(s);
@@ -1743,6 +1751,18 @@ void cmdToggleSelection(Command* command) {
 	outputMessage(select ? "selected" : "unselected");
 }
 
+void cmdMoveStretch(Command* command) {
+	if (lastStretchIndex == -1)
+		return;
+	MediaItem* item = (MediaItem*)GetSetMediaItemTakeInfo(lastStretchTake, "P_ITEM", NULL);
+	if (!item)
+		return;
+	// Stretch marker positions are relative to the start of the item.
+	double destPos = GetCursorPosition() - *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+	SetTakeStretchMarker(lastStretchTake, lastStretchIndex, destPos, NULL);
+	outputMessage("stretch marker moved");
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -1834,6 +1854,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move last focused stretch marker to current edit cursor position"}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},

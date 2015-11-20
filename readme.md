@@ -288,6 +288,18 @@ Unfortunately, these controls cannot be reached with the tab key and it is tedio
 When you tab to the Delete button for a send/receive/output, the name of the send/receive/output will first be reported.
 You can then press the Applications key to access a menu of additional options.
 
+### Manually Moving Stretch Markers
+REAPER includes actions to snap stretch markers to the grid.
+However, sometimes, this is not sufficient and it is useful to be able to manually move stretch markers to a specific position.
+
+To do this:
+
+1. Select the desired item.
+2. Go to a stretch marker; e.g. using the"Item: go to next stretch marker" action.
+ Ensure that OSARA reports the stretch marker.
+3. Move the edit cursor to the position to which you wish to move the stretch marker.
+4. Run the "OSARA: Move last focused stretch marker to current edit cursor position" action.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog using the "OSARA: Configuration" action.
