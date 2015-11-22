@@ -536,6 +536,17 @@ void postSelectEnvelope(int command) {
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
 	ostringstream s;
+	// Figure out what track this belongs to.
+	for (int t = 0; t < CountTracks(0); ++t) {
+		MediaTrack* track = GetTrack(0, t);
+		if (GetTrackEnvelopeByName(track, name) == envelope) {
+			s << t + 1;
+			char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+			if (trackName && trackName[0])
+				s << " " << trackName;
+			s << ": ";
+		}
+	}
 	s << name << " envelope selected";
 	outputMessage(s);
 }

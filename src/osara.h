@@ -84,6 +84,7 @@
 #define REAPERAPI_WANT_GetTakeNumStretchMarkers
 #define REAPERAPI_WANT_GetTakeStretchMarker
 #define REAPERAPI_WANT_SetTakeStretchMarker
+#define REAPERAPI_WANT_GetTrackEnvelopeByName
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
