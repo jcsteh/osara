@@ -537,6 +537,8 @@ void postSelectEnvelope(int command) {
 	GetEnvelopeName(envelope, name, sizeof(name));
 	ostringstream s;
 	// Figure out what track this belongs to.
+	if (GetTrackEnvelopeByName(GetMasterTrack(0), name) == envelope)
+		s << "master: ";
 	for (int t = 0; t < CountTracks(0); ++t) {
 		MediaTrack* track = GetTrack(0, t);
 		if (GetTrackEnvelopeByName(track, name) == envelope) {
