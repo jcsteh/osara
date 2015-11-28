@@ -85,6 +85,7 @@
 #define REAPERAPI_WANT_GetTakeStretchMarker
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_GetTrackEnvelopeByName
+#define REAPERAPI_WANT_ValidatePtr
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

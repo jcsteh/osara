@@ -1140,7 +1140,9 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	int count = CountTrackMediaItems(track);
 	double pos;
 	int start = direction == 1 ? 0 : count - 1;
-	if (currentItem && (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track) {
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track
+	) {
 		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", NULL);
 		if (direction == 1 ? pos <= cursor : pos >= cursor) {
 			// The cursor is right at or has moved past the item to which the user last moved.
