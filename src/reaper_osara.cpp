@@ -266,8 +266,8 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-void reportActionName(int command, bool skipCategory=true) {
-	const char* name = kbd_getTextFromCmd(command, NULL);
+void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
+	const char* name = kbd_getTextFromCmd(command, section);
 	const char* start;
 	if (skipCategory) {
 		// Skip the category before the colon (if any).
@@ -1994,7 +1994,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		isHandlingCommand = false;
 		return true;
 	} else if (isShortcutHelpEnabled) {
-		reportActionName(command, false);
+		reportActionName(command, section, false);
 		return true;
 	}
 	return false;
