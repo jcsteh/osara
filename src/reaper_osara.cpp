@@ -13,8 +13,6 @@
 #include <oleacc.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
-#include <UIAutomationCore.h>
-#include <UIAutomationCoreAPI.h>
 #endif
 #include <string>
 #include <sstream>
@@ -78,49 +76,28 @@ string narrow(const wstring& text) {
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
-HWND fakeFocusHwnd = NULL;
 void outputMessage(const string& message) {
-	// Use a fake focused accessible to output a message to the user.
-	HWND focus = GetFocus();
-	if (fakeFocusHwnd && focus != lastMessageHwnd) {
-		// We're outputting a message for a different window.
-		DestroyWindow(fakeFocusHwnd);
-		MSAAPROPID props[] = {PROPID_ACC_ROLE, PROPID_ACC_STATE, HasKeyboardFocus_Property_GUID, PROPID_ACC_NAME};
-		accPropServices->ClearHwndProps(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, props, ARRAYSIZE(props));
-		fakeFocusHwnd = NULL;
-	}
-	lastMessageHwnd = focus;
-	if (!fakeFocusHwnd) {
-		// Make it a child of the real focus to preserve ancestry.
-		fakeFocusHwnd = CreateWindow(L"Static", NULL, WS_CHILD, 0, 0, 0, 0, focus, NULL, NULL, NULL);
-		if (!fakeFocusHwnd)
-			return;
-		VARIANT val;
-		val.vt = VT_I4;
-		val.lVal = ROLE_SYSTEM_CLIENT;
-		accPropServices->SetHwndProp(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE, val);
-		val.lVal = STATE_SYSTEM_FOCUSED;
-		accPropServices->SetHwndProp(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_STATE, val);
-		val.vt = VT_BOOL;
-		val.boolVal = VARIANT_TRUE;
-		accPropServices->SetHwndProp(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, HasKeyboardFocus_Property_GUID, val);
-	}
-	// Tweak the MSAA accName for the fake focus.
+	// Tweak the MSAA accName for the current focus.
+	GUITHREADINFO guiThreadInfo;
+	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
+	GetGUIThreadInfo(guiThread, &guiThreadInfo);
+	if (!guiThreadInfo.hwndFocus)
+		return;
 	if (lastMessage.compare(message) == 0) {
 		// The last message was the same.
 		// Clients may ignore a nameChange event if the name didn't change.
 		// Append a space to make it different.
 		string procMessage = message;
 		procMessage += ' ';
-		accPropServices->SetHwndPropStr(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
+		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
 		lastMessage = message;
 	}
-	// Fire events so ATs will report this text.
-	NotifyWinEvent(EVENT_OBJECT_FOCUS, fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF);
-	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, fakeFocusHwnd, OBJID_CLIENT, CHILDID_SELF);
+	// Fire a nameChange event so ATs will report this text.
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
+	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
 
 #else // _WIN32
@@ -355,10 +332,7 @@ bool isItemSelected(MediaItem* item) {
 bool shouldReportFx = false;
 void postGoToTrack(int command) {
 	fakeFocus = FOCUS_TRACK;
-	// This causes focus to bounce even if this is already the context,
-	// so only do it if we have to.
-	if (GetCursorContext2(true) != 0)
-		SetCursorContext(0, NULL);
+	SetCursorContext(0, NULL);
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -2053,9 +2027,13 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 }
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
-	if (hwnd == fakeFocusHwnd)
-		return;
 	if (event == EVENT_OBJECT_FOCUS) {
+		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
+			// Focus is moving. Clear our tweak to accName for the previous focus.
+			// This avoids problems such as the last message repeating when a new project is opened (#17).
+			accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
+			lastMessageHwnd = NULL;
+		}
 		HWND tempWindow;
 		if (tempWindow = getSendContainer(hwnd)) {
 			// #24: This is a button for a send in the Track I/O window.
