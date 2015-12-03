@@ -30,6 +30,9 @@
 #include <WDL/db2val.h>
 #include "resource.h"
 #include "paramsUi.h"
+#ifdef _WIN32
+#include "winA11y.h"
+#endif
 
 using namespace std;
 
@@ -75,29 +78,20 @@ string narrow(const wstring& text) {
 }
 
 string lastMessage;
-HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
 	// Tweak the MSAA accName for the current focus.
-	GUITHREADINFO guiThreadInfo;
-	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
-	GetGUIThreadInfo(guiThread, &guiThreadInfo);
-	if (!guiThreadInfo.hwndFocus)
-		return;
 	if (lastMessage.compare(message) == 0) {
 		// The last message was the same.
 		// Clients may ignore a nameChange event if the name didn't change.
 		// Append a space to make it different.
 		string procMessage = message;
 		procMessage += ' ';
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
+		rawOutputMessage(widen(procMessage));
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
+		rawOutputMessage(widen(message));
 		lastMessage = message;
 	}
-	// Fire a nameChange event so ATs will report this text.
-	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
-	lastMessageHwnd = guiThreadInfo.hwndFocus;
 }
 
 #else // _WIN32
@@ -2028,12 +2022,6 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
-		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
-			// Focus is moving. Clear our tweak to accName for the previous focus.
-			// This avoids problems such as the last message repeating when a new project is opened (#17).
-			accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
-			lastMessageHwnd = NULL;
-		}
 		HWND tempWindow;
 		if (tempWindow = getSendContainer(hwnd)) {
 			// #24: This is a button for a send in the Track I/O window.
