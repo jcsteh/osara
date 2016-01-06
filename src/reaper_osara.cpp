@@ -752,6 +752,7 @@ void postTrackFxChain(int command) {
 	}
 }
 
+#ifdef _WIN32
 void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
@@ -759,6 +760,7 @@ void postTrackIo(int command) {
 		cmdIoMaster(NULL);
 	}
 }
+#endif // _WIN32
 
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
@@ -833,7 +835,9 @@ PostCommand POST_COMMANDS[] = {
 	{41860, postGoToStretch}, // Item: go to next stretch marker
 	{41861, postGoToStretch}, // Item: go to previous stretch marker
 	{40291, postTrackFxChain}, // Track: View FX chain for current track
+#ifdef _WIN32
 	{40293, postTrackIo}, // Track: View I/O for current track
+#endif
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
