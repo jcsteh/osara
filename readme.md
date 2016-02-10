@@ -281,6 +281,10 @@ You can do this as follows:
 
 Selection will revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
 
+If you want to select noncontiguous items on several different tracks, the procedure is exactly the same.
+However, it's important to remember that you must move between tracks without affecting the selection; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
+Otherwise, selection will revert to contiguous selection.
+
 ### Accessing Controls for Sends/Receives/Outputs in the Track I/O Window
 In the Track I/O window, there are various controls for each send, receive or hardware output.
 Unfortunately, these controls cannot be reached with the tab key and it is tedious at best to access these with screen raeder review functions.
