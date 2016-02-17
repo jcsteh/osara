@@ -28,17 +28,12 @@ OSARA requires REAPER 5.0 or later.
 It has only been tested with the NVDA screen reader.
 However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
 
-## Downloading
-For now, here are links to the latest versions of the plug-in files:
+## Download and Installation
+You can download the latest OSARA installer from the [OSARA Development Snapshot](http://www.nvaccess.org/files/osara/snapshots.html) page.
+Once it is downloaded, simply run the installer and follow the instructions.
 
-- [32 bit dll](http://www.nvaccess.org/files/osara/reaper_osara32.dll)
-- [64 bit dll](http://www.nvaccess.org/files/osara/reaper_osara64.dll)
-
-## Installation
-- If you are using a 32 bit version of REAPER, the file you need is reaper_osara32.dll.
-- If you are using a 64 bit version of REAPER, the file you need is reaper_osara64.dll.
-- Copy this file into the Plugins folder inside your REAPER program folder; e.g. C:\Program Files\REAPER\Plugins.
- Alternatively, you can copy it into the UserPlugins folder inside your REAPER user configuration; e.g. %appdata%\REAPER\UserPlugins.
+By default, the OSARA key map will be installed, completely replacing your existing key map.
+If yu do not wish this to occur, you can uncheck the OSARA key map option.
 
 ## A Note for ReaAccess Users
 Some of the actions in ReaAccess are specific to ReaAccess and will not work with OSARA.
