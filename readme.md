@@ -34,18 +34,7 @@ Once it is downloaded, simply run the installer and follow the instructions.
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If yu do not wish this to occur, you can uncheck the OSARA key map option.
-
-## A Note for ReaAccess Users
-Some of the actions in ReaAccess are specific to ReaAccess and will not work with OSARA.
-In particular, this includes arming tracks and item navigation.
-Please see below for a list of the exact actions supported.
-You will need to use these actions in order for OSARA to provide feedback.
-
-## Key Map
-OSARA does not yet provide its own key map.
-You may wish to use [this key map created by Derek Lane and Gianluca Apollaro](http://dl.dropbox.com/u/5126017/DGKeyMap03-10-2015.ReaperKeyMap?dl=1).
-You can import it from the Actions dialog.
-This key map is similar to that provided by ReaAccess, though there are some differences.
+For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
 
 ## Usage
