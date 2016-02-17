@@ -4,6 +4,23 @@
 # Copyright 2015 NV Access Limited
 # License: GNU General Public License version 2.0
 
+import os
+import _winreg
+
+# Get the path to makensis.
+try:
+	with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS") as nsisKey:
+		makensis = os.path.join(_winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
+except WindowsError:
+	makensis = "makensis"
+
+vars = Variables()
+vars.Add("version", "The version of this build", "unknown")
+vars.Add("publisher", "The publisher of this build", "unknown")
+env = Environment(variables=vars,
+	copyright="Copyright (C) 2014-2016 NV Access Limited and other contributors",
+)
+
 for arch, suffix in (("x86", "32"), ("x86_64", "64")):
 	archEnv = Environment(TARGET_ARCH=arch, dllSuffix=suffix,
 		# Hack around an odd bug where some tool after msvc states that static and shared objects are different.
@@ -11,3 +28,11 @@ for arch, suffix in (("x86", "32"), ("x86_64", "64")):
 	archEnv.SConscript("src/archBuild_sconscript",
 		exports={"env": archEnv},
 		variant_dir="build/%s" % arch)
+
+installer = env.Command("installer/osara_${version}.exe", ["installer/osara.nsi", "build"],
+	[[makensis, "/V2",
+	"/DVERSION=$version", '/DPUBLISHER="$publisher"','/DCOPYRIGHT="$copyright"',
+	"/DOUTFILE=${TARGET.abspath}",
+	"$SOURCE"]])
+env.Alias("installer", installer)
+env.Default(installer)

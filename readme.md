@@ -361,3 +361,6 @@ The resulting dll files can be found at build\x86\reaper_osara32.dll and build\x
 - NV Access Limited
 - James Teh
 - Victor Tsaran
+- Scott Chesworth
+- Derek Lane
+- Gianluca Apollaro

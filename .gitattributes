@@ -7,3 +7,6 @@
 *.rc text
 sconstruct text
 *sconscript text
+*.nsi text
+*.txt text
+*.ini text
