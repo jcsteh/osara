@@ -10,3 +10,4 @@ sconstruct text
 *.nsi text
 *.txt text
 *.ini text
+*.yml text

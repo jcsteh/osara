@@ -1,0 +1,44 @@
+version: "2016.1pre-{build}"
+
+branches:
+ only:
+  - master
+  - appveyor
+
+environment:
+ PY_PYTHON: 2.7-32
+ encFileKey:
+  secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
+
+init:
+ - ps:       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+ # We get weird errors without --egg. No idea why.
+ - py -m pip install --egg scons
+
+clone_depth: 1
+
+install:
+ - cd appveyor
+ # Decrypt files.
+ - openssl enc -aes-256-cbc -d -pass pass:%encFileKey% -in ssh_id_rsa.enc -out ssh_id_rsa
+ # Install ssh stuff.
+ - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
+ - type ssh_known_hosts >> %userprofile%\.ssh\known_hosts
+ - cd ..
+ - git submodule update --init
+
+build_script:
+ - py c:\python27\scripts\scons.py version=%APPVEYOR_BUILD_VERSION% publisher="NV Access Limited"
+
+artifacts:
+ - path: installer\*.exe
+
+deploy_script:
+ - ps: |
+     $exe = Get-ChildItem -Name installer\*.exe
+     $data = @{
+      jobId=$env:APPVEYOR_JOB_ID;
+      version=$env:APPVEYOR_BUILD_VERSION;
+      exe=$exe
+     }
+     ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org osaraAppveyorHook
