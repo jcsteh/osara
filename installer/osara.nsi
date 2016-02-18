@@ -5,6 +5,7 @@
 ; License: GNU General Public License version 2.0
 
 !include "MUI2.nsh"
+!include "x64.nsh"
 SetCompressor /SOLID LZMA
 Name "OSARA"
 Caption "OSARA ${VERSION} Setup"
@@ -33,7 +34,9 @@ Section "OSARA plug-in" SecPlugin
 	SectionIn RO
 	SetOutPath "$INSTDIR\UserPlugins"
 	File "..\build\x86\reaper_osara32.dll"
-	File "..\build\x86_64\reaper_osara64.dll"
+	${If} ${RunningX64}
+		File "..\build\x86_64\reaper_osara64.dll"
+	${EndIf}
 	CreateDirectory "$INSTDIR\osara"
 	WriteUninstaller "$INSTDIR\osara\uninstall.exe"
 	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"
