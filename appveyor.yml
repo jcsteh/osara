@@ -3,7 +3,6 @@ version: "2016.1pre-{build}"
 branches:
  only:
   - master
-  - appveyor
 
 environment:
  PY_PYTHON: 2.7-32
