@@ -34,6 +34,8 @@ Section "OSARA plug-in" SecPlugin
 	SectionIn RO
 	SetOutPath "$INSTDIR\UserPlugins"
 	File "..\build\x86\reaper_osara32.dll"
+	; Installing the 64 bit dll on a 32 bit system causes an error when REAPER starts up.
+	; However, it's fine on a 64 bit system even with 32 bit REAPER.
 	${If} ${RunningX64}
 		File "..\build\x86_64\reaper_osara64.dll"
 	${EndIf}
