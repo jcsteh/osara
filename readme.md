@@ -339,7 +339,7 @@ You will need:
 - [SCons](http://www.scons.org/), version 2.3.2 or later
 
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
-The resulting dll files can be found at build\x86\reaper_osara32.dll and build\x86_64\reaper_osara64.dll.
+The resulting installer can be found in the installer directory.
 
 ## Contributors
 - NV Access Limited
