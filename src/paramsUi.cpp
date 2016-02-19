@@ -75,15 +75,14 @@ class ReaperObjParam: public Param {
 
 class ReaperObjParamSource: public ParamSource {
 	protected:
-	const ReaperObjParamData* params;
-	int count;
+	vector<ReaperObjParamData> params;
 
 	public:
 
 	virtual void* getSetValue(const char* name, void* newValue) = 0;
 
 	int getParamCount() {
-		return this->count;
+		return this->params.size();
 	}
 
 	string getParamName(int param) {
@@ -469,13 +468,11 @@ class TrackParams: public ReaperObjParamSource {
 
 	public:
 	TrackParams(MediaTrack* track): track(track) {
-		static ReaperObjParamData params[] = {
+		this->params = {
 			{"Volume", "D_VOL", ReaperObjVolParam::make},
 			{"Pan", "D_PAN", ReaperObjPanParam::make},
 			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
 		};
-		this->params = params;
-		this->count = ARRAYSIZE(params);
 	}
 
 	string getTitle() {
@@ -494,16 +491,19 @@ class ItemParams: public ReaperObjParamSource {
 
 	public:
 	ItemParams(MediaItem* item): item(item) {
-		static ReaperObjParamData params[] = {
-			{"Item volume", "D_VOL", ReaperObjVolParam::make},
-			{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
-			{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
+		this->params.push_back({"Item volume", "D_VOL", ReaperObjVolParam::make});
+		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
+		if (GetActiveTake(item)) {
+			this->params.insert(this->params.end(), {
+				{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
+				{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
+			});
+		}
+		this->params.insert(this->params.end(), {
 			{"Mute", "B_MUTE", ReaperObjToggleParam::make},
 			{"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make},
 			{"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make}
-		};
-		this->params = params;
-		this->count = ARRAYSIZE(params);
+		});
 	}
 
 	string getTitle() {
@@ -514,7 +514,7 @@ class ItemParams: public ReaperObjParamSource {
 		if (strncmp(name, "t:", 2) == 0) {
 			// Take property.
 			name = &name[2];
-			MediaItem_Take* take = GetActiveTake(item);
+			MediaItem_Take* take = GetActiveTake(this->item);
 			return GetSetMediaItemTakeInfo(take, name, newValue);
 		}
 		return GetSetMediaItemInfo(this->item, name, newValue);

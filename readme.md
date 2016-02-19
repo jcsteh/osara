@@ -334,8 +334,8 @@ This section is for those interested in building OSARA from source code.
 
 You will need:
 
-- Microsoft Visual Studio 2012 or later for Windows Desktop.
- The Express edition is fine.
+- Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
+	- [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
 - [SCons](http://www.scons.org/), version 2.3.2 or later
 
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
