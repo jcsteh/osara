@@ -864,7 +864,8 @@ typedef struct {
 // Get the track VU window for the current track.
 HWND getTrackVu(MediaTrack* track) {
 	GetTrackVuData data;
-	data.index = (int)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	// Need to cast to size_t first to avoid pointer truncation errors/warnings.
+	data.index = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	if (data.index == -1) // Master
 		data.index = 0;
 	if (GetMasterTrackVisibility() & 1)
@@ -1522,7 +1523,8 @@ void cmdPeakWatcher(Command* command) {
 	MediaTrack* master = GetMasterTrack(0);
 	if (peakWatcher_track == master)
 		ComboBox_SetCurSel(track, PWT_MASTER);
-	s << (int)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
+	// Need to cast to size_t first to avoid pointer truncation errors/warnings.
+	s << (int)(size_t)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
 	if (name = (char*)GetSetMediaTrackInfo(currentTrack, "P_NAME", NULL))
 		s << ": " << name;
 	ComboBox_AddString(track, widen(s.str()).c_str());
@@ -1531,7 +1533,8 @@ void cmdPeakWatcher(Command* command) {
 	s.str("");
 	if (peakWatcher_track && !peakWatcher_followTrack && peakWatcher_track != master && peakWatcher_track != currentTrack) {
 		// Watching a previously specified track.
-		s << (int)GetSetMediaTrackInfo(peakWatcher_track, "IP_TRACKNUMBER", NULL);
+		// Need to cast to size_t first to avoid pointer truncation errors/warnings.
+		s << (int)(size_t)GetSetMediaTrackInfo(peakWatcher_track, "IP_TRACKNUMBER", NULL);
 		if (name = (char*)GetSetMediaTrackInfo(peakWatcher_track, "P_NAME", NULL))
 			s << ": " << name;
 		ComboBox_AddString(track, widen(s.str()).c_str());

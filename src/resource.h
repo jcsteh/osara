@@ -6,6 +6,8 @@
  * License: GNU General Public License version 2.0
  */
 
+#define IDC_STATIC -1
+
 #define ID_PARAMS_DLG 100
 #define ID_PARAM 101
 #define ID_PARAM_VAL_EDIT 102
