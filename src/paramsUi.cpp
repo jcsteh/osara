@@ -226,17 +226,15 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 
 	string getValueText(double value) {
-		static double lastVal;
 		static string lastText;
-		if (value == lastVal) {
-			// We can be called twice with the same value.
-			// Calling formatTime again would return nothing, since nothing changed.
+		string text = formatTime(value, TF_RULER, true);
+		if (text.empty()) {
+			// formatTime returned nothing because value produced the same value text as the last call.
 			// Therefore, we cache the text and return it here.
 			return lastText;
 		}
-		lastVal = value;
-		lastText = formatTime(value, TF_RULER, true);
-		return lastText;
+		lastText = text;
+		return text;
 	}
 
 	string getValueForEditing() {
