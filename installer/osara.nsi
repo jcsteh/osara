@@ -6,6 +6,9 @@
 
 !include "MUI2.nsh"
 !include "x64.nsh"
+!include "LogicLib.nsh"
+!include "nsDialogs.nsh"
+
 SetCompressor /SOLID LZMA
 Name "OSARA"
 Caption "OSARA ${VERSION} Setup"
@@ -22,6 +25,9 @@ RequestExecutionLevel user
 !define MUI_ABORTWARNING
 
 !insertmacro MUI_PAGE_LICENSE "..\copying.txt"
+Page custom portablePage portablePageLeave
+!define MUI_PAGE_CUSTOMFUNCTION_PRE directoryPagePre
+!insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
@@ -29,6 +35,48 @@ RequestExecutionLevel user
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
+
+Var dialog
+var standardRadio
+var portableRadio
+var portable
+
+Function portablePage
+	nsDialogs::Create 1018
+	Pop $Dialog
+	${If} $Dialog == error
+		Abort
+	${EndIf}
+	${NSD_CreateLabel} 0% 0% 100% 10% "Install into a standard or portable installation of REAPER?"
+	Pop $0
+	${NSD_CreateRadioButton} 10% 20% 50% 10% "&Standard installation"
+	Pop $standardRadio
+	${NSD_CreateRadioButton} 10% 40% 50% 10% "&Portable installation"
+	Pop $portableRadio
+	${If} $portable = ${BST_CHECKED}
+		${NSD_Check} $portableRadio
+		${NSD_Uncheck} $standardRadio
+		${NSD_SetFocus} $portableRadio
+	${Else}
+		${NSD_Check} $standardRadio
+		${NSD_Uncheck} $portableRadio
+		${NSD_SetFocus} $standardRadio
+	${EndIf}
+	nsDialogs::Show
+FunctionEnd
+
+Function portablePageLeave
+	${NSD_GetState} $portableRadio $portable
+	${Unless} $portable = ${BST_CHECKED}
+		StrCpy $INSTDIR "$APPDATA\REAPER\"
+	${EndIf}
+FunctionEnd
+
+Function directoryPagePre
+	${Unless} $portable = ${BST_CHECKED}
+		Abort
+	${EndIf}
+FunctionEnd
 
 Section "OSARA plug-in" SecPlugin
 	SectionIn RO
@@ -39,12 +87,14 @@ Section "OSARA plug-in" SecPlugin
 	${If} ${RunningX64}
 		File "..\build\x86_64\reaper_osara64.dll"
 	${EndIf}
-	CreateDirectory "$INSTDIR\osara"
-	WriteUninstaller "$INSTDIR\osara\uninstall.exe"
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayVersion" "${VERSION}"
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "Publisher" "${PUBLISHER}"
-	WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "UninstallString" "$\"$INSTDIR\osara\uninstall.exe$\""
+	${Unless} $portable = ${BST_CHECKED}
+		CreateDirectory "$INSTDIR\osara"
+		WriteUninstaller "$INSTDIR\osara\uninstall.exe"
+		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"
+		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayVersion" "${VERSION}"
+		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "Publisher" "${PUBLISHER}"
+		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "UninstallString" "$\"$INSTDIR\osara\uninstall.exe$\""
+	${EndIf}
 SectionEnd
 
 Section "OSARA key map (replaces existing key map)" SecKeyMap
