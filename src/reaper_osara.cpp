@@ -1049,8 +1049,10 @@ int int1 = 1;
 
 void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	int count = CountTracks(0);
-	if (count == 0)
+	if (count == 0) {
+		outputMessage("No tracks");
 		return;
+	}
 	int num;
 	MediaTrack* origTrack = GetLastTouchedTrack();
 	if (origTrack) {

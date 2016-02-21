@@ -12,6 +12,7 @@
 #define UNICODE
 #include <windows.h>
 #include <string>
+#include <sstream>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -112,6 +113,9 @@ enum FakeFocus {
 	FOCUS_STRETCH
 };
 extern enum FakeFocus fakeFocus;
+
+void outputMessage(const std::string& message);
+void outputMessage(std::ostringstream& message);
 
 typedef enum {
 	TF_NONE,

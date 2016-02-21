@@ -637,9 +637,10 @@ void fxParams_begin(MediaTrack* track) {
 
 	int fxCount = TrackFX_GetCount(track);
 	int fx;
-	if (fxCount == 0)
+	if (fxCount == 0) {
+		outputMessage("No FX");
 		return;
-	else if (fxCount == 1)
+	} else if (fxCount == 1)
 		fx = 0;
 	else {
 		// Present a menu of effects.
