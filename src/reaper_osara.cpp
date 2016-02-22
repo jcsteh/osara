@@ -806,6 +806,10 @@ void postToggleMetronome(int command) {
 	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
 }
 
+void postToggleMasterTrackVisible(int command) {
+	outputMessage(GetToggleCommandState(command) ? "master track visible" : "master track hidden");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -883,6 +887,7 @@ PostCommand POST_COMMANDS[] = {
 	{40293, postTrackIo}, // Track: View I/O for current track
 #endif
 	{40364, postToggleMetronome}, // Options: Toggle metronome
+	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

@@ -168,6 +168,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
 - Item: Paste items/tracks
 
+#### View
+- View: Toggle master track visible
+
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track, track area, item and ruler context menus.
