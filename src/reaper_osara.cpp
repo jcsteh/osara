@@ -802,6 +802,10 @@ void postTrackIo(int command) {
 }
 #endif // _WIN32
 
+void postToggleMetronome(int command) {
+	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -878,6 +882,7 @@ PostCommand POST_COMMANDS[] = {
 #ifdef _WIN32
 	{40293, postTrackIo}, // Track: View I/O for current track
 #endif
+	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

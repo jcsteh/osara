@@ -149,6 +149,7 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 
 #### Options
 - Options: Cycle ripple editing mode
+- Options: Toggle metronome
 
 #### Undo
 - Edit: Undo
