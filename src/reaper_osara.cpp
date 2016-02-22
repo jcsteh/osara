@@ -529,6 +529,46 @@ void postGoToMarker(int command) {
 		outputMessage(s);
 }
 
+// #59: postGoToMarker reports the marker/region at the cursor.
+// This can be misleading when jumping to a marker/region with a specific number
+// if that marker/region doesn't exist or there are two at the same position.
+// This function reports only if the number matches the target number.
+void postGoToSpecificMarker(int command) {
+	int count = CountProjectMarkers(0, NULL, NULL);
+	int wantNum;
+	bool wantReg = false;
+	// Work out the desired marker/region number based on the command id.
+	if (command == 40160)
+		wantNum = 10;
+	else if (40161 <= command && command <= 40169)
+		wantNum = command - 40160;
+	else if (command == 41760) {
+		wantReg = true;
+		wantNum = 10;
+	} else if (41761 <= command && command <= 41769) {
+		wantReg = true;
+		wantNum = command - 41760;
+	} else
+		return; // Shouldn't happen.
+	for (int i = 0; i < count; ++i) {
+		bool reg;
+		int num;
+		const char* name;
+		EnumProjectMarkers(i, &reg, NULL, NULL, &name, &num);
+		if (num != wantNum || reg != wantReg)
+			continue;
+		fakeFocus = reg ? FOCUS_REGION : FOCUS_MARKER;
+		ostringstream s;
+		if (name[0])
+			s << name << (reg ? " region " : " marker ");
+		else
+			s << (reg ? "region " : "marker ") << num << " ";
+		s << formatCursorPosition();
+		outputMessage(s);
+		return;
+	}
+}
+
 void postSelectEnvelope(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
@@ -794,26 +834,26 @@ PostCommand POST_COMMANDS[] = {
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
 	{40173, postGoToMarker}, // Markers: Go to next marker/project end
-	{40161, postGoToMarker}, // Markers: Go to marker 01
-	{40162, postGoToMarker}, // Markers: Go to marker 02
-	{40163, postGoToMarker}, // Markers: Go to marker 03
-	{40164, postGoToMarker}, // Markers: Go to marker 04
-	{40165, postGoToMarker}, // Markers: Go to marker 05
-	{40166, postGoToMarker}, // Markers: Go to marker 06
-	{40167, postGoToMarker}, // Markers: Go to marker 07
-	{40168, postGoToMarker}, // Markers: Go to marker 08
-	{40169, postGoToMarker}, // Markers: Go to marker 09
-	{40160, postGoToMarker}, // Markers: Go to marker 10
-	{41761, postGoToMarker}, // Regions: Go to region 01 after current region finishes playing (smooth seek)
-	{41762, postGoToMarker}, // Regions: Go to region 02 after current region finishes playing (smooth seek)
-	{41763, postGoToMarker}, // Regions: Go to region 03 after current region finishes playing (smooth seek)
-	{41764, postGoToMarker}, // Regions: Go to region 04 after current region finishes playing (smooth seek)
-	{41765, postGoToMarker}, // Regions: Go to region 05 after current region finishes playing (smooth seek)
-	{41766, postGoToMarker}, // Regions: Go to region 06 after current region finishes playing (smooth seek)
-	{41767, postGoToMarker}, // Regions: Go to region 07 after current region finishes playing (smooth seek)
-	{41768, postGoToMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
-	{41769, postGoToMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
-	{41760, postGoToMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
+	{40161, postGoToSpecificMarker}, // Markers: Go to marker 01
+	{40162, postGoToSpecificMarker}, // Markers: Go to marker 02
+	{40163, postGoToSpecificMarker}, // Markers: Go to marker 03
+	{40164, postGoToSpecificMarker}, // Markers: Go to marker 04
+	{40165, postGoToSpecificMarker}, // Markers: Go to marker 05
+	{40166, postGoToSpecificMarker}, // Markers: Go to marker 06
+	{40167, postGoToSpecificMarker}, // Markers: Go to marker 07
+	{40168, postGoToSpecificMarker}, // Markers: Go to marker 08
+	{40169, postGoToSpecificMarker}, // Markers: Go to marker 09
+	{40160, postGoToSpecificMarker}, // Markers: Go to marker 10
+	{41761, postGoToSpecificMarker}, // Regions: Go to region 01 after current region finishes playing (smooth seek)
+	{41762, postGoToSpecificMarker}, // Regions: Go to region 02 after current region finishes playing (smooth seek)
+	{41763, postGoToSpecificMarker}, // Regions: Go to region 03 after current region finishes playing (smooth seek)
+	{41764, postGoToSpecificMarker}, // Regions: Go to region 04 after current region finishes playing (smooth seek)
+	{41765, postGoToSpecificMarker}, // Regions: Go to region 05 after current region finishes playing (smooth seek)
+	{41766, postGoToSpecificMarker}, // Regions: Go to region 06 after current region finishes playing (smooth seek)
+	{41767, postGoToSpecificMarker}, // Regions: Go to region 07 after current region finishes playing (smooth seek)
+	{41768, postGoToSpecificMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
+	{41769, postGoToSpecificMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
+	{41760, postGoToSpecificMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
 	{41863, postSelectEnvelope}, // Track: Select previous envelope
 	{41864, postSelectEnvelope}, // Track: Select next envelope
 	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
