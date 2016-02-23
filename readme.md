@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@nvaccess.org&gt; & other contributors
-- Copyright: 2014-2015 NV Access Limited
+- Copyright: 2014-2016 NV Access Limited
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -34,6 +34,7 @@ Once it is downloaded, simply run the installer and follow the instructions.
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If yu do not wish this to occur, you can uncheck the OSARA key map option.
+Note that any keyboard commands described in this document assume you are using the OSARA key map.
 For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
 
@@ -189,8 +190,7 @@ This is useful for parameters which are tedious or impossible to access otherwis
 
 #### Track/Item Parameters
 To access the parameter list for a track or an item, select the track or item you wish to work with.
-Then, run the "OSARA: View parameters for current track/item (depending on focus)" action.
-You will probably want to add a keyboard shortcut for this action so you can access it quickly.
+Then, press control+shift+w (OSARA: View parameters for current track/item).
 
 #### FX Parameters
 Many effects are unfortunately either partially or completely inaccessible.
@@ -200,9 +200,8 @@ Thus, the FX parameter list is particular useful and is the only way to access s
 
 To access it:
 
-1. Select a track with at least one effect. Then, run the "OSARA: View FX parameters for current track" action.
- You will probably want to add a keyboard shortcut for this action so you can access it quickly.
-2. Alternatively, run the "OSARA: View FX parameters for master track" action.
+1. Select a track with at least one effect. Then, press shift+p (OSARA: View FX parameters for current track).
+2. Alternatively, to access FX parameters for the master track, press control+shift+p (OSARA: View FX parameters for master track).
 3. If there is more than one effect on the track, select the desired effect from the menu.
 
 Note that only some effects expose easily readable values, while others expose only percentages.
@@ -223,10 +222,10 @@ Alternatively, you can press enter or escape.
 OSARA allows you to read the current audio peak for channels 1 and 2 of either the current or master tracks.
 You do this using the following actions:
 
-- OSARA: Report current peak for channel 1 of current track
-- OSARA: Report current peak for channel 2 of current track
-- OSARA: Report current peak for channel 1 of master track
-- OSARA: Report current peak for channel 2 of master track
+- OSARA: Report current peak for channel 1 of current track: j
+- OSARA: Report current peak for channel 2 of current track: k
+- OSARA: Report current peak for channel 1 of master track: shift+j
+- OSARA: Report current peak for channel 2 of master track: shift+k
 
 ### Peak Watcher
 In addition to reading current peaks, You can also be notified automatically when the volume exceeds a specified maximum level using Peak Watcher.
@@ -234,7 +233,7 @@ This can be done for one or two tracks.
 
 To use Peak Watcher:
 
-1. Run the "OSARA: View Peak Watcher" action.
+1. Press alt+shift+p (OSARA: View Peak Watcher).
 2. From the First track combo box, select one of the following:
  - None: Select this if you do not wish to monitor a track.
  - Follow current track: Select this if you want to watch peaks for whatever track you move to in your project.
@@ -250,12 +249,12 @@ To use Peak Watcher:
 
 At any time, you can report or reset the peak levels for either of the tracks being watched using the following actions:
 
-- OSARA: Report Peak Watcher value for channel 1 of first track
-- OSARA: Report Peak Watcher value for channel 2 of first track
-- OSARA: Report Peak Watcher value for channel 1 of second track
-- OSARA: Report Peak Watcher value for channel 2 of second track
-- OSARA: Reset Peak Watcher for first track
-- OSARA: Reset Peak Watcher for second track
+- OSARA: Report Peak Watcher value for channel 1 of first track: alt+f9
+- OSARA: Report Peak Watcher value for channel 2 of first track: alt+f10
+- OSARA: Report Peak Watcher value for channel 1 of second track: alt+shift+f9
+- OSARA: Report Peak Watcher value for channel 2 of second track: alt+shift+f10
+- OSARA: Reset Peak Watcher for first track: alt+f8
+- OSARA: Reset Peak Watcher for second track: alt+shift+f8
 
 ### Shortcut Help
 It is possible to have REAPER list all shortcuts and to search for individual shortcuts in the Action List.
@@ -263,7 +262,7 @@ However, it is sometimes convenient to be able to simply press a shortcut and im
 This is especially useful if you have forgotten an exact shortcut but do have some idea of what it might be.
 You can achieve this using OSARA's shortcut help mode.
 
-You can turn shortcut help on and off using the "OSARA: Toggle shortcut help" action.
+You can turn shortcut help on and off by pressing f12 (OSARA: Toggle shortcut help).
 While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
 
 ### Noncontiguous Selection
@@ -274,16 +273,16 @@ You can do this as follows:
 
 1. Move to the track or item you want to start with.
 2. Optionally, select some other contiguous tracks or items.
-3. Run the "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)" action to switch to noncontiguous selection.
-4. Move through tracks/items leaving other tracks/items selected; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
+3. Press shift+space (OSARA: Enable noncontiguous selection/toggle selection of current track/item) to switch to noncontiguous selection.
+4. Move through tracks/items leaving other tracks/items selected; e.g. using shift+downArrow and shift+upArrow to move through tracks.
  These tracks/items will not be selected, but any previously selected tracks/items will remain selected.
-5. When you reach a track you want to select, run the "OSARA: Enable noncontiguous selection/toggle selection of current track" action.
+5. When you reach a track/item you want to select, press shift+space (OSARA: Enable noncontiguous selection/toggle selection of current track/item).
  You can also use this if you want to unselect a previously selected track/item.
 
 Selection will revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
 
 If you want to select noncontiguous items on several different tracks, the procedure is exactly the same.
-However, it's important to remember that you must move between tracks without affecting the selection; e.g. using the "Track: Go to next track (leaving other tracks selected)" action.
+However, it's important to remember that you must move between tracks without affecting the selection; i.e. using shift+downArrow and shift+upArrow.
 Otherwise, selection will revert to contiguous selection.
 
 ### Accessing Controls for Sends/Receives/Outputs in the Track I/O Window
@@ -300,14 +299,14 @@ However, sometimes, this is not sufficient and it is useful to be able to manual
 To do this:
 
 1. Select the desired item.
-2. Go to a stretch marker; e.g. using the"Item: go to next stretch marker" action.
+2. Go to a stretch marker; e.g. using shift+apostrophe (Item: go to next stretch marker).
  Ensure that OSARA reports the stretch marker.
 3. Move the edit cursor to the position to which you wish to move the stretch marker.
-4. Run the "OSARA: Move last focused stretch marker to current edit cursor position" action.
+4. Press alt+m (OSARA: Move last focused stretch marker to current edit cursor position).
 
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
-You open this dialog using the "OSARA: Configuration" action.
+You open this dialog by pressing control+alt+shift+p (OSARA: Configuration).
 
 The dialog contains the following options:
 
@@ -321,22 +320,22 @@ When you are done, press the OK button to accept any changes or the Cancel butto
 OSARA also includes some other miscellaneous actions.
 
 #### Main
-- OSARA: Move to next item (leaving other items selected)
-- OSARA: Move to previous item (leaving other items selected)
-- OSARA: View I/O for master track
-- OSARA: Report ripple editing mode
-- OSARA: Report muted tracks
-- OSARA: Report soloed tracks
-- OSARA: Report record armed tracks
-- OSARA: Report tracks with record monitor on
-- OSARA: Report tracks with phase inverted
-- OSARA: Report track/item/time selection (depending on focus)
-- OSARA: Remove items/tracks/contents of time selection/markers (depending on focus)
-- OSARA: Report edit/play cursor position
+- OSARA: Move to next item (leaving other items selected): control+shift+rightArrow
+- OSARA: Move to previous item (leaving other items selected): control+shift+leftArrow
+- OSARA: View I/O for master track: shift+i
+- OSARA: Report ripple editing mode: p
+- OSARA: Report muted tracks: control+shift+f5
+- OSARA: Report soloed tracks: control+shift+f6
+- OSARA: Report record armed tracks: control+shift+f7
+- OSARA: Report tracks with record monitor on: control+shift+f8
+- OSARA: Report tracks with phase inverted: control+shift+f9
+- OSARA: Report track/item/time selection (depending on focus): control+f
+- OSARA: Remove items/tracks/contents of time selection/markers (depending on focus): delete
+- OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 
 #### MIDI Event List Editor
-- OSARA: Focus event nearest edit cursor
+- OSARA: Focus event nearest edit cursor: control+f
 
 ## Support
 If you need help, please subscribe to the [Reapers Without Peepers mailing list](http://bluegrasspals.com/mailman/listinfo/rwp) and ask your questions there.
