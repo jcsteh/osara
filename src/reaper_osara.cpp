@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2015 NV Access Limited
+ * Copyright 2014-2016 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
@@ -30,6 +30,7 @@
 #include <WDL/db2val.h>
 #include "resource.h"
 #include "paramsUi.h"
+#include "peakWatcher.h"
 
 using namespace std;
 
@@ -1417,217 +1418,6 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 }
 
 #ifdef _WIN32
-MediaTrack* peakWatcher_track = NULL;
-bool peakWatcher_followTrack = false;
-// What the user can choose to watch.
-enum {
-	PWT_DISABLED,
-	PWT_FOLLOW,
-	PWT_MASTER,
-	PWT_CURRENT,
-	PWT_PREVSPEC,
-};
-double peakWatcher_level = 0;
-struct {
-	bool notify;
-	double peak;
-	DWORD time;
-} peakWatcher_channels[2] = {{true, -150, 0}, {true, -150, 0}};
-int peakWatcher_hold = 0;
-UINT_PTR peakWatcher_timer = 0;
-
-void peakWatcher_reset() {
-	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c)
-		peakWatcher_channels[c].peak = -150;
-}
-
-VOID CALLBACK peakWatcher_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
-	if (!peakWatcher_track && !peakWatcher_followTrack)
-		return; // Disabled.
-	MediaTrack* currentTrack = GetLastTouchedTrack();
-	if (peakWatcher_followTrack && peakWatcher_track != currentTrack) {
-		// We're following the current track and it changed.
-		peakWatcher_track = currentTrack;
-		peakWatcher_reset();
-		if (!currentTrack)
-			return; // No current track, so nothing to do.
-	}
-
-	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
-		double newPeak = VAL2DB(Track_GetPeakInfo(peakWatcher_track, c));
-		if (peakWatcher_hold == -1 // Hold disabled
-			|| newPeak > peakWatcher_channels[c].peak
-			|| (peakWatcher_hold != 0 && time > peakWatcher_channels[c].time + peakWatcher_hold)
-		) {
-			peakWatcher_channels[c].peak = newPeak;
-			peakWatcher_channels[c].time = time;
-			if (peakWatcher_channels[c].notify && newPeak > peakWatcher_level) {
-				ostringstream s;
-				s << fixed << setprecision(1);
-				s << "chan " << c + 1 << ": " << newPeak;
-				outputMessage(s);
-			}
-		}
-	}
-}
-
-void peakWatcher_onOk(HWND dialog) {
-	// Retrieve the notification state for channels.
-	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		peakWatcher_channels[c].notify = Button_GetCheck(channel) == BST_CHECKED;
-	}
-
-	WCHAR inText[7];
-	// Retrieve the entered maximum level.
-	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, ARRAYSIZE(inText)) > 0) {
-		peakWatcher_level = _wtof(inText);
-		// Restrict the range.
-		peakWatcher_level = max(min(peakWatcher_level, 40), -40);
-	}
-
-	// Retrieve the entered hold time.
-	if (GetDlgItemText(dialog, ID_PEAK_HOLD, inText, ARRAYSIZE(inText)) > 0) {
-		peakWatcher_hold = _wtoi(inText);
-		// Restrict the range.
-		peakWatcher_hold = max(min(peakWatcher_hold, 20000), -1);
-	}
-
-	// Set up according to what track the user chose to watch.
-	// If the track is changing, reset peaks.
-	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
-	int sel = ComboBox_GetCurSel(track);
-	switch(sel) {
-		case PWT_DISABLED:
-			peakWatcher_track = NULL;
-			peakWatcher_followTrack = false;
-			KillTimer(NULL, peakWatcher_timer);
-			peakWatcher_timer = 0;
-			return;
-		case PWT_FOLLOW:
-			if (!peakWatcher_followTrack)
-				peakWatcher_reset();
-			peakWatcher_followTrack = true;
-			peakWatcher_track = NULL;
-			break;
-		case PWT_MASTER: {
-			MediaTrack* master = GetMasterTrack(0);
-			if (peakWatcher_track != master)
-				peakWatcher_reset();
-			peakWatcher_track = master;
-			peakWatcher_followTrack = false;
-			break;
-		}
-		case PWT_CURRENT:
-			MediaTrack* currentTrack = GetLastTouchedTrack();
-			if (peakWatcher_track != currentTrack)
-				peakWatcher_reset();
-			peakWatcher_track = currentTrack;
-			peakWatcher_followTrack = false;
-			break;
-		// PWT_PREVSPEC means to keep watching some previously specified track; no change.
-	}
-
-	if (!peakWatcher_timer) // Previously disabled.
-		peakWatcher_timer = SetTimer(NULL, 0, 30, peakWatcher_watcher);
-}
-
-INT_PTR CALLBACK peakWatcher_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
-	switch (msg) {
-		case WM_COMMAND:
-			if (LOWORD(wParam) == ID_PEAK_RESET) {
-				peakWatcher_reset();
-				DestroyWindow(dialog);
-				return TRUE;
-			} else if (LOWORD(wParam) == IDOK) {
-				peakWatcher_onOk(dialog);
-				DestroyWindow(dialog);
-				return TRUE;
-			} else if (LOWORD(wParam) == IDCANCEL) {
-				DestroyWindow(dialog);
-				return TRUE;
-			}
-			break;
-		case WM_CLOSE:
-			DestroyWindow(dialog);
-			return TRUE;
-	}
-	return FALSE;
-}
-
-void cmdPeakWatcher(Command* command) {
-	MediaTrack* currentTrack = GetLastTouchedTrack();
-	if (!currentTrack)
-		return;
-	ostringstream s;
-	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), mainHwnd, peakWatcher_dialogProc);
-	HWND track = GetDlgItem(dialog, ID_PEAK_TRACK);
-
-	// Populate the list of what to watch.
-	char* name;
-	ComboBox_AddString(track, L"Disabled");
-	if (!peakWatcher_followTrack && !peakWatcher_track)
-		ComboBox_SetCurSel(track, PWT_DISABLED);
-	ComboBox_AddString(track, L"Follow current track");
-	if (peakWatcher_followTrack)
-		ComboBox_SetCurSel(track, PWT_FOLLOW);
-	ComboBox_AddString(track, L"Master");
-	MediaTrack* master = GetMasterTrack(0);
-	if (peakWatcher_track == master)
-		ComboBox_SetCurSel(track, PWT_MASTER);
-	// Need to cast to size_t first to avoid pointer truncation errors/warnings.
-	s << (int)(size_t)GetSetMediaTrackInfo(currentTrack, "IP_TRACKNUMBER", NULL);
-	if (name = (char*)GetSetMediaTrackInfo(currentTrack, "P_NAME", NULL))
-		s << ": " << name;
-	ComboBox_AddString(track, widen(s.str()).c_str());
-	if (!peakWatcher_followTrack && peakWatcher_track == currentTrack)
-		ComboBox_SetCurSel(track, PWT_CURRENT);
-	s.str("");
-	if (peakWatcher_track && !peakWatcher_followTrack && peakWatcher_track != master && peakWatcher_track != currentTrack) {
-		// Watching a previously specified track.
-		// Need to cast to size_t first to avoid pointer truncation errors/warnings.
-		s << (int)(size_t)GetSetMediaTrackInfo(peakWatcher_track, "IP_TRACKNUMBER", NULL);
-		if (name = (char*)GetSetMediaTrackInfo(peakWatcher_track, "P_NAME", NULL))
-			s << ": " << name;
-		ComboBox_AddString(track, widen(s.str()).c_str());
-		ComboBox_SetCurSel(track, PWT_PREVSPEC);
-		s.str("");
-	}
-
-	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		Button_SetCheck(channel, peakWatcher_channels[c].notify ? BST_CHECKED : BST_UNCHECKED);
-	}
-
-	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
-	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
-	s << fixed << setprecision(2);
-	s << peakWatcher_level;
-	SendMessage(level, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
-	s.str("");
-
-	HWND hold = GetDlgItem(dialog, ID_PEAK_HOLD);
-	SendMessage(hold, EM_SETLIMITTEXT, 5, 0);
-	s << peakWatcher_hold;
-	SendMessage(hold, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
-
-	ShowWindow(dialog, SW_SHOWNORMAL);
-}
-
-void cmdReportPeakWatcher(Command* command) {
-	if (!peakWatcher_track && !peakWatcher_followTrack) {
-		outputMessage("Peak watcher is disabled");
-		return;
-	}
-	ostringstream s;
-	s << fixed << setprecision(1);
-	for (int c = 0; c < ARRAYSIZE(peakWatcher_channels); ++c) {
-		if (c != 0)
-			s << ", ";
-		s << c + 1 << ": " << peakWatcher_channels[c].peak;
-	}
-	outputMessage(s);
-}
 
 void cmdIoMaster(Command* command) {
 	// If the master track isn't visible, make it so temporarily.
@@ -1865,6 +1655,35 @@ void cmdMoveStretch(Command* command) {
 		outputMessage("stretch marker moved");
 }
 
+void reportPeak(MediaTrack* track, int channel) {
+	ostringstream s;
+	s << fixed << setprecision(1);
+	s << VAL2DB(Track_GetPeakInfo(track, channel));
+	outputMessage(s);
+}
+
+void cmdReportPeakCurrentC1(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	reportPeak(track, 0);
+}
+
+void cmdReportPeakCurrentC2(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track)
+		return;
+	reportPeak(track, 1);
+}
+
+void cmdReportPeakMasterC1(Command* command) {
+	reportPeak(GetMasterTrack(0), 0);
+}
+
+void cmdReportPeakMasterC2(Command* command) {
+	reportPeak(GetMasterTrack(0), 1);
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -1942,7 +1761,12 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track"}, "OSARA_FXPARAMS", cmdFxParamsCurrentTrack},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher peaks"}, "OSARA_REPORTPEAKWATCHER", cmdReportPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of first track"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherT1C1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of first track"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherT1C2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of second track"}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherT2C1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 #endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
@@ -1957,6 +1781,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move last focused stretch marker to current edit cursor position"}, "OSARA_MOVESTRETCH", cmdMoveStretch},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of current track"}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 2 of current track"}, "OSARA_REPORTPEAKCURRENTC2", cmdReportPeakCurrentC2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of master track"}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 2 of master track"}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},

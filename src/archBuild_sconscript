@@ -16,6 +16,7 @@ env.SharedLibrary(
 	source=[
 		"reaper_osara.cpp",
 		"paramsUi.cpp",
+		"peakWatcher.cpp",
 		env.RES("reaper_osara.rc"),
 	],
 	LIBS=[

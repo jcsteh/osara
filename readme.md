@@ -219,21 +219,28 @@ Clearing the text in the Filter field shows the entire list.
 When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
 
+### Reading Current Peaks
+OSARA allows you to read the current audio peak for channels 1 and 2 of either the current or master tracks.
+You do this using the following actions:
+
+- OSARA: Report current peak for channel 1 of current track
+- OSARA: Report current peak for channel 2 of current track
+- OSARA: Report current peak for channel 1 of master track
+- OSARA: Report current peak for channel 2 of master track
+
 ### Peak Watcher
-Peak watcher allows you to read the level of audio peaks in a specified track.
-You can also be notified automatically when the volume exceeds a specified maximum level.
+In addition to reading current peaks, You can also be notified automatically when the volume exceeds a specified maximum level using Peak Watcher.
+This can be done for one or two tracks.
 
 To use Peak Watcher:
 
-1. Move to a track.
- If you want to report the peaks for a specific track, this is the track you should select.
-2. Run the "OSARA: View Peak Watcher" action.
-3. From the Track combo box, select one of the following:
- - Disabled: Select this to disable Peak Watcher.
- - Follow current track: Select this if you want to watch peaks for whatever track you move to.
+1. Run the "OSARA: View Peak Watcher" action.
+2. From the First track combo box, select one of the following:
+ - None: Select this if you do not wish to monitor a track.
+ - Follow current track: Select this if you want to watch peaks for whatever track you move to in your project.
  - Master: This watches peaks for the master track.
- - You can choose the track which was current when the dialog was opened to always watch this specific track.
- - If you were previously watching a specific track, this track will also be listed.
+ - Otherwise, you can choose any track in your project.
+3. If you wish to monitor a second track, you can choose another track from the Second track combo box.
 4. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level (in dB).
 5. The Hold peaks option allows you to specify whether the highest peak remains as the reported peak level and for how long.
  Holding peaks gives you time to examine the peak level, even if the audio level dropped immediately after the peak occurred.
@@ -241,8 +248,14 @@ To use Peak Watcher:
 6. Press the Reset button to reset the reported peak levels if they are being held.
 7. When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
-At any time, you can report the current peak level for the track being watched by running the "OSARA: Report Peak Watcher peaks" action.
-You will probably want to add a keyboard shortcut for this action so you can access it quickly.
+At any time, you can report or reset the peak levels for either of the tracks being watched using the following actions:
+
+- OSARA: Report Peak Watcher value for channel 1 of first track
+- OSARA: Report Peak Watcher value for channel 2 of first track
+- OSARA: Report Peak Watcher value for channel 1 of second track
+- OSARA: Report Peak Watcher value for channel 2 of second track
+- OSARA: Reset Peak Watcher for first track
+- OSARA: Reset Peak Watcher for second track
 
 ### Shortcut Help
 It is possible to have REAPER list all shortcuts and to search for individual shortcuts in the Action List.
