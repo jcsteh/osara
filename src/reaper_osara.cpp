@@ -811,6 +811,21 @@ void postToggleMasterTrackVisible(int command) {
 	outputMessage(GetToggleCommandState(command) ? "master track visible" : "master track hidden");
 }
 
+bool shouldReportTransport = true;
+void postChangeTransportState(int command) {
+	if (!shouldReportTransport)
+		return;
+	int state = GetPlayState();
+	if (state & 2)
+		outputMessage("pause");
+	else if (state & 4)
+		outputMessage("record");
+	else if (state & 1)
+		outputMessage("play");
+	else
+		outputMessage("stop");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -889,6 +904,10 @@ PostCommand POST_COMMANDS[] = {
 #endif
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
+	{40044, postChangeTransportState}, // Transport: Play/stop
+	{40073, postChangeTransportState}, // Transport: Play/pause
+	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
+	{1013, postChangeTransportState}, // Transport: Record
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -1803,6 +1822,7 @@ void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
 	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
+	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 }
 
 #ifdef _WIN32
@@ -1814,6 +1834,9 @@ void config_onOk(HWND dialog) {
 	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
 	shouldReportFx = Button_GetCheck(control) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
+	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
+	shouldReportTransport = Button_GetCheck(control) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -1842,6 +1865,8 @@ void cmdConfig(Command* command) {
 	Button_SetCheck(control, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
 	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
 	Button_SetCheck(control, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
+	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
+	Button_SetCheck(control, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }

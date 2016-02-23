@@ -313,6 +313,7 @@ The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report FX when moving to tracks: When enabled, OSARA will report the names of any effects on a track when you move to it.
+- Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
