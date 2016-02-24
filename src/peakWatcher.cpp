@@ -110,11 +110,15 @@ void pw_onOk(HWND dialog) {
 		pw_level = max(min(pw_level, 40), -40);
 	}
 
-	// Retrieve the entered hold time.
-	if (GetDlgItemText(dialog, ID_PEAK_HOLD, inText, ARRAYSIZE(inText)) > 0) {
+	// Retrieve the hold choice/time.
+	if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_DISABLED)) == BST_CHECKED)
+		pw_hold = -1;
+	else if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_FOREVER)) == BST_CHECKED)
+		pw_hold = 0;
+	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, ARRAYSIZE(inText)) > 0) {
 		pw_hold = _wtoi(inText);
 		// Restrict the range.
-		pw_hold = max(min(pw_hold, 20000), -1);
+		pw_hold = max(min(pw_hold, 20000), 1);
 	}
 
 	// Set up according to what tracks the user chose to watch.
@@ -163,21 +167,26 @@ void pw_onOk(HWND dialog) {
 
 INT_PTR CALLBACK pw_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
-		case WM_COMMAND:
-			if (LOWORD(wParam) == ID_PEAK_RESET) {
+		case WM_COMMAND: {
+			int id = LOWORD(wParam);
+			if (ID_PEAK_HOLD_DISABLED <= id && id <= ID_PEAK_HOLD_FOR) {
+				EnableWindow(GetDlgItem(dialog, ID_PEAK_HOLD_TIME),
+					id == ID_PEAK_HOLD_FOR ? BST_CHECKED : BST_UNCHECKED);
+			} else if (id == ID_PEAK_RESET) {
 				for (int t = 0; t < PW_NUM_TRACKS; ++t)
 					pw_resetTrack(t);
 				DestroyWindow(dialog);
 				return TRUE;
-			} else if (LOWORD(wParam) == IDOK) {
+			} else if (id == IDOK) {
 				pw_onOk(dialog);
 				DestroyWindow(dialog);
 				return TRUE;
-			} else if (LOWORD(wParam) == IDCANCEL) {
+			} else if (id == IDCANCEL) {
 				DestroyWindow(dialog);
 				return TRUE;
 			}
 			break;
+		}
 		case WM_CLOSE:
 			DestroyWindow(dialog);
 			return TRUE;
@@ -235,10 +244,21 @@ void cmdPeakWatcher(Command* command) {
 	SendMessage(level, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
 	s.str("");
 
-	HWND hold = GetDlgItem(dialog, ID_PEAK_HOLD);
-	SendMessage(hold, EM_SETLIMITTEXT, 5, 0);
-	s << pw_hold;
-	SendMessage(hold, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+	HWND holdTime = GetDlgItem(dialog, ID_PEAK_HOLD_TIME);
+	SendMessage(holdTime, EM_SETLIMITTEXT, 5, 0);
+	int id;
+	if (pw_hold == -1)
+		id = ID_PEAK_HOLD_DISABLED;
+	else if (pw_hold == 0)
+		id = ID_PEAK_HOLD_FOREVER;
+	else {
+		id = ID_PEAK_HOLD_FOR;
+		s << pw_hold;
+		SendMessage(holdTime, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+	}
+	HWND hold = GetDlgItem(dialog, id);
+	Button_SetCheck(hold, BST_CHECKED);
+	EnableWindow(holdTime, pw_hold > 0);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }

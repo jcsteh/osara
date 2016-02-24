@@ -241,9 +241,12 @@ To use Peak Watcher:
  - Otherwise, you can choose any track in your project.
 3. If you wish to monitor a second track, you can choose another track from the Second track combo box.
 4. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level (in dB).
-5. The Hold peaks option allows you to specify whether the highest peak remains as the reported peak level and for how long.
+5. The Hold peaks grouping allows you to specify whether the highest peak remains as the reported peak level and for how long.
  Holding peaks gives you time to examine the peak level, even if the audio level dropped immediately after the peak occurred.
- Specify -1 to disable holding of peaks or 0 to hold peaks forever.
+ There are three options:
+ - disabled: Don't hold peaks at all.
+ - until reset: Hold peaks until the Peak Watcher is reset.
+ - for (ms): Allows you to specify a time in milliseconds for which peaks will be held.
 6. Press the Reset button to reset the reported peak levels if they are being held.
 7. When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
