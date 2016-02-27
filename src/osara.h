@@ -96,6 +96,14 @@
 #define REAPERAPI_WANT_MIDI_EnumSelNotes
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_int
 #define REAPERAPI_WANT_MIDIEditor_OnCommand
+#define REAPERAPI_WANT_TakeFX_GetNumParams
+#define REAPERAPI_WANT_TakeFX_GetParamName
+#define REAPERAPI_WANT_TakeFX_GetCount
+#define REAPERAPI_WANT_TakeFX_GetFXName
+#define REAPERAPI_WANT_TakeFX_GetParam
+#define REAPERAPI_WANT_TakeFX_SetParam
+#define REAPERAPI_WANT_TakeFX_FormatParamValue
+#define REAPERAPI_WANT_plugin_getapi
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

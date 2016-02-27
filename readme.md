@@ -225,7 +225,8 @@ Thus, the FX parameter list is particular useful and is the only way to access s
 
 To access it:
 
-1. Select a track with at least one effect. Then, press shift+p (OSARA: View FX parameters for current track).
+1. Select a track or item with at least one effect.
+ Then, press shift+p (OSARA: View FX parameters for current track/take).
 2. Alternatively, to access FX parameters for the master track, press control+shift+p (OSARA: View FX parameters for master track).
 3. If there is more than one effect on the track, select the desired effect from the menu.
 

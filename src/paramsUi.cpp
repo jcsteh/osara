@@ -549,18 +549,36 @@ void cmdParamsFocus(Command* command) {
 
 #endif
 
-class TrackFxParam;
+// The FX functions in the REAPER API are the same for tracks and takes
+// except for the prefix (TrackFX_*/TakeFX_*)
+// and the first argument type (MediaTrack*/MediaItem_Take*).
+// Deal with the type using templates
+// and with the prefix by passing it and fetching the functions dynamically.
+template<typename ReaperObj>
+class FxParam;
 
-class TrackFxParams: public ParamSource {
-	friend class TrackFxParam;
+template<typename ReaperObj>
+class FxParams: public ParamSource {
+	friend class FxParam<ReaperObj>;
 
 	private:
-	MediaTrack* track;
+	ReaperObj* obj;
 	int fx;
+	int (*_GetNumParams)(ReaperObj*, int);
+	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
+	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
+	bool (*_SetParam)(ReaperObj*, int, int, double);
+	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 
 	public:
 
-	TrackFxParams(MediaTrack* track, int fx): track(track), fx(fx) {
+	FxParams(ReaperObj* obj, const string& apiPrefix, int fx): obj(obj), fx(fx) {
+		// Get functions.
+		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
+		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
+		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
+		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
+		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
 	}
 
 	string getTitle() {
@@ -568,12 +586,12 @@ class TrackFxParams: public ParamSource {
 	}
 
 	int getParamCount() {
-		return TrackFX_GetNumParams(this->track, this->fx);
+		return this->_GetNumParams(this->obj, this->fx);
 	}
 
 	string getParamName(int param) {
 		char name[256];
-		TrackFX_GetParamName(this->track, this->fx, param, name, sizeof(name));
+		this->_GetParamName(this->obj, this->fx, param, name, sizeof(name));
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
 		ostringstream ns;
@@ -584,27 +602,28 @@ class TrackFxParams: public ParamSource {
 	Param* getParam(int param);
 };
 
-class TrackFxParam: public Param {
+template<typename ReaperObj>
+class FxParam: public Param {
 	private:
-	TrackFxParams& source;
+	FxParams<ReaperObj>& source;
 	int param;
 
 	public:
 
-	TrackFxParam(TrackFxParams& source, int param): Param(), source(source), param(param) {
-		TrackFX_GetParam(source.track, source.fx, param, &this->min, &this->max);
+	FxParam(FxParams<ReaperObj>& source, int param): Param(), source(source), param(param) {
+		this->source._GetParam(source.obj, source.fx, param, &this->min, &this->max);
 		this->step = (this->max - this->min) / 1000;
 		this->largeStep = this->step * 20;
 		this->isEditable = true;
 	}
 
 	double getValue() {
-		return TrackFX_GetParam(this->source.track, this->source.fx, this->param, NULL, NULL);
+		return this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
 	}
 
 	string getValueText(double value) {
 		char text[50];
-		if (TrackFX_FormatParamValue(this->source.track, this->source.fx, param, value, text, sizeof(text)))
+		if (this->source._FormatParamValue(this->source.obj, this->source.fx, param, value, text, sizeof(text)))
 			return text;
 		return "";
 	}
@@ -612,12 +631,12 @@ class TrackFxParam: public Param {
 	string getValueForEditing() {
 		ostringstream s;
 		s << fixed << setprecision(4);
-		s << TrackFX_GetParam(this->source.track, this->source.fx, this->param, NULL, NULL);
+		s << this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
 		return s.str();
 	}
 	
 	void setValue(double value) {
-		TrackFX_SetParam(this->source.track, this->source.fx, this->param, value);
+		this->source._SetParam(this->source.obj, this->source.fx, this->param, value);
 	}
 
 	void setValueFromEdited(const string& text) {
@@ -626,16 +645,22 @@ class TrackFxParam: public Param {
 
 };
 
-Param* TrackFxParams::getParam(int param) {
-	return new TrackFxParam(*this, param);
+template<typename ReaperObj>
+Param* FxParams<ReaperObj>::getParam(int param) {
+	return new FxParam<ReaperObj>(*this, param);
 }
 
 #ifdef _WIN32
 
-void fxParams_begin(MediaTrack* track) {
+template<typename ReaperObj>
+void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
+	int (*_GetCount)(ReaperObj* obj);
+	*(void**)&_GetCount = plugin_getapi((apiPrefix + "_GetCount").c_str());
+	bool (*_GetFXName)(ReaperObj* obj, int fx, char* buf, int buf_sz);
+	*(void**)&_GetFXName = plugin_getapi((apiPrefix + "_GetFXName").c_str());
 	char name[256];
 
-	int fxCount = TrackFX_GetCount(track);
+	int fxCount = _GetCount(obj);
 	int fx;
 	if (fxCount == 0) {
 		outputMessage("No FX");
@@ -648,7 +673,7 @@ void fxParams_begin(MediaTrack* track) {
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(MENUITEMINFO);
 		for (int f = 0; f < fxCount; ++f) {
-			TrackFX_GetFXName(track, f, name, sizeof(name));
+			_GetFXName(obj, f, name, sizeof(name));
 			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = f + 1;
@@ -662,19 +687,34 @@ void fxParams_begin(MediaTrack* track) {
 			return; // Cancelled.
 	}
 
-	TrackFxParams* source = new TrackFxParams(track, fx);
+	FxParams<ReaperObj>* source = new FxParams<ReaperObj>(obj, apiPrefix, fx);
 	new ParamsDialog(source);
 }
 
-void cmdFxParamsCurrentTrack(Command* command) {
-	MediaTrack* currentTrack = GetLastTouchedTrack();
-	if (!currentTrack)
-		return;
-	fxParams_begin(currentTrack);
+void cmdFxParamsFocus(Command* command) {
+	switch (fakeFocus) {
+		case FOCUS_TRACK: {
+			MediaTrack* track = GetLastTouchedTrack();
+			if (!track)
+				return;
+			fxParams_begin(track, "TrackFX");
+			break;
+		}
+		case FOCUS_ITEM: {
+			MediaItem* item = GetSelectedMediaItem(0, 0);
+			if (!item)
+				return;
+			MediaItem_Take* take = GetActiveTake(item);
+			if (!take)
+				return;
+			fxParams_begin(take, "TakeFX");
+			break;
+		}
+	}
 }
 
 void cmdFxParamsMaster(Command* command) {
-	fxParams_begin(GetMasterTrack(0));
+	fxParams_begin(GetMasterTrack(0), "TrackFX");
 }
 
 #endif
