@@ -162,8 +162,10 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 #### Transport
 - Transport: Toggle repeat
 
-#### Time Selection
+#### Selection
 - Time selection: Remove contents of time selection (moving later items)
+- Time selection: Remove time selection and loop point selection
+- Unselect all tracks/items/envelope points
 
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection

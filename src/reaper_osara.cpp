@@ -1462,6 +1462,31 @@ void cmdRemoveStretch(Command* command) {
 		outputMessage("stretch marker deleted");
 }
 
+void cmdClearTimeLoopSel(Command* command) {
+	double start, end;
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
+	double old = start + end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	old += start + end;
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
+	double cur = start + end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	cur += start + end;
+	if (old != cur)
+		outputMessage("Cleared time/loop selection");
+}
+
+void cmdUnselAllTracksItemsPoints(Command* command) {
+	int old = CountSelectedTracks(0) + CountSelectedMediaItems(0)
+		+ (GetSelectedEnvelope(0) ? 1 : 0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
+		+ (GetSelectedEnvelope(0) ? 1 : 0);
+	if (old != cur)
+		outputMessage("Unselected tracks/items/envelope points");
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1783,6 +1808,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
 	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
+	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
+	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
