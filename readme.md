@@ -33,8 +33,11 @@ You can download the latest OSARA installer from the [OSARA Development Snapshot
 Once it is downloaded, simply run the installer and follow the instructions.
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
-If yu do not wish this to occur, you can uncheck the OSARA key map option.
+If yu do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
+Regardless, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
+This is particularly useful if you wish to merge the key map with your existing key map, rather than replacing it.
 Note that any keyboard commands described in this document assume you are using the OSARA key map.
+
 For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
 

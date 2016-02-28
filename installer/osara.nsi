@@ -87,6 +87,8 @@ Section "OSARA plug-in" SecPlugin
 	${If} ${RunningX64}
 		File "..\build\x86_64\reaper_osara64.dll"
 	${EndIf}
+	SetOutPath "$INSTDIR\KeyMaps"
+	File /oname=OSARA.ReaperKeyMap "..\config\reaper-kb.ini"
 	${Unless} $portable = ${BST_CHECKED}
 		CreateDirectory "$INSTDIR\osara"
 		WriteUninstaller "$INSTDIR\osara\uninstall.exe"
@@ -97,7 +99,7 @@ Section "OSARA plug-in" SecPlugin
 	${EndIf}
 SectionEnd
 
-Section "OSARA key map (replaces existing key map)" SecKeyMap
+Section "Replace existing key map with OSARA key map" SecKeyMap
 	SetOutPath "$INSTDIR"
 	File "..\config\reaper-kb.ini"
 SectionEnd
@@ -105,6 +107,7 @@ SectionEnd
 Section "Uninstall"
 	Delete "$INSTDIR\..\UserPlugins\reaper_osara32.dll"
 	Delete "$INSTDIR\..\UserPlugins\reaper_osara64.dll"
+	Delete "$INSTDIR\..\KeyMaps\OSARA.ReaperKeyMap"
 	Delete "$INSTDIR\uninstall.exe"
 	RMDir "$INSTDIR"
 	DeleteRegKey HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA"
