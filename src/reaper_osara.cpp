@@ -1032,6 +1032,34 @@ void sendMenu(HWND sendWindow) {
 	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
 }
 
+void clickIoButton(MediaTrack* track, bool rightClick=false) {
+	HWND hwnd = getTrackVu(track);
+	if (!hwnd)
+		return; // Really shouldn't happen.
+	// Use MSAA to get the location of the I/O button.
+	hwnd = GetAncestor(hwnd, GA_PARENT);
+	IAccessible* acc = NULL;
+	VARIANT varChild;
+	DWORD childId = track == GetMasterTrack(0) ? 5 : 7;
+	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, childId, &acc, &varChild) != S_OK)
+		return;
+	long l, t, w, h;
+	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
+	acc->Release();
+	if (res != S_OK)
+		return;
+	// Click it!
+	POINT point = {l, t};
+	ScreenToClient(hwnd, &point);
+	SendMessage(hwnd,
+		rightClick ? WM_RBUTTONDOWN : WM_LBUTTONDOWN,
+		rightClick ? MK_RBUTTON : MK_LBUTTON,
+		MAKELPARAM(point.x, point.y));
+	SendMessage(hwnd,
+		rightClick ? WM_RBUTTONUP : WM_LBUTTONUP, 0,
+		MAKELPARAM(point.x, point.y));
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -1054,10 +1082,16 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			switch (fakeFocus) {
 				// todo: Fix positioning when TrackPopupContextMenu is used.
 				case FOCUS_TRACK:
-					if (GetKeyState(VK_CONTROL) & 0x8000) // Secondary
+					if (GetKeyState(VK_CONTROL) & 0x8000) // Track area
 						TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
-					else {
-						// This menu can't be retrieved with GetContextMenu.
+					else if (GetKeyState(VK_MENU) & 0x8000) {
+						// Routing. Can't be retrieved with GetContextMenu.
+						MediaTrack* track = GetLastTouchedTrack();
+						if (!track)
+							return 0;
+						clickIoButton(track, true);
+					} else {
+						// Track input. Can't be retrieved with GetContextMenu.
 						MediaTrack* track = GetLastTouchedTrack();
 						if (!track)
 							return 0;
@@ -1443,30 +1477,7 @@ void cmdIoMaster(Command* command) {
 	int prevVisible = GetMasterTrackVisibility();
 	if (!(prevVisible & 1))
 		SetMasterTrackVisibility(prevVisible | 1);
-	HWND hwnd = getTrackVu(GetMasterTrack(0));
-	if (!hwnd)
-		return; // Really shouldn't happen.
-	// Use MSAA to get the location of the I/O button.
-	hwnd = GetAncestor(hwnd, GA_PARENT);
-	IAccessible* acc = NULL;
-	VARIANT varChild;
-	DWORD childId;
-	if (GetAppVersion()[0] <= '4')
-		childId = 7;
-	else
-		childId = 5;
-	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, childId, &acc, &varChild) != S_OK)
-		return;
-	long l, t, w, h;
-	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
-	acc->Release();
-	if (res != S_OK)
-		return;
-	// Click it!
-	POINT point = {l, t};
-	ScreenToClient(hwnd, &point);
-	SendMessage(hwnd, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
-	SendMessage(hwnd, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
+	clickIoButton(GetMasterTrack(0));
 	// Restore master invisibility if appropriate.
 	if (!(prevVisible & 1))
 		SetMasterTrackVisibility(prevVisible);

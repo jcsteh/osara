@@ -174,14 +174,20 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
-OSARA enables keyboard access for the track, track area, item and ruler context menus.
+OSARA enables keyboard access for the track input, track area, item and ruler context menus.
 
 Pressing the applications key will open the context menu for the element you are working with.
-For example, if you have just moved to a track, it will open the context menu for the track.
+For example, if you have just moved to a track, it will open the track input context menu for that track.
 If you have just moved the edit cursor, it will open the context menu for the ruler.
 
-For tracks, there are two context menus.
-You access the second by pressing control+applications.
+For tracks, there are three context menus:
+
+1. Track input: Allows you to set the input to use when recording, etc.
+ You access this by just pressing the applications key.
+2. Track area: Provides options for inserting, duplicating and removing tracks, etc.
+ You access this by pressing control+applications.
+3. Routing: Allows you to quickly add and remove sends, receives and outputs without opening the I/O window.
+ You access this by pressing alt+applications.
 
 ### Parameter Lists
 OSARA can display a list of parameters for various elements such as tracks, items and effects.
