@@ -87,6 +87,7 @@
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_GetTrackEnvelopeByName
 #define REAPERAPI_WANT_ValidatePtr
+#define REAPERAPI_WANT_DeleteTempoTimeSigMarker
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

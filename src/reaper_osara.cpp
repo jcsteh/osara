@@ -1739,6 +1739,17 @@ void cmdReportPeakMasterC2(Command* command) {
 	reportPeak(GetMasterTrack(0), 1);
 }
 
+void cmdDeleteAllTimeSigs(Command* command) {
+	Undo_BeginBlock();
+	int count = CountTempoTimeSigMarkers(0);
+	if (!count)
+		return;
+	for (int i = 0; i < count; ++i)
+		DeleteTempoTimeSigMarker(0, i);
+	Undo_EndBlock("Delete all time signature markers", UNDO_STATE_ALL);
+	outputMessage("Deleted all time signature markers");
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -1842,6 +1853,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 2 of current track"}, "OSARA_REPORTPEAKCURRENTC2", cmdReportPeakCurrentC2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of master track"}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 2 of master track"}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Delete all time signature markers"}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
