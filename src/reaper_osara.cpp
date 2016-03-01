@@ -574,6 +574,7 @@ void postSelectEnvelope(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return;
+	fakeFocus = FOCUS_ENVELOPE;
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
 	ostringstream s;
@@ -686,6 +687,7 @@ void postMoveToEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return;
+	fakeFocus = FOCUS_ENVELOPE;
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
 	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
@@ -836,6 +838,7 @@ void postMoveEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return;
+	fakeFocus = FOCUS_ENVELOPE;
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
 	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
@@ -1459,6 +1462,22 @@ void cmdRemoveItems(Command* command) {
 	cmdhRemoveItems(command->gaccel.accel.cmd);
 }
 
+void cmdhDeleteEnvelopePoints(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
+	int oldCount = CountEnvelopePoints(envelope);
+	Main_OnCommand(command, 0);
+	int removed = oldCount - CountEnvelopePoints(envelope);
+	ostringstream s;
+	s << removed << (removed == 1 ? " point" : " points") << " removed";
+	outputMessage(s);
+}
+
+void cmdDeleteEnvelopePoints(Command* command) {
+	cmdhDeleteEnvelopePoints(command->gaccel.accel.cmd);
+}
+
 void cmdCut(Command* command) {
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
@@ -1808,6 +1827,9 @@ void cmdRemoveFocus(Command* command) {
 		case FOCUS_STRETCH:
 			cmdRemoveStretch(NULL);
 			break;
+		case FOCUS_ENVELOPE:
+			cmdhDeleteEnvelopePoints(40333); // Envelope: Delete all selected points
+			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
 	}
@@ -1978,6 +2000,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
+	{MAIN_SECTION, {{0, 0, 40333}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
+	{MAIN_SECTION, {{0, 0, 40089}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
 	{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
 	{MAIN_SECTION, {{0, 0, 41384}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut)
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
@@ -2028,7 +2052,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},

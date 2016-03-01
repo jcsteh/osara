@@ -128,7 +128,8 @@ enum FakeFocus {
 	FOCUS_MARKER,
 	FOCUS_REGION,
 	FOCUS_TIMESIG,
-	FOCUS_STRETCH
+	FOCUS_STRETCH,
+	FOCUS_ENVELOPE
 };
 extern enum FakeFocus fakeFocus;
 

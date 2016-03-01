@@ -160,6 +160,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item edit: Move items/envelope points down one track/a bit
 - (SWS extension) SWS/FNG: Move selected envelope points up
 - (SWS extension) SWS/FNG: Move selected envelope points down
+- Envelope: Delete all selected points
+- Envelope: Delete all points in time selection
 
 #### Zoom
 - Zoom out horizontal
@@ -367,7 +369,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report tracks with record monitor on: control+shift+f8
 - OSARA: Report tracks with phase inverted: control+shift+f9
 - OSARA: Report track/item/time selection (depending on focus): control+f
-- OSARA: Remove items/tracks/contents of time selection/markers (depending on focus): delete
+- OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): delete
 - OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Delete all time signature markers
