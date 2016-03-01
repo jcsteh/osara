@@ -360,6 +360,7 @@ OSARA also includes some other miscellaneous actions.
 - Navigate: Select previous note
 - Edit: Increase pitch cursor one semitone
 - Edit: Decrease pitch cursor one semitone
+- Edit: Delete events
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
