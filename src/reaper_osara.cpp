@@ -922,6 +922,12 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
+map<int, string> POST_COMMAND_MESSAGES = {
+	{40625, "set selection start"}, // Time selection: Set start point
+	{40626, "set selection end"}, // Time selection: Set end point
+	{40222, "set loop start"}, // Loop points: Set start point
+	{40223, "set loop end"}, // Loop points: Set end point
+};
 
 #ifdef _WIN32
 
@@ -2038,8 +2044,13 @@ void cmdConfig(Command* command) {
 
 void postCommand(int command, int flag) {
 	const auto it = postCommandsMap.find(command);
-	if (it != postCommandsMap.end())
+	if (it != postCommandsMap.end()) {
 		it->second(command);
+		return;
+	}
+	const auto mIt = POST_COMMAND_MESSAGES.find(command);
+	if (mIt != POST_COMMAND_MESSAGES.end())
+		outputMessage(mIt->second);
 }
 
 bool isHandlingCommand = false;

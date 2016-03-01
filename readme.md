@@ -163,6 +163,10 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Transport: Toggle repeat
 
 #### Selection
+- Time selection: Set start point
+- Time selection: Set end point
+- Loop points: Set start point
+- Loop points: Set end point
 - Time selection: Remove contents of time selection (moving later items)
 - Time selection: Remove time selection and loop point selection
 - Unselect all tracks/items/envelope points
