@@ -101,6 +101,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item: go to next stretch marker
 - Item: go to previous stretch marker
 - Item: remove stretch marker at current position
+- Item navigation: Move cursor left to edge of item
+- Item navigation: Move cursor right to edge of item
 
 #### Takes
 - Take: Switch items to next take

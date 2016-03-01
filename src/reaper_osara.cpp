@@ -850,6 +850,8 @@ PostCommand POST_COMMANDS[] = {
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
+	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
+	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{41042, postCursorMovementMeasure}, // Go forward one measure
 	{41043, postCursorMovementMeasure}, // Go back one measure
 	{41044, postCursorMovementMeasure}, // Go forward one beat
