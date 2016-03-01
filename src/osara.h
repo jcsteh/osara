@@ -88,6 +88,14 @@
 #define REAPERAPI_WANT_GetTrackEnvelopeByName
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
+#define REAPERAPI_WANT_MIDIEditor_GetActive
+#define REAPERAPI_WANT_MIDIEditor_GetTake
+#define REAPERAPI_WANT_MIDI_CountEvts
+#define REAPERAPI_WANT_MIDI_GetNote
+#define REAPERAPI_WANT_MIDI_GetProjTimeFromPPQPos
+#define REAPERAPI_WANT_MIDI_EnumSelNotes
+#define REAPERAPI_WANT_MIDIEditor_GetSetting_int
+#define REAPERAPI_WANT_MIDIEditor_OnCommand
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

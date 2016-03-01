@@ -1487,6 +1487,94 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 		outputMessage("Unselected tracks/items/envelope points");
 }
 
+void cmdMidiMoveCursor(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	ostringstream s;
+	s << formatCursorPosition();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int notes;
+	MIDI_CountEvts(take, &notes, NULL, NULL);
+	double now = GetCursorPosition();
+	int count = 0;
+	// todo: Optimise; perhaps a binary search?
+	for (int n = 0; n < notes; ++n) {
+		double start;
+		MIDI_GetNote(take, n, NULL, NULL, &start, NULL, NULL, NULL, NULL);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		if (start > now)
+			break;
+		if (start == now)
+			++count;
+	}
+	if (count > 0)
+		s << " " << count << (count == 1 ? " note" : " notes");
+		outputMessage(s);
+}
+
+const string getMidiNoteName(int pitch) {
+	static char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
+		"f sharp", "g", "g sharp", "a", "a sharp", "b"};
+	int octave = pitch / 12 - 1;
+	pitch %= 12;
+	ostringstream s;
+	s << names[pitch] << " " << octave;
+	return s.str();
+}
+
+void cmdMidiMoveToNote(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	double now = GetCursorPosition();
+
+	bool selAtCur = false;
+	int note = -1;
+	double start;
+	while ((note = MIDI_EnumSelNotes(take, note)) != -1) {
+		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, NULL, NULL, NULL);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		if (start == now) {
+			selAtCur = true;
+			break;
+		}
+	}
+
+	if (!selAtCur) {
+		// There are selected notes which aren't at the cursor.
+		// In this case, these actions move relative to these selected notes,
+		// but we want to move relative to the edit cursor.
+		// Clear the selection to make these actions use the edit cursor.
+		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+		// Move back a tiny bit so notes right at our start position are always treated as next.
+		// SetEditCurPos isn't respected here for some reason.
+		MIDIEditor_OnCommand(editor, 40185); // Edit: Move edit cursor left one pixel
+	}
+
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	note = MIDI_EnumSelNotes(take, -1);
+	if (note == -1) {
+		// We might have moved the edit cursor.
+		SetEditCurPos(now, true, false);
+		return;
+	}
+	int pitch;
+	MIDI_GetNote(take, note, NULL, NULL, &start, NULL, NULL, &pitch, NULL);
+	start = MIDI_GetProjTimeFromPPQPos(take, start);
+	SetEditCurPos(start, false, false);
+	ostringstream s;
+	s << getMidiNoteName(pitch) << " " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void cmdMidiMovePitchCursor(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaTrack* track = (MediaTrack*)GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
+	outputMessage(getMidiNoteName(pitch));
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1789,6 +1877,7 @@ void cmdFocusNearestMidiEvent(Command* command) {
 #define DEFACCEL {0, 0, 0}
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
+const int MIDI_EDITOR_SECTION = 32060;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
@@ -1821,6 +1910,16 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
 	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
+	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40413}, NULL}, NULL, cmdMidiMoveToNote}, // Navigate: Select next note
+	{MIDI_EDITOR_SECTION, {{0, 0, 40414}, NULL}, NULL, cmdMidiMoveToNote}, // Navigate: Select previous note
+	{MIDI_EDITOR_SECTION, {{0, 0, 40049}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
+	{MIDI_EDITOR_SECTION, {{0, 0, 40050}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},

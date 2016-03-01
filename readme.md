@@ -349,6 +349,18 @@ OSARA also includes some other miscellaneous actions.
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Delete all time signature markers
 
+#### MIDI Editor
+- View: Go to start of file
+- View: Go to end of file
+- Edit: Move edit cursor right by grid
+- Edit: Move edit cursor left by grid
+- Edit: Move edit cursor right one measure
+- Edit: Move edit cursor left one measure
+- Navigate: Select next note
+- Navigate: Select previous note
+- Edit: Increase pitch cursor one semitone
+- Edit: Decrease pitch cursor one semitone
+
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
 
