@@ -85,6 +85,8 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Go back one measure
 - Go forward one beat
 - Go back one beat
+- View: Move cursor right to grid division
+- View: Move cursor left to grid division
 
 #### Items
 - Item navigation: Select and move to previous item

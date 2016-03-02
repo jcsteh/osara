@@ -852,6 +852,8 @@ PostCommand POST_COMMANDS[] = {
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
+	{40646, postCursorMovement}, // View: Move cursor left to grid division
+	{40647, postCursorMovement}, // View: Move cursor right to grid division
 	{41042, postCursorMovementMeasure}, // Go forward one measure
 	{41043, postCursorMovementMeasure}, // Go back one measure
 	{41044, postCursorMovementMeasure}, // Go forward one beat
