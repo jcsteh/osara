@@ -941,6 +941,8 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40626, "set selection end"}, // Time selection: Set end point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
+	// #82: This will end up as the label of the track name text box.
+	{40696, "Track name"}, // Track: Rename last touched track
 };
 
 #ifdef _WIN32
