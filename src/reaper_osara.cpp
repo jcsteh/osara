@@ -1080,10 +1080,37 @@ void clickIoButton(MediaTrack* track, bool rightClick=false) {
 		MAKELPARAM(point.x, point.y));
 }
 
+bool maybeSwitchToFxPluginWindow() {
+	HWND fg = GetForegroundWindow();
+	WCHAR name[4];
+	if (GetWindowText(fg, name, ARRAYSIZE(name)) == 0)
+		return false;
+	if (wcsncmp(name, L"FX: ", 4) != 0)
+		return false;
+	// CPU meter static.
+	HWND window;
+	if (!(window = GetDlgItem(fg, 1010)))
+		return false;
+	// Next is a property page containing the plugin window among other things.
+	if (!(window = GetWindow(window, GW_HWNDNEXT)))
+		return false;
+	// Descend.
+	if (!(window = GetWindow(window, GW_CHILD)))
+		return false;
+	// This should get the plugin window.
+	if (!(window = GetWindow(window, GW_HWNDLAST)))
+		return false;
+	HWND oldFocus = GetFocus();
+	SetFocus(window);
+	if (GetFocus() == oldFocus) // Focus didn't move
+		return false;
+	return true;
+}
+	
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN) {
+	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN && wParam != VK_F6) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1157,6 +1184,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			return 1;
 		}
+	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
+		if (maybeSwitchToFxPluginWindow())
+			return 1;
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }

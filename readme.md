@@ -329,6 +329,10 @@ To do this:
 3. Move the edit cursor to the position to which you wish to move the stretch marker.
 4. Press alt+m (OSARA: Move last focused stretch marker to current edit cursor position).
 
+### Accessing FX Plug-in Windows
+Some FX plug-ins can be controlled with keyboard commands, but you can't reach them by tabbing through the FX Chain dialog.
+In these cases, you can press f6 to have OSARA attempt to focus the plug-in window.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog by pressing control+alt+shift+p (OSARA: Configuration).
