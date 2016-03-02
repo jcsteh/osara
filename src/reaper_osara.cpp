@@ -826,6 +826,13 @@ void postChangeTransportState(int command) {
 		outputMessage("stop");
 }
 
+void postSelectMultipleItems(int command) {
+	int count = CountSelectedMediaItems(0);
+	ostringstream s;
+	s << count << (count == 1 ? " item" : " items") << " selected";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -912,6 +919,9 @@ PostCommand POST_COMMANDS[] = {
 	{40073, postChangeTransportState}, // Transport: Play/pause
 	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
 	{1013, postChangeTransportState}, // Transport: Record
+	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
+	{40421, postSelectMultipleItems}, // Item: Select all items in track
+	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

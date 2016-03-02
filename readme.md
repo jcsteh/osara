@@ -105,6 +105,9 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - Item: remove stretch marker at current position
 - Item navigation: Move cursor left to edge of item
 - Item navigation: Move cursor right to edge of item
+- Item: Select all items in track
+- Item: Select all items on selected tracks in current time selection
+- Item grouping: Select all items in groups
 
 #### Takes
 - Take: Switch items to next take
