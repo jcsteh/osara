@@ -1083,18 +1083,17 @@ void clickIoButton(MediaTrack* track, bool rightClick=false) {
 }
 
 bool maybeSwitchToFxPluginWindow() {
-	HWND fg = GetForegroundWindow();
+	HWND window = GetForegroundWindow();
 	WCHAR name[4];
-	if (GetWindowText(fg, name, ARRAYSIZE(name)) == 0)
+	if (GetWindowText(window, name, ARRAYSIZE(name)) == 0)
 		return false;
 	if (wcsncmp(name, L"FX: ", 4) != 0)
 		return false;
-	// CPU meter static.
-	HWND window;
-	if (!(window = GetDlgItem(fg, 1010)))
+	// Descend.
+	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	// Next is a property page containing the plugin window among other things.
-	if (!(window = GetWindow(window, GW_HWNDNEXT)))
+	// This is a property page containing the plugin window among other things.
+	if (!(window = GetWindow(window, GW_HWNDLAST)))
 		return false;
 	// Descend.
 	if (!(window = GetWindow(window, GW_CHILD)))
