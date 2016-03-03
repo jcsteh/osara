@@ -724,7 +724,9 @@ void postMoveToEnvelopePoint(int command) {
 
 void postMoveToTimeSig(int command) {
 	double cursor = GetCursorPosition();
-	int marker = FindTempoTimeSigMarker(0, cursor);
+	// FindTempoTimeSigMarker often returns the point before instead of right at the position.
+	// Increment the cursor position a bit to work around this.
+	int marker = FindTempoTimeSigMarker(0, cursor + 0.0001);
 	double pos, bpm;
 	int sigNum, sigDenom;
 	GetTempoTimeSigMarker(0, marker, &pos, NULL, NULL, &bpm, &sigNum, &sigDenom, NULL);
@@ -732,8 +734,10 @@ void postMoveToTimeSig(int command) {
 		return;
 	fakeFocus = FOCUS_TIMESIG;
 	ostringstream s;
-	s << "tempo " << bpm << " time sig " << sigNum << "/" << sigDenom;
-	s << formatCursorPosition();
+	s << "tempo " << bpm;
+	if (sigNum > 0)
+		s << " time sig " << sigNum << "/" << sigDenom;
+	s << " " << formatCursorPosition();
 	outputMessage(s);
 }
 
