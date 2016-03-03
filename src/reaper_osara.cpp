@@ -1894,7 +1894,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 	int count = CountTempoTimeSigMarkers(0);
 	if (!count)
 		return;
-	for (int i = 0; i < count; ++i)
+	for (int i = count - 1; i >= 0; --i)
 		DeleteTempoTimeSigMarker(0, i);
 	Undo_EndBlock("Delete all time signature markers", UNDO_STATE_ALL);
 	outputMessage("Deleted all time signature markers");
