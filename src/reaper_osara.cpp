@@ -684,6 +684,8 @@ void postCopy(int command) {
 
 void postMoveToEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
 	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
@@ -692,33 +694,26 @@ void postMoveToEnvelopePoint(int command) {
 	double value;
 	bool selected;
 	GetEnvelopePoint(envelope, point, NULL, &value, NULL, NULL, &selected);
-	char name[50];
-	GetEnvelopeName(envelope, name, sizeof(name));
 	ostringstream s;
 	s << "point " << point + 1 << " value ";
 	char out[64];
-	if (strcmp(name, "Volume") == 0) {
-		mkvolstr(out, value);
-		s << out;
-	} else if (strcmp(name, "Pan") == 0) {
-		// The sign is wrong for some reason. Flip it.
-		mkpanstr(out, -value);
-		s << out;
-	} else {
-		s << fixed << setprecision(2);
-		s << value;
-	}
-	if (selected)
-		s << " " << "selected";
+	Envelope_FormatValue(envelope, value, out, sizeof(out));
+	s << out;
+	if (selected) {
+		int numSel = 0;
+		for (point = 0; point < CountEnvelopePoints(envelope); ++point) {
+			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
+			if (selected)
+				++numSel;
+			if (numSel == 2)
+				break; // Don't care above this.
+		}
+		// One selected point is the norm, so don't report selected in this case.
+		if (numSel > 1)
+			s << " selected";
+	} else
+		s << " unselected";
 	s << " " << formatCursorPosition();
-	int numSel = 0;
-	for (point = 0; point < CountEnvelopePoints(envelope); ++point) {
-		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-		if (selected)
-			++numSel;
-	}
-	if (numSel > 0)
-		s << ", " << numSel << " selected";
 	outputMessage(s);
 }
 
@@ -837,6 +832,25 @@ void postSelectMultipleItems(int command) {
 	outputMessage(s);
 }
 
+void postMoveEnvelopePoint(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
+	// GetEnvelopePointByTime often returns the point before instead of right at the position.
+	// Increment the cursor position a bit to work around this.
+	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
+	if (point < 0)
+		return;
+	double value;
+	bool selected;
+	GetEnvelopePoint(envelope, point, NULL, &value, NULL, NULL, &selected);
+	if (!selected)
+		return; // Not moved.
+	char out[64];
+	Envelope_FormatValue(envelope, value, out, sizeof(out));
+	outputMessage(out);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -926,6 +940,8 @@ PostCommand POST_COMMANDS[] = {
 	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
+	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
+	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -937,6 +953,8 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_SWS_BRMOVEEDITSELNEXTENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and select it
 	{"_SWS_BRMOVEEDITTOPREVENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point and add to selection
 	{"_SWS_BRMOVEEDITTONEXTENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and add to selection
+	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
+	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;

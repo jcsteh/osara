@@ -156,6 +156,10 @@ If keyboard shortcuts aren't bound to them already, you will need to do this you
 - (SWS extension) SWS/BR: Move edit cursor to next envelope point and select it
 - (SWS extension) SWS/BR: Move edit cursor to previous envelope point and add to selection
 - (SWS extension) SWS/BR: Move edit cursor to next envelope point and add to selection
+- Item edit: Move items/envelope points up one track/a bit
+- Item edit: Move items/envelope points down one track/a bit
+- (SWS extension) SWS/FNG: Move selected envelope points up
+- (SWS extension) SWS/FNG: Move selected envelope points down
 
 #### Zoom
 - Zoom out horizontal

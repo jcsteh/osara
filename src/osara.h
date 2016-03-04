@@ -104,6 +104,7 @@
 #define REAPERAPI_WANT_TakeFX_SetParam
 #define REAPERAPI_WANT_TakeFX_FormatParamValue
 #define REAPERAPI_WANT_plugin_getapi
+#define REAPERAPI_WANT_Envelope_FormatValue
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
