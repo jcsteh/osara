@@ -32,6 +32,9 @@ However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate informa
 You can download the latest OSARA installer from the [OSARA Development Snapshot](http://www.nvaccess.org/files/osara/snapshots.html) page.
 Once it is downloaded, simply run the installer and follow the instructions.
 
+Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
+The installer installs the extension into your user configuration, not the program directory.
+
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If yu do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
 Regardless, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
