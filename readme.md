@@ -23,7 +23,8 @@ Features:
 - Noncontiguous selection of tracks/items
 
 ## Requirements
-OSARA requires REAPER 5.0 or later.
+OSARA requires REAPER 5.16 or later.
+The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
 It has only been tested with the NVDA screen reader.
 However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
@@ -48,8 +49,7 @@ You can see the full key map by selecting Key bindings and mouse modifiers from 
 
 ### Supported REAPER and Extension Actions
 OSARA supports reporting of information for the following actions.
-Most of these are actions built into REAPER, but a few are very useful actions from the popular SWS extension.
-If keyboard shortcuts aren't bound to them already, you will need to do this yourself.
+Most of these are actions built into REAPER, but a few are very useful actions from the SWS extension.
 
 #### Track Navigation/Management
 - Track: Go to next track
