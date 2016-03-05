@@ -854,6 +854,13 @@ void postMoveEnvelopePoint(int command) {
 	outputMessage(out);
 }
 
+void postRenameTrack(int command) {
+	if (!GetLastTouchedTrack())
+		return;
+	// #82: On Windows, this will end up as the label of the track name text box.
+	outputMessage("Track name");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -945,6 +952,7 @@ PostCommand POST_COMMANDS[] = {
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
 	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
+	{40696, postRenameTrack}, // Track: Rename last touched track
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -966,8 +974,6 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40626, "set selection end"}, // Time selection: Set end point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
-	// #82: This will end up as the label of the track name text box.
-	{40696, "Track name"}, // Track: Rename last touched track
 };
 
 #ifdef _WIN32
