@@ -18,6 +18,8 @@
 #include <sstream>
 #include <map>
 #include <iomanip>
+#include <functional>
+#include <regex>
 #include <math.h>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
@@ -570,31 +572,6 @@ void postGoToSpecificMarker(int command) {
 	}
 }
 
-void postSelectEnvelope(int command) {
-	TrackEnvelope* envelope = GetSelectedEnvelope(0);
-	if (!envelope)
-		return;
-	fakeFocus = FOCUS_ENVELOPE;
-	char name[50];
-	GetEnvelopeName(envelope, name, sizeof(name));
-	ostringstream s;
-	// Figure out what track this belongs to.
-	if (GetTrackEnvelopeByName(GetMasterTrack(0), name) == envelope)
-		s << "master: ";
-	for (int t = 0; t < CountTracks(0); ++t) {
-		MediaTrack* track = GetTrack(0, t);
-		if (GetTrackEnvelopeByName(track, name) == envelope) {
-			s << t + 1;
-			char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-			if (trackName && trackName[0])
-				s << " " << trackName;
-			s << ": ";
-		}
-	}
-	s << name << " envelope selected";
-	outputMessage(s);
-}
-
 void postChangeTrackVolume(MediaTrack* track) {
 	ostringstream s;
 	s << fixed << setprecision(2);
@@ -917,8 +894,6 @@ PostCommand POST_COMMANDS[] = {
 	{41768, postGoToSpecificMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
 	{41769, postGoToSpecificMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
 	{41760, postGoToSpecificMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
-	{41863, postSelectEnvelope}, // Track: Select previous envelope
-	{41864, postSelectEnvelope}, // Track: Select next envelope
 	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
 	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
 	{40743, postChangeMasterTrackVolume}, // Track: Nudge master track volume up
@@ -1950,6 +1925,84 @@ void cmdDeleteAllTimeSigs(Command* command) {
 	outputMessage("Deleted all time signature markers");
 }
 
+const regex RE_ENVELOPE_STATE("<[^]+?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
+bool selectEnvelopeUseTake = false;
+void cmdhSelectEnvelope(int direction) {
+	// If we're focused on a track or item, use the envelopes associated therewith.
+	// If we're focused on an envelope, use what we last used.
+	// This is necessary because the first envelope selection will focus the envelope
+	// and we want to allow the user to move past the first.
+	if (fakeFocus == FOCUS_TRACK)
+		selectEnvelopeUseTake = false;
+	else if (fakeFocus == FOCUS_ITEM)
+		selectEnvelopeUseTake = true;
+	else if (fakeFocus != FOCUS_ENVELOPE)
+		return; // No envelopes for focus.
+	int count;
+	function<TrackEnvelope*(int)> getEnvelope;
+	if (selectEnvelopeUseTake) {
+		MediaItem* item = GetSelectedMediaItem(0, 0);
+		if (!item)
+			return;
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take)
+			return;
+		count = CountTakeEnvelopes(take);
+		getEnvelope = [take] (int index) { return GetTakeEnvelope(take, index); };
+	} else {
+		MediaTrack* track = GetLastTouchedTrack();
+		if (!track)
+			return;
+		count = CountTrackEnvelopes(track);
+		getEnvelope = [track] (int index) { return GetTrackEnvelope(track, index); };
+	}
+	if (count == 0) {
+		outputMessage(selectEnvelopeUseTake ? "no take envelopes" : "no track envelopes");
+		return;
+	}
+
+	TrackEnvelope* origEnv = GetSelectedEnvelope(0);
+	// If there's an envelope currently selected, we want the next/previous if there is one.
+	// Otherwise, we want the first/last.
+	int target = direction == 1 ? 0 : count - 1;
+	TrackEnvelope* env;
+	for (int e = target; 0 <= e && e < count; e += direction) {
+		env = getEnvelope(e);
+		if (env == origEnv) {
+			e += direction;
+			if (0 <= e && e < count)
+				target = e;
+			break;
+		}
+	}
+
+	env = getEnvelope(target);
+	SetCursorContext(2, env);
+	fakeFocus = FOCUS_ENVELOPE;
+	char name[50];
+	GetEnvelopeName(env, name, sizeof(name));
+	ostringstream s;
+	s << name << " envelope";
+	char state[100];
+	GetEnvelopeStateChunk(env, state, sizeof(state), false);
+	cmatch m;
+	if (regex_search(state, m, RE_ENVELOPE_STATE)) {
+		if (m.str(1)[0] == '0')
+			s << " bypassed";
+		if (m.str(3)[0] == '1')
+			s << " armed";
+	}
+	outputMessage(s);
+}
+
+void cmdSelectNextEnvelope(Command* command) {
+	cmdhSelectEnvelope(1);
+}
+
+void cmdSelectPreviousEnvelope(Command* command) {
+	cmdhSelectEnvelope(-1);
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -2068,6 +2121,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of master track"}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 2 of master track"}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Delete all time signature markers"}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Select next track/take envelope (depending on focus)"}, "OSARA_SELECTNEXTENV", cmdSelectNextEnvelope},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Select previous track/take envelope (depending on focus)"}, "OSARA_SELECTPREVENV", cmdSelectPreviousEnvelope},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},

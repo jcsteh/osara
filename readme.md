@@ -148,8 +148,6 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Markers: Delete time signature marker near cursor
 
 #### Envelopes
-- Track: Select previous envelope
-- Track: Select next envelope
 - (SWS extension) SWS/BR: Move edit cursor to previous envelope point
 - (SWS extension) SWS/BR: Move edit cursor to next envelope point
 - (SWS extension) SWS/BR: Move edit cursor to previous envelope point and select it
@@ -373,6 +371,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Delete all time signature markers
+- OSARA: Select next track/take envelope (depending on focus)
+- OSARA: Select previous track/take envelope (depending on focus)
 
 #### MIDI Editor
 - View: Go to start of file

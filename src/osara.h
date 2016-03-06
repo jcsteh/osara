@@ -85,7 +85,6 @@
 #define REAPERAPI_WANT_GetTakeNumStretchMarkers
 #define REAPERAPI_WANT_GetTakeStretchMarker
 #define REAPERAPI_WANT_SetTakeStretchMarker
-#define REAPERAPI_WANT_GetTrackEnvelopeByName
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
 #define REAPERAPI_WANT_MIDIEditor_GetActive
@@ -105,6 +104,11 @@
 #define REAPERAPI_WANT_TakeFX_FormatParamValue
 #define REAPERAPI_WANT_plugin_getapi
 #define REAPERAPI_WANT_Envelope_FormatValue
+#define REAPERAPI_WANT_CountTrackEnvelopes
+#define REAPERAPI_WANT_GetTrackEnvelope
+#define REAPERAPI_WANT_CountTakeEnvelopes
+#define REAPERAPI_WANT_GetTakeEnvelope
+#define REAPERAPI_WANT_GetEnvelopeStateChunk
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
