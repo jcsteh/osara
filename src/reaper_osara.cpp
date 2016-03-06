@@ -1925,7 +1925,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 	outputMessage("Deleted all time signature markers");
 }
 
-const regex RE_ENVELOPE_STATE("<[^]+?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
+const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
 bool selectEnvelopeUseTake = false;
 void cmdhSelectEnvelope(int direction) {
 	// If we're focused on a track or item, use the envelopes associated therewith.
@@ -1938,6 +1938,7 @@ void cmdhSelectEnvelope(int direction) {
 		selectEnvelopeUseTake = true;
 	else if (fakeFocus != FOCUS_ENVELOPE)
 		return; // No envelopes for focus.
+	MediaTrack* track = NULL;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
 	if (selectEnvelopeUseTake) {
@@ -1950,7 +1951,7 @@ void cmdhSelectEnvelope(int direction) {
 		count = CountTakeEnvelopes(take);
 		getEnvelope = [take] (int index) { return GetTakeEnvelope(take, index); };
 	} else {
-		MediaTrack* track = GetLastTouchedTrack();
+		track = GetLastTouchedTrack();
 		if (!track)
 			return;
 		count = CountTrackEnvelopes(track);
@@ -1979,17 +1980,34 @@ void cmdhSelectEnvelope(int direction) {
 	env = getEnvelope(target);
 	SetCursorContext(2, env);
 	fakeFocus = FOCUS_ENVELOPE;
-	char name[50];
-	GetEnvelopeName(env, name, sizeof(name));
-	ostringstream s;
-	s << name << " envelope";
 	char state[100];
 	GetEnvelopeStateChunk(env, state, sizeof(state), false);
 	cmatch m;
-	if (regex_search(state, m, RE_ENVELOPE_STATE)) {
-		if (m.str(1)[0] == '0')
+	regex_search(state, m, RE_ENVELOPE_STATE);
+	ostringstream s;
+	if (!m.empty() && m.str(1).compare("AUX") == 0) {
+		// Send envelope. Get the name of the send.
+		string envType = '<' + m.str(2);
+		int sendCount = GetTrackNumSends(track, 0);
+		for (int i = 0; i < sendCount; ++i) {
+			TrackEnvelope* sendEnv = (TrackEnvelope*)GetSetTrackSendInfo(track, 0, i, "P_ENV", (void*)envType.c_str());
+			if (sendEnv == env) {
+				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", NULL);
+				// Need to cast to size_t first to avoid pointer truncation errors/warnings.
+				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL);
+				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
+				if (trackName)
+					s << " " << trackName;
+			}
+		}
+	}
+	char name[50];
+	GetEnvelopeName(env, name, sizeof(name));
+	s << name << " envelope";
+	if (!m.empty()) {
+		if (m.str(3)[0] == '0')
 			s << " bypassed";
-		if (m.str(3)[0] == '1')
+		if (m.str(5)[0] == '1')
 			s << " armed";
 	}
 	outputMessage(s);

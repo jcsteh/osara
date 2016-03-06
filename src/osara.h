@@ -109,6 +109,8 @@
 #define REAPERAPI_WANT_CountTakeEnvelopes
 #define REAPERAPI_WANT_GetTakeEnvelope
 #define REAPERAPI_WANT_GetEnvelopeStateChunk
+#define REAPERAPI_WANT_GetSetTrackSendInfo
+#define REAPERAPI_WANT_GetTrackNumSends
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
