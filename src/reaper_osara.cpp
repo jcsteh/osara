@@ -1987,17 +1987,17 @@ void cmdhSelectEnvelope(int direction) {
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
 		// Send envelope. Get the name of the send.
-		string envType = '<' + m.str(2);
+		string envType = '<' + m.str(2); // e.g. <VOLENV
 		int sendCount = GetTrackNumSends(track, 0);
 		for (int i = 0; i < sendCount; ++i) {
 			TrackEnvelope* sendEnv = (TrackEnvelope*)GetSetTrackSendInfo(track, 0, i, "P_ENV", (void*)envType.c_str());
 			if (sendEnv == env) {
 				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", NULL);
 				// Need to cast to size_t first to avoid pointer truncation errors/warnings.
-				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL);
+				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
 				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
 				if (trackName)
-					s << " " << trackName;
+					s << trackName << " ";
 			}
 		}
 	}
