@@ -1866,6 +1866,7 @@ void cmdMoveStretch(Command* command) {
 	if (itemCount == 0)
 		return;
 	double cursor = GetCursorPosition();
+	Undo_BeginBlock();
 	bool done = false;
 	for (int i = 0; i < itemCount; ++i) {
 		MediaItem* item = GetSelectedMediaItem(0, i);
@@ -1881,6 +1882,7 @@ void cmdMoveStretch(Command* command) {
 		SetTakeStretchMarker(take, index, destPos, NULL);
 		done = true;
 	}
+	Undo_EndBlock("Move stretch marker", UNDO_STATE_ITEMS);
 	if (done)
 		outputMessage("stretch marker moved");
 }
