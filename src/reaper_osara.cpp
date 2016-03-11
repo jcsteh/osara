@@ -340,7 +340,6 @@ void postGoToTrack(int command) {
 	if (!track)
 		return;
 	ostringstream s;
-	// Need to cast to size_t first to avoid "loses information" error with clang.
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	if (trackNum <= 0)
 		s << "master";
@@ -636,7 +635,6 @@ void postSwitchToTake(int command) {
 	if (!take)
 		return;
 	ostringstream s;
-	// Need to cast to size_t first to avoid "loses information" error with clang.
 	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
 		<< GetTakeName(take);
 	outputMessage(s);
@@ -962,7 +960,6 @@ typedef struct {
 // Get the track VU window for the current track.
 HWND getTrackVu(MediaTrack* track) {
 	GetTrackVuData data;
-	// Need to cast to size_t first to avoid pointer truncation errors/warnings.
 	data.index = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	if (data.index == -1) // Master
 		data.index = 0;
@@ -1316,7 +1313,6 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 			// The cursor is right at or has moved past the item to which the user last moved.
 			// Therefore, start at the adjacent item.
 			// This is faster and also allows the user to move to items which start at the same position.
-			// Need to cast to size_t first to avoid "loses information" error with clang.
 			start = (int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", NULL) + direction;
 			if (start < 0 || start >= count) {
 				// There's no adjacent item in this direction,
@@ -1995,7 +1991,6 @@ void cmdhSelectEnvelope(int direction) {
 			TrackEnvelope* sendEnv = (TrackEnvelope*)GetSetTrackSendInfo(track, 0, i, "P_ENV", (void*)envType.c_str());
 			if (sendEnv == env) {
 				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", NULL);
-				// Need to cast to size_t first to avoid pointer truncation errors/warnings.
 				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
 				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
 				if (trackName)

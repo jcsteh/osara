@@ -80,7 +80,6 @@ VOID CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 					if (pw_numTracksEnabled > 1 && !trackReported) {
 						// Only report the track name if watching more than one track
 						// and a channel actually changed for this track.
-						// Need to cast to size_t first to avoid pointer truncation errors/warnings.
 						int trackNum = (int)(size_t)GetSetMediaTrackInfo(pwTrack.track, "IP_TRACKNUMBER", NULL);
 						if (trackNum <= 0)
 							s << "master ";
@@ -218,7 +217,6 @@ void cmdPeakWatcher(Command* command) {
 		MediaTrack* currentTrack = GetLastTouchedTrack();
 		for (int t = 0; t < trackCount; ++t) {
 			track = GetTrack(0, t);
-			// Need to cast to size_t first to avoid pointer truncation errors/warnings.
 			if (track == currentTrack)
 				s << "current ";
 			s << (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
