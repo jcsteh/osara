@@ -627,6 +627,22 @@ void postToggleRepeat(int command) {
 	outputMessage(GetToggleCommandState(command) ? "repeat on" : "repeat off");
 }
 
+void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
+	if (!shouldReportFx)
+		return;
+	int count = TakeFX_GetCount(take);
+	if (count == 0)
+		return;
+	s << "; FX: ";
+	char name[256];
+	for (int f = 0; f < count; ++f) {
+		if (f > 0)
+			s << ", ";
+		TakeFX_GetFXName(take, f, name, sizeof(name));
+		s << name;
+	}
+}
+
 void postSwitchToTake(int command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	if (!item)
@@ -637,6 +653,7 @@ void postSwitchToTake(int command) {
 	ostringstream s;
 	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
 		<< GetTakeName(take);
+	addTakeFxNames(take, s);
 	outputMessage(s);
 }
 
@@ -1355,7 +1372,15 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 				s << " selected";
 		} else
 			s << " unselected";
+		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL))
+			s << " muted";
+		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1)
+			s << " locked";
+		int takeCount = CountTakes(item);
+		if (takeCount > 1)
+			s << " " << takeCount << " takes";
 		s << " " << formatCursorPosition();
+		addTakeFxNames(take, s);
 		outputMessage(s);
 		return;
 	}
