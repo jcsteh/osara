@@ -853,6 +853,14 @@ void postRenameTrack(int command) {
 	outputMessage("Track name");
 }
 
+void postToggleItemMute(int command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return;
+	outputMessage(*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL) ?
+		"muted" : "unmuted");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -943,6 +951,7 @@ PostCommand POST_COMMANDS[] = {
 	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
+	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
