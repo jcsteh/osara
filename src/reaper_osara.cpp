@@ -1497,6 +1497,9 @@ void cmdCut(Command* command) {
 		case 1: // Item
 			cmdhRemoveItems(command->gaccel.accel.cmd);
 			return;
+		case 2: // Envelope
+			cmdhDeleteEnvelopePoints(command->gaccel.accel.cmd);
+			return;
 	}
 }
 
