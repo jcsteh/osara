@@ -1435,6 +1435,10 @@ void cmdSplitItems(Command* command) {
 void cmdPaste(Command* command) {
 	int oldItems = CountMediaItems(0);
 	int oldTracks = CountTracks(0);
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	int oldPoints = 0;
+	if (envelope)
+		oldPoints = CountEnvelopePoints(envelope);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	ostringstream s;
 	int added;
@@ -1442,6 +1446,8 @@ void cmdPaste(Command* command) {
 		s << added << (added == 1 ? " track" : " tracks") << " added";
 	else if ((added = CountMediaItems(0) - oldItems) > 0)
 		s << added << (added == 1 ? " item" : " items") << " added";
+	else if (envelope && (added = CountEnvelopePoints(envelope) - oldPoints) > 0)
+		s << added << (added == 1 ? " point" : " points") << " added";
 	else
 		s << "nothing pasted";
 	outputMessage(s);
