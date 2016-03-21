@@ -149,12 +149,6 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Markers: Delete time signature marker near cursor
 
 #### Envelopes
-- (SWS extension) SWS/BR: Move edit cursor to previous envelope point
-- (SWS extension) SWS/BR: Move edit cursor to next envelope point
-- (SWS extension) SWS/BR: Move edit cursor to previous envelope point and select it
-- (SWS extension) SWS/BR: Move edit cursor to next envelope point and select it
-- (SWS extension) SWS/BR: Move edit cursor to previous envelope point and add to selection
-- (SWS extension) SWS/BR: Move edit cursor to next envelope point and add to selection
 - Item edit: Move items/envelope points up one track/a bit
 - Item edit: Move items/envelope points down one track/a bit
 - (SWS extension) SWS/FNG: Move selected envelope points up
@@ -374,6 +368,10 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Delete all time signature markers
 - OSARA: Select next track/take envelope (depending on focus)
 - OSARA: Select previous track/take envelope (depending on focus)
+- OSARA: Move to next envelope point
+- OSARA: Move to previous envelope point
+- OSARA: Move to next envelope point (leaving other points selected)
+- OSARA: Move to previous envelope point (leaving other points selected)
 
 #### MIDI Editor
 - View: Go to start of file

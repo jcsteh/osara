@@ -112,6 +112,7 @@
 #define REAPERAPI_WANT_GetSetTrackSendInfo
 #define REAPERAPI_WANT_GetTrackNumSends
 #define REAPERAPI_WANT_CountTakes
+#define REAPERAPI_WANT_SetEnvelopePoint
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

@@ -675,42 +675,6 @@ void postCopy(int command) {
 	outputMessage(s);
 }
 
-void postMoveToEnvelopePoint(int command) {
-	TrackEnvelope* envelope = GetSelectedEnvelope(0);
-	if (!envelope)
-		return;
-	fakeFocus = FOCUS_ENVELOPE;
-	// GetEnvelopePointByTime often returns the point before instead of right at the position.
-	// Increment the cursor position a bit to work around this.
-	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
-	if (point < 0)
-		return;
-	double value;
-	bool selected;
-	GetEnvelopePoint(envelope, point, NULL, &value, NULL, NULL, &selected);
-	ostringstream s;
-	s << "point " << point + 1 << " value ";
-	char out[64];
-	Envelope_FormatValue(envelope, value, out, sizeof(out));
-	s << out;
-	if (selected) {
-		int numSel = 0;
-		for (point = 0; point < CountEnvelopePoints(envelope); ++point) {
-			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-			if (selected)
-				++numSel;
-			if (numSel == 2)
-				break; // Don't care above this.
-		}
-		// One selected point is the norm, so don't report selected in this case.
-		if (numSel > 1)
-			s << " selected";
-	} else
-		s << " unselected";
-	s << " " << formatCursorPosition();
-	outputMessage(s);
-}
-
 void postMoveToTimeSig(int command) {
 	double cursor = GetCursorPosition();
 	// FindTempoTimeSigMarker often returns the point before instead of right at the position.
@@ -963,12 +927,6 @@ PostCommand POST_COMMANDS[] = {
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
 	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
-	{"_SWS_BRMOVEEDITTOPREVENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point
-	{"_SWS_BRMOVEEDITTONEXTENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point
-	{"_SWS_BRMOVEEDITSELPREVENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point and select it
-	{"_SWS_BRMOVEEDITSELNEXTENV", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and select it
-	{"_SWS_BRMOVEEDITTOPREVENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to previous envelope point and add to selection
-	{"_SWS_BRMOVEEDITTONEXTENVADDSELL", postMoveToEnvelopePoint}, // SWS/BR: Move edit cursor to next envelope point and add to selection
 	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{NULL},
@@ -2098,6 +2056,84 @@ void cmdSelectPreviousEnvelope(Command* command) {
 	cmdhSelectEnvelope(-1);
 }
 
+void moveToEnvelopePoint(int direction, bool clearSelection=true) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
+	int count = CountEnvelopePoints(envelope);
+	if (count == 0)
+		return;
+	double now = GetCursorPosition();
+	// Get the point at or before the cursr.
+	int point = GetEnvelopePointByTime(envelope, now);
+	if (point < 0) {
+		if (direction == -1)
+			return;
+		++point;
+	}
+	double time, value;
+	bool selected;
+	GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+	if ((direction == 1 && time < now)
+		// If this point is at the cursor, skip it only if it's selected.
+		// This allows you to easily get to a point at the cursor
+		// while still allowing you to move beyond it once you do.
+		|| (direction == 1 && selected && time == now)
+		// Moving backward should skip the point at the cursor.
+		|| (direction == -1 && time >= now)
+	) {
+		// This isn't the point we want. Try the next.
+		int newPoint = point + direction;
+		if (0 <= newPoint && newPoint < count) {
+			point = newPoint;
+			GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+		}
+	}
+	if (direction == 1 ? time < now : time > now)
+		return; // No point in this direction.
+	fakeFocus = FOCUS_ENVELOPE;
+	if (clearSelection)
+		Main_OnCommand(40331, 0); // Envelope: Unselect all points
+	SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+	SetEditCurPos(time, true, true);
+	ostringstream s;
+	s << "point " << point + 1 << " value ";
+	char out[64];
+	Envelope_FormatValue(envelope, value, out, sizeof(out));
+	s << out;
+	if (!clearSelection) {
+		int numSel = 0;
+		for (point = 0; point < count; ++point) {
+			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
+			if (selected)
+				++numSel;
+			if (numSel == 2)
+				break; // Don't care above this.
+		}
+		// One selected point is the norm, so don't report selected in this case.
+		if (numSel > 1)
+			s << " selected";
+	}
+	s << " " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void cmdMoveToNextEnvelopePoint(Command* command) {
+	moveToEnvelopePoint(1);
+}
+
+void cmdMoveToPrevEnvelopePoint(Command* command) {
+	moveToEnvelopePoint(-1);
+}
+
+void cmdMoveToNextEnvelopePointKeepSel(Command* command) {
+	moveToEnvelopePoint(1, false);
+}
+
+void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
+	moveToEnvelopePoint(-1, false);
+}
+
 #ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
@@ -2218,6 +2254,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Delete all time signature markers"}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Select next track/take envelope (depending on focus)"}, "OSARA_SELECTNEXTENV", cmdSelectNextEnvelope},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Select previous track/take envelope (depending on focus)"}, "OSARA_SELECTPREVENV", cmdSelectPreviousEnvelope},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point"}, "OSARA_NEXTENVPOINT", cmdMoveToNextEnvelopePoint},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point"}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
 #ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
