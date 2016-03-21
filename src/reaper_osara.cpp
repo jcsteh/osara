@@ -2004,27 +2004,59 @@ void cmdhSelectEnvelope(int direction) {
 	}
 
 	TrackEnvelope* origEnv = GetSelectedEnvelope(0);
-	// If there's an envelope currently selected, we want the next/previous if there is one.
-	// Otherwise, we want the first/last.
-	int target = direction == 1 ? 0 : count - 1;
+	int start = direction == 1 ? 0 : count - 1;
+	// Find the current envelope.
+	int origIndex = -1;
+	int index;
 	TrackEnvelope* env;
-	for (int e = target; 0 <= e && e < count; e += direction) {
-		env = getEnvelope(e);
+	for (index = start; 0 <= index && index < count; index += direction) {
+		env = getEnvelope(index);
 		if (env == origEnv) {
-			e += direction;
-			if (0 <= e && e < count)
-				target = e;
+			origIndex = index;
 			break;
 		}
 	}
+	if (origIndex == -1) {
+		// The current envelope isn't for this track/take.
+		origEnv = NULL;
+		// Start at the start.
+		origIndex = start - direction;
+	}
 
-	env = getEnvelope(target);
+	// Get the next envelope in the requested direction.
+	cmatch m;
+	index = origIndex;
+	for (; ;) {
+		index += direction;
+		if (index < 0 || index >= count) {
+			if (origEnv) {
+				// We started after the start, so wrap around.
+				index = start;
+			} else {
+				// We started at the start, so there are no more.
+				env = NULL;
+				break;
+			}
+		}
+		env = getEnvelope(index);
+		char state[100];
+		GetEnvelopeStateChunk(env, state, sizeof(state), false);
+		regex_search(state, m, RE_ENVELOPE_STATE);
+		if (env == origEnv) {
+			// We're back where we started. Don't try to go any further.
+			break;
+		}
+		if (!m.empty() && m.str(4)[0] == '0')
+			continue; // Invisible, so skip.
+		break; // We found our envelope!
+	}
+	if (!env) {
+		outputMessage("no visible envelopes");
+		return;
+	}
+
 	SetCursorContext(2, env);
 	fakeFocus = FOCUS_ENVELOPE;
-	char state[100];
-	GetEnvelopeStateChunk(env, state, sizeof(state), false);
-	cmatch m;
-	regex_search(state, m, RE_ENVELOPE_STATE);
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
 		// Send envelope. Get the name of the send.
