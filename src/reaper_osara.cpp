@@ -861,6 +861,11 @@ void postToggleItemMute(int command) {
 		"muted" : "unmuted");
 }
 
+void postSetSelectionEnd(int command) {
+	outputMessage("set selection end");
+	fakeFocus = FOCUS_RULER;
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -952,6 +957,7 @@ PostCommand POST_COMMANDS[] = {
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
+	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -970,7 +976,6 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
 	{40625, "set selection start"}, // Time selection: Set start point
-	{40626, "set selection end"}, // Time selection: Set end point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
 };
