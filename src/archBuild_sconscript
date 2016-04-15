@@ -1,28 +1,55 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConscript for architecture-specific building of the source
 # Author: James Teh <jamie@nvaccess.org>
-# Copyright 2015 NV Access Limited
+# Copyright 2015-2016 NV Access Limited
 # License: GNU General Public License version 2.0
 
 Import("env")
-env.Append(CPPFLAGS="/EHsc", CPPPATH=("#include", "#include/WDL"))
-# We always want debug symbols.
-env.Append(PDB="${TARGET}.pdb")
-# having symbols usually turns this off, but we have no need for unused symbols.
-env.Append(LINKFLAGS='/OPT:REF')
+env.Append(CPPPATH=("#include", "#include/WDL"))
 
-env.SharedLibrary(
-	target="reaper_osara%s" % env["dllSuffix"],
-	source=[
-		"reaper_osara.cpp",
-		"paramsUi.cpp",
-		"peakWatcher.cpp",
-		env.RES("reaper_osara.rc"),
-	],
-	LIBS=[
+sources = [
+	"reaper_osara.cpp",
+	"paramsUi.cpp",
+	"peakWatcher.cpp",
+]
+
+if env["PLATFORM"] == "win32":
+	env.Append(CPPFLAGS="/EHsc")
+	# We always want debug symbols.
+	env.Append(PDB="${TARGET}.pdb")
+	# having symbols usually turns this off, but we have no need for unused symbols.
+	env.Append(LINKFLAGS='/OPT:REF')
+	sources.append(env.RES("reaper_osara.rc"))
+	libs = [
 		"user32",
 		"ole32",
 		"oleacc",
 		"OleAut32",
-	],
+	]
+
+else: # Mac
+	swellDir = env.Dir("#include/WDL/WDL/swell")
+	env.Append(CPPPATH=(swellDir,))
+	env["CXX"] = "clang++"
+	# Build a universal binary with both 32 and 64 bit.
+	archFlags = ("-arch", "i386", "-arch", "x86_64")
+	env.Append(CXXFLAGS=archFlags, LINKFLAGS=archFlags)
+	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++11"))
+	# SWELL files.
+	sources.extend(swellDir.File(f) for f in (
+		"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
+		"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
+		"swell-wnd.mm", "swell-modstub.mm",
+	))
+	sources.append("osxa11y.mm")
+	libs = []
+	# OS X frameworks.
+	for f in ("Cocoa", "Carbon", "Appkit"):
+		env.Append(LINKFLAGS=("-framework", f))
+	# We don't want the "lib" prefix for our dylib.
+	env["SHLIBPREFIX"] = ""
+
+env.SharedLibrary(
+	target="reaper_osara%s" % env["libSuffix"],
+	source=sources, LIBS=libs,
 )
