@@ -12,7 +12,8 @@ environment:
 init:
  - ps:       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
  # We get weird errors without --egg. No idea why.
- - py -m pip install --egg scons
+ # The latest SCons 2.5.0.post1 is broken, so hard-code 2.5.0 for now.
+ - py -m pip install --egg scons==2.5.0
 
 clone_depth: 1
 
