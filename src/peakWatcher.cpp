@@ -6,6 +6,8 @@
  * License: GNU General Public License version 2.0
  */
 
+#ifdef _WIN32
+
 #define UNICODE
 #include <windows.h>
 #include <string>
@@ -298,3 +300,5 @@ void cmdResetPeakWatcherT1(Command* command) {
 void cmdResetPeakWatcherT2(Command* command) {
 	pw_resetTrack(1, true);
 }
+
+#endif

@@ -238,7 +238,7 @@ class ReaperObjLenParam: public ReaperObjParam {
 
 	string getValueForEditing() {
 		char out[64];
-		format_timestr_pos(this->getValue(), out, ARRAYSIZE(out), -1);
+		format_timestr_pos(this->getValue(), out, sizeof(out), -1);
 		return out;
 	}
 
