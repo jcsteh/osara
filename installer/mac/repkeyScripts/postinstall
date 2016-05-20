@@ -1,0 +1,4 @@
+#!/bin/bash
+target=~/"Library/Application Support/REAPER"
+cd "$target"
+cp KeyMaps/OSARA.ReaperKeyMap reaper-kb.ini

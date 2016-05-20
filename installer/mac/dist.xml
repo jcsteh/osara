@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <domains enable_anywhere="false" enable_currentUserHome="true" enable_localSystem="false"/>
+    <pkg-ref id="org.nvaccess.osara.extension"/>
+    <pkg-ref id="org.nvaccess.osara.replaceKeyMap"/>
+    <options customize="always" require-scripts="false"/>
+    <choices-outline>
+        <line choice="org.nvaccess.osara.extension"/>
+        <line choice="org.nvaccess.osara.replaceKeyMap"/>
+    </choices-outline>
+    <choice id="org.nvaccess.osara.extension" title="OSARA extension" enabled="false" selected="true">
+        <pkg-ref id="org.nvaccess.osara.extension"/>
+    </choice>
+    <pkg-ref id="org.nvaccess.osara.extension" version="0" onConclusion="none">extension.pkg</pkg-ref>
+    <choice id="org.nvaccess.osara.replaceKeyMap" title="Replace existing key map with OSARA key map">
+        <pkg-ref id="org.nvaccess.osara.replaceKeyMap"/>
+    </choice>
+    <pkg-ref id="org.nvaccess.osara.replaceKeyMap" version="0" onConclusion="none">replaceKeyMap.pkg</pkg-ref>
+</installer-gui-script>

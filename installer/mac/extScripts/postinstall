@@ -1,0 +1,4 @@
+#!/bin/bash
+target=~/"Library/Application Support/REAPER"
+cp "$2/reaper_osara.dylib" "$target/UserPlugins"
+cp "$2/OSARA.ReaperKeyMap" "$target/KeyMaps"
