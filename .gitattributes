@@ -11,3 +11,4 @@ sconstruct text
 *.txt text
 *.ini text
 *.yml text
+*.sh eol=lf

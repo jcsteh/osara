@@ -6,3 +6,5 @@
 .sconsign.dblite
 build
 *.exe
+.DS_Store
+*.dmg

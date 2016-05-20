@@ -34,11 +34,14 @@ if env["PLATFORM"] == "win32":
 		"/DVERSION=$version", '/DPUBLISHER="$publisher"','/DCOPYRIGHT="$copyright"',
 		"/DOUTFILE=${TARGET.abspath}",
 		"$SOURCE"]])
-	env.Alias("installer", installer)
-	env.Default(installer)
 
 else: # Mac
 	env["libSuffix"] = ""
 	env.SConscript("src/archBuild_sconscript",
 		exports={"env": env},
 		variant_dir="build", duplicate=False)
+	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
+		[["$SOURCE", "$version"]])
+
+	env.Alias("installer", installer)
+	env.Default(installer)
