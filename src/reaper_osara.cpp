@@ -2518,3 +2518,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 }
 
 }
+
+#ifndef _WIN32
+// Mac resources
+#include <swell-dlggen.h>
+#include "reaper_osara.rc_mac_dlg"
+#include <swell-menugen.h>
+#include "reaper_osara.rc_mac_menu"
+#endif

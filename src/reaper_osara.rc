@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Resource script
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2015 NV Access Limited
+ * Copyright 2015-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
@@ -15,47 +15,47 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 // todo: Fix positioning.
 ID_PARAMS_DLG DIALOGEX 0, 0, 500, 500
 	CAPTION "Parameters"
-{
+BEGIN
 	LTEXT "Parameter:", IDC_STATIC, 10, 10, 10, 10
 	COMBOBOX ID_PARAM, 20, 10, 10, 10, CBS_DROPDOWNLIST | WS_TABSTOP
 	LTEXT "Value:", IDC_STATIC, 10, 20, 10, 10
-	CONTROL "", ID_PARAM_VAL_SLIDER, TRACKBAR_CLASS, WS_TABSTOP | TBS_DOWNISLEFT, 30, 20, 10, 10
+	CONTROL "", ID_PARAM_VAL_SLIDER, "msctls_trackbar32", WS_TABSTOP, 30, 20, 10, 10
 	EDITTEXT ID_PARAM_VAL_EDIT, 40, 20, 40, 10
 	DEFPUSHBUTTON "Close", IDCANCEL, 10, 30, 10, 10
 	LTEXT "Filter:", IDC_STATIC, 10, 40, 10, 10
 	EDITTEXT ID_PARAM_FILTER, 20, 40, 40, 10
-}
+END
 
 // todo: Fix positioning.
 ID_PEAK_WATCHER_DLG DIALOGEX 0, 0, 500, 500
 	CAPTION "Peak Watcher"
-{
+BEGIN
 	LTEXT "First track:", IDC_STATIC, 10, 10, 10, 10
 	COMBOBOX ID_PEAK_TRACK1, 20, 10, 10, 10, CBS_DROPDOWNLIST | WS_TABSTOP
 	LTEXT "Second track:", IDC_STATIC, 10, 20, 10, 10
 	COMBOBOX ID_PEAK_TRACK2, 20, 20, 10, 10, CBS_DROPDOWNLIST | WS_TABSTOP
 	GROUPBOX "Notify automatically for channels:", 0, 10, 30, 100, 30
-	AUTOCHECKBOX "&1", ID_PEAK_CHAN1, 15, 35, 20, 10
-	AUTOCHECKBOX "&2", ID_PEAK_CHAN2, 35, 35, 20, 10
+	CONTROL "&1", ID_PEAK_CHAN1, "Button", BS_AUTOCHECKBOX, 15, 35, 20, 10
+	CONTROL "&2", ID_PEAK_CHAN2, "Button", BS_AUTOCHECKBOX, 35, 35, 20, 10
 	LTEXT "When &level reaches (dB):", IDC_STATIC, 15, 45, 20, 10
 	EDITTEXT ID_PEAK_LEVEL, 35, 45, 40, 10
 	GROUPBOX "&Hold peaks:", 0, 10, 60, 100, 20
-	AUTORADIOBUTTON "disabled", ID_PEAK_HOLD_DISABLED, 20, 60, 10, 10
-	AUTORADIOBUTTON "until reset", ID_PEAK_HOLD_FOREVER, 30, 60, 10, 10
-	AUTORADIOBUTTON "for (ms):", ID_PEAK_HOLD_FOR, 40, 60, 10, 10
+	CONTROL "disabled", ID_PEAK_HOLD_DISABLED, "Button", BS_AUTORADIOBUTTON, 20, 60, 10, 10
+	CONTROL "until reset", ID_PEAK_HOLD_FOREVER, "Button", BS_AUTORADIOBUTTON, 30, 60, 10, 10
+	CONTROL "for (ms):", ID_PEAK_HOLD_FOR, "Button", BS_AUTORADIOBUTTON, 40, 60, 10, 10
 	EDITTEXT ID_PEAK_HOLD_TIME, 40, 60, 40, 10
 	PUSHBUTTON "&Reset", ID_PEAK_RESET, 10, 80, 10, 10
 	DEFPUSHBUTTON "OK", IDOK, 20, 80, 10, 10
 	PUSHBUTTON "Cancel", IDCANCEL, 30, 80, 10, 10
-}
+END
 
 // todo: Fix positioning.
 ID_CONFIG_DLG DIALOGEX 0, 0, 500, 500
 	CAPTION "OSARA Configuration"
-{
-	AUTOCHECKBOX "Report position when &scrubbing", ID_CONFIG_REPORT_SCRUB, 10, 10, 10, 10
-	AUTOCHECKBOX "Report &FX when moving to tracks/takes", ID_CONFIG_REPORT_FX, 10, 20, 10, 10
-	AUTOCHECKBOX "Report transport state (play, record, etc.)", ID_CONFIG_REPORT_TRANSPORT, 10, 30, 10, 10
+BEGIN
+	CONTROL "Report position when &scrubbing", ID_CONFIG_REPORT_SCRUB, "Button", BS_AUTOCHECKBOX, 10, 10, 10, 10
+	CONTROL "Report &FX when moving to tracks/takes", ID_CONFIG_REPORT_FX, "Button", BS_AUTOCHECKBOX, 10, 20, 10, 10
+	CONTROL "Report transport state (play, record, etc.)", ID_CONFIG_REPORT_TRANSPORT, "Button", BS_AUTOCHECKBOX, 10, 30, 10, 10
 	DEFPUSHBUTTON "OK", IDOK, 10, 70, 10, 10
 	PUSHBUTTON "Cancel", IDCANCEL, 20, 70, 10, 10
-}
+END

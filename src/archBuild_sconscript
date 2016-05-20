@@ -49,6 +49,11 @@ else: # Mac
 	# We don't want the "lib" prefix for our dylib.
 	env["SHLIBPREFIX"] = ""
 
+	# Generate Mac resources.
+	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
+		[["include/WDL/WDL/swell/mac_resgen.php", "$SOURCE"]])
+	env.Depends("reaper_osara.cpp", res)
+
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],
 	source=sources, LIBS=libs,
