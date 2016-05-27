@@ -18,7 +18,7 @@ init:
 clone_depth: 1
 
 install:
- - cd appveyor
+ - cd ci
  # Decrypt files.
  - openssl enc -aes-256-cbc -d -pass pass:%encFileKey% -in ssh_id_rsa.enc -out ssh_id_rsa
  # Install ssh stuff.
@@ -37,8 +37,9 @@ deploy_script:
  - ps: |
      $exe = Get-ChildItem -Name installer\*.exe
      $data = @{
+      os="win";
       jobId=$env:APPVEYOR_JOB_ID;
       version=$env:APPVEYOR_BUILD_VERSION;
       exe=$exe
      }
-     ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org osaraAppveyorHook
+     ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org osaraCiHook
