@@ -6,7 +6,7 @@
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
 It was heavily inspired by and based on the concepts of the ReaAccess extension, but was created as a potential replacement because ReaAccess seems to have been abandoned and was not developed openly.
-Currently, it runs only on Windows.
+It runs on both Windows and Mac, though it is currently very experimental on Mac ad is not yet fully functional.
 
 Features:
 
@@ -26,19 +26,36 @@ Features:
 OSARA requires REAPER 5.16 or later.
 The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
-It has only been tested with the NVDA screen reader.
-However, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
+It has only been tested with the NVDA and VoiceOver screen readers.
+However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
 
 ## Download and Installation
-You can download the latest OSARA installer from the [OSARA Development Snapshot](http://www.nvaccess.org/files/osara/snapshots.html) page.
-Once it is downloaded, simply run the installer and follow the instructions.
+You can download the latest OSARA installer from the [OSARA Development Snapshots](http://www.nvaccess.org/files/osara/snapshots.html) page.
+
+### Windows
+Once yu have downloaded the installer, simply run it and follow the instructions.
 
 Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
 The installer installs the extension into your user configuration, not the program directory.
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If yu do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
-Regardless, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
+
+### Mac
+Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
+Please follow these instructions to install it:
+
+1. Open the OSARA disk image file you downloaded.
+2. Open the "Install OSARA extension.command" file.
+ This will open a terminal window.
+ Wait a few seconds and then press command+q to close the terminal window.
+3. If you wish to replace your existing key map with the OSARA key map (which is recommended), open the "Replace existing key map with OSARA key map.command" file.
+ This will open another terminal window.
+ Wait a few seconds and then press command+q to close the terminal window.
+4. Press command+e to eject the disk image.
+
+### Key Map
+Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
 This is particularly useful if you wish to merge the key map with your existing key map, rather than replacing it.
 Note that any keyboard commands described in this document assume you are using the OSARA key map.
 
@@ -403,8 +420,9 @@ This section is for those interested in building OSARA from source code.
 
 You will need:
 
-- Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
-	- [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
+- Windows only: Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
+ - [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
+- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or [Xcode](https://developer.apple.com/xcode/download/)
 - [SCons](http://www.scons.org/), version 2.3.2 or later
 
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
