@@ -231,7 +231,7 @@ This is useful for parameters which are tedious or impossible to access otherwis
 
 #### Track/Item Parameters
 To access the parameter list for a track or an item, select the track or item you wish to work with.
-Then, press control+shift+w (OSARA: View parameters for current track/item).
+Then, press control+shift+p (OSARA: View parameters for current track/item).
 
 #### FX Parameters
 Many effects are unfortunately either partially or completely inaccessible.
@@ -242,8 +242,8 @@ Thus, the FX parameter list is particular useful and is the only way to access s
 To access it:
 
 1. Select a track or item with at least one effect.
- Then, press shift+p (OSARA: View FX parameters for current track/take).
-2. Alternatively, to access FX parameters for the master track, press control+shift+p (OSARA: View FX parameters for master track).
+ Then, press p (OSARA: View FX parameters for current track/take).
+2. Alternatively, to access FX parameters for the master track, press shift+p (OSARA: View FX parameters for master track).
 3. If there is more than one effect on the track, select the desired effect from the menu.
 
 Note that only some effects expose easily readable values, while others expose only percentages.
@@ -275,7 +275,7 @@ This can be done for one or two tracks.
 
 To use Peak Watcher:
 
-1. Press alt+shift+p (OSARA: View Peak Watcher).
+1. Press control+shift+w (OSARA: View Peak Watcher).
 2. From the First track combo box, select one of the following:
  - None: Select this if you do not wish to monitor a track.
  - Follow current track: Select this if you want to watch peaks for whatever track you move to in your project.
@@ -372,13 +372,13 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to next item (leaving other items selected): control+shift+rightArrow
 - OSARA: Move to previous item (leaving other items selected): control+shift+leftArrow
 - OSARA: View I/O for master track: shift+i
-- OSARA: Report ripple editing mode: p
+- OSARA: Report ripple editing mode: alt+shift+p
 - OSARA: Report muted tracks: control+shift+f5
 - OSARA: Report soloed tracks: control+shift+f6
 - OSARA: Report record armed tracks: control+shift+f7
 - OSARA: Report tracks with record monitor on: control+shift+f8
 - OSARA: Report tracks with phase inverted: control+shift+f9
-- OSARA: Report track/item/time selection (depending on focus): control+f
+- OSARA: Report track/item/time selection (depending on focus): control+shift+space
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): delete
 - OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
