@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 version=$1
 dmg=../osara_$version.dmg
 cd "`dirname \"$0\"`"
