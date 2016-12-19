@@ -9,7 +9,7 @@ cd content
 cp ../../../copying.txt .
 cd .data
 cp ../../../../build/reaper_osara.dylib .
-cp ../../../../config/reaper-kb.ini OSARA.ReaperKeyMap
+cp ../../../../config/mac/reaper-kb.ini OSARA.ReaperKeyMap
 cd ../..
 rm -f $dmg
 # We seem to need a delay here to avoid an "hdiutil: create failed - Resource busy" error.
