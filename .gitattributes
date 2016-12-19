@@ -9,5 +9,6 @@ sconstruct text
 *sconscript text
 *.nsi text
 *.txt text
+*.ini text
 *.yml text
 *.sh eol=lf
