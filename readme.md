@@ -435,3 +435,4 @@ The resulting installer can be found in the installer directory.
 - Scott Chesworth
 - Derek Lane
 - Gianluca Apollaro
+- Marc Mulcahy
