@@ -101,7 +101,7 @@ SectionEnd
 
 Section "Replace existing key map with OSARA key map" SecKeyMap
 	SetOutPath "$INSTDIR"
-	File "..\config\reaper-kb.ini"
+	File "..\config\windows\reaper-kb.ini"
 SectionEnd
 
 Section "Uninstall"
