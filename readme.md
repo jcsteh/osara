@@ -332,7 +332,7 @@ Otherwise, selection will revert to contiguous selection.
 
 ### Accessing Controls for Sends/Receives/Outputs in the Track I/O Window
 In the Track I/O window, there are various controls for each send, receive or hardware output.
-Unfortunately, these controls cannot be reached with the tab key and it is tedious at best to access these with screen raeder review functions.
+Unfortunately, these controls cannot be reached with the tab key and it is tedious at best to access these with screen reader review functions.
 
 When you tab to the Delete button for a send/receive/output, the name of the send/receive/output will first be reported.
 You can then press the Applications key to access a menu of additional options.
@@ -382,13 +382,13 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): delete
 - OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
-- OSARA: Delete all time signature markers
-- OSARA: Select next track/take envelope (depending on focus)
-- OSARA: Select previous track/take envelope (depending on focus)
-- OSARA: Move to next envelope point
-- OSARA: Move to previous envelope point
-- OSARA: Move to next envelope point (leaving other points selected)
-- OSARA: Move to previous envelope point (leaving other points selected)
+- OSARA: Delete all time signature markers: alt+win+delete
+- OSARA: Select next track/take envelope (depending on focus): control+l
+- OSARA: Select previous track/take envelope (depending on focus): control+shift+l
+- OSARA: Move to next envelope point: alt+k
+- OSARA: Move to previous envelope point: alt+j
+- OSARA: Move to next envelope point (leaving other points selected): alt+shift+k
+- OSARA: Move to previous envelope point (leaving other points selected): alt+shift+j
 
 #### MIDI Editor
 - View: Go to start of file
