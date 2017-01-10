@@ -6,16 +6,16 @@
  * License: GNU General Public License version 2.0
  */
 
-#ifdef _WIN32
-
 #include <windows.h>
 #include <math.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <cassert>
+#ifdef _WIN32
 #include <Commctrl.h>
 #include <Windowsx.h>
+#endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include "osara.h"
@@ -53,7 +53,7 @@ void pw_resetTrack(int trackIndex, bool report=false) {
 		outputMessage("reset");
 }
 
-VOID CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
 	s << fixed << setprecision(1);
 	for (int t = 0; t < PW_NUM_TRACKS; ++t) {
@@ -108,7 +108,7 @@ void pw_onOk(HWND dialog) {
 	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, sizeof(inText)) > 0) {
 		pw_level = atof(inText);
 		// Restrict the range.
-		pw_level = max(min(pw_level, 40), -40);
+		pw_level = max(min(pw_level, 40.0), -40.0);
 	}
 
 	// Retrieve the hold choice/time.
@@ -238,14 +238,18 @@ void cmdPeakWatcher(Command* command) {
 	}
 
 	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
+#ifdef _WIN32
 	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
+#endif
 	s << fixed << setprecision(2);
 	s << pw_level;
 	SetWindowText(level, s.str().c_str());
 	s.str("");
 
 	HWND holdTime = GetDlgItem(dialog, ID_PEAK_HOLD_TIME);
+#ifdef _WIN32
 	SendMessage(holdTime, EM_SETLIMITTEXT, 5, 0);
+#endif
 	int id;
 	if (pw_hold == -1)
 		id = ID_PEAK_HOLD_DISABLED;
@@ -299,5 +303,3 @@ void cmdResetPeakWatcherT1(Command* command) {
 void cmdResetPeakWatcherT2(Command* command) {
 	pw_resetTrack(1, true);
 }
-
-#endif

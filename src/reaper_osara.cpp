@@ -2136,10 +2136,10 @@ void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
 	moveToEnvelopePoint(-1, false);
 }
 
-#ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
+#ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -2169,7 +2169,6 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		}
 	}
 }
-
 #endif // _WIN32
 
 #define DEFACCEL {0, 0, 0}
@@ -2228,6 +2227,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
+#endif
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of first track"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherT1C1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of first track"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherT1C2},
@@ -2235,6 +2235,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
+#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 #endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
@@ -2260,8 +2261,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point"}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
-#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
+#ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
 	{0, {}, NULL, NULL},
@@ -2280,8 +2281,6 @@ void loadConfig() {
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 }
-
-#ifdef _WIN32
 
 void config_onOk(HWND dialog) {
 	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
@@ -2320,8 +2319,6 @@ void cmdConfig(Command* command) {
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
-
-#endif // _WIN32
 
 /*** Initialisation, termination and inner workings. */
 
