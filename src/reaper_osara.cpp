@@ -2284,14 +2284,11 @@ void loadConfig() {
 #ifdef _WIN32
 
 void config_onOk(HWND dialog) {
-	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
-	shouldReportScrub = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
-	shouldReportFx = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportFx = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_FX) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
-	shouldReportTransport = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportTransport = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TRANSPORT) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 }
 
@@ -2317,12 +2314,9 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
 
-	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
-	Button_SetCheck(control, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
-	Button_SetCheck(control, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
-	Button_SetCheck(control, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }

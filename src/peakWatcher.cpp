@@ -100,8 +100,7 @@ VOID CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 void pw_onOk(HWND dialog) {
 	// Retrieve the notification state for channels.
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		pw_notifyChannels[c] = Button_GetCheck(channel) == BST_CHECKED;
+		pw_notifyChannels[c] = IsDlgButtonChecked(dialog, ID_PEAK_CHAN1 + c) == BST_CHECKED;
 	}
 
 	char inText[7];
@@ -113,9 +112,9 @@ void pw_onOk(HWND dialog) {
 	}
 
 	// Retrieve the hold choice/time.
-	if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_DISABLED)) == BST_CHECKED)
+	if (IsDlgButtonChecked(dialog, ID_PEAK_HOLD_DISABLED) == BST_CHECKED)
 		pw_hold = -1;
-	else if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_FOREVER)) == BST_CHECKED)
+	else if (IsDlgButtonChecked(dialog, ID_PEAK_HOLD_FOREVER) == BST_CHECKED)
 		pw_hold = 0;
 	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, sizeof(inText)) > 0) {
 		pw_hold = atoi(inText);
@@ -235,8 +234,7 @@ void cmdPeakWatcher(Command* command) {
 	}
 
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		Button_SetCheck(channel, pw_notifyChannels[c] ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(dialog, ID_PEAK_CHAN1 + c, pw_notifyChannels[c] ? BST_CHECKED : BST_UNCHECKED);
 	}
 
 	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
@@ -258,8 +256,7 @@ void cmdPeakWatcher(Command* command) {
 		s << pw_hold;
 		SetWindowText(holdTime, s.str().c_str());
 	}
-	HWND hold = GetDlgItem(dialog, id);
-	Button_SetCheck(hold, BST_CHECKED);
+	CheckDlgButton(dialog, id, BST_CHECKED);
 	EnableWindow(holdTime, pw_hold > 0);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
