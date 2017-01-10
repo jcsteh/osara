@@ -2,11 +2,10 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2016 NV Access Limited
+ * Copyright 2014-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
-#define UNICODE
 #include <windows.h>
 #ifdef _WIN32
 #include <initguid.h>
@@ -27,6 +26,7 @@
 #else
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
+#include <WDL/win32_utf8.h>
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
@@ -959,7 +959,7 @@ HWND getTrackVu(MediaTrack* track) {
 	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
 		GetTrackVuData* data = (GetTrackVuData*)lParam;
 		WCHAR className[14];
-		if (GetClassName(testHwnd, className, 14) != 0
+		if (GetClassNameW(testHwnd, className, 14) != 0
 			&& wcscmp(className, L"REAPERtrackvu") == 0
 			&& ++data->foundCount == data->index
 		)  {
@@ -974,19 +974,19 @@ HWND getTrackVu(MediaTrack* track) {
 
 HWND getSendContainer(HWND hwnd) {
 	WCHAR className[21] = L"\0";
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"Button") != 0)
 		return NULL;
 	hwnd = GetWindow(hwnd, GW_HWNDPREV);
 	if (!hwnd)
 		return NULL;
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"Static") != 0)
 		return NULL;
 	hwnd = GetAncestor(hwnd, GA_PARENT);
 	if (!hwnd)
 		return NULL;
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
 		return NULL;
 	return hwnd;
@@ -1023,7 +1023,9 @@ void sendMenu(HWND sendWindow) {
 		if (acc->get_accName(child, &name) != S_OK || !name)
 			continue;
 		itemInfo.wID = c;
-		itemInfo.dwTypeData = name;
+		// Make sure this stays around until the InsertMenuItem call.
+		string nameN = narrow(name);
+		itemInfo.dwTypeData = (char*)nameN.c_str();
 		itemInfo.cch = SysStringLen(name);
 		InsertMenuItem(menu, item, true, &itemInfo);
 		SysFreeString(name);
@@ -1076,10 +1078,10 @@ void clickIoButton(MediaTrack* track, bool rightClick=false) {
 
 bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetForegroundWindow();
-	WCHAR name[4];
-	if (GetWindowText(window, name, ARRAYSIZE(name)) == 0)
+	char name[4];
+	if (GetWindowText(window, name, sizeof(name)) == 0)
 		return false;
-	if (wcsncmp(name, L"FX: ", 4) != 0)
+	if (strncmp(name, "FX: ", 4) != 0)
 		return false;
 	// Descend.
 	if (!(window = GetWindow(window, GW_CHILD)))
@@ -1099,7 +1101,7 @@ bool maybeSwitchToFxPluginWindow() {
 		return false;
 	return true;
 }
-	
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -1111,7 +1113,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	WCHAR className[22] = L"\0";
-	GetClassName(focus, className, ARRAYSIZE(className));
+	GetClassNameW(focus, className, ARRAYSIZE(className));
 	HWND window;
 	if (wParam == VK_APPS && lParam & 0x80000000) {
 		if (wcscmp(className, L"REAPERTrackListWindow") == 0
@@ -2134,10 +2136,10 @@ void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
 	moveToEnvelopePoint(-1, false);
 }
 
-#ifdef _WIN32
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
+#ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -2146,11 +2148,11 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		return;
 	double cursorPos = GetCursorPosition();
 	for (int i = 0; i < ListView_GetItemCount(guiThreadInfo.hwndFocus); ++i) {
-		WCHAR textW[50];
+		char text[50];
 		// Get the text from the position column (1).
-		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, textW, ARRAYSIZE(textW));
+		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, text, sizeof(text));
 		// Convert this to project time. text is always in measures.beats.
-		double eventPos = parse_timestr_pos(narrow(textW).c_str(), 2);
+		double eventPos = parse_timestr_pos(text, 2);
 		if (eventPos >= cursorPos) {
 			// This item is at or just after the cursor.
 			int oldFocus = ListView_GetNextItem(guiThreadInfo.hwndFocus, -1, LVNI_FOCUSED);
@@ -2167,7 +2169,6 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		}
 	}
 }
-
 #endif // _WIN32
 
 #define DEFACCEL {0, 0, 0}
@@ -2226,6 +2227,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
+#endif
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of first track"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherT1C1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of first track"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherT1C2},
@@ -2233,6 +2235,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
+#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 #endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
@@ -2258,8 +2261,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point"}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
-#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
+#ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
 	{0, {}, NULL, NULL},
@@ -2279,17 +2282,12 @@ void loadConfig() {
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 }
 
-#ifdef _WIN32
-
 void config_onOk(HWND dialog) {
-	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
-	shouldReportScrub = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
-	shouldReportFx = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportFx = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_FX) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
-	shouldReportTransport = Button_GetCheck(control) == BST_CHECKED;
+	shouldReportTransport = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TRANSPORT) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 }
 
@@ -2315,17 +2313,12 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
 
-	HWND control = GetDlgItem(dialog, ID_CONFIG_REPORT_SCRUB);
-	Button_SetCheck(control, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_FX);
-	Button_SetCheck(control, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
-	control = GetDlgItem(dialog, ID_CONFIG_REPORT_TRANSPORT);
-	Button_SetCheck(control, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
-
-#endif // _WIN32
 
 /*** Initialisation, termination and inner workings. */
 
@@ -2413,12 +2406,12 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// First, get the name of the send.
 			HWND child = GetTopWindow(tempWindow);
 			WCHAR name[50];
-			if (GetWindowText(child, name, ARRAYSIZE(name)) == 0)
+			if (GetWindowTextW(child, name, ARRAYSIZE(name)) == 0)
 				return;
 			wostringstream focusName;
 			focusName << name;
 			// Now, get the original name of the button.
-			if (GetWindowText(hwnd, name, ARRAYSIZE(name)) == 0)
+			if (GetWindowTextW(hwnd, name, ARRAYSIZE(name)) == 0)
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
@@ -2439,8 +2432,8 @@ void annotateSpuriousDialogs(HWND hwnd) {
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0)
 		accPropServices->SetHwndPropStr(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L"");
-	for (HWND child = FindWindowEx(hwnd, NULL, L"#32770", NULL); child;
-		child = FindWindowEx(hwnd, child, L"#32770", NULL)
+	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
+		child = FindWindowExW(hwnd, child, L"#32770", NULL)
 	)
 		annotateSpuriousDialogs(child);
 }
@@ -2518,3 +2511,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 }
 
 }
+
+#ifndef _WIN32
+// Mac resources
+#include <swell-dlggen.h>
+#include "reaper_osara.rc_mac_dlg"
+#include <swell-menugen.h>
+#include "reaper_osara.rc_mac_menu"
+#endif

@@ -2,11 +2,10 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Parameters UI code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2015 NV Access Limited
+ * Copyright 2014-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
-#define UNICODE
 #include <windows.h>
 #include <string>
 #include <sstream>
@@ -18,6 +17,7 @@
 #include <Windowsx.h>
 #include <Commctrl.h>
 #endif
+#include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include "osara.h"
 #include "resource.h"
@@ -297,8 +297,7 @@ class ParamsDialog {
 		this->valText = this->param->getValueText(this->val);
 		this->updateValueText();
 		if (this->param->isEditable) {
-			SendMessage(this->valueEdit, WM_SETTEXT, 0,
-				(LPARAM)widen(this->param->getValueForEditing()).c_str());
+			SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
 		}
 	}
 
@@ -347,10 +346,10 @@ class ParamsDialog {
 	}
 
 	void onValueEdited() {
-		WCHAR rawText[30];
-		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, ARRAYSIZE(rawText)) == 0)
+		char rawText[30];
+		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0)
 			return;
-		this->param->setValueFromEdited(narrow(rawText));
+		this->param->setValueFromEdited(rawText);
 		this->val = this->param->getValue();
 		this->updateValue();
 	}
@@ -419,7 +418,7 @@ class ParamsDialog {
 			if (!this->shouldIncludeParam(name))
 				continue;
 			this->visibleParams.push_back(p);
-			ComboBox_AddString(this->paramCombo, widen(name).c_str());
+			ComboBox_AddString(this->paramCombo, name.c_str());
 			if (p == prevSelParam)
 				newComboSel = this->visibleParams.size() - 1;
 		}
@@ -433,9 +432,9 @@ class ParamsDialog {
 	}
 
 	void onFilterChange() {
-		WCHAR rawText[100];
-		GetDlgItemText(this->dialog, ID_PARAM_FILTER, rawText, ARRAYSIZE(rawText));
-		string& text = narrow(rawText);
+		char rawText[100];
+		GetDlgItemText(this->dialog, ID_PARAM_FILTER, rawText, sizeof(rawText));
+		string text = rawText;
 		if (this->filter.compare(text) == 0)
 			return; // No change.
 		this->filter = text;
@@ -450,8 +449,9 @@ class ParamsDialog {
 		}
 		this->dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PARAMS_DLG), mainHwnd, ParamsDialog::dialogProc);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
-		SetWindowText(this->dialog, widen(source->getTitle()).c_str());
+		SetWindowText(this->dialog, source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
+		WDL_UTF8_HookComboBox(this->paramCombo);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->updateParamList();
@@ -677,8 +677,8 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = f + 1;
-			itemInfo.dwTypeData = (wchar_t*)widen(name).c_str();
-			itemInfo.cch = ARRAYSIZE(name);
+			itemInfo.dwTypeData = (char*)name;
+			itemInfo.cch = sizeof(name);
 			InsertMenuItem(effects, f, false, &itemInfo);
 		}
 		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;

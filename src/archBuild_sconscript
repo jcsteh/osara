@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConscript for architecture-specific building of the source
 # Author: James Teh <jamie@nvaccess.org>
-# Copyright 2015-2016 NV Access Limited
+# Copyright 2015-2017 NV Access Limited
 # License: GNU General Public License version 2.0
 
 Import("env")
@@ -19,12 +19,18 @@ if env["PLATFORM"] == "win32":
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
-	sources.append(env.RES("reaper_osara.rc"))
+	sources.extend((
+		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
+		env.RES("reaper_osara.rc"),
+	))
 	libs = [
 		"user32",
 		"ole32",
 		"oleacc",
 		"OleAut32",
+		"Shell32",
+		"Comdlg32",
+		"Advapi32",
 	]
 
 else: # Mac
@@ -48,6 +54,11 @@ else: # Mac
 		env.Append(LINKFLAGS=("-framework", f))
 	# We don't want the "lib" prefix for our dylib.
 	env["SHLIBPREFIX"] = ""
+
+	# Generate Mac resources.
+	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
+		[["include/WDL/WDL/swell/mac_resgen.php", "$SOURCE"]])
+	env.Depends("reaper_osara.cpp", res)
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],

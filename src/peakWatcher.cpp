@@ -2,20 +2,21 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Peak Watcher code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2015-2016 NV Access Limited
+ * Copyright 2015-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
-#ifdef _WIN32
-
-#define UNICODE
 #include <windows.h>
+#include <math.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <cassert>
+#ifdef _WIN32
 #include <Commctrl.h>
 #include <Windowsx.h>
+#endif
+#include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include "osara.h"
 #include "resource.h"
@@ -52,7 +53,7 @@ void pw_resetTrack(int trackIndex, bool report=false) {
 		outputMessage("reset");
 }
 
-VOID CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
 	s << fixed << setprecision(1);
 	for (int t = 0; t < PW_NUM_TRACKS; ++t) {
@@ -99,25 +100,24 @@ VOID CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 void pw_onOk(HWND dialog) {
 	// Retrieve the notification state for channels.
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		pw_notifyChannels[c] = Button_GetCheck(channel) == BST_CHECKED;
+		pw_notifyChannels[c] = IsDlgButtonChecked(dialog, ID_PEAK_CHAN1 + c) == BST_CHECKED;
 	}
 
-	WCHAR inText[7];
+	char inText[7];
 	// Retrieve the entered maximum level.
-	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, ARRAYSIZE(inText)) > 0) {
-		pw_level = _wtof(inText);
+	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, sizeof(inText)) > 0) {
+		pw_level = atof(inText);
 		// Restrict the range.
-		pw_level = max(min(pw_level, 40), -40);
+		pw_level = max(min(pw_level, 40.0), -40.0);
 	}
 
 	// Retrieve the hold choice/time.
-	if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_DISABLED)) == BST_CHECKED)
+	if (IsDlgButtonChecked(dialog, ID_PEAK_HOLD_DISABLED) == BST_CHECKED)
 		pw_hold = -1;
-	else if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_FOREVER)) == BST_CHECKED)
+	else if (IsDlgButtonChecked(dialog, ID_PEAK_HOLD_FOREVER) == BST_CHECKED)
 		pw_hold = 0;
-	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, ARRAYSIZE(inText)) > 0) {
-		pw_hold = _wtoi(inText);
+	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, sizeof(inText)) > 0) {
+		pw_hold = atoi(inText);
 		// Restrict the range.
 		pw_hold = max(min(pw_hold, 20000), 1);
 	}
@@ -204,15 +204,16 @@ void cmdPeakWatcher(Command* command) {
 
 	for (int pwt = 0; pwt < PW_NUM_TRACKS; ++pwt) {
 		HWND trackSel = GetDlgItem(dialog, ID_PEAK_TRACK1 + pwt);
+		WDL_UTF8_HookComboBox(trackSel);
 		auto& pwTrack = pw_tracks[pwt];
 		// Populate the list of what to watch.
-		ComboBox_AddString(trackSel, L"None");
+		ComboBox_AddString(trackSel, "None");
 		if (!pwTrack.follow && !pwTrack.track)
 			ComboBox_SetCurSel(trackSel, PWT_DISABLED);
-		ComboBox_AddString(trackSel, L"Follow current track");
+		ComboBox_AddString(trackSel, "Follow current track");
 		if (pwTrack.follow)
 			ComboBox_SetCurSel(trackSel, PWT_FOLLOW);
-		ComboBox_AddString(trackSel, L"Master");
+		ComboBox_AddString(trackSel, "Master");
 		MediaTrack* track = GetMasterTrack(0);
 		if (pwTrack.track == track)
 			ComboBox_SetCurSel(trackSel, PWT_MASTER);
@@ -225,7 +226,7 @@ void cmdPeakWatcher(Command* command) {
 			char* name;
 			if (name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
 				s << ": " << name;
-			ComboBox_AddString(trackSel, widen(s.str()).c_str());
+			ComboBox_AddString(trackSel, s.str().c_str());
 			s.str("");
 			if (!pwTrack.follow && pwTrack.track == track)
 				ComboBox_SetCurSel(trackSel, PWT_TRACKS_START + t);
@@ -233,19 +234,22 @@ void cmdPeakWatcher(Command* command) {
 	}
 
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
-		HWND channel = GetDlgItem(dialog, ID_PEAK_CHAN1 + c);
-		Button_SetCheck(channel, pw_notifyChannels[c] ? BST_CHECKED : BST_UNCHECKED);
+		CheckDlgButton(dialog, ID_PEAK_CHAN1 + c, pw_notifyChannels[c] ? BST_CHECKED : BST_UNCHECKED);
 	}
 
 	HWND level = GetDlgItem(dialog, ID_PEAK_LEVEL);
+#ifdef _WIN32
 	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
+#endif
 	s << fixed << setprecision(2);
 	s << pw_level;
-	SendMessage(level, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+	SetWindowText(level, s.str().c_str());
 	s.str("");
 
 	HWND holdTime = GetDlgItem(dialog, ID_PEAK_HOLD_TIME);
+#ifdef _WIN32
 	SendMessage(holdTime, EM_SETLIMITTEXT, 5, 0);
+#endif
 	int id;
 	if (pw_hold == -1)
 		id = ID_PEAK_HOLD_DISABLED;
@@ -254,10 +258,9 @@ void cmdPeakWatcher(Command* command) {
 	else {
 		id = ID_PEAK_HOLD_FOR;
 		s << pw_hold;
-		SendMessage(holdTime, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+		SetWindowText(holdTime, s.str().c_str());
 	}
-	HWND hold = GetDlgItem(dialog, id);
-	Button_SetCheck(hold, BST_CHECKED);
+	CheckDlgButton(dialog, id, BST_CHECKED);
 	EnableWindow(holdTime, pw_hold > 0);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
@@ -300,5 +303,3 @@ void cmdResetPeakWatcherT1(Command* command) {
 void cmdResetPeakWatcherT2(Command* command) {
 	pw_resetTrack(1, true);
 }
-
-#endif
