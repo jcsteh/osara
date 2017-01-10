@@ -2,11 +2,10 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2016 NV Access Limited
+ * Copyright 2014-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
-#define UNICODE
 #include <windows.h>
 #ifdef _WIN32
 #include <initguid.h>
@@ -27,6 +26,7 @@
 #else
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
+#include <WDL/win32_utf8.h>
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
@@ -959,7 +959,7 @@ HWND getTrackVu(MediaTrack* track) {
 	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
 		GetTrackVuData* data = (GetTrackVuData*)lParam;
 		WCHAR className[14];
-		if (GetClassName(testHwnd, className, 14) != 0
+		if (GetClassNameW(testHwnd, className, 14) != 0
 			&& wcscmp(className, L"REAPERtrackvu") == 0
 			&& ++data->foundCount == data->index
 		)  {
@@ -974,19 +974,19 @@ HWND getTrackVu(MediaTrack* track) {
 
 HWND getSendContainer(HWND hwnd) {
 	WCHAR className[21] = L"\0";
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"Button") != 0)
 		return NULL;
 	hwnd = GetWindow(hwnd, GW_HWNDPREV);
 	if (!hwnd)
 		return NULL;
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"Static") != 0)
 		return NULL;
 	hwnd = GetAncestor(hwnd, GA_PARENT);
 	if (!hwnd)
 		return NULL;
-	GetClassName(hwnd, className, ARRAYSIZE(className));
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
 	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
 		return NULL;
 	return hwnd;
@@ -1023,7 +1023,9 @@ void sendMenu(HWND sendWindow) {
 		if (acc->get_accName(child, &name) != S_OK || !name)
 			continue;
 		itemInfo.wID = c;
-		itemInfo.dwTypeData = name;
+		// Make sure this stays around until the InsertMenuItem call.
+		string nameN = narrow(name);
+		itemInfo.dwTypeData = (char*)nameN.c_str();
 		itemInfo.cch = SysStringLen(name);
 		InsertMenuItem(menu, item, true, &itemInfo);
 		SysFreeString(name);
@@ -1076,10 +1078,10 @@ void clickIoButton(MediaTrack* track, bool rightClick=false) {
 
 bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetForegroundWindow();
-	WCHAR name[4];
-	if (GetWindowText(window, name, ARRAYSIZE(name)) == 0)
+	char name[4];
+	if (GetWindowText(window, name, sizeof(name)) == 0)
 		return false;
-	if (wcsncmp(name, L"FX: ", 4) != 0)
+	if (strncmp(name, "FX: ", 4) != 0)
 		return false;
 	// Descend.
 	if (!(window = GetWindow(window, GW_CHILD)))
@@ -1099,7 +1101,7 @@ bool maybeSwitchToFxPluginWindow() {
 		return false;
 	return true;
 }
-	
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -1111,7 +1113,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	WCHAR className[22] = L"\0";
-	GetClassName(focus, className, ARRAYSIZE(className));
+	GetClassNameW(focus, className, ARRAYSIZE(className));
 	HWND window;
 	if (wParam == VK_APPS && lParam & 0x80000000) {
 		if (wcscmp(className, L"REAPERTrackListWindow") == 0
@@ -2146,11 +2148,11 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		return;
 	double cursorPos = GetCursorPosition();
 	for (int i = 0; i < ListView_GetItemCount(guiThreadInfo.hwndFocus); ++i) {
-		WCHAR textW[50];
+		char text[50];
 		// Get the text from the position column (1).
-		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, textW, ARRAYSIZE(textW));
+		ListView_GetItemText(guiThreadInfo.hwndFocus, i, 1, text, sizeof(text));
 		// Convert this to project time. text is always in measures.beats.
-		double eventPos = parse_timestr_pos(narrow(textW).c_str(), 2);
+		double eventPos = parse_timestr_pos(text, 2);
 		if (eventPos >= cursorPos) {
 			// This item is at or just after the cursor.
 			int oldFocus = ListView_GetNextItem(guiThreadInfo.hwndFocus, -1, LVNI_FOCUSED);
@@ -2413,12 +2415,12 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// First, get the name of the send.
 			HWND child = GetTopWindow(tempWindow);
 			WCHAR name[50];
-			if (GetWindowText(child, name, ARRAYSIZE(name)) == 0)
+			if (GetWindowTextW(child, name, ARRAYSIZE(name)) == 0)
 				return;
 			wostringstream focusName;
 			focusName << name;
 			// Now, get the original name of the button.
-			if (GetWindowText(hwnd, name, ARRAYSIZE(name)) == 0)
+			if (GetWindowTextW(hwnd, name, ARRAYSIZE(name)) == 0)
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
@@ -2439,8 +2441,8 @@ void annotateSpuriousDialogs(HWND hwnd) {
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0)
 		accPropServices->SetHwndPropStr(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L"");
-	for (HWND child = FindWindowEx(hwnd, NULL, L"#32770", NULL); child;
-		child = FindWindowEx(hwnd, child, L"#32770", NULL)
+	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
+		child = FindWindowExW(hwnd, child, L"#32770", NULL)
 	)
 		annotateSpuriousDialogs(child);
 }

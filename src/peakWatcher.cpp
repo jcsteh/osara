@@ -2,20 +2,21 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Peak Watcher code
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2015-2016 NV Access Limited
+ * Copyright 2015-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
 #ifdef _WIN32
 
-#define UNICODE
 #include <windows.h>
+#include <math.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <cassert>
 #include <Commctrl.h>
 #include <Windowsx.h>
+#include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include "osara.h"
 #include "resource.h"
@@ -103,10 +104,10 @@ void pw_onOk(HWND dialog) {
 		pw_notifyChannels[c] = Button_GetCheck(channel) == BST_CHECKED;
 	}
 
-	WCHAR inText[7];
+	char inText[7];
 	// Retrieve the entered maximum level.
-	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, ARRAYSIZE(inText)) > 0) {
-		pw_level = _wtof(inText);
+	if (GetDlgItemText(dialog, ID_PEAK_LEVEL, inText, sizeof(inText)) > 0) {
+		pw_level = atof(inText);
 		// Restrict the range.
 		pw_level = max(min(pw_level, 40), -40);
 	}
@@ -116,8 +117,8 @@ void pw_onOk(HWND dialog) {
 		pw_hold = -1;
 	else if (Button_GetCheck(GetDlgItem(dialog, ID_PEAK_HOLD_FOREVER)) == BST_CHECKED)
 		pw_hold = 0;
-	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, ARRAYSIZE(inText)) > 0) {
-		pw_hold = _wtoi(inText);
+	else if (GetDlgItemText(dialog, ID_PEAK_HOLD_TIME, inText, sizeof(inText)) > 0) {
+		pw_hold = atoi(inText);
 		// Restrict the range.
 		pw_hold = max(min(pw_hold, 20000), 1);
 	}
@@ -204,15 +205,16 @@ void cmdPeakWatcher(Command* command) {
 
 	for (int pwt = 0; pwt < PW_NUM_TRACKS; ++pwt) {
 		HWND trackSel = GetDlgItem(dialog, ID_PEAK_TRACK1 + pwt);
+		WDL_UTF8_HookComboBox(trackSel);
 		auto& pwTrack = pw_tracks[pwt];
 		// Populate the list of what to watch.
-		ComboBox_AddString(trackSel, L"None");
+		ComboBox_AddString(trackSel, "None");
 		if (!pwTrack.follow && !pwTrack.track)
 			ComboBox_SetCurSel(trackSel, PWT_DISABLED);
-		ComboBox_AddString(trackSel, L"Follow current track");
+		ComboBox_AddString(trackSel, "Follow current track");
 		if (pwTrack.follow)
 			ComboBox_SetCurSel(trackSel, PWT_FOLLOW);
-		ComboBox_AddString(trackSel, L"Master");
+		ComboBox_AddString(trackSel, "Master");
 		MediaTrack* track = GetMasterTrack(0);
 		if (pwTrack.track == track)
 			ComboBox_SetCurSel(trackSel, PWT_MASTER);
@@ -225,7 +227,7 @@ void cmdPeakWatcher(Command* command) {
 			char* name;
 			if (name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
 				s << ": " << name;
-			ComboBox_AddString(trackSel, widen(s.str()).c_str());
+			ComboBox_AddString(trackSel, s.str().c_str());
 			s.str("");
 			if (!pwTrack.follow && pwTrack.track == track)
 				ComboBox_SetCurSel(trackSel, PWT_TRACKS_START + t);
@@ -241,7 +243,7 @@ void cmdPeakWatcher(Command* command) {
 	SendMessage(level, EM_SETLIMITTEXT, 6, 0);
 	s << fixed << setprecision(2);
 	s << pw_level;
-	SendMessage(level, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+	SetWindowText(level, s.str().c_str());
 	s.str("");
 
 	HWND holdTime = GetDlgItem(dialog, ID_PEAK_HOLD_TIME);
@@ -254,7 +256,7 @@ void cmdPeakWatcher(Command* command) {
 	else {
 		id = ID_PEAK_HOLD_FOR;
 		s << pw_hold;
-		SendMessage(holdTime, WM_SETTEXT, 0, (LPARAM)widen(s.str()).c_str());
+		SetWindowText(holdTime, s.str().c_str());
 	}
 	HWND hold = GetDlgItem(dialog, id);
 	Button_SetCheck(hold, BST_CHECKED);

@@ -9,7 +9,6 @@
 #ifndef _OSARA_H
 #define _OSARA_H
 
-#define UNICODE
 #include <windows.h>
 #include <string>
 #include <sstream>
