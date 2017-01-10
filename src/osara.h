@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main header
  * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2015 NV Access Limited
+ * Copyright 2014-2017 NV Access Limited
  * License: GNU General Public License version 2.0
  */
 
@@ -164,6 +164,13 @@ std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 
 extern IAccPropServices* accPropServices;
+
+#else
+// These macros exist on Windows but aren't defined by Swell for Mac.
+#define ComboBox_GetCurSel(hwnd) (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0)
+#define ComboBox_SetCurSel(hwnd, index) (int)SendMessage(hwnd, CB_SETCURSEL, (WPARAM)index, 0)
+#define ComboBox_AddString(hwnd, str) (int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
+#define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
 
 #endif
