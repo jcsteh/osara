@@ -9,12 +9,52 @@
 #include <windows.h>
 #include <string>
 #include <sstream>
+#include <vector>
 #include "osara.h"
 #ifdef _WIN32
 #include <Commctrl.h>
 #endif
 
 using namespace std;
+
+typedef struct {
+	int channel;
+	int pitch;
+	int velocity;
+} MidiNote;
+vector<MidiNote> previewingNotes; // Notes currently being previewed.
+UINT_PTR previewDoneTimer = 0;
+const int PREVIEW_LENGTH = 250;
+const int MIDI_NOTE_ON = 0x90;
+const int MIDI_NOTE_OFF = 0x80;
+
+// Called to turn off notes currently being previewed,
+// either by a timer once the preview length is reached
+// or directly if interrupted by another preview.
+VOID CALLBACK previewDone(HWND hwnd, UINT msg, UINT event, DWORD time) {
+	if (event != previewDoneTimer)
+		return; // Cancelled.
+	// Send note off messages for the notes just previewed.
+	for (auto note = previewingNotes.cbegin(); note != previewingNotes.cend(); ++note)
+		StuffMIDIMessage(0, MIDI_NOTE_OFF | note->channel, note->pitch, note->velocity);
+	previewingNotes.clear();
+	previewDoneTimer = 0;
+}
+
+void previewNotes(const vector<MidiNote>& notes) {
+	if (previewDoneTimer) {
+		// Notes are currently being previewed. Interrupt them.
+		// We want to turn off these notes immediately.
+		KillTimer(NULL, previewDoneTimer);
+		previewDone(NULL, NULL, previewDoneTimer, 0);
+	}
+	// Send note on messages.
+	for (auto note = notes.cbegin(); note != notes.cend(); ++note)
+		StuffMIDIMessage(0, MIDI_NOTE_ON | note->channel, note->pitch, note->velocity);
+	previewingNotes = notes;
+	// Schedule note off messages.
+	previewDoneTimer = SetTimer(NULL, NULL, PREVIEW_LENGTH, previewDone);
+}
 
 void cmdMidiMoveCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
@@ -99,8 +139,9 @@ void cmdMidiMovePitchCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	MediaTrack* track = (MediaTrack*)GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
+	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
+	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
+	previewNotes({{chan, pitch, vel}});
 	outputMessage(getMidiNoteName(pitch));
 }
 
