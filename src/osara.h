@@ -155,6 +155,7 @@ typedef enum {
 const TimeFormat TF_RULER = TF_NONE;
 std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
+std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
 
 #ifdef _WIN32
 #include <string>

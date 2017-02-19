@@ -11,6 +11,7 @@ sources = [
 	"reaper_osara.cpp",
 	"paramsUi.cpp",
 	"peakWatcher.cpp",
+	"midiEditorCommands.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
