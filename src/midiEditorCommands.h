@@ -15,6 +15,7 @@ void cmdMidiMoveToNextNoteInChord(Command* command);
 void cmdMidiMoveToPreviousNoteInChord(Command* command);
 void cmdMidiMoveToNote(Command* command);
 void cmdMidiMovePitchCursor(Command* command);
+void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command);

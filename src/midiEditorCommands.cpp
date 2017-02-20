@@ -225,6 +225,21 @@ void cmdMidiMovePitchCursor(Command* command) {
 	outputMessage(getMidiNoteName(pitch));
 }
 
+void cmdMidiInsertNote(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = MIDI_CountEvts(take, NULL, NULL, NULL);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	if (MIDI_CountEvts(take, NULL, NULL, NULL) <= oldCount)
+		return; // Not inserted.
+	// Play the inserted note.
+	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
+	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
+	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
+	previewNotes({{chan, pitch, vel}});
+	outputMessage(formatCursorPosition());
+}
+
 void cmdMidiDeleteEvents(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);

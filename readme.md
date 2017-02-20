@@ -217,6 +217,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Increase pitch cursor one semitone
 - Edit: Decrease pitch cursor one semitone
 - Edit: Delete events
+- Edit: Insert note at edit cursor
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
