@@ -207,6 +207,19 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### View
 - View: Toggle master track visible
 
+#### MIDI Editor
+- View: Go to start of file
+- View: Go to end of file
+- Edit: Move edit cursor right by grid
+- Edit: Move edit cursor left by grid
+- Edit: Move edit cursor right one measure
+- Edit: Move edit cursor left one measure
+- Navigate: Select next note
+- Navigate: Select previous note
+- Edit: Increase pitch cursor one semitone
+- Edit: Decrease pitch cursor one semitone
+- Edit: Delete events
+
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track input, track area, item and ruler context menus.
@@ -389,19 +402,6 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous envelope point: alt+j
 - OSARA: Move to next envelope point (leaving other points selected): alt+shift+k
 - OSARA: Move to previous envelope point (leaving other points selected): alt+shift+j
-
-#### MIDI Editor
-- View: Go to start of file
-- View: Go to end of file
-- Edit: Move edit cursor right by grid
-- Edit: Move edit cursor left by grid
-- Edit: Move edit cursor right one measure
-- Edit: Move edit cursor left one measure
-- Navigate: Select next note
-- Navigate: Select previous note
-- Edit: Increase pitch cursor one semitone
-- Edit: Decrease pitch cursor one semitone
-- Edit: Delete events
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
