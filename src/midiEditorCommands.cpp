@@ -31,7 +31,7 @@ const int MIDI_NOTE_OFF = 0x80;
 // Called to turn off notes currently being previewed,
 // either by a timer once the preview length is reached
 // or directly if interrupted by another preview.
-VOID CALLBACK previewDone(HWND hwnd, UINT msg, UINT event, DWORD time) {
+void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	if (event != previewDoneTimer)
 		return; // Cancelled.
 	// Send note off messages for the notes just previewed.
