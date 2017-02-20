@@ -24,7 +24,7 @@ typedef struct {
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
-const int PREVIEW_LENGTH = 250;
+const int PREVIEW_LENGTH = 300;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
@@ -91,48 +91,128 @@ const string getMidiNoteName(int pitch) {
 	return s.str();
 }
 
-void cmdMidiMoveToNote(Command* command) {
-	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+// Returns the indexes of the first and last notes in a chord in a given direction.
+pair<int, int> findChord(MediaItem_Take* take, int direction) {
+	int count;
+	MIDI_CountEvts(take, &count, NULL, NULL);
 	double now = GetCursorPosition();
-
-	bool selAtCur = false;
-	int note = -1;
-	double start;
-	while ((note = MIDI_EnumSelNotes(take, note)) != -1) {
-		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, NULL, NULL, NULL);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		if (start == now) {
-			selAtCur = true;
+	// Find the first note of the chord.
+	int firstNote = direction == -1 ? count - 1 : 0;
+	int movement = direction == 0 ? 1 : direction;
+	bool found = false;
+	int nowNote = -1;
+	double firstStart;
+	for (; 0 <= firstNote && firstNote < count; firstNote += movement) {
+		MIDI_GetNote(take, firstNote, NULL, NULL, &firstStart, NULL, NULL, NULL, NULL);
+		firstStart = MIDI_GetProjTimeFromPPQPos(take, firstStart);
+		if (firstStart == now)
+			nowNote = firstNote;
+		if ((direction == 0 && firstStart == now)
+			|| (direction == 1 && firstStart > now)
+			|| (direction == -1 && firstStart < now)
+		) {
+			found = true;
 			break;
 		}
 	}
-
-	if (!selAtCur) {
-		// There are selected notes which aren't at the cursor.
-		// In this case, these actions move relative to these selected notes,
-		// but we want to move relative to the edit cursor.
-		// Clear the selection to make these actions use the edit cursor.
-		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
-		// Move back a tiny bit so notes right at our start position are always treated as next.
-		// SetEditCurPos isn't respected here for some reason.
-		MIDIEditor_OnCommand(editor, 40185); // Edit: Move edit cursor left one pixel
+	if (!found) {
+		if (nowNote != -1) {
+			// No chord in the requested direction, so use the chord at the cursor.
+			firstNote = nowNote;
+			firstStart = now;
+			// Reverse the direction to find the remaining notes in the chord.
+			movement = direction == 1 ? -1 : 1;
+		} else
+			return {-1, -1};
 	}
+	// Find the last note of the chord.
+	int lastNote = firstNote;
+	for (int note = lastNote + movement; 0 <= note && note < count; note += movement) {
+		double start;
+		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, NULL, NULL, NULL);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		if (start != firstStart)
+			break;
+		lastNote = note;
+	}
+	return {min(firstNote, lastNote), max(lastNote, firstNote)};
+}
 
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	note = MIDI_EnumSelNotes(take, -1);
-	if (note == -1) {
-		// We might have moved the edit cursor.
-		SetEditCurPos(now, true, false);
+// Keeps track of the note to which the user last moved in a chord.
+int currentNote = -1;
+
+const bool bTrue = true;
+void moveToChord(int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	auto chord = findChord(take, direction);
+	if (chord.first == -1)
 		return;
+	currentNote = -1;
+	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+	// Move the edit cursor to this chord, select it and play it.
+	bool cursorSet = false;
+	vector<MidiNote> notes;
+	for (int note = chord.first; note <= chord.second; ++note) {
+		double start = 0;
+		int chan, pitch, vel;
+		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, &chan, &pitch, &vel);
+		if (!cursorSet && direction != 0) {
+			start = MIDI_GetProjTimeFromPPQPos(take, start);
+			SetEditCurPos(start, true, false);
+			cursorSet = true;
+		}
+		// Select this note.
+		MIDI_SetNote(take, note, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		notes.push_back({chan, pitch, vel});
 	}
-	int pitch;
-	MIDI_GetNote(take, note, NULL, NULL, &start, NULL, NULL, &pitch, NULL);
-	start = MIDI_GetProjTimeFromPPQPos(take, start);
-	SetEditCurPos(start, false, false);
+	previewNotes(notes);
 	ostringstream s;
-	s << getMidiNoteName(pitch) << " " << formatCursorPosition();
+	s << formatCursorPosition() << " ";
+	int count = chord.second - chord.first + 1;
+	s << count << (count == 1 ? " note" : " notes");
 	outputMessage(s);
+}
+
+void cmdMidiMoveToNextChord(Command* command) {
+	moveToChord(1);
+}
+
+void cmdMidiMoveToPreviousChord(Command* command) {
+	moveToChord(-1);
+}
+
+void moveToNoteInChord(int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	auto chord = findChord(take, 0);
+	if (chord.first == -1)
+		return;
+	if (chord.first <= currentNote && currentNote <= chord.second) {
+		// Already on a note within the chord. Move to the next/previous note.
+		currentNote += direction;
+		// If we were already on the first/last note, stay there.
+		if (currentNote < chord.first || currentNote > chord.second)
+			currentNote -= direction;
+	} else {
+		// We're moving into a new chord. Move to the first/last note.
+		currentNote = direction == 1 ? chord.first : chord.second;
+	}
+	// Select this note.
+	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+	MIDI_SetNote(take, currentNote, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	int chan, pitch, vel;
+	MIDI_GetNote(take, currentNote, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
+	previewNotes({{chan, pitch, vel}});
+	outputMessage(getMidiNoteName(pitch));
+}
+
+void cmdMidiMoveToNextNoteInChord(Command* command) {
+	moveToNoteInChord(1);
+}
+
+void cmdMidiMoveToPreviousNoteInChord(Command* command) {
+	moveToNoteInChord(-1);
 }
 
 void cmdMidiMovePitchCursor(Command* command) {

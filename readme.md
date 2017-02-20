@@ -214,8 +214,6 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Move edit cursor left by grid
 - Edit: Move edit cursor right one measure
 - Edit: Move edit cursor left one measure
-- Navigate: Select next note
-- Navigate: Select previous note
 - Edit: Increase pitch cursor one semitone
 - Edit: Decrease pitch cursor one semitone
 - Edit: Delete events
@@ -365,6 +363,20 @@ To do this:
 ### Accessing FX Plug-in Windows
 Some FX plug-ins can be controlled with keyboard commands, but you can't reach them by tabbing through the FX Chain dialog.
 In these cases, you can press f6 to have OSARA attempt to focus the plug-in window.
+
+### Notes and Chords in the MIDI Editor
+In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.
+
+You move between chords using the left and right arrow keys (OSARA: Move to previous chord, OSARA: Move to next chord).
+When you move to a chord, the edit cursor will be placed at the chord and the new position will be reported.
+The notes of the chord will be played and the number of notes will be reported.
+The notes in the chord are also selected so you can manipulate the entire chord.
+For example, pressing delete will delete the chord.
+
+Once you have moved to a chord, you can move to individual notes using the up and down arrow keys (OSARA: Move to previous note in chord, OSARA: Move to next note in chord).
+When you move to a note, that note will be played and its name will be reported.
+The single note will also be selected so you can manipulate just that note.
+For example, pressing delete will delete only that note.
 
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
