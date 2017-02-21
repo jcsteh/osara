@@ -114,6 +114,8 @@
 #define REAPERAPI_WANT_CountTakes
 #define REAPERAPI_WANT_SetEnvelopePoint
 #define REAPERAPI_WANT_StuffMIDIMessage
+#define REAPERAPI_WANT_PlayTrackPreview
+#define REAPERAPI_WANT_StopTrackPreview
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

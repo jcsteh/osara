@@ -24,34 +24,153 @@ typedef struct {
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
-const int PREVIEW_LENGTH = 300;
+const UINT PREVIEW_LENGTH = 300;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
-// Called to turn off notes currently being previewed,
-// either by a timer once the preview length is reached
-// or directly if interrupted by another preview.
+// A minimal PCM_source to send MIDI events for preview.
+class PreviewSource : public PCM_source {
+	public:
+	
+	PreviewSource() {
+	}
+
+	virtual ~PreviewSource() {
+	}
+
+	// The events to send.
+	// These will be consumed (and the vector cleared) soon after PlayTrackPreview is called.
+	vector<MIDI_event_t> events;
+
+	bool SetFileName(const char* fn) {
+		return false;
+	}
+
+	PCM_source* Duplicate() {
+		return new PreviewSource();
+	}
+
+	bool IsAvailable() {
+		return true;
+	}
+
+	const char* GetType() {
+		return "OsaraMIDIPreview";
+	};
+
+	int GetNumChannels() {
+		return 1;
+	}
+
+	double GetSampleRate() {
+		return 0.0;
+	}
+
+	double GetLength() {
+		// This only needs to be long enough to send MIDI events immediately.
+		// Once we send note on events, the notes stay on, even though the preview stops.
+		// We then play another preview with more events to turn the notes off.
+		return 0.001;
+	}
+
+	int PropertiesWindow(HWND parent) {
+		return -1;
+	}
+
+	void GetSamples(PCM_source_transfer_t* block) {
+		block->samples_out=0;
+		if (block->midi_events) {
+			for (auto event = this->events.begin(); event != this->events.end(); ++event)
+				block->midi_events->AddItem(&*event);
+			this->events.clear();
+		}
+	}
+
+	void GetPeakInfo(PCM_source_peaktransfer_t* block) {
+		block->peaks_out=0;
+	}
+
+	void SaveState(ProjectStateContext* ctx) {
+	}
+
+	int LoadState(char* firstLine, ProjectStateContext* ctx) {
+		return -1;
+	}
+
+	void Peaks_Clear(bool deleteFile) {
+	}
+
+	int PeaksBuild_Begin() {
+		return 0;
+	}
+
+	int PeaksBuild_Run() {
+		return 0;
+	}
+
+	void PeaksBuild_Finish() {
+	}
+
+};
+
+PreviewSource previewSource;
+preview_register_t previewReg = {0};
+
+// Queue note off events for the notes currently being previewed.
+// This function doesn't begin sending the events.
+void previewNotesOff() {
+	for (auto note = previewingNotes.cbegin(); note != previewingNotes.cend(); ++note) {
+		MIDI_event_t event = {0, 3, {
+			(unsigned char)(MIDI_NOTE_OFF | note->channel),
+			(unsigned char)note->pitch, (unsigned char)note->velocity}};
+		previewSource.events.push_back(event);
+	}
+}
+
+// Called after the preview length elapses to turn off notes currently being previewed.
 void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	if (event != previewDoneTimer)
 		return; // Cancelled.
-	// Send note off messages for the notes just previewed.
-	for (auto note = previewingNotes.cbegin(); note != previewingNotes.cend(); ++note)
-		StuffMIDIMessage(0, MIDI_NOTE_OFF | note->channel, note->pitch, note->velocity);
+	previewNotesOff();
 	previewingNotes.clear();
+	// Send the events.
+	previewReg.curpos = 0.0;
+	PlayTrackPreview(&previewReg);
 	previewDoneTimer = 0;
 }
 
-void previewNotes(const vector<MidiNote>& notes) {
+void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
+	if (!previewReg.src) {
+		// Initialise preview.
+#ifdef _WIN32
+		InitializeCriticalSection(&previewReg.cs);
+#else
+		pthread_mutex_init(&previewReg.mutex, NULL);
+#endif
+		previewReg.src = &previewSource;
+		previewReg.m_out_chan = -1;
+	}
 	if (previewDoneTimer) {
 		// Notes are currently being previewed. Interrupt them.
 		// We want to turn off these notes immediately.
 		KillTimer(NULL, previewDoneTimer);
-		previewDone(NULL, NULL, previewDoneTimer, 0);
+		previewDoneTimer = 0;
+		previewNotesOff();
 	}
-	// Send note on messages.
-	for (auto note = notes.cbegin(); note != notes.cend(); ++note)
-		StuffMIDIMessage(0, MIDI_NOTE_ON | note->channel, note->pitch, note->velocity);
+	// Queue note on events for the new notes.
+	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
+		MIDI_event_t event = {50000, 3, {
+			(unsigned char)(MIDI_NOTE_ON | note->channel),
+			(unsigned char)note->pitch, (unsigned char)note->velocity}};
+		previewSource.events.push_back(event);
+	}
+	// Save the notes being previewed so we can turn them off later (previewNotesOff).
 	previewingNotes = notes;
+	// Send the events.
+	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
+	previewReg.preview_track = track;
+	previewReg.curpos = 0.0;
+	PlayTrackPreview(&previewReg);
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(NULL, NULL, PREVIEW_LENGTH, previewDone);
 }
@@ -166,7 +285,7 @@ void moveToChord(int direction) {
 		MIDI_SetNote(take, note, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 		notes.push_back({chan, pitch, vel});
 	}
-	previewNotes(notes);
+	previewNotes(take, notes);
 	ostringstream s;
 	s << formatCursorPosition() << " ";
 	int count = chord.second - chord.first + 1;
@@ -203,7 +322,7 @@ void moveToNoteInChord(int direction) {
 	MIDI_SetNote(take, currentNote, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	int chan, pitch, vel;
 	MIDI_GetNote(take, currentNote, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
-	previewNotes({{chan, pitch, vel}});
+	previewNotes(take, {{chan, pitch, vel}});
 	outputMessage(getMidiNoteName(pitch));
 }
 
@@ -217,11 +336,12 @@ void cmdMidiMoveToPreviousNoteInChord(Command* command) {
 
 void cmdMidiMovePitchCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes({{chan, pitch, vel}});
+	previewNotes(take, {{chan, pitch, vel}});
 	outputMessage(getMidiNoteName(pitch));
 }
 
@@ -236,7 +356,7 @@ void cmdMidiInsertNote(Command* command) {
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes({{chan, pitch, vel}});
+	previewNotes(take, {{chan, pitch, vel}});
 	outputMessage(formatCursorPosition());
 }
 
