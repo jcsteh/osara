@@ -181,7 +181,7 @@ void cmdMidiMoveCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	ostringstream s;
-	s << formatCursorPosition();
+	s << formatCursorPosition(TF_MEASURE);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int notes;
 	MIDI_CountEvts(take, &notes, NULL, NULL);
@@ -292,7 +292,7 @@ void moveToChord(int direction) {
 	}
 	previewNotes(take, notes);
 	ostringstream s;
-	s << formatCursorPosition() << " ";
+	s << formatCursorPosition(TF_MEASURE) << " ";
 	int count = chord.second - chord.first + 1;
 	s << count << (count == 1 ? " note" : " notes");
 	outputMessage(s);
@@ -385,7 +385,7 @@ void cmdMidiInsertNote(Command* command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
-	outputMessage(formatCursorPosition());
+	outputMessage(formatCursorPosition(TF_MEASURE));
 }
 
 void cmdMidiDeleteEvents(Command* command) {
