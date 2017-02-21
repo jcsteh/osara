@@ -150,7 +150,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		pthread_mutex_init(&previewReg.mutex, NULL);
 #endif
 		previewReg.src = &previewSource;
-		previewReg.m_out_chan = -1;
+		previewReg.m_out_chan = -1; // Use .preview_track.
 	}
 	if (previewDoneTimer) {
 		// Notes are currently being previewed. Interrupt them.
@@ -161,7 +161,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	}
 	// Queue note on events for the new notes.
 	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
-		MIDI_event_t event = {50000, 3, {
+		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_ON | note->channel),
 			(unsigned char)note->pitch, (unsigned char)note->velocity}};
 		previewSource.events.push_back(event);
