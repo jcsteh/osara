@@ -343,7 +343,15 @@ void moveToNoteInChord(int direction) {
 	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 	MIDI_SetNote(take, note.index, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	previewNotes(take, {note});
-	outputMessage(getMidiNoteName(note.pitch));
+	ostringstream s;
+	s << getMidiNoteName(note.pitch);
+	double start, end;
+	MIDI_GetNote(take, note.index, NULL, NULL, &start, &end, NULL, NULL, NULL);
+	start = MIDI_GetProjTimeFromPPQPos(take, start);
+	end = MIDI_GetProjTimeFromPPQPos(take, end);
+	double length = end - start;
+	s << ", " << formatTime(length, TF_MEASURE, true, false, false);
+	outputMessage(s);
 }
 
 void cmdMidiMoveToNextNoteInChord(Command* command) {

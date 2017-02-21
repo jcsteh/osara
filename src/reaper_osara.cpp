@@ -116,7 +116,7 @@ void outputMessage(ostringstream& message) {
 	outputMessage(message.str());
 }
 
-string formatTime(double time, TimeFormat format, bool isLength, bool useCache) {
+string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
 	ostringstream s;
 	if (format == TF_RULER) {
 		if (GetToggleCommandState(40365))
@@ -143,21 +143,24 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache) 
 			}
 			int beatPercent = (int)(beat * 100) % 100;
 			if (!useCache || measure != oldMeasure) {
-				if (isLength)
-					s << measure << (measure == 1 ? " bar " : " bars ");
-				else
+				if (isLength) {
+					if (includeZeros || measure != 0)
+						s << measure << (measure == 1 ? " bar " : " bars ");
+				} else
 					s << "bar " << measure << " ";
 				oldMeasure = measure;
 			}
 			if (!useCache || wholeBeat != oldBeat) {
-				if (isLength)
-					s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
-				else
+				if (isLength) {
+					if (includeZeros || wholeBeat != 0)
+						s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
+				} else
 					s << "beat " << wholeBeat << " ";
 				oldBeat = wholeBeat;
 			}
 			if (!useCache || beatPercent != oldBeatPercent) {
-				s << beatPercent << "%";
+				if (includeZeros || beatPercent != 0)
+					s << beatPercent << "%";
 				oldBeatPercent = beatPercent;
 			}
 			break;
