@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include "osara.h"
 #ifdef _WIN32
 #include <Commctrl.h>
@@ -21,6 +22,7 @@ typedef struct {
 	int channel;
 	int pitch;
 	int velocity;
+	int index;
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
@@ -258,7 +260,10 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 }
 
 // Keeps track of the note to which the user last moved in a chord.
-int currentNote = -1;
+// This is the number of the note in the chord; e.g. 0 is the first note.
+// It is not a REAPER note index!
+// -1 means not in a chord.
+int curNoteInChord = -1;
 
 const bool bTrue = true;
 void moveToChord(int direction) {
@@ -267,7 +272,7 @@ void moveToChord(int direction) {
 	auto chord = findChord(take, direction);
 	if (chord.first == -1)
 		return;
-	currentNote = -1;
+	curNoteInChord = -1;
 	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
@@ -301,29 +306,44 @@ void cmdMidiMoveToPreviousChord(Command* command) {
 	moveToChord(-1);
 }
 
+// Used to order notes in a chord by pitch.
+bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
+	return note1.pitch < note2.pitch;
+}
+
 void moveToNoteInChord(int direction) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, 0);
 	if (chord.first == -1)
 		return;
-	if (chord.first <= currentNote && currentNote <= chord.second) {
+	// Notes at the same position are ordered arbitrarily.
+	// This is not intuitive, so sort them.
+	vector<MidiNote> notes;
+	for (int note = chord.first; note <= chord.second; ++note) {
+		int chan, pitch, vel;
+		MIDI_GetNote(take, note, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
+		notes.push_back({chan, pitch, vel, note});
+	}
+	sort(notes.begin(), notes.end(), compareNotes);
+	const int lastNoteIndex = notes.size() - 1;
+	// Work out which note to move to.
+	if (0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
 		// Already on a note within the chord. Move to the next/previous note.
-		currentNote += direction;
+		curNoteInChord += direction;
 		// If we were already on the first/last note, stay there.
-		if (currentNote < chord.first || currentNote > chord.second)
-			currentNote -= direction;
+		if (curNoteInChord < 0 || curNoteInChord > lastNoteIndex)
+			curNoteInChord -= direction;
 	} else {
 		// We're moving into a new chord. Move to the first/last note.
-		currentNote = direction == 1 ? chord.first : chord.second;
+		curNoteInChord = direction == 1 ? 0 : lastNoteIndex;
 	}
+	MidiNote& note = notes[curNoteInChord];
 	// Select this note.
 	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
-	MIDI_SetNote(take, currentNote, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-	int chan, pitch, vel;
-	MIDI_GetNote(take, currentNote, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
-	previewNotes(take, {{chan, pitch, vel}});
-	outputMessage(getMidiNoteName(pitch));
+	MIDI_SetNote(take, note.index, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	previewNotes(take, {note});
+	outputMessage(getMidiNoteName(note.pitch));
 }
 
 void cmdMidiMoveToNextNoteInChord(Command* command) {
