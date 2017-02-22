@@ -2136,8 +2136,12 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord and add to selection"}, "OSARA_NEXTCHORDKEEPSEL", cmdMidiMoveToNextChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord and add to selection"}, "OSARA_PREVCHORDKEEPSEL", cmdMidiMoveToPreviousChordKeepSel},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord"}, "OSARA_NEXTNOTE", cmdMidiMoveToNextNoteInChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord"}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord and add to selection"}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord and add to selection"}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif

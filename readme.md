@@ -379,6 +379,11 @@ When you move to a note, that note will be played and its name will be reported.
 The single note will also be selected so you can manipulate just that note.
 For example, pressing delete will delete only that note.
 
+You can select multiple chords or multiple notes in a chord.
+To do this, first move to the first chord or note you want to select.
+Then, use shift plus the arrow keys to add the next or previous chord or note to the selection.
+For example, if you've moved to a chord and also want to add the next chord to the selection, you would press shift+rightArrow.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog by pressing control+alt+shift+p (OSARA: Configuration).

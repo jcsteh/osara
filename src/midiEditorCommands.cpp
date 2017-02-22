@@ -266,14 +266,15 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 int curNoteInChord = -1;
 
 const bool bTrue = true;
-void moveToChord(int direction) {
+void moveToChord(int direction, bool clearSelection=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, direction);
 	if (chord.first == -1)
 		return;
 	curNoteInChord = -1;
-	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+	if (clearSelection)
+		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
 	vector<MidiNote> notes;
@@ -306,12 +307,20 @@ void cmdMidiMoveToPreviousChord(Command* command) {
 	moveToChord(-1);
 }
 
+void cmdMidiMoveToNextChordKeepSel(Command* command) {
+	moveToChord(1, false);
+}
+
+void cmdMidiMoveToPreviousChordKeepSel(Command* command) {
+	moveToChord(-1, false);
+}
+
 // Used to order notes in a chord by pitch.
 bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
 	return note1.pitch < note2.pitch;
 }
 
-void moveToNoteInChord(int direction) {
+void moveToNoteInChord(int direction, bool clearSelection=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, 0);
@@ -340,7 +349,8 @@ void moveToNoteInChord(int direction) {
 	}
 	MidiNote& note = notes[curNoteInChord];
 	// Select this note.
-	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+	if (clearSelection)
+		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 	MIDI_SetNote(take, note.index, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 	previewNotes(take, {note});
 	ostringstream s;
@@ -360,6 +370,14 @@ void cmdMidiMoveToNextNoteInChord(Command* command) {
 
 void cmdMidiMoveToPreviousNoteInChord(Command* command) {
 	moveToNoteInChord(-1);
+}
+
+void cmdMidiMoveToNextNoteInChordKeepSel(Command* command) {
+	moveToNoteInChord(1, false);
+}
+
+void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
+	moveToNoteInChord(-1, false);
 }
 
 void cmdMidiMovePitchCursor(Command* command) {

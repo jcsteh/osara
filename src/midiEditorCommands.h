@@ -11,9 +11,12 @@
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiMoveToNextChord(Command* command);
 void cmdMidiMoveToPreviousChord(Command* command);
+void cmdMidiMoveToNextChordKeepSel(Command* command);
+void cmdMidiMoveToPreviousChordKeepSel(Command* command);
 void cmdMidiMoveToNextNoteInChord(Command* command);
 void cmdMidiMoveToPreviousNoteInChord(Command* command);
-void cmdMidiMoveToNote(Command* command);
+void cmdMidiMoveToNextNoteInChordKeepSel(Command* command);
+void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command);
 void cmdMidiMovePitchCursor(Command* command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
