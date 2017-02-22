@@ -792,6 +792,9 @@ void postSelectMultipleItems(int command) {
 	ostringstream s;
 	s << count << (count == 1 ? " item" : " items") << " selected";
 	outputMessage(s);
+	// Items have just been selected, so the user almost certainly wants to operate on items.
+	fakeFocus = FOCUS_ITEM;
+	SetCursorContext(1, NULL);
 }
 
 void postMoveEnvelopePoint(int command) {
@@ -921,6 +924,7 @@ PostCommand POST_COMMANDS[] = {
 	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
+	{40717, postSelectMultipleItems}, // Item: Select all items in current time selection
 	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track

@@ -129,6 +129,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Select all items in track
 - Item: Select all items on selected tracks in current time selection
 - Item grouping: Select all items in groups
+- Item: Select all items in current time selection
 - Item properties: Toggle mute
 
 #### Takes
