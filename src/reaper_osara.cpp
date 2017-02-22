@@ -54,7 +54,7 @@ int oldSecond;
 int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
-bool isSelectionContiguous = true;
+static bool isSelectionContiguous = true;
 
 /*** Utilities */
 
@@ -2134,6 +2134,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord and add to selection"}, "OSARA_NEXTCHORDKEEPSEL", cmdMidiMoveToNextChordKeepSel},

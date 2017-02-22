@@ -9,6 +9,7 @@
 #include "osara.h"
 
 void cmdMidiMoveCursor(Command* command);
+void cmdMidiToggleSelection(Command* command);
 void cmdMidiMoveToNextChord(Command* command);
 void cmdMidiMoveToPreviousChord(Command* command);
 void cmdMidiMoveToNextChordKeepSel(Command* command);

@@ -265,16 +265,91 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 // -1 means not in a chord.
 int curNoteInChord = -1;
 
-const bool bTrue = true;
-void moveToChord(int direction, bool clearSelection=true) {
+// Used to order notes in a chord by pitch.
+bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
+	return note1.pitch < note2.pitch;
+}
+
+// Finds a single note in the chord at the cursor in a given direction and returns its info.
+// This updates curNoteInChord.
+MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
+	auto chord = findChord(take, 0);
+	if (chord.first == -1)
+		return {-1};
+	// Notes at the same position are ordered arbitrarily.
+	// This is not intuitive, so sort them.
+	vector<MidiNote> notes;
+	for (int note = chord.first; note <= chord.second; ++note) {
+		int chan, pitch, vel;
+		MIDI_GetNote(take, note, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
+		notes.push_back({chan, pitch, vel, note});
+	}
+	sort(notes.begin(), notes.end(), compareNotes);
+	const int lastNoteIndex = notes.size() - 1;
+	// Work out which note to move to.
+	if (direction != 0 && 0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
+		// Already on a note within the chord. Move to the next/previous note.
+		curNoteInChord += direction;
+		// If we were already on the first/last note, stay there.
+		if (curNoteInChord < 0 || curNoteInChord > lastNoteIndex)
+			curNoteInChord -= direction;
+	} else if (direction != 0) {
+		// We're moving into a new chord. Move to the first/last note.
+		curNoteInChord = direction == 1 ? 0 : lastNoteIndex;
+	}
+	return notes[curNoteInChord];
+}
+
+void selectNote(MediaItem_Take* take, const int note, bool select=true) {
+	MIDI_SetNote(take, note, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+}
+
+bool isNoteSelected(MediaItem_Take* take, const int note) {
+	bool sel;
+	MIDI_GetNote(take, note, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	return sel;
+}
+
+static bool isSelectionContiguous = true;
+void cmdMidiToggleSelection(Command* command) {
+	if (isSelectionContiguous) {
+		isSelectionContiguous = false;
+		outputMessage("noncontiguous selection");
+		return;
+	}
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	bool select;
+	if (curNoteInChord != -1) {
+		// Note in chord.
+		MidiNote note = findNoteInChord(take, 0);
+		if (note.channel == -1)
+			return;
+		select = !isNoteSelected(take, note.index);
+		selectNote(take, note.index, select);
+	} else {
+		// Chord.
+		auto chord = findChord(take, 0);
+		if (chord.first == -1)
+			return;
+		select = !isNoteSelected(take, chord.first);
+		for (int note = chord.first; note <= chord.second; ++note)
+			selectNote(take, note, select);
+	}
+	outputMessage(select ? "selected" : "unselected");
+}
+
+void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, direction);
 	if (chord.first == -1)
 		return;
 	curNoteInChord = -1;
-	if (clearSelection)
+	if (clearSelection) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+		isSelectionContiguous = true;
+	}
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
 	vector<MidiNote> notes;
@@ -287,13 +362,15 @@ void moveToChord(int direction, bool clearSelection=true) {
 			SetEditCurPos(start, true, false);
 			cursorSet = true;
 		}
-		// Select this note.
-		MIDI_SetNote(take, note, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		if (select)
+			selectNote(take, note);
 		notes.push_back({chan, pitch, vel});
 	}
 	previewNotes(take, notes);
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
+	if (!select && !isNoteSelected(take, chord.first))
+		s << "unselected" << " ";
 	int count = chord.second - chord.first + 1;
 	s << count << (count == 1 ? " note" : " notes");
 	outputMessage(s);
@@ -308,59 +385,38 @@ void cmdMidiMoveToPreviousChord(Command* command) {
 }
 
 void cmdMidiMoveToNextChordKeepSel(Command* command) {
-	moveToChord(1, false);
+	moveToChord(1, false, isSelectionContiguous);
 }
 
 void cmdMidiMoveToPreviousChordKeepSel(Command* command) {
-	moveToChord(-1, false);
+	moveToChord(-1, false, isSelectionContiguous);
 }
 
-// Used to order notes in a chord by pitch.
-bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
-	return note1.pitch < note2.pitch;
-}
-
-void moveToNoteInChord(int direction, bool clearSelection=true) {
+void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	auto chord = findChord(take, 0);
-	if (chord.first == -1)
+	MidiNote note = findNoteInChord(take, direction);
+	if (note.channel == -1)
 		return;
-	// Notes at the same position are ordered arbitrarily.
-	// This is not intuitive, so sort them.
-	vector<MidiNote> notes;
-	for (int note = chord.first; note <= chord.second; ++note) {
-		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
-		notes.push_back({chan, pitch, vel, note});
-	}
-	sort(notes.begin(), notes.end(), compareNotes);
-	const int lastNoteIndex = notes.size() - 1;
-	// Work out which note to move to.
-	if (0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
-		// Already on a note within the chord. Move to the next/previous note.
-		curNoteInChord += direction;
-		// If we were already on the first/last note, stay there.
-		if (curNoteInChord < 0 || curNoteInChord > lastNoteIndex)
-			curNoteInChord -= direction;
-	} else {
-		// We're moving into a new chord. Move to the first/last note.
-		curNoteInChord = direction == 1 ? 0 : lastNoteIndex;
-	}
-	MidiNote& note = notes[curNoteInChord];
-	// Select this note.
-	if (clearSelection)
+	if (clearSelection) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
-	MIDI_SetNote(take, note.index, &bTrue, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		isSelectionContiguous = true;
+	}
+	if (select)
+		selectNote(take, note.index);
 	previewNotes(take, {note});
 	ostringstream s;
 	s << getMidiNoteName(note.pitch);
+	if (!select && !isNoteSelected(take, note.index))
+		s << " unselected ";
+	else
+		s << ", ";
 	double start, end;
 	MIDI_GetNote(take, note.index, NULL, NULL, &start, &end, NULL, NULL, NULL);
 	start = MIDI_GetProjTimeFromPPQPos(take, start);
 	end = MIDI_GetProjTimeFromPPQPos(take, end);
 	double length = end - start;
-	s << ", " << formatTime(length, TF_MEASURE, true, false, false);
+	s << formatTime(length, TF_MEASURE, true, false, false);
 	outputMessage(s);
 }
 
@@ -373,11 +429,11 @@ void cmdMidiMoveToPreviousNoteInChord(Command* command) {
 }
 
 void cmdMidiMoveToNextNoteInChordKeepSel(Command* command) {
-	moveToNoteInChord(1, false);
+	moveToNoteInChord(1, false, isSelectionContiguous);
 }
 
 void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
-	moveToNoteInChord(-1, false);
+	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
 void cmdMidiMovePitchCursor(Command* command) {

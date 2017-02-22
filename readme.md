@@ -387,6 +387,10 @@ To do this, first move to the first chord or note you want to select.
 Then, use shift plus the arrow keys to add the next or previous chord or note to the selection.
 For example, if you've moved to a chord and also want to add the next chord to the selection, you would press shift+rightArrow.
 
+Noncontiguous selection is also possible.
+You do this in the same way described above for tracks and items.
+That is, press shift+space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to switch to noncontiguous selection, move to other chords/notes with shift plus the arrow keys and press shift+space to select/unselect the current chord/note.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog by pressing control+alt+shift+p (OSARA: Configuration).
