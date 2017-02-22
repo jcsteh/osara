@@ -325,7 +325,7 @@ While shortcut help is enabled, pressing any shortcut will report the action ass
 
 ### Noncontiguous Selection
 Usually, selection is done contiguously; e.g. you might select tracks 1 through 4.
-Sometimes, it is desirable to select noncontiguously; e.g. you might want too select tracks 1, 3 and 5.
+Sometimes, it is desirable to select noncontiguously; e.g. you might want to select tracks 1, 3 and 5.
 
 You can do this as follows:
 
