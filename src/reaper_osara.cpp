@@ -2046,6 +2046,24 @@ void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
 	moveToEnvelopePoint(-1, false);
 }
 
+void moveToTransient(int moveCommand) {
+	int selCmd = NamedCommandLookup("_XENAKIOS_SELITEMSUNDEDCURSELTX");
+	if (selCmd)
+		Main_OnCommand(selCmd, 0); // Xenakios/SWS: Select items under edit cursor on selected tracks
+	Main_OnCommand(moveCommand, 0);
+	double cursor = GetCursorPosition();
+	if (GetPlayPosition() != cursor)
+		SetEditCurPos(cursor, true, true); // Seek playback.
+}
+
+void cmdMoveToNextTransient(Command* command) {
+	moveToTransient(40375); // Item navigation: Move cursor to next transient in items
+}
+
+void cmdMoveToPreviousTransient(Command* command) {
+	moveToTransient(40376); // Item navigation: Move cursor to previous transient in items
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2138,6 +2156,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point"}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next transient"}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous transient"}, "OSARA_PREVTRANSIENT", cmdMoveToPreviousTransient},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
@@ -2208,7 +2228,11 @@ void cmdConfig(Command* command) {
 
 /*** Initialisation, termination and inner workings. */
 
+bool isHandlingCommand = false;
+
 void postCommand(int command, int flag) {
+	if (isHandlingCommand)
+		return; // Don't react to actions we triggered ourselves.
 	const auto it = postCommandsMap.find(command);
 	if (it != postCommandsMap.end()) {
 		it->second(command);
@@ -2219,7 +2243,6 @@ void postCommand(int command, int flag) {
 		outputMessage(mIt->second);
 }
 
-bool isHandlingCommand = false;
 Command* lastCommand = NULL;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;

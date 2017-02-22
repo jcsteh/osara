@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@nvaccess.org&gt; & other contributors
-- Copyright: 2014-2016 NV Access Limited
+- Copyright: 2014-2017 NV Access Limited
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -429,6 +429,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous envelope point: alt+j
 - OSARA: Move to next envelope point (leaving other points selected): alt+shift+k
 - OSARA: Move to previous envelope point (leaving other points selected): alt+shift+j
+- OSARA: Move to next transient: tab
+- OSARA: Move to previous transient: shift+tab
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
