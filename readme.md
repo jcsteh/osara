@@ -21,6 +21,7 @@ Features:
 - Facility to adjust of automatable FX parameters
 - Ability to watch and report track peak meters
 - Noncontiguous selection of tracks/items
+- Navigation and selection of chords and notes in the MIDI Editor
 
 ## Requirements
 OSARA requires REAPER 5.16 or later.
@@ -367,6 +368,8 @@ In these cases, you can press f6 to have OSARA attempt to focus the plug-in wind
 
 ### Notes and Chords in the MIDI Editor
 In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.
+In this context, a chord is any number of notes that are placed at the exact same position.
+If there is only one note at a given position, it will be treated as a chord.
 
 You move between chords using the left and right arrow keys (OSARA: Move to previous chord, OSARA: Move to next chord).
 When you move to a chord, the edit cursor will be placed at the chord and the new position will be reported.
