@@ -2050,20 +2050,27 @@ void moveToTransient(bool previous) {
 	int selCmd = NamedCommandLookup("_XENAKIOS_SELITEMSUNDEDCURSELTX");
 	if (selCmd)
 		Main_OnCommand(selCmd, 0); // Xenakios/SWS: Select items under edit cursor on selected tracks
-	if (GetPlayState() & 1 && (!previous || lastCommandRepeatCount == 0)) {
-		// We're playing, so we want to find a transient relative to the play position.
-		// Therefore, first move the edit cursor to the play position.
-		// However, don't do this if the user is trying to move back more than one.
-		// Otherwise, the cursor will keep moving and they'll just get stuck on the same transient.
-		SetEditCurPos(GetPlayPosition(), false, false);
+	bool wasPlaying = GetPlayState() & 1;
+	if (wasPlaying) {
+		// Moving to transients can be slow, so pause/stop playback so it doesn't drift
+		// and potentially cause repeats.
+		if (previous && lastCommandRepeatCount > 0) {
+			// The user is moving back more than one, so just stop playback;
+			// we don't want the edit cursor to be routed to the play position first.
+			// Otherwise, the user would just keep hitting the same transient.
+			OnStopButton();
+		} else {
+			// Pause playback so the edit cursor will be routed to the play position.
+			// This means we find the transient relative to the play position.
+			OnPauseButton();
+		}
 	}
 	if (previous)
 		Main_OnCommand(40376, 0); // Item navigation: Move cursor to previous transient in items
 	else
 		Main_OnCommand(40375, 0); // Item navigation: Move cursor to next transient in items
-	double cursor = GetCursorPosition();
-	if (GetPlayPosition() != cursor)
-		SetEditCurPos(cursor, true, true); // Seek playback.
+	if (wasPlaying)
+		OnPlayButton();
 }
 
 void cmdMoveToNextTransient(Command* command) {
