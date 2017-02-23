@@ -175,6 +175,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - (SWS extension) SWS/FNG: Move selected envelope points down
 - Envelope: Delete all selected points
 - Envelope: Delete all points in time selection
+- Envelope: Insert new point at current position
 
 #### Zoom
 - Zoom out horizontal

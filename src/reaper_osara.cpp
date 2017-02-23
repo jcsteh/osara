@@ -1593,6 +1593,85 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 		outputMessage("Unselected tracks/items/envelope points");
 }
 
+void moveToEnvelopePoint(int direction, bool clearSelection=true) {
+	TrackEnvelope* envelope;
+	double offset;
+	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
+	if (!envelope)
+		return;
+	int count = CountEnvelopePoints(envelope);
+	if (count == 0)
+		return;
+	double now = GetCursorPosition();
+	// Get the point at or before the cursr.
+	int point = GetEnvelopePointByTime(envelope, now - offset);
+	if (point < 0) {
+		if (direction != 1)
+			return;
+		++point;
+	}
+	double time, value;
+	bool selected;
+	GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+	time += offset;
+	if ((direction == 1 && time < now)
+		// If this point is at the cursor, skip it only if it's selected.
+		// This allows you to easily get to a point at the cursor
+		// while still allowing you to move beyond it once you do.
+		|| (direction == 1 && selected && time == now)
+		// Moving backward should skip the point at the cursor.
+		|| (direction == -1 && time >= now)
+	) {
+		// This isn't the point we want. Try the next.
+		int newPoint = point + direction;
+		if (0 <= newPoint && newPoint < count) {
+			point = newPoint;
+			GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+			time += offset;
+		}
+	}
+	if (direction != 0 && direction == 1 ? time < now : time > now)
+		return; // No point in this direction.
+	fakeFocus = FOCUS_ENVELOPE;
+	if (clearSelection)
+		Main_OnCommand(40331, 0); // Envelope: Unselect all points
+	if (direction != 0) {
+		SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+		SetEditCurPos(time, true, true);
+	}
+	ostringstream s;
+	s << "point " << point + 1 << " value ";
+	char out[64];
+	Envelope_FormatValue(envelope, value, out, sizeof(out));
+	s << out;
+	if (!clearSelection) {
+		int numSel = 0;
+		for (point = 0; point < count; ++point) {
+			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
+			if (selected)
+				++numSel;
+			if (numSel == 2)
+				break; // Don't care above this.
+		}
+		// One selected point is the norm, so don't report selected in this case.
+		if (numSel > 1)
+			s << " selected";
+	}
+	s << " " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void cmdInsertEnvelopePoint(Command* command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return;
+	int oldCount = CountEnvelopePoints(envelope);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (CountEnvelopePoints(envelope) <= oldCount)
+		return;
+	moveToEnvelopePoint(0, false); // Report inserted point.
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	moveToItem(1, false, isSelectionContiguous);
 }
@@ -1987,72 +2066,6 @@ void cmdSelectPreviousEnvelope(Command* command) {
 	cmdhSelectEnvelope(-1);
 }
 
-void moveToEnvelopePoint(int direction, bool clearSelection=true) {
-	TrackEnvelope* envelope;
-	double offset;
-	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
-	if (!envelope)
-		return;
-	int count = CountEnvelopePoints(envelope);
-	if (count == 0)
-		return;
-	double now = GetCursorPosition();
-	// Get the point at or before the cursr.
-	int point = GetEnvelopePointByTime(envelope, now - offset);
-	if (point < 0) {
-		if (direction == -1)
-			return;
-		++point;
-	}
-	double time, value;
-	bool selected;
-	GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
-	time += offset;
-	if ((direction == 1 && time < now)
-		// If this point is at the cursor, skip it only if it's selected.
-		// This allows you to easily get to a point at the cursor
-		// while still allowing you to move beyond it once you do.
-		|| (direction == 1 && selected && time == now)
-		// Moving backward should skip the point at the cursor.
-		|| (direction == -1 && time >= now)
-	) {
-		// This isn't the point we want. Try the next.
-		int newPoint = point + direction;
-		if (0 <= newPoint && newPoint < count) {
-			point = newPoint;
-			GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
-			time += offset;
-		}
-	}
-	if (direction == 1 ? time < now : time > now)
-		return; // No point in this direction.
-	fakeFocus = FOCUS_ENVELOPE;
-	if (clearSelection)
-		Main_OnCommand(40331, 0); // Envelope: Unselect all points
-	SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
-	SetEditCurPos(time, true, true);
-	ostringstream s;
-	s << "point " << point + 1 << " value ";
-	char out[64];
-	Envelope_FormatValue(envelope, value, out, sizeof(out));
-	s << out;
-	if (!clearSelection) {
-		int numSel = 0;
-		for (point = 0; point < count; ++point) {
-			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-			if (selected)
-				++numSel;
-			if (numSel == 2)
-				break; // Don't care above this.
-		}
-		// One selected point is the norm, so don't report selected in this case.
-		if (numSel > 1)
-			s << " selected";
-	}
-	s << " " << formatCursorPosition();
-	outputMessage(s);
-}
-
 void cmdMoveToNextEnvelopePoint(Command* command) {
 	moveToEnvelopePoint(1);
 }
@@ -2145,6 +2158,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
 	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
+	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
