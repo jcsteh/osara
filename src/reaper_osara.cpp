@@ -19,6 +19,7 @@
 #include <iomanip>
 #include <functional>
 #include <regex>
+#include <tuple>
 #include <math.h>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
@@ -55,6 +56,7 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 static bool isSelectionContiguous = true;
+bool selectedEnvelopeIsTake = false;
 
 /*** Utilities */
 
@@ -330,6 +332,22 @@ bool isTrackSelected(MediaTrack* track) {
 
 bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
+}
+
+// Returns the selected envelope and the offset for all envelope point times.
+// Track envelope points are relative to the start of the project,
+// but take envelope points are relative to the start of the item.
+tuple<TrackEnvelope*, double> getSelectedEnvelopeAndOffset() {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope)
+		return {NULL, 0.0};
+	if (!selectedEnvelopeIsTake)
+		return {envelope, 0.0};
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item)
+		return {envelope, 0.0};
+	double offset = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+	return {envelope, offset};
 }
 
 /*** Code to execute after existing actions.
@@ -798,13 +816,15 @@ void postSelectMultipleItems(int command) {
 }
 
 void postMoveEnvelopePoint(int command) {
-	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	TrackEnvelope* envelope;
+	double offset;
+	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
 	if (!envelope)
 		return;
 	fakeFocus = FOCUS_ENVELOPE;
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
-	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001);
+	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001 - offset);
 	if (point < 0)
 		return;
 	double value;
@@ -1842,22 +1862,21 @@ void cmdDeleteAllTimeSigs(Command* command) {
 }
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
-bool selectEnvelopeUseTake = false;
 void cmdhSelectEnvelope(int direction) {
 	// If we're focused on a track or item, use the envelopes associated therewith.
 	// If we're focused on an envelope, use what we last used.
 	// This is necessary because the first envelope selection will focus the envelope
 	// and we want to allow the user to move past the first.
 	if (fakeFocus == FOCUS_TRACK)
-		selectEnvelopeUseTake = false;
+		selectedEnvelopeIsTake = false;
 	else if (fakeFocus == FOCUS_ITEM)
-		selectEnvelopeUseTake = true;
+		selectedEnvelopeIsTake = true;
 	else if (fakeFocus != FOCUS_ENVELOPE)
 		return; // No envelopes for focus.
 	MediaTrack* track = NULL;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
-	if (selectEnvelopeUseTake) {
+	if (selectedEnvelopeIsTake) {
 		MediaItem* item = GetSelectedMediaItem(0, 0);
 		if (!item)
 			return;
@@ -1874,7 +1893,7 @@ void cmdhSelectEnvelope(int direction) {
 		getEnvelope = [track] (int index) { return GetTrackEnvelope(track, index); };
 	}
 	if (count == 0) {
-		outputMessage(selectEnvelopeUseTake ? "no take envelopes" : "no track envelopes");
+		outputMessage(selectedEnvelopeIsTake ? "no take envelopes" : "no track envelopes");
 		return;
 	}
 
@@ -1969,7 +1988,9 @@ void cmdSelectPreviousEnvelope(Command* command) {
 }
 
 void moveToEnvelopePoint(int direction, bool clearSelection=true) {
-	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	TrackEnvelope* envelope;
+	double offset;
+	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
 	if (!envelope)
 		return;
 	int count = CountEnvelopePoints(envelope);
@@ -1977,7 +1998,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 		return;
 	double now = GetCursorPosition();
 	// Get the point at or before the cursr.
-	int point = GetEnvelopePointByTime(envelope, now);
+	int point = GetEnvelopePointByTime(envelope, now - offset);
 	if (point < 0) {
 		if (direction == -1)
 			return;
@@ -1986,6 +2007,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	double time, value;
 	bool selected;
 	GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+	time += offset;
 	if ((direction == 1 && time < now)
 		// If this point is at the cursor, skip it only if it's selected.
 		// This allows you to easily get to a point at the cursor
@@ -1999,6 +2021,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 		if (0 <= newPoint && newPoint < count) {
 			point = newPoint;
 			GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+			time += offset;
 		}
 	}
 	if (direction == 1 ? time < now : time > now)
