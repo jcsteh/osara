@@ -1635,10 +1635,9 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	fakeFocus = FOCUS_ENVELOPE;
 	if (clearSelection)
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
-	if (direction != 0) {
-		SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+	SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+	if (direction != 0)
 		SetEditCurPos(time, true, true);
-	}
 	ostringstream s;
 	s << "point " << point + 1 << " value ";
 	char out[64];
@@ -1669,7 +1668,7 @@ void cmdInsertEnvelopePoint(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (CountEnvelopePoints(envelope) <= oldCount)
 		return;
-	moveToEnvelopePoint(0, false); // Report inserted point.
+	moveToEnvelopePoint(0); // Select and report inserted point.
 }
 
 void cmdMoveToNextItemKeepSel(Command* command) {
