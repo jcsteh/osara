@@ -337,7 +337,7 @@ bool isItemSelected(MediaItem* item) {
 // Returns the selected envelope and the offset for all envelope point times.
 // Track envelope points are relative to the start of the project,
 // but take envelope points are relative to the start of the item.
-tuple<TrackEnvelope*, double> getSelectedEnvelopeAndOffset() {
+pair<TrackEnvelope*, double> getSelectedEnvelopeAndOffset() {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return {NULL, 0.0};
