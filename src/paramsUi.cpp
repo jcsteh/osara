@@ -58,8 +58,8 @@ class ParamSource {
 class ReaperObjParamSource;
 
 typedef struct {
-	const char* displayName;
-	const char* name;
+	const string displayName;
+	const string name;
 	Param*(*makeParam)(ReaperObjParamSource& source, const char* name);
 } ReaperObjParamData;
 
@@ -91,7 +91,7 @@ class ReaperObjParamSource: public ParamSource {
 
 	Param* getParam(int param) {
 		const ReaperObjParamData& data = this->params[param];
-		return data.makeParam(*this, data.name);
+		return data.makeParam(*this, data.name.c_str());
 	}
 
 };
@@ -466,6 +466,27 @@ class TrackParams: public ReaperObjParamSource {
 	private:
 	MediaTrack* track;
 
+	void addSendParams(int category, const char* categoryName, const char* trackParam) {
+		int count = GetTrackNumSends(track, category);
+		for (int i = 0; i < count; ++i) {
+			MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, NULL);
+			ostringstream dispPrefix;
+			// Example display name: "1 Drums send volume"
+			dispPrefix << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
+			char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
+			if (trackName)
+				dispPrefix << trackName << " ";
+			dispPrefix << categoryName << " ";
+			ostringstream namePrefix;
+			// The name prefix enables getSetValue to identify send parameters.
+			// Example name: "s 0 0 D_VOL"
+			namePrefix << "s " << category << " " << i << " ";
+			this->params.push_back({dispPrefix.str() + "volume", namePrefix.str() + "D_VOL", ReaperObjVolParam::make});
+			this->params.push_back({dispPrefix.str() + "pan", namePrefix.str() + "D_PAN", ReaperObjPanParam::make});
+			this->params.push_back({dispPrefix.str() + "mute", namePrefix.str() + "B_MUTE", ReaperObjToggleParam::make});
+		}
+	}
+
 	public:
 	TrackParams(MediaTrack* track): track(track) {
 		this->params = {
@@ -473,6 +494,8 @@ class TrackParams: public ReaperObjParamSource {
 			{"Pan", "D_PAN", ReaperObjPanParam::make},
 			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
 		};
+		this->addSendParams(0, "send", "P_DESTTRACK");
+		this->addSendParams(-1, "receive", "P_SRCTRACK");
 	}
 
 	string getTitle() {
@@ -480,6 +503,17 @@ class TrackParams: public ReaperObjParamSource {
 	}
 
 	void* getSetValue(const char* name, void* newValue) {
+		istringstream nameStream(name);
+		string category;
+		nameStream >> category;
+		if (category.compare("s") == 0) {
+			// Send.
+			// Extract required arguments from the name.
+			int category, index;
+			string param;
+			nameStream >> category >> index >> param;
+			return GetSetTrackSendInfo(this->track, category, index, param.c_str(), newValue);
+		}
 		return GetSetMediaTrackInfo(this->track, name, newValue);
 	}
 
@@ -494,16 +528,12 @@ class ItemParams: public ReaperObjParamSource {
 		this->params.push_back({"Item volume", "D_VOL", ReaperObjVolParam::make});
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
 		if (GetActiveTake(item)) {
-			this->params.insert(this->params.end(), {
-				{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
-				{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
-			});
+			this->params.push_back({"Take volume", "t:D_VOL", ReaperObjVolParam::make});
+			this->params.push_back({"Take pan", "t:D_PAN", ReaperObjPanParam::make});
 		}
-		this->params.insert(this->params.end(), {
-			{"Mute", "B_MUTE", ReaperObjToggleParam::make},
-			{"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make},
-			{"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make}
-		});
+		this->params.push_back({"Mute", "B_MUTE", ReaperObjToggleParam::make});
+		this->params.push_back({"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make});
+		this->params.push_back({"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make});
 	}
 
 	string getTitle() {
