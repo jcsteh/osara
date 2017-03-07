@@ -58,8 +58,8 @@ class ParamSource {
 class ReaperObjParamSource;
 
 typedef struct {
-	const string displayName;
-	const string name;
+	string displayName;
+	string name;
 	Param*(*makeParam)(ReaperObjParamSource& source, const char* name);
 } ReaperObjParamData;
 
@@ -481,9 +481,11 @@ class TrackParams: public ReaperObjParamSource {
 			// The name prefix enables getSetValue to identify send parameters.
 			// Example name: "s 0 0 D_VOL"
 			namePrefix << "s " << category << " " << i << " ";
-			this->params.push_back({dispPrefix.str() + "volume", namePrefix.str() + "D_VOL", ReaperObjVolParam::make});
-			this->params.push_back({dispPrefix.str() + "pan", namePrefix.str() + "D_PAN", ReaperObjPanParam::make});
-			this->params.push_back({dispPrefix.str() + "mute", namePrefix.str() + "B_MUTE", ReaperObjToggleParam::make});
+			this->params.insert(this->params.end(), {
+				{dispPrefix.str() + "volume", namePrefix.str() + "D_VOL", ReaperObjVolParam::make},
+				{dispPrefix.str() + "pan", namePrefix.str() + "D_PAN", ReaperObjPanParam::make},
+				{dispPrefix.str() + "mute", namePrefix.str() + "B_MUTE", ReaperObjToggleParam::make}
+			});
 		}
 	}
 
@@ -528,12 +530,16 @@ class ItemParams: public ReaperObjParamSource {
 		this->params.push_back({"Item volume", "D_VOL", ReaperObjVolParam::make});
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
 		if (GetActiveTake(item)) {
-			this->params.push_back({"Take volume", "t:D_VOL", ReaperObjVolParam::make});
-			this->params.push_back({"Take pan", "t:D_PAN", ReaperObjPanParam::make});
+			this->params.insert(this->params.end(), {
+				{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
+				{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
+			});
 		}
-		this->params.push_back({"Mute", "B_MUTE", ReaperObjToggleParam::make});
-		this->params.push_back({"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make});
-		this->params.push_back({"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make});
+		this->params.insert(this->params.end(), {
+			{"Mute", "B_MUTE", ReaperObjToggleParam::make},
+			{"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make},
+			{"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make}
+		});
 	}
 
 	string getTitle() {
