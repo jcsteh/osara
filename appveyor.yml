@@ -1,4 +1,4 @@
-version: "2016.1pre-{build}"
+version: "2017.1pre-{build}"
 
 branches:
  only:

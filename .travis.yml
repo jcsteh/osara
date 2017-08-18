@@ -8,7 +8,7 @@ addons:
  ssh_known_hosts: exbi.nvaccess.org
 
 env:
- - version="2016.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
+ - version="2017.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
 
 before_install:
  # We get weird errors without --egg. No idea why.
