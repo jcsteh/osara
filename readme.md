@@ -261,6 +261,7 @@ To access it:
  Then, press p (OSARA: View FX parameters for current track/take).
 2. Alternatively, to access FX parameters for the master track, press shift+p (OSARA: View FX parameters for master track).
 3. If there is more than one effect on the track, select the desired effect from the menu.
+ If there are input or monitoring FX on the track, these will be included in the menu as well with an appropriate suffix.
 
 Note that only some effects expose easily readable values, while others expose only percentages.
 Even for effects that do expose easily readable values, the editable text is an internal number and probably won't correspond to the readable value on the slider.

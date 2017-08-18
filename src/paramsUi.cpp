@@ -688,16 +688,51 @@ Param* FxParams<ReaperObj>::getParam(int param) {
 
 #ifdef _WIN32
 
+typedef vector<pair<int, string>> FxList;
+
+FxList listFx(MediaTrack* track) {
+	FxList fxList;
+	char rawName[256];
+	const int count = TrackFX_GetCount(track);
+	for (int index = 0; index < count; ++index) {
+		TrackFX_GetFXName(track, index, rawName, sizeof(rawName));
+		fxList.push_back({index, rawName});
+	}
+	const int recCount = TrackFX_GetRecCount(track);
+	if (recCount == 0) {
+		return fxList;
+	}
+	string suffix;
+	if (track == GetMasterTrack(0)) {
+		suffix = " [monitor]";
+	} else {
+		suffix = " [input]";
+	}
+	for (int index = 0; index < recCount; ++index) {
+		const int rawIndex = 0x1000000 + index;
+		TrackFX_GetFXName(track, rawIndex, rawName, sizeof(rawName));
+		string name = rawName + suffix;
+		fxList.push_back({rawIndex, name});
+	}
+	return fxList;
+}
+
+FxList listFx(MediaItem_Take* track) {
+	FxList fxList;
+	char rawName[256];
+	const int count = TakeFX_GetCount(track);
+	for (int index = 0; index < count; ++index) {
+		TakeFX_GetFXName(track, index, rawName, sizeof(rawName));
+		fxList.push_back({index, rawName});
+	}
+	return fxList;
+}
+
 template<typename ReaperObj>
 void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
-	int (*_GetCount)(ReaperObj* obj);
-	*(void**)&_GetCount = plugin_getapi((apiPrefix + "_GetCount").c_str());
-	bool (*_GetFXName)(ReaperObj* obj, int fx, char* buf, int buf_sz);
-	*(void**)&_GetFXName = plugin_getapi((apiPrefix + "_GetFXName").c_str());
-	char name[256];
-
-	int fxCount = _GetCount(obj);
-	int fx;
+	const auto fxList = listFx(obj);
+	const int fxCount = fxList.size();
+	int fx = -1;
 	if (fxCount == 0) {
 		outputMessage("No FX");
 		return;
@@ -709,13 +744,12 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(MENUITEMINFO);
 		for (int f = 0; f < fxCount; ++f) {
-			_GetFXName(obj, f, name, sizeof(name));
 			itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
 			itemInfo.fType = MFT_STRING;
-			itemInfo.wID = f + 1;
-			itemInfo.dwTypeData = (char*)name;
-			itemInfo.cch = sizeof(name);
-			InsertMenuItem(effects, f, false, &itemInfo);
+			itemInfo.wID = fxList[f].first + 1;
+			itemInfo.dwTypeData = (char*)fxList[f].second.c_str();
+			itemInfo.cch = fxList[f].second.length();
+			InsertMenuItem(effects, f, true, &itemInfo);
 		}
 		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
 		DestroyMenu(effects);

@@ -119,6 +119,7 @@
 #define REAPERAPI_WANT_OnPauseButton
 #define REAPERAPI_WANT_OnPlayButton
 #define REAPERAPI_WANT_OnStopButton
+#define REAPERAPI_WANT_TrackFX_GetRecCount
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
