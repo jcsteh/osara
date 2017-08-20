@@ -737,7 +737,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 		outputMessage("No FX");
 		return;
 	} else if (fxCount == 1)
-		fx = 0;
+		fx = fxList[0].first;
 	else {
 		// Present a menu of effects.
 		HMENU effects = CreatePopupMenu();
