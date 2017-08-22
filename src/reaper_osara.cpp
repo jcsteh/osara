@@ -857,6 +857,10 @@ void postSetSelectionEnd(int command) {
 	fakeFocus = FOCUS_RULER;
 }
 
+void postToggleMasterMono(int command) {
+	outputMessage(GetToggleCommandState(command) ? "master mono" : "master stereo");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -950,6 +954,7 @@ PostCommand POST_COMMANDS[] = {
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
+	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

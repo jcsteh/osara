@@ -96,6 +96,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Nudge master track volume down
 - Track: Nudge track pan left
 - Track: Nudge track pan right
+- Master track: Toggle stereo/mono (L+R): shift+f9
 
 #### Edit Cursor Movement
 - View: Move cursor left one pixel
