@@ -92,6 +92,24 @@ void cmdDeleteEnvelopePoints(Command* command) {
 	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, true, false);
 }
 
+// If max2 is true, this only counts to 2;
+// i.e. 2 or more selected envelope points returns 2.
+int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
+	int count = CountEnvelopePoints(envelope);
+	int numSel = 0;
+	for (int point = 0; point < count; ++point) {
+		bool selected;
+		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
+		if (selected) {
+			++numSel;
+		}
+		if (max2 && numSel == 2) {
+			break; // Don't care above this.
+		}
+	}
+	return numSel;
+}
+
 void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	TrackEnvelope* envelope;
 	double offset;
@@ -143,14 +161,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
 	s << out;
 	if (!clearSelection) {
-		int numSel = 0;
-		for (point = 0; point < count; ++point) {
-			GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-			if (selected)
-				++numSel;
-			if (numSel == 2)
-				break; // Don't care above this.
-		}
+		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
 		if (numSel > 1)
 			s << " selected";
@@ -328,18 +339,18 @@ bool isAutomationItemSelected(TrackEnvelope* envelope, int index) {
 	return GetSetAutomationItemInfo(envelope, index, "D_UISEL", 0, false);
 }
 
-// Return whether there are 0, 1 or >= 2 automation items selected.
-// That is, if there are 3 or more selected, only 2 will be returned.
-int countSelectedAutomationItems(TrackEnvelope* envelope) {
+// If max2 is true, this only counts to 2;
+// i.e. 2 or more selected automation items returns 2.
+int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2=false) {
 	int count = CountAutomationItems(envelope);
 	int sel = 0;
 	for (int i = 0; i < count; ++i) {
 		if (isAutomationItemSelected(envelope, i)) {
 			++sel;
 		}
-		if (sel == 2) {
+		if (max2 && sel == 2) {
 			// optimisation: We don't care beyond 2.
-			return sel;
+			break;
 		}
 	}
 	return sel;
@@ -401,7 +412,7 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		s << "Auto " << i + 1;
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
-			if (countSelectedAutomationItems(envelope) > 1) {
+			if (countSelectedAutomationItems(envelope, true) > 1) {
 				s << " selected";
 			}
 		} else {
@@ -422,4 +433,21 @@ bool toggleCurrentAutomationItemSelection() {
 	bool select = !isAutomationItemSelected(envelope, currentAutomationItem);
 	selectAutomationItem(envelope, currentAutomationItem, select);
 	return select;
+}
+
+void reportCopiedEnvelopePointsOrAutoItems() {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope) {
+		return;
+	}
+	ostringstream s;
+	int count;
+	if (count = countSelectedAutomationItems(envelope)) {
+		s << count << (count == 1 ? " automation item" : " automation items");
+	} else {
+		count = countSelectedEnvelopePoints(envelope);
+		s << count << (count == 1 ? " envelope point" : " envelope points");
+	}
+	s << " copied";
+	outputMessage(s);
 }

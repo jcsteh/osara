@@ -672,6 +672,11 @@ void postCopy(int command) {
 			if ((count = CountSelectedMediaItems(0)) > 0)
 				s << count << (count == 1 ? " item" : " items") << " copied";
 			break;
+		case 2: // Envelope
+			reportCopiedEnvelopePointsOrAutoItems();
+			// A message was already reported, so return here;
+			// don't let the outputMessage below squelch it.
+			return;
 		default:
 			return;
 	}
