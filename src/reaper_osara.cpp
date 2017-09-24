@@ -1407,7 +1407,7 @@ void cmdPaste(Command* command) {
 	int oldPoints = 0;
 	int oldAutoItems = 0;
 	if (envelope) {
-		oldPoints = CountEnvelopePoints(envelope);
+		oldPoints = countEnvelopePointsIncludingAutoItems(envelope);
 		oldAutoItems = CountAutomationItems(envelope);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -1417,7 +1417,7 @@ void cmdPaste(Command* command) {
 		s << added << (added == 1 ? " track" : " tracks") << " added";
 	else if ((added = CountMediaItems(0) - oldItems) > 0)
 		s << added << (added == 1 ? " item" : " items") << " added";
-	else if (envelope && (added = CountEnvelopePoints(envelope) - oldPoints) > 0)
+	else if (envelope && (added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints) > 0)
 		s << added << (added == 1 ? " point" : " points") << " added";
 	else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0)
 		s << added << (added == 1 ? " automation item" : " automation items") << " added";

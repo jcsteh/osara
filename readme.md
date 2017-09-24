@@ -382,6 +382,10 @@ With OSARA, you move to automation items as follows:
 3. The item navigation commands will revert back to moving through media items (instead of automation items) when focus is moved away from the envelope.
  For example, moving to another track and back again will again allow you to move through the media items on the track.
 
+Once you move to an automation item, the commands to move between envelope points such as alt+k and alt+j (OSARA: Move to next envelope point, OSARA: Move to previous envelope point) move between the points in the automation item.
+The points within an automation item can only be accessed after moving to that automation item; they cannot be accessed from the underlying envelope.
+To return to the points in the underlying envelope, simply move focus back to the envelope by selecting it again with control+l and control+shift+l (OSARA: Select next track/take envelope (depending on focus), OSARA: Select previous track/take envelope (depending on focus)).
+
 ### Notes and Chords in the MIDI Editor
 In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.
 In this context, a chord is any number of notes that are placed at the exact same position.

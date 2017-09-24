@@ -47,17 +47,29 @@ void postMoveEnvelopePoint(int command) {
 	fakeFocus = FOCUS_ENVELOPE;
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
-	int point = GetEnvelopePointByTime(envelope, GetCursorPosition() + 0.0001 - offset);
+	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
+		GetCursorPosition() + 0.0001 - offset);
 	if (point < 0)
 		return;
 	double value;
 	bool selected;
-	GetEnvelopePoint(envelope, point, NULL, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, &value, NULL, NULL, &selected);
 	if (!selected)
 		return; // Not moved.
 	char out[64];
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
 	outputMessage(out);
+}
+
+int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope) {
+	// First, count the points in the envelope itself.
+	int count = CountEnvelopePoints(envelope);
+	// Now, add the points in each automation item.
+	int itemCount = CountAutomationItems(envelope);
+	for (int item = 0; item < itemCount; ++item) {
+		count += CountEnvelopePointsEx(envelope, item);
+	}
+	return count;
 }
 
 void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool checkItems) {
@@ -67,7 +79,7 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 	int oldPoints;
 	int oldItems;
 	if (checkPoints) {
-		oldPoints = CountEnvelopePoints(envelope);
+		oldPoints = countEnvelopePointsIncludingAutoItems(envelope);
 	}
 	if (checkItems) {
 		oldItems = CountAutomationItems(envelope);
@@ -82,7 +94,7 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		return;
 	}
 	if (checkPoints) {
-		removed = oldPoints - CountEnvelopePoints(envelope);
+		removed = oldPoints - countEnvelopePointsIncludingAutoItems(envelope);
 		s << removed << (removed == 1 ? " point" : " points") << " removed";
 		outputMessage(s);
 	}
@@ -95,16 +107,31 @@ void cmdDeleteEnvelopePoints(Command* command) {
 // If max2 is true, this only counts to 2;
 // i.e. 2 or more selected envelope points returns 2.
 int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
-	int count = CountEnvelopePoints(envelope);
 	int numSel = 0;
-	for (int point = 0; point < count; ++point) {
-		bool selected;
+	bool selected;
+	// First, count the points in the envelope itself.
+	int pointCount = CountEnvelopePoints(envelope);
+	for (int point = 0; point < pointCount; ++point) {
 		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
 		if (selected) {
 			++numSel;
 		}
 		if (max2 && numSel == 2) {
-			break; // Don't care above this.
+			return 2; // Don't care above this.
+		}
+	}
+	// Now add the count of the points in each automation item.
+	int itemCount = CountAutomationItems(envelope);
+	for (int item = 0; item < itemCount; ++item) {
+		pointCount = CountEnvelopePointsEx(envelope, item);
+		for (int point = 0; point < pointCount; ++point) {
+			GetEnvelopePointEx(envelope, item, point, NULL, NULL, NULL, NULL, &selected);
+			if (selected) {
+				++numSel;
+			}
+			if (max2 && numSel == 2) {
+				return 2; // Don't care above this.
+			}
 		}
 	}
 	return numSel;
@@ -116,12 +143,12 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
 	if (!envelope)
 		return;
-	int count = CountEnvelopePoints(envelope);
+	int count = CountEnvelopePointsEx(envelope, currentAutomationItem);
 	if (count == 0)
 		return;
 	double now = GetCursorPosition();
 	// Get the point at or before the cursr.
-	int point = GetEnvelopePointByTime(envelope, now - offset);
+	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem, now - offset);
 	if (point < 0) {
 		if (direction != 1)
 			return;
@@ -129,7 +156,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	}
 	double time, value;
 	bool selected;
-	GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
 	time += offset;
 	if ((direction == 1 && time < now)
 		// If this point is at the cursor, skip it only if it's selected.
@@ -143,7 +170,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 		int newPoint = point + direction;
 		if (0 <= newPoint && newPoint < count) {
 			point = newPoint;
-			GetEnvelopePoint(envelope, point, &time, &value, NULL, NULL, &selected);
+			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
 			time += offset;
 		}
 	}
@@ -152,7 +179,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	fakeFocus = FOCUS_ENVELOPE;
 	if (clearSelection)
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
-	SetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+	SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
 	ostringstream s;

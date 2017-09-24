@@ -67,8 +67,10 @@
 #define REAPERAPI_WANT_GetExtState
 #define REAPERAPI_WANT_SetExtState
 #define REAPERAPI_WANT_GetEnvelopePoint
-#define REAPERAPI_WANT_GetEnvelopePointByTime
+#define REAPERAPI_WANT_GetEnvelopePointEx
+#define REAPERAPI_WANT_GetEnvelopePointByTimeEx
 #define REAPERAPI_WANT_CountEnvelopePoints
+#define REAPERAPI_WANT_CountEnvelopePointsEx
 #define REAPERAPI_WANT_format_timestr_pos
 #define REAPERAPI_WANT_GetPlayState
 #define REAPERAPI_WANT_TimeMap_curFrameRate
@@ -112,7 +114,7 @@
 #define REAPERAPI_WANT_GetSetTrackSendInfo
 #define REAPERAPI_WANT_GetTrackNumSends
 #define REAPERAPI_WANT_CountTakes
-#define REAPERAPI_WANT_SetEnvelopePoint
+#define REAPERAPI_WANT_SetEnvelopePointEx
 #define REAPERAPI_WANT_StuffMIDIMessage
 #define REAPERAPI_WANT_PlayTrackPreview
 #define REAPERAPI_WANT_StopTrackPreview
