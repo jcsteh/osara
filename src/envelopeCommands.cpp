@@ -60,20 +60,36 @@ void postMoveEnvelopePoint(int command) {
 	outputMessage(out);
 }
 
-void cmdhDeleteEnvelopePoints(int command) {
+void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool checkItems) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return;
-	int oldCount = CountEnvelopePoints(envelope);
+	int oldPoints;
+	int oldItems;
+	if (checkPoints) {
+		oldPoints = CountEnvelopePoints(envelope);
+	}
+	if (checkItems) {
+		oldItems = CountAutomationItems(envelope);
+	}
 	Main_OnCommand(command, 0);
-	int removed = oldCount - CountEnvelopePoints(envelope);
 	ostringstream s;
-	s << removed << (removed == 1 ? " point" : " points") << " removed";
-	outputMessage(s);
+	int removed;
+	if (checkItems) {
+		removed = oldItems - CountAutomationItems(envelope);
+		s << removed << (removed == 1 ? " automation item" : " automation items") << " removed";
+		outputMessage(s);
+		return;
+	}
+	if (checkPoints) {
+		removed = oldPoints - CountEnvelopePoints(envelope);
+		s << removed << (removed == 1 ? " point" : " points") << " removed";
+		outputMessage(s);
+	}
 }
 
 void cmdDeleteEnvelopePoints(Command* command) {
-	cmdhDeleteEnvelopePoints(command->gaccel.accel.cmd);
+	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, true, false);
 }
 
 void moveToEnvelopePoint(int direction, bool clearSelection=true) {

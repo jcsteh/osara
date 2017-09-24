@@ -9,7 +9,7 @@
 #include "osara.h"
 
 void postMoveEnvelopePoint(int command);
-void cmdhDeleteEnvelopePoints(int command);
+void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints=true, bool checkItems=true);
 void cmdDeleteEnvelopePoints(Command* command);
 void cmdInsertEnvelopePoint(Command* command);
 void cmdSelectNextEnvelope(Command* command);

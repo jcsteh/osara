@@ -1400,8 +1400,11 @@ void cmdPaste(Command* command) {
 	int oldTracks = CountTracks(0);
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	int oldPoints = 0;
-	if (envelope)
+	int oldAutoItems = 0;
+	if (envelope) {
 		oldPoints = CountEnvelopePoints(envelope);
+		oldAutoItems = CountAutomationItems(envelope);
+	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	ostringstream s;
 	int added;
@@ -1411,6 +1414,8 @@ void cmdPaste(Command* command) {
 		s << added << (added == 1 ? " item" : " items") << " added";
 	else if (envelope && (added = CountEnvelopePoints(envelope) - oldPoints) > 0)
 		s << added << (added == 1 ? " point" : " points") << " added";
+	else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0)
+		s << added << (added == 1 ? " automation item" : " automation items") << " added";
 	else
 		s << "nothing pasted";
 	outputMessage(s);
@@ -1451,7 +1456,7 @@ void cmdCut(Command* command) {
 			cmdhRemoveItems(command->gaccel.accel.cmd);
 			return;
 		case 2: // Envelope
-			cmdhDeleteEnvelopePoints(command->gaccel.accel.cmd);
+			cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd);
 			return;
 	}
 }
@@ -1704,7 +1709,10 @@ void cmdRemoveFocus(Command* command) {
 			cmdRemoveStretch(NULL);
 			break;
 		case FOCUS_ENVELOPE:
-			cmdhDeleteEnvelopePoints(40333); // Envelope: Delete all selected points
+			cmdhDeleteEnvelopePointsOrAutoItems(40333, true, false); // Envelope: Delete all selected points
+			break;
+		case FOCUS_AUTOMATIONITEM:
+			cmdhDeleteEnvelopePointsOrAutoItems(42086, false, true); // Envelope: Delete automation items
 			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
