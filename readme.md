@@ -111,8 +111,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - View: Move cursor left to grid division
 
 #### Items
-- Item navigation: Select and move to previous item
-- Item navigation: Select and move to next item
+- Item navigation: Select and move to previous item: control+leftArrow
+- Item navigation: Select and move to next item: control+rightArrow
 - Item: Split items at edit or play cursor
 - Item: Split items at time selection
 - Item: Remove items
@@ -370,6 +370,17 @@ To do this:
 ### Accessing FX Plug-in Windows
 Some FX plug-ins can be controlled with keyboard commands, but you can't reach them by tabbing through the FX Chain dialog.
 In these cases, you can press f6 to have OSARA attempt to focus the plug-in window.
+
+### Automation Items
+An envelope can contain one or more automation items positioned along the timeline.
+With OSARA, you move to automation items as follows:
+
+1. Select an envelope using control+l or control+shift+l (OSARA: Select next track/take envelope (depending on focus)).
+2. Now, use the normal item navigation commands; i.e. control+rightArrow and control+leftArrow (Item navigation: Select and move to next item, Item navigation: Select and move to previous item).
+ Multiple selection is also possible using control+shift+rightArrow and control+shift+leftArrow (OSARA: Move to next item (leaving other items selected), OSARA: Move to previous item (leaving other items selected).
+ Noncontiguous selection is done the same way described above for tracks and items.
+3. The item navigation commands will revert back to moving through media items (instead of automation items) when focus is moved away from the envelope.
+ For example, moving to another track and back again will again allow you to move through the media items on the track.
 
 ### Notes and Chords in the MIDI Editor
 In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.

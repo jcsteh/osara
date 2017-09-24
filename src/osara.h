@@ -1,8 +1,8 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main header
- * Author: James Teh <jamie@nvaccess.org>
- * Copyright 2014-2017 NV Access Limited
+ * Author: James Teh <jamie@jantrid.net>
+ * Copyright 2014-2017 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -120,6 +120,8 @@
 #define REAPERAPI_WANT_OnPlayButton
 #define REAPERAPI_WANT_OnStopButton
 #define REAPERAPI_WANT_TrackFX_GetRecCount
+#define REAPERAPI_WANT_CountAutomationItems
+#define REAPERAPI_WANT_GetSetAutomationItemInfo
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -148,9 +150,12 @@ enum FakeFocus {
 	FOCUS_REGION,
 	FOCUS_TIMESIG,
 	FOCUS_STRETCH,
-	FOCUS_ENVELOPE
+	FOCUS_ENVELOPE,
+	FOCUS_AUTOMATIONITEM
 };
 extern enum FakeFocus fakeFocus;
+
+extern bool isSelectionContiguous;
 
 void outputMessage(const std::string& message);
 void outputMessage(std::ostringstream& message);

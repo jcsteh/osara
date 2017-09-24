@@ -17,6 +17,10 @@
 using namespace std;
 
 bool selectedEnvelopeIsTake = false;
+// Keeps track of the automation item the user last moved to.
+// -1 means no automation item,
+// which means use the envelope itself for stuff related to envelope points.
+int currentAutomationItem = -1;
 
 // Returns the selected envelope and the offset for all envelope point times.
 // Track envelope points are relative to the start of the project,
@@ -160,7 +164,7 @@ void cmdhSelectEnvelope(int direction) {
 		selectedEnvelopeIsTake = false;
 	else if (fakeFocus == FOCUS_ITEM)
 		selectedEnvelopeIsTake = true;
-	else if (fakeFocus != FOCUS_ENVELOPE)
+	else if (fakeFocus != FOCUS_ENVELOPE && fakeFocus != FOCUS_AUTOMATIONITEM)
 		return; // No envelopes for focus.
 	MediaTrack* track = NULL;
 	int count;
@@ -239,6 +243,7 @@ void cmdhSelectEnvelope(int direction) {
 	}
 
 	SetCursorContext(2, env);
+	currentAutomationItem = -1;
 	fakeFocus = FOCUS_ENVELOPE;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
@@ -290,4 +295,115 @@ void cmdMoveToNextEnvelopePointKeepSel(Command* command) {
 
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
 	moveToEnvelopePoint(-1, false);
+}
+
+void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) {
+	GetSetAutomationItemInfo(envelope, index, "D_UISEL", select, true);
+}
+
+void unselectAllAutomationItems(TrackEnvelope* envelope) {
+	int count = CountAutomationItems(envelope);
+	for (int i = 0; i < count; ++i) {
+		selectAutomationItem(envelope, i, false);
+	}
+}
+
+bool isAutomationItemSelected(TrackEnvelope* envelope, int index) {
+	return GetSetAutomationItemInfo(envelope, index, "D_UISEL", 0, false);
+}
+
+// Return whether there are 0, 1 or >= 2 automation items selected.
+// That is, if there are 3 or more selected, only 2 will be returned.
+int countSelectedAutomationItems(TrackEnvelope* envelope) {
+	int count = CountAutomationItems(envelope);
+	int sel = 0;
+	for (int i = 0; i < count; ++i) {
+		if (isAutomationItemSelected(envelope, i)) {
+			++sel;
+		}
+		if (sel == 2) {
+			// optimisation: We don't care beyond 2.
+			return sel;
+		}
+	}
+	return sel;
+}
+
+void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope) {
+		return;
+	}
+	int count = CountAutomationItems(envelope);
+	if (!count) {
+		return;
+	}
+	double cursor = GetCursorPosition();
+	double pos;
+	int start = direction == 1 ? 0 : count - 1;
+	if (0 <= currentAutomationItem && currentAutomationItem < count) {
+		pos = GetSetAutomationItemInfo(envelope, currentAutomationItem, "D_POSITION", 0, false);
+		if (direction == 1 ? pos <= cursor : pos >= cursor) {
+			// The cursor is right at or has moved past the automation item to which the user last moved.
+			// Therefore, start at the adjacent automation item.
+			// This is faster and also allows the user to move to automation items which start at the same position.
+			start += direction;
+			if (start < 0 || start >= count) {
+				// There's no adjacent automation item in this direction,
+				// so move to the current one again.
+				start -= direction;
+			}
+		}
+	} else {
+		currentAutomationItem = -1; // Invalid.
+	}
+
+	for (int i = start; 0 <= i && i < count; i += direction) {
+		pos = GetSetAutomationItemInfo(envelope, i, "D_POSITION", 0, false);
+		if (direction == 1 ? pos < cursor : pos > cursor) {
+			continue; // Not the right direction.
+		}
+		currentAutomationItem = i;
+		if (clearSelection || select) {
+			Undo_BeginBlock();
+		}
+		if (clearSelection) {
+			unselectAllAutomationItems(envelope);
+			isSelectionContiguous = true;
+		}
+		if (select) {
+			selectAutomationItem(envelope, i);
+		}
+		if (clearSelection || select) {
+			Undo_EndBlock("Change Automation Item Selection", 0);
+		}
+		SetEditCurPos(pos, true, true); // Seek playback.
+
+		// Report the automation item.
+		fakeFocus = FOCUS_AUTOMATIONITEM;
+		ostringstream s;
+		s << "Auto " << i + 1;
+		if (isAutomationItemSelected(envelope, i)) {
+			// One selected item is the norm, so don't report selected in this case.
+			if (countSelectedAutomationItems(envelope) > 1) {
+				s << " selected";
+			}
+		} else {
+			s << " unselected";
+		}
+		s << " " << formatCursorPosition();
+		outputMessage(s);
+		return;
+	}
+}
+
+bool toggleCurrentAutomationItemSelection() {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope || currentAutomationItem == -1) {
+		// We really shouldn't get called if this happens, but just in case...
+		return false;
+	}
+	bool select = !isAutomationItemSelected(envelope, currentAutomationItem);
+	selectAutomationItem(envelope, currentAutomationItem, select);
+	return select;
 }

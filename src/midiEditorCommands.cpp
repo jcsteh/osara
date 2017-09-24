@@ -310,7 +310,6 @@ bool isNoteSelected(MediaItem_Take* take, const int note) {
 	return sel;
 }
 
-static bool isSelectionContiguous = true;
 void cmdMidiToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;

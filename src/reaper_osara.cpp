@@ -53,7 +53,7 @@ int oldSecond;
 int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
-static bool isSelectionContiguous = true;
+bool isSelectionContiguous = true;
 
 /*** Utilities */
 
@@ -1351,11 +1351,19 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 }
 
 void cmdMoveToNextItem(Command* command) {
-	moveToItem(1);
+	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+		moveToAutomationItem(1);
+	} else {
+		moveToItem(1);
+	}
 }
 
 void cmdMoveToPrevItem(Command* command) {
-	moveToItem(-1);
+	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+		moveToAutomationItem(-1);
+	} else {
+		moveToItem(-1);
+	}
 }
 
 void cmdUndo(Command* command) {
@@ -1539,11 +1547,19 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 }
 
 void cmdMoveToNextItemKeepSel(Command* command) {
-	moveToItem(1, false, isSelectionContiguous);
+	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+		moveToAutomationItem(1, false, isSelectionContiguous);
+	} else {
+		moveToItem(1, false, isSelectionContiguous);
+	}
 }
 
 void cmdMoveToPrevItemKeepSel(Command* command) {
-	moveToItem(-1, false, isSelectionContiguous);
+	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+		moveToAutomationItem(-1, false, isSelectionContiguous);
+	} else {
+		moveToItem(-1, false, isSelectionContiguous);
+	}
 }
 
 #ifdef _WIN32
@@ -1731,6 +1747,9 @@ void cmdToggleSelection(Command* command) {
 				return;
 			select = !isItemSelected(currentItem);
 			GetSetMediaItemInfo(currentItem, "B_UISEL", (select ? &bTrue : &bFalse));
+			break;
+		case FOCUS_AUTOMATIONITEM:
+			select = toggleCurrentAutomationItemSelection();
 			break;
 		default:
 			return;

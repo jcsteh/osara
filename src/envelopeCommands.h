@@ -18,3 +18,5 @@ void cmdMoveToNextEnvelopePoint(Command* command);
 void cmdMoveToPrevEnvelopePoint(Command* command);
 void cmdMoveToNextEnvelopePointKeepSel(Command* command);
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command);
+void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true);
+bool toggleCurrentAutomationItemSelection();
