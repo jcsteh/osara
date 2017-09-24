@@ -1,0 +1,20 @@
+/*
+ * OSARA: Open Source Accessibility for the REAPER Application
+ * Envelope commands header
+ * Author: James Teh <jamie@jantrid.net>
+ * Copyright 2015-2017 NV Access Limited, James Teh
+ * License: GNU General Public License version 2.0
+ */
+
+#include "osara.h"
+
+void postMoveEnvelopePoint(int command);
+void cmdhDeleteEnvelopePoints(int command);
+void cmdDeleteEnvelopePoints(Command* command);
+void cmdInsertEnvelopePoint(Command* command);
+void cmdSelectNextEnvelope(Command* command);
+void cmdSelectPreviousEnvelope(Command* command);
+void cmdMoveToNextEnvelopePoint(Command* command);
+void cmdMoveToPrevEnvelopePoint(Command* command);
+void cmdMoveToNextEnvelopePointKeepSel(Command* command);
+void cmdMoveToPrevEnvelopePointKeepSel(Command* command);

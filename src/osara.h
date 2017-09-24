@@ -123,6 +123,10 @@
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
+// Needed for REAPER API functions which take a bool as an input pointer.
+static bool bFalse = false;
+static bool bTrue = true;
+
 typedef struct Command {
 	int section;
 	gaccel_register_t gaccel;

@@ -12,6 +12,7 @@ sources = [
 	"paramsUi.cpp",
 	"peakWatcher.cpp",
 	"midiEditorCommands.cpp",
+	"envelopeCommands.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
