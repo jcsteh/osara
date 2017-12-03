@@ -1,7 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Resource constants
- * Author: James Teh <jamie@nvaccess.org>
+ * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015 NV Access Limited
  * License: GNU General Public License version 2.0
  */

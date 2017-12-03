@@ -1,6 +1,6 @@
 ; OSARA: Open Source Accessibility for the REAPER Application
 ; NSIS installer script
-; Author: James Teh <jamie@nvaccess.org>
+; Author: James Teh <jamie@jantrid.net>
 ; Copyright 2016 NV Access Limited
 ; License: GNU General Public License version 2.0
 
