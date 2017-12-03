@@ -462,13 +462,28 @@ Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
 ## Building
 This section is for those interested in building OSARA from source code.
 
-You will need:
+### Getting the Source Code
+The OSARA Git repository is located at https://github.com/jcsteh/osara.git.
+You can clone it with the following command, which will place files in a directory named osara:
+
+```
+git clone --recursive https://github.com/jcsteh/osara.git
+```
+
+The `--recursive` option is needed to retrieve Git submodules we use.
+If you didn't pass this option to `git clone`, you will need to run `git submodule update --init`.
+Whenever a required submodule commit changes (e.g. after git pull), you will need to run `git submodule update`.
+If you aren't sure, run `git submodule update` after every git pull, merge or checkout.
+
+### Dependencies
+To build OSARA, you will need:
 
 - Windows only: Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
  - [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or [Xcode](https://developer.apple.com/xcode/download/)
 - [SCons](http://www.scons.org/), version 2.3.2 or later
 
+### How to Build
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
 The resulting installer can be found in the installer directory.
 
