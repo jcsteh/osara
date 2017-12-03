@@ -7,7 +7,7 @@ branches:
 environment:
  PY_PYTHON: 2.7-32
  encFileKey:
-  secure: ekOvuyywHuDdGZmRmoj+b3jfrq39A2xlx4RD5ZUGd/8=
+  secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
 
 init:
  - ps:       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
@@ -42,4 +42,4 @@ deploy_script:
       version=$env:APPVEYOR_BUILD_VERSION;
       exe=$exe
      }
-     ConvertTo-Json -InputObject $data -Compress | ssh nvaccess@exbi.nvaccess.org osaraCiHook
+     ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook

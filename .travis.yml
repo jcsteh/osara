@@ -5,7 +5,7 @@ branches:
 language: objective-c
 
 addons:
- ssh_known_hosts: exbi.nvaccess.org
+ ssh_known_hosts: duralumin.jantrid.net
 
 env:
  - version="2017.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
@@ -27,4 +27,4 @@ install:
 script: scons version=$version
 
 after_success:
- '(echo "{\"os\": \"mac\", \"version\": \"$version\", \"dmg\": \"$dmg\"}"; cat installer/$dmg) | ssh nvaccess@exbi.nvaccess.org osaraCiHook'
+ '(echo "{\"os\": \"mac\", \"version\": \"$version\", \"dmg\": \"$dmg\"}"; cat installer/$dmg) | ssh osara@duralumin.jantrid.net osaraCiHook'
