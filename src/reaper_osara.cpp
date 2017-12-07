@@ -825,6 +825,10 @@ void postToggleMasterMono(int command) {
 	outputMessage(GetToggleCommandState(command) ? "master mono" : "master stereo");
 }
 
+void postToggleAutoCrossfade(int command) {
+	outputMessage(GetToggleCommandState(command) ? "crossfade on" : "crossfade off");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -919,6 +923,7 @@ PostCommand POST_COMMANDS[] = {
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
+	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

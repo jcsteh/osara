@@ -191,6 +191,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### Options
 - Options: Cycle ripple editing mode
 - Options: Toggle metronome
+- Options: Toggle auto-crossfade on/off: alt+x
 
 #### Undo
 - Edit: Undo
