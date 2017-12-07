@@ -1039,16 +1039,9 @@ void sendMenu(HWND sendWindow) {
 		acc->Release();
 		return;
 	}
-	// Click the selected control.
-	long l, t, w, h;
-	HRESULT res = acc->accLocation(&l, &t, &w, &h, child);
+	// Activate the selected control.
+	acc->accDoDefaultAction(child);
 	acc->Release();
-	if (res != S_OK)
-		return;
-	POINT point = {l, t};
-	ScreenToClient(sendWindow, &point);
-	SendMessage(sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
-	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
 }
 
 void clickIoButton(MediaTrack* track, bool rightClick=false) {
