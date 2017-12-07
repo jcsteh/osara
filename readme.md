@@ -31,7 +31,7 @@ It has only been tested with the NVDA and VoiceOver screen readers.
 However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
 
 ## Download and Installation
-You can download the latest OSARA installer from the [OSARA Development Snapshots](http://www.nvaccess.org/files/osara/snapshots.html) page.
+You can download the latest OSARA installer from the [OSARA Development Snapshots](https://osara.reaperaccessibility.com/snapshots/) page.
 
 ### Windows
 Once yu have downloaded the installer, simply run it and follow the instructions.
@@ -62,6 +62,12 @@ Note that any keyboard commands described in this document assume you are using 
 
 For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
+
+## Additional Documentation
+The sections below document all functionality specific to OSARA.
+However, they do not attempt to explain how a screen reader user can best understand and use REAPER.
+REAPER is a fairly complex application and most of the existing documentation is very much targeted at sighted users.
+For more complete, in-depth documentation and guides on using REAPER with OSARA, please consult the [REAPER Accessibility Wiki](https://reaperaccessibility.com/).
 
 ## Usage
 
