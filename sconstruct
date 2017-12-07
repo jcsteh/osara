@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConstruct
 # Author: James Teh <jamie@jantrid.net>
-# Copyright 2015-2016 NV Access Limited
+# Copyright 2015-2017 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
 import os
@@ -10,7 +10,7 @@ vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
 env = Environment(variables=vars,
-	copyright="Copyright (C) 2014-2016 NV Access Limited and other contributors",
+	copyright="Copyright (C) 2014-2017 NV Access Limited, James Teh & other contributors",
 )
 
 if env["PLATFORM"] == "win32":
