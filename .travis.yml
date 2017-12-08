@@ -11,6 +11,7 @@ env:
  - version="2017.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
 
 before_install:
+ - sudo python -m ensurepip
  # We get weird errors without --egg. No idea why.
  # The latest SCons 2.5.0.post1 is broken, so hard-code 2.5.0 for now.
  - sudo pip install --egg scons==2.5.0
