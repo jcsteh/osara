@@ -8,7 +8,7 @@ addons:
  ssh_known_hosts: duralumin.jantrid.net
 
 env:
- - version="2017.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
+ - version="2018.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
 
 before_install:
  - sudo python -m ensurepip
