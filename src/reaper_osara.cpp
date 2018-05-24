@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2017 NV Access Limited, James Teh
+ * Copyright 2014-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -829,6 +829,10 @@ void postToggleAutoCrossfade(int command) {
 	outputMessage(GetToggleCommandState(command) ? "crossfade on" : "crossfade off");
 }
 
+void postToggleLocking(int command) {
+	outputMessage(GetToggleCommandState(command) ? "locking on" : "locking off");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -924,6 +928,7 @@ PostCommand POST_COMMANDS[] = {
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
+	{1135, postToggleLocking}, // Options: Toggle locking
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

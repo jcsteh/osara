@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@jantrid.net&gt; & other contributors
-- Copyright: 2014-2017 NV Access Limited, James Teh & other contributors
+- Copyright: 2014-2018 NV Access Limited, James Teh & other contributors
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -192,6 +192,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Options: Cycle ripple editing mode
 - Options: Toggle metronome
 - Options: Toggle auto-crossfade on/off: alt+x
+- Options: Toggle locking: l
 
 #### Undo
 - Edit: Undo
