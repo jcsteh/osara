@@ -833,6 +833,16 @@ void postToggleLocking(int command) {
 	outputMessage(GetToggleCommandState(command) ? "locking on" : "locking off");
 }
 
+void postCycleRecordMode(int command) {
+	if (GetToggleCommandState(40252)) {
+		outputMessage("normal record");
+	} else if (GetToggleCommandState(40253)) {
+		outputMessage("selected item auto-punch");
+	} else if (GetToggleCommandState(40076)) {
+		outputMessage("time selection auto-punch");
+	}
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -937,6 +947,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
+	{"_BR_CYCLE_RECORD_MODES", postCycleRecordMode}, // SWS/BR: Options - Cycle through record modes
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
