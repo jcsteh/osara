@@ -72,7 +72,13 @@ void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		bool trackReported = false;
 		for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
 			auto& pwChan = pwTrack.channels[c];
-			double newPeak = VAL2DB(Track_GetPeakInfo(pwTrack.track, c));
+			// #119: We use Track_GetPeakHoldDB even when Peak Watcher's hold
+			//  functionality is disabled because we only measure every 30 ms and we
+			// might miss peaks.
+			// Undocumented: Track_GetPeakHoldDB returns hundredths of a dB.
+			double newPeak = Track_GetPeakHoldDB(pwTrack.track, c, false) * 100.0;
+			// We have the peak now, so reset REAPER's hold.
+			Track_GetPeakHoldDB(pwTrack.track, c, true);
 			if (pw_hold == -1 // Hold disabled
 				|| newPeak > pwChan.peak
 				|| (pw_hold != 0 && time > pwChan.time + pw_hold)

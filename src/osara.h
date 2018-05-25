@@ -124,6 +124,7 @@
 #define REAPERAPI_WANT_TrackFX_GetRecCount
 #define REAPERAPI_WANT_CountAutomationItems
 #define REAPERAPI_WANT_GetSetAutomationItemInfo
+#define REAPERAPI_WANT_Track_GetPeakHoldDB
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
