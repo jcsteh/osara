@@ -194,6 +194,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Options: Toggle auto-crossfade on/off: alt+x
 - Options: Toggle locking: l
 - (SWS extension) SWS/BR: Options - Cycle through record modes
+- Options: Solo in front
 
 #### Undo
 - Edit: Undo

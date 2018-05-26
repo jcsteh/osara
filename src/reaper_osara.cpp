@@ -838,6 +838,10 @@ void postToggleLocking(int command) {
 	outputMessage(GetToggleCommandState(command) ? "locking on" : "locking off");
 }
 
+void postToggleSoloInFront(int command) {
+	outputMessage(GetToggleCommandState(command) ? "solo in front" : "normal solo");
+}
+
 void postCycleRecordMode(int command) {
 	if (GetToggleCommandState(40252)) {
 		outputMessage("normal record");
@@ -944,6 +948,7 @@ PostCommand POST_COMMANDS[] = {
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
 	{1135, postToggleLocking}, // Options: Toggle locking
+	{40745, postToggleSoloInFront}, // Options: Solo in front
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
