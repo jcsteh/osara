@@ -702,9 +702,12 @@ void postMoveToTimeSig(int command) {
 	outputMessage(s);
 }
 
-int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart) {
-	// Stretch marker positions are relative to the start of the item.
-	double posRel = pos - itemStart;
+int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
+	double playRate
+) {
+	// Stretch marker positions are relative to the start of the item and the
+	// take's play rate.
+	double posRel = (pos - itemStart) * playRate;
 	if (posRel < 0)
 		return -1;
 	int index = GetTakeStretchMarker(take, -1, &posRel, NULL);
@@ -733,7 +736,9 @@ void postGoToStretch(int command) {
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take)
 			continue;
-		if (getStretchAtPos(take, cursor, *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL)) != -1) {
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		if (getStretchAtPos(take, cursor, itemStart, playRate) != -1) {
 			found = true;
 			break;
 		}
@@ -1806,11 +1811,13 @@ void cmdMoveStretch(Command* command) {
 		if (!take)
 			continue;
 		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-		int index = getStretchAtPos(take, lastStretchPos, itemStart);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		int index = getStretchAtPos(take, lastStretchPos, itemStart, playRate);
 		if (index == -1)
 			continue;
-		// Stretch marker positions are relative to the start of the item.
-		double destPos = cursor - itemStart;
+		// Stretch marker positions are relative to the start of the item and the
+		// take's play rate.
+		double destPos = (cursor - itemStart) * playRate;
 		SetTakeStretchMarker(take, index, destPos, NULL);
 		done = true;
 	}
