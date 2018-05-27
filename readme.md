@@ -227,6 +227,17 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### View
 - View: Toggle master track visible
 
+#### Grid
+- Grid: Set to 1: control+shift+1
+- Grid: Set to 1/2: control+shift+2
+- Grid: Set to 1/32: control+shift+3
+- Grid: Set to 1/4: control+shift+4
+- Grid: Set to 1/6 (1/4 triplet): control+shift+5
+- Grid: Set to 1/16: control+shift+6
+- Grid: Set to 1/24 (1/16 triplet): control+shift+7
+- Grid: Set to 1/8: control+shift+8
+- Grid: Set to 1/12 (1/8 triplet): control+shift+9
+
 #### MIDI Editor
 - View: Go to start of file
 - View: Go to end of file

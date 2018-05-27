@@ -982,6 +982,15 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40625, "set selection start"}, // Time selection: Set start point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
+	{40781, "grid whole"}, // Grid: Set to 1
+	{40780, "grid half"}, // Grid: Set to 1/2
+	{40775, "grid thirty second"}, // Grid: Set to 1/32
+	{40779, "grid quarter"}, // Grid: Set to 1/4
+	{41214, "grid quarter triplet"}, // Grid: Set to 1/6 (1/4 triplet)
+	{40776, "grid sixteenth"}, // Grid: Set to 1/16
+	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
+	{40778, "grid eighth"}, // Grid: Set to 1/8
+	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 };
 
 #ifdef _WIN32
