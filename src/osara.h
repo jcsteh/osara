@@ -125,6 +125,7 @@
 #define REAPERAPI_WANT_CountAutomationItems
 #define REAPERAPI_WANT_GetSetAutomationItemInfo
 #define REAPERAPI_WANT_Track_GetPeakHoldDB
+#define REAPERAPI_WANT_Master_GetPlayRate
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

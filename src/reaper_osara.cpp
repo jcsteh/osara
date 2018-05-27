@@ -842,6 +842,14 @@ void postToggleSoloInFront(int command) {
 	outputMessage(GetToggleCommandState(command) ? "solo in front" : "normal solo");
 }
 
+void postAdjustPlayRate(int command) {
+	double rate = Master_GetPlayRate(nullptr);
+	ostringstream s;
+	s << fixed << setprecision(3);
+	s << rate << " play rate";
+	outputMessage(s);
+}
+
 void postCycleRecordMode(int command) {
 	if (GetToggleCommandState(40252)) {
 		outputMessage("normal record");
@@ -949,6 +957,10 @@ PostCommand POST_COMMANDS[] = {
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
 	{1135, postToggleLocking}, // Options: Toggle locking
 	{40745, postToggleSoloInFront}, // Options: Solo in front
+	{40522, postAdjustPlayRate}, // Transport: Increase playrate by ~6% (one semitone)
+	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
+	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
+	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

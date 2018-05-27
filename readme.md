@@ -202,6 +202,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 
 #### Transport
 - Transport: Toggle repeat
+- Transport: Increase playrate by ~6% (one semitone): shift+=
+- Transport: Decrease playrate by ~6% (one semitone): shift+-
+- Transport: Increase playrate by ~0.6% (10 cents): =
+- Transport: Decrease playrate by ~0.6% (10 cents): -
 
 #### Selection
 - Time selection: Set start point
