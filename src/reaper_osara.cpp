@@ -850,6 +850,10 @@ void postAdjustPlayRate(int command) {
 	outputMessage(s);
 }
 
+void postToggleMonitoringFxBypass(int command) {
+	outputMessage(GetToggleCommandState(command) ? "FX bypassed" : "fx active");
+}
+
 void postCycleRecordMode(int command) {
 	if (GetToggleCommandState(40252)) {
 		outputMessage("normal record");
@@ -961,6 +965,7 @@ PostCommand POST_COMMANDS[] = {
 	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
+	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
