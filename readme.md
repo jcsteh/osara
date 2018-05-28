@@ -34,13 +34,13 @@ However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) to communi
 You can download the latest OSARA installer from the [OSARA Development Snapshots](https://osara.reaperaccessibility.com/snapshots/) page.
 
 ### Windows
-Once yu have downloaded the installer, simply run it and follow the instructions.
+Once you have downloaded the installer, simply run it and follow the instructions.
 
 Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
 The installer installs the extension into your user configuration, not the program directory.
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
-If yu do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
+If you do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
 
 ### Mac
 Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
@@ -76,156 +76,156 @@ OSARA supports reporting of information for the following actions.
 Most of these are actions built into REAPER, but a few are very useful actions from the SWS extension.
 
 #### Track Navigation/Management
-- Track: Go to next track
-- Track: Go to previous track
-- Track: Go to next track (leaving other tracks selected)
-- Track: Go to previous track (leaving other tracks selected)
+- Track: Go to next track: Downarrow
+- Track: Go to previous track: Uparrow
+- Track: Go to next track (leaving other tracks selected): Shift+Downarrow
+- Track: Go to previous track (leaving other tracks selected): Shift+Uparrow
 - Track: Insert new track
-- Track: Cycle track folder state
-- Track: Cycle track folder collapsed state
+- Track: Cycle track folder state: Shift+Enter
+- Track: Cycle track folder collapsed state: Enter
 - Track: Remove tracks
 
 #### Adjusting Track Parameters
-- Track: Mute/unmute tracks
-- Track: Solo/unsolo tracks
-- Toggle record arming for current (last touched) track
-- Track: Cycle track record monitor
-- Track: Invert track phase
-- Track: Toggle FX bypass for current track
-- Track: Toggle FX bypass for master track
-- Track: toggle FX bypass on all tracks
-- Track: Nudge track volume up
-- Track: Nudge track volume down
-- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up
-- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down
-- Track: Nudge master track volume up
-- Track: Nudge master track volume down
-- Track: Nudge track pan left
-- Track: Nudge track pan right
+- Track: Mute/unmute tracks: F5
+- Track: Solo/unsolo tracks: F6
+- Toggle record arming for current (last touched) track: F7
+- Track: Cycle track record monitor:F8
+- Track: Invert track phase: F9
+- Track: Toggle FX bypass for current track: B
+- Track: Toggle FX bypass for master track: Shift+B
+- Track: toggle FX bypass on all tracks: Control+B
+- Track: Nudge track volume up: Alt+Uparrow
+- Track: Nudge track volume down: Alt+Downarrow
+- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up: Control+Shift+Uparrow
+- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down: Control+Shift+Downarrow
+- Track: Nudge master track volume up: Alt+Shift+Uparrow
+- Track: Nudge master track volume down: Alt+Shift+Downarrow
+- Track: Nudge track pan left: Alt+Leftarrow
+- Track: Nudge track pan right: Alt+Rightarrow
 - Master track: Toggle stereo/mono (L+R): shift+f9
-- Monitoring FX: Toggle bypass
+- Monitoring FX: Toggle bypass: Control+Shift+B
 
 #### Edit Cursor Movement
-- View: Move cursor left one pixel
-- View: Move cursor right one pixel
-- Transport: Go to start of project
-- Transport: Go to end of project
-- Go forward one measure
-- Go back one measure
-- Go forward one beat
-- Go back one beat
-- View: Move cursor right to grid division
-- View: Move cursor left to grid division
+- View: Move cursor left one pixel: Leftarrow
+- View: Move cursor right one pixel: Rightarrow
+- Transport: Go to start of project: Control+Home
+- Transport: Go to end of project: Control+End
+- Go forward one measure: PageDown
+- Go back one measure: PageUp
+- Go forward one beat: Control+PageDown
+- Go back one beat: Control+PageUp
+- View: Move cursor right to grid division: Alt+Shift+Rightarrow
+- View: Move cursor left to grid division: Alt+Shift+Leftarrow
 
 #### Items
 - Item navigation: Select and move to previous item: control+leftArrow
 - Item navigation: Select and move to next item: control+rightArrow
-- Item: Split items at edit or play cursor
-- Item: Split items at time selection
+- Item: Split items at edit or play cursor: S
+- Item: Split items at time selection: Shift+S
 - Item: Remove items
-- Item edit: Move items/envelope points right
-- Item edit: Move items/envelope points left
-- Item edit: Grow left edge of items
-- Item edit: Shrink left edge of items
-- Item edit: Shrink right edge of items
-- Item edit: Grow right edge of items
-- Item: go to next stretch marker
-- Item: go to previous stretch marker
+- Item edit: Move items/envelope points right: . or NumPad6
+- Item edit: Move items/envelope points left: , or NumPad4
+- Item edit: Grow left edge of items: Control+, or Control+NumPad4
+- Item edit: Shrink left edge of items: Control+. or Control+NumPad6
+- Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
+- Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item: go to next stretch marker: Shift+'
+- Item: go to previous stretch marker: Shift+;
 - Item: remove stretch marker at current position
-- Item navigation: Move cursor left to edge of item
-- Item navigation: Move cursor right to edge of item
-- Item: Select all items in track
-- Item: Select all items on selected tracks in current time selection
-- Item grouping: Select all items in groups
-- Item: Select all items in current time selection
-- (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
-- Item properties: Toggle mute
+- Item navigation: Move cursor left to edge of item: Control+Shift+,
+- Item navigation: Move cursor right to edge of item: Control+Shift+.
+- Item: Select all items in track: Control+Alt+A
+- Item: Select all items on selected tracks in current time selection: Alt+Shift+A
+- Item grouping: Select all items in groups: Shift+G
+- Item: Select all items in current time selection: Control+Shift+A
+- (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
+- Item properties: Toggle mute: Alt+F5
 
 #### Takes
-- Take: Switch items to next take
-- Take: Switch items to previous take
+- Take: Switch items to next take: T
+- Take: Switch items to previous take: Shift+T
 
 #### Markers and Regions
-- Markers: Go to previous marker/project start
-- Markers: Go to next marker/project end
-- Markers: Delete marker near cursor
+- Markers: Go to previous marker/project start: ;
+- Markers: Go to next marker/project end: '
+- Markers: Delete marker near cursor: 
 - Markers: Delete region near cursor
-- Markers: Go to marker 01
-- Markers: Go to marker 02
-- Markers: Go to marker 03
-- Markers: Go to marker 04
-- Markers: Go to marker 05
-- Markers: Go to marker 06
-- Markers: Go to marker 07
-- Markers: Go to marker 08
-- Markers: Go to marker 09
-- Markers: Go to marker 10
-- Regions: Go to region 01 after current region finishes playing (smooth seek)
-- Regions: Go to region 02 after current region finishes playing (smooth seek)
-- Regions: Go to region 03 after current region finishes playing (smooth seek)
-- Regions: Go to region 04 after current region finishes playing (smooth seek)
-- Regions: Go to region 05 after current region finishes playing (smooth seek)
-- Regions: Go to region 06 after current region finishes playing (smooth seek)
-- Regions: Go to region 07 after current region finishes playing (smooth seek)
-- Regions: Go to region 08 after current region finishes playing (smooth seek)
-- Regions: Go to region 09 after current region finishes playing (smooth seek)
-- Regions: Go to region 10 after current region finishes playing (smooth seek)
+- Markers: Go to marker 01: 1
+- Markers: Go to marker 02: 2
+- Markers: Go to marker 03: 3
+- Markers: Go to marker 04: 4
+- Markers: Go to marker 05: 5 
+- Markers: Go to marker 06:6
+- Markers: Go to marker 07: 7
+- Markers: Go to marker 08: 8
+- Markers: Go to marker 09: 9
+- Markers: Go to marker 10: 0
+- Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
+- Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
+- Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
+- Regions: Go to region 04 after current region finishes playing (smooth seek): Alt+4
+- Regions: Go to region 05 after current region finishes playing (smooth seek): Alt+5
+- Regions: Go to region 06 after current region finishes playing (smooth seek): Alt+6
+- Regions: Go to region 07 after current region finishes playing (smooth seek): Alt+7
+- Regions: Go to region 08 after current region finishes playing (smooth seek): Alt+8
+- Regions: Go to region 09 after current region finishes playing (smooth seek): Alt+9
+- Regions: Go to region 10 after current region finishes playing (smooth seek): Alt+0
 
 #### Time Signature/Tempo Markers
-- Move edit cursor to previous tempo or time signature change
-- Move edit cursor to next tempo or time signature change
+- Move edit cursor to previous tempo or time signature change: Control+;
+- Move edit cursor to next tempo or time signature change: Control+'
 - Markers: Delete time signature marker near cursor
 
 #### Envelopes
-- Item edit: Move items/envelope points up one track/a bit
-- Item edit: Move items/envelope points down one track/a bit
-- (SWS extension) SWS/FNG: Move selected envelope points up
-- (SWS extension) SWS/FNG: Move selected envelope points down
-- Envelope: Delete all selected points
-- Envelope: Delete all points in time selection
-- Envelope: Insert new point at current position
+- Item edit: Move items/envelope points up one track/a bit: NumPad8
+- Item edit: Move items/envelope points down one track/a bit: NumPad2
+- (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
+- (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
+- Envelope: Delete all selected points: Control+Shift+Delete
+- Envelope: Delete all points in time selection: Alt+Shift+Delete
+- Envelope: Insert new point at current position: Shift+E
 
 #### Zoom
-- Zoom out horizontal
-- Zoom in horizontal
+- Zoom out horizontal: - or NumPad-
+- Zoom in horizontal: = or NumPad+
 
 #### Options
-- Options: Cycle ripple editing mode
-- Options: Toggle metronome
+- Options: Cycle ripple editing mode: Alt+P
+- Options: Toggle metronome: Control+Shift+M
 - Options: Toggle auto-crossfade on/off: alt+x
 - Options: Toggle locking: l
-- (SWS extension) SWS/BR: Options - Cycle through record modes
-- Options: Solo in front
+- (SWS extension) SWS/BR: Options - Cycle through record modes: Alt+\
+- Options: Solo in front: Control+Alt+F6
 
 #### Undo
-- Edit: Undo
-- Edit: Redo
+- Edit: Undo: Control+Z
+- Edit: Redo: Control+Shift+Z
 
 #### Transport
-- Transport: Toggle repeat
-- Transport: Increase playrate by ~6% (one semitone): shift+=
-- Transport: Decrease playrate by ~6% (one semitone): shift+-
-- Transport: Increase playrate by ~0.6% (10 cents): =
-- Transport: Decrease playrate by ~0.6% (10 cents): -
+- Transport: Toggle repeat: Control+R
+- Transport: Increase playrate by ~6% (one semitone): Control+Shift+=
+- Transport: Decrease playrate by ~6% (one semitone): Control+Shift+-
+- Transport: Increase playrate by ~0.6% (10 cents): Shift+=
+- Transport: Decrease playrate by ~0.6% (10 cents): Shift+-
 
 #### Selection
-- Time selection: Set start point
-- Time selection: Set end point
-- Loop points: Set start point
-- Loop points: Set end point
+- Time selection: Set start point: [
+- Time selection: Set end point: ]
+- Loop points: Set start point: Alt+Shift+[
+- Loop points: Set end point: Alt+Shift+]
 - Time selection: Remove contents of time selection (moving later items)
-- Time selection: Remove time selection and loop point selection
-- Unselect all tracks/items/envelope points
+- Time selection: Remove time selection and loop point selection: Escape
+- Unselect all tracks/items/envelope points: Shift+Escape
 
 #### Clipboard
-- Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
-- Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut)
-- Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
-- Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
-- Item: Paste items/tracks
+- Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
+- Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Control+Shift+X
+- Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
+- Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Control+Shift+C
+- Item: Paste items/tracks: Control+V
 
 #### View
-- View: Toggle master track visible
+- View: Toggle master track visible: Control+Alt+M
 
 #### Grid
 - Grid: Set to 1: control+shift+1
@@ -239,16 +239,16 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Grid: Set to 1/12 (1/8 triplet): control+shift+9
 
 #### MIDI Editor
-- View: Go to start of file
-- View: Go to end of file
-- Edit: Move edit cursor right by grid
-- Edit: Move edit cursor left by grid
-- Edit: Move edit cursor right one measure
-- Edit: Move edit cursor left one measure
-- Edit: Increase pitch cursor one semitone
-- Edit: Decrease pitch cursor one semitone
-- Edit: Delete events
-- Edit: Insert note at edit cursor
+- View: Go to start of file: Control+Home
+- View: Go to end of file: Control+End
+- Edit: Move edit cursor right by grid: Alt+Shift+Leftarrow
+- Edit: Move edit cursor left by grid: Alt+Shift+Rightarrow
+- Navigate: Move edit cursor right one measure: PageDown
+- Navigate: Move edit cursor left one measure: PageUp
+- Edit: Increase pitch cursor one semitone: Alt+Uparrow or NumPad8
+- Edit: Decrease pitch cursor one semitone: Alt+Downarrow or NumPad2
+- Edit: Delete events: Delete
+- Edit: Insert note at edit cursor: I
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -521,3 +521,4 @@ The resulting installer can be found in the installer directory.
 - Derek Lane
 - Gianluca Apollaro
 - Marc Mulcahy
+- Garth Humphreys
