@@ -522,3 +522,4 @@ The resulting installer can be found in the installer directory.
 - Gianluca Apollaro
 - Marc Mulcahy
 - Garth Humphreys
+- Lars Sönnebo
