@@ -76,10 +76,10 @@ OSARA supports reporting of information for the following actions.
 Most of these are actions built into REAPER, but a few are very useful actions from the SWS extension.
 
 #### Track Navigation/Management
-- Track: Go to next track: Downarrow
-- Track: Go to previous track: Uparrow
-- Track: Go to next track (leaving other tracks selected): Shift+Downarrow
-- Track: Go to previous track (leaving other tracks selected): Shift+Uparrow
+- Track: Go to next track: DownArrow
+- Track: Go to previous track: UpArrow
+- Track: Go to next track (leaving other tracks selected): Shift+DownArrow
+- Track: Go to previous track (leaving other tracks selected): Shift+UpArrow
 - Track: Insert new track
 - Track: Cycle track folder state: Shift+Enter
 - Track: Cycle track folder collapsed state: Enter
@@ -94,12 +94,12 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Toggle FX bypass for current track: B
 - Track: Toggle FX bypass for master track: Shift+B
 - Track: toggle FX bypass on all tracks: Control+B
-- Track: Nudge track volume up: Alt+Uparrow
-- Track: Nudge track volume down: Alt+Downarrow
-- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up: Control+Shift+Uparrow
-- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down: Control+Shift+Downarrow
-- Track: Nudge master track volume up: Alt+Shift+Uparrow
-- Track: Nudge master track volume down: Alt+Shift+Downarrow
+- Track: Nudge track volume up: Alt+UpArrow
+- Track: Nudge track volume down: Alt+DownArrow
+- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks up: Control+Shift+UpArrow
+- (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down: Control+Shift+DownArrow
+- Track: Nudge master track volume up: Alt+Shift+UpArrow
+- Track: Nudge master track volume down: Alt+Shift+DownArrow
 - Track: Nudge track pan left: Alt+Leftarrow
 - Track: Nudge track pan right: Alt+Rightarrow
 - Master track: Toggle stereo/mono (L+R): shift+f9
@@ -245,8 +245,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Move edit cursor left by grid: Alt+Shift+Rightarrow
 - Navigate: Move edit cursor right one measure: PageDown
 - Navigate: Move edit cursor left one measure: PageUp
-- Edit: Increase pitch cursor one semitone: Alt+Uparrow or NumPad8
-- Edit: Decrease pitch cursor one semitone: Alt+Downarrow or NumPad2
+- Edit: Increase pitch cursor one semitone: Alt+UpArrow or NumPad8
+- Edit: Decrease pitch cursor one semitone: Alt+DownArrow or NumPad2
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
 
