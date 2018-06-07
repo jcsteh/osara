@@ -2155,11 +2155,9 @@ bool handleMainCommandFallback(int command, int flag) {
 	return false;
 }
 
-#ifdef _WIN32
-
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
-VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
 		if (cmd)
@@ -2167,6 +2165,8 @@ VOID CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	KillTimer(NULL, event);
 }
+
+#ifdef _WIN32
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
@@ -2269,8 +2269,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
-#ifdef _WIN32
 		SetTimer(NULL, NULL, 0, delayedInit);
+#ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
 #endif
 		return 1;
