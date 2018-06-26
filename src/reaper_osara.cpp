@@ -993,6 +993,49 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 };
 
+/*** Code related to context menus and other UI that isn't just actions.
+ * This includes code to access REAPER context menus, but also code to display
+ * our own in some cases where REAPER doesn't provide one.
+ */
+
+bool showReaperContextMenu(const int menu) {
+	if (fakeFocus != FOCUS_TRACK && menu != 0) {
+		// Only tracks support more than one menu.
+		return false;
+	}
+	switch (fakeFocus) {
+		// todo: Fix visual positioning.
+		case FOCUS_TRACK:
+			if (menu == 0) {
+				ShowPopupMenu("track_input", 0, 0, nullptr, nullptr, 0, 0);
+			} else if (menu == 1) {
+				ShowPopupMenu("track_panel", 0, 0, nullptr, nullptr, 0, 0);
+			} else if (menu == 2) {
+				ShowPopupMenu("track_routing", 0, 0, nullptr, nullptr, 0, 0);
+			} else {
+				return false;
+			}
+			return true;
+		case FOCUS_ITEM:
+			ShowPopupMenu("item", 0, 0, nullptr, nullptr, 0, 0);
+			return true;
+		case FOCUS_RULER:
+			ShowPopupMenu("ruler", 0, 0, nullptr, nullptr, 0, 0);
+			return true;
+		case FOCUS_ENVELOPE: {
+			int point = getEnvelopePointAtCursor();
+			ShowPopupMenu("envelope_point", 0, 0, nullptr, nullptr,
+				point, currentAutomationItem + 1);
+			return true;
+		}
+		case FOCUS_AUTOMATIONITEM:
+			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr,
+				currentAutomationItem + 1, 0);
+			return true;
+	}
+	return false;
+}
+
 #ifdef _WIN32
 
 // A capturing lambda can't be passed as a Windows callback, hence the struct.
@@ -1176,33 +1219,12 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		) {
 			// Reaper doesn't handle the applications key for these windows.
 			// Display the appropriate context menu depending on fakeFocus.
-			switch (fakeFocus) {
-				// todo: Fix positioning when TrackPopupContextMenu is used.
-				case FOCUS_TRACK:
-					if (GetKeyState(VK_CONTROL) & 0x8000) // Track area
-						TrackPopupMenu(GetContextMenu(0), 0, 0, 0, 0, mainHwnd, NULL);
-					else if (GetKeyState(VK_MENU) & 0x8000) {
-						// Routing. Can't be retrieved with GetContextMenu.
-						MediaTrack* track = GetLastTouchedTrack();
-						if (!track)
-							return 0;
-						clickIoButton(track, true);
-					} else {
-						// Track input. Can't be retrieved with GetContextMenu.
-						MediaTrack* track = GetLastTouchedTrack();
-						if (!track)
-							return 0;
-						HWND hwnd = getTrackVu(track);
-						if (hwnd)
-							PostMessage(hwnd, WM_CONTEXTMENU, NULL, NULL);
-					}
-					break;
-				case FOCUS_ITEM:
-					TrackPopupMenu(GetContextMenu(1), 0, 0, 0, 0, mainHwnd, NULL);
-					break;
-				case FOCUS_RULER:
-					TrackPopupMenu(GetContextMenu(2), 0, 0, 0, 0, mainHwnd, NULL);
-					break;
+			if (GetKeyState(VK_CONTROL) & 0x8000) {
+				showReaperContextMenu(1);
+			} else if (GetKeyState(VK_MENU) & 0x8000) {
+				showReaperContextMenu(2);
+			} else {
+				showReaperContextMenu(0);
 			}
 			return 1;
 		} else if (window = getSendContainer(focus)) {

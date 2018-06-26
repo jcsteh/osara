@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2017 NV Access Limited, James Teh
+ * Copyright 2015-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -17,9 +17,6 @@
 using namespace std;
 
 bool selectedEnvelopeIsTake = false;
-// Keeps track of the automation item the user last moved to.
-// -1 means no automation item,
-// which means use the envelope itself for stuff related to envelope points.
 int currentAutomationItem = -1;
 
 // Returns the selected envelope and the offset for all envelope point times.
@@ -36,6 +33,18 @@ pair<TrackEnvelope*, double> getSelectedEnvelopeAndOffset() {
 		return {envelope, 0.0};
 	double offset = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
 	return {envelope, offset};
+}
+
+int getEnvelopePointAtCursor() {
+	TrackEnvelope* envelope;
+	double offset;
+	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
+	if (!envelope)
+		return -1;
+	// GetEnvelopePointByTime often returns the point before instead of right at the position.
+	// Increment the cursor position a bit to work around this.
+	return GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
+		GetCursorPosition() + 0.0001 - offset);
 }
 
 void postMoveEnvelopePoint(int command) {

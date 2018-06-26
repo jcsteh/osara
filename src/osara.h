@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2017 NV Access Limited, James Teh
+ * Copyright 2014-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -126,6 +126,7 @@
 #define REAPERAPI_WANT_GetSetAutomationItemInfo
 #define REAPERAPI_WANT_Track_GetPeakHoldDB
 #define REAPERAPI_WANT_Master_GetPlayRate
+#define REAPERAPI_WANT_ShowPopupMenu
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

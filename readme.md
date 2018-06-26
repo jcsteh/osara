@@ -24,7 +24,7 @@ Features:
 - Navigation and selection of chords and notes in the MIDI Editor
 
 ## Requirements
-OSARA requires REAPER 5.50 or later.
+OSARA requires REAPER 5.92 or later.
 The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
 It has only been tested with the NVDA and VoiceOver screen readers.
@@ -252,7 +252,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
-OSARA enables keyboard access for the track input, track area, item and ruler context menus.
+OSARA enables keyboard access for the track input, track area, track routing, item, ruler, envelope point and automation item context menus.
 
 Pressing the applications key will open the context menu for the element you are working with.
 For example, if you have just moved to a track, it will open the track input context menu for that track.

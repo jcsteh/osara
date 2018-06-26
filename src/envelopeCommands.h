@@ -2,12 +2,17 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2017 NV Access Limited, James Teh
+ * Copyright 2015-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
 #include "osara.h"
 
+// Keeps track of the automation item the user last moved to.
+// -1 means no automation item,
+// which means use the envelope itself for stuff related to envelope points.
+extern int currentAutomationItem;
+int getEnvelopePointAtCursor();
 void postMoveEnvelopePoint(int command);
 int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope);
 void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints=true, bool checkItems=true);
