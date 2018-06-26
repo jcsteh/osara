@@ -1954,6 +1954,18 @@ void cmdMoveToPreviousTransient(Command* command) {
 	moveToTransient(true);
 }
 
+void cmdShowContextMenu1(Command* command) {
+	showReaperContextMenu(0);
+}
+
+void cmdShowContextMenu2(Command* command) {
+	showReaperContextMenu(1);
+}
+
+void cmdShowContextMenu3(Command* command) {
+	showReaperContextMenu(2);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2049,6 +2061,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next transient"}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous transient"}, "OSARA_PREVTRANSIENT", cmdMoveToPreviousTransient},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Show first context menu (depending on focus)"}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Show second context menu (depending on focus)"}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Show third context menu (depending on focus)"}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
