@@ -23,4 +23,5 @@ void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command);
+void cmdMidiFilterWindow(Command* command);
 #endif
