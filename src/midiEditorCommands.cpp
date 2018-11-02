@@ -501,22 +501,13 @@ void cmdFocusNearestMidiEvent(Command* command) {
 	}
 }
 
-static BOOL CALLBACK cbFindFilterWindow(HWND hWnd, LPARAM lParam) {
-	WCHAR szText[128];
-	if ((GetWindowTextW(hWnd, szText, 128) != 0) &&
-		!wcsncmp(szText, L"Filter Events", 13)) {
-		*((HWND *)lParam) = hWnd;
-		return false;
-	}
-	return true;
-}
-
 void cmdMidiFilterWindow(Command *command) {
-	HWND editor = MIDIEditor_GetActive(), filter = NULL;
+	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	// TODO: we could also check the command state was "off", to skip searching otherwise
-	EnumWindows(cbFindFilterWindow, (LPARAM)&filter);
-	if (filter && (filter != GetFocus()))
+	HWND filter = FindWindow(WC_DIALOG, "Filter Events");
+	if (filter && (filter != GetFocus())) {
 		SetFocus(filter); // focus the window
+	}
 }
 #endif // _WIN32
