@@ -523,3 +523,4 @@ The resulting installer can be found in the installer directory.
 - Marc Mulcahy
 - Garth Humphreys
 - Lars Sönnebo
+- Alexey Zhelezov
