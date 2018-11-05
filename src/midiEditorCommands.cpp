@@ -510,4 +510,5 @@ void cmdMidiFilterWindow(Command *command) {
 		SetFocus(filter); // focus the window
 	}
 }
+
 #endif // _WIN32
