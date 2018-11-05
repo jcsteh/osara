@@ -11,9 +11,9 @@ env:
  - version="2018.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
 
 before_install:
- - sudo python2 -m ensurepip
- # We get weird errors without --egg. No idea why.
- - sudo pip2 install --egg scons
+ # We must use easy_install instead of pip because of a scons packaging bug.
+ # See https://github.com/SCons/scons/issues/2769
+ - sudo python2 -m easy_install scons
 
 install:
  - cd ci
@@ -24,7 +24,7 @@ install:
  - chmod 600 ~/.ssh/id_rsa
  - cd ..
 
-script: scons version=$version
+script: SCONS_LIB_DIR=/usr/local/lib/python2.7/site-packages/scons-3.0.1-py2.7.egg/scons-3.0.1 scons version=$version
 
 after_success:
  '(echo "{\"os\": \"mac\", \"version\": \"$version\", \"dmg\": \"$dmg\"}"; cat installer/$dmg) | ssh osara@duralumin.jantrid.net osaraCiHook'
