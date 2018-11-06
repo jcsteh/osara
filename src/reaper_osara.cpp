@@ -1176,11 +1176,17 @@ void clickIoButton(MediaTrack* track, bool rightClick=false) {
 
 bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetForegroundWindow();
-	char name[4];
+	char name[8];
 	if (GetWindowText(window, name, sizeof(name)) == 0)
 		return false;
-	if (strncmp(name, "FX: ", 4) != 0)
+	if (strncmp(name, "FX: ", 4) != 0 &&
+		strncmp(name, "DX: ", 4) != 0 &&
+		strncmp(name, "VST: ", 5) != 0 &&
+		strncmp(name, "VSTi: ", 6) != 0 &&
+		strncmp(name, "VST3: ", 6) != 0 &&
+		strncmp(name, "VST3i: ", 7) != 0) {
 		return false;
+	}
 	// Descend.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
@@ -1193,10 +1199,7 @@ bool maybeSwitchToFxPluginWindow() {
 	// This should get the plugin window.
 	if (!(window = GetWindow(window, GW_HWNDLAST)))
 		return false;
-	HWND oldFocus = GetFocus();
 	SetFocus(window);
-	if (GetFocus() == oldFocus) // Focus didn't move
-		return false;
 	return true;
 }
 
