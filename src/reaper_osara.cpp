@@ -1201,7 +1201,19 @@ bool maybeSwitchToFxPluginWindow() {
 	// This should get the plugin window.
 	if (!(window = GetWindow(window, GW_HWNDLAST)))
 		return false;
-	SetFocus(window);
+	// Try to focus the first child in Z order
+	HWND plugin = window; // remember plug-in window
+	HWND child;
+	while ((child = GetWindow(window, GW_CHILD))) {
+		window = child;
+	}
+	while (window) {
+		SetFocus(window);
+		if ((window == plugin) || (GetFocus() == window)) {
+			break; // success or the last possible attempt
+		}
+		window = GetParent(window);
+	}
 	return true;
 }
 
