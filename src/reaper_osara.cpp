@@ -1195,12 +1195,17 @@ bool maybeSwitchToFxPluginWindow() {
 	// This is a property page containing the plugin window among other things.
 	if (!(window = GetWindow(window, GW_HWNDLAST)))
 		return false;
+	HWND dialog = window;
 	// Descend.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
 	// This should get the plugin window.
 	if (!(window = GetWindow(window, GW_HWNDLAST)))
 		return false;
+	// set property page name, to avoid CPU label audition after switching
+	if (GetWindowText(dialog, name, sizeof(name)) == 0) {
+		SetWindowText(dialog, " ");
+	}
 	// Try to focus the first child in Z order
 	HWND plugin = window; // remember plug-in window
 	HWND child;
