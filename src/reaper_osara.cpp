@@ -1189,25 +1189,37 @@ bool maybeSwitchToFxPluginWindow() {
 	) {
 		return false;
 	}
-	// Descend.
-	if (!(window = GetWindow(window, GW_CHILD)))
+	// Descend. Observed as the first or as the last.
+	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
 		return false;
+	}
 	// This is a property page containing the plugin window among other things.
-	if (!(window = GetWindow(window, GW_HWNDLAST)))
-		return false;
-	HWND dialog = window;
-	// Descend.
+	// set property page name, to avoid CPU/PDC label audition after switching
+	if (GetWindowText(window, name, sizeof(name)) == 0) {
+		SetWindowText(window, " ");
+	}
+	// Descend. Observed as the first or as the last. 
+	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	// This should get the plugin window.
-	if (!(window = GetWindow(window, GW_HWNDLAST)))
+	char classname[16];
+	if (!GetClassName(window, classname, sizeof(classname))) {
 		return false;
-	// set property page name, to avoid CPU label audition after switching
-	if (GetWindowText(dialog, name, sizeof(name)) == 0) {
-		SetWindowText(dialog, " ");
+	}
+	if (!strcmp(classname, "ComboBox")) {
+		// Plugin window should be the last.
+		if (!(window = GetWindow(window, GW_HWNDLAST))) {
+			return false;
+		}
+	} // else it is the first
+	// We have found plug-in window or its container
+	HWND plugin = window;
+	// if focus is already inside plug-in window, let F6 work as usual
+	HWND focus = GetFocus();
+	if ((focus == plugin) || (IsChild(plugin, focus))) {
+		return false;
 	}
 	// Try to focus the first child in Z order
-	HWND plugin = window; // remember plug-in window
 	HWND child;
 	while ((child = GetWindow(window, GW_CHILD))) {
 		window = child;
