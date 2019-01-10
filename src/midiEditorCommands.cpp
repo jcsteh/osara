@@ -205,18 +205,18 @@ void cmdMidiMoveCursor(Command* command) {
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	static char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
 		"f sharp", "g", "g sharp", "a", "a sharp", "b"};
-	MediaTrack *track = GetMediaItemTake_Track(take);
+	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
-	const char *note_name = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
+	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
 	ostringstream s;
-	if (note_name) {
-		s << note_name;
+	if (noteName) {
+		s << noteName;
 	} else {
 		int octave = pitch / 12 - 1;
 		int szOut = 0;
-		int *octave_offset = (int *)get_config_var("midioctoffs", &szOut);
-		if (octave_offset && (szOut == sizeof(int))) {
-			octave += *octave_offset - 1; // REAPER offset "0" is saved as "1" in the preferences file.
+		int* octaveOffset = (int*)get_config_var("midioctoffs", &szOut);
+		if (octaveOffset && (szOut == sizeof(int))) {
+			octave += *octaveOffset - 1; // REAPER offset "0" is saved as "1" in the preferences file.
 		}
 		pitch %= 12;
 		s << names[pitch] << " " << octave;

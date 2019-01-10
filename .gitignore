@@ -9,3 +9,4 @@ build
 .DS_Store
 *.dmg
 *.rc_mac_*
+/.vs
