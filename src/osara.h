@@ -127,6 +127,10 @@
 #define REAPERAPI_WANT_Track_GetPeakHoldDB
 #define REAPERAPI_WANT_Master_GetPlayRate
 #define REAPERAPI_WANT_ShowPopupMenu
+#define REAPERAPI_WANT_GetMediaItemTake_Track
+#define REAPERAPI_WANT_GetMediaTrackInfo_Value
+#define REAPERAPI_WANT_GetTrackMIDINoteName
+#define REAPERAPI_WANT_get_config_var
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

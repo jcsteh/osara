@@ -202,13 +202,25 @@ void cmdMidiMoveCursor(Command* command) {
 		outputMessage(s);
 }
 
-const string getMidiNoteName(int pitch) {
+const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	static char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
 		"f sharp", "g", "g sharp", "a", "a sharp", "b"};
-	int octave = pitch / 12 - 1;
-	pitch %= 12;
+	MediaTrack* track = GetMediaItemTake_Track(take);
+	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
+	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
 	ostringstream s;
-	s << names[pitch] << " " << octave;
+	if (noteName) {
+		s << noteName;
+	} else {
+		int octave = pitch / 12 - 1;
+		int szOut = 0;
+		int* octaveOffset = (int*)get_config_var("midioctoffs", &szOut);
+		if (octaveOffset && (szOut == sizeof(int))) {
+			octave += *octaveOffset - 1; // REAPER offset "0" is saved as "1" in the preferences file.
+		}
+		pitch %= 12;
+		s << names[pitch] << " " << octave;
+	}
 	return s.str();
 }
 
@@ -405,7 +417,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		selectNote(take, note.index);
 	previewNotes(take, {note});
 	ostringstream s;
-	s << getMidiNoteName(note.pitch);
+	s << getMidiNoteName(take, note.pitch, note.channel);
 	if (!select && !isNoteSelected(take, note.index))
 		s << " unselected ";
 	else
@@ -443,7 +455,7 @@ void cmdMidiMovePitchCursor(Command* command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
-	outputMessage(getMidiNoteName(pitch));
+	outputMessage(getMidiNoteName(take, pitch, chan));
 }
 
 void cmdMidiInsertNote(Command* command) {
