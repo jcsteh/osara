@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2018 NV Access Limited, James Teh
+ * Copyright 2014-2019 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -1669,6 +1669,22 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 		outputMessage("Unselected tracks/items/envelope points");
 }
 
+void cmdSwitchProjectTab(Command* command) {
+	ReaProject* oldProj = EnumProjects(-1, nullptr, 0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	ReaProject* newProj = EnumProjects(-1, nullptr, 0);
+	if (newProj == oldProj) {
+		return;
+	}
+	char newName[200];
+	GetProjectName(newProj, newName, sizeof(newName));
+	if (newName[0]) {
+		outputMessage(newName);
+	} else {
+		outputMessage("[Unsaved]");
+	}
+}
+
 void cmdMoveToNextItemKeepSel(Command* command) {
 	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
 		moveToAutomationItem(1, false, isSelectionContiguous);
@@ -2042,6 +2058,12 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
 	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position
+	{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
+	{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
+	{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
+	{MAIN_SECTION, {{0, 0, 41929}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab (ignore default template)
+	{MAIN_SECTION, {{0, 0, 40861}, NULL}, NULL, cmdSwitchProjectTab}, // Next project tab
+	{MAIN_SECTION, {{0, 0, 40862}, NULL}, NULL, cmdSwitchProjectTab}, // Previous project tab
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid

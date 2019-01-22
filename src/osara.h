@@ -131,6 +131,8 @@
 #define REAPERAPI_WANT_GetMediaTrackInfo_Value
 #define REAPERAPI_WANT_GetTrackMIDINoteName
 #define REAPERAPI_WANT_get_config_var
+#define REAPERAPI_WANT_EnumProjects
+#define REAPERAPI_WANT_GetProjectName
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

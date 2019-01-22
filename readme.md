@@ -140,6 +140,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Select all items in current time selection: Control+Shift+A
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
 - Item properties: Toggle mute: Alt+F5
+- Item: Open associated project in new tab
 
 #### Takes
 - Take: Switch items to next take: T
@@ -237,6 +238,13 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Grid: Set to 1/24 (1/16 triplet): control+shift+7
 - Grid: Set to 1/8: control+shift+8
 - Grid: Set to 1/12 (1/8 triplet): control+shift+9
+
+#### Project Tabs
+- Close current project tab: control+f4
+- New project tab: alt+shift+n
+- New project tab (ignore default template)
+- Next project tab: control+tab
+- Previous project tab: control+shift+tab
 
 #### MIDI Editor
 - View: Go to start of file: Control+Home
