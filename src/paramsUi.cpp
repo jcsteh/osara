@@ -263,39 +263,29 @@ class ParamsDialog {
 	ParamSource* source;
 	HWND dialog;
 	HWND paramCombo;
-	HWND slider;
+	HWND valueCombo;
 	HWND valueEdit;
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
 	Param* param;
+	vector<double> values;
 	double val;
-	int sliderRange;
 	string valText;
 
-	void updateValueText() {
-		if (this->valText.empty()) {
-			// No value text.
-			accPropServices->ClearHwndProps(this->slider, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_VALUE, 1);
+	void updateValue() {
+		int choice = -1;
+		// Find the choice with the highest value <= the current value.
+		for (auto& choiceVal: this->values) {
+			if (choiceVal > this->val) {
+				break;
+			}
+			++choice;
+		}
+		if (choice == -1) {
 			return;
 		}
-
-		// Set the slider's accessible value to this text.
-		accPropServices->SetHwndPropStr(slider, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_VALUE,
-			widen(this->valText).c_str());
-	}
-
-	void updateValue() {
-		double sliderVal = (this->val - this->param->min) / this->param->step;
-		// This should be very close to an integer, but we can get values like 116.999...
-		// Casting to int just truncates the decimal.
-		// Nudge the number a bit to compensate for this.
-		// nearbyint would be better, but MSVC doesn't have this.
-		sliderVal += sliderVal > 0 ? 0.1 : -0.1;
-		SendMessage(this->slider, TBM_SETPOS, TRUE,
-			(int)sliderVal);
-		this->valText = this->param->getValueText(this->val);
-		this->updateValueText();
+		ComboBox_SetCurSel(this->valueCombo, choice);
 		if (this->param->isEditable) {
 			SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
 		}
@@ -307,40 +297,29 @@ class ParamsDialog {
 		int paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
 		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
-		this->sliderRange = (int)((this->param->max - this->param->min) / this->param->step);
-		SendMessage(this->slider, TBM_SETRANGE, TRUE, MAKELPARAM(0, this->sliderRange));
-		SendMessage(this->slider, TBM_SETLINESIZE, 0, 1);
-		SendMessage(this->slider, TBM_SETPAGESIZE, 0,
-			(int)(this->param->largeStep / this->param->step));
+		this->values.clear();
+		ComboBox_ResetContent(this->valueCombo);
+		int numSteps = (int)((this->param->max - this->param->min) / this->param->step);
+		string lastText;
+		for (int step = 0; step <= numSteps; ++step) {
+			// Continually adding to a float accumulates inaccuracy,
+			// so calculate the value from scratch each time.
+			double stepVal = step * this->param->step + this->param->min;
+			string& text = this->param->getValueText(stepVal);
+			if (text.compare(lastText) == 0) {
+				continue; // Same effective value.
+			}
+			lastText = text;
+			this->values.push_back(stepVal);
+			ComboBox_AddString(this->valueCombo, text.c_str());
+		}
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		this->updateValue();
 	}
 
-	void onSliderChange() {
-		int sliderVal = SendMessage(this->slider, TBM_GETPOS, 0, 0);
-		double newVal = sliderVal * this->param->step + this->param->min;
-		if (newVal == this->val)
-			return; // This is due to our own snapping call (below).
-		int step = (newVal > this->val) ? 1 : -1;
+	void onValueChoice() {
+		double newVal = this->values[ComboBox_GetCurSel(this->valueCombo)];
 		this->val = newVal;
-
-		// If the value text (if any) doesn't change, the value change is insignificant.
-		// Snap to the next change in value text.
-		// todo: Optimise; perhaps a binary search?
-		for (; 0 <= sliderVal && sliderVal <= this->sliderRange; sliderVal += step) {
-			// Continually adding to a float accumulates inaccuracy,
-			// so calculate the value from scratch each time.
-			newVal = sliderVal * this->param->step + this->param->min;
-			string& testText = this->param->getValueText(newVal);
-			if (testText.empty())
-				break; // Formatted values not supported.
-			if (testText.compare(this->valText) != 0) {
-				// The value text is different, so this change is significant.
-				// Snap to this value.
-				this->val = newVal;
-				break;
-			}
-		}
 		this->param->setValue(this->val);
 		this->updateValue();
 	}
@@ -361,6 +340,9 @@ class ParamsDialog {
 				if (LOWORD(wParam) == ID_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
 					dialog->onParamChange();
 					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_VAL_COMBO && HIWORD(wParam) == CBN_SELCHANGE) {
+					dialog->onValueChoice();
+					return TRUE;
 				} else if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
 					dialog->onFilterChange();
 					return TRUE;
@@ -370,12 +352,6 @@ class ParamsDialog {
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					DestroyWindow(dialogHwnd);
 					delete dialog;
-					return TRUE;
-				}
-				break;
-			case WM_HSCROLL:
-				if ((HWND)lParam == dialog->slider) {
-					dialog->onSliderChange();
 					return TRUE;
 				}
 				break;
@@ -424,10 +400,10 @@ class ParamsDialog {
 		}
 		ComboBox_SetCurSel(this->paramCombo, newComboSel);
 		if (this->visibleParams.empty()) {
-			EnableWindow(this->slider, FALSE);
+			EnableWindow(this->valueCombo, FALSE);
 			return;
 		}
-		EnableWindow(this->slider, TRUE);
+		EnableWindow(this->valueCombo, TRUE);
 		this->onParamChange();
 	}
 
@@ -452,7 +428,8 @@ class ParamsDialog {
 		SetWindowText(this->dialog, source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
-		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+		this->valueCombo = GetDlgItem(this->dialog, ID_PARAM_VAL_COMBO);
+		WDL_UTF8_HookComboBox(this->paramCombo);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->updateParamList();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
