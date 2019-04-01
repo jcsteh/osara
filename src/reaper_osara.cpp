@@ -331,6 +331,24 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
+/*** A control surface to obtain certain info that can only be retrieved that way.
+ */
+class Surface : IReaperControlSurface {
+	public:
+	const char* GetTypeString() {
+		return "OSARA";
+	}
+	const char* GetDescString() {
+		return "OSARA";
+	}
+	const char* GetConfigString() {
+		return "";
+	}
+
+};
+
+Surface* surface = NULL;
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -2374,6 +2392,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
+		surface = new Surface;
+		rec->Register("csurf_inst", (void*)surface);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
@@ -2384,6 +2404,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Unload.
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
+		delete surface;
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 #else
