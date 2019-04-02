@@ -331,24 +331,6 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
-/*** A control surface to obtain certain info that can only be retrieved that way.
- */
-class Surface : IReaperControlSurface {
-	public:
-	const char* GetTypeString() {
-		return "OSARA";
-	}
-	const char* GetDescString() {
-		return "OSARA";
-	}
-	const char* GetConfigString() {
-		return "";
-	}
-
-};
-
-Surface* surface = NULL;
-
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -804,10 +786,13 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 bool shouldReportTransport = true;
-void postChangeTransportState(int command) {
+int lastTransportState = 0;
+void reportTransportState(int state) {
+	if (state == lastTransportState)
+		return;
+	lastTransportState = state;
 	if (!shouldReportTransport)
 		return;
-	int state = GetPlayState();
 	if (state & 2)
 		outputMessage("pause");
 	else if (state & 4)
@@ -816,6 +801,10 @@ void postChangeTransportState(int command) {
 		outputMessage("play");
 	else
 		outputMessage("stop");
+}
+
+void postChangeTransportState(int command) {
+	reportTransportState(GetPlayState());
 }
 
 void postSelectMultipleItems(int command) {
@@ -2278,6 +2267,32 @@ bool handleMainCommandFallback(int command, int flag) {
 		return true;
 	return false;
 }
+
+/*** A control surface to obtain certain info that can only be retrieved that way.
+ */
+class Surface : IReaperControlSurface {
+	public:
+	virtual const char* GetTypeString() override {
+		return "OSARA";
+	}
+
+	virtual const char* GetDescString() override {
+		return "OSARA";
+	}
+
+	virtual const char* GetConfigString() override {
+		return "";
+	}
+
+	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+		// Calculate integer based transport state
+		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
+		reportTransportState(TransportState);
+	}
+
+};
+
+Surface* surface = NULL;
 
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
