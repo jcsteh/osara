@@ -455,6 +455,10 @@ void postToggleTrackFxBypass(int command) {
 	postToggleTrackFxBypass(track);
 }
 
+void postToggleMasterTrackFxBypass(int command) {
+	postToggleTrackFxBypass(GetMasterTrack(0));
+}
+
 bool shouldReportScrub = true;
 
 void postCursorMovement(int command) {
@@ -883,6 +887,7 @@ PostCommand POST_COMMANDS[] = {
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
+	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
@@ -1604,12 +1609,6 @@ void cmdMoveItems(Command* command) {
 		reportActionName(command->gaccel.accel.cmd);
 }
 
-void cmdToggleMasterTrackFxBypass(Command* command) {
-	// #42: This really should be a post command, but hookpostcommand doesn't fire.
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	postToggleTrackFxBypass(GetMasterTrack(0));
-}
-
 void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
@@ -2050,7 +2049,6 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
 	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
 	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
-	{MAIN_SECTION, {{0, 0, 16}, NULL}, NULL, cmdToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
@@ -2198,17 +2196,24 @@ void cmdConfig(Command* command) {
 
 bool isHandlingCommand = false;
 
-void postCommand(int command, int flag) {
-	if (isHandlingCommand)
-		return; // Don't react to actions we triggered ourselves.
+bool handlePostCommand(int command) {
 	const auto it = postCommandsMap.find(command);
 	if (it != postCommandsMap.end()) {
+		isHandlingCommand = true;
+		Main_OnCommand(command, 0);
 		it->second(command);
-		return;
+		isHandlingCommand = false;
+		return true;
 	}
 	const auto mIt = POST_COMMAND_MESSAGES.find(command);
-	if (mIt != POST_COMMAND_MESSAGES.end())
+	if (mIt != POST_COMMAND_MESSAGES.end()) {
+		isHandlingCommand = true;
+		Main_OnCommand(command, 0);
 		outputMessage(mIt->second);
+		isHandlingCommand = false;
+		return true;
+	}
+	return false;
 }
 
 Command* lastCommand = NULL;
@@ -2237,7 +2242,8 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	}
+	} else if (handlePostCommand(command))
+		return true;
 	return false;
 }
 
@@ -2250,7 +2256,8 @@ bool handleMainCommandFallback(int command, int flag) {
 		it->second->execute(it->second);
 		isHandlingCommand = false;
 		return true;
-	}
+	} else if (handlePostCommand(command))
+		return true;
 	return false;
 }
 
@@ -2342,7 +2349,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
-		rec->Register("hookpostcommand", (void*)postCommand);
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
 			if (COMMANDS[i].id) {
