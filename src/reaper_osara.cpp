@@ -630,8 +630,12 @@ void postCycleRippleMode(int command) {
 	outputMessage(s);
 }
 
+void reportRepeat(bool repeat) {
+	outputMessage(repeat ? "repeat on" : "repeat off");
+}
+
 void postToggleRepeat(int command) {
-	outputMessage(GetToggleCommandState(command) ? "repeat on" : "repeat off");
+	reportRepeat(GetToggleCommandState(command));
 }
 
 void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
@@ -2285,9 +2289,17 @@ class Surface : IReaperControlSurface {
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+		if (isHandlingCommand)
+			return;
 		// Calculate integer based transport state
 		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
 		reportTransportState(TransportState);
+	}
+
+	virtual void SetRepeatState(bool repeat) override {
+		if (isHandlingCommand)
+			return;
+		reportRepeat(repeat);
 	}
 
 };
