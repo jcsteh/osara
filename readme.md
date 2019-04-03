@@ -532,3 +532,4 @@ The resulting installer can be found in the installer directory.
 - Garth Humphreys
 - Lars Sönnebo
 - Alexey Zhelezov
+- Leonard de Ruijter
