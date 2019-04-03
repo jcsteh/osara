@@ -2198,17 +2198,24 @@ void cmdConfig(Command* command) {
 
 bool isHandlingCommand = false;
 
-void postCommand(int command, int flag) {
-	if (isHandlingCommand)
-		return; // Don't react to actions we triggered ourselves.
+bool handlePostCommand(int command) {
 	const auto it = postCommandsMap.find(command);
 	if (it != postCommandsMap.end()) {
+		isHandlingCommand = true;
+		Main_OnCommand(command, 0);
 		it->second(command);
-		return;
+		isHandlingCommand = false;
+		return true;
 	}
 	const auto mIt = POST_COMMAND_MESSAGES.find(command);
-	if (mIt != POST_COMMAND_MESSAGES.end())
+	if (mIt != POST_COMMAND_MESSAGES.end()) {
+		isHandlingCommand = true;
+		Main_OnCommand(command, 0);
 		outputMessage(mIt->second);
+		isHandlingCommand = false;
+		return true;
+	}
+	return false;
 }
 
 Command* lastCommand = NULL;
@@ -2237,7 +2244,8 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	}
+	} else if (handlePostCommand(command))
+		return true;
 	return false;
 }
 
@@ -2250,7 +2258,8 @@ bool handleMainCommandFallback(int command, int flag) {
 		it->second->execute(it->second);
 		isHandlingCommand = false;
 		return true;
-	}
+	} else if (handlePostCommand(command))
+		return true;
 	return false;
 }
 
@@ -2342,7 +2351,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
-		rec->Register("hookpostcommand", (void*)postCommand);
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
 			if (COMMANDS[i].id) {
