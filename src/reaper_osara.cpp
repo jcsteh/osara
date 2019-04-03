@@ -460,6 +460,7 @@ void postToggleMasterTrackFxBypass(int command) {
 }
 
 bool shouldReportScrub = true;
+
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	outputMessage(formatCursorPosition().c_str());
