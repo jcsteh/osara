@@ -272,6 +272,20 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
+string formatTrackWithName(MediaTrack* track) {
+	ostringstream s;
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	if (trackNum <= 0)
+		s << "master";
+	else {
+		s << trackNum;
+		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+		if (trackName && trackName[0])
+			s << " " << trackName;
+	}
+	return s.str();
+}
+
 void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
 	const char* name = kbd_getTextFromCmd(command, section);
 	const char* start;
@@ -348,9 +362,9 @@ void postGoToTrack(int command) {
 		s << "master";
 	else {
 		s << trackNum;
-	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-	if (folderDepth == 1) // Folder
-		s << " " << getFolderCompacting(track);
+		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
+		if (folderDepth == 1) // Folder
+			s << " " << getFolderCompacting(track);
 		const char* message = formatFolderState(folderDepth, false);
 		if (message)
 			s << " " << message;
@@ -1740,10 +1754,7 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 			++count;
 			if (count > 1)
 				s << ", ";
-			s << i + 1;
-			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-			if (name && name[0])
-				s << " " << name;
+			s << formatTrackWithName(track);
 		}
 	}
 	if (count == 0)
@@ -2300,6 +2311,24 @@ class Surface : IReaperControlSurface {
 		if (isHandlingCommand)
 			return;
 		reportRepeat(repeat);
+	}
+
+	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
+		if (isHandlingCommand)
+			return;
+		ostringstream s;
+		s << (solo ? "soloed" : "unsoloed") << " ";
+		s << formatTrackWithName(track);
+		outputMessage(s);
+	}
+
+	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
+		if (isHandlingCommand)
+			return;
+		ostringstream s;
+		s << (arm ? "armed" : "unarmed") << " ";
+		s << formatTrackWithName(track);
+		outputMessage(s);
 	}
 
 };
