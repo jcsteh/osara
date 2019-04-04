@@ -804,11 +804,7 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 bool shouldReportTransport = true;
-int lastTransportState = 0;
 void reportTransportState(int state) {
-	if (state == lastTransportState)
-		return;
-	lastTransportState = state;
 	if (!shouldReportTransport)
 		return;
 	if (state & 2)
@@ -1748,8 +1744,14 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 	ostringstream s;
 	s << prefix << ": ";
 	int count = 0;
-	for (int i = 0; i < CountTracks(0); ++i) {
-		MediaTrack* track = GetTrack(0, i);
+	// We use -1 for the master track.
+	for (int i = -1; i < CountTracks(0); ++i) {
+		MediaTrack* track;
+		if (i == -1)
+			// Even when the master track is invisible, it could have a state we want to know, such as muted.
+			track = GetMasterTrack(0);
+		else
+			track = GetTrack(0, i);
 		if (checkState(track)) {
 			++count;
 			if (count > 1)
@@ -2300,7 +2302,7 @@ class Surface : IReaperControlSurface {
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
-		if (isHandlingCommand)
+		if (!this->shouldHandleChange())
 			return;
 		// Calculate integer based transport state
 		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
@@ -2308,13 +2310,13 @@ class Surface : IReaperControlSurface {
 	}
 
 	virtual void SetRepeatState(bool repeat) override {
-		if (isHandlingCommand)
+		if (!this->shouldHandleChange())
 			return;
 		reportRepeat(repeat);
 	}
 
 	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
-		if (isHandlingCommand)
+		if (!this->shouldHandleChange())
 			return;
 		ostringstream s;
 		s << (solo ? "soloed" : "unsoloed") << " ";
@@ -2323,13 +2325,29 @@ class Surface : IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
-		if (isHandlingCommand)
+		if (!this->shouldHandleChange())
 			return;
 		ostringstream s;
 		s << (arm ? "armed" : "unarmed") << " ";
 		s << formatTrackWithName(track);
 		outputMessage(s);
 	}
+
+	private:
+	bool shouldHandleChange() {
+		DWORD now = GetTickCount();
+		DWORD prevChangeTime = lastChangeTime;
+		lastChangeTime = now;
+		if (!isHandlingCommand &&
+			// Only handle surface changes if the last command is 100ms or more ago.
+			now - lastCommandTime >= 100 &&
+			// Only handle surface changes if the last change is 250ms or more ago.
+			now - prevChangeTime >= 250
+		)
+			return true;
+		return false;
+	}
+	DWORD lastChangeTime = 0;
 
 };
 
