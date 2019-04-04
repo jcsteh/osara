@@ -2324,6 +2324,15 @@ class Surface : IReaperControlSurface {
 		outputMessage(s);
 	}
 
+	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
+		if (!this->shouldHandleChange())
+			return;
+		ostringstream s;
+		s << (mute ? "muted" : "unmuted") << " ";
+		s << formatTrackWithName(track);
+		outputMessage(s);
+	}
+
 	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
 		if (!this->shouldHandleChange())
 			return;
