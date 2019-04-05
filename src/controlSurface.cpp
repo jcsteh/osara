@@ -29,22 +29,25 @@ class Surface : public IReaperControlSurface {
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
-		if (!this->shouldHandleChange())
+		if (!this->shouldHandleChange()) {
 			return;
+		}
 		// Calculate integer based transport state
 		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
 		reportTransportState(TransportState);
 	}
 
 	virtual void SetRepeatState(bool repeat) override {
-		if (!this->shouldHandleChange())
+		if (!this->shouldHandleChange()) {
 			return;
+		}
 		reportRepeat(repeat);
 	}
 
 	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
-		if (!this->shouldHandleChange())
+		if (!this->shouldHandleChange()) {
 			return;
+		}
 		ostringstream s;
 		s << (solo ? "soloed" : "unsoloed") << " ";
 		s << formatTrackWithName(track);
@@ -52,8 +55,9 @@ class Surface : public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
-		if (!this->shouldHandleChange())
+		if (!this->shouldHandleChange()) {
 			return;
+		}
 		ostringstream s;
 		s << (mute ? "muted" : "unmuted") << " ";
 		s << formatTrackWithName(track);
@@ -61,8 +65,9 @@ class Surface : public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
-		if (!this->shouldHandleChange())
+		if (!this->shouldHandleChange()) {
 			return;
+		}
 		ostringstream s;
 		s << (arm ? "armed" : "unarmed") << " ";
 		s << formatTrackWithName(track);
@@ -77,8 +82,9 @@ class Surface : public IReaperControlSurface {
 		if (!isHandlingCommand &&
 			// Only handle surface changes if the last change is 100ms or more ago.
 			now - prevChangeTime >= 100
-		)
+		) {
 			return true;
+		}
 		return false;
 	}
 	DWORD lastChangeTime = 0;
