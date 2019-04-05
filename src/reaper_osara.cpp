@@ -275,7 +275,7 @@ const char* getFolderCompacting(MediaTrack* track) {
 string formatTrackWithName(MediaTrack* track) {
 	ostringstream s;
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum <= 0)
+	if (trackNum == -1)
 		s << "master";
 	else {
 		s << trackNum;
@@ -358,7 +358,7 @@ void postGoToTrack(int command) {
 		return;
 	ostringstream s;
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum <= 0)
+	if (trackNum == -1)
 		s << "master";
 	else {
 		s << trackNum;
