@@ -184,6 +184,7 @@ const TimeFormat TF_RULER = TF_NONE;
 std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true, bool includeZeros=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
+std::string formatTrackWithName(MediaTrack* track);
 
 #ifdef _WIN32
 #include <string>
@@ -201,5 +202,10 @@ extern IAccPropServices* accPropServices;
 #define ComboBox_AddString(hwnd, str) (int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
 #define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
+
+extern bool isHandlingCommand;
+void reportTransportState(int state);
+void reportRepeat(bool repeat);
+IReaperControlSurface* createSurface();
 
 #endif

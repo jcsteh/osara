@@ -2216,6 +2216,10 @@ void cmdConfig(Command* command) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
+/*** Surface definition. */
+
+IReaperControlSurface* surface = NULL;
+
 /*** Initialisation, termination and inner workings. */
 
 bool isHandlingCommand = false;
@@ -2284,83 +2288,6 @@ bool handleMainCommandFallback(int command, int flag) {
 		return true;
 	return false;
 }
-
-/*** A control surface to obtain certain info that can only be retrieved that way.
- */
-class Surface : IReaperControlSurface {
-	public:
-	virtual const char* GetTypeString() override {
-		return "OSARA";
-	}
-
-	virtual const char* GetDescString() override {
-		return "OSARA";
-	}
-
-	virtual const char* GetConfigString() override {
-		return "";
-	}
-
-	virtual void SetPlayState(bool play, bool pause, bool rec) override {
-		if (!this->shouldHandleChange())
-			return;
-		// Calculate integer based transport state
-		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
-		reportTransportState(TransportState);
-	}
-
-	virtual void SetRepeatState(bool repeat) override {
-		if (!this->shouldHandleChange())
-			return;
-		reportRepeat(repeat);
-	}
-
-	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
-		if (!this->shouldHandleChange())
-			return;
-		ostringstream s;
-		s << (solo ? "soloed" : "unsoloed") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
-	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
-		if (!this->shouldHandleChange())
-			return;
-		ostringstream s;
-		s << (mute ? "muted" : "unmuted") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
-	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
-		if (!this->shouldHandleChange())
-			return;
-		ostringstream s;
-		s << (arm ? "armed" : "unarmed") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
-	private:
-	bool shouldHandleChange() {
-		DWORD now = GetTickCount();
-		DWORD prevChangeTime = lastChangeTime;
-		lastChangeTime = now;
-		if (!isHandlingCommand &&
-			// Only handle surface changes if the last command is 100ms or more ago.
-			now - lastCommandTime >= 100 &&
-			// Only handle surface changes if the last change is 250ms or more ago.
-			now - prevChangeTime >= 250
-		)
-			return true;
-		return false;
-	}
-	DWORD lastChangeTime = 0;
-
-};
-
-Surface* surface = NULL;
 
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
@@ -2475,7 +2402,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
-		surface = new Surface;
+		surface = createSurface();
 		rec->Register("csurf_inst", (void*)surface);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #ifdef _WIN32
