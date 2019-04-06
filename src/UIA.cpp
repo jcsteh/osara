@@ -7,13 +7,85 @@
  */
 
 #include "osara.h"
+#include <ole2.h>
 #include <UIAutomation.h>
 
 HWND UIAWnd = 0;
 const char* WINDOW_CLASS_NAME = "OSARA_UIA_WND";
 
+// Provider code based on Microsoft's UIAutomationSimpleProvider example.
+class UIAProvider : public IRawElementProviderSimple
+{
+public:
+	UIAProvider(HWND hwnd) {}
+
+	// IUnknown methods
+	IFACEMETHODIMP_(ULONG) AddRef() {
+		return InterlockedIncrement(&m_refCount);
+	}
+
+	IFACEMETHODIMP_(ULONG) Release() {
+		long val = InterlockedDecrement(&m_refCount);
+		if (val == 0) {
+			delete this;
+		}
+		return val;
+	}
+
+	IFACEMETHODIMP QueryInterface(REFIID riid, void** ppInterface) {
+		if (riid == __uuidof(IUnknown)) {
+			*ppInterface =static_cast<IUnknown*>(this);
+		} else if (riid == __uuidof(IRawElementProviderSimple)) {
+			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+		} else {
+			*ppInterface = NULL;
+			return E_NOINTERFACE;
+		}
+		(static_cast<IUnknown*>(*ppInterface))->AddRef();
+		return S_OK;
+	}
+
+	// IRawElementProviderSimple methods
+	IFACEMETHODIMP get_ProviderOptions(ProviderOptions * pRetVal) {
+		*pRetVal = ProviderOptions_ServerSideProvider;
+		return S_OK;
+	}
+
+	IFACEMETHODIMP GetPatternProvider(PATTERNID patternId, IUnknown** pRetVal) {
+		// We do not support any pattern.
+		*pRetVal = NULL;
+		return S_OK;
+	}
+
+	IFACEMETHODIMP GetPropertyValue(PROPERTYID propertyId, VARIANT * pRetVal) {
+		// We do not implement any property.
+		pRetVal->vt = VT_EMPTY;
+		return S_OK;
+	}
+
+	IFACEMETHODIMP get_HostRawElementProvider(IRawElementProviderSimple ** pRetVal) {
+		return UiaHostProviderFromHwnd(m_controlHWnd, pRetVal);
+	}
+
+private:
+	virtual ~UIAProvider() {}
+	// Ref Counter for this COM object
+	ULONG m_refCount;
+	HWND m_controlHWnd; // The HWND for the control.
+};
+
+IRawElementProviderSimple* provider = nullptr;
+
 LRESULT CALLBACK UIAWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	return DefWindowProc(hwnd, msg, wParam, lParam);
+	switch (msg) {
+		case WM_GETOBJECT:
+			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
+				return UiaReturnRawElementProvider(hwnd, wParam, lParam, provider);
+			}
+			return 0;
+		default:
+			return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
 }
 
 WNDCLASSEX getWindowClass() {
@@ -49,13 +121,14 @@ bool initializeUIA() {
 	if (!UIAWnd) {
 		return false;
 	}
+	provider = new UIAProvider(UIAWnd);
 	ShowWindow(UIAWnd, SW_SHOWNA);
 	return true;;
 }
 
-
 bool trminateUIA() {
 	ShowWindow(UIAWnd, SW_HIDE);
+	delete provider;
 	if (!DestroyWindow(UIAWnd)) {
 		return false;
 	}
