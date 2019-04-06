@@ -44,36 +44,6 @@ class Surface : public IReaperControlSurface {
 		reportRepeat(repeat);
 	}
 
-	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
-		if (!this->shouldHandleChange()) {
-			return;
-		}
-		ostringstream s;
-		s << (solo ? "soloed" : "unsoloed") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
-	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
-		if (!this->shouldHandleChange()) {
-			return;
-		}
-		ostringstream s;
-		s << (mute ? "muted" : "unmuted") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
-	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
-		if (!this->shouldHandleChange()) {
-			return;
-		}
-		ostringstream s;
-		s << (arm ? "armed" : "unarmed") << " ";
-		s << formatTrackWithName(track);
-		outputMessage(s);
-	}
-
 	private:
 	bool shouldHandleChange() {
 		DWORD now = GetTickCount();
