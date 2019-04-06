@@ -229,6 +229,8 @@ std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 
 extern IAccPropServices* accPropServices;
+bool initializeUIA();
+bool terminateUIA();
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.

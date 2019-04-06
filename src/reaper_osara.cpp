@@ -3133,11 +3133,15 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		resetTimeCache();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)
+		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
 			return 0;
+		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
+		if (!initializeUIA()) {
+			return 0;
+		}
 #else
 		NSA11yWrapper::init();
 #endif
