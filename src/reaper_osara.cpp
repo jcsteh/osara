@@ -88,6 +88,12 @@ string narrow(const wstring& text) {
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
+	// Use UIA when available (Windows 10 fall creators update and above)
+	if (UIAProvider &&
+		(UiaRaiseNotificationEvent(UIAProvider, NotificationKind_Other, NotificationProcessing_MostRecent, SysAllocString(widen(message).c_str()), nullptr) == S_OK)
+	) {
+		return;	
+	}
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);

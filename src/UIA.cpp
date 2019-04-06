@@ -8,16 +8,17 @@
 
 #include "osara.h"
 #include <ole2.h>
-#include <UIAutomation.h>
+
+using namespace std;
 
 HWND UIAWnd = 0;
 const char* WINDOW_CLASS_NAME = "OSARA_UIA_WND";
 
 // Provider code based on Microsoft's UIAutomationSimpleProvider example.
-class UIAProvider : public IRawElementProviderSimple
+class UIAProviderImpl : public IRawElementProviderSimple
 {
 public:
-	UIAProvider(HWND hwnd) {}
+	UIAProviderImpl(HWND hwnd) {}
 
 	// IUnknown methods
 	IFACEMETHODIMP_(ULONG) AddRef() {
@@ -68,19 +69,19 @@ public:
 	}
 
 private:
-	virtual ~UIAProvider() {}
+	virtual ~UIAProviderImpl() {}
 	// Ref Counter for this COM object
 	ULONG m_refCount;
 	HWND m_controlHWnd; // The HWND for the control.
 };
 
-IRawElementProviderSimple* provider = nullptr;
+IRawElementProviderSimple* UIAProvider = nullptr;
 
 LRESULT CALLBACK UIAWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
 			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
-				return UiaReturnRawElementProvider(hwnd, wParam, lParam, provider);
+				return UiaReturnRawElementProvider(hwnd, wParam, lParam, UIAProvider);
 			}
 			return 0;
 		default:
@@ -121,14 +122,14 @@ bool initializeUIA() {
 	if (!UIAWnd) {
 		return false;
 	}
-	provider = new UIAProvider(UIAWnd);
+	UIAProvider = new UIAProviderImpl(UIAWnd);
 	ShowWindow(UIAWnd, SW_SHOWNA);
 	return true;;
 }
 
 bool trminateUIA() {
 	ShowWindow(UIAWnd, SW_HIDE);
-	delete provider;
+	delete UIAProvider;
 	if (!DestroyWindow(UIAWnd)) {
 		return false;
 	}
