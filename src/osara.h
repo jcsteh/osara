@@ -224,7 +224,6 @@ bool isTrackSelected(MediaTrack* track);
 #ifdef _WIN32
 #include <string>
 #include <oleacc.h>
-#include <UIAutomation.h>
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
@@ -232,8 +231,8 @@ std::string narrow(const std::wstring& text);
 extern IAccPropServices* accPropServices;
 bool initializeUIA();
 bool terminateUIA();
+bool sendUIANotification(const std::string& message);
 extern HWND UIAWnd;
-extern IRawElementProviderSimple* UIAProvider;
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.

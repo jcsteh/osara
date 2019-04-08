@@ -7,12 +7,22 @@
  */
 
 #include "osara.h"
+#include <UIAutomation.h>
 #include <ole2.h>
 
 using namespace std;
 
 HWND UIAWnd = 0;
 const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
+typedef HRESULT(WINAPI *UiaRaiseNotificationEvent_funcType)(
+	_In_ IRawElementProviderSimple* provider,
+	NotificationKind notificationKind,
+	NotificationProcessing notificationProcessing,
+	_In_opt_ BSTR displayString,
+	_In_ BSTR activityId
+);
+HMODULE UIAutomationCore = nullptr;
+UiaRaiseNotificationEvent_funcType UiaRaiseNotificationEvent_ptr = nullptr;
 
 // Provider code based on Microsoft's UIAutomationSimpleProvider example.
 class UIAProviderImpl : public IRawElementProviderSimple
@@ -121,6 +131,14 @@ WNDCLASSEX getWindowClass() {
 WNDCLASSEX windowClass;
 
 bool initializeUIA() {
+	UIAutomationCore = LoadLibraryA("UIAutomationCore.dll");
+	if (!UIAutomationCore) {
+		return false;
+	}
+	UiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(UIAutomationCore, "UiaRaiseNotificationEvent");
+	if (!UiaRaiseNotificationEvent_ptr) {
+		return false;
+	}
 	windowClass = getWindowClass();
 	if (!RegisterClassEx(&windowClass)) {
 		return false;
@@ -155,5 +173,26 @@ bool trminateUIA() {
 	if (!UnregisterClass(WINDOW_CLASS_NAME, pluginHInstance)) {
 		return false;
 	}
+	UiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(UIAutomationCore, "UiaRaiseNotificationEvent");
+	if (UiaRaiseNotificationEvent_ptr) {
+		UiaRaiseNotificationEvent_ptr = nullptr;
+	}
+	if (UIAutomationCore) {
+		FreeLibrary(UIAutomationCore);
+		UIAutomationCore = nullptr;
+	}
 	return true;
+}
+
+bool sendUIANotification(const string& message) {
+	if (message.empty()) {
+		return true; // Silently do not send empty messages as Narrator announces those.
+	}
+	return (UiaRaiseNotificationEvent_ptr(
+		UIAProvider,
+		NotificationKind_Other,
+		NotificationProcessing_MostRecent,
+		SysAllocString(widen(message).c_str()),
+		SysAllocString(L"Reaper_OSARA")
+	) == S_OK);
 }

@@ -89,16 +89,11 @@ string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
 	// Use UIA when available (Windows 10 fall creators update and above)
-	if (UIAWnd &&
-		(UiaRaiseNotificationEvent(
-			UIAProvider,
-			NotificationKind_Other,
-			NotificationProcessing_MostRecent,
-			SysAllocString(widen(message).c_str()),
-			SysAllocString(L"Reaper_OSARA")
-		) == S_OK)
-	) {
-		return;	
+	if (UIAWnd) {
+		if (sendUIANotification(message)) {
+			lastMessage = message;
+			return;
+		}
 	}
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
