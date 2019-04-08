@@ -18,7 +18,7 @@ const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
 class UIAProviderImpl : public IRawElementProviderSimple
 {
 public:
-	UIAProviderImpl(HWND hwnd) {}
+	UIAProviderImpl(HWND hwnd): controlHWnd(hwnd) {}
 
 	// IUnknown methods
 	IFACEMETHODIMP_(ULONG) AddRef() {
@@ -48,7 +48,7 @@ public:
 
 	// IRawElementProviderSimple methods
 	IFACEMETHODIMP get_ProviderOptions(ProviderOptions * pRetVal) {
-		*pRetVal = ProviderOptions_ServerSideProvider;
+		*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
 		return S_OK;
 	}
 
@@ -65,14 +65,14 @@ public:
 	}
 
 	IFACEMETHODIMP get_HostRawElementProvider(IRawElementProviderSimple ** pRetVal) {
-		return UiaHostProviderFromHwnd(m_controlHWnd, pRetVal);
+		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
 	}
 
 private:
 	virtual ~UIAProviderImpl() {}
 	// Ref Counter for this COM object
 	ULONG m_refCount;
-	HWND m_controlHWnd; // The HWND for the control.
+	HWND controlHWnd; // The HWND for the control.
 };
 
 IRawElementProviderSimple* UIAProvider = nullptr;
@@ -105,7 +105,7 @@ bool initializeUIA() {
 	if (!RegisterClassEx(&windowClass)) {
 		return false;
 	}
-	HWND UIAWnd = CreateWindowEx(
+	UIAWnd = CreateWindowEx(
 		0,
 		WINDOW_CLASS_NAME,
 		"Reaper OSARA Notifications",
