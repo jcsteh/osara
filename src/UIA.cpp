@@ -112,9 +112,9 @@ bool initializeUIA() {
 		0,
 		WINDOW_CLASS_NAME,
 		"Reaper OSARA Notifications",
-		WS_DISABLED,
+		0,
 		CW_USEDEFAULT,
-		SW_SHOWNA,
+		SW_HIDE,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		mainHwnd,
@@ -125,7 +125,7 @@ bool initializeUIA() {
 	if (!UIAWnd) {
 		return false;
 	}
-	ShowWindow(UIAWnd, SW_SHOWNA);
+	ShowWindow(UIAWnd, SW_HIDE);
 	return true;;
 }
 
