@@ -59,8 +59,25 @@ public:
 	}
 
 	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId, _Out_ VARIANT* pRetVal) {
-		// We do not implement any property.
-		pRetVal->vt = VT_EMPTY;
+		switch (propertyId) {
+			case UIA_ControlTypePropertyId:
+				// Stop Narrator from ever speaking this as a window
+				pRetVal->vt = VT_I4;
+				pRetVal->lVal = UIA_CustomControlTypeId;
+				break;
+			case UIA_IsControlElementPropertyId:
+			case UIA_IsContentElementPropertyId:
+			case UIA_IsKeyboardFocusablePropertyId:
+				pRetVal->vt = VT_BOOL;
+				pRetVal->boolVal = VARIANT_FALSE;
+				break;
+			case UIA_ProviderDescriptionPropertyId:
+				pRetVal->vt = VT_BSTR;
+				pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
+				break;
+			default:
+				pRetVal->vt = VT_EMPTY;
+		}
 		return S_OK;
 	}
 
@@ -112,9 +129,9 @@ bool initializeUIA() {
 		0,
 		WINDOW_CLASS_NAME,
 		"Reaper OSARA Notifications",
-		0,
+		WS_DISABLED,
 		CW_USEDEFAULT,
-		SW_HIDE,
+		SW_SHOWNA,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		mainHwnd,
@@ -125,7 +142,7 @@ bool initializeUIA() {
 	if (!UIAWnd) {
 		return false;
 	}
-	ShowWindow(UIAWnd, SW_HIDE);
+	ShowWindow(UIAWnd, SW_SHOWNA);
 	return true;;
 }
 

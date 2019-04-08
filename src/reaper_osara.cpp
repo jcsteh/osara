@@ -89,7 +89,7 @@ string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
 	// Use UIA when available (Windows 10 fall creators update and above)
-	if (UIAProvider &&
+	if (UIAWnd &&
 		(UiaRaiseNotificationEvent(
 			UIAProvider,
 			NotificationKind_Other,

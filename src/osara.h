@@ -232,6 +232,7 @@ std::string narrow(const std::wstring& text);
 extern IAccPropServices* accPropServices;
 bool initializeUIA();
 bool terminateUIA();
+extern HWND UIAWnd;
 extern IRawElementProviderSimple* UIAProvider;
 
 #else
