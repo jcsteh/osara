@@ -18,14 +18,14 @@ const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
 class UIAProviderImpl : public IRawElementProviderSimple
 {
 public:
-	UIAProviderImpl(HWND hwnd): controlHWnd(hwnd) {}
+	UIAProviderImpl(_In_ HWND hwnd): controlHWnd(hwnd) {}
 
 	// IUnknown methods
-	IFACEMETHODIMP_(ULONG) AddRef() {
+	ULONG STDMETHODCALLTYPE AddRef() {
 		return InterlockedIncrement(&m_refCount);
 	}
 
-	IFACEMETHODIMP_(ULONG) Release() {
+	ULONG STDMETHODCALLTYPE Release() {
 		long val = InterlockedDecrement(&m_refCount);
 		if (val == 0) {
 			delete this;
@@ -33,7 +33,7 @@ public:
 		return val;
 	}
 
-	IFACEMETHODIMP QueryInterface(REFIID riid, void** ppInterface) {
+	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid, _Outptr_ void** ppInterface) {
 		if (riid == __uuidof(IUnknown)) {
 			*ppInterface =static_cast<IUnknown*>(this);
 		} else if (riid == __uuidof(IRawElementProviderSimple)) {
@@ -47,24 +47,24 @@ public:
 	}
 
 	// IRawElementProviderSimple methods
-	IFACEMETHODIMP get_ProviderOptions(ProviderOptions * pRetVal) {
+	HRESULT STDMETHODCALLTYPE get_ProviderOptions(_Out_ ProviderOptions* pRetVal) {
 		*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
 		return S_OK;
 	}
 
-	IFACEMETHODIMP GetPatternProvider(PATTERNID patternId, IUnknown** pRetVal) {
+	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal) {
 		// We do not support any pattern.
 		*pRetVal = NULL;
 		return S_OK;
 	}
 
-	IFACEMETHODIMP GetPropertyValue(PROPERTYID propertyId, VARIANT * pRetVal) {
+	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId, _Out_ VARIANT* pRetVal) {
 		// We do not implement any property.
 		pRetVal->vt = VT_EMPTY;
 		return S_OK;
 	}
 
-	IFACEMETHODIMP get_HostRawElementProvider(IRawElementProviderSimple ** pRetVal) {
+	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(IRawElementProviderSimple** pRetVal) {
 		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
 	}
 
@@ -81,6 +81,9 @@ LRESULT CALLBACK UIAWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
 			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
+				if (!UIAProvider) {
+					UIAProvider = new UIAProviderImpl(UIAWnd);
+				}
 				return UiaReturnRawElementProvider(hwnd, wParam, lParam, UIAProvider);
 			}
 			return 0;
@@ -122,7 +125,6 @@ bool initializeUIA() {
 	if (!UIAWnd) {
 		return false;
 	}
-	UIAProvider = new UIAProviderImpl(UIAWnd);
 	ShowWindow(UIAWnd, SW_SHOWNA);
 	return true;;
 }
