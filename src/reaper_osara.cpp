@@ -90,7 +90,13 @@ HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
 	// Use UIA when available (Windows 10 fall creators update and above)
 	if (UIAProvider &&
-		(UiaRaiseNotificationEvent(UIAProvider, NotificationKind_Other, NotificationProcessing_MostRecent, SysAllocString(widen(message).c_str()), nullptr) == S_OK)
+		(UiaRaiseNotificationEvent(
+			UIAProvider,
+			NotificationKind_Other,
+			NotificationProcessing_MostRecent,
+			SysAllocString(widen(message).c_str()),
+			SysAllocString(L"Reaper_OSARA")
+		) == S_OK)
 	) {
 		return;	
 	}

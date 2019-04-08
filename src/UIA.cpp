@@ -12,7 +12,7 @@
 using namespace std;
 
 HWND UIAWnd = 0;
-const char* WINDOW_CLASS_NAME = "OSARA_UIA_WND";
+const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
 
 // Provider code based on Microsoft's UIAutomationSimpleProvider example.
 class UIAProviderImpl : public IRawElementProviderSimple
@@ -108,7 +108,7 @@ bool initializeUIA() {
 	HWND UIAWnd = CreateWindowEx(
 		0,
 		WINDOW_CLASS_NAME,
-		NULL,
+		"Reaper OSARA Notifications",
 		WS_DISABLED,
 		CW_USEDEFAULT,
 		SW_SHOWNA,
