@@ -189,8 +189,8 @@ bool trminateUIA() {
 }
 
 bool sendUIANotification(const string& message) {
-	if (message.empty()) {
-		return true; // Silently do not send empty messages as Narrator announces those.
+	if (!UiaClientsAreListening() || message.empty()) {
+		return true;
 	}
 	return (UiaRaiseNotificationEvent_ptr(
 		UIAProvider,
