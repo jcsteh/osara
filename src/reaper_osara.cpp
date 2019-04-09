@@ -2242,8 +2242,11 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	} else if (handlePostCommand(command))
+	}
+	// For now, only support the main section for post commands.
+	else if ((section->uniqueID == MAIN_SECTION) && handlePostCommand(command)) {
 		return true;
+	}
 	return false;
 }
 
