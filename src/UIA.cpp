@@ -32,20 +32,24 @@ public:
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() {
-		return InterlockedIncrement(&m_refCount);
+		return InterlockedIncrement(&refCount);
 	}
 
 	ULONG STDMETHODCALLTYPE Release() {
-		long val = InterlockedDecrement(&m_refCount);
-		if (val == 0) {
+		long val = InterlockedDecrement(&refCount);
+		if (val <= 0) {
 			delete this;
 		}
 		return val;
 	}
 
 	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid, _Outptr_ void** ppInterface) {
+		if (ppInterface) {
+			return E_INVALIDARG;
+		}
 		if (riid == __uuidof(IUnknown)) {
-			*ppInterface =static_cast<IUnknown*>(this);
+			// Several examples seem to cast to IRawElementProviderSimple instead of IUnknown in this case.
+			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
 		} else if (riid == __uuidof(IRawElementProviderSimple)) {
 			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
 		} else {
@@ -98,7 +102,7 @@ public:
 private:
 	virtual ~UIAProviderImpl() {}
 	// Ref Counter for this COM object
-	ULONG m_refCount;
+	ULONG refCount;
 	HWND controlHWnd; // The HWND for the control.
 };
 
