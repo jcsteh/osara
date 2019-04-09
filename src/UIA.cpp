@@ -100,7 +100,9 @@ public:
 	}
 
 private:
-	virtual ~UIAProviderImpl() {}
+	virtual ~UIAProviderImpl() {
+		UiaDisconnectProvider(this);
+	}
 	// Ref Counter for this COM object
 	ULONG refCount;
 	HWND controlHWnd; // The HWND for the control.
@@ -169,14 +171,17 @@ bool initializeUIA() {
 }
 
 bool trminateUIA() {
+	if (UIAProvider) {
+		delete UIAProvider;
+	}
 	ShowWindow(UIAWnd, SW_HIDE);
-	delete UIAProvider;
 	if (!DestroyWindow(UIAWnd)) {
 		return false;
 	}
 	if (!UnregisterClass(WINDOW_CLASS_NAME, pluginHInstance)) {
 		return false;
 	}
+	UiaDisconnectAllProviders();
 	UiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(UIAutomationCore, "UiaRaiseNotificationEvent");
 	if (UiaRaiseNotificationEvent_ptr) {
 		UiaRaiseNotificationEvent_ptr = nullptr;
