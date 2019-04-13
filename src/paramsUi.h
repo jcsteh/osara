@@ -8,8 +8,6 @@
 
 #include "osara.h"
 
-#ifdef _WIN32
 void cmdFxParamsFocus(Command* command);
 void cmdFxParamsMaster(Command* command);
 void cmdParamsFocus(Command* command);
-#endif
