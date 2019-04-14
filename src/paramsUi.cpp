@@ -409,8 +409,6 @@ class ParamsDialog {
 		return 1;
 	}
 
-	public:
-
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
 		if (this->param)
@@ -463,6 +461,8 @@ class ParamsDialog {
 		this->filter = text;
 		this->updateParamList();
 	}
+
+	public:
 
 	ParamsDialog(ParamSource* source): source(source), param(NULL) {
 		this->paramCount = source->getParamCount();
