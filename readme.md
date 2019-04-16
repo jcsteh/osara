@@ -512,10 +512,15 @@ If you aren't sure, run `git submodule update` after every git pull, merge or ch
 ### Dependencies
 To build OSARA, you will need:
 
-- Windows only: Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
- - [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
-- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or [Xcode](https://developer.apple.com/xcode/download/)
-- [SCons](http://www.scons.org/), version 2.3.2 or later
+- Windows only: Microsoft Visual Studio 2017 Community:
+ * Visual Studio 2019 is not yet supported.
+ * [Download Visual Studio 2017 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15)
+ * When installing Visual Studio, you need to enable the following:
+  - On the Workloads tab, in the Windows group: Desktop development with C++
+- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
+ * Xcode 10 is not yet supported.
+ * You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
+- [SCons](http://www.scons.org/), version 3.0.4 or later
 
 ### How to Build
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
