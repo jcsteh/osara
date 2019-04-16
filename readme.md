@@ -520,7 +520,13 @@ To build OSARA, you will need:
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
 	* Xcode 10 is not yet supported.
 	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
-- [SCons](http://www.scons.org/), version 3.0.4 or later
+- Python, version 2.7:
+	* This is needed by SCons.
+	* Python 3 and later are not yet supported.
+	* [Download Python](https://www.python.org/downloads/)
+- [SCons](https://www.scons.org/), version 3.0.4 or later:
+	* Once Python is installed, you should be able to install SCons by simply running this at the command line: `pip install scons`
+- Windows only: [NSIS](https://nsis.sourceforge.io/Download), version 3.03 or later
 
 ### How to Build
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
