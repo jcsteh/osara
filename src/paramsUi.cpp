@@ -313,6 +313,10 @@ class ParamsDialog {
 	}
 
 	void onSliderChange(double newVal) {
+		if (newVal == this->val
+				|| newVal < this->param->min || newVal > this->param->max) {
+			return;
+		}
 		double step = this->param->step;
 		if (newVal < val) {
 			step = -step;
