@@ -276,13 +276,15 @@ class ParamsDialog {
 	string valText;
 
 	void updateValueText() {
-#ifdef _WIN32
 		if (this->valText.empty()) {
-			// No value text.
-			accPropServices->ClearHwndProps(this->slider, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_VALUE, 1);
-			return;
+			// Fall back to a percentage.
+			double percent = (this->val - this->param->min)
+				/ (this->param->max - this->param->min) * 100;
+			ostringstream s;
+			s << fixed << setprecision(1) << percent << "%";
+			this->valText = s.str();
 		}
-
+#ifdef _WIN32
 		// Set the slider's accessible value to this text.
 		accPropServices->SetHwndPropStr(this->slider, OBJID_CLIENT, CHILDID_SELF,
 			PROPID_ACC_VALUE, widen(this->valText).c_str());
