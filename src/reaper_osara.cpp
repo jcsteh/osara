@@ -1242,7 +1242,11 @@ bool maybeSwitchToFxPluginWindow() {
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN && wParam != VK_F6) {
+	if (code != HC_ACTION){
+		// Return early if this event does not have key code info
+		return CallNextHookEx(NULL, code, wParam, lParam);
+	}
+	if(wParam != VK_APPS && wParam != VK_RETURN && wParam != VK_F6 && wParam != VK_HOME && wParam != VK_END && wParam != VK_SHIFT) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1298,7 +1302,19 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
 		if (maybeSwitchToFxPluginWindow())
 			return 1;
-	}
+	}else if(wParam == VK_HOME || wParam == VK_END || wParam == VK_SHIFT){
+		//Pressing home / end keys in midi events view moves the cursor to top / bottom respectively, by passing the needed key events to the listview
+		if(wcscmp(className, L"SysListView32") == 0){
+			HWND parent = GetParent(focus);
+			WCHAR parentClassName[22] = L"\0";
+			GetClassNameW(parent, parentClassName, ARRAYSIZE(parentClassName));
+			if(wcscmp(parentClassName, L"REAPERmidieditorwnd") == 0){
+				int msg = WM_KEYDOWN;
+				if((lParam >> 31) == 1) msg=WM_KEYUP;
+				SendMessage(focus, msg, wParam, 0);
+			}//if reaper midi editor window is foreground
+		}//If the focused on sysListView
+	}//if VK_HOME or VK_END
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
 HHOOK keyboardHook = NULL;
