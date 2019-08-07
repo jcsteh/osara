@@ -473,11 +473,6 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
-void postCursorMovementMeasure(int command) {
-	fakeFocus = FOCUS_RULER;
-	outputMessage(formatCursorPosition(TF_MEASURE).c_str());
-}
-
 void postCycleTrackFolderState(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -897,10 +892,10 @@ PostCommand POST_COMMANDS[] = {
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
-	{41042, postCursorMovementMeasure}, // Go forward one measure
-	{41043, postCursorMovementMeasure}, // Go back one measure
-	{41044, postCursorMovementMeasure}, // Go forward one beat
-	{41045, postCursorMovementMeasure}, // Go back one beat
+	{41042, postCursorMovement}, // Go forward one measure
+	{41043, postCursorMovement}, // Go back one measure
+	{41044, postCursorMovement}, // Go forward one beat
+	{41045, postCursorMovement}, // Go back one beat
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
