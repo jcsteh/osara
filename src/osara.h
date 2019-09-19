@@ -135,6 +135,7 @@
 #define REAPERAPI_WANT_GetProjectName
 #define REAPERAPI_WANT_plugin_register
 #define REAPERAPI_WANT_GetTrackUIVolPan
+#define REAPERAPI_WANT_GetGlobalAutomationOverride
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
