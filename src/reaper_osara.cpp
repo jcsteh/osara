@@ -574,9 +574,12 @@ void postGoToSpecificMarker(int command) {
 }
 
 void postChangeTrackVolume(MediaTrack* track) {
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+		return;
 	ostringstream s;
 	s << fixed << setprecision(2);
-	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
+	s << VAL2DB(volume);
 	outputMessage(s);
 }
 
@@ -602,7 +605,10 @@ void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	double pan = *(double*)GetSetMediaTrackInfo(track, "D_PAN", NULL) * 100;
+	double pan =0.0;
+	if ( !GetTrackUIVolPan(track, NULL, &pan) )
+		return;
+	pan *=100.0;
 	ostringstream s;
 	if (pan == 0)
 		s << "center";
