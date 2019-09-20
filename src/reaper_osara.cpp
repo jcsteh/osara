@@ -331,7 +331,7 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
-char* automationModeAsString(int mode) {
+const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
 	case -1:
