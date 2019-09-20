@@ -273,7 +273,8 @@ const char* getFolderCompacting(MediaTrack* track) {
 }
 
 void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
-	const char* name = kbd_getTextFromCmd(command, section);
+	
+	r* name = kbd_getTextFromCmd(command, section);
 	const char* start;
 	if (skipCategory) {
 		// Skip the category before the colon (if any).
@@ -335,20 +336,19 @@ const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
 	case -1:
-		return "no override";
+		return "none";
 	case 0:
-		return "Trim/Read";
+		return "trim/read";
 	case 1:
-		return "Read";
+		return "read";
 	case 2:
-		return "Touch";
-		break;
+		return "touch";
 	case 3:
-		return "Write";
+		return "write";
 	case 4:
-		return "Latch";
+		return "latch";
 	case 5:
-		return "Latch Preview";
+		return "latch preview";
 	case 6:
 		return "bypass";
 	default:
@@ -896,11 +896,10 @@ void postCycleRecordMode(int command) {
 
 void postChangeGlobalAutomationOverride(int command) {
 	ostringstream s;
-	s << "Global Automation Override ";
+	s << "Override ";
 	s << automationModeAsString(GetGlobalAutomationOverride());
 	outputMessage(s);
 }
-
 
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
