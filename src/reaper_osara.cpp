@@ -273,8 +273,7 @@ const char* getFolderCompacting(MediaTrack* track) {
 }
 
 void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
-	
-	r* name = kbd_getTextFromCmd(command, section);
+	const char* name = kbd_getTextFromCmd(command, section);
 	const char* start;
 	if (skipCategory) {
 		// Skip the category before the colon (if any).
@@ -335,24 +334,24 @@ bool isItemSelected(MediaItem* item) {
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
-	case -1:
-		return "none";
-	case 0:
-		return "trim/read";
-	case 1:
-		return "read";
-	case 2:
-		return "touch";
-	case 3:
-		return "write";
-	case 4:
-		return "latch";
-	case 5:
-		return "latch preview";
-	case 6:
-		return "bypass";
-	default:
-		return "unknown";
+		case -1:
+			return "none";
+		case 0:
+			return "trim/read";
+		case 1:
+			return "read";
+		case 2:
+			return "touch";
+		case 3:
+			return "write";
+		case 4:
+			return "latch";
+		case 5:
+			return "latch preview";
+		case 6:
+			return "bypass";
+		default:
+			return "unknown";
 	}
 }
 
@@ -1004,7 +1003,7 @@ PostCommand POST_COMMANDS[] = {
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
-		{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
+	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
 	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
 	{40879, postChangeGlobalAutomationOverride}, // Global automation override: All automation in read mode
 	{40880, postChangeGlobalAutomationOverride}, // Global automation override: All automation in touch mode
