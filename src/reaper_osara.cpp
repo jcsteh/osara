@@ -331,6 +331,30 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
+const char* automationModeAsString(int mode) {
+	// this works for track automation mode and global automation override.
+	switch (mode) {
+		case -1:
+			return "none";
+		case 0:
+			return "trim/read";
+		case 1:
+			return "read";
+		case 2:
+			return "touch";
+		case 3:
+			return "write";
+		case 4:
+			return "latch";
+		case 5:
+			return "latch preview";
+		case 6:
+			return "bypass";
+		default:
+			return "unknown";
+	}
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -869,6 +893,13 @@ void postCycleRecordMode(int command) {
 	}
 }
 
+void postChangeGlobalAutomationOverride(int command) {
+	ostringstream s;
+	s << "Override ";
+	s << automationModeAsString(GetGlobalAutomationOverride());
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -972,6 +1003,14 @@ PostCommand POST_COMMANDS[] = {
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
+	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
+	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
+	{40879, postChangeGlobalAutomationOverride}, // Global automation override: All automation in read mode
+	{40880, postChangeGlobalAutomationOverride}, // Global automation override: All automation in touch mode
+	{40878, postChangeGlobalAutomationOverride}, // Global automation override: All automation in trim/read mode
+	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
+	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
+	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
