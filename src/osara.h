@@ -141,6 +141,7 @@
 #define REAPERAPI_WANT_CountSelectedTracks2
 #define REAPERAPI_WANT_GetSelectedTrack2
 #define REAPERAPI_WANT_SetTrackAutomationMode
+#define REAPERAPI_WANT_SetMediaTrackInfo_Value
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

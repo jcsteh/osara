@@ -355,6 +355,35 @@ const char* automationModeAsString(int mode) {
 	}
 }
 
+const char* recordingModeAsString(int mode) {
+	switch (mode) {
+		case 0:
+			return "Input";
+		case 1:
+			return "Output (stereo)";
+		case 2:
+			return "Disabled";
+		case 3:
+			return "Output (stereo, latency compensated)";
+		case 4:
+			return "Output (midi)";
+		case 5:
+			return "Output (mono)";
+		case 6:
+			return "Output (mono, latency compensated)";
+		case 7:
+			return "Midi overdub";
+		case 8:
+			return "Midi replace";
+		case 9:
+			return "Midi touch-replace";
+		case 16:
+			return "Midi latch-replace";
+		default:
+			return "unknown";
+	}
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -2097,6 +2126,43 @@ void cmdCycleTrackAutomation(Command* command) {
 	outputMessage(s);
 }
 
+void cmdCycleMidiRecordingMode(Command* command) {
+	int count = CountSelectedTracks2(0, false);
+	if (count == 0) {
+		outputMessage("No selected tracks");
+		return;
+	}
+	int oldmode = (int)GetMediaTrackInfo_Value(GetLastTouchedTrack(), "I_RECMODE");
+	int newmode = 0;
+	switch (oldmode) {
+		case 0: // input (audio or MIDI)
+			newmode = 4;
+			break;
+		case 4: // MIDI output
+			newmode = 7;
+			break;
+		case 7: // MIDI overdub
+			newmode = 8;
+			break;
+		case 8: // MIDI replace
+			newmode = 9;
+			break;
+		case 9: // MIDI touch-replace
+			newmode = 16;
+			break;
+		case 16: // MIDI latch-replace
+			newmode = 0;
+			break;
+		default: // when not in one of the MIDI rec. modes set to 'input (audio or MIDI)'
+			newmode = 0;
+	}
+	for (int tracknum = 0; tracknum < count; ++tracknum) {
+		MediaTrack* track = GetSelectedTrack2(0, tracknum, false);
+		SetMediaTrackInfo_Value(track, "I_RECMODE", newmode);
+	}
+	outputMessage(recordingModeAsString(newmode));
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2204,6 +2270,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show first context menu (depending on focus)"}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show second context menu (depending on focus)"}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show third context menu (depending on focus)"}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Cycle through midi recording modes of selected tracks"}, "OSARA_CYCLEMIDIRECORDINGMODE", cmdCycleMidiRecordingMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report global / Track Automation Mode"}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
