@@ -483,6 +483,9 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous envelope point (leaving other points selected): alt+shift+j
 - OSARA: Move to next transient: tab
 - OSARA: Move to previous transient: shift+tab
+- OSARA: Cycle automation mode of selected tracks
+- OSARA: Report global / Track Automation Mode
+- OSARA: Toggle global automation override between latch preview and off
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
