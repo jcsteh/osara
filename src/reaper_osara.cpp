@@ -2056,7 +2056,7 @@ void cmdShowContextMenu3(Command* command) {
 }
 
 void cmdReportAutomationMode(Command* command) {
-	// This reports the global automation override if set, otherwise tcurrent track automation mode.
+	// This reports the global automation override if set, otherwise the current track automation mode.
 	ostringstream s;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (GetGlobalAutomationOverride() >= 0) {
@@ -2071,18 +2071,19 @@ void cmdToggleGlobalAutomationLatchPreview(Command* command) {
 	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
 		SetGlobalAutomationOverride(-1);
 		outputMessage("Global automation override off");
-	}
-	else { //not in latch preview.
-	 		SetGlobalAutomationOverride(5);
+	} else { //not in latch preview.
+		SetGlobalAutomationOverride(5);
 		outputMessage("Global automation override latch preview");
 	}
 }
 
 void cmdCycleTrackAutomation(Command* command) {
 	int count = CountSelectedTracks2(0, true);
-	if (count == 0)
+	if (count == 0) {
+		outputMessage("No selected tracks");
 		return;
-	int oldmode = GetTrackAutomationMode(GetSelectedTrack2(0, 0, true));
+	}
+	int oldmode = GetTrackAutomationMode(GetLastTouchedTrack());
 	int newmode = oldmode + 1;
 	if (newmode > 5)
 		newmode = 0;
