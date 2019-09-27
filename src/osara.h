@@ -136,6 +136,11 @@
 #define REAPERAPI_WANT_plugin_register
 #define REAPERAPI_WANT_GetTrackUIVolPan
 #define REAPERAPI_WANT_GetGlobalAutomationOverride
+#define REAPERAPI_WANT_SetGlobalAutomationOverride
+#define REAPERAPI_WANT_GetTrackAutomationMode
+#define REAPERAPI_WANT_CountSelectedTracks2
+#define REAPERAPI_WANT_GetSelectedTrack2
+#define REAPERAPI_WANT_SetTrackAutomationMode
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
