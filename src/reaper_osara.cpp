@@ -356,29 +356,29 @@ const char* automationModeAsString(int mode) {
 }
 
 const char* recordingModeAsString(int mode) {
-	switch (mode) {
+	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
 		case 0:
-			return "Input";
+			return "input";
 		case 1:
-			return "Output (stereo)";
+			return "output (stereo)";
 		case 2:
-			return "Disabled";
+			return "disabled";
 		case 3:
-			return "Output (stereo, latency compensated)";
+			return "output (stereo, latency compensated)";
 		case 4:
-			return "Output (midi)";
+			return "output (midi)";
 		case 5:
-			return "Output (mono)";
+			return "output (mono)";
 		case 6:
-			return "Output (mono, latency compensated)";
+			return "output (mono, latency compensated)";
 		case 7:
-			return "Midi overdub";
+			return "midi overdub";
 		case 8:
-			return "Midi replace";
+			return "midi replace";
 		case 9:
-			return "Midi touch-replace";
+			return "midi touch-replace";
 		case 16:
-			return "Midi latch-replace";
+			return "midi latch-replace";
 		default:
 			return "unknown";
 	}
