@@ -142,6 +142,7 @@
 #define REAPERAPI_WANT_GetSelectedTrack2
 #define REAPERAPI_WANT_SetTrackAutomationMode
 #define REAPERAPI_WANT_SetMediaTrackInfo_Value
+#define REAPERAPI_WANT_MIDI_EnumSelEvts
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
