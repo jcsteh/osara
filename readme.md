@@ -257,6 +257,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Decrease pitch cursor one semitone: Alt+DownArrow or NumPad2
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
+- Edit: Select all events: Ctrl+A
+- Edit: Select all notes in time selection: Ctrl+Alt+E
+- Invert selection: Ctrl+I
+- Select all notes with the same pitch: Ctrl+Shift+A
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
