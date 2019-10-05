@@ -490,6 +490,14 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Cycle automation mode of selected tracks
 - OSARA: Report global / Track Automation Mode
 - OSARA: Toggle global automation override between latch preview and off
+- Global automation override: All automation in latch mode
+- Global automation override: All automation in latch preview mode
+- Global automation override: All automation in read mode
+- Global automation override: All automation in touch mode
+- Global automation override: All automation in trim/read mode
+- Global automation override: All automation in write mode
+- Global automation override: Bypass all automation
+- Global automation override: No override (set automation modes per track)
 - OSARA: Cycle through midi recording modes of selected tracks
 
 #### MIDI Event List Editor
