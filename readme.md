@@ -177,7 +177,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Move edit cursor to next tempo or time signature change: Control+'
 - Markers: Delete time signature marker near cursor
 
-#### Envelopes
+#### Automation
 - Item edit: Move items/envelope points up one track/a bit: NumPad8
 - Item edit: Move items/envelope points down one track/a bit: NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
@@ -185,6 +185,14 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position: Shift+E
+- Global automation override: All automation in latch mode
+- Global automation override: All automation in latch preview mode
+- Global automation override: All automation in read mode
+- Global automation override: All automation in touch mode
+- Global automation override: All automation in trim/read mode
+- Global automation override: All automation in write mode
+- Global automation override: Bypass all automation
+- Global automation override: No override (set automation modes per track)
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -490,14 +498,6 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Cycle automation mode of selected tracks
 - OSARA: Report global / Track Automation Mode
 - OSARA: Toggle global automation override between latch preview and off
-- Global automation override: All automation in latch mode
-- Global automation override: All automation in latch preview mode
-- Global automation override: All automation in read mode
-- Global automation override: All automation in touch mode
-- Global automation override: All automation in trim/read mode
-- Global automation override: All automation in write mode
-- Global automation override: Bypass all automation
-- Global automation override: No override (set automation modes per track)
 - OSARA: Cycle through midi recording modes of selected tracks
 
 #### MIDI Event List Editor
