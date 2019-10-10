@@ -177,7 +177,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Move edit cursor to next tempo or time signature change: Control+'
 - Markers: Delete time signature marker near cursor
 
-#### Envelopes
+#### Automation
 - Item edit: Move items/envelope points up one track/a bit: NumPad8
 - Item edit: Move items/envelope points down one track/a bit: NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
@@ -185,6 +185,14 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position: Shift+E
+- Global automation override: All automation in latch mode
+- Global automation override: All automation in latch preview mode
+- Global automation override: All automation in read mode
+- Global automation override: All automation in touch mode
+- Global automation override: All automation in trim/read mode
+- Global automation override: All automation in write mode
+- Global automation override: Bypass all automation
+- Global automation override: No override (set automation modes per track)
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -257,6 +265,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Decrease pitch cursor one semitone: Alt+DownArrow or NumPad2
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
+- Edit: Select all events: Ctrl+A
+- Edit: Select all notes in time selection: Ctrl+Alt+E
+- Invert selection: Ctrl+I
+- Select all notes with the same pitch: Ctrl+Shift+A
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.

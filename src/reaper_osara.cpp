@@ -2220,6 +2220,10 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40050}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
+	{MIDI_EDITOR_SECTION, {{0, 0,40746}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all notes in time selection
+	{MIDI_EDITOR_SECTION, {{0, 0,40006}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all events
+	{MIDI_EDITOR_SECTION, {{0, 0,40501}, NULL}, NULL, cmdMidiSelectNotes},// Invert selection
+	{MIDI_EDITOR_SECTION, {{0, 0,40434}, NULL}, NULL, cmdMidiSelectNotes},// Select all notes with the same pitch
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
