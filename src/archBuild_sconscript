@@ -40,8 +40,8 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	# Build a universal binary with both 32 and 64 bit.
-	archFlags = ("-arch", "i386", "-arch", "x86_64")
+	# Build a binary with 64 bit. Starting from 10.15 no 32-bit apps are allowed.
+	archFlags = ("-arch", "x86_64")
 	env.Append(CXXFLAGS=archFlags, LINKFLAGS=archFlags)
 	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++11"))
 	# SWELL files.
