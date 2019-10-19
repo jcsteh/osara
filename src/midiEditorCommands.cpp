@@ -489,16 +489,16 @@ void cmdMidiSelectNotes(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int evtx=0;
+	int noteIndex=-1;
 	int count=0;
 	for(;;){
-		evtx = MIDI_EnumSelEvts(take, evtx);
-		if (evtx == -1)
+		noteIndex = MIDI_EnumSelNotes(take, noteIndex);
+		if (noteIndex == -1)
 			break;
 		++count;
 	}
 	ostringstream s;
-	s << count << " event" << ((count == 1) ? "" : "s") << " selected";
+	s << count << " note" << ((count == 1) ? "" : "s") << " selected";
 	outputMessage(s);
 }
 
