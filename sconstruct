@@ -25,7 +25,8 @@ if env["PLATFORM"] == "win32":
 	import _winreg
 	# Get the path to makensis.
 	try:
-		with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS") as nsisKey:
+		with _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS",
+				0, _winreg.KEY_READ | _winreg.KEY_WOW64_32KEY) as nsisKey:
 			makensis = os.path.join(_winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
 	except WindowsError:
 		makensis = "makensis"

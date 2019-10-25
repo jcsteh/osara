@@ -177,7 +177,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Move edit cursor to next tempo or time signature change: Control+'
 - Markers: Delete time signature marker near cursor
 
-#### Envelopes
+#### Automation
 - Item edit: Move items/envelope points up one track/a bit: NumPad8
 - Item edit: Move items/envelope points down one track/a bit: NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
@@ -185,6 +185,14 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position: Shift+E
+- Global automation override: All automation in latch mode
+- Global automation override: All automation in latch preview mode
+- Global automation override: All automation in read mode
+- Global automation override: All automation in touch mode
+- Global automation override: All automation in trim/read mode
+- Global automation override: All automation in write mode
+- Global automation override: Bypass all automation
+- Global automation override: No override (set automation modes per track)
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -257,6 +265,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Decrease pitch cursor one semitone: Alt+DownArrow or NumPad2
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
+- Edit: Select all events: Ctrl+A
+- Edit: Select all notes in time selection: Ctrl+Alt+E
+- Invert selection: Ctrl+I
+- Select all notes with the same pitch: Ctrl+Shift+A
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -483,6 +495,10 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous envelope point (leaving other points selected): alt+shift+j
 - OSARA: Move to next transient: tab
 - OSARA: Move to previous transient: shift+tab
+- OSARA: Cycle automation mode of selected tracks
+- OSARA: Report global / Track Automation Mode
+- OSARA: Toggle global automation override between latch preview and off
+- OSARA: Cycle through midi recording modes of selected tracks
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
@@ -512,10 +528,21 @@ If you aren't sure, run `git submodule update` after every git pull, merge or ch
 ### Dependencies
 To build OSARA, you will need:
 
-- Windows only: Microsoft Visual Studio 2015 (Express for Desktop, or Community with VC++ and Windows SDK 7.1A support):
- - [Download for Visual Studio 2015 Express for Desktop](https://go.microsoft.com/fwlink/?LinkId=691984&clcid=0x409)
-- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or [Xcode](https://developer.apple.com/xcode/download/)
-- [SCons](http://www.scons.org/), version 2.3.2 or later
+- Windows only: Microsoft Visual Studio 2017 Community:
+	* Visual Studio 2019 is not yet supported.
+	* [Download Visual Studio 2017 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15)
+	* When installing Visual Studio, you need to enable the following:
+		- On the Workloads tab, in the Windows group: Desktop development with C++
+- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
+	* Xcode 10 is not yet supported.
+	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
+- Python, version 2.7:
+	* This is needed by SCons.
+	* Python 3 and later are not yet supported.
+	* [Download Python](https://www.python.org/downloads/)
+- [SCons](https://www.scons.org/), version 3.0.4 or later:
+	* Once Python is installed, you should be able to install SCons by simply running this at the command line: `pip install scons`
+- Windows only: [NSIS](https://nsis.sourceforge.io/Download), version 3.03 or later
 
 ### How to Build
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.

@@ -484,6 +484,24 @@ void cmdMidiDeleteEvents(Command* command) {
 	outputMessage(s);
 }
 
+void cmdMidiSelectNotes(Command* command) {
+	int noteCount;
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int evtx=0;
+	int count=0;
+	for(;;){
+		evtx = MIDI_EnumSelEvts(take, evtx);
+		if (evtx == -1)
+			break;
+		++count;
+	}
+	ostringstream s;
+	s << count << " event" << ((count == 1) ? "" : "s") << " selected";
+	outputMessage(s);
+}
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	HWND focus = GetFocus();

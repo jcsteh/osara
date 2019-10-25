@@ -345,6 +345,59 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
+const char* automationModeAsString(int mode) {
+	// this works for track automation mode and global automation override.
+	switch (mode) {
+		case -1:
+			return "none";
+		case 0:
+			return "trim/read";
+		case 1:
+			return "read";
+		case 2:
+			return "touch";
+		case 3:
+			return "write";
+		case 4:
+			return "latch";
+		case 5:
+			return "latch preview";
+		case 6:
+			return "bypass";
+		default:
+			return "unknown";
+	}
+}
+
+const char* recordingModeAsString(int mode) {
+	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
+		case 0:
+			return "input";
+		case 1:
+			return "output (stereo)";
+		case 2:
+			return "disabled";
+		case 3:
+			return "output (stereo, latency compensated)";
+		case 4:
+			return "output (midi)";
+		case 5:
+			return "output (mono)";
+		case 6:
+			return "output (mono, latency compensated)";
+		case 7:
+			return "midi overdub";
+		case 8:
+			return "midi replace";
+		case 9:
+			return "midi touch-replace";
+		case 16:
+			return "midi latch-replace";
+		default:
+			return "unknown";
+	}
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -487,11 +540,6 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
-void postCursorMovementMeasure(int command) {
-	fakeFocus = FOCUS_RULER;
-	outputMessage(formatCursorPosition(TF_MEASURE).c_str());
-}
-
 void postCycleTrackFolderState(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -593,9 +641,12 @@ void postGoToSpecificMarker(int command) {
 }
 
 void postChangeTrackVolume(MediaTrack* track) {
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+		return;
 	ostringstream s;
 	s << fixed << setprecision(2);
-	s << VAL2DB(*(double*)GetSetMediaTrackInfo(track, "D_VOL", NULL));
+	s << VAL2DB(volume);
 	outputMessage(s);
 }
 
@@ -621,7 +672,10 @@ void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	double pan = *(double*)GetSetMediaTrackInfo(track, "D_PAN", NULL) * 100;
+	double pan =0.0;
+	if ( !GetTrackUIVolPan(track, NULL, &pan) )
+		return;
+	pan *=100.0;
 	ostringstream s;
 	if (pan == 0)
 		s << "center";
@@ -889,6 +943,13 @@ void postCycleRecordMode(int command) {
 	}
 }
 
+void postChangeGlobalAutomationOverride(int command) {
+	ostringstream s;
+	s << "Override ";
+	s << automationModeAsString(GetGlobalAutomationOverride());
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -918,10 +979,10 @@ PostCommand POST_COMMANDS[] = {
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
-	{41042, postCursorMovementMeasure}, // Go forward one measure
-	{41043, postCursorMovementMeasure}, // Go back one measure
-	{41044, postCursorMovementMeasure}, // Go forward one beat
-	{41045, postCursorMovementMeasure}, // Go back one beat
+	{41042, postCursorMovement}, // Go forward one measure
+	{41043, postCursorMovement}, // Go back one measure
+	{41044, postCursorMovement}, // Go forward one beat
+	{41045, postCursorMovement}, // Go back one beat
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
@@ -992,6 +1053,14 @@ PostCommand POST_COMMANDS[] = {
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
+	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
+	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
+	{40879, postChangeGlobalAutomationOverride}, // Global automation override: All automation in read mode
+	{40880, postChangeGlobalAutomationOverride}, // Global automation override: All automation in touch mode
+	{40878, postChangeGlobalAutomationOverride}, // Global automation override: All automation in trim/read mode
+	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
+	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
+	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -2039,6 +2108,85 @@ void cmdShowContextMenu3(Command* command) {
 	showReaperContextMenu(2);
 }
 
+void cmdReportAutomationMode(Command* command) {
+	// This reports the global automation override if set, otherwise the current track automation mode.
+	ostringstream s;
+	MediaTrack* track = GetLastTouchedTrack();
+	if (GetGlobalAutomationOverride() >= 0) {
+		s << "global automation override " << automationModeAsString(GetGlobalAutomationOverride());
+	} else {
+		s << "track automation mode " << automationModeAsString(GetTrackAutomationMode(track));
+	}
+	outputMessage(s);
+}
+
+void cmdToggleGlobalAutomationLatchPreview(Command* command) {
+	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
+		SetGlobalAutomationOverride(-1);
+		outputMessage("Global automation override off");
+	} else { //not in latch preview.
+		SetGlobalAutomationOverride(5);
+		outputMessage("Global automation override latch preview");
+	}
+}
+
+void cmdCycleTrackAutomation(Command* command) {
+	int count = CountSelectedTracks2(0, true);
+	if (count == 0) {
+		outputMessage("No selected tracks");
+		return;
+	}
+	int oldmode = GetTrackAutomationMode(GetLastTouchedTrack());
+	int newmode = oldmode + 1;
+	if (newmode > 5)
+		newmode = 0;
+	for (int tracknum = 0; tracknum < count; ++tracknum) {
+		SetTrackAutomationMode(GetSelectedTrack2(0, tracknum, true), newmode);
+	}
+	ostringstream s;
+	s << "automation mode ";
+	s << automationModeAsString(newmode);
+	s << " for selected tracks";
+	outputMessage(s);
+}
+
+void cmdCycleMidiRecordingMode(Command* command) {
+	int count = CountSelectedTracks2(0, false);
+	if (count == 0) {
+		outputMessage("No selected tracks");
+		return;
+	}
+	int oldmode = (int)GetMediaTrackInfo_Value(GetLastTouchedTrack(), "I_RECMODE");
+	int newmode = 0;
+	switch (oldmode) {
+		case 0: // input (audio or MIDI)
+			newmode = 4;
+			break;
+		case 4: // MIDI output
+			newmode = 7;
+			break;
+		case 7: // MIDI overdub
+			newmode = 8;
+			break;
+		case 8: // MIDI replace
+			newmode = 9;
+			break;
+		case 9: // MIDI touch-replace
+			newmode = 16;
+			break;
+		case 16: // MIDI latch-replace
+			newmode = 0;
+			break;
+		default: // when not in one of the MIDI rec. modes set to 'input (audio or MIDI)'
+			newmode = 0;
+	}
+	for (int tracknum = 0; tracknum < count; ++tracknum) {
+		MediaTrack* track = GetSelectedTrack2(0, tracknum, false);
+		SetMediaTrackInfo_Value(track, "I_RECMODE", newmode);
+	}
+	outputMessage(recordingModeAsString(newmode));
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2096,6 +2244,10 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40050}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
+	{MIDI_EDITOR_SECTION, {{0, 0,40746}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all notes in time selection
+	{MIDI_EDITOR_SECTION, {{0, 0,40006}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all events
+	{MIDI_EDITOR_SECTION, {{0, 0,40501}, NULL}, NULL, cmdMidiSelectNotes},// Invert selection
+	{MIDI_EDITOR_SECTION, {{0, 0,40434}, NULL}, NULL, cmdMidiSelectNotes},// Select all notes with the same pitch
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
@@ -2105,11 +2257,9 @@ Command COMMANDS[] = {
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
-#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-#endif
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of first track"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherT1C1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of first track"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherT1C2},
@@ -2148,7 +2298,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show first context menu (depending on focus)"}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show second context menu (depending on focus)"}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Show third context menu (depending on focus)"}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Cycle through midi recording modes of selected tracks"}, "OSARA_CYCLEMIDIRECORDINGMODE", cmdCycleMidiRecordingMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report global / Track Automation Mode"}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -2270,8 +2424,10 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	} else if (handlePostCommand(command))
+	} else if ((section->uniqueID == MAIN_SECTION) && handlePostCommand(command)) {
+		// For now, only support the main section for post commands.
 		return true;
+	}
 	return false;
 }
 
