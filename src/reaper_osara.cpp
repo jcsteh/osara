@@ -1713,6 +1713,48 @@ void cmdMoveItems(Command* command) {
 		reportActionName(command->gaccel.accel.cmd);
 }
 
+void cmdMoveItemEdge(Command* command) {
+	MediaItem* item;
+	// try to provide information based on the last item spoken by osara if it is selected
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& IsMediaItemSelected(currentItem)
+	) 
+	item = currentItem;
+	else if(CountSelectedMediaItems(0)>0)
+		item = GetSelectedMediaItem(0, 0);
+	else {
+		outputMessage("no items selected");
+		return;
+	}
+	const char* name;
+	ostringstream s;
+	if(lastCommand != command) { 
+		name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
+		const char* start;
+		// Skip the category before the colon (if any).
+		for (start = name; *start; ++start) {
+			if (*start == ':') {
+				name = start + 2;
+				break;
+			}
+		}
+		s<<name << " ";
+		resetTimeCache();
+	}
+	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	if(newStart!=oldStart)
+		s<<formatTime(newStart, TF_RULER, false, true);
+	else if(newEnd!=oldEnd)
+		s<<formatTime(newEnd, TF_RULER, false, true);
+	else
+		s<<"no change";
+	outputMessage(s);
+}
+
 void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
@@ -2228,10 +2270,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
 	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
-	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
