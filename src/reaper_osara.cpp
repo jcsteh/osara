@@ -929,6 +929,17 @@ void postChangeGlobalAutomationOverride(int command) {
 	outputMessage(s);
 }
 
+void postReverseTake(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage("no items selected");
+		return;
+	}
+	ostringstream s;
+	s<<count<<((count==1)?" take ":" takes ")<<"reversed";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1040,6 +1051,7 @@ PostCommand POST_COMMANDS[] = {
 	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
+		{41051, postReverseTake}, // Item properties: Toggle take reverse
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
