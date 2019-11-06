@@ -205,6 +205,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Options: Toggle locking: l
 - (SWS extension) SWS/BR: Options - Cycle through record modes: Alt+\
 - Options: Solo in front: Control+Alt+F6
+- Pre-roll: Toggle pre-roll on record: Shift+`
+- SWS/AW: Toggle count-in before recording: Control+Shift+`
 
 #### Undo
 - Edit: Undo: Control+Z

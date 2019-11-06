@@ -940,6 +940,14 @@ void postReverseTake(int command) {
 	outputMessage(s);
 }
 
+void postTogglePreRoll(int command) {
+	outputMessage(GetToggleCommandState(command) ? "pre roll on":"pre roll off");
+}
+
+void postToggleCountIn(int command) {
+	outputMessage(GetToggleCommandState(command) ? "count in on":"count in off");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1051,7 +1059,8 @@ PostCommand POST_COMMANDS[] = {
 	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
-		{41051, postReverseTake}, // Item properties: Toggle take reverse
+	{41051, postReverseTake}, // Item properties: Toggle take reverse
+	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -1061,6 +1070,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
 	{"_BR_CYCLE_RECORD_MODES", postCycleRecordMode}, // SWS/BR: Options - Cycle through record modes
+	{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
