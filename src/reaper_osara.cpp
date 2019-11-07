@@ -2261,6 +2261,25 @@ void cmdCycleMidiRecordingMode(Command* command) {
 	outputMessage(recordingModeAsString(newmode));
 }
 
+void cmdNudgeTimeSelection(Command* command) {
+	bool first= (lastCommand!=command);
+	double oldStart, oldEnd, newStart, newEnd;
+	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
+	if(first) 
+		resetTimeCache();
+	ostringstream s;
+	if(newStart!=oldStart) {
+		s<<(first?"time selection start ":"");
+		s<<formatTime(newStart, TF_RULER, false, true, false);
+	} else if(newEnd!=oldEnd) {
+		s<<(first?"time selection end ":"");
+		s<<formatTime(newEnd, TF_RULER, false, true, false);
+	}
+	outputMessage(s);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2308,6 +2327,14 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41929}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab (ignore default template)
 	{MAIN_SECTION, {{0, 0, 40861}, NULL}, NULL, cmdSwitchProjectTab}, // Next project tab
 	{MAIN_SECTION, {{0, 0, 40862}, NULL}, NULL, cmdSwitchProjectTab}, // Previous project tab
+	{MAIN_SECTION, {{0, 0, 40320}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge left
+	{MAIN_SECTION, {{0, 0, 40321}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge right
+	{MAIN_SECTION, {{0, 0, 40322}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge left
+	{MAIN_SECTION, {{0, 0, 40323}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge right
+	{MAIN_SECTION, {{0, 0, 40039}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left
+	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
+	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
+	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
