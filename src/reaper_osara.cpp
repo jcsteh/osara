@@ -1067,6 +1067,9 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 };
 
+map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+};
+
 /*** Code related to context menus and other UI that isn't just actions.
  * This includes code to access REAPER context menus, but also code to display
  * our own in some cases where REAPER doesn't provide one.
@@ -2350,22 +2353,34 @@ void cmdConfig(Command* command) {
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int command) {
-	const auto it = postCommandsMap.find(command);
-	if (it != postCommandsMap.end()) {
-		isHandlingCommand = true;
-		Main_OnCommand(command, 0);
-		it->second(command);
-		isHandlingCommand = false;
-		return true;
-	}
-	const auto mIt = POST_COMMAND_MESSAGES.find(command);
-	if (mIt != POST_COMMAND_MESSAGES.end()) {
-		isHandlingCommand = true;
-		Main_OnCommand(command, 0);
-		outputMessage(mIt->second);
-		isHandlingCommand = false;
-		return true;
+bool handlePostCommand(int section, int command) {
+	if (section==MAIN_SECTION) {
+		const auto it = postCommandsMap.find(command);
+		if (it != postCommandsMap.end()) {
+			isHandlingCommand = true;
+			Main_OnCommand(command, 0);
+			it->second(command);
+			isHandlingCommand = false;
+			return true;
+		}
+		const auto mIt = POST_COMMAND_MESSAGES.find(command);
+		if (mIt != POST_COMMAND_MESSAGES.end()) {
+			isHandlingCommand = true;
+			Main_OnCommand(command, 0);
+			outputMessage(mIt->second);
+			isHandlingCommand = false;
+			return true;
+		}
+	}else if (section==MIDI_EDITOR_SECTION) {
+		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
+		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
+			isHandlingCommand = true;
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			outputMessage(mIt->second);
+			isHandlingCommand = false;
+			return true;
+		}
 	}
 	return false;
 }
@@ -2396,8 +2411,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	} else if ((section->uniqueID == MAIN_SECTION) && handlePostCommand(command)) {
-		// For now, only support the main section for post commands.
+	} else if (handlePostCommand(section->uniqueID, command)) {
 		return true;
 	}
 	return false;
@@ -2412,7 +2426,7 @@ bool handleMainCommandFallback(int command, int flag) {
 		it->second->execute(it->second);
 		isHandlingCommand = false;
 		return true;
-	} else if (handlePostCommand(command))
+	} else if (handlePostCommand(MAIN_SECTION, command))
 		return true;
 	return false;
 }
