@@ -269,6 +269,26 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Select all notes in time selection: Ctrl+Alt+E
 - Invert selection: Ctrl+I
 - Select all notes with the same pitch: Ctrl+Shift+A
+- Grid: Set to 1: 1, control+shift+1
+- Grid: Set to 1/2: 2, control+shift+2
+- Grid: Set to 1/32: 3, control+shift+3
+- Grid: Set to 1/4: 4, control+shift+4
+- Grid: Set to 1/6 (1/4 triplet): 5, control+shift+5
+- Grid: Set to 1/16: 6, control+shift+6
+- Grid: Set to 1/24 (1/16 triplet): 7, control+shift+7
+- Grid: Set to 1/8: 8, control+shift+8
+- Grid: Set to 1/12 (1/8 triplet): 9, control+shift+9
+- Grid: Set to 1/48 (1/32 triplet): 0
+- Set length for next inserted note: 1: control+1
+- Set length for next inserted note: 1/2: control+2
+- Set length for next inserted note: 1/32: control+3
+- Set length for next inserted note: 1/4: control+4
+- Set length for next inserted note: 1/4T: control+5
+- Set length for next inserted note: 1/16: control+6
+- Set length for next inserted note: 1/16T: control+7
+- Set length for next inserted note: 1/8: control+8
+- Set length for next inserted note: 1/8T: control+9
+- Set length for next inserted note: 1/32T: control+0
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
