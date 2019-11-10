@@ -1068,6 +1068,26 @@ map<int, string> POST_COMMAND_MESSAGES = {
 };
 
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+	{40204, "grid whole"}, // Grid: Set to 1
+	{40203, "grid half"}, // Grid: Set to 1/2
+	{40190, "grid thirty second"}, // Grid: Set to 1/32
+	{40201, "grid quarter"}, // Grid: Set to 1/4
+	{40199, "grid quarter triplet"}, // Grid: Set to 1/6 (1/4 triplet)
+	{40192, "grid sixteenth"}, // Grid: Set to 1/16
+	{40191, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
+	{40197, "grid eighth"}, // Grid: Set to 1/8
+	{40193, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{40189, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
+	{41081, "length whole"}, // Set length for next inserted note: 1
+	{41079, "length half"}, // Set length for next inserted note: 1/2
+	{41067, "length thirty second"}, // Set length for next inserted note: 1/32
+	{41076, "length quarter"}, // Set length for next inserted note: 1/4
+	{41075, "length quarter triplet"}, // Set length for next inserted note: 1/4T
+	{41070, "length sixteenth"}, // Set length for next inserted note: 1/16
+	{41069, "length sixteenth triplet"}, // Set length for next inserted note: 1/16T
+	{41073, "length eighth"}, // Set length for next inserted note: 1/8
+	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
+	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
