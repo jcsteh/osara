@@ -506,7 +506,9 @@ void midiMoveToItem(int direction) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, ((direction==1)?40798:40797)); // Contents: Activate next/previous MIDI media item on this track, clearing the editor first
 	MIDIEditor_OnCommand(editor, 40036); // View: Go to start of file
-	MIDIEditor_OnCommand(editor, NamedCommandLookup("_FNG_ME_SELECT_NOTES_NEAR_EDIT_CURSOR")); // SWS/FNG: Select notes nearest edit cursor
+	int cmd = NamedCommandLookup("_FNG_ME_SELECT_NOTES_NEAR_EDIT_CURSOR");
+	if(cmd>0)
+		MIDIEditor_OnCommand(editor, cmd); // SWS/FNG: Select notes nearest edit cursor
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	MediaItem* item = GetMediaItemTake_Item(take);
 	MediaTrack* track = GetMediaItem_Track(item);
