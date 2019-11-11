@@ -880,12 +880,52 @@ void postRenameTrack(int command) {
 	outputMessage("Track name");
 }
 
+bool isItemMuted(MediaItem* item) {
+	return *(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL);
+}
+
 void postToggleItemMute(int command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
+	int muteCount=0;
+	int unmuteCount=0;
+	int count = CountSelectedMediaItems(0);
+	if(count==0)
 		return;
-	outputMessage(*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL) ?
-		"muted" : "unmuted");
+	if(count==1)  {
+		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"muted":"unmuted");
+		return;
+	}
+	for (int i=0; i<count; i++)
+		isItemMuted(GetSelectedMediaItem(0, i))?muteCount++:unmuteCount++;
+	ostringstream s;
+	if(muteCount>0){
+		s<<muteCount<<" item"<<((muteCount==1)?"":"s") <<" muted";
+		s<<((unmuteCount>0)?", ":"");
+	}
+	if(unmuteCount>0) 
+		s<<unmuteCount<<" item"<<((unmuteCount==1)?"":"s") <<" unmuted";
+	outputMessage(s);
+}
+
+void postToggleItemSolo(int command) {
+	int soloCount=0;
+	int unsoloCount=0;
+	int count = CountSelectedMediaItems(0);
+	if(count==0)
+		return;
+	if(count==1)  {
+		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"unsoloed":"soloed");
+		return;
+	}
+	for (int i=0; i<count; i++)
+		isItemMuted(GetSelectedMediaItem(0, i))?unsoloCount++:soloCount++;
+	ostringstream s;
+	if(soloCount>0){
+		s<<soloCount<<" item"<<((soloCount==1)?"":"s") <<" soloed";
+		s<<((unsoloCount>0)?", ":"");
+	}
+	if(unsoloCount>0) 
+		s<<unsoloCount<<" item"<<((unsoloCount==1)?"":"s") <<" unsoloed";
+	outputMessage(s);
 }
 
 void postSetSelectionEnd(int command) {
@@ -1048,6 +1088,7 @@ PostCommand POST_COMMANDS[] = {
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
+		{41561, postToggleItemSolo}, // Item properties: Toggle solo
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
