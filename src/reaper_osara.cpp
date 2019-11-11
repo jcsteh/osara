@@ -907,24 +907,22 @@ void postToggleItemMute(int command) {
 }
 
 void postToggleItemSolo(int command) {
-	int soloCount=0;
-	int unsoloCount=0;
-	int count = CountSelectedMediaItems(0);
-	if(count==0)
+	bool soloed=true;
+	int itemCount=CountMediaItems(0);
+	int selectedCount = CountSelectedMediaItems(0);
+	if(selectedCount==0)
 		return;
-	if(count==1)  {
-		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"unsoloed":"soloed");
+	for(int i=0; i<itemCount; i++) {
+		MediaItem* item = GetMediaItem(0, i);
+		if((!isItemSelected(item)) && (!isItemMuted(item)))
+			soloed=false;
+	}
+	if(selectedCount==1) {
+		outputMessage(soloed?"soloed":"unsoloed");
 		return;
 	}
-	for (int i=0; i<count; i++)
-		isItemMuted(GetSelectedMediaItem(0, i))?unsoloCount++:soloCount++;
 	ostringstream s;
-	if(soloCount>0){
-		s<<soloCount<<" item"<<((soloCount==1)?"":"s") <<" soloed";
-		s<<((unsoloCount>0)?", ":"");
-	}
-	if(unsoloCount>0) 
-		s<<unsoloCount<<" item"<<((unsoloCount==1)?"":"s") <<" unsoloed";
+	s<<selectedCount<<" items "<<(soloed?"soloed":"unsoloed");
 	outputMessage(s);
 }
 
