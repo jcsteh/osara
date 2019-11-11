@@ -855,6 +855,42 @@ void cmdMidiMoveToTrack(Command* command) {
 	outputMessage(s);
 }
 
+void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
+	double tsStart,tsEnd;
+	GetSet_LoopTimeRange(false, false, &tsStart, &tsEnd, false);
+	if(tsStart == tsEnd) {
+		outputMessage("No time selection");
+		return;
+	}
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int selNote = MIDI_EnumSelNotes(take, -1);
+	if(selNote==-1) {
+		outputMessage("No notes selected");
+		return;
+	}
+	int selPitch;
+	MIDI_GetNote(take, selNote, nullptr, nullptr, nullptr, nullptr, nullptr, &selPitch, nullptr);
+	Undo_BeginBlock();
+	MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+	int noteCount {0}, selectCount {0};
+	MIDI_CountEvts(take, &noteCount, nullptr, nullptr);
+	for(int i=0; i<noteCount; i++) {
+		double startPPQPos;
+		int pitch;
+		MIDI_GetNote(take, i, nullptr, nullptr, &startPPQPos, nullptr, nullptr, &pitch, nullptr);
+		double startTime = MIDI_GetProjTimeFromPPQPos(take, startPPQPos);
+		if(tsStart<=startTime && startTime<tsEnd && pitch==selPitch) {
+			selectNote(take, i);
+			selectCount++;
+		}
+	}
+	Undo_EndBlock("OSARA: Select all notes with the same pitch within time selection",0);
+	ostringstream s;
+	s<< selectCount << " note"<<((selectCount==1)?"":"s")<<" selected";
+	outputMessage(s);
+}
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	HWND focus = GetFocus();

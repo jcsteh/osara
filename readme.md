@@ -568,6 +568,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous CC
 - OSARA: Move to next CC and add to selection
 - OSARA: Move to previous CC and add to selection
+- OSARA: Select all notes with the same pitch starting in time selection
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
