@@ -502,6 +502,68 @@ void cmdMidiSelectNotes(Command* command) {
 	outputMessage(s);
 }
 
+void midiMoveToItem(int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, ((direction==1)?40798:40797)); // Contents: Activate next/previous MIDI media item on this track, clearing the editor first
+	MIDIEditor_OnCommand(editor, 40036); // View: Go to start of file
+	int cmd = NamedCommandLookup("_FNG_ME_SELECT_NOTES_NEAR_EDIT_CURSOR");
+	if(cmd>0)
+		MIDIEditor_OnCommand(editor, cmd); // SWS/FNG: Select notes nearest edit cursor
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	MediaTrack* track = GetMediaItem_Track(item);
+	int count = CountTrackMediaItems(track);
+	int itemNum;
+	for (int i=0; i<count; ++i) {
+		MediaItem* itemTmp = GetTrackMediaItem(track, i);
+		if (itemTmp == item) {
+			itemNum = i+1;
+			break;
+		}
+	}
+	ostringstream s;
+	s << itemNum << " " << GetTakeName(take);
+	s << " " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void cmdMidiMoveToNextItem(Command* command) {
+	Undo_BeginBlock();
+	midiMoveToItem(1);
+	Undo_EndBlock("OSARA: Move to next midi item on track", 0);
+}
+
+void cmdMidiMoveToPrevItem(Command* command) {
+	Undo_BeginBlock();
+	midiMoveToItem(-1);
+	Undo_EndBlock("OSARA: Move to previous midi item on track", 0);
+}
+
+void cmdMidiMoveToTrack(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+		MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	MediaTrack* track = GetMediaItem_Track(item);
+	int count = CountTrackMediaItems(track);
+	int itemNum;
+	for (int i=0; i<count; ++i) {
+		MediaItem* itemTmp = GetTrackMediaItem(track, i);
+		if (itemTmp == item) {
+			itemNum = i+1;
+			break;
+		}
+	}
+	ostringstream s;
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	s << trackNum;
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+	if (trackName)
+		s << " " << trackName;
+	s << " item " << itemNum << " " << GetTakeName(take);
+	outputMessage(s);
+}
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	HWND focus = GetFocus();

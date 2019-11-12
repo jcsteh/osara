@@ -22,6 +22,9 @@ void cmdMidiMovePitchCursor(Command* command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 void cmdMidiSelectNotes(Command* command);
+void cmdMidiMoveToNextItem(Command* command) ;
+void cmdMidiMoveToPrevItem(Command* command) ;
+void cmdMidiMoveToTrack(Command* command);
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);

@@ -289,6 +289,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Set length for next inserted note: 1/8: control+8
 - Set length for next inserted note: 1/8T: control+9
 - Set length for next inserted note: 1/32T: control+0
+- Activate next MIDI track: Ctrl+DownArrow
+- Activate previous MIDI track: Ctrl+UpArrow
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -519,6 +521,10 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report global / Track Automation Mode
 - OSARA: Toggle global automation override between latch preview and off
 - OSARA: Cycle through midi recording modes of selected tracks
+
+#### Midi editor
+- OSARA: Move to next midi item on track
+- OSARA: Move to previous midi item on track
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
