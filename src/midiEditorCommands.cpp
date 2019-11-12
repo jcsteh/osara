@@ -561,8 +561,9 @@ void cmdMidiMoveToTrack(Command* command) {
 	if (trackName)
 		s << " " << trackName;
 	s << " item " << itemNum << " " << GetTakeName(take);
-outputMessage(s);
+	outputMessage(s);
 }
+
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command) {
 	HWND focus = GetFocus();
