@@ -161,7 +161,6 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 extern int lastCommandRepeatCount;
-extern Command* lastCommand ;
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;

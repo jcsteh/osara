@@ -54,6 +54,9 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 bool isSelectionContiguous = true;
+Command* lastCommand = NULL;
+DWORD lastCommandTime = 0;
+int lastCommandRepeatCount;
 
 /*** Utilities */
 
@@ -1724,12 +1727,12 @@ void cmdMoveItemEdge(Command* command) {
 		item = GetSelectedMediaItem(0, 0);
 	else {
 		outputMessage("no items selected");
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
-	const char* name;
 	ostringstream s;
 	if(lastCommand != command) { 
-		name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
+		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
 		const char* start;
 		// Skip the category before the colon (if any).
 		for (start = name; *start; ++start) {
@@ -2462,10 +2465,6 @@ bool handlePostCommand(int section, int command) {
 	}
 	return false;
 }
-
-Command* lastCommand = NULL;
-DWORD lastCommandTime = 0;
-int lastCommandRepeatCount;
 
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
