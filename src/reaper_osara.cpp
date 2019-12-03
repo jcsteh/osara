@@ -2438,10 +2438,6 @@ void cmdConfig(Command* command) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
-/*** Surface definition. */
-
-IReaperControlSurface* surface = NULL;
-
 /*** Initialisation, termination and inner workings. */
 
 bool isHandlingCommand = false;
@@ -2582,6 +2578,8 @@ void annotateSpuriousDialogs(HWND hwnd) {
 }
 
 #endif // _WIN32
+
+IReaperControlSurface* surface = nullptr;
 
 extern "C" {
 
