@@ -54,6 +54,9 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 bool isSelectionContiguous = true;
+Command* lastCommand = NULL;
+DWORD lastCommandTime = 0;
+int lastCommandRepeatCount;
 
 /*** Utilities */
 
@@ -937,6 +940,17 @@ void postChangeGlobalAutomationOverride(int command) {
 	outputMessage(s);
 }
 
+void postReverseTake(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage("no items selected");
+		return;
+	}
+	ostringstream s;
+	s<<count<<((count==1)?" take ":" takes ")<<"reversed";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1048,6 +1062,7 @@ PostCommand POST_COMMANDS[] = {
 	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
+		{41051, postReverseTake}, // Item properties: Toggle take reverse
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -1073,6 +1088,29 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
 	{40778, "grid eighth"}, // Grid: Set to 1/8
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+};
+
+map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+	{40204, "grid whole"}, // Grid: Set to 1
+	{40203, "grid half"}, // Grid: Set to 1/2
+	{40190, "grid thirty second"}, // Grid: Set to 1/32
+	{40201, "grid quarter"}, // Grid: Set to 1/4
+	{40199, "grid quarter triplet"}, // Grid: Set to 1/6 (1/4 triplet)
+	{40192, "grid sixteenth"}, // Grid: Set to 1/16
+	{40191, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
+	{40197, "grid eighth"}, // Grid: Set to 1/8
+	{40193, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{40189, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
+	{41081, "length whole"}, // Set length for next inserted note: 1
+	{41079, "length half"}, // Set length for next inserted note: 1/2
+	{41067, "length thirty second"}, // Set length for next inserted note: 1/32
+	{41076, "length quarter"}, // Set length for next inserted note: 1/4
+	{41075, "length quarter triplet"}, // Set length for next inserted note: 1/4T
+	{41070, "length sixteenth"}, // Set length for next inserted note: 1/16
+	{41069, "length sixteenth triplet"}, // Set length for next inserted note: 1/16T
+	{41073, "length eighth"}, // Set length for next inserted note: 1/8
+	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
+	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -1686,6 +1724,48 @@ void cmdMoveItems(Command* command) {
 		reportActionName(command->gaccel.accel.cmd);
 }
 
+void cmdMoveItemEdge(Command* command) {
+	MediaItem* item;
+	// try to provide information based on the last item spoken by osara if it is selected
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& IsMediaItemSelected(currentItem)
+	) 
+	item = currentItem;
+	else if(CountSelectedMediaItems(0)>0)
+		item = GetSelectedMediaItem(0, 0);
+	else {
+		outputMessage("no items selected");
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	ostringstream s;
+	if(lastCommand != command) { 
+		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
+		const char* start;
+		// Skip the category before the colon (if any).
+		for (start = name; *start; ++start) {
+			if (*start == ':') {
+				name = start + 2;
+				break;
+			}
+		}
+		s<<name << " ";
+		resetTimeCache();
+	}
+	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	if(newStart!=oldStart)
+		s<<formatTime(newStart, TF_RULER, false, true);
+	else if(newEnd!=oldEnd)
+		s<<formatTime(newEnd, TF_RULER, false, true);
+	else
+		s<<"no change";
+	outputMessage(s);
+}
+
 void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
@@ -2201,10 +2281,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
 	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
-	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
@@ -2232,6 +2312,8 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0,40006}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all events
 	{MIDI_EDITOR_SECTION, {{0, 0,40501}, NULL}, NULL, cmdMidiSelectNotes},// Invert selection
 	{MIDI_EDITOR_SECTION, {{0, 0,40434}, NULL}, NULL, cmdMidiSelectNotes},// Select all notes with the same pitch
+	{MIDI_EDITOR_SECTION, {{0, 0,40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0,40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
@@ -2296,6 +2378,8 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord"}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord and add to selection"}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord and add to selection"}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToPreviousNoteInChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
@@ -2362,29 +2446,37 @@ IReaperControlSurface* surface = NULL;
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int command) {
-	const auto it = postCommandsMap.find(command);
-	if (it != postCommandsMap.end()) {
-		isHandlingCommand = true;
-		Main_OnCommand(command, 0);
-		it->second(command);
-		isHandlingCommand = false;
-		return true;
-	}
-	const auto mIt = POST_COMMAND_MESSAGES.find(command);
-	if (mIt != POST_COMMAND_MESSAGES.end()) {
-		isHandlingCommand = true;
-		Main_OnCommand(command, 0);
-		outputMessage(mIt->second);
-		isHandlingCommand = false;
-		return true;
+bool handlePostCommand(int section, int command) {
+	if (section==MAIN_SECTION) {
+		const auto it = postCommandsMap.find(command);
+		if (it != postCommandsMap.end()) {
+			isHandlingCommand = true;
+			Main_OnCommand(command, 0);
+			it->second(command);
+			isHandlingCommand = false;
+			return true;
+		}
+		const auto mIt = POST_COMMAND_MESSAGES.find(command);
+		if (mIt != POST_COMMAND_MESSAGES.end()) {
+			isHandlingCommand = true;
+			Main_OnCommand(command, 0);
+			outputMessage(mIt->second);
+			isHandlingCommand = false;
+			return true;
+		}
+	}else if (section==MIDI_EDITOR_SECTION) {
+		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
+		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
+			isHandlingCommand = true;
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			outputMessage(mIt->second);
+			isHandlingCommand = false;
+			return true;
+		}
 	}
 	return false;
 }
-
-Command* lastCommand = NULL;
-DWORD lastCommandTime = 0;
-int lastCommandRepeatCount;
 
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
@@ -2408,8 +2500,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	} else if ((section->uniqueID == MAIN_SECTION) && handlePostCommand(command)) {
-		// For now, only support the main section for post commands.
+	} else if (handlePostCommand(section->uniqueID, command)) {
 		return true;
 	}
 	return false;
@@ -2424,7 +2515,7 @@ bool handleMainCommandFallback(int command, int flag) {
 		it->second->execute(it->second);
 		isHandlingCommand = false;
 		return true;
-	} else if (handlePostCommand(command))
+	} else if (handlePostCommand(MAIN_SECTION, command))
 		return true;
 	return false;
 }
