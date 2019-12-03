@@ -14,7 +14,7 @@ using namespace std;
 
 /*** A control surface to obtain certain info that can only be retrieved that way.
  */
-class Surface : public IReaperControlSurface {
+class Surface: public IReaperControlSurface {
 	public:
 	virtual const char* GetTypeString() override {
 		return "OSARA";
