@@ -216,4 +216,9 @@ extern IAccPropServices* accPropServices;
 #define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
 
+extern bool isHandlingCommand;
+void reportTransportState(int state);
+void reportRepeat(bool repeat);
+IReaperControlSurface* createSurface();
+
 #endif

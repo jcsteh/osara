@@ -404,9 +404,10 @@ void postGoToTrack(int command) {
 		s << "master";
 	else {
 		s << trackNum;
-	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-	if (folderDepth == 1) // Folder
-		s << " " << getFolderCompacting(track);
+		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
+		if (folderDepth == 1) { // Folder
+			s << " " << getFolderCompacting(track);
+		}
 		const char* message = formatFolderState(folderDepth, false);
 		if (message)
 			s << " " << message;
@@ -687,8 +688,12 @@ void postCycleRippleMode(int command) {
 	outputMessage(s);
 }
 
+void reportRepeat(bool repeat) {
+	outputMessage(repeat ? "repeat on" : "repeat off");
+}
+
 void postToggleRepeat(int command) {
-	outputMessage(GetToggleCommandState(command) ? "repeat on" : "repeat off");
+	reportRepeat(GetToggleCommandState(command));
 }
 
 void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
@@ -843,10 +848,9 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 bool shouldReportTransport = true;
-void postChangeTransportState(int command) {
+void reportTransportState(int state) {
 	if (!shouldReportTransport)
 		return;
-	int state = GetPlayState();
 	if (state & 2)
 		outputMessage("pause");
 	else if (state & 4)
@@ -855,6 +859,10 @@ void postChangeTransportState(int command) {
 		outputMessage("play");
 	else
 		outputMessage("stop");
+}
+
+void postChangeTransportState(int command) {
+	reportTransportState(GetPlayState());
 }
 
 void postSelectMultipleItems(int command) {
@@ -2571,6 +2579,8 @@ void annotateSpuriousDialogs(HWND hwnd) {
 
 #endif // _WIN32
 
+IReaperControlSurface* surface = nullptr;
+
 extern "C" {
 
 REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
@@ -2621,6 +2631,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
+		surface = createSurface();
+		rec->Register("csurf_inst", (void*)surface);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
@@ -2631,6 +2643,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Unload.
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
+		delete surface;
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 #else
