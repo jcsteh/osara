@@ -194,7 +194,6 @@ const TimeFormat TF_RULER = TF_NONE;
 std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true, bool includeZeros=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
-std::string formatTrackWithName(MediaTrack* track);
 
 #ifdef _WIN32
 #include <string>

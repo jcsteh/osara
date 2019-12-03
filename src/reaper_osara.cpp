@@ -272,20 +272,6 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-string formatTrackWithName(MediaTrack* track) {
-	ostringstream s;
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum == -1)
-		s << "master";
-	else {
-		s << trackNum;
-		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-		if (trackName && trackName[0])
-			s << " " << trackName;
-	}
-	return s.str();
-}
-
 void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
 	const char* name = kbd_getTextFromCmd(command, section);
 	const char* start;
@@ -411,13 +397,14 @@ void postGoToTrack(int command) {
 		return;
 	ostringstream s;
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum == -1)
+	if (trackNum <= 0)
 		s << "master";
 	else {
 		s << trackNum;
 		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-		if (folderDepth == 1) // Folder
+		if (folderDepth == 1) { // Folder
 			s << " " << getFolderCompacting(track);
+		}
 		const char* message = formatFolderState(folderDepth, false);
 		if (message)
 			s << " " << message;
@@ -1813,19 +1800,16 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 	ostringstream s;
 	s << prefix << ": ";
 	int count = 0;
-	// We use -1 for the master track.
-	for (int i = -1; i < CountTracks(0); ++i) {
-		MediaTrack* track;
-		if (i == -1)
-			// Even when the master track is invisible, it could have a state we want to know, such as muted.
-			track = GetMasterTrack(0);
-		else
-			track = GetTrack(0, i);
+	for (int i = 0; i < CountTracks(0); ++i) {
+		MediaTrack* track = GetTrack(0, i);
 		if (checkState(track)) {
 			++count;
 			if (count > 1)
 				s << ", ";
-			s << formatTrackWithName(track);
+			s << i + 1;
+			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+			if (name && name[0])
+				s << " " << name;
 		}
 	}
 	if (count == 0)
