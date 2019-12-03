@@ -5,15 +5,13 @@ branches:
   - master
 
 environment:
- PY_PYTHON: 2.7-32
+ PY_PYTHON: 3.7-32
  encFileKey:
   secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
 
 init:
  - ps:       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
- # We must use easy_install instead of pip because of a scons packaging bug.
- # See https://github.com/SCons/scons/issues/2769
- - py -m easy_install scons
+ - py -m pip install scons
 
 clone_depth: 1
 
