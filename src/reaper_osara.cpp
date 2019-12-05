@@ -1370,6 +1370,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (wParam == VK_APPS && lParam & 0x80000000) {
 		if (wcscmp(className, L"REAPERTrackListWindow") == 0
 			|| wcscmp(className, L"REAPERtrackvu") == 0
+			|| wcscmp(className, L"REAPERTCPDisplay") == 0
 		) {
 			// Reaper doesn't handle the applications key for these windows.
 			// Display the appropriate context menu depending on fakeFocus.
