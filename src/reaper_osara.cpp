@@ -2549,6 +2549,12 @@ void annotateAccRole(HWND hwnd, long role) {
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
+		bool focusIsTrackView = isTrackViewWindow(hwnd);
+		if (focusIsTrackView) {
+			// Give these objects a non-generic role so NVDA doesn't fall back to
+			// screen scraping, which causes spurious messages to be reported.
+			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
+		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
 			// This avoids problems such as the last message repeating when a new project is opened (#17).
@@ -2562,7 +2568,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
 					&PROPID_ACC_NAME, 1);
 			}
-			if (lastWasTrackView && isTrackViewWindow(hwnd)) {
+			if (lastWasTrackView && focusIsTrackView) {
 				// REAPER 6.0 moves focus between two track view windows in some cases.
 				// For example, if you select a track, REAPERTCPDisplay gets focus. If
 				// you select an item, REAPERTrackListWindow gets focus.
