@@ -1354,6 +1354,20 @@ bool maybeSwitchToFxPluginWindow() {
 	return true;
 }
 
+bool isTrackViewWindow(HWND hwnd) {
+	WCHAR className[22] = L"\0";
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
+	return wcscmp(className, L"REAPERTrackListWindow") == 0
+		|| wcscmp(className, L"REAPERtrackvu") == 0
+		|| wcscmp(className, L"REAPERTCPDisplay") == 0;
+}
+
+bool isListView(HWND hwnd) {
+	WCHAR className[14] = L"\0";
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
+	return wcscmp(className, L"SysListView32") == 0;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -1364,14 +1378,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	HWND focus = GetFocus();
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	WCHAR className[22] = L"\0";
-	GetClassNameW(focus, className, ARRAYSIZE(className));
 	HWND window;
 	if (wParam == VK_APPS && lParam & 0x80000000) {
-		if (wcscmp(className, L"REAPERTrackListWindow") == 0
-			|| wcscmp(className, L"REAPERtrackvu") == 0
-			|| wcscmp(className, L"REAPERTCPDisplay") == 0
-		) {
+		if (isTrackViewWindow(focus)) {
 			// Reaper doesn't handle the applications key for these windows.
 			// Display the appropriate context menu depending on fakeFocus.
 			if (GetKeyState(VK_CONTROL) & 0x8000) {
@@ -1388,7 +1397,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		}
 	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
 		&& !(lParam & 0x80000000) // Key down
-		&& wcscmp(className, L"SysListView32") == 0
+		&& isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
