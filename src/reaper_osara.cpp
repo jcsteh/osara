@@ -2539,6 +2539,14 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 
 #ifdef _WIN32
 
+void annotateAccRole(HWND hwnd, long role) {
+	VARIANT var;
+	var.vt = VT_I4;
+	var.lVal = role;
+	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE,
+		var);
+}
+
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
@@ -2591,10 +2599,8 @@ HWINEVENTHOOK winEventHook = NULL;
 // This includes the main window.
 // Annotate these to prevent screen readers from potentially reading a spurious caption.
 void annotateSpuriousDialogs(HWND hwnd) {
-	VARIANT role;
-	role.vt = VT_I4;
-	role.lVal = hwnd == mainHwnd ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING;
-	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE, role);
+	annotateAccRole(hwnd,
+		hwnd == mainHwnd ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING);
 	// If the previous hwnd is static text, oleacc will use this as the name.
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0)
