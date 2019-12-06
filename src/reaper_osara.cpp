@@ -829,7 +829,6 @@ void postTrackFxChain(int command) {
 	}
 }
 
-#ifdef _WIN32
 void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
@@ -837,7 +836,6 @@ void postTrackIo(int command) {
 		cmdIoMaster(NULL);
 	}
 }
-#endif // _WIN32
 
 void postToggleMetronome(int command) {
 	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
@@ -1027,9 +1025,7 @@ PostCommand POST_COMMANDS[] = {
 	{41860, postGoToStretch}, // Item: go to next stretch marker
 	{41861, postGoToStretch}, // Item: go to previous stretch marker
 	{40291, postTrackFxChain}, // Track: View FX chain for current track
-#ifdef _WIN32
 	{40293, postTrackIo}, // Track: View I/O for current track
-#endif
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
 	{40044, postChangeTransportState}, // Transport: Play/stop
@@ -1867,9 +1863,13 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 	}
 }
 
-#ifdef _WIN32
-
 void cmdIoMaster(Command* command) {
+	if (GetAppVersion()[0] >= '6') {
+		// REAPER >= 6.01 has a builtin action for this.
+		Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
+		return;
+	}
+#ifdef _WIN32
 	// If the master track isn't visible, make it so temporarily.
 	int prevVisible = GetMasterTrackVisibility();
 	if (!(prevVisible & 1))
@@ -1878,9 +1878,8 @@ void cmdIoMaster(Command* command) {
 	// Restore master invisibility if appropriate.
 	if (!(prevVisible & 1))
 		SetMasterTrackVisibility(prevVisible);
-}
-
 #endif // _WIN32
+}
 
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
@@ -2343,9 +2342,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
-#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
-#endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
