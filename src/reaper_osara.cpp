@@ -2544,8 +2544,26 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
 			// This avoids problems such as the last message repeating when a new project is opened (#17).
-			accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
-			lastMessageHwnd = NULL;
+			bool lastWasTrackView = isTrackViewWindow(lastMessageHwnd);
+			if (lastWasTrackView) {
+				// These objects can get a bogus name from oleacc, so set an empty name
+				// instead of clearing it.
+				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
+					PROPID_ACC_NAME, L" ");
+			} else {
+				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
+					&PROPID_ACC_NAME, 1);
+			}
+			if (lastWasTrackView && isTrackViewWindow(hwnd)) {
+				// REAPER 6.0 moves focus between two track view windows in some cases.
+				// For example, if you select a track, REAPERTCPDisplay gets focus. If
+				// you select an item, REAPERTrackListWindow gets focus.
+				// Sometimes, focus moves after the action executes. Therefore, repeat
+				// the message so the user doesn't miss it.
+				outputMessage(lastMessage);
+			} else {
+				lastMessageHwnd = nullptr;
+			}
 		}
 		HWND tempWindow;
 		if (tempWindow = getSendContainer(hwnd)) {
