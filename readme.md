@@ -83,6 +83,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Insert new track
 - Track: Cycle track folder state: Shift+Enter
 - Track: Cycle track folder collapsed state: Enter
+- SWS: Select nearest next folder
+- SWS: Select nearest previous folder
 - Track: Remove tracks
 
 #### Adjusting Track Parameters
