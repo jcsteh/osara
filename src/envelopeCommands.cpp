@@ -487,3 +487,33 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	s << " copied";
 	outputMessage(s);
 }
+
+void reportToggleTrackEnvelope(char* envType) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	bool visible = false;
+	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV", envType);
+	if (envelope) {
+		char state[100];
+		GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
+		cmatch m;
+		regex_search(state, m, RE_ENVELOPE_STATE);
+		visible =  !m.empty() && m.str(4)[0] == '1';
+	}
+	ostringstream s;
+	s << (visible ? "showed " : "hid ");
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	s << name << " envelope";
+	outputMessage(s);
+}
+
+void postToggleTrackVolumeEnvelope(int command) {
+	reportToggleTrackEnvelope("<VOLENV2");
+}
+
+void postToggleTrackPanEnvelope(int command) {
+	reportToggleTrackEnvelope("<PANENV2");
+}

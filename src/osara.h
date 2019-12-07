@@ -143,6 +143,10 @@
 #define REAPERAPI_WANT_SetTrackAutomationMode
 #define REAPERAPI_WANT_SetMediaTrackInfo_Value
 #define REAPERAPI_WANT_MIDI_EnumSelEvts
+#define REAPERAPI_WANT_GetMediaItemTake_Item
+#define REAPERAPI_WANT_GetMediaItem_Track
+#define REAPERAPI_WANT_IsMediaItemSelected
+#define REAPERAPI_WANT_GetMediaItemInfo_Value
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -211,5 +215,10 @@ extern IAccPropServices* accPropServices;
 #define ComboBox_AddString(hwnd, str) (int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
 #define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
+
+extern bool isHandlingCommand;
+void reportTransportState(int state);
+void reportRepeat(bool repeat);
+IReaperControlSurface* createSurface();
 
 #endif

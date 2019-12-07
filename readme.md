@@ -195,6 +195,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Global automation override: All automation in write mode
 - Global automation override: Bypass all automation
 - Global automation override: No override (set automation modes per track)
+- Track: Toggle track volume envelope visible: Control+Alt+V
+- Track: Toggle track pan envelope visible: Control+Alt+P
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -207,6 +209,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Options: Toggle locking: l
 - (SWS extension) SWS/BR: Options - Cycle through record modes: Alt+\
 - Options: Solo in front: Control+Alt+F6
+- Pre-roll: Toggle pre-roll on record: Shift+`
+- SWS/AW: Toggle count-in before recording: Control+Shift+`
 
 #### Undo
 - Edit: Undo: Control+Z
@@ -271,6 +275,28 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Select all notes in time selection: Ctrl+Alt+E
 - Invert selection: Ctrl+I
 - Select all notes with the same pitch: Ctrl+Shift+A
+- Grid: Set to 1: 1, control+shift+1
+- Grid: Set to 1/2: 2, control+shift+2
+- Grid: Set to 1/32: 3, control+shift+3
+- Grid: Set to 1/4: 4, control+shift+4
+- Grid: Set to 1/6 (1/4 triplet): 5, control+shift+5
+- Grid: Set to 1/16: 6, control+shift+6
+- Grid: Set to 1/24 (1/16 triplet): 7, control+shift+7
+- Grid: Set to 1/8: 8, control+shift+8
+- Grid: Set to 1/12 (1/8 triplet): 9, control+shift+9
+- Grid: Set to 1/48 (1/32 triplet): 0
+- Set length for next inserted note: 1: control+1
+- Set length for next inserted note: 1/2: control+2
+- Set length for next inserted note: 1/32: control+3
+- Set length for next inserted note: 1/4: control+4
+- Set length for next inserted note: 1/4T: control+5
+- Set length for next inserted note: 1/16: control+6
+- Set length for next inserted note: 1/16T: control+7
+- Set length for next inserted note: 1/8: control+8
+- Set length for next inserted note: 1/8T: control+9
+- Set length for next inserted note: 1/32T: control+0
+- Activate next MIDI track: Ctrl+DownArrow
+- Activate previous MIDI track: Ctrl+UpArrow
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -502,6 +528,10 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Toggle global automation override between latch preview and off
 - OSARA: Cycle through midi recording modes of selected tracks
 
+#### Midi editor
+- OSARA: Move to next midi item on track
+- OSARA: Move to previous midi item on track
+
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
 
@@ -538,9 +568,8 @@ To build OSARA, you will need:
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
 	* Xcode 10 is not yet supported.
 	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
-- Python, version 2.7:
+- Python, version 2.7 or later:
 	* This is needed by SCons.
-	* Python 3 and later are not yet supported.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
 	* Once Python is installed, you should be able to install SCons by simply running this at the command line: `pip install scons`

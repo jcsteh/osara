@@ -27,3 +27,5 @@ void cmdMoveToPrevEnvelopePointKeepSel(Command* command);
 void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true);
 bool toggleCurrentAutomationItemSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
+void postToggleTrackVolumeEnvelope(int command);
+void postToggleTrackPanEnvelope(int command);
