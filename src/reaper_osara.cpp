@@ -54,6 +54,9 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 bool isSelectionContiguous = true;
+Command* lastCommand = NULL;
+DWORD lastCommandTime = 0;
+int lastCommandRepeatCount;
 
 /*** Utilities */
 
@@ -401,9 +404,10 @@ void postGoToTrack(int command) {
 		s << "master";
 	else {
 		s << trackNum;
-	int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-	if (folderDepth == 1) // Folder
-		s << " " << getFolderCompacting(track);
+		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
+		if (folderDepth == 1) { // Folder
+			s << " " << getFolderCompacting(track);
+		}
 		const char* message = formatFolderState(folderDepth, false);
 		if (message)
 			s << " " << message;
@@ -684,8 +688,12 @@ void postCycleRippleMode(int command) {
 	outputMessage(s);
 }
 
+void reportRepeat(bool repeat) {
+	outputMessage(repeat ? "repeat on" : "repeat off");
+}
+
 void postToggleRepeat(int command) {
-	outputMessage(GetToggleCommandState(command) ? "repeat on" : "repeat off");
+	reportRepeat(GetToggleCommandState(command));
 }
 
 void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
@@ -821,7 +829,6 @@ void postTrackFxChain(int command) {
 	}
 }
 
-#ifdef _WIN32
 void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
@@ -829,7 +836,6 @@ void postTrackIo(int command) {
 		cmdIoMaster(NULL);
 	}
 }
-#endif // _WIN32
 
 void postToggleMetronome(int command) {
 	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
@@ -840,10 +846,9 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 bool shouldReportTransport = true;
-void postChangeTransportState(int command) {
+void reportTransportState(int state) {
 	if (!shouldReportTransport)
 		return;
-	int state = GetPlayState();
 	if (state & 2)
 		outputMessage("pause");
 	else if (state & 4)
@@ -852,6 +857,10 @@ void postChangeTransportState(int command) {
 		outputMessage("play");
 	else
 		outputMessage("stop");
+}
+
+void postChangeTransportState(int command) {
+	reportTransportState(GetPlayState());
 }
 
 void postSelectMultipleItems(int command) {
@@ -1024,9 +1033,7 @@ PostCommand POST_COMMANDS[] = {
 	{41860, postGoToStretch}, // Item: go to next stretch marker
 	{41861, postGoToStretch}, // Item: go to previous stretch marker
 	{40291, postTrackFxChain}, // Track: View FX chain for current track
-#ifdef _WIN32
 	{40293, postTrackIo}, // Track: View I/O for current track
-#endif
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
 	{40044, postChangeTransportState}, // Transport: Play/stop
@@ -1060,6 +1067,8 @@ PostCommand POST_COMMANDS[] = {
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
 	{41051, postReverseTake}, // Item properties: Toggle take reverse
+	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
+	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
 	{0},
 };
@@ -1353,6 +1362,20 @@ bool maybeSwitchToFxPluginWindow() {
 	return true;
 }
 
+bool isTrackViewWindow(HWND hwnd) {
+	WCHAR className[22] = L"\0";
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
+	return wcscmp(className, L"REAPERTrackListWindow") == 0
+		|| wcscmp(className, L"REAPERtrackvu") == 0
+		|| wcscmp(className, L"REAPERTCPDisplay") == 0;
+}
+
+bool isListView(HWND hwnd) {
+	WCHAR className[14] = L"\0";
+	GetClassNameW(hwnd, className, ARRAYSIZE(className));
+	return wcscmp(className, L"SysListView32") == 0;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -1363,13 +1386,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	HWND focus = GetFocus();
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	WCHAR className[22] = L"\0";
-	GetClassNameW(focus, className, ARRAYSIZE(className));
 	HWND window;
 	if (wParam == VK_APPS && lParam & 0x80000000) {
-		if (wcscmp(className, L"REAPERTrackListWindow") == 0
-			|| wcscmp(className, L"REAPERtrackvu") == 0
-		) {
+		if (isTrackViewWindow(focus)) {
 			// Reaper doesn't handle the applications key for these windows.
 			// Display the appropriate context menu depending on fakeFocus.
 			if (GetKeyState(VK_CONTROL) & 0x8000) {
@@ -1386,7 +1405,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		}
 	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
 		&& !(lParam & 0x80000000) // Key down
-		&& wcscmp(className, L"SysListView32") == 0
+		&& isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
@@ -1723,6 +1742,48 @@ void cmdMoveItems(Command* command) {
 		reportActionName(command->gaccel.accel.cmd);
 }
 
+void cmdMoveItemEdge(Command* command) {
+	MediaItem* item;
+	// try to provide information based on the last item spoken by osara if it is selected
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& IsMediaItemSelected(currentItem)
+	) 
+	item = currentItem;
+	else if(CountSelectedMediaItems(0)>0)
+		item = GetSelectedMediaItem(0, 0);
+	else {
+		outputMessage("no items selected");
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	ostringstream s;
+	if(lastCommand != command) { 
+		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
+		const char* start;
+		// Skip the category before the colon (if any).
+		for (start = name; *start; ++start) {
+			if (*start == ':') {
+				name = start + 2;
+				break;
+			}
+		}
+		s<<name << " ";
+		resetTimeCache();
+	}
+	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	if(newStart!=oldStart)
+		s<<formatTime(newStart, TF_RULER, false, true);
+	else if(newEnd!=oldEnd)
+		s<<formatTime(newEnd, TF_RULER, false, true);
+	else
+		s<<"no change";
+	outputMessage(s);
+}
+
 void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
@@ -1814,9 +1875,13 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 	}
 }
 
-#ifdef _WIN32
-
 void cmdIoMaster(Command* command) {
+	if (GetAppVersion()[0] >= '6') {
+		// REAPER >= 6.01 has a builtin action for this.
+		Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
+		return;
+	}
+#ifdef _WIN32
 	// If the master track isn't visible, make it so temporarily.
 	int prevVisible = GetMasterTrackVisibility();
 	if (!(prevVisible & 1))
@@ -1825,9 +1890,8 @@ void cmdIoMaster(Command* command) {
 	// Restore master invisibility if appropriate.
 	if (!(prevVisible & 1))
 		SetMasterTrackVisibility(prevVisible);
-}
-
 #endif // _WIN32
+}
 
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
@@ -2238,10 +2302,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
 	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
-	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItems}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItems}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
@@ -2290,9 +2354,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
-#ifdef _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
-#endif // _WIN32
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
@@ -2431,10 +2493,6 @@ bool handlePostCommand(int section, int command) {
 	return false;
 }
 
-Command* lastCommand = NULL;
-DWORD lastCommandTime = 0;
-int lastCommandRepeatCount;
-
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
@@ -2490,13 +2548,56 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 
 #ifdef _WIN32
 
+void annotateAccRole(HWND hwnd, long role) {
+	VARIANT var;
+	var.vt = VT_I4;
+	var.lVal = role;
+	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE,
+		var);
+}
+
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
+		bool focusIsTrackView = isTrackViewWindow(hwnd);
+		if (focusIsTrackView) {
+			// Give these objects a non-generic role so NVDA doesn't fall back to
+			// screen scraping, which causes spurious messages to be reported.
+			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
+			// REAPER doesn't set the focused state correctly on the client
+			// IAccessible, causing JAWS to ignore the focus event. Force the focused
+			// state using annotation.
+			VARIANT var;
+			var.vt = VT_I4;
+			var.lVal = STATE_SYSTEM_FOCUSABLE | STATE_SYSTEM_FOCUSED;
+			accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF,
+				PROPID_ACC_STATE, var);
+		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
 			// This avoids problems such as the last message repeating when a new project is opened (#17).
-			accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
-			lastMessageHwnd = NULL;
+			bool lastWasTrackView = isTrackViewWindow(lastMessageHwnd);
+			if (lastWasTrackView) {
+				// These objects can get a bogus name from oleacc, so set an empty name
+				// instead of clearing it.
+				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
+					PROPID_ACC_NAME, L" ");
+				// Clear the focused state we forced.
+				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
+					&PROPID_ACC_STATE, 1);
+			} else {
+				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
+					&PROPID_ACC_NAME, 1);
+			}
+			if (lastWasTrackView && focusIsTrackView) {
+				// REAPER 6.0 moves focus between two track view windows in some cases.
+				// For example, if you select a track, REAPERTCPDisplay gets focus. If
+				// you select an item, REAPERTrackListWindow gets focus.
+				// Sometimes, focus moves after the action executes. Therefore, repeat
+				// the message so the user doesn't miss it.
+				outputMessage(lastMessage);
+			} else {
+				lastMessageHwnd = nullptr;
+			}
 		}
 		HWND tempWindow;
 		if (tempWindow = getSendContainer(hwnd)) {
@@ -2524,10 +2625,8 @@ HWINEVENTHOOK winEventHook = NULL;
 // This includes the main window.
 // Annotate these to prevent screen readers from potentially reading a spurious caption.
 void annotateSpuriousDialogs(HWND hwnd) {
-	VARIANT role;
-	role.vt = VT_I4;
-	role.lVal = hwnd == mainHwnd ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING;
-	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE, role);
+	annotateAccRole(hwnd,
+		hwnd == mainHwnd ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING);
 	// If the previous hwnd is static text, oleacc will use this as the name.
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0)
@@ -2539,6 +2638,8 @@ void annotateSpuriousDialogs(HWND hwnd) {
 }
 
 #endif // _WIN32
+
+IReaperControlSurface* surface = nullptr;
 
 extern "C" {
 
@@ -2590,6 +2691,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
+		surface = createSurface();
+		rec->Register("csurf_inst", (void*)surface);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
@@ -2600,6 +2703,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Unload.
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
+		delete surface;
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 #else

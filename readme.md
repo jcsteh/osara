@@ -193,6 +193,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Global automation override: All automation in write mode
 - Global automation override: Bypass all automation
 - Global automation override: No override (set automation modes per track)
+- Track: Toggle track volume envelope visible: Control+Alt+V
+- Track: Toggle track pan envelope visible: Control+Alt+P
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -564,9 +566,8 @@ To build OSARA, you will need:
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
 	* Xcode 10 is not yet supported.
 	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
-- Python, version 2.7:
+- Python, version 2.7 or later:
 	* This is needed by SCons.
-	* Python 3 and later are not yet supported.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
 	* Once Python is installed, you should be able to install SCons by simply running this at the command line: `pip install scons`
