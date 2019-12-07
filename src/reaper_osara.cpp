@@ -1058,7 +1058,9 @@ PostCommand POST_COMMANDS[] = {
 	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
-		{41051, postReverseTake}, // Item properties: Toggle take reverse
+	{41051, postReverseTake}, // Item properties: Toggle take reverse
+	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
+	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {

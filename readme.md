@@ -193,6 +193,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Global automation override: All automation in write mode
 - Global automation override: Bypass all automation
 - Global automation override: No override (set automation modes per track)
+- Track: Toggle track volume envelope visible: Control+Alt+V
+- Track: Toggle track pan envelope visible: Control+Alt+P
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
