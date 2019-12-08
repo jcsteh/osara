@@ -2039,10 +2039,22 @@ void cmdShortcutHelp(Command* command) {
 
 void cmdReportCursorPosition(Command* command) {
 	TimeFormat tf;
-	if (lastCommandRepeatCount == 0)
+	if (lastCommandRepeatCount == 0) {
+		// Use primary ruler unit.
 		tf = TF_RULER;
-	else if (GetToggleCommandState(40366) || GetToggleCommandState(41918)) // Rule unit is measures/min:sec
+	} else if (GetToggleCommandState(42361)) {
 		tf = TF_MINSEC;
+	} else if (GetToggleCommandState(42362)) {
+		tf = TF_SEC;
+	} else if (GetToggleCommandState(42363)) {
+		tf = TF_SAMPLE;
+	} else if (GetToggleCommandState(42364)) {
+		tf = TF_HMSF;
+	} else if (GetToggleCommandState(42365)) {
+		tf = TF_FRAME;
+	} else {
+		tf = TF_RULER;
+	}
 	double pos = GetPlayState() & 1 ? GetPlayPosition() : GetCursorPosition();
 	outputMessage(formatTime(pos, tf, false, false));
 }
