@@ -894,8 +894,12 @@ void postToggleItemMute(int command) {
 		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"muted":"unmuted");
 		return;
 	}
-	for (int i=0; i<count; i++)
-		isItemMuted(GetSelectedMediaItem(0, i))?muteCount++:unmuteCount++;
+	for (int i=0; i<count; ++i) {
+		if(isItemMuted(GetSelectedMediaItem(0, i)))
+			++muteCount;
+		else
+			++unmuteCount;
+	}
 	ostringstream s;
 	if(muteCount>0){
 		s<<muteCount<<" item"<<((muteCount==1)?"":"s") <<" muted";
@@ -912,10 +916,12 @@ void postToggleItemSolo(int command) {
 	int selectedCount = CountSelectedMediaItems(0);
 	if(selectedCount==0)
 		return;
-	for(int i=0; i<itemCount; i++) {
+	for(int i=0; i<itemCount; ++i) {
 		MediaItem* item = GetMediaItem(0, i);
-		if((!isItemSelected(item)) && (!isItemMuted(item)))
+		if((!isItemSelected(item)) && (!isItemMuted(item)))  {
 			soloed=false;
+			break;
+		}
 	}
 	if(selectedCount==1) {
 		outputMessage(soloed?"soloed":"unsoloed");
@@ -1086,7 +1092,7 @@ PostCommand POST_COMMANDS[] = {
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
-		{41561, postToggleItemSolo}, // Item properties: Toggle solo
+	{41561, postToggleItemSolo}, // Item properties: Toggle solo
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
