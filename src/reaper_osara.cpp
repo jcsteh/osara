@@ -2271,10 +2271,12 @@ void cmdNudgeTimeSelection(Command* command) {
 		resetTimeCache();
 	ostringstream s;
 	if(newStart!=oldStart) {
-		s<<(first?"time selection start ":"");
+		if(first)
+			s<<"time selection start ";
 		s<<formatTime(newStart, TF_RULER, false, true, false);
 	} else if(newEnd!=oldEnd) {
-		s<<(first?"time selection end ":"");
+		if(first)
+			s<<"time selection end ";
 		s<<formatTime(newEnd, TF_RULER, false, true, false);
 	}
 	outputMessage(s);
