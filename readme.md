@@ -231,6 +231,14 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Time selection: Remove contents of time selection (moving later items)
 - Time selection: Remove time selection and loop point selection: Escape
 - Unselect all tracks/items/envelope points: Shift+Escape
+- Time selection: Nudge left edge left: Control+[
+- Time selection: Nudge left edge right: Control+]
+- Time selection: Nudge right edge left: Alt+[
+- Time selection: Nudge right edge right: Alt+]
+- Time selection: Nudge left: Control+Alt+[
+- Time selection: Nudge right: Control+Alt+]
+- Time selection: Shift left (by time selection length): Shift+[
+- Time selection: Shift right (by time selection length): Shift+]
 
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
