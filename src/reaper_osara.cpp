@@ -880,12 +880,56 @@ void postRenameTrack(int command) {
 	outputMessage("Track name");
 }
 
+bool isItemMuted(MediaItem* item) {
+	return *(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL);
+}
+
 void postToggleItemMute(int command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
+	int muteCount=0;
+	int unmuteCount=0;
+	int count = CountSelectedMediaItems(0);
+	if(count==0)
 		return;
-	outputMessage(*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL) ?
-		"muted" : "unmuted");
+	if(count==1)  {
+		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"muted":"unmuted");
+		return;
+	}
+	for (int i=0; i<count; ++i) {
+		if(isItemMuted(GetSelectedMediaItem(0, i)))
+			++muteCount;
+		else
+			++unmuteCount;
+	}
+	ostringstream s;
+	if(muteCount>0){
+		s<<muteCount<<" item"<<((muteCount==1)?"":"s") <<" muted";
+		s<<((unmuteCount>0)?", ":"");
+	}
+	if(unmuteCount>0) 
+		s<<unmuteCount<<" item"<<((unmuteCount==1)?"":"s") <<" unmuted";
+	outputMessage(s);
+}
+
+void postToggleItemSolo(int command) {
+	bool soloed=true;
+	int itemCount=CountMediaItems(0);
+	int selectedCount = CountSelectedMediaItems(0);
+	if(selectedCount==0)
+		return;
+	for(int i=0; i<itemCount; ++i) {
+		MediaItem* item = GetMediaItem(0, i);
+		if((!isItemSelected(item)) && (!isItemMuted(item)))  {
+			soloed=false;
+			break;
+		}
+	}
+	if(selectedCount==1) {
+		outputMessage(soloed?"soloed":"unsoloed");
+		return;
+	}
+	ostringstream s;
+	s<<selectedCount<<" items "<<(soloed?"soloed":"unsoloed");
+	outputMessage(s);
 }
 
 void postSetSelectionEnd(int command) {
@@ -1048,6 +1092,7 @@ PostCommand POST_COMMANDS[] = {
 	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
+	{41561, postToggleItemSolo}, // Item properties: Toggle solo
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off

@@ -147,6 +147,7 @@
 #define REAPERAPI_WANT_GetMediaItem_Track
 #define REAPERAPI_WANT_IsMediaItemSelected
 #define REAPERAPI_WANT_GetMediaItemInfo_Value
+#define REAPERAPI_WANT_GetMediaItem
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
