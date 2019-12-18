@@ -2651,14 +2651,6 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// Give these objects a non-generic role so NVDA doesn't fall back to
 			// screen scraping, which causes spurious messages to be reported.
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
-			// REAPER doesn't set the focused state correctly on the client
-			// IAccessible, causing JAWS to ignore the focus event. Force the focused
-			// state using annotation.
-			VARIANT var;
-			var.vt = VT_I4;
-			var.lVal = STATE_SYSTEM_FOCUSABLE | STATE_SYSTEM_FOCUSED;
-			accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF,
-				PROPID_ACC_STATE, var);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
@@ -2669,9 +2661,6 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				// instead of clearing it.
 				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
 					PROPID_ACC_NAME, L" ");
-				// Clear the focused state we forced.
-				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
-					&PROPID_ACC_STATE, 1);
 			} else {
 				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
 					&PROPID_ACC_NAME, 1);
