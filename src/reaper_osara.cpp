@@ -2001,7 +2001,7 @@ void cmdReportSelection(Command* command) {
 				if (isTrackSelected(track)) {
 					++count;
 					if (count > 1)
-						s << ", ";
+						s << "\n";
 					s << t + 1;
 					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 					if (name && name[0])
@@ -2018,7 +2018,7 @@ void cmdReportSelection(Command* command) {
 					if (isItemSelected(item)) {
 						++count;
 						if (count > 1)
-							s << ", ";
+							s << "\n";
 						s << t + 1 << "." << i + 1;
 						MediaItem_Take* take = GetActiveTake(item);
 						if (take)
