@@ -137,13 +137,22 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 	switch (format) {
 		case TF_MEASURE: {
 			int measure;
-			double beat = TimeMap2_timeToBeats(NULL, time, &measure, NULL, NULL, NULL);
+			int measureLength;
+			double beat = TimeMap2_timeToBeats(NULL, time, &measure, &measureLength, NULL, NULL);
 			int wholeBeat = (int)beat;
+			int beatPercent = lround((beat - wholeBeat) * 100)  ;
+			if(beatPercent==100) {
+				beatPercent = 0;
+				++wholeBeat;
+			}
+			if(wholeBeat==measureLength) {
+				wholeBeat = 0;
+				++measure;
+			}
 			if (!isLength) {
 				++measure;
 				++wholeBeat;
 			}
-			int beatPercent = (int)(beat * 100) % 100;
 			if (!useCache || measure != oldMeasure) {
 				if (isLength) {
 					if (includeZeros || measure != 0)
