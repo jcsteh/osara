@@ -25,10 +25,12 @@ typedef struct {
 	int index;
 	double start;
 	double end;
+	double GetLength() const {
+		return end - start;
+	}
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
-const UINT PREVIEW_LENGTH = 300;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
@@ -161,11 +163,13 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewDoneTimer = 0;
 		previewNotesOff();
 	}
-	// Queue note on events for the new notes.
+	// Queue note on events for the new notes and calculate the minimum length.
+	double minLength = 0;
 	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
 		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_ON | note->channel),
 			(unsigned char)note->pitch, (unsigned char)note->velocity}};
+		minLength = minLength ? min(minLength, note->GetLength()) : note->GetLength();
 		previewSource.events.push_back(event);
 	}
 	// Save the notes being previewed so we can turn them off later (previewNotesOff).
@@ -176,7 +180,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(NULL, NULL, PREVIEW_LENGTH, previewDone);
+	previewDoneTimer = SetTimer(NULL, NULL, minLength * 1000, previewDone);
 }
 
 void cmdMidiMoveCursor(Command* command) {
@@ -370,17 +374,18 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	bool cursorSet = false;
 	vector<MidiNote> notes;
 	for (int note = chord.first; note <= chord.second; ++note) {
-		double start = 0;
+		double start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, &chan, &pitch, &vel);
+		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
 		if (!cursorSet && direction != 0) {
-			start = MIDI_GetProjTimeFromPPQPos(take, start);
 			SetEditCurPos(start, true, false);
 			cursorSet = true;
 		}
 		if (select)
 			selectNote(take, note);
-		notes.push_back({chan, pitch, vel, 0, start});
+		notes.push_back({chan, pitch, vel, 0, start, end});
 	}
 	previewNotes(take, notes);
 	ostringstream s;
@@ -427,8 +432,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << " unselected ";
 	else
 		s << ", ";
-	double length = note.end - note.start;
-	s << formatTime(length, TF_MEASURE, true, false, false);
+	s << formatTime(note.GetLength(), TF_MEASURE, true, false, false);
 	outputMessage(s);
 }
 
