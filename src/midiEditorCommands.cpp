@@ -23,6 +23,8 @@ typedef struct {
 	int pitch;
 	int velocity;
 	int index;
+	double start;
+	double end;
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
@@ -292,9 +294,12 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 	// This is not intuitive, so sort them.
 	vector<MidiNote> notes;
 	for (int note = chord.first; note <= chord.second; ++note) {
+		double start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
-		notes.push_back({chan, pitch, vel, note});
+		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
+		notes.push_back({chan, pitch, vel, note, start, end});
 	}
 	sort(notes.begin(), notes.end(), compareNotes);
 	const int lastNoteIndex = notes.size() - 1;
@@ -375,7 +380,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		}
 		if (select)
 			selectNote(take, note);
-		notes.push_back({chan, pitch, vel});
+		notes.push_back({chan, pitch, vel, 0, start});
 	}
 	previewNotes(take, notes);
 	ostringstream s;
@@ -422,11 +427,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << " unselected ";
 	else
 		s << ", ";
-	double start, end;
-	MIDI_GetNote(take, note.index, NULL, NULL, &start, &end, NULL, NULL, NULL);
-	start = MIDI_GetProjTimeFromPPQPos(take, start);
-	end = MIDI_GetProjTimeFromPPQPos(take, end);
-	double length = end - start;
+	double length = note.end - note.start;
 	s << formatTime(length, TF_MEASURE, true, false, false);
 	outputMessage(s);
 }
