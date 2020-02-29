@@ -18,6 +18,8 @@
 
 using namespace std;
 
+const double DEFAULT_PREVIEW_LENGTH = 0.3;
+
 typedef struct {
 	int channel;
 	int pitch;
@@ -26,7 +28,12 @@ typedef struct {
 	double start;
 	double end;
 	double GetLength() const {
-		return end - start;
+		double length = end - start;
+		if (length <= 0) {
+			// No or negative length, fallback to default length.
+			return DEFAULT_PREVIEW_LENGTH;
+		}
+		return length;
 	}
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
