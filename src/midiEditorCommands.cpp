@@ -154,6 +154,11 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	previewDoneTimer = 0;
 }
 
+// Used to find out the minimum note length.
+bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
+	return note1.GetLength() < note2.GetLength();
+}
+
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	if (!shouldPreviewNotes) {
 		return;
@@ -175,13 +180,11 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewDoneTimer = 0;
 		previewNotesOff();
 	}
-	// Queue note on events for the new notes and calculate the minimum length.
-	double minLength = 0;
+	// Queue note on events for the new notes.
 	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
 		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_ON | note->channel),
 			(unsigned char)note->pitch, (unsigned char)note->velocity}};
-		minLength = minLength ? min(minLength, note->GetLength()) : note->GetLength();
 		previewSource.events.push_back(event);
 	}
 	// Save the notes being previewed so we can turn them off later (previewNotesOff).
@@ -191,6 +194,8 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	previewReg.preview_track = track;
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
+	// Calculate the minimum note length.
+	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->GetLength();
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(NULL, NULL, minLength * 1000, previewDone);
 }
@@ -296,7 +301,7 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 int curNoteInChord = -1;
 
 // Used to order notes in a chord by pitch.
-bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
+bool compareNotesByPitch(const MidiNote& note1, const MidiNote& note2) {
 	return note1.pitch < note2.pitch;
 }
 
@@ -317,7 +322,7 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 		end = MIDI_GetProjTimeFromPPQPos(take, end);
 		notes.push_back({chan, pitch, vel, note, start, end});
 	}
-	sort(notes.begin(), notes.end(), compareNotes);
+	sort(notes.begin(), notes.end(), compareNotesByPitch);
 	const int lastNoteIndex = notes.size() - 1;
 	// Work out which note to move to.
 	if (direction != 0 && 0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
