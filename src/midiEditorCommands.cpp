@@ -490,10 +490,9 @@ void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
-void cmdMidiMovePitchCursor(Command* command) {
+void postMidiMovePitchCursor(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
@@ -541,10 +540,8 @@ void cmdMidiDeleteEvents(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMidiSelectNotes(Command* command) {
-	int noteCount;
+void postMidiSelectNotes(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int noteIndex=-1;
 	int count=0;
@@ -661,3 +658,31 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 #endif // _WIN32
+
+string formatVelocity(int velocity) {
+	ostringstream s;
+	s << "velocity " << lround((velocity / 127) * 100) << "%";
+	return s.str();
+}
+
+void postMidiChangeVelocity(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	if (curNoteInChord == -1) {
+		return;
+	}
+	// Note in chord.
+	MidiNote note = findNoteInChord(take, 0);
+	if (note.channel == -1) {
+		return;
+	}
+	previewNotes(take, {note});
+	ostringstream s;
+	s << getMidiNoteName(take, note.pitch, note.channel) << " ";
+	s << formatVelocity(note.velocity);
+	outputMessage(s);
+}
+
+void postMidiChangeLength(int command) {
+
+}
