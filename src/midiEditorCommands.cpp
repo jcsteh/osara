@@ -33,6 +33,8 @@ vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
+bool shouldReportNotes = true;
+bool shouldPreviewNotes = true;
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
@@ -146,6 +148,9 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
+	if (!shouldPreviewNotes) {
+		return;
+	}
 	if (!previewReg.src) {
 		// Initialise preview.
 #ifdef _WIN32
@@ -392,8 +397,10 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	s << formatCursorPosition(TF_MEASURE) << " ";
 	if (!select && !isNoteSelected(take, chord.first))
 		s << "unselected" << " ";
-	int count = chord.second - chord.first + 1;
-	s << count << (count == 1 ? " note" : " notes");
+	if (shouldReportNotes) {
+		int count = chord.second - chord.first + 1;
+		s << count << (count == 1 ? " note" : " notes");
+	}
 	outputMessage(s);
 }
 
@@ -427,12 +434,17 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		selectNote(take, note.index);
 	previewNotes(take, {note});
 	ostringstream s;
-	s << getMidiNoteName(take, note.pitch, note.channel);
-	if (!select && !isNoteSelected(take, note.index))
+	if (shouldReportNotes) {
+		s << getMidiNoteName(take, note.pitch, note.channel);
+	}
+	if (!select && !isNoteSelected(take, note.index)) {
 		s << " unselected ";
-	else
+	} else if (shouldReportNotes) {
 		s << ", ";
-	s << formatTime(note.GetLength(), TF_MEASURE, true, false, false);
+	}
+	if (shouldReportNotes) {
+		s << formatTime(note.GetLength(), TF_MEASURE, true, false, false);
+	}
 	outputMessage(s);
 }
 
@@ -460,6 +472,9 @@ void cmdMidiMovePitchCursor(Command* command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
+	if (!shouldReportNotes) {
+		return;
+	}
 	outputMessage(getMidiNoteName(take, pitch, chan));
 }
 
