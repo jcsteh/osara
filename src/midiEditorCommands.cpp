@@ -27,7 +27,7 @@ typedef struct {
 	int index;
 	double start;
 	double end;
-	double GetLength() const {
+	double getLength() const {
 		double length = end - start;
 		if (length <= 0) {
 			// No or negative length, fallback to default length.
@@ -156,7 +156,7 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 
 // Used to find out the minimum note length.
 bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
-	return note1.GetLength() < note2.GetLength();
+	return note1.getLength() < note2.getLength();
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
@@ -195,7 +195,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	// Calculate the minimum note length.
-	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->GetLength();
+	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(NULL, NULL, minLength * 1000, previewDone);
 }
@@ -455,7 +455,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << ", ";
 	}
 	if (shouldReportNotes) {
-		s << formatTime(note.GetLength(), TF_MEASURE, true, false, false);
+		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
 	}
 	outputMessage(s);
 }
