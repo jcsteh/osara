@@ -484,10 +484,9 @@ void cmdMidiMovePitchCursor(Command* command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
-	if (!shouldReportNotes) {
-		return;
+	if (shouldReportNotes) {
+		outputMessage(getMidiNoteName(take, pitch, chan));
 	}
-	outputMessage(getMidiNoteName(take, pitch, chan));
 }
 
 void cmdMidiInsertNote(Command* command) {
