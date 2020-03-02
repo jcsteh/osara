@@ -18,17 +18,29 @@
 
 using namespace std;
 
+const double DEFAULT_PREVIEW_LENGTH = 0.3;
+
 typedef struct {
 	int channel;
 	int pitch;
 	int velocity;
 	int index;
+	double start;
+	double end;
+	double getLength() const {
+		double length = end - start;
+		if (length <= 0) {
+			// No or negative length, fallback to default length.
+			return DEFAULT_PREVIEW_LENGTH;
+		}
+		return length;
+	}
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
-const UINT PREVIEW_LENGTH = 300;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
+bool shouldReportNotes = true;
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
@@ -141,6 +153,11 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	previewDoneTimer = 0;
 }
 
+// Used to find out the minimum note length.
+bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
+	return note1.getLength() < note2.getLength();
+}
+
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	if (!previewReg.src) {
 		// Initialise preview.
@@ -173,8 +190,10 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	previewReg.preview_track = track;
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
+	// Calculate the minimum note length.
+	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(NULL, NULL, PREVIEW_LENGTH, previewDone);
+	previewDoneTimer = SetTimer(NULL, NULL, minLength * 1000, previewDone);
 }
 
 void cmdMidiMoveCursor(Command* command) {
@@ -278,7 +297,7 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 int curNoteInChord = -1;
 
 // Used to order notes in a chord by pitch.
-bool compareNotes(const MidiNote& note1, const MidiNote& note2) {
+bool compareNotesByPitch(const MidiNote& note1, const MidiNote& note2) {
 	return note1.pitch < note2.pitch;
 }
 
@@ -292,11 +311,14 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 	// This is not intuitive, so sort them.
 	vector<MidiNote> notes;
 	for (int note = chord.first; note <= chord.second; ++note) {
+		double start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, NULL, NULL, &chan, &pitch, &vel);
-		notes.push_back({chan, pitch, vel, note});
+		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
+		notes.push_back({chan, pitch, vel, note, start, end});
 	}
-	sort(notes.begin(), notes.end(), compareNotes);
+	sort(notes.begin(), notes.end(), compareNotesByPitch);
 	const int lastNoteIndex = notes.size() - 1;
 	// Work out which note to move to.
 	if (direction != 0 && 0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
@@ -365,25 +387,28 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	bool cursorSet = false;
 	vector<MidiNote> notes;
 	for (int note = chord.first; note <= chord.second; ++note) {
-		double start = 0;
+		double start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, &start, NULL, &chan, &pitch, &vel);
+		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
 		if (!cursorSet && direction != 0) {
-			start = MIDI_GetProjTimeFromPPQPos(take, start);
 			SetEditCurPos(start, true, false);
 			cursorSet = true;
 		}
 		if (select)
 			selectNote(take, note);
-		notes.push_back({chan, pitch, vel});
+		notes.push_back({chan, pitch, vel, 0, start, end});
 	}
 	previewNotes(take, notes);
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
 	if (!select && !isNoteSelected(take, chord.first))
 		s << "unselected" << " ";
-	int count = chord.second - chord.first + 1;
-	s << count << (count == 1 ? " note" : " notes");
+	if (shouldReportNotes) {
+		int count = chord.second - chord.first + 1;
+		s << count << (count == 1 ? " note" : " notes");
+	}
 	outputMessage(s);
 }
 
@@ -417,17 +442,17 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		selectNote(take, note.index);
 	previewNotes(take, {note});
 	ostringstream s;
-	s << getMidiNoteName(take, note.pitch, note.channel);
-	if (!select && !isNoteSelected(take, note.index))
+	if (shouldReportNotes) {
+		s << getMidiNoteName(take, note.pitch, note.channel);
+	}
+	if (!select && !isNoteSelected(take, note.index)) {
 		s << " unselected ";
-	else
+	} else if (shouldReportNotes) {
 		s << ", ";
-	double start, end;
-	MIDI_GetNote(take, note.index, NULL, NULL, &start, &end, NULL, NULL, NULL);
-	start = MIDI_GetProjTimeFromPPQPos(take, start);
-	end = MIDI_GetProjTimeFromPPQPos(take, end);
-	double length = end - start;
-	s << formatTime(length, TF_MEASURE, true, false, false);
+	}
+	if (shouldReportNotes) {
+		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+	}
 	outputMessage(s);
 }
 
@@ -455,7 +480,9 @@ void cmdMidiMovePitchCursor(Command* command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
-	outputMessage(getMidiNoteName(take, pitch, chan));
+	if (shouldReportNotes) {
+		outputMessage(getMidiNoteName(take, pitch, chan));
+	}
 }
 
 void cmdMidiInsertNote(Command* command) {
