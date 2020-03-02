@@ -2510,7 +2510,6 @@ map<pair<int, int>, Command*> commandsMap;
 const char CONFIG_SECTION[] = "osara";
 
 extern bool shouldReportNotes;
-extern bool shouldPreviewNotes;
 
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
@@ -2518,7 +2517,6 @@ void loadConfig() {
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
-	shouldPreviewNotes = GetExtState(CONFIG_SECTION, "previewNotes")[0] != '0';
 }
 
 void config_onOk(HWND dialog) {
@@ -2530,8 +2528,6 @@ void config_onOk(HWND dialog) {
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 	shouldReportNotes = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_NOTES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportNotes", shouldReportNotes ? "1" : "0", true);
-	shouldPreviewNotes = IsDlgButtonChecked(dialog, ID_CONFIG_PREVIEW_NOTES) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "previewNotes", shouldPreviewNotes ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -2561,7 +2557,6 @@ void cmdConfig(Command* command) {
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_PREVIEW_NOTES, shouldPreviewNotes ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }

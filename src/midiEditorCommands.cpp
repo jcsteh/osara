@@ -41,7 +41,6 @@ UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 bool shouldReportNotes = true;
-bool shouldPreviewNotes = true;
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
@@ -160,9 +159,6 @@ bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
-	if (!shouldPreviewNotes) {
-		return;
-	}
 	if (!previewReg.src) {
 		// Initialise preview.
 #ifdef _WIN32
