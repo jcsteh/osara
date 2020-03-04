@@ -344,7 +344,7 @@ bool isNoteSelected(MediaItem_Take* take, const int note) {
 	return sel;
 }
 
-vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1, bool getPosition=true, bool getPitch=true, bool getVelocity=true) {
+vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 	int noteIndex = offset;
 	vector<MidiNote> notes;
 	for(;;){
@@ -354,11 +354,9 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1, bool getP
 		}
 		double start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, noteIndex, NULL, NULL, getPosition ? &start: NULL, getPosition? &end: NULL, &chan, getPitch ? &pitch: NULL, getVelocity ? &vel: NULL);
-		if (getPosition) {
-			start = MIDI_GetProjTimeFromPPQPos(take, start);
-			end = MIDI_GetProjTimeFromPPQPos(take, end);
-		}
+		MIDI_GetNote(take, noteIndex, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
 		notes.push_back({chan, pitch, vel, noteIndex, start, end});
 	}
 	return notes;
