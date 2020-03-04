@@ -32,3 +32,4 @@ void cmdMidiFilterWindow(Command* command);
 
 void postMidiChangeVelocity(int command);
 void postMidiChangeLength(int command);
+void postMidiChangePitch(int command);

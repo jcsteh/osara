@@ -659,30 +659,59 @@ void cmdMidiFilterWindow(Command *command) {
 
 #endif // _WIN32
 
-string formatVelocity(int velocity) {
-	ostringstream s;
-	s << "velocity " << lround((velocity / 127) * 100) << "%";
-	return s.str();
-}
-
 void postMidiChangeVelocity(int command) {
+	if (!shouldReportNotes) {
+		return;
+	}
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
-	if (curNoteInChord == -1) {
-		return;
-	}
-	// Note in chord.
-	MidiNote note = findNoteInChord(take, 0);
-	if (note.channel == -1) {
-		return;
-	}
-	previewNotes(take, {note});
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// The Reaper action takes care of note preview.
 	ostringstream s;
-	s << getMidiNoteName(take, note.pitch, note.channel) << " ";
-	s << formatVelocity(note.velocity);
+	for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+		s << getMidiNoteName(take, note->pitch, note->channel) << "  " << note->velocity;
+		if (note != selectedNotes.cend() - 1) {
+			s << ", ";
+		}
+	}
 	outputMessage(s);
 }
 
 void postMidiChangeLength(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	previewNotes(take, selectedNotes);
+	if (shouldReportNotes) {
+		ostringstream s;
+		for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+			s << getMidiNoteName(take, note->pitch, note->channel) << " ";
+			s			<< formatTime(note->getLength(), TF_MEASURE, true, false, false);
+			if (note != selectedNotes.cend() - 1) {
+				s << ", ";
+			}
+		}
+		outputMessage(s);
+	}
+}
 
+void postMidiChangePitch(int command) {
+	if (!shouldReportNotes) {
+		return;
+	}
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// The Reaper action takes care of note preview.
+	ostringstream s;
+	for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+		s << getMidiNoteName(take, note->pitch, note->channel);
+		if (note != selectedNotes.cend() - 1) {
+			s << ", ";
+		}
+	}
+	outputMessage(s);
 }

@@ -1127,16 +1127,26 @@ PostCommand POST_COMMANDS[] = {
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
+	{40006, postMidiSelectNotes}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
-	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
-	{40006, postMidiSelectNotes}, // Edit: Select all events
-	{40501, postMidiSelectNotes}, // Invert selection
+	{40177, postMidiChangePitch}, // Edit: Move notes up one semitone
+	{40178, postMidiChangePitch}, // Edit: Move notes down one semitone
+	{40180, postMidiChangePitch}, // Edit: Move notes down one octave
+	{40181, postMidiChangePitch}, // Edit: Move notes up one octave
 	{40434, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
+	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
+	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
+	{40447, postMidiChangeLength}, // Edit: Shorten notes one grid unit
 	{40462, postMidiChangeVelocity}, // Edit: Note velocity +01
 	{40463, postMidiChangeVelocity}, // Edit: Note velocity +10
 	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
 	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
+	{40501, postMidiSelectNotes}, // Invert selection
+	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
+	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
+	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
