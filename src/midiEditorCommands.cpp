@@ -344,6 +344,24 @@ bool isNoteSelected(MediaItem_Take* take, const int note) {
 	return sel;
 }
 
+vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
+	int noteIndex = offset;
+	vector<MidiNote> notes;
+	for(;;){
+		noteIndex = MIDI_EnumSelNotes(take, noteIndex);
+		if (noteIndex == -1) {
+			break;
+		}
+		double start, end;
+		int chan, pitch, vel;
+		MIDI_GetNote(take, noteIndex, NULL, NULL, &start, &end, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, start);
+		end = MIDI_GetProjTimeFromPPQPos(take, end);
+		notes.push_back({chan, pitch, vel, noteIndex, start, end});
+	}
+	return notes;
+}
+
 void cmdMidiToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
@@ -492,12 +510,24 @@ void cmdMidiInsertNote(Command* command) {
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	if (MIDI_CountEvts(take, NULL, NULL, NULL) <= oldCount)
 		return; // Not inserted.
-	// Play the inserted note.
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
-	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
-	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes(take, {{chan, pitch, vel}});
-	outputMessage(formatCursorPosition(TF_MEASURE));
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// Find the just inserted note based on its pitch, as that makes it unique.
+	auto note = *(find_if(
+		selectedNotes.begin(), selectedNotes.end(),
+		[pitch](MidiNote n) { return n.pitch == pitch; })
+	);
+	// Play the inserted note.
+	previewNotes(take, {note});
+	ostringstream s;
+	if (shouldReportNotes) {
+		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
+		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+		s << ", ";
+	}
+	s << formatCursorPosition(TF_MEASURE);
+	outputMessage(s);
 }
 
 void cmdMidiDeleteEvents(Command* command) {
