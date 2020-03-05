@@ -521,7 +521,7 @@ void cmdMidiInsertNote(Command* command) {
 	// Play the inserted note.
 	previewNotes(take, {note});
 	ostringstream s;
-		if (shouldReportNotes) {
+	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
 		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
 		s << ", ";
