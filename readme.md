@@ -539,6 +539,10 @@ OSARA also includes some other miscellaneous actions.
 #### Midi editor
 - OSARA: Move to next midi item on track
 - OSARA: Move to previous midi item on track
+- OSARA: Move to next CC
+- OSARA: Move to previous CC
+- OSARA: Move to next CC and add to selection
+- OSARA: Move to previous CC and add to selection
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
