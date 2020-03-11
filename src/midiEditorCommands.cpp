@@ -812,7 +812,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 	} else {
 		currentCC = -1;  // Invalid.
 	}
-	for (int index = start; 0 <= index && index < count; index += direction) {
+	for (int index = start; -1 <= index && index < count; index += direction) {
 		int chan, control, value;
 		MIDI_GetCC(take, index, NULL, NULL, &position, NULL, &chan, &control, &value);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
@@ -861,3 +861,4 @@ void cmdMidiMoveToNextCCKeepSel(Command* command) {
 void cmdMidiMoveToPreviousCCKeepSel(Command* command) {
 	moveToCC(-1, false, isSelectionContiguous);
 }
+
