@@ -10,6 +10,7 @@
 !include "nsDialogs.nsh"
 
 SetCompressor /SOLID LZMA
+Unicode true
 Name "OSARA"
 Caption "OSARA ${VERSION} Setup"
 OutFile "${OUTFILE}"
