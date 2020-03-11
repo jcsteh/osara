@@ -93,8 +93,11 @@
 #define REAPERAPI_WANT_MIDI_CountEvts
 #define REAPERAPI_WANT_MIDI_GetNote
 #define REAPERAPI_WANT_MIDI_SetNote
+#define REAPERAPI_WANT_MIDI_GetCC
+#define REAPERAPI_WANT_MIDI_SetCC
 #define REAPERAPI_WANT_MIDI_GetProjTimeFromPPQPos
 #define REAPERAPI_WANT_MIDI_EnumSelNotes
+#define REAPERAPI_WANT_MIDI_EnumSelCC
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_int
 #define REAPERAPI_WANT_MIDIEditor_OnCommand
 #define REAPERAPI_WANT_TakeFX_GetNumParams

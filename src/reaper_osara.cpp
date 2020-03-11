@@ -2499,6 +2499,10 @@ Command COMMANDS[] = {
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC"}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC"}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC and add to selection"}, "OSARA_NEXTCCKEEPSEL", cmdMidiMoveToNextCCKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC and add to selection"}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;

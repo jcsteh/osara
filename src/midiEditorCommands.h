@@ -29,3 +29,8 @@ void cmdMidiMoveToTrack(Command* command);
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);
 #endif
+
+void cmdMidiMoveToNextCC(Command* command);
+void cmdMidiMoveToPreviousCC(Command* command);
+void cmdMidiMoveToNextCCKeepSel(Command* command);
+void cmdMidiMoveToPreviousCCKeepSel(Command* command);

@@ -11,12 +11,21 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include "osara.h"
 #ifdef _WIN32
 #include <Commctrl.h>
 #endif
 
 using namespace std;
+
+typedef struct {
+	int channel;
+	int index;
+	int control;
+	int value;
+	double position;
+} MidiControlChange;
 
 const double DEFAULT_PREVIEW_LENGTH = 0.3;
 
@@ -661,3 +670,194 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 #endif // _WIN32
+
+void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
+	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+}
+
+bool isCCSelected(MediaItem_Take* take, const int cc) {
+	bool sel;
+	MIDI_GetCC(take, cc, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	return sel;
+}
+
+vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
+	int ccIndex = offset;
+	vector<MidiControlChange> ccs;
+	for(;;){
+		ccIndex = MIDI_EnumSelCC(take, ccIndex);
+		if (ccIndex == -1) {
+			break;
+		}
+		double position;
+		int chan, control, value;
+		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		ccs.push_back({chan, ccIndex, control, value, position});
+	}
+	return ccs;
+}
+
+const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
+	static map<int, string> names = {
+		{0, "Bank Select MSB"},
+		{1, "Mod Wheel MSB"},
+		{2, "Breath MSB"},
+		{4, "Foot Pedal MSB"},
+		{5, "Portamento MSB"},
+		{6, "Data Entry MSB"},
+		{7, "Volume MSB"},
+		{8, "Balance MSB"},
+		{10, "Pan Position MSB"},
+		{11, "Expression MSB"},
+		{12, "Control 1 MSB"},
+		{13, "Control 2 MSB"},
+		{16, "GP Slider 1"},
+		{17, "GP Slider 2"},
+		{18, "GP Slider 3"},
+		{19, "GP Slider 4"},
+		{32, "Bank Select LSB"},
+		{33, "Mod Wheel LSB"},
+		{34, "Breath LSB"},
+		{36, "Foot Pedal LSB"},
+		{37, "Portamento LSB"},
+		{38, "Data Entry LSB"},
+		{39, "Volume LSB"},
+		{40, "Balance LSB"},
+		{42, "Pan Position LSB"},
+		{43, "Expression LSB"},
+		{44, "Control 1 LSB"},
+		{45, "Control 2 LSB"},
+		{64, "Hold Pedal (on/off)"},
+		{65, "Portamento (on/off)"},
+		{66, "Sostenuto (on/off)"},
+		{67, "Soft Pedal (on/off)"},
+		{68, "Legato Pedal (on/off)"},
+		{69, "Hold 2 Pedal (on/off)"},
+		{70, "Sound Variation"},	
+		{71, "Timbre/Resonance"},
+		{72, "Sound Release"},
+		{73, "Sound Attack"},
+		{74, "Brightness/Cutoff Freq"},
+		{75, "Sound Control 6"},
+		{76, "Sound Control 7"},	
+		{77, "Sound Controll 8"},
+		{78, "Sound Control 9"},
+		{79, "Sound Control 10"},
+		{80, "GP Button 1 (on/off)"},
+		{81, "GP Button 2 (on/off)"},
+		{82, "GP Button 3 (on/off)"},
+		{83, "GP Button 4 (on/off)"},
+		{91, "Effects Level"},
+		{92, "Tremolo Level"},
+		{93, "Chorus Level"},
+		{94, "Celeste Level"},
+		{95, "Phaser Level"},
+		{96, "Data Button Inc"},
+		{97, "Data Button Dec"},
+		{98, "Non-Reg Parm LSB"},
+		{99, "Non-Reg Parm MSB"},
+		{100, "Reg Parm LSB"},
+		{101, "Reg Parm MSB"},
+		{120, "All Sound Off"},
+		{121, "Reset"},
+		{122, "Local"},
+		{123, "All Notes Off"},
+		{124, "Omni On"},
+		{125, "Omni Off"},
+		{126, "Mono On"},
+		{127, "Poly On"}
+	};
+	MediaTrack* track = GetMediaItemTake_Track(take);
+	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
+	const char* controlName = GetTrackMIDINoteName(tracknumber - 1, 128 + control, channel); // track number is zero based, controls start at 128
+	ostringstream s;
+	s << control;
+	if (controlName) {
+		s << " (" << controlName << ")";
+	} else {
+		auto it = names.find(control);
+		if (it != names.end()) {
+			s << " (" << it->second << ")";
+		}
+	}
+	return s.str();
+}
+
+int currentCC = -1;
+// We cache the last reported control so we can report just the components which have changed.
+int oldControl = -1;
+
+void moveToCC(int direction, bool clearSelection=true, bool select=true, bool useCache=true) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count;
+	MIDI_CountEvts(take, NULL, &count, NULL);
+	double cursor = GetCursorPosition();
+	double position;
+	int start = direction == 1 ? 0 : count - 1;
+	if (currentCC != -1) {
+		MIDI_GetCC(take, currentCC, NULL, NULL, &position, NULL, NULL, NULL, NULL);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+	}
+	if (direction == 1 ? position <= cursor : position >= cursor) {
+		// The cursor is right at or has moved past the CC to which the user last moved.
+		// Therefore, start at the adjacent CC.
+		start = currentCC + direction;
+		if (start < 0 || start >= count) {
+			// There's no adja	cent item in this direction,
+			// so move to the current one again.
+			start -= currentCC;
+		}
+	} else {
+		currentCC = -1;  // Invalid.
+	}
+	for (int index = start; 0 <= index && index < count; index += direction) {
+		int chan, control, value;
+		MIDI_GetCC(take, index, NULL, NULL, &position, NULL, &chan, &control, &value);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		if (direction == 1 ? position < cursor : position > cursor) {
+			continue; // Not the right direction.
+		}
+		currentCC = index;
+		if (clearSelection || select) {
+			Undo_BeginBlock();
+		}
+		if (clearSelection) {
+			MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+			isSelectionContiguous = true;
+		}
+		if (select) {
+			selectCC(take, index);
+		}
+		if (clearSelection || select) {
+			Undo_EndBlock("Change CC Selection", 0);
+		}
+		SetEditCurPos(position, true, false);
+		ostringstream s;
+		s << formatCursorPosition(TF_MEASURE) << " ";
+		if (!useCache || control != oldControl) {
+			s << getMidiControlName(take, control, chan) << ", ";
+			oldControl = control;
+		}
+		s << value;
+		outputMessage(s);
+		return;
+	}
+}
+
+void cmdMidiMoveToNextCC(Command* command) {
+	moveToCC(1);
+}
+
+void cmdMidiMoveToPreviousCC(Command* command) {
+	moveToCC(-1);
+}
+
+void cmdMidiMoveToNextCCKeepSel(Command* command) {
+	moveToCC(1, false, isSelectionContiguous);
+}
+
+void cmdMidiMoveToPreviousCCKeepSel(Command* command) {
+	moveToCC(-1, false, isSelectionContiguous);
+}
