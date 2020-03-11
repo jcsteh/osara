@@ -28,12 +28,7 @@ typedef struct {
 	double start;
 	double end;
 	double getLength() const {
-		double length = end - start;
-		if (length <= 0) {
-			// No or negative length, fallback to default length.
-			return DEFAULT_PREVIEW_LENGTH;
-		}
-		return length;
+		return max (0, (end - start));
 	}
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
@@ -193,7 +188,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	// Calculate the minimum note length.
 	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(NULL, NULL, minLength * 1000, previewDone);
+	previewDoneTimer = SetTimer(NULL, NULL, max(DEFAULT_PREVIEW_LENGTH, (minLength * 1000)), previewDone);
 }
 
 void cmdMidiMoveCursor(Command* command) {
