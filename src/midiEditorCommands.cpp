@@ -664,17 +664,17 @@ void postMidiChangeVelocity(int command) {
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-	if (!selectedNotes.size()) {
+	if (selectedNotes.size() == 0) {
 		return;
 	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
 	} else {
-		// Get indexes vor the current chord.
+		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
 		if (chord.first == -1) {
 			generalize = true;
@@ -723,14 +723,14 @@ void postMidiChangeLength(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-		if (!selectedNotes.size()) {
+		if (selectedNotes.size() == 0) {
 		return;
 	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
 	} else {
-		// Get indexes vor the current chord.
+		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
 		if (chord.first == -1) {
 			generalize = true;
@@ -763,7 +763,7 @@ void postMidiChangeLength(int command) {
 					s << "shortened grid unit";
 					break;				
 				default:
-					s << "lengthchanged";
+					s << "length changed";
 					break;
 			}
 		} else{ 
@@ -787,14 +787,14 @@ void postMidiChangePitch(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-	if (!selectedNotes.size()) {
+	if (selectedNotes.size() == 0) {
 		return;
 	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
 	} else {
-		// Get indexes vor the current chord.
+		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
 		if (chord.first == -1) {
 			generalize = true;
