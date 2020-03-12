@@ -28,6 +28,7 @@ typedef struct {
 } MidiControlChange;
 
 const double DEFAULT_PREVIEW_LENGTH = 0.3;
+extern FakeFocus fakeFocus;
 
 typedef struct {
 	int channel;
@@ -221,6 +222,7 @@ void cmdMidiMoveCursor(Command* command) {
 			++count;
 	}
 	if (count > 0)
+		fakeFocus = FOCUS_NOTE;
 		s << " " << count << (count == 1 ? " note" : " notes");
 		outputMessage(s);
 }
@@ -299,6 +301,10 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 // It is not a REAPER note index!
 // -1 means not in a chord.
 int curNoteInChord = -1;
+// Keeps track of the CC to which the user last moved.
+// This is a REAPER CC index.
+// -1 means no CC.
+int currentCC = -1;
 
 // Used to order notes in a chord by pitch.
 bool compareNotesByPitch(const MidiNote& note1, const MidiNote& note2) {
@@ -366,6 +372,34 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 	return notes;
 }
 
+
+void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
+	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+}
+
+bool isCCSelected(MediaItem_Take* take, const int cc) {
+	bool sel;
+	MIDI_GetCC(take, cc, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	return sel;
+}
+
+vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
+	int ccIndex = offset;
+	vector<MidiControlChange> ccs;
+	for(;;){
+		ccIndex = MIDI_EnumSelCC(take, ccIndex);
+		if (ccIndex == -1) {
+			break;
+		}
+		double position;
+		int chan, control, value;
+		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		ccs.push_back({chan, ccIndex, control, value, position});
+	}
+	return ccs;
+}
+
 void cmdMidiToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
@@ -375,21 +409,37 @@ void cmdMidiToggleSelection(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	bool select;
-	if (curNoteInChord != -1) {
-		// Note in chord.
-		MidiNote note = findNoteInChord(take, 0);
-		if (note.channel == -1)
-			return;
-		select = !isNoteSelected(take, note.index);
-		selectNote(take, note.index, select);
-	} else {
-		// Chord.
-		auto chord = findChord(take, 0);
-		if (chord.first == -1)
-			return;
-		select = !isNoteSelected(take, chord.first);
-		for (int note = chord.first; note <= chord.second; ++note)
-			selectNote(take, note, select);
+	switch (fakeFocus) {
+		case FOCUS_NOTE: {
+			if (curNoteInChord != -1) {
+				// Note in chord.
+				MidiNote note = findNoteInChord(take, 0);
+				if (note.channel == -1) {
+					return;
+				}
+				select = !isNoteSelected(take, note.index);
+				selectNote(take, note.index, select);
+			} else {
+				// Chord.
+				auto chord = findChord(take, 0);
+				if (chord.first == -1) {
+					return;
+				}
+				select = !isNoteSelected(take, chord.first);
+				for (int note = chord.first; note <= chord.second; ++note) {
+					selectNote(take, note, select);
+				}
+			}
+			break;
+		}
+		case FOCUS_CC: {
+			if (currentCC == -1) {
+				return;
+			}
+			select = !isCCSelected(take, currentCC);
+			selectCC(take, currentCC, select);
+			break;
+		}
 	}
 	outputMessage(select ? "selected" : "unselected");
 }
@@ -423,6 +473,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		notes.push_back({chan, pitch, vel, 0, start, end});
 	}
 	previewNotes(take, notes);
+	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
 	if (!select && !isNoteSelected(take, chord.first))
@@ -463,6 +514,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	if (select)
 		selectNote(take, note.index);
 	previewNotes(take, {note});
+	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel);
@@ -524,6 +576,7 @@ void cmdMidiInsertNote(Command* command) {
 	);
 	// Play the inserted note.
 	previewNotes(take, {note});
+	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
@@ -558,139 +611,10 @@ void cmdMidiSelectNotes(Command* command) {
 			break;
 		++count;
 	}
+	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	s << count << " note" << ((count == 1) ? "" : "s") << " selected";
 	outputMessage(s);
-}
-
-void midiMoveToItem(int direction) {
-	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, ((direction==1)?40798:40797)); // Contents: Activate next/previous MIDI media item on this track, clearing the editor first
-	MIDIEditor_OnCommand(editor, 40036); // View: Go to start of file
-	int cmd = NamedCommandLookup("_FNG_ME_SELECT_NOTES_NEAR_EDIT_CURSOR");
-	if(cmd>0)
-		MIDIEditor_OnCommand(editor, cmd); // SWS/FNG: Select notes nearest edit cursor
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	MediaItem* item = GetMediaItemTake_Item(take);
-	MediaTrack* track = GetMediaItem_Track(item);
-	int count = CountTrackMediaItems(track);
-	int itemNum;
-	for (int i=0; i<count; ++i) {
-		MediaItem* itemTmp = GetTrackMediaItem(track, i);
-		if (itemTmp == item) {
-			itemNum = i+1;
-			break;
-		}
-	}
-	ostringstream s;
-	s << itemNum << " " << GetTakeName(take);
-	s << " " << formatCursorPosition();
-	outputMessage(s);
-}
-
-void cmdMidiMoveToNextItem(Command* command) {
-	Undo_BeginBlock();
-	midiMoveToItem(1);
-	Undo_EndBlock("OSARA: Move to next midi item on track", 0);
-}
-
-void cmdMidiMoveToPrevItem(Command* command) {
-	Undo_BeginBlock();
-	midiMoveToItem(-1);
-	Undo_EndBlock("OSARA: Move to previous midi item on track", 0);
-}
-
-void cmdMidiMoveToTrack(Command* command) {
-	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-		MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	MediaItem* item = GetMediaItemTake_Item(take);
-	MediaTrack* track = GetMediaItem_Track(item);
-	int count = CountTrackMediaItems(track);
-	int itemNum;
-	for (int i=0; i<count; ++i) {
-		MediaItem* itemTmp = GetTrackMediaItem(track, i);
-		if (itemTmp == item) {
-			itemNum = i+1;
-			break;
-		}
-	}
-	ostringstream s;
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	s << trackNum;
-	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-	if (trackName)
-		s << " " << trackName;
-	s << " item " << itemNum << " " << GetTakeName(take);
-	outputMessage(s);
-}
-
-#ifdef _WIN32
-void cmdFocusNearestMidiEvent(Command* command) {
-	HWND focus = GetFocus();
-	if (!focus)
-		return;
-	double cursorPos = GetCursorPosition();
-	for (int i = 0; i < ListView_GetItemCount(focus); ++i) {
-		char text[50];
-		// Get the text from the position column (1).
-		ListView_GetItemText(focus, i, 1, text, sizeof(text));
-		// Convert this to project time. text is always in measures.beats.
-		double eventPos = parse_timestr_pos(text, 2);
-		if (eventPos >= cursorPos) {
-			// This item is at or just after the cursor.
-			int oldFocus = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
-			// Focus and select this item.
-			ListView_SetItemState(focus, i,
-				LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-			ListView_EnsureVisible (focus, i, false);
-			if (oldFocus != -1 && oldFocus != i) {
-				// Unselect the previously focused item.
-				ListView_SetItemState(focus, oldFocus,
-					0, LVIS_SELECTED);
-			}
-			break;
-		}
-	}
-}
-
-void cmdMidiFilterWindow(Command *command) {
-	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	// TODO: we could also check the command state was "off", to skip searching otherwise
-	HWND filter = FindWindow(WC_DIALOG, "Filter Events");
-	if (filter && (filter != GetFocus())) {
-		SetFocus(filter); // focus the window
-	}
-}
-
-#endif // _WIN32
-
-void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
-	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-}
-
-bool isCCSelected(MediaItem_Take* take, const int cc) {
-	bool sel;
-	MIDI_GetCC(take, cc, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
-	return sel;
-}
-
-vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
-	int ccIndex = offset;
-	vector<MidiControlChange> ccs;
-	for(;;){
-		ccIndex = MIDI_EnumSelCC(take, ccIndex);
-		if (ccIndex == -1) {
-			break;
-		}
-		double position;
-		int chan, control, value;
-		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
-		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, control, value, position});
-	}
-	return ccs;
 }
 
 const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
@@ -779,7 +703,6 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-int currentCC = -1;
 // We cache the last reported control so we can report just the components which have changed.
 int oldControl = -1;
 
@@ -790,24 +713,26 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 	MIDI_CountEvts(take, NULL, &count, NULL);
 	double cursor = GetCursorPosition();
 	double position;
-	int start = direction == 1 ? 0 : count - 1;
-	if (currentCC != -1) {
+	int start = direction == -1 ? count - 1 : 0;
+	if (fakeFocus == FOCUS_CC // If not, currentCC is invalid.
+		&& currentCC != -1)
+	{
 		MIDI_GetCC(take, currentCC, NULL, NULL, &position, NULL, NULL, NULL, NULL);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-	}
-	if (direction == 1 ? position <= cursor : position >= cursor) {
-		// The cursor is right at or has moved past the CC to which the user last moved.
-		// Therefore, start at the adjacent CC.
-		start = currentCC + direction;
-		if (start < 0 || start >= count) {
-			// There's no adja	cent item in this direction,
-			// so move to the current one again.
-			start -= currentCC;
+		if (direction == 1 ? position <= cursor : position >= cursor) {
+			// The cursor is right at or has moved past the CC to which the user last moved.
+			// Therefore, start at the adjacent CC.
+			start = currentCC + direction;
+			if (start < 0 || start >= count) {
+				// There's no adja	cent item in this direction,
+				// so move to the current one again.
+				start = currentCC;
+			}
 		}
 	} else {
 		currentCC = -1;  // Invalid.
 	}
-	for (int index = start; -1 <= index && index < count; index += direction) {
+	for (int index = start; 0 <= index && index < count; index += direction) {
 		int chan, control, value;
 		MIDI_GetCC(take, index, NULL, NULL, &position, NULL, &chan, &control, &value);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
@@ -829,6 +754,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 			Undo_EndBlock("Change CC Selection", 0);
 		}
 		SetEditCurPos(position, true, false);
+		fakeFocus = FOCUS_CC;
 		ostringstream s;
 		s << formatCursorPosition(TF_MEASURE) << " ";
 		if (!useCache || control != oldControl) {
@@ -836,6 +762,9 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 			oldControl = control;
 		}
 		s << value;
+		if (!select && !isCCSelected(take, index)) {
+			s << "unselected" << " ";
+		}
 		outputMessage(s);
 		return;
 	}
@@ -857,3 +786,107 @@ void cmdMidiMoveToPreviousCCKeepSel(Command* command) {
 	moveToCC(-1, false, isSelectionContiguous);
 }
 
+void midiMoveToItem(int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, ((direction==1)?40798:40797)); // Contents: Activate next/previous MIDI media item on this track, clearing the editor first
+	MIDIEditor_OnCommand(editor, 40036); // View: Go to start of file
+	int cmd = NamedCommandLookup("_FNG_ME_SELECT_NOTES_NEAR_EDIT_CURSOR");
+	if(cmd>0)
+		MIDIEditor_OnCommand(editor, cmd); // SWS/FNG: Select notes nearest edit cursor
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	MediaTrack* track = GetMediaItem_Track(item);
+	int count = CountTrackMediaItems(track);
+	int itemNum;
+	for (int i=0; i<count; ++i) {
+		MediaItem* itemTmp = GetTrackMediaItem(track, i);
+		if (itemTmp == item) {
+			itemNum = i+1;
+			break;
+		}
+	}
+	fakeFocus = FOCUS_ITEM;
+	ostringstream s;
+	s << itemNum << " " << GetTakeName(take);
+	s << " " << formatCursorPosition();
+	outputMessage(s);
+}
+
+void cmdMidiMoveToNextItem(Command* command) {
+	Undo_BeginBlock();
+	midiMoveToItem(1);
+	Undo_EndBlock("OSARA: Move to next midi item on track", 0);
+}
+
+void cmdMidiMoveToPrevItem(Command* command) {
+	Undo_BeginBlock();
+	midiMoveToItem(-1);
+	Undo_EndBlock("OSARA: Move to previous midi item on track", 0);
+}
+
+void cmdMidiMoveToTrack(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+		MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	MediaTrack* track = GetMediaItem_Track(item);
+	int count = CountTrackMediaItems(track);
+	int itemNum;
+	for (int i=0; i<count; ++i) {
+		MediaItem* itemTmp = GetTrackMediaItem(track, i);
+		if (itemTmp == item) {
+			itemNum = i+1;
+			break;
+		}
+	}
+	fakeFocus = FOCUS_TRACK;
+	ostringstream s;
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	s << trackNum;
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+	if (trackName)
+		s << " " << trackName;
+	s << " item " << itemNum << " " << GetTakeName(take);
+	outputMessage(s);
+}
+
+#ifdef _WIN32
+void cmdFocusNearestMidiEvent(Command* command) {
+	HWND focus = GetFocus();
+	if (!focus)
+		return;
+	double cursorPos = GetCursorPosition();
+	for (int i = 0; i < ListView_GetItemCount(focus); ++i) {
+		char text[50];
+		// Get the text from the position column (1).
+		ListView_GetItemText(focus, i, 1, text, sizeof(text));
+		// Convert this to project time. text is always in measures.beats.
+		double eventPos = parse_timestr_pos(text, 2);
+		if (eventPos >= cursorPos) {
+			// This item is at or just after the cursor.
+			int oldFocus = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
+			// Focus and select this item.
+			ListView_SetItemState(focus, i,
+				LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
+			ListView_EnsureVisible (focus, i, false);
+			if (oldFocus != -1 && oldFocus != i) {
+				// Unselect the previously focused item.
+				ListView_SetItemState(focus, oldFocus,
+					0, LVIS_SELECTED);
+			}
+			break;
+		}
+	}
+}
+
+void cmdMidiFilterWindow(Command *command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	// TODO: we could also check the command state was "off", to skip searching otherwise
+	HWND filter = FindWindow(WC_DIALOG, "Filter Events");
+	if (filter && (filter != GetFocus())) {
+		SetFocus(filter); // focus the window
+	}
+}
+
+#endif // _WIN32
