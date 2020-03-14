@@ -401,7 +401,7 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	for (; 0 <= start && start < count; start += direction) {
 		MIDI_GetCC(take, start, NULL, NULL, &position, NULL, &chan, &control, &value);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		if (direction == 1 ? position >= cursor : position <= cursor) {
+		if (direction == -1 ? position <= cursor : position >= cursor) {
 			currentCC = start;
 			found = true;
 			break;
