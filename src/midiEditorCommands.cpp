@@ -372,6 +372,46 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 	return notes;
 }
 
+// Finds a single CC at the cursor in a given direction and returns its info.
+// This updates currentCC.
+MidiControlChange findCC(MediaItem_Take* take, int direction) {
+	int count;
+	MIDI_CountEvts(take, NULL, &count, NULL);
+	double cursor = GetCursorPosition();
+	double position;
+	int start = direction == -1 ? count - 1 : 0;
+	if (currentCC != -1) {
+		MIDI_GetCC(take, currentCC, NULL, NULL, &position, NULL, NULL, NULL, NULL);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		if (direction == 0 && position == cursor) {
+			start = currentCC;
+		} else if (direction == 1 ? position <= cursor : position >= cursor) {
+			// The cursor is right at or has moved past the CC to which the user last moved.
+			// Therefore, start at the adjacent CC.
+			start = currentCC + direction;
+			if (start < 0 || start >= count) {
+				// There's no adja	cent item in this direction,
+				// so move to the current one again.
+				start = currentCC;
+			}
+		}
+	}
+	bool found = false;
+	int chan, control, value;
+	for (; 0 <= start && start < count; start += direction) {
+		MIDI_GetCC(take, start, NULL, NULL, &position, NULL, &chan, &control, &value);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		if (direction == 1 ? position >= cursor : position <= cursor) {
+			currentCC = start;
+			found = true;
+			break;
+		}
+	}
+	if (!found) {
+		return {-1};
+	}
+	return {chan, currentCC, control, value, position};
+}
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
 	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
@@ -709,65 +749,33 @@ int oldControl = -1;
 void moveToCC(int direction, bool clearSelection=true, bool select=true, bool useCache=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int count;
-	MIDI_CountEvts(take, NULL, &count, NULL);
-	double cursor = GetCursorPosition();
-	double position;
-	int start = direction == -1 ? count - 1 : 0;
-	if (fakeFocus == FOCUS_CC // If not, currentCC is invalid.
-		&& currentCC != -1)
-	{
-		MIDI_GetCC(take, currentCC, NULL, NULL, &position, NULL, NULL, NULL, NULL);
-		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		if (direction == 1 ? position <= cursor : position >= cursor) {
-			// The cursor is right at or has moved past the CC to which the user last moved.
-			// Therefore, start at the adjacent CC.
-			start = currentCC + direction;
-			if (start < 0 || start >= count) {
-				// There's no adja	cent item in this direction,
-				// so move to the current one again.
-				start = currentCC;
-			}
-		}
-	} else {
-		currentCC = -1;  // Invalid.
+	auto cc = findCC(take, direction);
+	if (clearSelection || select) {
+		Undo_BeginBlock();
 	}
-	for (int index = start; 0 <= index && index < count; index += direction) {
-		int chan, control, value;
-		MIDI_GetCC(take, index, NULL, NULL, &position, NULL, &chan, &control, &value);
-		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		if (direction == 1 ? position < cursor : position > cursor) {
-			continue; // Not the right direction.
-		}
-		currentCC = index;
-		if (clearSelection || select) {
-			Undo_BeginBlock();
-		}
-		if (clearSelection) {
-			MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
-			isSelectionContiguous = true;
-		}
-		if (select) {
-			selectCC(take, index);
-		}
-		if (clearSelection || select) {
-			Undo_EndBlock("Change CC Selection", 0);
-		}
-		SetEditCurPos(position, true, false);
-		fakeFocus = FOCUS_CC;
-		ostringstream s;
-		s << formatCursorPosition(TF_MEASURE) << " ";
-		if (!useCache || control != oldControl) {
-			s << getMidiControlName(take, control, chan) << ", ";
-			oldControl = control;
-		}
-		s << value;
-		if (!select && !isCCSelected(take, index)) {
-			s << "unselected" << " ";
-		}
-		outputMessage(s);
-		return;
+	if (clearSelection) {
+		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+		isSelectionContiguous = true;
 	}
+	if (select) {
+		selectCC(take, cc.index);
+	}
+	if (clearSelection || select) {
+		Undo_EndBlock("Change CC Selection", 0);
+	}
+	SetEditCurPos(cc.position, true, false);
+	fakeFocus = FOCUS_CC;
+	ostringstream s;
+	s << formatCursorPosition(TF_MEASURE) << " ";
+	if (!useCache || cc.control != oldControl) {
+		s << getMidiControlName(take, cc.control, cc.channel) << ", ";
+		oldControl = cc.control;
+	}
+	s << cc.value;
+	if (!select && !isCCSelected(take, cc.index)) {
+		s << "unselected" << " ";
+	}
+	outputMessage(s);
 }
 
 void cmdMidiMoveToNextCC(Command* command) {
