@@ -18,10 +18,10 @@ void cmdMidiMoveToNextNoteInChord(Command* command);
 void cmdMidiMoveToPreviousNoteInChord(Command* command);
 void cmdMidiMoveToNextNoteInChordKeepSel(Command* command);
 void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command);
-void cmdMidiMovePitchCursor(Command* command);
+void postMidiMovePitchCursor(int command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
-void cmdMidiSelectNotes(Command* command);
+void postMidiSelectNotes(int command);
 void cmdMidiMoveToNextItem(Command* command) ;
 void cmdMidiMoveToPrevItem(Command* command) ;
 void cmdMidiMoveToTrack(Command* command);
@@ -29,3 +29,7 @@ void cmdMidiMoveToTrack(Command* command);
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);
 #endif
+
+void postMidiChangeVelocity(int command);
+void postMidiChangeLength(int command);
+void postMidiChangePitch(int command);
