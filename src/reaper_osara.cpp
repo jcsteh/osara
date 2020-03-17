@@ -1126,6 +1126,31 @@ PostCommand POST_COMMANDS[] = {
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
 	{0},
 };
+PostCommand MIDI_POST_COMMANDS[] = {
+	{40006, postMidiSelectNotes}, // Edit: Select all events
+	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
+	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
+	{40177, postMidiChangePitch}, // Edit: Move notes up one semitone
+	{40178, postMidiChangePitch}, // Edit: Move notes down one semitone
+	{40180, postMidiChangePitch}, // Edit: Move notes down one octave
+	{40181, postMidiChangePitch}, // Edit: Move notes up one octave
+	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
+	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
+	{40434, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
+	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
+	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
+	{40447, postMidiChangeLength}, // Edit: Shorten notes one grid unit
+	{40462, postMidiChangeVelocity}, // Edit: Note velocity +01
+	{40463, postMidiChangeVelocity}, // Edit: Note velocity +10
+	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
+	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
+	{40501, postMidiSelectNotes}, // Invert selection
+	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
+	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
+	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
+	{0},
+};
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
 	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
@@ -1154,6 +1179,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 };
 
+map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
@@ -2422,14 +2448,8 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40049}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
-	{MIDI_EDITOR_SECTION, {{0, 0, 40050}, NULL}, NULL, cmdMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0,40746}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all notes in time selection
-	{MIDI_EDITOR_SECTION, {{0, 0,40006}, NULL}, NULL, cmdMidiSelectNotes}, // Edit: Select all events
-	{MIDI_EDITOR_SECTION, {{0, 0,40501}, NULL}, NULL, cmdMidiSelectNotes},// Invert selection
-	{MIDI_EDITOR_SECTION, {{0, 0,40434}, NULL}, NULL, cmdMidiSelectNotes},// Select all notes with the same pitch
 	{MIDI_EDITOR_SECTION, {{0, 0,40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
 	{MIDI_EDITOR_SECTION, {{0, 0,40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
 #ifdef _WIN32
@@ -2583,6 +2603,15 @@ bool handlePostCommand(int section, int command) {
 			return true;
 		}
 	}else if (section==MIDI_EDITOR_SECTION) {
+		const auto it = midiPostCommandsMap.find(command);
+		if (it != midiPostCommandsMap.end()) {
+			isHandlingCommand = true;
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			it->second(command);
+			isHandlingCommand = false;
+			return true;
+		}
 		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
 		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
@@ -2758,6 +2787,10 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
+
+		for (int i = 0; MIDI_POST_COMMANDS[i].cmd; ++i) {
+			midiPostCommandsMap.insert(make_pair(MIDI_POST_COMMANDS[i].cmd, MIDI_POST_COMMANDS[i].execute));
+		}
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
 			if (COMMANDS[i].id) {
