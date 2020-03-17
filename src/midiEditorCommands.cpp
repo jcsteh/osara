@@ -586,10 +586,9 @@ void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
-void cmdMidiMovePitchCursor(Command* command) {
+void postMidiMovePitchCursor(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
@@ -612,8 +611,8 @@ void cmdMidiInsertNote(Command* command) {
 	// Find the just inserted note based on its pitch, as that makes it unique.
 	auto note = *(find_if(
 		selectedNotes.begin(), selectedNotes.end(),
-		[pitch](MidiNote n) { return n.pitch == pitch; })
-	);
+		[pitch](MidiNote n) { return n.pitch == pitch; }
+	));
 	// Play the inserted note.
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
@@ -638,10 +637,8 @@ void cmdMidiDeleteEvents(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMidiSelectNotes(Command* command) {
-	int noteCount;
+void postMidiSelectNotes(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int noteIndex=-1;
 	int count=0;
@@ -898,3 +895,188 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 #endif // _WIN32
+
+void postMidiChangeVelocity(int command) {
+	if (!shouldReportNotes) {
+		return;
+	}
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	if (selectedNotes.size() == 0) {
+		return;
+	}
+	bool generalize = false;
+	if (selectedNotes.size() >= 8) {
+		generalize = true;
+	} else {
+		// Get indexes for the current chord.
+		auto chord = findChord(take, 0);
+		if (chord.first == -1) {
+			generalize = true;
+		} else {
+			generalize = !(all_of(
+				selectedNotes.begin(), selectedNotes.end(),
+				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+			));
+		}
+	}
+	// The Reaper action takes care of note preview.
+	ostringstream s;
+	if (generalize) {
+		auto count = selectedNotes.size();
+		s << count << (count == 1 ? " note" : " notes ");
+		switch (command) {
+			case 40462:
+				s << "velocity +1";
+				break;
+			case 40463:
+				s << "velocity -1";
+				break;
+			case 40464:
+				s << "velocity +10";
+				break;
+			case 40465:
+				s << "velocity -10";
+				break;
+			default:
+				s << "velocity changed";
+				break;
+		}
+	} else{
+		for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+			s << getMidiNoteName(take, note->pitch, note->channel) << "  " << note->velocity;
+			if (note != selectedNotes.cend() - 1) {
+				s << ", ";
+			}
+		}
+	}
+	outputMessage(s);
+}
+
+void postMidiChangeLength(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+		if (selectedNotes.size() == 0) {
+		return;
+	}
+	bool generalize = false;
+	if (selectedNotes.size() >= 8) {
+		generalize = true;
+	} else {
+		// Get indexes for the current chord.
+		auto chord = findChord(take, 0);
+		if (chord.first == -1) {
+			generalize = true;
+		} else {
+			generalize = !(all_of(
+				selectedNotes.begin(), selectedNotes.end(),
+				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+			));
+		}
+	}
+	if (!generalize) {
+		previewNotes(take, selectedNotes);
+	}
+	if (shouldReportNotes) {
+		ostringstream s;
+		if (generalize) {
+			auto count = selectedNotes.size();
+			s << count << (count == 1 ? " note" : " notes ");
+			switch (command) {
+				case 40444:
+					s << "lengthened pixel";
+					break;
+				case 40445:
+					s << "shortened pixel";
+					break;
+				case 40446:
+					s << "lengthened grid unit";
+					break;
+				case 40447:
+					s << "shortened grid unit";
+					break;				
+				default:
+					s << "length changed";
+					break;
+			}
+		} else{ 
+			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+				s << getMidiNoteName(take, note->pitch, note->channel) << " ";
+				s			<< formatTime(note->getLength(), TF_MEASURE, true, false, false);
+				if (note != selectedNotes.cend() - 1) {
+					s << ", ";
+				}
+			}
+		}
+		outputMessage(s);
+	}
+}
+
+void postMidiChangePitch(int command) {
+	if (!shouldReportNotes) {
+		return;
+	}
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	if (selectedNotes.size() == 0) {
+		return;
+	}
+	bool generalize = false;
+	if (selectedNotes.size() >= 8) {
+		generalize = true;
+	} else {
+		// Get indexes for the current chord.
+		auto chord = findChord(take, 0);
+		if (chord.first == -1) {
+			generalize = true;
+		} else {
+			generalize = !(all_of(
+				selectedNotes.begin(), selectedNotes.end(),
+				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+			));
+		}
+	}
+	// The Reaper action takes care of note preview.
+	ostringstream s;
+	if (generalize) {
+		auto count = selectedNotes.size();
+		s << count << (count == 1 ? " note" : " notes ");
+		switch (command) {
+			case 40177:
+				s << "semitone up";
+				break;
+			case 40178:
+				s << "semitone down";
+				break;
+			case 40180:
+				s << "octave down";
+				break;
+			case 40181:
+				s << "octave up";
+				break;
+			case 41026:
+				s << "semitone up ignoring scale";
+				break;
+			case 41027:
+				s << "semitone down ignoring scale";
+				break;
+			default:
+				s << "pitch changed";
+				break;
+		}
+	} else{ 
+		for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+			s << getMidiNoteName(take, note->pitch, note->channel);
+			if (note != selectedNotes.cend() - 1) {
+				s << ", ";
+			}
+		}
+	}
+	outputMessage(s);
+}

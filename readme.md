@@ -275,8 +275,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Move edit cursor left by grid: Alt+Shift+Rightarrow
 - Navigate: Move edit cursor right one measure: PageDown
 - Navigate: Move edit cursor left one measure: PageUp
-- Edit: Increase pitch cursor one semitone: Alt+UpArrow or NumPad8
-- Edit: Decrease pitch cursor one semitone: Alt+DownArrow or NumPad2
+- Edit: Increase pitch cursor one semitone: Alt+UpArrow or Ctrl+NumPad8
+- Edit: Decrease pitch cursor one semitone: Alt+DownArrow or Ctrl+NumPad2
+- Edit: Increase pitch cursor one octave: Alt+Shift+UpArrow
+- Edit: Decrease pitch cursor one octave: Alt+Shift+DownArrow
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
 - Edit: Select all events: Ctrl+A
@@ -305,6 +307,20 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Set length for next inserted note: 1/32T: control+0
 - Activate next MIDI track: Ctrl+DownArrow
 - Activate previous MIDI track: Ctrl+UpArrow
+- Edit: Move notes up one semitone: NumPad8
+- Edit: Move notes down one semitone: NumPad2
+- Edit: Move notes up one semitone ignoring scale/key: Ctrl+Alt+NumPad8
+- Edit: Move notes down one semitone ignoring scale/key: Ctrl+Alt+NumPad2
+- Edit: Move notes up one octave: Alt+NumPad8
+- Edit: Move notes down one octave: Alt+NumPad2
+- Edit: Lengthen notes one pixel: Alt+NumPad3
+- Edit: Shorten notes one pixel: Alt+NumPad1
+- Edit: Lengthen notes one grid unit: NumPad3
+- Edit: Shorten notes one grid unit: NumPad1
+- Edit: Note velocity +01: NumPad9
+- Edit: Note velocity +10: Alt+NumPad9
+- Edit: Note velocity -01: NumPad7
+- Edit: Note velocity -10: Alt+NumPad7
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
