@@ -423,6 +423,23 @@ bool isCCSelected(MediaItem_Take* take, const int cc) {
 	return sel;
 }
 
+vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
+	int ccIndex = offset;
+	vector<MidiControlChange> ccs;
+	for (;;) {
+		ccIndex = MIDI_EnumSelCC(take, ccIndex);
+		if (ccIndex == -1) {
+			break;
+		}
+		double position;
+		int chan, control, value;
+		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
+		position = MIDI_GetProjTimeFromPPQPos(take, position);
+		ccs.push_back({chan, ccIndex, control, value, position});
+	}
+	return ccs;
+}
+
 void cmdMidiToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
@@ -1060,6 +1077,39 @@ void postMidiChangePitch(int command) {
 				s << ", ";
 			}
 		}
+	}
+	outputMessage(s);
+}
+
+void postMidiChangeCCValue(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	auto count = selectedCCs.size();
+	if (count == 0) {
+		return;
+	}
+	ostringstream s;
+	if (count > 1) {
+		s << count << " control values ";
+		switch (command) {
+			case 40676: {
+				s << "increased";
+				break;
+			}
+			case 40677: {
+				s << "decreased";
+				break;
+			}
+			default: {
+				s << "changed";
+				break;
+			}
+		}
+	} else{ 
+		auto cc = *selectedCCs.cbegin();
+		s << cc.value;
 	}
 	outputMessage(s);
 }
