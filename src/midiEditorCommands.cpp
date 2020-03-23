@@ -395,12 +395,13 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 			}
 		}
 	}
+	int movement = direction == 0 ? 1 : direction;
 	bool found = false;
 	int chan, control, value;
-	for (; 0 <= start && start < count; start += direction) {
+	for (; 0 <= start && start < count; start += movement) {
 		MIDI_GetCC(take, start, NULL, NULL, &position, NULL, &chan, &control, &value);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		if (direction == -1 ? position <= cursor : position >= cursor) {
+		if (movement == -1 ? position <= cursor : position >= cursor) {
 			currentCC = start;
 			found = true;
 			break;
