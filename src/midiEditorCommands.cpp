@@ -390,7 +390,7 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 			// Therefore, start at the adjacent CC.
 			start = currentCC + direction;
 			if (start < 0 || start >= count) {
-				// There's no adja	cent item in this direction,
+				// There's no adjacent item in this direction,
 				// so move to the current one again.
 				start = currentCC;
 			}
@@ -690,13 +690,13 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 		{67, "Soft Pedal (on/off)"},
 		{68, "Legato Pedal (on/off)"},
 		{69, "Hold 2 Pedal (on/off)"},
-		{70, "Sound Variation"},	
+		{70, "Sound Variation"},
 		{71, "Timbre/Resonance"},
 		{72, "Sound Release"},
 		{73, "Sound Attack"},
 		{74, "Brightness/Cutoff Freq"},
 		{75, "Sound Control 6"},
-		{76, "Sound Control 7"},	
+		{76, "Sound Control 7"},
 		{77, "Sound Controll 8"},
 		{78, "Sound Control 9"},
 		{79, "Sound Control 10"},
