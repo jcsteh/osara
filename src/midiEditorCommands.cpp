@@ -426,7 +426,7 @@ bool isCCSelected(MediaItem_Take* take, const int cc) {
 vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 	int ccIndex = offset;
 	vector<MidiControlChange> ccs;
-	for(;;){
+	for (;;) {
 		ccIndex = MIDI_EnumSelCC(take, ccIndex);
 		if (ccIndex == -1) {
 			break;
@@ -1083,7 +1083,7 @@ void postMidiChangePitch(int command) {
 
 void postMidiChangeCCValue(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
 	auto count = selectedCCs.size();
