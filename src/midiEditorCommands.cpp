@@ -1080,3 +1080,36 @@ void postMidiChangePitch(int command) {
 	}
 	outputMessage(s);
 }
+
+void postMidiChangeCCValue(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	auto count = selectedCCs.size();
+	if (count == 0) {
+		return;
+	}
+	ostringstream s;
+	if (count > 1) {
+		s << count << " control values ";
+		switch (command) {
+			case 40676: {
+				s << "increased";
+				break;
+			}
+			case 40677: {
+				s << "decreased";
+				break;
+			}
+			default: {
+				s << "changed";
+				break;
+			}
+		}
+	} else{ 
+		auto cc = *selectedCCs.cbegin();
+		s << cc.value;
+	}
+	outputMessage(s);
+}
