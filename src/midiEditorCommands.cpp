@@ -28,7 +28,6 @@ typedef struct {
 } MidiControlChange;
 
 const double DEFAULT_PREVIEW_LENGTH = 0.3;
-extern FakeFocus fakeFocus;
 
 typedef struct {
 	int channel;
