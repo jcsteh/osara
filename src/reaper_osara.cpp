@@ -2514,6 +2514,10 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord"}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord and add to selection"}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord and add to selection"}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToPreviousNoteInChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC"}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC"}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC and add to selection"}, "OSARA_NEXTCCKEEPSEL", cmdMidiMoveToNextCCKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC and add to selection"}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
 #ifdef _WIN32
