@@ -1113,3 +1113,16 @@ void postMidiChangeCCValue(int command) {
 	}
 	outputMessage(s);
 }
+
+void postMidiSwitchCCLane(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	ostringstream s;
+	int ccNum = MIDIEditor_GetSetting_int(editor, "last_clicked_cc_lane");
+	if (ccNum < 128) {
+		s << ccNum << " ";
+	}
+	char textBuffer[64];
+	MIDIEditor_GetSetting_str(editor, "last_clicked_cc_lane", textBuffer, 64);
+	s << textBuffer;
+	outputMessage(s);
+}

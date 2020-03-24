@@ -1136,7 +1136,9 @@ PostCommand MIDI_POST_COMMANDS[] = {
 	{40181, postMidiChangePitch}, // Edit: Move notes up one octave
 	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
-	{40434, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
+	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
+	{40435, postMidiSelectNotes}, // Select all notes with the same pitch
 	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
 	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
