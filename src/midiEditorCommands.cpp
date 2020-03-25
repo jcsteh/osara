@@ -1121,8 +1121,9 @@ void postMidiSwitchCCLane(int command) {
 	if (ccNum < 128) {
 		s << ccNum << " ";
 	}
-	char textBuffer[64];
-	MIDIEditor_GetSetting_str(editor, "last_clicked_cc_lane", textBuffer, 64);
+	const int BUFFER_LENGTH = 64;
+	char textBuffer[BUFFER_LENGTH];
+	MIDIEditor_GetSetting_str(editor, "last_clicked_cc_lane", textBuffer, BUFFER_LENGTH);
 	s << textBuffer;
 	outputMessage(s);
 }
