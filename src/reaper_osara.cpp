@@ -2590,12 +2590,20 @@ void cmdConfig(Command* command) {
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int section, int command) {
+bool handlePostCommand(int section, int command, int val=0, int valHw=0,
+	int relMode=0, HWND hwnd=nullptr
+) {
 	if (section==MAIN_SECTION) {
 		const auto it = postCommandsMap.find(command);
 		if (it != postCommandsMap.end()) {
 			isHandlingCommand = true;
-			Main_OnCommand(command, 0);
+			if (hwnd) {
+				// #244: If the command was triggered via MIDI, pass the MIDI data when
+				// executing the command so that toggles, etc. work as expected.
+				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
+			} else {
+				Main_OnCommand(command, 0);
+			}
 			it->second(command);
 			isHandlingCommand = false;
 			return true;
@@ -2603,7 +2611,11 @@ bool handlePostCommand(int section, int command) {
 		const auto mIt = POST_COMMAND_MESSAGES.find(command);
 		if (mIt != POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
-			Main_OnCommand(command, 0);
+			if (hwnd) {
+				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
+			} else {
+				Main_OnCommand(command, 0);
+			}
 			outputMessage(mIt->second);
 			isHandlingCommand = false;
 			return true;
@@ -2653,7 +2665,8 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
-	} else if (handlePostCommand(section->uniqueID, command)) {
+	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
+			hwnd)) {
 		return true;
 	}
 	return false;
