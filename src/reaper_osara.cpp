@@ -1460,10 +1460,52 @@ bool isListView(HWND hwnd) {
 	return wcscmp(className, L"SysListView32") == 0;
 }
 
+// If an FX chain dialog is focused, report active/bypassed for the selected
+// effect.
+// We can't annotate the names of SysListView32 items, since screen readers have
+// special support for those and override MSAA. Instead, we do this when the
+// user is focused in the Notes text box. This is a big ugly hack, but it's
+// far better than nothing.
+bool maybeReportFxChainBypass(bool aboutToToggle=false) {
+	HWND focus = GetFocus();
+	if (GetWindowLongW(focus, GWL_ID) != 1191) {
+		// Not the notes field in the FX Chain dialog.
+		return false;
+	}
+	bool enabled = false;
+	if (fakeFocus == FOCUS_TRACK) {
+		MediaTrack* track = GetLastTouchedTrack();
+		if (!track) {
+			return false;
+		}
+		int fx = TrackFX_GetChainVisible(track);
+		if (fx < 0) {
+			return false;
+		}
+		enabled = TrackFX_GetEnabled(track, fx);
+	} else  {
+		MediaItem* item = GetSelectedMediaItem(0, 0);
+		MediaItem_Take* take = item ? GetActiveTake(item) : nullptr;
+		if (!take) {
+			return false;
+		}
+		int fx = TakeFX_GetChainVisible(take);
+		if (fx < 0) {
+			return false;
+		}
+		enabled = TakeFX_GetEnabled(take, fx);
+	}
+	if (aboutToToggle) {
+		enabled = !enabled;
+	}
+	outputMessage(enabled ? "active" : "bypassed");
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN && wParam != VK_F6) {
+	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
+			wParam != VK_F6 && wParam != 'B') {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1515,6 +1557,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
 		if (maybeSwitchToFxPluginWindow())
 			return 1;
+	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
+			GetKeyState(VK_CONTROL) & 0x8000) {
+		maybeReportFxChainBypass(true);
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
@@ -2756,6 +2801,8 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+		} else {
+			maybeReportFxChainBypass();
 		}
 	}
 }

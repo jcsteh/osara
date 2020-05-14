@@ -152,6 +152,10 @@
 #define REAPERAPI_WANT_GetMediaItemInfo_Value
 #define REAPERAPI_WANT_GetMediaItem
 #define REAPERAPI_WANT_KBD_OnMainActionEx
+#define REAPERAPI_WANT_TrackFX_GetChainVisible
+#define REAPERAPI_WANT_TakeFX_GetChainVisible
+#define REAPERAPI_WANT_TrackFX_GetEnabled
+#define REAPERAPI_WANT_TakeFX_GetEnabled
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
