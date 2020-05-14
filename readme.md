@@ -323,6 +323,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Note velocity -10: Alt+NumPad7
 - Edit: Increase value a little bit for CC events
 - Edit: Decrease value a little bit for CC events
+- CC: Next CC lane
+- CC: Previous CC lane
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
