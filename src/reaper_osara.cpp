@@ -1499,6 +1499,7 @@ bool maybeReportFxChainBypass(bool aboutToToggle=false) {
 		enabled = !enabled;
 	}
 	outputMessage(enabled ? "active" : "bypassed");
+	return true;
 }
 
 // Handle keyboard keys which can't be bound to actions.
