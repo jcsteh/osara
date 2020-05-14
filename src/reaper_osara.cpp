@@ -2893,9 +2893,9 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 	} else {
 		// Unload.
+		delete surface;
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
-		delete surface;
 		UnhookWinEvent(winEventHook);
 		accPropServices->Release();
 #else
