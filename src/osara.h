@@ -99,6 +99,7 @@
 #define REAPERAPI_WANT_MIDI_EnumSelNotes
 #define REAPERAPI_WANT_MIDI_EnumSelCC
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_int
+#define REAPERAPI_WANT_MIDIEditor_GetSetting_str
 #define REAPERAPI_WANT_MIDIEditor_OnCommand
 #define REAPERAPI_WANT_TakeFX_GetNumParams
 #define REAPERAPI_WANT_TakeFX_GetParamName
