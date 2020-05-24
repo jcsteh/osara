@@ -273,6 +273,11 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Next project tab: control+tab
 - Previous project tab: control+shift+tab
 
+#### Tempo
+- Tempo: Decrease current project tempo 01 BPM
+- Tempo: Increase current project tempo 01 BPM
+- SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
+
 #### MIDI Editor
 - View: Go to start of file: Control+Home
 - View: Go to end of file: Control+End

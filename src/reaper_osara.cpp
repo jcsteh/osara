@@ -1043,6 +1043,20 @@ void postTakeChannelMode(int command) {
 	outputMessage(s);
 }
 
+void postChangeTempo(int command) {
+	double tempo = Master_GetTempo();
+	ostringstream s;
+	s << tempo << " BPM";
+	outputMessage(s);
+}
+
+void postTogglePlaybackPositionFollowsTimebase(int command) {
+	ostringstream s;
+	s << ( GetToggleCommandState(command) ? "Enabled" : "Disabled" );
+	s << " playback position follows project timebase when changing tempo" ;
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1161,6 +1175,8 @@ PostCommand POST_COMMANDS[] = {
 	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
 	{40178, postTakeChannelMode}, //Item properties: Set take channel mode to mono (downmix)
 	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
+	{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
+	{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
@@ -1202,6 +1218,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
 	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
 	{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
+	{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
