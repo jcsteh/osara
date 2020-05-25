@@ -1905,6 +1905,9 @@ void cmdMoveItemEdge(Command* command) {
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if(GetPlayState() & 1) { //don't talk while playing
+		return;
+	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	if(newStart!=oldStart)
@@ -2422,6 +2425,9 @@ void cmdNudgeTimeSelection(Command* command) {
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
+	if(GetPlayState() & 1) { // don't talk while playing
+		return;
+	}
 	if(first) 
 		resetTimeCache();
 	ostringstream s;
