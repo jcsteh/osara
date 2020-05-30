@@ -147,6 +147,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### Takes
 - Take: Switch items to next take: T
 - Take: Switch items to previous take: Shift+T
+- Item properties: Set take channel mode to normal: Shift+F5
+- Item properties: Set take channel mode to mono (left): Shift+F6
+- Item properties: Set take channel mode to mono (downmix): Shift+F7
+- Item properties: Set take channel mode to mono (right): Shift+F8
 
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
