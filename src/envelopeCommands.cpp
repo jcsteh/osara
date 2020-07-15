@@ -96,11 +96,17 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 	Main_OnCommand(command, 0);
 	ostringstream s;
 	int removed;
+	// Check items first, since deleting an item might also implicitly remove
+	// points.
 	if (checkItems) {
 		removed = oldItems - CountAutomationItems(envelope);
-		s << removed << (removed == 1 ? " automation item" : " automation items") << " removed";
-		outputMessage(s);
-		return;
+		// If no items wer removed, fall through to the points check below unless
+		// we're not checking points, in which case report 0 items.
+		if (removed > 0 || !checkPoints) {
+			s << removed << (removed == 1 ? " automation item" : " automation items") << " removed";
+			outputMessage(s);
+			return;
+		}
 	}
 	if (checkPoints) {
 		removed = oldPoints - countEnvelopePointsIncludingAutoItems(envelope);
