@@ -26,7 +26,7 @@ install:
  - git submodule update --init
 
 build_script:
- - c:\python37\scripts\scons.bat version=%APPVEYOR_BUILD_VERSION% publisher="James Teh"
+ - c:\python37\scripts\scons.exe version=%APPVEYOR_BUILD_VERSION% publisher="James Teh"
 
 artifacts:
  - path: installer\*.exe

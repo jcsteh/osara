@@ -13,7 +13,7 @@ env:
 before_install:
  # We must use easy_install instead of pip because of a scons packaging bug.
  # See https://github.com/SCons/scons/issues/2769
- - sudo python2 -m easy_install scons
+ - sudo pip install scons
 
 install:
  - cd ci
@@ -24,7 +24,7 @@ install:
  - chmod 600 ~/.ssh/id_rsa
  - cd ..
 
-script: SCONS_LIB_DIR=/usr/local/lib/python2.7/site-packages/scons-3.0.1-py2.7.egg/scons-3.0.1 scons version=$version
+script: scons version=$version
 
 after_success:
  '(echo "{\"os\": \"mac\", \"version\": \"$version\", \"dmg\": \"$dmg\"}"; cat installer/$dmg) | ssh osara@duralumin.jantrid.net osaraCiHook'
