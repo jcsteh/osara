@@ -1010,6 +1010,39 @@ void postToggleCountIn(int command) {
 	outputMessage(GetToggleCommandState(command) ? "count in on":"count in off");
 }
 
+void postTakeChannelMode(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage("no items selected");
+		return;
+	}
+	char* mode;
+	switch(command) {
+		case 40176: {
+			mode = "normal";
+			break;
+		}
+		case 40179: {
+			mode = "mono (left)";
+			break;
+		}
+		case 40178: {
+			mode = "mono (downmix)";
+			break;
+		}
+		case 40180: {
+			mode = "mono (right)";
+			break;
+		}
+		default: {
+			mode = "unknown mode";
+		}
+	}
+	ostringstream s;
+	s<< "set " << count <<((count==1)?" take ":" takes ") << "to " << mode;
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1124,6 +1157,10 @@ PostCommand POST_COMMANDS[] = {
 	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
 	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
+	{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
+	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
+	{40178, postTakeChannelMode}, //Item properties: Set take channel mode to mono (downmix)
+	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
