@@ -186,7 +186,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
-- Envelope: Insert new point at current position: Shift+E
+- Envelope: Insert new point at current position (remove nearby points): Shift+E
+- Envelope: Insert new point at current position (do not remove nearby points)
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode

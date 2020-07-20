@@ -2477,7 +2477,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
 	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
-	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position
+	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)
+	{MAIN_SECTION, {{0, 0, 40106}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (do not remove nearby points)
 	{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
 	{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
 	{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
