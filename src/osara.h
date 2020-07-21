@@ -157,6 +157,7 @@
 #define REAPERAPI_WANT_TakeFX_GetChainVisible
 #define REAPERAPI_WANT_TrackFX_GetEnabled
 #define REAPERAPI_WANT_TakeFX_GetEnabled
+#define REAPERAPI_WANT_Master_GetTempo
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
