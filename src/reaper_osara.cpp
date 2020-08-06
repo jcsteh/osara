@@ -1010,6 +1010,53 @@ void postToggleCountIn(int command) {
 	outputMessage(GetToggleCommandState(command) ? "count in on":"count in off");
 }
 
+void postTakeChannelMode(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage("no items selected");
+		return;
+	}
+	char* mode;
+	switch(command) {
+		case 40176: {
+			mode = "normal";
+			break;
+		}
+		case 40179: {
+			mode = "mono (left)";
+			break;
+		}
+		case 40178: {
+			mode = "mono (downmix)";
+			break;
+		}
+		case 40180: {
+			mode = "mono (right)";
+			break;
+		}
+		default: {
+			mode = "unknown mode";
+		}
+	}
+	ostringstream s;
+	s<< "set " << count <<((count==1)?" take ":" takes ") << "to " << mode;
+	outputMessage(s);
+}
+
+void postChangeTempo(int command) {
+	double tempo = Master_GetTempo();
+	ostringstream s;
+	s << tempo << " BPM";
+	outputMessage(s);
+}
+
+void postTogglePlaybackPositionFollowsTimebase(int command) {
+	ostringstream s;
+	s << ( GetToggleCommandState(command) ? "Enabled" : "Disabled" );
+	s << " playback position follows project timebase when changing tempo" ;
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1124,6 +1171,12 @@ PostCommand POST_COMMANDS[] = {
 	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
 	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
+	{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
+	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
+	{40178, postTakeChannelMode}, //Item properties: Set take channel mode to mono (downmix)
+	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
+	{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
+	{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
@@ -1165,6 +1218,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
 	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
 	{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
+	{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
@@ -1905,6 +1959,9 @@ void cmdMoveItemEdge(Command* command) {
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if(GetPlayState() & 1) { //don't talk while playing
+		return;
+	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	if(newStart!=oldStart)
@@ -2422,6 +2479,9 @@ void cmdNudgeTimeSelection(Command* command) {
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
+	if(GetPlayState() & 1) { // don't talk while playing
+		return;
+	}
 	if(first) 
 		resetTimeCache();
 	ostringstream s;
@@ -2457,7 +2517,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
 	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
-	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
+	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
+	{MAIN_SECTION, {{0, 0, 42398}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40333}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
@@ -2477,7 +2538,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
 	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
-	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position
+	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)
+	{MAIN_SECTION, {{0, 0, 40106}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (do not remove nearby points)
 	{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
 	{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
 	{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
@@ -2570,6 +2632,7 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC and add to selection"}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Select all notes with the same pitch starting in time selection"}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif

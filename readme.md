@@ -147,6 +147,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### Takes
 - Take: Switch items to next take: T
 - Take: Switch items to previous take: Shift+T
+- Item properties: Set take channel mode to normal: Shift+F5
+- Item properties: Set take channel mode to mono (left): Shift+F6
+- Item properties: Set take channel mode to mono (downmix): Shift+F7
+- Item properties: Set take channel mode to mono (right): Shift+F8
 
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
@@ -186,7 +190,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
-- Envelope: Insert new point at current position: Shift+E
+- Envelope: Insert new point at current position (remove nearby points): Shift+E
+- Envelope: Insert new point at current position (do not remove nearby points)
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode
@@ -267,6 +272,11 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - New project tab (ignore default template)
 - Next project tab: control+tab
 - Previous project tab: control+shift+tab
+
+#### Tempo
+- Tempo: Decrease current project tempo 01 BPM
+- Tempo: Increase current project tempo 01 BPM
+- SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
 
 #### MIDI Editor
 - View: Go to start of file: Control+Home
@@ -563,6 +573,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous CC
 - OSARA: Move to next CC and add to selection
 - OSARA: Move to previous CC and add to selection
+- OSARA: Select all notes with the same pitch starting in time selection
 
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
