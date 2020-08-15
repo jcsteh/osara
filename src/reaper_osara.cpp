@@ -396,6 +396,22 @@ const char* recordingModeAsString(int mode) {
 	}
 }
 
+bool isTrackInClosedFolder(MediaTrack* track) {
+	MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK",
+		nullptr);
+	// Folders can be nested, so we need to check all ancestor tracks, not just
+	// the parent.
+	while (parent) {
+		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
+			&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
+		) {
+			return true;
+		}
+		parent = (MediaTrack*)GetSetMediaTrackInfo(parent, "P_PARTRACK", nullptr);
+	}
+	return false;
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -1658,11 +1674,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 			track = GetMasterTrack(0);
 		} else {
 			track = GetTrack(0, num);
-			MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", NULL);
-			if (parent
-				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
-				&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
-			) {
+			if (isTrackInClosedFolder(track)) {
 				// This track is inside a closed folder, so skip it.
 				if (direction == 1 && num == count - 1) {
 					// We're moving forward and we're on the last track.
