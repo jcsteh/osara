@@ -47,10 +47,17 @@ int pw_numTracksEnabled = 0;
 UINT_PTR pw_timer = 0;
 
 void pw_resetTrack(int trackIndex, bool report=false) {
-	for (int c = 0; c < PW_NUM_CHANNELS; ++c)
-		pw_tracks[trackIndex].channels[c].peak = -150;
-	if (report)
-		outputMessage("reset");
+	auto& pwTrack = pw_tracks[trackIndex];
+	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
+		pwTrack.channels[c].peak = -150;
+	}
+	if (report) {
+		if (!pwTrack.track && !pwTrack.follow) {
+			outputMessage("Peak Watcher track disabled");
+		} else {
+			outputMessage("reset");
+		}
+	}
 }
 
 void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
