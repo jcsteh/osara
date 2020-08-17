@@ -1574,6 +1574,66 @@ bool maybeReportFxChainBypass(bool aboutToToggle=false) {
 	return true;
 }
 
+HWND getPreferenceDescHwnd(HWND pref) {
+	// A preference control is always in a property page inside a dialog.
+	// There may be nested property pages.
+	// So, we test for at least two ancestor HWNDs.
+	HWND parent = GetParent(pref);
+	if (!parent) {
+		return nullptr;
+	}
+	HWND dialog = GetAncestor(parent, GA_ROOT);
+	if (dialog == parent) {
+		return nullptr;
+	}
+	// Group boxes aren't preference controls.
+	char className[8];
+	if (GetClassName(pref, className, sizeof(className))
+			&& strcmp(className, "Button") == 0
+			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
+		return nullptr;
+	}
+	// if the control id for the description isn't in this root window, it's not
+	// the Preferences dialog.
+	return GetDlgItem(dialog, 1259);
+}
+
+void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
+	DWORD time
+) {
+	KillTimer(nullptr, event);
+	HWND focus = GetFocus();
+	HWND desc = getPreferenceDescHwnd(focus);
+	if (!desc) {
+		return;
+	}
+	char text[1000];
+	if (GetWindowText(desc, text, sizeof(text)) == 0) {
+		return;
+	}
+	// Set the accDescription on the control.
+	accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF,
+		PROPID_ACC_DESCRIPTION, widen(string(text)).c_str());
+	NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT,
+		CHILDID_SELF);
+}
+
+bool maybeAnnotatePreferenceDescription() {
+	HWND focus = GetFocus();
+	HWND desc = getPreferenceDescHwnd(focus);
+	if (!desc) {
+		// Not a preference.
+		return false;
+	}
+	// Move the mouse to the control.
+	RECT rect;
+	GetWindowRect(focus, &rect);
+	SetCursorPos(rect.left, rect.top);
+	// The description takes some time to appear, so we must use a timer.
+	SetTimer(nullptr, 0, 100, annotatePreferenceDescription);
+	return true;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
@@ -2880,7 +2940,8 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
 		} else {
-			maybeReportFxChainBypass();
+			maybeReportFxChainBypass()
+				|| maybeAnnotatePreferenceDescription();
 		}
 	}
 }
