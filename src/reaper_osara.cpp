@@ -1630,7 +1630,7 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must use a timer.
-	SetTimer(nullptr, 0, 100, annotatePreferenceDescription);
+	SetTimer(nullptr, 0, 300, annotatePreferenceDescription);
 	return true;
 }
 
