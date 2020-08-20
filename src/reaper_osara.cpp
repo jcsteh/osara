@@ -783,7 +783,8 @@ int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
 	// Stretch marker positions are relative to the start of the item and the
 	// take's play rate.
 	double posRel = (pos - itemStart) * playRate;
-	double posRelAdj = posRel-0.00003; // approximately 1 sample at 48000. 
+	const double STRETCH_FUZZ_FACTOR = 0.00003; // approximately 1 sample at 48000.
+	double posRelAdj = posRel - STRETCH_FUZZ_FACTOR;
 	if (posRelAdj < 0)
 		return -1;
 	int index = GetTakeStretchMarker(take, -1, &posRelAdj, NULL);
@@ -792,7 +793,7 @@ int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
 	double stretchRel;
 	// Get the real position; pos wasn't written.
 	GetTakeStretchMarker(take, index, &stretchRel, NULL);
-	if (abs(stretchRel - posRel)>0.00003)
+	if (abs(stretchRel - posRel) > STRETCH_FUZZ_FACTOR)
 		return -1; // Marker not near to  pos.
 	return index;
 }
