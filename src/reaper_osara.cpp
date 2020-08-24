@@ -1195,6 +1195,14 @@ PostCommand POST_COMMANDS[] = {
 	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
 	{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
 	{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
+	{41138, postChangeTempo}, // Tempo: Decrease current project tempo 0.1 BPM 
+	{41136, postChangeTempo}, // Tempo: Decrease current project tempo 10 BPM 
+	{41132, postChangeTempo}, // Tempo: Decrease current project tempo 10 percent 
+	{41134, postChangeTempo}, // Tempo: Decrease current project tempo 50 percent (half) 
+	{41137, postChangeTempo}, // Tempo: Increase current project tempo 0.1 BPM 
+	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
+	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
+	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
