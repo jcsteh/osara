@@ -1600,10 +1600,12 @@ HWND getPreferenceDescHwnd(HWND pref) {
 	return GetDlgItem(dialog, 1259);
 }
 
+UINT_PTR annotatePreferenceDescriptionTimer = 0;
 void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
 	DWORD time
 ) {
-	KillTimer(nullptr, event);
+	KillTimer(nullptr, annotatePreferenceDescriptionTimer);
+	annotatePreferenceDescriptionTimer = 0;
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
 	if (!desc) {
@@ -1621,6 +1623,11 @@ void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
 }
 
 bool maybeAnnotatePreferenceDescription() {
+	if (annotatePreferenceDescriptionTimer) {
+		// Cancel previous annotation if focus moved before it could complete.
+		KillTimer(nullptr, annotatePreferenceDescriptionTimer);
+		annotatePreferenceDescriptionTimer = 0;
+	}
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
 	if (!desc) {
@@ -1632,7 +1639,8 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must use a timer.
-	SetTimer(nullptr, 0, 300, annotatePreferenceDescription);
+	annotatePreferenceDescriptionTimer = SetTimer(nullptr, 0, 300,
+		annotatePreferenceDescription);
 	return true;
 }
 
