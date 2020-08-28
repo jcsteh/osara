@@ -11,8 +11,6 @@ env:
  - version="2020.1pre-$TRAVIS_BUILD_NUMBER,${TRAVIS_COMMIT:0:8}" dmg="osara_$version.dmg"
 
 before_install:
- # We must use easy_install instead of pip because of a scons packaging bug.
- # See https://github.com/SCons/scons/issues/2769
  - sudo pip install scons
 
 install:

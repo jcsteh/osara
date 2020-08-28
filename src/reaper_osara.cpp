@@ -799,16 +799,18 @@ int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
 	// Stretch marker positions are relative to the start of the item and the
 	// take's play rate.
 	double posRel = (pos - itemStart) * playRate;
-	if (posRel < 0)
+	const double STRETCH_FUZZ_FACTOR = 0.00003; // approximately 1 sample at 48000.
+	double posRelAdj = posRel - STRETCH_FUZZ_FACTOR;
+	if (posRelAdj < 0)
 		return -1;
-	int index = GetTakeStretchMarker(take, -1, &posRel, NULL);
+	int index = GetTakeStretchMarker(take, -1, &posRelAdj, NULL);
 	if (index < 0)
 		return -1;
 	double stretchRel;
 	// Get the real position; pos wasn't written.
 	GetTakeStretchMarker(take, index, &stretchRel, NULL);
-	if (stretchRel != posRel)
-		return -1; // Marker not right at pos.
+	if (abs(stretchRel - posRel) > STRETCH_FUZZ_FACTOR)
+		return -1; // Marker not near to  pos.
 	return index;
 }
 
@@ -1598,10 +1600,12 @@ HWND getPreferenceDescHwnd(HWND pref) {
 	return GetDlgItem(dialog, 1259);
 }
 
+UINT_PTR annotatePreferenceDescriptionTimer = 0;
 void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
 	DWORD time
 ) {
-	KillTimer(nullptr, event);
+	KillTimer(nullptr, annotatePreferenceDescriptionTimer);
+	annotatePreferenceDescriptionTimer = 0;
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
 	if (!desc) {
@@ -1619,6 +1623,11 @@ void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
 }
 
 bool maybeAnnotatePreferenceDescription() {
+	if (annotatePreferenceDescriptionTimer) {
+		// Cancel previous annotation if focus moved before it could complete.
+		KillTimer(nullptr, annotatePreferenceDescriptionTimer);
+		annotatePreferenceDescriptionTimer = 0;
+	}
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
 	if (!desc) {
@@ -1630,7 +1639,8 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must use a timer.
-	SetTimer(nullptr, 0, 100, annotatePreferenceDescription);
+	annotatePreferenceDescriptionTimer = SetTimer(nullptr, 0, 300,
+		annotatePreferenceDescription);
 	return true;
 }
 
