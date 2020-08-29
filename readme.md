@@ -276,6 +276,14 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### Tempo
 - Tempo: Decrease current project tempo 01 BPM
 - Tempo: Increase current project tempo 01 BPM
+- Tempo: Decrease current project tempo 0.1 BPM
+- Tempo: Decrease current project tempo 10 BPM
+- Tempo: Decrease current project tempo 10 percent
+- Tempo: Decrease current project tempo 50 percent (half)
+- Tempo: Increase current project tempo 0.1 BPM
+- Tempo: Increase current project tempo 10 BPM
+- Tempo: Increase current project tempo 10 percent
+- Tempo: Increase current project tempo 100 percent (double)
 - SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
 
 #### MIDI Editor
