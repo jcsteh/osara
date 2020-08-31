@@ -416,7 +416,7 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 			// The cursor is right at or has moved past the automation item to which the user last moved.
 			// Therefore, start at the adjacent automation item.
 			// This is faster and also allows the user to move to automation items which start at the same position.
-			start += direction;
+			start = currentAutomationItem + direction;
 			if (start < 0 || start >= count) {
 				// There's no adjacent automation item in this direction,
 				// so move to the current one again.
