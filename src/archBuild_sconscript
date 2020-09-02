@@ -43,7 +43,7 @@ else: # Mac
 	# Build a universal binary with both 32 and 64 bit.
 	archFlags = ("-arch", "i386", "-arch", "x86_64")
 	env.Append(CXXFLAGS=archFlags, LINKFLAGS=archFlags)
-	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++11"))
+	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++17"))
 	# SWELL files.
 	sources.extend(swellDir.File(f) for f in (
 		"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
