@@ -515,6 +515,106 @@ class ParamsDialog {
 
 };
 
+// The FX functions in the REAPER API are the same for tracks and takes
+// except for the prefix (TrackFX_*/TakeFX_*)
+// and the first argument type (MediaTrack*/MediaItem_Take*).
+// Deal with the type using templates
+// and with the prefix by passing it and fetching the functions dynamically.
+template<typename ReaperObj>
+class FxParam;
+
+template<typename ReaperObj>
+class FxParams: public ParamSource {
+	friend class FxParam<ReaperObj>;
+
+	private:
+	ReaperObj* obj;
+	int fx;
+	int (*_GetNumParams)(ReaperObj*, int);
+	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
+	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
+	bool (*_SetParam)(ReaperObj*, int, int, double);
+	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
+
+	public:
+
+	FxParams(ReaperObj* obj, const string& apiPrefix, int fx): obj(obj), fx(fx) {
+		// Get functions.
+		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
+		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
+		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
+		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
+		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
+	}
+
+	string getTitle() {
+		return "FX Parameters";
+	}
+
+	int getParamCount() {
+		return this->_GetNumParams(this->obj, this->fx);
+	}
+
+	string getParamName(int param) {
+		char name[256];
+		this->_GetParamName(this->obj, this->fx, param, name, sizeof(name));
+		// Append the parameter number to facilitate efficient navigation
+		// and to ensure reporting where two consecutive parameters have the same name (#32).
+		ostringstream ns;
+		ns << name << " (" << param + 1 << ")";
+		return ns.str();
+	}
+
+	Param* getParam(int param);
+};
+
+template<typename ReaperObj>
+class FxParam: public Param {
+	private:
+	FxParams<ReaperObj>& source;
+	int param;
+
+	public:
+
+	FxParam(FxParams<ReaperObj>& source, int param): Param(), source(source), param(param) {
+		this->source._GetParam(source.obj, source.fx, param, &this->min, &this->max);
+		this->step = (this->max - this->min) / 1000;
+		this->largeStep = this->step * 20;
+		this->isEditable = true;
+	}
+
+	double getValue() {
+		return this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
+	}
+
+	string getValueText(double value) {
+		char text[50];
+		if (this->source._FormatParamValue(this->source.obj, this->source.fx, param, value, text, sizeof(text)))
+			return text;
+		return "";
+	}
+
+	string getValueForEditing() {
+		ostringstream s;
+		s << fixed << setprecision(4);
+		s << this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
+		return s.str();
+	}
+
+	void setValue(double value) {
+		this->source._SetParam(this->source.obj, this->source.fx, this->param, value);
+	}
+
+	void setValueFromEdited(const string& text) {
+		this->setValue(atof(text.c_str()));
+	}
+};
+
+template<typename ReaperObj>
+Param* FxParams<ReaperObj>::getParam(int param) {
+	return new FxParam<ReaperObj>(*this, param);
+}
+
 class TrackParamProvider: public ReaperObjParamProvider {
 	public:
 	TrackParamProvider(const string displayName, MediaTrack* track,
@@ -669,107 +769,6 @@ void cmdParamsFocus(Command* command) {
 			return;
 	}
 	new ParamsDialog(source);
-}
-
-// The FX functions in the REAPER API are the same for tracks and takes
-// except for the prefix (TrackFX_*/TakeFX_*)
-// and the first argument type (MediaTrack*/MediaItem_Take*).
-// Deal with the type using templates
-// and with the prefix by passing it and fetching the functions dynamically.
-template<typename ReaperObj>
-class FxParam;
-
-template<typename ReaperObj>
-class FxParams: public ParamSource {
-	friend class FxParam<ReaperObj>;
-
-	private:
-	ReaperObj* obj;
-	int fx;
-	int (*_GetNumParams)(ReaperObj*, int);
-	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
-	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
-	bool (*_SetParam)(ReaperObj*, int, int, double);
-	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
-
-	public:
-
-	FxParams(ReaperObj* obj, const string& apiPrefix, int fx): obj(obj), fx(fx) {
-		// Get functions.
-		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
-		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
-		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
-		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
-		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
-	}
-
-	string getTitle() {
-		return "FX Parameters";
-	}
-
-	int getParamCount() {
-		return this->_GetNumParams(this->obj, this->fx);
-	}
-
-	string getParamName(int param) {
-		char name[256];
-		this->_GetParamName(this->obj, this->fx, param, name, sizeof(name));
-		// Append the parameter number to facilitate efficient navigation
-		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ostringstream ns;
-		ns << name << " (" << param + 1 << ")";
-		return ns.str();
-	}
-
-	Param* getParam(int param);
-};
-
-template<typename ReaperObj>
-class FxParam: public Param {
-	private:
-	FxParams<ReaperObj>& source;
-	int param;
-
-	public:
-
-	FxParam(FxParams<ReaperObj>& source, int param): Param(), source(source), param(param) {
-		this->source._GetParam(source.obj, source.fx, param, &this->min, &this->max);
-		this->step = (this->max - this->min) / 1000;
-		this->largeStep = this->step * 20;
-		this->isEditable = true;
-	}
-
-	double getValue() {
-		return this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
-	}
-
-	string getValueText(double value) {
-		char text[50];
-		if (this->source._FormatParamValue(this->source.obj, this->source.fx, param, value, text, sizeof(text)))
-			return text;
-		return "";
-	}
-
-	string getValueForEditing() {
-		ostringstream s;
-		s << fixed << setprecision(4);
-		s << this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
-		return s.str();
-	}
-	
-	void setValue(double value) {
-		this->source._SetParam(this->source.obj, this->source.fx, this->param, value);
-	}
-
-	void setValueFromEdited(const string& text) {
-		this->setValue(atof(text.c_str()));
-	}
-
-};
-
-template<typename ReaperObj>
-Param* FxParams<ReaperObj>::getParam(int param) {
-	return new FxParam<ReaperObj>(*this, param);
 }
 
 typedef vector<pair<int, string>> FxList;
