@@ -47,13 +47,10 @@ Because OSARA is an extension (not a standalone application) and also needs to i
 Please follow these instructions to install it:
 
 1. Open the OSARA disk image file you downloaded.
-2. Open the "Install OSARA extension.command" file.
- This will open a terminal window.
- Wait a few seconds and then press command+q to close the terminal window.
-3. If you wish to replace your existing key map with the OSARA key map (which is recommended), open the "Replace existing key map with OSARA key map.command" file.
- This will open another terminal window.
- Wait a few seconds and then press command+q to close the terminal window.
+2. Open the "Install OSARA.command" file.  On macOS Catalina and later, you have to choose open from the context menu, accessed with VO+Shift+M.
+3. Follow the instructions.  If you wish to replace the existing keymap with the OSARA keymap, (which is recommended), answer yes when prompted. A backup of your existing keymap will be made in Reaper's KeyMaps folder. 
 4. Press command+e to eject the disk image.
+5. The installer leaves a terminal window open. it can be closed with Command+Q.
 
 ### Key Map
 Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
