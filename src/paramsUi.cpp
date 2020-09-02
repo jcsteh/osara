@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
+#include <memory>
 #ifdef _WIN32
 #include <initguid.h>
 #include <Windowsx.h>
@@ -25,8 +26,6 @@
 #include "resource.h"
 
 using namespace std;
-
-class ParamSource;
 
 class Param {
 	public:
@@ -60,51 +59,72 @@ class ParamSource {
 	virtual Param* getParam(int param) = 0;
 };
 
-class ReaperObjParamSource;
+// Provides data for a parameter and allows you to create a Param instance for
+// it. Used where the parameters are predefined; e.g. for tracks and items.
+class ParamProvider {
+	public:
+	ParamProvider(const string displayName): displayName(displayName) {
+	}
 
-typedef struct {
-	string displayName;
-	string name;
-	Param*(*makeParam)(ReaperObjParamSource& source, const char* name);
-} ReaperObjParamData;
+	virtual Param* makeParam() = 0;
+
+	const string displayName;
+};
+
+class ReaperObjParamProvider;
+typedef Param*(*MakeParamFromProviderFunc)(ReaperObjParamProvider& provider);
+class ReaperObjParamProvider: public ParamProvider {
+	public:
+	ReaperObjParamProvider(const string displayName, const string name,
+		MakeParamFromProviderFunc makeParamFromProvider):
+		ParamProvider(displayName), name(name),
+		makeParamFromProvider(makeParamFromProvider) {}
+
+	virtual Param* makeParam() override {
+		return makeParamFromProvider(*this);
+	}
+
+	virtual void* getSetValue(void* newValue) = 0;
+
+	protected:
+	const string name;
+
+	private:
+	MakeParamFromProviderFunc makeParamFromProvider;
+};
 
 class ReaperObjParam: public Param {
 	protected:
-	ReaperObjParamSource& source;
-	const char* name;
+	ReaperObjParamProvider& provider;
 
-	ReaperObjParam(ReaperObjParamSource& source, const char* name): Param(), source(source), name(name) {
-	}
-
+	ReaperObjParam(ReaperObjParamProvider& provider):
+		Param(), provider(provider) {}
 };
 
 class ReaperObjParamSource: public ParamSource {
 	protected:
-	vector<ReaperObjParamData> params;
+	vector<unique_ptr<ParamProvider>> params;
 
 	public:
-
-	virtual void* getSetValue(const char* name, void* newValue) = 0;
 
 	int getParamCount() {
 		return this->params.size();
 	}
 
 	string getParamName(int param) {
-		return this->params[param].displayName;
+		return this->params[param]->displayName;
 	}
 
 	Param* getParam(int param) {
-		const ReaperObjParamData& data = this->params[param];
-		return data.makeParam(*this, data.name.c_str());
+		return this->params[param]->makeParam();
 	}
 
 };
 
 class ReaperObjToggleParam: public ReaperObjParam {
-
 	public:
-	ReaperObjToggleParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+	ReaperObjToggleParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
 		this->min = 0;
 		this->max = 1;
 		this->step = 1;
@@ -112,7 +132,7 @@ class ReaperObjToggleParam: public ReaperObjParam {
 	}
 
 	double getValue() {
-		return (double)*(bool*)this->source.getSetValue(this->name, NULL);
+		return (double)*(bool*)this->provider.getSetValue(nullptr);
 	}
 
 	string getValueText(double value) {
@@ -121,19 +141,18 @@ class ReaperObjToggleParam: public ReaperObjParam {
 
 	void setValue(double value) {
 		bool val = (bool)value;
-		this->source.getSetValue(this->name, (void*)&val);
+		this->provider.getSetValue((void*)&val);
 	}
 
-	static Param* make(ReaperObjParamSource& source, const char* name) {
-		return new ReaperObjToggleParam(source, name);
+	static Param* make(ReaperObjParamProvider& provider) {
+		return new ReaperObjToggleParam(provider);
 	}
-
 };
 
 class ReaperObjVolParam: public ReaperObjParam {
-
 	public:
-	ReaperObjVolParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+	ReaperObjVolParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
 		this->min = 0;
 		this->max = 4;
 		this->step = 0.002;
@@ -142,7 +161,7 @@ class ReaperObjVolParam: public ReaperObjParam {
 	}
 
 	double getValue() {
-		return *(double*)this->source.getSetValue(this->name, NULL);
+		return *(double*)this->provider.getSetValue(nullptr);
 	}
 
 	string getValueText(double value) {
@@ -156,7 +175,7 @@ class ReaperObjVolParam: public ReaperObjParam {
 	}
 
 	void setValue(double value) {
-		this->source.getSetValue(this->name, (void*)&value);
+		this->provider.getSetValue((void*)&value);
 	}
 
 	void setValueFromEdited(const string& text) {
@@ -168,16 +187,15 @@ class ReaperObjVolParam: public ReaperObjParam {
 		this->setValue(DB2VAL(db));
 	}
 
-	static Param* make(ReaperObjParamSource& source, const char* name) {
-		return new ReaperObjVolParam(source, name);
+	static Param* make(ReaperObjParamProvider& provider) {
+		return new ReaperObjVolParam(provider);
 	}
-
 };
 
 class ReaperObjPanParam: public ReaperObjParam {
-
 	public:
-	ReaperObjPanParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+	ReaperObjPanParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
 		this->min = -1;
 		this->max = 1;
 		this->step = 0.01;
@@ -186,7 +204,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 	}
 
 	double getValue() {
-		return *(double*)this->source.getSetValue(this->name, NULL);
+		return *(double*)this->provider.getSetValue(nullptr);
 	}
 
 	string getValueText(double value) {
@@ -200,23 +218,22 @@ class ReaperObjPanParam: public ReaperObjParam {
 	}
 
 	void setValue(double value) {
-		this->source.getSetValue(this->name, (void*)&value);
+		this->provider.getSetValue((void*)&value);
 	}
 
 	void setValueFromEdited(const string& text) {
 		this->setValue(parsepanstr(text.c_str()));
 	}
 
-	static Param* make(ReaperObjParamSource& source, const char* name) {
-		return new ReaperObjPanParam(source, name);
+	static Param* make(ReaperObjParamProvider& provider) {
+		return new ReaperObjPanParam(provider);
 	}
-
 };
 
 class ReaperObjLenParam: public ReaperObjParam {
-
 	public:
-	ReaperObjLenParam(ReaperObjParamSource& source, const char* name): ReaperObjParam(source, name) {
+	ReaperObjLenParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
 		this->min = 0;
 		this->max = 500;
 		this->step = 0.02;
@@ -226,7 +243,7 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 
 	double getValue() {
-		return *(double*)this->source.getSetValue(this->name, NULL);
+		return *(double*)this->provider.getSetValue(nullptr);
 	}
 
 	string getValueText(double value) {
@@ -248,17 +265,16 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 
 	void setValue(double value) {
-		this->source.getSetValue(this->name, (void*)&value);
+		this->provider.getSetValue((void*)&value);
 	}
 
 	void setValueFromEdited(const string& text) {
 		this->setValue(parse_timestr_pos(text.c_str(), -1));
 	}
 
-	static Param* make(ReaperObjParamSource& source, const char* name) {
-		return new ReaperObjLenParam(source, name);
+	static Param* make(ReaperObjParamProvider& provider) {
+		return new ReaperObjLenParam(provider);
 	}
-
 };
 
 class ParamsDialog {
@@ -499,6 +515,40 @@ class ParamsDialog {
 
 };
 
+class TrackParamProvider: public ReaperObjParamProvider {
+	public:
+	TrackParamProvider(const string displayName, MediaTrack* track,
+		const string name, MakeParamFromProviderFunc makeParamFromProvider):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		track(track) {}
+
+	virtual void* getSetValue(void* newValue) override {
+		return GetSetMediaTrackInfo(this->track, this->name.c_str(), newValue);
+	}
+
+	private:
+	MediaTrack* track;
+};
+
+class TrackSendParamProvider: public ReaperObjParamProvider {
+	public:
+	TrackSendParamProvider(const string displayName, MediaTrack* track,
+		int category, int index, const string name,
+		MakeParamFromProviderFunc makeParamFromProvider):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		track(track), category(category), index(index) {}
+
+	virtual void* getSetValue(void* newValue) override {
+		return GetSetTrackSendInfo(this->track, this->category, this->index,
+			name.c_str(), newValue);
+	}
+
+	private:
+	MediaTrack* track;
+	int category;
+	int index;
+};
+
 class TrackParams: public ReaperObjParamSource {
 	private:
 	MediaTrack* track;
@@ -514,25 +564,26 @@ class TrackParams: public ReaperObjParamSource {
 			if (trackName)
 				dispPrefix << trackName << " ";
 			dispPrefix << categoryName << " ";
-			ostringstream namePrefix;
-			// The name prefix enables getSetValue to identify send parameters.
-			// Example name: "s 0 0 D_VOL"
-			namePrefix << "s " << category << " " << i << " ";
-			this->params.insert(this->params.end(), {
-				{dispPrefix.str() + "volume", namePrefix.str() + "D_VOL", ReaperObjVolParam::make},
-				{dispPrefix.str() + "pan", namePrefix.str() + "D_PAN", ReaperObjPanParam::make},
-				{dispPrefix.str() + "mute", namePrefix.str() + "B_MUTE", ReaperObjToggleParam::make}
-			});
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + "volume", this->track, category, i, "D_VOL",
+				ReaperObjVolParam::make));
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + "pan", this->track, category, i, "D_PAN",
+				ReaperObjPanParam::make));
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + "mute", this->track, category, i, "B_MUTE",
+				ReaperObjToggleParam::make));
 		}
 	}
 
 	public:
 	TrackParams(MediaTrack* track): track(track) {
-		this->params = {
-			{"Volume", "D_VOL", ReaperObjVolParam::make},
-			{"Pan", "D_PAN", ReaperObjPanParam::make},
-			{"Mute", "B_MUTE", ReaperObjToggleParam::make}
-		};
+		this->params.push_back(make_unique<TrackParamProvider>("Volume", track,
+			"D_VOL", ReaperObjVolParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>("Pan", track,
+			"D_PAN", ReaperObjPanParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>("Mute", track,
+			"B_MUTE", ReaperObjToggleParam::make));
 		this->addSendParams(0, "send", "P_DESTTRACK");
 		this->addSendParams(-1, "receive", "P_SRCTRACK");
 	}
@@ -540,59 +591,61 @@ class TrackParams: public ReaperObjParamSource {
 	string getTitle() {
 		return "Track Parameters";
 	}
+};
 
-	void* getSetValue(const char* name, void* newValue) {
-		istringstream nameStream(name);
-		string category;
-		nameStream >> category;
-		if (category.compare("s") == 0) {
-			// Send.
-			// Extract required arguments from the name.
-			int category, index;
-			string param;
-			nameStream >> category >> index >> param;
-			return GetSetTrackSendInfo(this->track, category, index, param.c_str(), newValue);
-		}
-		return GetSetMediaTrackInfo(this->track, name, newValue);
+class ItemParamProvider: public ReaperObjParamProvider {
+	public:
+	ItemParamProvider(const string displayName, MediaItem* item,
+		const string name, MakeParamFromProviderFunc makeParamFromProvider):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		item(item) {}
+
+	virtual void* getSetValue(void* newValue) override {
+		return GetSetMediaItemInfo(this->item, this->name.c_str(), newValue);
 	}
 
+	private:
+	MediaItem* item;
+};
+
+class TakeParamProvider: public ReaperObjParamProvider {
+	public:
+	TakeParamProvider(const string displayName, MediaItem_Take* take,
+		const string name, MakeParamFromProviderFunc makeParamFromProvider):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		take(take) {}
+
+	virtual void* getSetValue(void* newValue) override {
+		return GetSetMediaItemTakeInfo(this->take, this->name.c_str(), newValue);
+	}
+
+	private:
+	MediaItem_Take* take;
 };
 
 class ItemParams: public ReaperObjParamSource {
-	private:
-	MediaItem* item;
-
 	public:
-	ItemParams(MediaItem* item): item(item) {
-		this->params.push_back({"Item volume", "D_VOL", ReaperObjVolParam::make});
+	ItemParams(MediaItem* item) {
+		this->params.push_back(make_unique<ItemParamProvider>("Item volume", item,
+			"D_VOL", ReaperObjVolParam::make));
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
-		if (GetActiveTake(item)) {
-			this->params.insert(this->params.end(), {
-				{"Take volume", "t:D_VOL", ReaperObjVolParam::make},
-				{"Take pan", "t:D_PAN", ReaperObjPanParam::make},
-			});
+		if (MediaItem_Take* take = GetActiveTake(item)) {
+			this->params.push_back(make_unique<TakeParamProvider>("Take volume", take,
+				"D_VOL", ReaperObjVolParam::make));
+			this->params.push_back(make_unique<TakeParamProvider>("Take pan", take,
+				"D_PAN", ReaperObjPanParam::make));
 		}
-		this->params.insert(this->params.end(), {
-			{"Mute", "B_MUTE", ReaperObjToggleParam::make},
-			{"Fade in length", "D_FADEINLEN", ReaperObjLenParam::make},
-			{"Fade out length", "D_FADEOUTLEN", ReaperObjLenParam::make}
-		});
+		this->params.push_back(make_unique<ItemParamProvider>("Mute", item,
+			"B_MUTE", ReaperObjToggleParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>("Fade in length",
+			item, "D_FADEINLEN", ReaperObjLenParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>("Fade out length",
+			item, "D_FADEOUTLEN", ReaperObjLenParam::make));
 	}
 
 	string getTitle() {
 		return "Item Parameters";
 	}
-
-	void* getSetValue(const char* name, void* newValue) {
-		if (strncmp(name, "t:", 2) == 0) {
-			// Take property.
-			name = &name[2];
-			MediaItem_Take* take = GetActiveTake(this->item);
-			return GetSetMediaItemTakeInfo(take, name, newValue);
-		}
-		return GetSetMediaItemInfo(this->item, name, newValue);
-	}
-
 };
 
 void cmdParamsFocus(Command* command) {
