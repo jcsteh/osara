@@ -538,7 +538,8 @@ class FxParams: public ParamSource {
 
 	public:
 
-	FxParams(ReaperObj* obj, const string& apiPrefix, int fx): obj(obj), fx(fx) {
+	FxParams(ReaperObj* obj, const string& apiPrefix, int fx=-1):
+			obj(obj), fx(fx) {
 		// Get functions.
 		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
@@ -565,31 +566,38 @@ class FxParams: public ParamSource {
 		return ns.str();
 	}
 
-	Param* getParam(int param);
+	Param* getParam(int fx, int param);
+	Param* getParam(int param) {
+		return this->getParam(this->fx, param);
+	}
 };
 
 template<typename ReaperObj>
 class FxParam: public Param {
 	private:
 	FxParams<ReaperObj>& source;
+	int fx;
 	int param;
 
 	public:
 
-	FxParam(FxParams<ReaperObj>& source, int param): Param(), source(source), param(param) {
-		this->source._GetParam(source.obj, source.fx, param, &this->min, &this->max);
+	FxParam(FxParams<ReaperObj>& source, int fx, int param):
+			Param(), source(source), fx(fx), param(param) {
+		source._GetParam(source.obj, fx, param, &this->min, &this->max);
 		this->step = (this->max - this->min) / 1000;
 		this->largeStep = this->step * 20;
 		this->isEditable = true;
 	}
 
 	double getValue() {
-		return this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
+		return this->source._GetParam(this->source.obj, this->fx, this->param,
+			nullptr, nullptr);
 	}
 
 	string getValueText(double value) {
 		char text[50];
-		if (this->source._FormatParamValue(this->source.obj, this->source.fx, param, value, text, sizeof(text)))
+		if (this->source._FormatParamValue(this->source.obj, this->fx, param, value,
+				text, sizeof(text)))
 			return text;
 		return "";
 	}
@@ -597,12 +605,13 @@ class FxParam: public Param {
 	string getValueForEditing() {
 		ostringstream s;
 		s << fixed << setprecision(4);
-		s << this->source._GetParam(this->source.obj, this->source.fx, this->param, NULL, NULL);
+		s << this->source._GetParam(this->source.obj, this->fx, this->param,
+			nullptr, nullptr);
 		return s.str();
 	}
 
 	void setValue(double value) {
-		this->source._SetParam(this->source.obj, this->source.fx, this->param, value);
+		this->source._SetParam(this->source.obj, this->fx, this->param, value);
 	}
 
 	void setValueFromEdited(const string& text) {
@@ -611,8 +620,8 @@ class FxParam: public Param {
 };
 
 template<typename ReaperObj>
-Param* FxParams<ReaperObj>::getParam(int param) {
-	return new FxParam<ReaperObj>(*this, param);
+Param* FxParams<ReaperObj>::getParam(int fx, int param) {
+	return new FxParam<ReaperObj>(*this, fx, param);
 }
 
 class TrackParamProvider: public ReaperObjParamProvider {
@@ -649,9 +658,26 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	int index;
 };
 
+class TcpFxParamProvider: public ParamProvider {
+	public:
+	TcpFxParamProvider(const string displayName, FxParams<MediaTrack>& source,
+		int fx, int param):
+		ParamProvider(displayName), source(source), fx(fx), param(param) {}
+
+	Param* makeParam() {
+		return this->source.getParam(this->fx, this->param);
+	}
+
+	private:
+	FxParams<MediaTrack>& source;
+	int fx;
+	int param;
+};
+
 class TrackParams: public ReaperObjParamSource {
 	private:
 	MediaTrack* track;
+	unique_ptr<FxParams<MediaTrack>> fxParams;
 
 	void addSendParams(int category, const char* categoryName, const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
@@ -686,6 +712,23 @@ class TrackParams: public ReaperObjParamSource {
 			"B_MUTE", ReaperObjToggleParam::make));
 		this->addSendParams(0, "send", "P_DESTTRACK");
 		this->addSendParams(-1, "receive", "P_SRCTRACK");
+
+		int fxParamCount = CountTCPFXParms(nullptr, track);
+		if (fxParamCount > 0) {
+			this->fxParams = make_unique<FxParams<MediaTrack>>(track, "TrackFX");
+			for (int i = 0; i < fxParamCount; ++i) {
+				int fx, param;
+				GetTCPFXParm(nullptr, track, i, &fx, &param);
+				ostringstream displayName;
+				char name[256];
+				TrackFX_GetFXName(track, fx, name, sizeof(name));
+				displayName << name << " ";
+				TrackFX_GetParamName(track, fx, param, name, sizeof(name));
+				displayName << name;
+				this->params.push_back(make_unique<TcpFxParamProvider>(displayName.str(),
+					*this->fxParams, fx, param));
+			}
+		}
 	}
 
 	string getTitle() {
