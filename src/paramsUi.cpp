@@ -537,6 +537,8 @@ class FxParams: public ParamSource {
 	int (*_GetNumParams)(ReaperObj*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
 	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
+	bool (*_GetParameterStepSizes)(ReaperObj*, int, int, double*, double*,
+		double*, bool*);
 	bool (*_SetParam)(ReaperObj*, int, int, double);
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 
@@ -548,6 +550,8 @@ class FxParams: public ParamSource {
 		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
 		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
+		*(void**)&this->_GetParameterStepSizes = plugin_getapi((apiPrefix +
+			"_GetParameterStepSizes").c_str());
 		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
 		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
 	}
@@ -588,8 +592,16 @@ class FxParam: public Param {
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
 		source._GetParam(source.obj, fx, param, &this->min, &this->max);
-		this->step = (this->max - this->min) / 1000;
-		this->largeStep = this->step * 20;
+		source._GetParameterStepSizes(source.obj, fx, param, &this->step, nullptr,
+			&this->largeStep, nullptr);
+		if (this->step) {
+			if (!this->largeStep) {
+				this->largeStep = this->step;
+			}
+		} else {
+			this->step = (this->max - this->min) / 1000;
+			this->largeStep = this->step * 20;
+		}
 		this->isEditable = true;
 	}
 
