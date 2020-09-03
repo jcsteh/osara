@@ -343,8 +343,12 @@ class ParamsDialog {
 
 		// If the value text (if any) doesn't change, the value change is insignificant.
 		// Snap to the next change in value text.
-		// todo: Optimise; perhaps a binary search?
-		for (; this->param->min <= newVal && newVal <= this->param->max; newVal += step) {
+		// Continually adding to a float accumulates inaccuracy, so multiply by the
+		// number of steps each iteration instead.
+		for (unsigned int steps = 1;
+			this->param->min <= newVal && newVal <= this->param->max;
+			newVal = this->val + (step * steps++)
+		) {
 			const string testText = this->param->getValueText(newVal);
 			if (testText.empty())
 				break; // Formatted values not supported.
