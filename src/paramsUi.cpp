@@ -56,7 +56,7 @@ class ParamSource {
 	virtual string getTitle() = 0;
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
-	virtual Param* getParam(int param) = 0;
+	virtual unique_ptr<Param> getParam(int param) = 0;
 };
 
 // Provides data for a parameter and allows you to create a Param instance for
@@ -66,13 +66,13 @@ class ParamProvider {
 	ParamProvider(const string displayName): displayName(displayName) {
 	}
 
-	virtual Param* makeParam() = 0;
+	virtual unique_ptr<Param> makeParam() = 0;
 
 	const string displayName;
 };
 
 class ReaperObjParamProvider;
-typedef Param*(*MakeParamFromProviderFunc)(ReaperObjParamProvider& provider);
+typedef unique_ptr<Param>(*MakeParamFromProviderFunc)(ReaperObjParamProvider&);
 class ReaperObjParamProvider: public ParamProvider {
 	public:
 	ReaperObjParamProvider(const string displayName, const string name,
@@ -80,7 +80,7 @@ class ReaperObjParamProvider: public ParamProvider {
 		ParamProvider(displayName), name(name),
 		makeParamFromProvider(makeParamFromProvider) {}
 
-	virtual Param* makeParam() override {
+	virtual unique_ptr<Param> makeParam() override {
 		return makeParamFromProvider(*this);
 	}
 
@@ -115,7 +115,7 @@ class ReaperObjParamSource: public ParamSource {
 		return this->params[param]->displayName;
 	}
 
-	Param* getParam(int param) {
+	unique_ptr<Param> getParam(int param) {
 		return this->params[param]->makeParam();
 	}
 
@@ -144,8 +144,8 @@ class ReaperObjToggleParam: public ReaperObjParam {
 		this->provider.getSetValue((void*)&val);
 	}
 
-	static Param* make(ReaperObjParamProvider& provider) {
-		return new ReaperObjToggleParam(provider);
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<ReaperObjToggleParam>(provider);
 	}
 };
 
@@ -187,8 +187,8 @@ class ReaperObjVolParam: public ReaperObjParam {
 		this->setValue(DB2VAL(db));
 	}
 
-	static Param* make(ReaperObjParamProvider& provider) {
-		return new ReaperObjVolParam(provider);
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<ReaperObjVolParam>(provider);
 	}
 };
 
@@ -225,8 +225,8 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->setValue(parsepanstr(text.c_str()));
 	}
 
-	static Param* make(ReaperObjParamProvider& provider) {
-		return new ReaperObjPanParam(provider);
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<ReaperObjPanParam>(provider);
 	}
 };
 
@@ -272,14 +272,14 @@ class ReaperObjLenParam: public ReaperObjParam {
 		this->setValue(parse_timestr_pos(text.c_str(), -1));
 	}
 
-	static Param* make(ReaperObjParamProvider& provider) {
-		return new ReaperObjLenParam(provider);
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<ReaperObjLenParam>(provider);
 	}
 };
 
 class ParamsDialog {
 	private:
-	ParamSource* source;
+	unique_ptr<ParamSource> source;
 	HWND dialog;
 	HWND paramCombo;
 	HWND slider;
@@ -287,7 +287,7 @@ class ParamsDialog {
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
-	Param* param;
+	unique_ptr<Param> param;
 	double val;
 	string valText;
 
@@ -321,8 +321,6 @@ class ParamsDialog {
 	}
 
 	void onParamChange() {
-		if (this->param)
-			delete this->param;
 		int paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
 		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
@@ -343,8 +341,12 @@ class ParamsDialog {
 
 		// If the value text (if any) doesn't change, the value change is insignificant.
 		// Snap to the next change in value text.
-		// todo: Optimise; perhaps a binary search?
-		for (; this->param->min <= newVal && newVal <= this->param->max; newVal += step) {
+		// Continually adding to a float accumulates inaccuracy, so multiply by the
+		// number of steps each iteration instead.
+		for (unsigned int steps = 1;
+			this->param->min <= newVal && newVal <= this->param->max;
+			newVal = this->val + (step * steps++)
+		) {
 			const string testText = this->param->getValueText(newVal);
 			if (testText.empty())
 				break; // Formatted values not supported.
@@ -433,9 +435,6 @@ class ParamsDialog {
 
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
-		if (this->param)
-			delete this->param;
-		delete this->source;
 	}
 
 	bool shouldIncludeParam(string name) {
@@ -486,15 +485,15 @@ class ParamsDialog {
 
 	public:
 
-	ParamsDialog(ParamSource* source): source(source), param(NULL) {
-		this->paramCount = source->getParamCount();
+	ParamsDialog(unique_ptr<ParamSource> source): source(move(source)) {
+		this->paramCount = this->source->getParamCount();
 		if (this->paramCount == 0) {
 			delete this;
 			return;
 		}
 		this->dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PARAMS_DLG), mainHwnd, ParamsDialog::dialogProc);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
-		SetWindowText(this->dialog, source->getTitle().c_str());
+		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
@@ -533,6 +532,8 @@ class FxParams: public ParamSource {
 	int (*_GetNumParams)(ReaperObj*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
 	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
+	bool (*_GetParameterStepSizes)(ReaperObj*, int, int, double*, double*,
+		double*, bool*);
 	bool (*_SetParam)(ReaperObj*, int, int, double);
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 
@@ -544,6 +545,8 @@ class FxParams: public ParamSource {
 		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
 		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
+		*(void**)&this->_GetParameterStepSizes = plugin_getapi((apiPrefix +
+			"_GetParameterStepSizes").c_str());
 		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
 		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
 	}
@@ -566,8 +569,8 @@ class FxParams: public ParamSource {
 		return ns.str();
 	}
 
-	Param* getParam(int fx, int param);
-	Param* getParam(int param) {
+	unique_ptr<Param> getParam(int fx, int param);
+	unique_ptr<Param> getParam(int param) {
 		return this->getParam(this->fx, param);
 	}
 };
@@ -584,8 +587,25 @@ class FxParam: public Param {
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
 		source._GetParam(source.obj, fx, param, &this->min, &this->max);
-		this->step = (this->max - this->min) / 1000;
-		this->largeStep = this->step * 20;
+		// *FX_GetParameterStepSizes doesn't set these to 0 if it can't fetch them,
+		// even if it returns true.
+		this->step = 0;
+		this->largeStep = 0;
+		source._GetParameterStepSizes(source.obj, fx, param, &this->step, nullptr,
+			&this->largeStep, nullptr);
+		if (this->step) {
+			if (!this->largeStep) {
+				this->largeStep = (this->max - this->min) / 50;
+				// Ensure largeStep is a multiple of step.
+				this->largeStep = this->step * int(this->largeStep / this->step);
+				if (this->largeStep == 0) {
+					this->largeStep = this->step;
+				}
+			}
+		} else {
+			this->step = (this->max - this->min) / 1000;
+			this->largeStep = this->step * 20;
+		}
 		this->isEditable = true;
 	}
 
@@ -620,8 +640,8 @@ class FxParam: public Param {
 };
 
 template<typename ReaperObj>
-Param* FxParams<ReaperObj>::getParam(int fx, int param) {
-	return new FxParam<ReaperObj>(*this, fx, param);
+unique_ptr<Param> FxParams<ReaperObj>::getParam(int fx, int param) {
+	return make_unique<FxParam<ReaperObj>>(*this, fx, param);
 }
 
 class TrackParamProvider: public ReaperObjParamProvider {
@@ -664,7 +684,7 @@ class TcpFxParamProvider: public ParamProvider {
 		int fx, int param):
 		ParamProvider(displayName), source(source), fx(fx), param(param) {}
 
-	Param* makeParam() {
+	unique_ptr<Param> makeParam() {
 		return this->source.getParam(this->fx, this->param);
 	}
 
@@ -792,26 +812,26 @@ class ItemParams: public ReaperObjParamSource {
 };
 
 void cmdParamsFocus(Command* command) {
-	ParamSource* source;
+	unique_ptr<ParamSource> source;
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			MediaTrack* track = GetLastTouchedTrack();
 			if (!track)
 				return;
-			source = new TrackParams(track);
+			source = make_unique<TrackParams>(track);
 			break;
 		}
 		case FOCUS_ITEM: {
 			MediaItem* item = GetSelectedMediaItem(0, 0);
 			if (!item)
 				return;
-			source = new ItemParams(item);
+			source = make_unique<ItemParams>(item);
 			break;
 		}
 		default:
 			return;
 	}
-	new ParamsDialog(source);
+	new ParamsDialog(move(source));
 }
 
 typedef vector<pair<int, string>> FxList;
@@ -883,8 +903,8 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 			return; // Cancelled.
 	}
 
-	FxParams<ReaperObj>* source = new FxParams<ReaperObj>(obj, apiPrefix, fx);
-	new ParamsDialog(source);
+	auto source = make_unique<FxParams<ReaperObj>>(obj, apiPrefix, fx);
+	new ParamsDialog(move(source));
 }
 
 void cmdFxParamsFocus(Command* command) {
