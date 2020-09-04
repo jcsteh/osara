@@ -235,5 +235,7 @@ extern bool isHandlingCommand;
 void reportTransportState(int state);
 void reportRepeat(bool repeat);
 IReaperControlSurface* createSurface();
+// exports.cpp
+void registerExports(reaper_plugin_info_t* rec);
 
 #endif

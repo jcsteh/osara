@@ -3041,6 +3041,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		surface = createSurface();
 		rec->Register("csurf_inst", (void*)surface);
+		registerExports(rec);
 		SetTimer(NULL, NULL, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
