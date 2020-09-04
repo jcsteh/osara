@@ -587,6 +587,10 @@ class FxParam: public Param {
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
 		source._GetParam(source.obj, fx, param, &this->min, &this->max);
+		// *FX_GetParameterStepSizes doesn't set these to 0 if it can't fetch them,
+		// even if it returns true.
+		this->step = 0;
+		this->largeStep = 0;
 		source._GetParameterStepSizes(source.obj, fx, param, &this->step, nullptr,
 			&this->largeStep, nullptr);
 		if (this->step) {
