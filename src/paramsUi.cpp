@@ -595,7 +595,12 @@ class FxParam: public Param {
 			&this->largeStep, nullptr);
 		if (this->step) {
 			if (!this->largeStep) {
-				this->largeStep = this->step;
+				this->largeStep = (this->max - this->min) / 50;
+				// Ensure largeStep is a multiple of step.
+				this->largeStep = this->step * int(this->largeStep / this->step);
+				if (this->largeStep == 0) {
+					this->largeStep = this->step;
+				}
 			}
 		} else {
 			this->step = (this->max - this->min) / 1000;
