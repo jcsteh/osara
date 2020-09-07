@@ -298,11 +298,16 @@ void cmdhSelectEnvelope(int direction) {
 		char state[200];
 		GetEnvelopeStateChunk(env, state, sizeof(state), false);
 		regex_search(state, m, RE_ENVELOPE_STATE);
+		bool invisible = !m.empty() && m.str(4)[0] == '0';
 		if (env == origEnv) {
 			// We're back where we started. Don't try to go any further.
+			if (invisible) {
+				// This envelope is now invisible, so don't report it.
+				env = nullptr;
+			}
 			break;
 		}
-		if (!m.empty() && m.str(4)[0] == '0')
+		if (invisible)
 			continue; // Invisible, so skip.
 		break; // We found our envelope!
 	}
