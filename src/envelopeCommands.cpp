@@ -295,7 +295,7 @@ void cmdhSelectEnvelope(int direction) {
 			}
 		}
 		env = getEnvelope(index);
-		char state[100];
+		char state[200];
 		GetEnvelopeStateChunk(env, state, sizeof(state), false);
 		regex_search(state, m, RE_ENVELOPE_STATE);
 		if (env == origEnv) {
