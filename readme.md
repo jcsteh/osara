@@ -228,6 +228,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Transport: Decrease playrate by ~6% (one semitone): Control+Shift+-
 - Transport: Increase playrate by ~0.6% (10 cents): Shift+=
 - Transport: Decrease playrate by ~0.6% (10 cents): Shift+-
+- Transport: Set playrate to 1.0
 
 #### Selection
 - Time selection: Set start point: [

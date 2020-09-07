@@ -1176,6 +1176,7 @@ PostCommand POST_COMMANDS[] = {
 	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
+	{40521, postAdjustPlayRate}, // Set playrate to 1.0
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
 	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
 	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
