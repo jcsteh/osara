@@ -29,3 +29,4 @@ bool toggleCurrentAutomationItemSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void postToggleTrackVolumeEnvelope(int command);
 void postToggleTrackPanEnvelope(int command);
+void cmdToggleTrackEnvelope(Command* command);
