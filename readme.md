@@ -229,6 +229,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Transport: Increase playrate by ~0.6% (10 cents): Shift+=
 - Transport: Decrease playrate by ~0.6% (10 cents): Shift+-
 - Transport: Set playrate to 1.0
+- Transport: Toggle preserve pitch in audio items when changing master playrate
 
 #### Selection
 - Time selection: Set start point: [

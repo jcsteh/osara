@@ -1075,6 +1075,13 @@ void postTogglePlaybackPositionFollowsTimebase(int command) {
 	outputMessage(s);
 }
 
+void postTogglePreservePitchWhenPlayRateChanged(int command) {
+	ostringstream s;
+	s << ( GetToggleCommandState(command) ? "preserving" : "not preserving")
+		<< " pitch when changing play rate";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1204,6 +1211,7 @@ PostCommand POST_COMMANDS[] = {
 	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
 	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
 	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
+	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
