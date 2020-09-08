@@ -615,15 +615,14 @@ If you aren't sure, run `git submodule update` after every git pull, merge or ch
 ### Dependencies
 To build OSARA, you will need:
 
-- Windows only: Microsoft Visual Studio 2017 Community:
-	* Visual Studio 2019 is not yet supported.
-	* [Download Visual Studio 2017 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15)
+- Windows only: Microsoft Visual Studio 2019 Community:
+	* [Download Visual Studio 2019 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 	* When installing Visual Studio, you need to enable the following:
 		- On the Workloads tab, in the Windows group: Desktop development with C++
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
 	* Xcode 10 is not yet supported.
 	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
-- Python, version 2.7 or later:
+- Python, version 3.7 or later:
 	* This is needed by SCons.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
