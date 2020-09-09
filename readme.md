@@ -203,6 +203,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Global automation override: No override (set automation modes per track)
 - Track: Toggle track volume envelope visible: Control+Alt+V
 - Track: Toggle track pan envelope visible: Control+Alt+P
+- FX: Show/hide track envelope for last touched FX parameter
 
 #### Zoom
 - Zoom out horizontal: - or NumPad-
@@ -228,6 +229,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Transport: Decrease playrate by ~6% (one semitone): Control+Shift+-
 - Transport: Increase playrate by ~0.6% (10 cents): Shift+=
 - Transport: Decrease playrate by ~0.6% (10 cents): Shift+-
+- Transport: Set playrate to 1.0
+- Transport: Toggle preserve pitch in audio items when changing master playrate
 
 #### Selection
 - Time selection: Set start point: [
@@ -612,15 +615,14 @@ If you aren't sure, run `git submodule update` after every git pull, merge or ch
 ### Dependencies
 To build OSARA, you will need:
 
-- Windows only: Microsoft Visual Studio 2017 Community:
-	* Visual Studio 2019 is not yet supported.
-	* [Download Visual Studio 2017 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=15)
+- Windows only: Microsoft Visual Studio 2019 Community:
+	* [Download Visual Studio 2019 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 	* When installing Visual Studio, you need to enable the following:
 		- On the Workloads tab, in the Windows group: Desktop development with C++
 - Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
 	* Xcode 10 is not yet supported.
 	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
-- Python, version 2.7 or later:
+- Python, version 3.7 or later:
 	* This is needed by SCons.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:

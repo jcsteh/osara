@@ -66,6 +66,8 @@ class ParamProvider {
 	ParamProvider(const string displayName): displayName(displayName) {
 	}
 
+	virtual ~ParamProvider() = default;
+
 	virtual unique_ptr<Param> makeParam() = 0;
 
 	const string displayName;

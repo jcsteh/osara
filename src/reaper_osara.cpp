@@ -1075,6 +1075,13 @@ void postTogglePlaybackPositionFollowsTimebase(int command) {
 	outputMessage(s);
 }
 
+void postTogglePreservePitchWhenPlayRateChanged(int command) {
+	ostringstream s;
+	s << ( GetToggleCommandState(command) ? "preserving" : "not preserving")
+		<< " pitch when changing play rate";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1176,6 +1183,7 @@ PostCommand POST_COMMANDS[] = {
 	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
+	{40521, postAdjustPlayRate}, // Set playrate to 1.0
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
 	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
 	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
@@ -1203,6 +1211,7 @@ PostCommand POST_COMMANDS[] = {
 	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
 	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
 	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
+	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
@@ -2644,6 +2653,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
 	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
+	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid

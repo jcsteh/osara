@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2018 NV Access Limited, James Teh
+ * Copyright 2015-2020 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -12,6 +12,8 @@
 #include <tuple>
 #include <regex>
 #include <functional>
+#include <set>
+#include <algorithm>
 #include "osara.h"
 
 using namespace std;
@@ -295,14 +297,19 @@ void cmdhSelectEnvelope(int direction) {
 			}
 		}
 		env = getEnvelope(index);
-		char state[100];
+		char state[200];
 		GetEnvelopeStateChunk(env, state, sizeof(state), false);
 		regex_search(state, m, RE_ENVELOPE_STATE);
+		bool invisible = !m.empty() && m.str(4)[0] == '0';
 		if (env == origEnv) {
 			// We're back where we started. Don't try to go any further.
+			if (invisible) {
+				// This envelope is now invisible, so don't report it.
+				env = nullptr;
+			}
 			break;
 		}
-		if (!m.empty() && m.str(4)[0] == '0')
+		if (invisible)
 			continue; // Invisible, so skip.
 		break; // We found our envelope!
 	}
@@ -494,20 +501,21 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	outputMessage(s);
 }
 
+bool isEnvelopeVisible(TrackEnvelope* envelope) {
+	char state[200];
+	GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
+	cmatch m;
+	regex_search(state, m, RE_ENVELOPE_STATE);
+	return !m.empty() && m.str(4)[0] == '1';
+}
+
 void reportToggleTrackEnvelope(char* envType) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		return;
 	}
-	bool visible = false;
 	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV", envType);
-	if (envelope) {
-		char state[100];
-		GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
-		cmatch m;
-		regex_search(state, m, RE_ENVELOPE_STATE);
-		visible =  !m.empty() && m.str(4)[0] == '1';
-	}
+	bool visible = envelope && isEnvelopeVisible(envelope);
 	ostringstream s;
 	s << (visible ? "showed " : "hid ");
 	char name[50];
@@ -522,4 +530,44 @@ void postToggleTrackVolumeEnvelope(int command) {
 
 void postToggleTrackPanEnvelope(int command) {
 	reportToggleTrackEnvelope("<PANENV2");
+}
+
+set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
+	set<TrackEnvelope*> envelopes;
+	int count = CountTrackEnvelopes(track);
+	for (int i = 0; i < count; ++i) {
+		TrackEnvelope* env = GetTrackEnvelope(track, i);
+		if (isEnvelopeVisible(env)) {
+			envelopes.emplace(env);
+		}
+	}
+	return envelopes;
+}
+
+void cmdToggleTrackEnvelope(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
+	ostringstream s;
+	if (after.size() == before.size()) {
+		outputMessage("no envelopes toggled");
+		return;
+	}
+	if (after.size() > before.size()) {
+		s << "showed ";
+	} else {
+		s << "hid ";
+	}
+	set<TrackEnvelope*> difference;
+	set_symmetric_difference(before.begin(), before.end(),
+		after.begin(), after.end(), inserter(difference, difference.end()));
+	TrackEnvelope* envelope = *difference.begin();
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	s << name << " envelope";
+	outputMessage(s);
 }
