@@ -34,10 +34,43 @@ typedef struct {
 	int pitch;
 	int velocity;
 	int index;
-	double start;
-	double end;
+	double startPPQ;
+	double endPPQ;
+	MediaItem_Take* take;
+
 	double getLength() const {
-		return max (0, (end - start));
+		return max (0, (MIDI_GetProjTimeFromPPQPos(take, endPPQ) - MIDI_GetProjTimeFromPPQPos(take, startPPQ)));
+	}
+
+	string formatLength() const {
+		int measureLength;
+		double startBeats;
+		double endBeats;
+		TimeMap2_timeToBeats(NULL, MIDI_GetProjTimeFromPPQPos(take, startPPQ), NULL, &measureLength, &startBeats, NULL);
+		TimeMap2_timeToBeats(NULL, MIDI_GetProjTimeFromPPQPos(take, endPPQ), NULL, NULL, &endBeats, NULL);
+		double lengthBeats = endBeats-startBeats;
+		int bars = int(lengthBeats)/measureLength;
+		int remBeats = int(lengthBeats)%measureLength;
+		int percent = lround((lengthBeats-int(lengthBeats))*100);
+		if(percent>99) {
+			percent = 0;
+			++remBeats;
+		}
+		if(remBeats==measureLength) {
+			remBeats = 0;
+			++bars;
+		}
+		ostringstream s;
+		if(bars>0) {
+			s<< bars << (bars==1?" bar ":" bars ");
+		}
+		if(remBeats>0){
+			s << remBeats << (remBeats==1?" beat ":" beats ");
+		}
+		if(percent>0) {
+			s << percent << " percent ";
+		}
+		return s.str();
 	}
 } MidiNote;
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
@@ -323,9 +356,7 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 		double start, end;
 		int chan, pitch, vel;
 		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
-		notes.push_back({chan, pitch, vel, note, start, end});
+		notes.push_back({chan, pitch, vel, note, start, end, take});
 	}
 	sort(notes.begin(), notes.end(), compareNotesByPitch);
 	const int lastNoteIndex = notes.size() - 1;
@@ -364,9 +395,7 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 		double start, end;
 		int chan, pitch, vel;
 		MIDI_GetNote(take, noteIndex, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
-		notes.push_back({chan, pitch, vel, noteIndex, start, end});
+		notes.push_back({chan, pitch, vel, noteIndex, start, end, take});
 	}
 	return notes;
 }
@@ -499,18 +528,18 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	bool cursorSet = false;
 	vector<MidiNote> notes;
 	for (int note = chord.first; note <= chord.second; ++note) {
-		double start, end;
+		double startPPQ, endPPQ, start, end;
 		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
+		MIDI_GetNote(take, note, NULL, NULL, &startPPQ, &endPPQ, &chan, &pitch, &vel);
+		start = MIDI_GetProjTimeFromPPQPos(take, startPPQ);
+		end = MIDI_GetProjTimeFromPPQPos(take, endPPQ);
 		if (!cursorSet && direction != 0) {
 			SetEditCurPos(start, true, false);
 			cursorSet = true;
 		}
 		if (select)
 			selectNote(take, note);
-		notes.push_back({chan, pitch, vel, 0, start, end});
+		notes.push_back({chan, pitch, vel, 0, startPPQ, endPPQ, take});
 	}
 	previewNotes(take, notes);
 	fakeFocus = FOCUS_NOTE;
@@ -565,7 +594,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << ", ";
 	}
 	if (shouldReportNotes) {
-		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+		s << note.formatLength();
 	}
 	outputMessage(s);
 }
@@ -619,7 +648,7 @@ void cmdMidiInsertNote(Command* command) {
 	ostringstream s;
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
-		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+		s <<note.formatLength();
 		s << ", ";
 	}
 	s << formatCursorPosition(TF_MEASURE);
@@ -1042,7 +1071,7 @@ void postMidiChangeLength(int command) {
 		} else{ 
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
 				s << getMidiNoteName(take, note->pitch, note->channel) << " ";
-				s			<< formatTime(note->getLength(), TF_MEASURE, true, false, false);
+				s << note->formatLength();
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
 				}
