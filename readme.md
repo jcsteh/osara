@@ -41,6 +41,7 @@ The installer installs the extension into your user configuration, not the progr
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If you do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
+If the installer does replace the key map, a backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
 Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.

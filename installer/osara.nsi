@@ -102,6 +102,7 @@ SectionEnd
 
 Section "Replace existing key map with OSARA key map" SecKeyMap
 	SetOutPath "$INSTDIR"
+	Rename "reaper-kb.ini" "KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	File "..\config\windows\reaper-kb.ini"
 SectionEnd
 
