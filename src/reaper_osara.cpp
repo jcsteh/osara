@@ -54,9 +54,11 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 bool isSelectionContiguous = true;
-Command* lastCommand = NULL;
+int lastCommand = 0;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
+MediaItem* currentItem = NULL;
+
 
 /*** Utilities */
 
@@ -412,6 +414,19 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 	return false;
 }
 
+MediaItem* getItemInContext() {
+	MediaItem* item;
+	// try to provide information based on the last item spoken by osara if it is selected
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& IsMediaItemSelected(currentItem)
+	) 
+	return currentItem;
+	else if(CountSelectedMediaItems(0)>0)
+		return GetSelectedMediaItem(0, 0);
+	else 
+		return nullptr;
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -655,11 +670,10 @@ void postGoToSpecificMarker(int command) {
 	}
 }
 
-void postChangeTrackVolume(MediaTrack* track) {
-	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
-		return;
+void postChangeVolumeH(double volume, int command, char* commandMessage) {
 	ostringstream s;
+	if(lastCommand != command) 
+		s << commandMessage;
 	s << fixed << setprecision(2);
 	s << VAL2DB(volume);
 	outputMessage(s);
@@ -667,13 +681,36 @@ void postChangeTrackVolume(MediaTrack* track) {
 
 void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeTrackVolume(track);
+	postChangeVolumeH(volume, command, "Track ");
 }
 
 void postChangeMasterTrackVolume(int command) {
-	postChangeTrackVolume(GetMasterTrack(0));
+	MediaTrack* track = GetMasterTrack(0);
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+		return;
+	postChangeVolumeH(volume, command, "Master ");
+}
+
+void postChangeItemVolume(int command) {
+	MediaItem* item = getItemInContext();
+	if(item == nullptr)
+		return;
+	double volume = GetMediaItemInfo_Value(item, "D_VOL");
+	postChangeVolumeH(volume, command, "Item ");
+}
+
+void postChangeTakeVolume(int command) {
+	MediaItem* item = getItemInContext();
+	if(item == nullptr)
+		return;
+	MediaItem_Take* take = GetActiveTake(item);
+	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
+	volume = fabs(volume);// volume is negative if take polarity is flipped
+	postChangeVolumeH(volume, command, "Take ");
 }
 
 void postChangeHorizontalZoom(int command) {
@@ -1212,6 +1249,10 @@ PostCommand POST_COMMANDS[] = {
 	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
 	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
 	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
+	{41925, postChangeItemVolume}, // Item: Nudge items volume +1dB
+	{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
+	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
+	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
@@ -1254,6 +1295,10 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
 	{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
 	{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
+	{"_XENAKIOS_NUDGETAKEVOLDOWN", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume down
+	{"_XENAKIOS_NUDGETAKEVOLUP", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume up
+	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
+	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
@@ -1818,7 +1863,6 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
-MediaItem* currentItem = NULL;
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -2028,21 +2072,14 @@ void cmdMoveItems(Command* command) {
 }
 
 void cmdMoveItemEdge(Command* command) {
-	MediaItem* item;
-	// try to provide information based on the last item spoken by osara if it is selected
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& IsMediaItemSelected(currentItem)
-	) 
-	item = currentItem;
-	else if(CountSelectedMediaItems(0)>0)
-		item = GetSelectedMediaItem(0, 0);
-	else {
-		outputMessage("no items selected");
+	MediaItem* item = getItemInContext();
+	if (item == nullptr) {
+		outputMessage("No items selected");
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
 	ostringstream s;
-	if(lastCommand != command) { 
+	if(lastCommand != command->gaccel.accel.cmd) { 
 		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
 		const char* start;
 		// Skip the category before the colon (if any).
@@ -2573,7 +2610,7 @@ void cmdCycleMidiRecordingMode(Command* command) {
 }
 
 void cmdNudgeTimeSelection(Command* command) {
-	bool first= (lastCommand!=command);
+	bool first= (lastCommand!=command->gaccel.accel.cmd);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -2816,6 +2853,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 				Main_OnCommand(command, 0);
 			}
 			it->second(command);
+			lastCommand=command;
 			isHandlingCommand = false;
 			return true;
 		}
@@ -2864,13 +2902,13 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	) {
 		isHandlingCommand = true;
 		DWORD now = GetTickCount();
-		if (it->second == lastCommand && now - lastCommandTime < 500)
+		if (it->second->gaccel.accel.cmd == lastCommand && now - lastCommandTime < 500)
 			++lastCommandRepeatCount;
 		else
 			lastCommandRepeatCount = 0;
 		lastCommandTime = now;
 		it->second->execute(it->second);
-		lastCommand = it->second;
+		lastCommand = it->second->gaccel.accel.cmd;
 		isHandlingCommand = false;
 		return true;
 	} else if (isShortcutHelpEnabled) {
