@@ -1119,6 +1119,22 @@ void postTogglePreservePitchWhenPlayRateChanged(int command) {
 	outputMessage(s);
 }
 
+void postSetItemEnd(int command) {
+	MediaItem* item = getItemInContext();
+	if(item == nullptr)
+		return;
+	ostringstream s;
+	int selCount = CountSelectedMediaItems(0);
+	if(selCount > 1){
+		s << selCount << " item ends set to source media end";
+	} else {
+		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
+		s << "Item end set to source media end: ";
+		s << formatTime(endPos, TF_RULER, false, false, true);
+	}
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1253,6 +1269,7 @@ PostCommand POST_COMMANDS[] = {
 	{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
 	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
 	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
+	{40612, postSetItemEnd}, // Item: Set item end to source media end
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
