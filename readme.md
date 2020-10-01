@@ -149,6 +149,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Nudge items volume -1dB
 - Xenakios/SWS: Nudge item volume down
 - Xenakios/SWS: Nudge item volume up
+- Item: Set item end to source media end
 
 #### Takes
 - Take: Switch items to next take: T

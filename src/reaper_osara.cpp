@@ -57,7 +57,7 @@ bool isSelectionContiguous = true;
 int lastCommand = 0;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
-MediaItem* currentItem = NULL;
+MediaItem* currentItem = nullptr;
 
 
 /*** Utilities */
@@ -414,17 +414,16 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 	return false;
 }
 
-MediaItem* getItemInContext() {
+MediaItem* getItemWithFocus() {
 	MediaItem* item;
 	// try to provide information based on the last item spoken by osara if it is selected
 	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
 		&& IsMediaItemSelected(currentItem)
 	) 
 	return currentItem;
-	else if(CountSelectedMediaItems(0)>0)
+	if(CountSelectedMediaItems(0)>0)
 		return GetSelectedMediaItem(0, 0);
-	else 
-		return nullptr;
+	return nullptr;
 }
 
 /*** Code to execute after existing actions.
@@ -696,16 +695,16 @@ void postChangeMasterTrackVolume(int command) {
 }
 
 void postChangeItemVolume(int command) {
-	MediaItem* item = getItemInContext();
-	if(item == nullptr)
+	MediaItem* item = getItemWithFocus();
+	if(!item)
 		return;
 	double volume = GetMediaItemInfo_Value(item, "D_VOL");
 	postChangeVolumeH(volume, command, "Item ");
 }
 
 void postChangeTakeVolume(int command) {
-	MediaItem* item = getItemInContext();
-	if(item == nullptr)
+	MediaItem* item = getItemWithFocus();
+	if(!item)
 		return;
 	MediaItem_Take* take = GetActiveTake(item);
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
@@ -1120,8 +1119,8 @@ void postTogglePreservePitchWhenPlayRateChanged(int command) {
 }
 
 void postSetItemEnd(int command) {
-	MediaItem* item = getItemInContext();
-	if(item == nullptr)
+	MediaItem* item = getItemWithFocus();
+	if(!item)
 		return;
 	ostringstream s;
 	int selCount = CountSelectedMediaItems(0);
@@ -2089,8 +2088,8 @@ void cmdMoveItems(Command* command) {
 }
 
 void cmdMoveItemEdge(Command* command) {
-	MediaItem* item = getItemInContext();
-	if (item == nullptr) {
+	MediaItem* item = getItemWithFocus();
+	if (!item) {
 		outputMessage("No items selected");
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
