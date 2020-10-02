@@ -59,7 +59,6 @@ DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
 MediaItem* currentItem = nullptr;
 
-
 /*** Utilities */
 
 #ifdef _WIN32
@@ -707,6 +706,9 @@ void postChangeTakeVolume(int command) {
 	if(!item)
 		return;
 	MediaItem_Take* take = GetActiveTake(item);
+	if (!take) {
+		return;
+	}
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
 	volume = fabs(volume);// volume is negative if take polarity is flipped
 	postChangeVolumeH(volume, command, "Take ");
