@@ -160,6 +160,7 @@
 #define REAPERAPI_WANT_Master_GetTempo
 #define REAPERAPI_WANT_CountTCPFXParms
 #define REAPERAPI_WANT_GetTCPFXParm
+#define REAPERAPI_WANT_GetMediaItemTakeInfo_Value
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
