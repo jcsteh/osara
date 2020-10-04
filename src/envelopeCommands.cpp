@@ -14,6 +14,7 @@
 #include <functional>
 #include <set>
 #include <algorithm>
+#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -154,7 +155,7 @@ int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	return numSel;
 }
 
-int currentEnvelopePoint;
+optional<int> currentEnvelopePoint{};
 
 void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
 	TrackEnvelope* envelope;
@@ -177,7 +178,11 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	bool selected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
 	time += offset;
-	if ((direction == 1 && time <= now)
+	if ((direction == 1 && time < now)
+		// If this point is at the cursor, skip it only if it's the current point.
+		// This allows you to easily get to a point at the cursor
+		// while still allowing you to move beyond it once you do.
+		|| (direction == 1 && point == currentEnvelopePoint && time == now)
 		// Moving backward should skip the point at the cursor.
 		|| (direction == -1 && time >= now)
 	) {
@@ -192,7 +197,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	if (direction != 0 && direction == 1 ? time < now : time > now)
 		return; // No point in this direction.
 	fakeFocus = FOCUS_ENVELOPE;
-	currentEnvelopePoint = point;
+	currentEnvelopePoint.emplace(point);
 	if (clearSelection) {
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
 		isSelectionContiguous = true;
@@ -220,13 +225,16 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	outputMessage(s);
 }
 
-bool toggleCurrentEnvelopePointSelection() {
+optional<bool> toggleCurrentEnvelopePointSelection() {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope || !currentEnvelopePoint)
+		return nullopt;
 	bool isSelected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected);
+	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
+		return nullopt;
 	isSelected = !isSelected;
-	SetEnvelopePointEx(envelope, currentAutomationItem, currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
-	return isSelected;
+	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	return {isSelected};
 }
 
 void cmdInsertEnvelopePoint(Command* command) {

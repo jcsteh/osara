@@ -18,6 +18,7 @@
 #include <map>
 #include <iomanip>
 #include <math.h>
+#include <optional>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
@@ -2371,8 +2372,13 @@ void cmdToggleSelection(Command* command) {
 			select = toggleCurrentAutomationItemSelection();
 			break;
 		case FOCUS_ENVELOPE:
-			select = toggleCurrentEnvelopePointSelection();
+		{
+			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
+			if(!selectOpt)
+				return;
+			select = selectOpt.value();
 			break;
+		}
 		default:
 			return;
 	}
