@@ -343,6 +343,7 @@ void cmdhSelectEnvelope(int direction) {
 
 	SetCursorContext(2, env);
 	currentAutomationItem = -1;
+	currentEnvelopePoint.reset();
 	fakeFocus = FOCUS_ENVELOPE;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
