@@ -14,6 +14,7 @@
 #include <functional>
 #include <set>
 #include <algorithm>
+#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -154,7 +155,9 @@ int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	return numSel;
 }
 
-void moveToEnvelopePoint(int direction, bool clearSelection=true) {
+optional<int> currentEnvelopePoint{};
+
+void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
 	TrackEnvelope* envelope;
 	double offset;
 	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
@@ -176,10 +179,10 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
 	time += offset;
 	if ((direction == 1 && time < now)
-		// If this point is at the cursor, skip it only if it's selected.
+		// If this point is at the cursor, skip it only if it's the current point.
 		// This allows you to easily get to a point at the cursor
 		// while still allowing you to move beyond it once you do.
-		|| (direction == 1 && selected && time == now)
+		|| (direction == 1 && point == currentEnvelopePoint && time == now)
 		// Moving backward should skip the point at the cursor.
 		|| (direction == -1 && time >= now)
 	) {
@@ -194,9 +197,13 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	if (direction != 0 && direction == 1 ? time < now : time > now)
 		return; // No point in this direction.
 	fakeFocus = FOCUS_ENVELOPE;
-	if (clearSelection)
+	currentEnvelopePoint.emplace(point);
+	if (clearSelection) {
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
-	SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+		isSelectionContiguous = true;
+	}
+	if(select)
+		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
 	ostringstream s;
@@ -204,14 +211,30 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	char out[64];
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
 	s << out;
-	if (!clearSelection) {
+	bool isSelected;
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
+	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
 		if (numSel > 1)
 			s << " selected";
+	} else {
+		s << " unselected ";
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
+}
+
+optional<bool> toggleCurrentEnvelopePointSelection() {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope || !currentEnvelopePoint)
+		return nullopt;
+	bool isSelected;
+	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
+		return nullopt;
+	isSelected = !isSelected;
+	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	return {isSelected};
 }
 
 void cmdInsertEnvelopePoint(Command* command) {
@@ -320,6 +343,7 @@ void cmdhSelectEnvelope(int direction) {
 
 	SetCursorContext(2, env);
 	currentAutomationItem = -1;
+	currentEnvelopePoint.reset();
 	fakeFocus = FOCUS_ENVELOPE;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
@@ -358,19 +382,19 @@ void cmdSelectPreviousEnvelope(Command* command) {
 }
 
 void cmdMoveToNextEnvelopePoint(Command* command) {
-	moveToEnvelopePoint(1);
+	moveToEnvelopePoint(1, true, true);
 }
 
 void cmdMoveToPrevEnvelopePoint(Command* command) {
-	moveToEnvelopePoint(-1);
+	moveToEnvelopePoint(-1, true, true);
 }
 
 void cmdMoveToNextEnvelopePointKeepSel(Command* command) {
-	moveToEnvelopePoint(1, false);
+	moveToEnvelopePoint(1, false, isSelectionContiguous);
 }
 
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
-	moveToEnvelopePoint(-1, false);
+	moveToEnvelopePoint(-1, false, isSelectionContiguous);
 }
 
 void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) {
