@@ -5,7 +5,15 @@
  * Copyright 2015-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
-#include <optional>
+// Support for experimental/optional can be removed once we drop support for
+// Xcode 9.
+#if __has_include(<optional>)
+# include <optional>
+# define stdoptional std::optional
+#else
+# include <experimental/optional>
+# define stdoptional std::experimental::optional
+#endif
 #include "osara.h"
 
 // Keeps track of the automation item the user last moved to.
@@ -26,7 +34,7 @@ void cmdMoveToNextEnvelopePointKeepSel(Command* command);
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command);
 void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true);
 bool toggleCurrentAutomationItemSelection();
-std::optional <bool> toggleCurrentEnvelopePointSelection();
+stdoptional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void postToggleTrackVolumeEnvelope(int command);
 void postToggleTrackPanEnvelope(int command);
