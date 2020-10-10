@@ -1,4 +1,5 @@
 version: "2020.1pre-{build}"
+image: Visual Studio 2019
 
 branches:
  only:
