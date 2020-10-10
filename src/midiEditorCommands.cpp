@@ -29,7 +29,7 @@ typedef struct {
 
 const double DEFAULT_PREVIEW_LENGTH = 0.3;
 
-typedef struct {
+struct MidiNote {
 	int channel;
 	int pitch;
 	int velocity;
@@ -39,7 +39,7 @@ typedef struct {
 	double getLength() const {
 		return max (0, (end - start));
 	}
-} MidiNote;
+};
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;

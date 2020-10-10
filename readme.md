@@ -41,6 +41,7 @@ The installer installs the extension into your user configuration, not the progr
 
 By default, the OSARA key map will be installed, completely replacing your existing key map.
 If you do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
+If the installer does replace the key map, a backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
 Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
@@ -144,6 +145,11 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
 - Item properties: Toggle mute: Alt+F5
 - Item: Open associated project in new tab
+- Item: Nudge items volume +1dB
+- Item: Nudge items volume -1dB
+- Xenakios/SWS: Nudge item volume down
+- Xenakios/SWS: Nudge item volume up
+- Item: Set item end to source media end
 
 #### Takes
 - Take: Switch items to next take: T
@@ -152,6 +158,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item properties: Set take channel mode to mono (left): Shift+F6
 - Item properties: Set take channel mode to mono (downmix): Shift+F7
 - Item properties: Set take channel mode to mono (right): Shift+F8
+- Take: Nudge active takes volume +1dB
+- Take: Nudge active takes volume -1dB
+- Xenakios/SWS: Nudge active take volume down
+- Xenakios/SWS: Nudge active take volume up
 
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
