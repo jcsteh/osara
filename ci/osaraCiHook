@@ -3,7 +3,6 @@
 import sys
 import os.path
 import json
-import shutil
 import datetime
 import urllib.request
 import markdown
@@ -21,12 +20,6 @@ def getData(buildOs):
 	except IOError:
 		return None
 
-def dlMac(data):
-	dmg = os.path.basename(data["dmg"])
-	print("Downloading %s" % dmg)
-	shutil.copyfileobj(sys.stdin.buffer,
-		open(os.path.join(SNAPSHOTS_DIR, dmg), "wb"))
-
 def writeSnapshotIndex(winData, macData):
 	print("Writing snapshot index")
 	with open(SNAPSHOT_INDEX_FILE, "w") as f:
@@ -42,13 +35,15 @@ def writeSnapshotIndex(winData, macData):
 '<p>Support requests should be posted on the <a href="https://groups.io/g/rwp">Reapers Without Peepers (RWP) group</a>.</p>\n'
 			"<ul>\n")
 		if winData:
-			f.write(
-				'<li><a href="https://ci.appveyor.com/api/buildjobs/{win[jobId]}/artifacts/installer/{win[exe]}">Download OSARA {win[version]} for Windows</a> ({win[date]})</li>\n'
-				.format(win=winData))
+			winData["osName"] = "Windows"
 		if macData:
+			macData["osName"] = "Mac"
+		for data in winData, macData:
+			if not data:
+				continue
 			f.write(
-				'<li><a href="{mac[dmg]}">Download OSARA {mac[version]} for Mac</a> ({mac[date]})</li>\n'
-				.format(mac=macData))
+				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/installer/{data[installer]}">Download OSARA {data[version]} for {data[osName]}</a> ({data[date]})</li>\n'
+				.format(data=data))
 		f.write(
 			"</ul>\n"
 			"</body>\n"
@@ -71,8 +66,7 @@ def updateReadme():
 		f.write('\n</body>\n</html>\n')
 
 def main():
-	jsonData = sys.stdin.buffer.readline().decode("UTF-8")
-	data = json.loads(jsonData)
+	data = json.loads(sys.stdin.readline())
 	data["date"] = datetime.datetime.utcnow().ctime()
 	buildOs = data["os"]
 	if not buildOs.isalpha():
@@ -86,7 +80,6 @@ def main():
 	else:
 		macData = data
 		winData = getData("win")
-		dlMac(data)
 
 	writeSnapshotIndex(winData, macData)
 	if buildOs == "win":

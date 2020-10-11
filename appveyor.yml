@@ -1,5 +1,7 @@
 version: "2020.1pre-{build}"
-image: Visual Studio 2019
+image:
+ - Visual Studio 2019
+ - macos
 
 branches:
  only:
@@ -11,34 +13,42 @@ environment:
   secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
 
 init:
- - ps:       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
- - py -m pip install scons
+ - ps: |
+     If (([regex]::Matches($env:APPVEYOR_BUILD_VERSION, "," )).count -eq 0) {
+      Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+     }
+ - cmd: py -m pip install scons
+ - sh: pip3 install --user scons
 
 clone_depth: 1
 
 install:
- - cd ci
+ - ps: cd ci
  # Decrypt files.
- - openssl enc -aes-256-cbc -d -pass pass:%encFileKey% -in ssh_id_rsa.enc -out ssh_id_rsa
+ - ps: openssl enc -aes-256-cbc -d -pass pass:$env:encFileKey -in ssh_id_rsa.enc -out ssh_id_rsa
  # Install ssh stuff.
- - copy ssh_id_rsa %userprofile%\.ssh\id_rsa
- - type ssh_known_hosts >> %userprofile%\.ssh\known_hosts
- - cd ..
+ - sh: mkdir ~/.ssh && chmod 700 ~/.ssh
+ - ps: Copy-Item ssh_id_rsa $HOME/.ssh/id_rsa
+ - sh: chmod 600 ~/.ssh/id_rsa
+ - ps: Add-Content -Path $HOME/.ssh/known_hosts -Value $(Get-Content ssh_known_hosts  )
+ - ps: cd ..
  - git submodule update --init
 
 build_script:
- - c:\python37\scripts\scons.exe version=%APPVEYOR_BUILD_VERSION% publisher="James Teh"
+ - ps: If ($IsWindows) { $scons = "c:\python37\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.7/bin/scons" }
+ - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh"'
 
 artifacts:
- - path: installer\*.exe
+ - path: installer/*.exe
+ - path: installer/*.dmg
 
 deploy_script:
  - ps: |
-     $exe = Get-ChildItem -Name installer\*.exe
+     $installer = Get-ChildItem -Name installer/*.exe, installer/*.dmg
      $data = @{
-      os="win";
+      os=$(If ($IsWindows) { "win" } Else { "mac" });
       jobId=$env:APPVEYOR_JOB_ID;
       version=$env:APPVEYOR_BUILD_VERSION;
-      exe=$exe
+      installer=$installer
      }
      ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
