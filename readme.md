@@ -629,9 +629,9 @@ To build OSARA, you will need:
 	* [Download Visual Studio 2019 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 	* When installing Visual Studio, you need to enable the following:
 		- On the Workloads tab, in the Windows group: Desktop development with C++
-- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 9:
-	* Xcode 10 is not yet supported.
-	* You can download Xcode 9 from the [Apple Developer Downloads page](https://developer.apple.com/downloads/more/).
+- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 11:
+	* Xcode 12 may work, but hasn't been tested.
+	* You can download Xcode 11 from the [Apple Developer Downloads page](https://developer.apple.com/download/more/).
 - Python, version 3.7 or later:
 	* This is needed by SCons.
 	* [Download Python](https://www.python.org/downloads/)
