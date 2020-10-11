@@ -18,14 +18,7 @@
 #include <map>
 #include <iomanip>
 #include <math.h>
-// Support for experimental/optional can be removed once we drop support for
-// Xcode 9.
-#if __has_include(<optional>)
-# include <optional>
-#else
-# include <experimental/optional>
-using namespace std::experimental;
-#endif
+#include <optional>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
@@ -2438,7 +2431,7 @@ void cmdToggleSelection(Command* command) {
 			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
 			if(!selectOpt)
 				return;
-			select = *selectOpt;
+			select = selectOpt.value();
 			break;
 		}
 		default:

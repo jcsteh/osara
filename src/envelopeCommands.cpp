@@ -14,14 +14,7 @@
 #include <functional>
 #include <set>
 #include <algorithm>
-// Support for experimental/optional can be removed once we drop support for
-// Xcode 9.
-#if __has_include(<optional>)
-# include <optional>
-#else
-# include <experimental/optional>
-using namespace std::experimental;
-#endif
+#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -350,7 +343,7 @@ void cmdhSelectEnvelope(int direction) {
 
 	SetCursorContext(2, env);
 	currentAutomationItem = -1;
-	currentEnvelopePoint = nullopt;
+	currentEnvelopePoint.reset();
 	fakeFocus = FOCUS_ENVELOPE;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
