@@ -15,7 +15,11 @@ environment:
 init:
  - ps: |
      If (([regex]::Matches($env:APPVEYOR_BUILD_VERSION, "," )).count -eq 0) {
-      Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+      If ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+       Update-AppveyorBuild -Version ("pr$env:APPVEYOR_PULL_REQUEST_NUMBER-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+      } Else {
+       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+      }
      }
  - cmd: py -m pip install scons
  - sh: pip3 install --user scons
@@ -23,15 +27,23 @@ init:
 clone_depth: 1
 
 install:
- - ps: cd ci
- # Decrypt files.
- - ps: openssl enc -aes-256-cbc -d -pass pass:$env:encFileKey -in ssh_id_rsa.enc -out ssh_id_rsa
- # Install ssh stuff.
- - sh: mkdir ~/.ssh && chmod 700 ~/.ssh
- - ps: Copy-Item ssh_id_rsa $HOME/.ssh/id_rsa
- - sh: chmod 600 ~/.ssh/id_rsa
- - ps: Add-Content -Path $HOME/.ssh/known_hosts -Value $(Get-Content ssh_known_hosts  )
- - ps: cd ..
+ - ps: |
+     If (!$env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      cd ci
+      # Decrypt files.
+      openssl enc -aes-256-cbc -d -pass pass:$env:encFileKey -in ssh_id_rsa.enc -out ssh_id_rsa
+      # Install ssh stuff.
+      If ($IsMacOS) {
+       mkdir $HOME/.ssh
+       chmod 700 $HOME/.ssh
+      }
+      Copy-Item ssh_id_rsa $HOME/.ssh/id_rsa
+      If ($IsMacOS) {
+       chmod 600 $HOME/.ssh/id_rsa
+      }
+      Add-Content -Path $HOME/.ssh/known_hosts -Value $(Get-Content ssh_known_hosts  )
+      cd ..
+     }
  - git submodule update --init
 
 build_script:
@@ -44,11 +56,20 @@ artifacts:
 
 deploy_script:
  - ps: |
-     $installer = Get-ChildItem -Name installer/*.exe, installer/*.dmg
-     $data = @{
-      os=$(If ($IsWindows) { "win" } Else { "mac" });
-      jobId=$env:APPVEYOR_JOB_ID;
-      version=$env:APPVEYOR_BUILD_VERSION;
-      installer=$installer
+     If (!$env:APPVEYOR_PULL_REQUEST_NUMBER) {
+      $installer = Get-ChildItem -Name installer/*.exe, installer/*.dmg
+      $data = @{
+       os=$(If ($IsWindows) { "win" } Else { "mac" });
+       jobId=$env:APPVEYOR_JOB_ID;
+       version=$env:APPVEYOR_BUILD_VERSION;
+       installer=$installer
+      }
+      ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
      }
-     ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
+
+notifications:
+ - provider: GitHubPullRequest
+   on_build_success: false
+   on_build_failure: true
+   on_build_status_changed: false
+   template: '{{#failed}} Build failed! See [{{status}} build]({{buildUrl}}) of [commit {{commitId}}]({{commitUrl}}) {{/failed}}'
