@@ -110,7 +110,7 @@ class ReaperObjParamSource: public ParamSource {
 	public:
 
 	int getParamCount() {
-		return this->params.size();
+		return (int)this->params.size();
 	}
 
 	string getParamName(int param) {
@@ -464,7 +464,7 @@ class ParamsDialog {
 			this->visibleParams.push_back(p);
 			ComboBox_AddString(this->paramCombo, name.c_str());
 			if (p == prevSelParam)
-				newComboSel = this->visibleParams.size() - 1;
+				newComboSel = (int)this->visibleParams.size() - 1;
 		}
 		ComboBox_SetCurSel(this->paramCombo, newComboSel);
 		if (this->visibleParams.empty()) {
@@ -879,7 +879,7 @@ FxList listFx(MediaItem_Take* track) {
 template<typename ReaperObj>
 void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	const auto fxList = listFx(obj);
-	const int fxCount = fxList.size();
+	const size_t fxCount = fxList.size();
 	int fx = -1;
 	if (fxCount == 0) {
 		outputMessage("No FX");
@@ -891,13 +891,13 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 		HMENU effects = CreatePopupMenu();
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(MENUITEMINFO);
-		for (int f = 0; f < fxCount; ++f) {
+		for (size_t f = 0; f < fxCount; ++f) {
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = fxList[f].first + 1;
 			itemInfo.dwTypeData = (char*)fxList[f].second.c_str();
-			itemInfo.cch = fxList[f].second.length();
-			InsertMenuItem(effects, f, true, &itemInfo);
+			itemInfo.cch = (UINT)fxList[f].second.length();
+			InsertMenuItem(effects, (UINT)f, true, &itemInfo);
 		}
 		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
 		DestroyMenu(effects);

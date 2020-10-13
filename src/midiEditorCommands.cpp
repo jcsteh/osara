@@ -197,7 +197,8 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	// Calculate the minimum note length.
 	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(NULL, NULL, max(DEFAULT_PREVIEW_LENGTH, (minLength * 1000)), previewDone);
+	previewDoneTimer = SetTimer(nullptr, 0,
+		(UINT)max(DEFAULT_PREVIEW_LENGTH, (minLength * 1000)), previewDone);
 }
 
 void cmdMidiMoveCursor(Command* command) {
@@ -227,7 +228,7 @@ void cmdMidiMoveCursor(Command* command) {
 }
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
-	static char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
+	static const char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
 		"f sharp", "g", "g sharp", "a", "a sharp", "b"};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
@@ -328,9 +329,10 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 		notes.push_back({chan, pitch, vel, note, start, end});
 	}
 	sort(notes.begin(), notes.end(), compareNotesByPitch);
-	const int lastNoteIndex = notes.size() - 1;
+	const int lastNoteIndex = (int)notes.size() - 1;
 	// Work out which note to move to.
-	if (direction != 0 && 0 <= curNoteInChord && curNoteInChord <= lastNoteIndex) {
+	if (direction != 0 && 0 <= curNoteInChord &&
+			curNoteInChord <= (int)lastNoteIndex) {
 		// Already on a note within the chord. Move to the next/previous note.
 		curNoteInChord += direction;
 		// If we were already on the first/last note, stay there.
@@ -338,7 +340,7 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 			curNoteInChord -= direction;
 	} else if (direction != 0) {
 		// We're moving into a new chord. Move to the first/last note.
-		curNoteInChord = direction == 1 ? 0 : lastNoteIndex;
+		curNoteInChord = direction == 1 ? 0 : (int)lastNoteIndex;
 	}
 	return notes[curNoteInChord];
 }
@@ -480,6 +482,8 @@ void cmdMidiToggleSelection(Command* command) {
 			selectCC(take, currentCC, select);
 			break;
 		}
+		default:
+			return;
 	}
 	outputMessage(select ? "selected" : "unselected");
 }
