@@ -515,7 +515,7 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	}
 	ostringstream s;
 	int count;
-	if (count = countSelectedAutomationItems(envelope)) {
+	if ((count = countSelectedAutomationItems(envelope))) {
 		s << count << (count == 1 ? " automation item" : " automation items");
 	} else {
 		count = countSelectedEnvelopePoints(envelope);
@@ -533,12 +533,13 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-void reportToggleTrackEnvelope(char* envType) {
+void reportToggleTrackEnvelope(const char* envType) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		return;
 	}
-	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV", envType);
+	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
+		(void*)envType);
 	bool visible = envelope && isEnvelopeVisible(envelope);
 	ostringstream s;
 	s << (visible ? "showed " : "hid ");

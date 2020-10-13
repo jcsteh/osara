@@ -13,10 +13,13 @@
 #include <Windowsx.h>
 #include <Commctrl.h>
 #endif
+// Must be defined before any C++ STL header is included.
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <string>
 #include <sstream>
 #include <map>
 #include <iomanip>
+#include <cassert>
 #include <math.h>
 #include <optional>
 #ifdef _WIN32
@@ -180,7 +183,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_MINSEC: {
 			// Minutes:seconds
-			int minute = time / 60;
+			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
 				s << minute << " min ";
@@ -198,7 +201,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_FRAME: {
 			// Frames
-			int frame = time * TimeMap_curFrameRate(0, NULL);
+			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 			if (!useCache || oldFrame != frame) {
 				s << frame << (frame == 1 ? " frame" : " frames");
 				oldFrame = frame;
@@ -207,25 +210,25 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
-			int hour = time / 3600;
+			int hour = (int)(time / 3600);
 			time = fmod(time, 3600);
 			if (!useCache || oldHour != hour) {
 				s << hour << (hour == 1 ? " hour " : " hours ");
 				oldHour = hour;
 			}
-			int minute = time / 60;
+			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
 				s << minute << " min ";
 				oldMinute = minute;
 			}
-			int second = time;
+			int second = (int)time;
 			if (!useCache || oldSecond != second) {
 				s << second << " sec ";
 				oldSecond = second;
 			}
 			time = time - second;
-			int frame = time * TimeMap_curFrameRate(0, NULL);
+			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
 				s << frame << (frame == 1 ? " frame" : " frames");
 				oldFrame = frame;
@@ -238,6 +241,8 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			s << buf << " samples";
 			break;
 		}
+		default:
+			assert(false);
 	}
 	// #31: Clear cache for other units to avoid confusion if they are used later.
 	resetTimeCache(format);
@@ -415,7 +420,6 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 }
 
 MediaItem* getItemWithFocus() {
-	MediaItem* item;
 	// try to provide information based on the last item spoken by osara if it is selected
 	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
 		&& IsMediaItemSelected(currentItem)
@@ -669,7 +673,7 @@ void postGoToSpecificMarker(int command) {
 	}
 }
 
-void postChangeVolumeH(double volume, int command, char* commandMessage) {
+void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
 	if(lastCommand != command) 
 		s << commandMessage;
@@ -1073,7 +1077,7 @@ void postTakeChannelMode(int command) {
 		outputMessage("no items selected");
 		return;
 	}
-	char* mode;
+	const char* mode;
 	switch(command) {
 		case 40176: {
 			mode = "normal";
@@ -1399,6 +1403,8 @@ bool showReaperContextMenu(const int menu) {
 			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr,
 				currentAutomationItem + 1, 0);
 			return true;
+		default:
+			break;
 	}
 	return false;
 }
@@ -2337,6 +2343,8 @@ void cmdReportSelection(Command* command) {
 			}
 			break;
 		}
+		default:
+			return;
 	}
 	if (count == 0)
 		s << "No selection";
@@ -3117,7 +3125,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		surface = createSurface();
 		rec->Register("csurf_inst", (void*)surface);
 		registerExports(rec);
-		SetTimer(NULL, NULL, 0, delayedInit);
+		SetTimer(nullptr, 0, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
 #endif

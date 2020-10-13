@@ -18,7 +18,7 @@ sources = [
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CPPFLAGS="/EHsc /std:c++latest")
+	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX")
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
@@ -41,12 +41,16 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++17"))
+	cxxFlags = "-stdlib=libc++ -std=c++17 -Werror"
+	env.Append(CXXFLAGS=cxxFlags)
 	# SWELL files.
-	sources.extend(swellDir.File(f) for f in (
-		"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
-		"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
-		"swell-wnd.mm", "swell-modstub.mm",
+	sources.extend(
+		# Disable warnings for SWELL, since we don't have any control over those.
+		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + "-Wno-everything")
+		for f in (
+			"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
+			"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
+			"swell-wnd.mm", "swell-modstub.mm",
 	))
 	sources.append("osxa11y.mm")
 	libs = []

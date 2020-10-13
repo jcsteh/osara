@@ -237,8 +237,9 @@ void cmdPeakWatcher(Command* command) {
 				s << "current ";
 			s << (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 			char* name;
-			if (name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL))
+			if ((name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr))) {
 				s << ": " << name;
+			}
 			ComboBox_AddString(trackSel, s.str().c_str());
 			s.str("");
 			if (!pwTrack.follow && pwTrack.track == track)
