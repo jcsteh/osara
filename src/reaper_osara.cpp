@@ -1864,6 +1864,8 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		// so we must first unselected.
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
+		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		SetMixerScroll(track); // MCP
 		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		if (clearSelection || select)
