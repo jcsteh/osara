@@ -1672,7 +1672,7 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	HWND dialog = GetAncestor(parent, GA_ROOT);
-	if (dialog == parent) {
+	if (dialog == parent || dialog == mainHwnd) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
