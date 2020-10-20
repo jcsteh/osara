@@ -258,6 +258,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Time selection: Nudge right: Control+Alt+]
 - Time selection: Shift left (by time selection length): Shift+[
 - Time selection: Shift right (by time selection length): Shift+]
+- Go to start of time selection: home
+- Go to end of time selection: end
 
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X

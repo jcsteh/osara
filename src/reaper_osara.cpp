@@ -1276,6 +1276,8 @@ PostCommand POST_COMMANDS[] = {
 	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
 	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
+	{40630, postCursorMovement}, // Go to start of time selection
+	{40631, postCursorMovement}, // Go to end of time selection
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
