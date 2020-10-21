@@ -538,6 +538,10 @@ void reportToggleTrackEnvelope(const char* envType) {
 	if (!track) {
 		return;
 	}
+	if (!isTrackSelected(track)) {
+		outputMessage("track not selected");
+		return;
+	}
 	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
 		(void*)envType);
 	bool visible = envelope && isEnvelopeVisible(envelope);

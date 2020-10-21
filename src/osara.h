@@ -216,6 +216,8 @@ std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=fa
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
 
+bool isTrackSelected(MediaTrack* track);
+
 #ifdef _WIN32
 #include <string>
 #include <oleacc.h>
