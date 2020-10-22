@@ -1141,6 +1141,27 @@ void postSetItemEnd(int command) {
 	outputMessage(s);
 }
 
+void postChangeItemGroup(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	int selCount = CountSelectedMediaItems(nullptr);
+	ostringstream s;
+	if (selCount == 1) {
+		s << "item";
+	} else {
+		s << selCount << " items";
+	}
+	int groupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
+	if (groupId) {
+		s << " added to group";
+	} else {
+		s << " removed from group";
+	}
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1278,6 +1299,8 @@ PostCommand POST_COMMANDS[] = {
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
 	{40630, postCursorMovement}, // Go to start of time selection
 	{40631, postCursorMovement}, // Go to end of time selection
+	{40032, postChangeItemGroup}, // Item grouping: Group items
+	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {

@@ -140,6 +140,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item navigation: Move cursor right to edge of item: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
 - Item: Select all items on selected tracks in current time selection: Alt+Shift+A
+- Item grouping: Group items: control+g
+- Item grouping: Remove items from group: control+shift+g
 - Item grouping: Select all items in groups: Shift+G
 - Item: Select all items in current time selection: Control+Shift+A
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
