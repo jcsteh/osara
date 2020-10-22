@@ -1823,29 +1823,35 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		// #47: Deleting the last track results in no last touched track.
 		// Therefore, navigate to the last track.
 		num = count - 1;
+		origTrack = GetTrack(nullptr, num);
 	}
 	MediaTrack* track = origTrack;
 	// We use -1 for the master track.
 	for (; -1 <= num && num < count; num += direction) {
 		if (num == -1) {
-			if (!(GetMasterTrackVisibility() & 1))
-				continue; // Invisible.
-			track = GetMasterTrack(0);
-		} else {
-			track = GetTrack(0, num);
-			if (isTrackInClosedFolder(track)) {
-				// This track is inside a closed folder, so skip it.
-				if (direction == 1 && num == count - 1) {
-					// We're moving forward and we're on the last track.
-					// Therefore, go backward.
-					// Note that this can't happen when the user moves backward
-					// because the first track can never be inside a folder.
-					direction = -1;
+			if (!(GetMasterTrackVisibility() & 1)) {
+				// Invisible.
+				if (direction == -1) {
+					// We're moving backward and we're on the master track, which is
+					// invisible. Return to the original track.
+					track = origTrack;
+					break;
 				}
 				continue;
 			}
-			if (!IsTrackVisible(track, false))
+			track = GetMasterTrack(0);
+		} else {
+			track = GetTrack(nullptr, num);
+			if (!IsTrackVisible(track, false) || isTrackInClosedFolder(track)) {
+				// This track is invisible or inside a closed folder, so skip it.
+				if (direction == 1 && num == count - 1) {
+					// We're moving forward and we're on the last track, which is
+					// invisible. Return to the original track.
+					track = origTrack;
+					break;
+				}
 				continue;
+			}
 		}
 		break;
 	}
