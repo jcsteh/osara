@@ -743,10 +743,10 @@ class TrackParams: public ReaperObjParamSource {
 				GetTCPFXParm(nullptr, track, i, &fx, &param);
 				ostringstream displayName;
 				char name[256];
-				TrackFX_GetFXName(track, fx, name, sizeof(name));
-				displayName << name << " ";
 				TrackFX_GetParamName(track, fx, param, name, sizeof(name));
 				displayName << name;
+				TrackFX_GetFXName(track, fx, name, sizeof(name));
+				displayName << " (" << name << ")";
 				this->params.push_back(make_unique<TcpFxParamProvider>(displayName.str(),
 					*this->fxParams, fx, param));
 			}
