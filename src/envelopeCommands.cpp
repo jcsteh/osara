@@ -482,7 +482,14 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		// Report the automation item.
 		fakeFocus = FOCUS_AUTOMATIONITEM;
 		ostringstream s;
-		s << "Auto " << i + 1;
+		s << "Auto ";
+		char name[500];
+		GetSetAutomationItemInfo_String(envelope, i, "P_POOL_NAME", name, false);
+		if (name[0]) {
+			s << name;
+		} else {
+			s << i + 1;
+		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
 			if (countSelectedAutomationItems(envelope, true) > 1) {

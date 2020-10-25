@@ -162,6 +162,7 @@
 #define REAPERAPI_WANT_GetTCPFXParm
 #define REAPERAPI_WANT_GetMediaItemTakeInfo_Value
 #define REAPERAPI_WANT_SetMixerScroll
+#define REAPERAPI_WANT_GetSetAutomationItemInfo_String
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
