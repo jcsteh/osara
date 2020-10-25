@@ -430,6 +430,15 @@ MediaItem* getItemWithFocus() {
 	return nullptr;
 }
 
+bool shouldReportTimeMovementWhilePlaying = true;
+bool shouldReportTimeMovement() {
+	if (shouldReportTimeMovementWhilePlaying) {
+		return true;
+	}
+	// Don't report if playing.
+	return !(GetPlayState() & 1);
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -563,7 +572,9 @@ bool shouldReportScrub = true;
 
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
-	outputMessage(formatCursorPosition().c_str());
+	if (shouldReportTimeMovement()) {
+		outputMessage(formatCursorPosition().c_str());
+	}
 }
 
 void postCursorMovementScrub(int command) {
@@ -2153,7 +2164,7 @@ void cmdMoveItemEdge(Command* command) {
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	if(GetPlayState() & 1) { //don't talk while playing
+	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
@@ -2683,7 +2694,7 @@ void cmdNudgeTimeSelection(Command* command) {
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
-	if(GetPlayState() & 1) { // don't talk while playing
+	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	if(first) 
@@ -2856,6 +2867,8 @@ extern bool shouldReportNotes;
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
 	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
+	shouldReportTimeMovementWhilePlaying =
+		GetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying")[0] != '0';
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
@@ -2864,6 +2877,11 @@ void loadConfig() {
 void config_onOk(HWND dialog) {
 	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
+	shouldReportTimeMovementWhilePlaying =
+		IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING)
+		== BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying",
+		shouldReportTimeMovementWhilePlaying ? "1" : "0", true);
 	shouldReportFx = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_FX) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
 	shouldReportTransport = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TRANSPORT) == BST_CHECKED;
@@ -2895,6 +2913,8 @@ void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
+		shouldReportTimeMovementWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
