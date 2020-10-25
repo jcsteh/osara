@@ -166,6 +166,8 @@
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
+const char CONFIG_SECTION[] = "osara";
+
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
 static bool bTrue = true;

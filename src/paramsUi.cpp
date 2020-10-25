@@ -279,6 +279,8 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 };
 
+const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
+
 class ParamsDialog {
 	private:
 	unique_ptr<ParamSource> source;
@@ -372,6 +374,27 @@ class ParamsDialog {
 		this->updateValue();
 	}
 
+	void saveWindowPos() {
+		RECT rect;
+		GetWindowRect(this->dialog, &rect);
+		ostringstream s;
+		s << rect.left << " " << rect.top << " " <<
+			(rect.right - rect.left) << " " << (rect.bottom - rect.top);
+		SetExtState(CONFIG_SECTION, CFGKEY_DIALOG_POS, s.str().c_str(), true);
+	}
+
+	void restoreWindowPos() {
+		const char* config = GetExtState(CONFIG_SECTION, CFGKEY_DIALOG_POS);
+		if (!config[0]) {
+			return;
+		}
+		istringstream s(config);
+		int x, y, w, h;
+		s >> x >> y >> w >> h;
+		SetWindowPos(this->dialog, nullptr, x, y, w, h,
+			SWP_NOACTIVATE | SWP_NOZORDER);
+	}
+
 	static INT_PTR CALLBACK dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
@@ -386,12 +409,14 @@ class ParamsDialog {
 					dialog->onValueEdited();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
+					dialog->saveWindowPos();
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
 				}
 				break;
 			case WM_CLOSE:
+				dialog->saveWindowPos();
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
@@ -511,6 +536,7 @@ class ParamsDialog {
 		plugin_register("accelerator", &this->accelReg);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->updateParamList();
+		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 	}
 

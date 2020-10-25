@@ -2849,8 +2849,6 @@ map<pair<int, int>, Command*> commandsMap;
  * For new settings, appropriate code needs to be added to loadConfig, config_onOk and cmdConfig.
  ***/
 
-const char CONFIG_SECTION[] = "osara";
-
 extern bool shouldReportNotes;
 
 void loadConfig() {
