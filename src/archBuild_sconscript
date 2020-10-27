@@ -41,8 +41,10 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	cxxFlags = "-stdlib=libc++ -std=c++17 -Werror"
+	coreFlags = "-mmacosx-version-min=10.7 -stdlib=libc++"
+	cxxFlags = coreFlags + " -std=c++17 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
+	env.Append(LINKFLAGS=coreFlags)
 	# SWELL files.
 	sources.extend(
 		# Disable warnings for SWELL, since we don't have any control over those.

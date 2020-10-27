@@ -2483,7 +2483,7 @@ void cmdToggleSelection(Command* command) {
 			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
 			if(!selectOpt)
 				return;
-			select = selectOpt.value();
+			select = *selectOpt;
 			break;
 		}
 		default:
