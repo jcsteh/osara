@@ -31,7 +31,7 @@ install:
      If (!$env:APPVEYOR_PULL_REQUEST_NUMBER) {
       cd ci
       # Decrypt files.
-      openssl enc -aes-256-cbc -d -pass pass:$env:encFileKey -in ssh_id_rsa.enc -out ssh_id_rsa
+      openssl enc -aes-256-cbc -md md5 -d -pass pass:$env:encFileKey -in ssh_id_rsa.enc -out ssh_id_rsa
       # Install ssh stuff.
       If ($IsMacOS) {
        mkdir $HOME/.ssh
