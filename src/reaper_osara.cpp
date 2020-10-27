@@ -6,7 +6,6 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #ifdef _WIN32
 #include <initguid.h>
 #include <oleacc.h>

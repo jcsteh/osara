@@ -6,13 +6,15 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <algorithm>
 #include <iomanip>
 #include <memory>
+// osara.h includes windows.h, which must be included before other Windows
+// headers.
+#include "osara.h"
 #ifdef _WIN32
 #include <initguid.h>
 #include <Windowsx.h>
@@ -22,7 +24,6 @@
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
 #include <reaper/reaper_plugin.h>
-#include "osara.h"
 #include "resource.h"
 
 using namespace std;

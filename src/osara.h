@@ -9,7 +9,15 @@
 #ifndef _OSARA_H
 #define _OSARA_H
 
-#include <windows.h>
+#ifdef _WIN32
+# include <windows.h>
+#else
+// Disable warnings for SWELL, since we don't have any control over those.
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Weverything"
+# include <windows.h>
+# pragma clang diagnostic pop
+#endif
 #include <string>
 #include <sstream>
 
