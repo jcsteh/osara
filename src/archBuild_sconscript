@@ -46,7 +46,7 @@ else: # Mac
 	# SWELL files.
 	sources.extend(
 		# Disable warnings for SWELL, since we don't have any control over those.
-		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + "-Wno-everything")
+		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + " -Wno-everything")
 		for f in (
 			"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
 			"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
