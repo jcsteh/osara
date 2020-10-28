@@ -111,9 +111,6 @@ LRESULT CALLBACK uiaWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
 			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
-				if (!uiaProvider) {
-					uiaProvider = new UiaProviderImpl(uiaWnd);
-				}
 				return UiaReturnRawElementProvider(hwnd, wParam, lParam, uiaProvider);
 			}
 			return 0;
@@ -166,6 +163,8 @@ bool initializeUia() {
 		return false;
 	}
 	ShowWindow(uiaWnd, SW_SHOWNA);
+	uiaProvider = new UiaProviderImpl(uiaWnd);
+	uiaProvider->AddRef();
 	return true;
 }
 
