@@ -190,6 +190,10 @@ bool terminateUia() {
 }
 
 bool shouldUseUiaNotifications() {
+	if (!uiaWnd) {
+		// Not available (requires Windows 10 fall creators update or above).
+		return false;
+	}
 	static optional<bool> cachedResult;
 	if (!cachedResult) {
 		// Don't use for JAWS because JAWS ignores these events in REAPER.

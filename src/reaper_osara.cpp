@@ -88,7 +88,6 @@ string narrow(const wstring& text) {
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message, bool interrupt) {
-	// Use UIA when available (Windows 10 fall creators update and above)
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;
