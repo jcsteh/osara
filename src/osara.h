@@ -233,7 +233,7 @@ extern IAccPropServices* accPropServices;
 // uia.cpp
 bool initializeUia();
 bool terminateUia();
-bool sendUiaNotification(const std::string& message);
+bool sendUiaNotification(const std::string& message, bool interrupt = true);
 extern HWND uiaWnd;
 
 #else

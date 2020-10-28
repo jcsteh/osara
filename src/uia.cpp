@@ -187,14 +187,14 @@ bool terminateUia() {
 	return true;
 }
 
-bool sendUiaNotification(const string& message) {
+bool sendUiaNotification(const string& message, bool interrupt) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
 	return (uiaRaiseNotificationEvent_ptr(
 		uiaProvider,
 		NotificationKind_Other,
-		NotificationProcessing_MostRecent,
+		interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
 		SysAllocString(widen(message).c_str()),
 		SysAllocString(L"REAPER_OSARA")
 	) == S_OK);
