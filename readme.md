@@ -28,7 +28,7 @@ OSARA requires REAPER 5.982 or later.
 The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
 It has only been tested with the NVDA and VoiceOver screen readers.
-However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) to communicate information, so it should work with any screen reader which supports this correctly.
+However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) and UI Automation (UIA) to communicate information, so it should work with any screen reader which supports this correctly.
 
 ## Download and Installation
 You can download the latest OSARA installer from the [OSARA Development Snapshots](https://osara.reaperaccessibility.com/snapshots/) page.
