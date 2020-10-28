@@ -8,6 +8,7 @@
 #include <uiautomation.h>
 #include <ole2.h>
 #include <atlcomcli.h>
+#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -186,6 +187,15 @@ bool terminateUia() {
 		uiAutomationCore = nullptr;
 	}
 	return true;
+}
+
+bool shouldUseUiaNotifications() {
+	static optional<bool> cachedResult;
+	if (!cachedResult) {
+		// Don't use for JAWS because JAWS ignores these events in REAPER.
+		cachedResult.emplace(!GetModuleHandleA("jhook.dll"));
+	}
+	return *cachedResult;
 }
 
 bool sendUiaNotification(const string& message, bool interrupt) {
