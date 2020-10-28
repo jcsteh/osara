@@ -3145,9 +3145,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
-		if (!initializeUia()) {
-			return 0;
-		}
+		initializeUia();
 #else
 		NSA11yWrapper::init();
 #endif

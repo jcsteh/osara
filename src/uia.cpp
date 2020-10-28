@@ -11,7 +11,7 @@
 
 using namespace std;
 
-HWND uiaWnd = 0;
+HWND uiaWnd = nullptr;
 const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
 typedef HRESULT(WINAPI *UiaRaiseNotificationEvent_funcType)(
 	_In_ IRawElementProviderSimple* provider,
