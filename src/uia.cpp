@@ -147,14 +147,16 @@ bool initializeUia() {
 		return false;
 	}
 	uiaWnd = CreateWindowEx(
-		0,
+		// Make it transparent because it has to have width/height.
+		WS_EX_TRANSPARENT,
 		WINDOW_CLASS_NAME,
 		"Reaper OSARA Notifications",
-		WS_DISABLED,
+		WS_CHILD | WS_DISABLED,
 		0,
 		0,
-		0,
-		0,
+		// UIA notifications fail if the window has 0 width/height.
+		1,
+		1,
 		mainHwnd,
 		0,
 		pluginHInstance,
