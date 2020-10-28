@@ -202,8 +202,8 @@ extern enum FakeFocus fakeFocus;
 
 extern bool isSelectionContiguous;
 
-void outputMessage(const std::string& message);
-void outputMessage(std::ostringstream& message);
+void outputMessage(const std::string& message, bool interrupt = true);
+void outputMessage(std::ostringstream& message, bool interrupt = true);
 
 typedef enum {
 	TF_NONE,

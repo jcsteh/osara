@@ -87,10 +87,10 @@ string narrow(const wstring& text) {
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
 	// Use UIA when available (Windows 10 fall creators update and above)
 	if (uiaWnd) {
-		if (sendUiaNotification(message)) {
+		if (sendUiaNotification(message, interrupt)) {
 			return;
 		}
 	}
@@ -119,14 +119,14 @@ void outputMessage(const string& message) {
 
 #else // _WIN32
 
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
 #endif // _WIN32
 
-void outputMessage(ostringstream& message) {
-	outputMessage(message.str());
+void outputMessage(ostringstream& message, bool interrupt) {
+	outputMessage(message.str(), interrupt);
 }
 
 string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
