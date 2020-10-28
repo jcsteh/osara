@@ -7,6 +7,7 @@
 
 #include <uiautomation.h>
 #include <ole2.h>
+#include <atlcomcli.h>
 #include "osara.h"
 
 using namespace std;
@@ -105,7 +106,7 @@ class UiaProviderImpl : public IRawElementProviderSimple {
 	HWND controlHWnd; // The HWND for the control.
 };
 
-IRawElementProviderSimple* uiaProvider = nullptr;
+CComPtr<IRawElementProviderSimple> uiaProvider;
 
 LRESULT CALLBACK uiaWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
@@ -164,13 +165,12 @@ bool initializeUia() {
 	}
 	ShowWindow(uiaWnd, SW_SHOWNA);
 	uiaProvider = new UiaProviderImpl(uiaWnd);
-	uiaProvider->AddRef();
 	return true;
 }
 
 bool terminateUia() {
 	if (uiaProvider) {
-		delete uiaProvider;
+		uiaProvider = nullptr;
 	}
 	ShowWindow(uiaWnd, SW_HIDE);
 	if (!DestroyWindow(uiaWnd)) {
