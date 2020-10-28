@@ -89,9 +89,8 @@ string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message) {
 	// Use UIA when available (Windows 10 fall creators update and above)
-	if (UIAWnd) {
-		if (sendUIANotification(message)) {
-			lastMessage = message;
+	if (uiaWnd) {
+		if (sendUiaNotification(message)) {
 			return;
 		}
 	}
@@ -3146,7 +3145,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
-		if (!initializeUIA()) {
+		if (!initializeUia()) {
 			return 0;
 		}
 #else
@@ -3199,6 +3198,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
 		UnhookWinEvent(winEventHook);
+		terminateUia();
 		accPropServices->Release();
 #else
 		NSA11yWrapper::destroy();

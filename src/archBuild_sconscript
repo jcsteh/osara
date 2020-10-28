@@ -24,7 +24,7 @@ if env["PLATFORM"] == "win32":
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
 	sources.extend((
-		"UIA.cpp",
+		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
 		env.RES("reaper_osara.rc"),
 	))

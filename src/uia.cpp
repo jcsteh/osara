@@ -1,18 +1,17 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
- * UIAutomation code
- * Author: James Teh <jamie@jantrid.net>
- * Copyright 2019 NV Access Limited, James Teh
+ * UI Automation code
+ * Copyright 2019-2020 Leonard de Ruijter, James Teh
  * License: GNU General Public License version 2.0
  */
 
-#include "osara.h"
-#include <UIAutomation.h>
+#include <uiautomation.h>
 #include <ole2.h>
+#include "osara.h"
 
 using namespace std;
 
-HWND UIAWnd = 0;
+HWND uiaWnd = 0;
 const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
 typedef HRESULT(WINAPI *UiaRaiseNotificationEvent_funcType)(
 	_In_ IRawElementProviderSimple* provider,
@@ -21,14 +20,13 @@ typedef HRESULT(WINAPI *UiaRaiseNotificationEvent_funcType)(
 	_In_opt_ BSTR displayString,
 	_In_ BSTR activityId
 );
-HMODULE UIAutomationCore = nullptr;
-UiaRaiseNotificationEvent_funcType UiaRaiseNotificationEvent_ptr = nullptr;
+HMODULE uiAutomationCore = nullptr;
+UiaRaiseNotificationEvent_funcType uiaRaiseNotificationEvent_ptr = nullptr;
 
-// Provider code based on Microsoft's UIAutomationSimpleProvider example.
-class UIAProviderImpl : public IRawElementProviderSimple
-{
-public:
-	UIAProviderImpl(_In_ HWND hwnd): controlHWnd(hwnd) {}
+// Provider code based on Microsoft's uiautomationSimpleProvider example.
+class UiaProviderImpl : public IRawElementProviderSimple {
+	public:
+	UiaProviderImpl(_In_ HWND hwnd): controlHWnd(hwnd) {}
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() {
@@ -37,7 +35,7 @@ public:
 
 	ULONG STDMETHODCALLTYPE Release() {
 		long val = InterlockedDecrement(&refCount);
-		if (val <= 0) {
+		if (val == 0) {
 			delete this;
 		}
 		return val;
@@ -48,12 +46,11 @@ public:
 			return E_INVALIDARG;
 		}
 		if (riid == __uuidof(IUnknown)) {
-			// Several examples seem to cast to IRawElementProviderSimple instead of IUnknown in this case.
 			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
 		} else if (riid == __uuidof(IRawElementProviderSimple)) {
 			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
 		} else {
-			*ppInterface = NULL;
+			*ppInterface = nullptr;
 			return E_NOINTERFACE;
 		}
 		(static_cast<IUnknown*>(*ppInterface))->AddRef();
@@ -99,25 +96,25 @@ public:
 		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
 	}
 
-private:
-	virtual ~UIAProviderImpl() {
+	private:
+	virtual ~UiaProviderImpl() {
 		UiaDisconnectProvider(this);
 	}
-	// Ref Counter for this COM object
-	ULONG refCount;
+
+	ULONG refCount; // Ref Count for this COM object
 	HWND controlHWnd; // The HWND for the control.
 };
 
-IRawElementProviderSimple* UIAProvider = nullptr;
+IRawElementProviderSimple* uiaProvider = nullptr;
 
-LRESULT CALLBACK UIAWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK uiaWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
 			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
-				if (!UIAProvider) {
-					UIAProvider = new UIAProviderImpl(UIAWnd);
+				if (!uiaProvider) {
+					uiaProvider = new UiaProviderImpl(uiaWnd);
 				}
-				return UiaReturnRawElementProvider(hwnd, wParam, lParam, UIAProvider);
+				return UiaReturnRawElementProvider(hwnd, wParam, lParam, uiaProvider);
 			}
 			return 0;
 		default:
@@ -128,7 +125,7 @@ LRESULT CALLBACK UIAWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 WNDCLASSEX getWindowClass() {
 	WNDCLASSEX windowClass = {};
 	windowClass.cbSize = sizeof(WNDCLASSEX);
-	windowClass.lpfnWndProc = UIAWndProc;
+	windowClass.lpfnWndProc = uiaWndProc;
 	windowClass.hInstance = pluginHInstance;
 	windowClass.lpszClassName = WINDOW_CLASS_NAME;
 	return windowClass;
@@ -136,20 +133,20 @@ WNDCLASSEX getWindowClass() {
 
 WNDCLASSEX windowClass;
 
-bool initializeUIA() {
-	UIAutomationCore = LoadLibraryA("UIAutomationCore.dll");
-	if (!UIAutomationCore) {
+bool initializeUia() {
+	uiAutomationCore = LoadLibraryA("UIAutomationCore.dll");
+	if (!uiAutomationCore) {
 		return false;
 	}
-	UiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(UIAutomationCore, "UiaRaiseNotificationEvent");
-	if (!UiaRaiseNotificationEvent_ptr) {
+	uiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(uiAutomationCore, "UiaRaiseNotificationEvent");
+	if (!uiaRaiseNotificationEvent_ptr) {
 		return false;
 	}
 	windowClass = getWindowClass();
 	if (!RegisterClassEx(&windowClass)) {
 		return false;
 	}
-	UIAWnd = CreateWindowEx(
+	uiaWnd = CreateWindowEx(
 		0,
 		WINDOW_CLASS_NAME,
 		"Reaper OSARA Notifications",
@@ -163,45 +160,42 @@ bool initializeUIA() {
 		pluginHInstance,
 		nullptr
 	);
-	if (!UIAWnd) {
+	if (!uiaWnd) {
 		return false;
 	}
-	ShowWindow(UIAWnd, SW_SHOWNA);
-	return true;;
+	ShowWindow(uiaWnd, SW_SHOWNA);
+	return true;
 }
 
-bool trminateUIA() {
-	if (UIAProvider) {
-		delete UIAProvider;
+bool terminateUia() {
+	if (uiaProvider) {
+		delete uiaProvider;
 	}
-	ShowWindow(UIAWnd, SW_HIDE);
-	if (!DestroyWindow(UIAWnd)) {
+	ShowWindow(uiaWnd, SW_HIDE);
+	if (!DestroyWindow(uiaWnd)) {
 		return false;
 	}
 	if (!UnregisterClass(WINDOW_CLASS_NAME, pluginHInstance)) {
 		return false;
 	}
 	UiaDisconnectAllProviders();
-	UiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(UIAutomationCore, "UiaRaiseNotificationEvent");
-	if (UiaRaiseNotificationEvent_ptr) {
-		UiaRaiseNotificationEvent_ptr = nullptr;
-	}
-	if (UIAutomationCore) {
-		FreeLibrary(UIAutomationCore);
-		UIAutomationCore = nullptr;
+	uiaRaiseNotificationEvent_ptr = nullptr;
+	if (uiAutomationCore) {
+		FreeLibrary(uiAutomationCore);
+		uiAutomationCore = nullptr;
 	}
 	return true;
 }
 
-bool sendUIANotification(const string& message) {
+bool sendUiaNotification(const string& message) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
-	return (UiaRaiseNotificationEvent_ptr(
-		UIAProvider,
+	return (uiaRaiseNotificationEvent_ptr(
+		uiaProvider,
 		NotificationKind_Other,
 		NotificationProcessing_MostRecent,
 		SysAllocString(widen(message).c_str()),
-		SysAllocString(L"Reaper_OSARA")
+		SysAllocString(L"REAPER_OSARA")
 	) == S_OK);
 }
