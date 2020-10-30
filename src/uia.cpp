@@ -195,6 +195,13 @@ bool shouldUseUiaNotifications() {
 			// Not available (requires Windows 10 fall creators update or above).
 			return false;
 		}
+		const char setting = GetExtState(CONFIG_SECTION, "uiaNotificationEvents")[0];
+		if (setting == '0') {
+			return false; // Force disable.
+		} else if (setting == '2') {
+			return true; // Force enable.
+		}
+		// Setting not present or '1' means auto.
 		// Several screen readers ignore or don't support UIA notification events.
 		// First check for screen readers with in-process dlls.
 		if (
