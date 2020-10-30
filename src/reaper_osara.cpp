@@ -87,7 +87,12 @@ string narrow(const wstring& text) {
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
+	if (shouldUseUiaNotifications()) {
+		if (sendUiaNotification(message, interrupt)) {
+			return;
+		}
+	}
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -113,14 +118,14 @@ void outputMessage(const string& message) {
 
 #else // _WIN32
 
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
 #endif // _WIN32
 
-void outputMessage(ostringstream& message) {
-	outputMessage(message.str());
+void outputMessage(ostringstream& message, bool interrupt) {
+	outputMessage(message.str(), interrupt);
 }
 
 string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
@@ -1695,7 +1700,7 @@ bool maybeReportFxChainBypass(bool aboutToToggle=false) {
 	if (aboutToToggle) {
 		enabled = !enabled;
 	}
-	outputMessage(enabled ? "active" : "bypassed");
+	outputMessage(enabled ? "active" : "bypassed", /* interrupt */ false);
 	return true;
 }
 
@@ -3133,11 +3138,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		resetTimeCache();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)
+		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
 			return 0;
+		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
+		initializeUia();
 #else
 		NSA11yWrapper::init();
 #endif
@@ -3188,6 +3195,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
 		UnhookWinEvent(winEventHook);
+		terminateUia();
 		accPropServices->Release();
 #else
 		NSA11yWrapper::destroy();

@@ -202,8 +202,8 @@ extern enum FakeFocus fakeFocus;
 
 extern bool isSelectionContiguous;
 
-void outputMessage(const std::string& message);
-void outputMessage(std::ostringstream& message);
+void outputMessage(const std::string& message, bool interrupt = true);
+void outputMessage(std::ostringstream& message, bool interrupt = true);
 
 typedef enum {
 	TF_NONE,
@@ -229,6 +229,12 @@ std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 
 extern IAccPropServices* accPropServices;
+
+// uia.cpp
+bool initializeUia();
+bool terminateUia();
+bool shouldUseUiaNotifications();
+bool sendUiaNotification(const std::string& message, bool interrupt = true);
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
