@@ -190,16 +190,15 @@ bool terminateUia() {
 }
 
 bool shouldUseUiaNotifications() {
-	if (!uiaWnd) {
-		// Not available (requires Windows 10 fall creators update or above).
-		return false;
-	}
-	static optional<bool> cachedResult;
-	if (!cachedResult) {
+	static const bool cachedResult = []() -> bool {
+		if (!uiaWnd) {
+			// Not available (requires Windows 10 fall creators update or above).
+			return false;
+		}
 		// Don't use for JAWS because JAWS ignores these events in REAPER.
-		cachedResult.emplace(!GetModuleHandleA("jhook.dll"));
-	}
-	return *cachedResult;
+		return !GetModuleHandleA("jhook.dll");
+	}();
+	return cachedResult;
 }
 
 bool sendUiaNotification(const string& message, bool interrupt) {
