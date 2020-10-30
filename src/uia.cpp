@@ -26,9 +26,9 @@ HMODULE uiAutomationCore = nullptr;
 UiaRaiseNotificationEvent_funcType uiaRaiseNotificationEvent_ptr = nullptr;
 
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
-class UiaProviderImpl : public IRawElementProviderSimple {
+class UiaProvider : public IRawElementProviderSimple {
 	public:
-	UiaProviderImpl(_In_ HWND hwnd): controlHWnd(hwnd) {}
+	UiaProvider(_In_ HWND hwnd): controlHWnd(hwnd) {}
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() {
@@ -99,7 +99,7 @@ class UiaProviderImpl : public IRawElementProviderSimple {
 	}
 
 	private:
-	virtual ~UiaProviderImpl() {
+	virtual ~UiaProvider() {
 		UiaDisconnectProvider(this);
 	}
 
@@ -165,7 +165,7 @@ bool initializeUia() {
 		return false;
 	}
 	ShowWindow(uiaWnd, SW_SHOWNA);
-	uiaProvider = new UiaProviderImpl(uiaWnd);
+	uiaProvider = new UiaProvider(uiaWnd);
 	return true;
 }
 
