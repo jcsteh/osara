@@ -7,8 +7,8 @@
 
 #include <uiautomation.h>
 #include <ole2.h>
+#include <tlhelp32.h>
 #include <atlcomcli.h>
-#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -195,8 +195,33 @@ bool shouldUseUiaNotifications() {
 			// Not available (requires Windows 10 fall creators update or above).
 			return false;
 		}
-		// Don't use for JAWS because JAWS ignores these events in REAPER.
-		return !GetModuleHandleA("jhook.dll");
+		// Several screen readers ignore or don't support UIA notification events.
+		// First check for screen readers with in-process dlls.
+		if (
+			GetModuleHandleA("jhook.dll") // JAWS
+			|| GetModuleHandleA("dolwinhk.dll") // Dolphin
+		) {
+			return false;
+		}
+		// Now check for screen readers which don't have in-process dlls, so we have
+		// to search for processes.
+		PROCESSENTRY32 entry;
+		entry.dwSize = sizeof(PROCESSENTRY32);
+		HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+		if (!Process32First(snapshot, &entry)) {
+			CloseHandle(snapshot);
+			return true;
+		}
+		do {
+			if (
+				strcmp(entry.szExeFile, "ZDSRMain.exe") == 0 // Zhengdu
+			) {
+				CloseHandle(snapshot);
+				return false;
+			}
+		} while (Process32Next(snapshot, &entry));
+		CloseHandle(snapshot);
+		return true;
 	}();
 	return cachedResult;
 }
