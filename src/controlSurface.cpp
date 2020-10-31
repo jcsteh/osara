@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include "osara.h"
+#include "paramsUi.h"
 
 using namespace std;
 
@@ -50,6 +51,11 @@ class Surface: public IReaperControlSurface {
 			}
 			auto track = (MediaTrack*)parm1;
 			int fx = *(int*)parm2 >> 16;
+			// Don't report parameter changes where they might already be reported by
+			// the UI.
+			if (isParamsDialogOpen || TrackFX_GetChainVisible(track) == fx) {
+				return 0; // Unsupported.
+			}
 			int param = *(int*)parm2 & 0xFFFF;
 			double normVal = *(double*)parm3;
 			ostringstream s;

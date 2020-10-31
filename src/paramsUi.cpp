@@ -281,6 +281,8 @@ class ReaperObjLenParam: public ReaperObjParam {
 
 const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
 
+bool isParamsDialogOpen = false;
+
 class ParamsDialog {
 	private:
 	unique_ptr<ParamSource> source;
@@ -462,6 +464,7 @@ class ParamsDialog {
 
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
+		isParamsDialogOpen = false;
 	}
 
 	bool shouldIncludeParam(string name) {
@@ -538,6 +541,7 @@ class ParamsDialog {
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
+		isParamsDialogOpen = true;
 	}
 
 };
