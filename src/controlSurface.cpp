@@ -51,9 +51,7 @@ class Surface: public IReaperControlSurface {
 			auto track = (MediaTrack*)parm1;
 			int fx = *(int*)parm2 >> 16;
 			int param = *(int*)parm2 & 0xFFFF;
-			// parm3 is supposedly normalized value, but it seems to be incorrect in
-			// some cases.
-			double value = TrackFX_GetParam(track, fx, param, nullptr, nullptr);
+			double normVal = *(double*)parm3;
 			ostringstream s;
 			char chunk[256];
 			// Don't report the effect name if we're changing the same effect.
@@ -70,12 +68,12 @@ class Surface: public IReaperControlSurface {
 				s << chunk << " ";
 			}
 			this->lastFxParam = param;
-			TrackFX_FormatParamValue(track, fx, param, value, chunk,
+			TrackFX_FormatParamValueNormalized(track, fx, param, normVal, chunk,
 				sizeof(chunk));
 			if (chunk[0]) {
 				s << chunk;
 			} else {
-				s << value;
+				s << normVal;
 			}
 			outputMessage(s);
 		}

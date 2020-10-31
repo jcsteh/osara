@@ -163,6 +163,7 @@
 #define REAPERAPI_WANT_GetMediaItemTakeInfo_Value
 #define REAPERAPI_WANT_SetMixerScroll
 #define REAPERAPI_WANT_GetSetAutomationItemInfo_String
+#define REAPERAPI_WANT_TrackFX_FormatParamValueNormalized
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
