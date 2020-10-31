@@ -449,10 +449,9 @@ bool shouldReportTimeMovement() {
  */
 
 bool shouldReportFx = false;
-void postGoToTrack(int command) {
+void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	SetCursorContext(0, NULL);
-	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	ostringstream s;
@@ -508,6 +507,10 @@ void postGoToTrack(int command) {
 		// This command replaces the selection , so revert to contiguous selection.
 		isSelectionContiguous = true;
 	}
+}
+
+void postGoToTrack(int command) {
+	postGoToTrack(command, GetLastTouchedTrack());
 }
 
 void postToggleTrackMute(int command) {

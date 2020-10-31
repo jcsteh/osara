@@ -44,6 +44,15 @@ class Surface: public IReaperControlSurface {
 		reportRepeat(repeat);
 	}
 
+	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
+		if (!selected) {
+			return;
+		}
+		// The last touched track won't be updated yet, so we pass the track
+		// explicitly.
+		postGoToTrack(0, track);
+	}
+	
 	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
 		if (call == CSURF_EXT_SETFXPARAM) {
 			if (!this->shouldHandleChange()) {
