@@ -1,8 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Control surface code
- * Author: James Teh <jamie@jantrid.net>
- * Copyright 2019 NV Access Limited, James Teh, Leonard de Ruijter
+ * Copyright 2019-2020 NV Access Limited, James Teh, Leonard de Ruijter
  * License: GNU General Public License version 2.0
  */
 
@@ -57,10 +56,20 @@ class Surface: public IReaperControlSurface {
 			double value = TrackFX_GetParam(track, fx, param, nullptr, nullptr);
 			ostringstream s;
 			char chunk[256];
-			TrackFX_GetFXName(track, fx, chunk, sizeof(chunk));
-			s << chunk << " ";
-			TrackFX_GetParamName(track, fx, param, chunk, sizeof(chunk));
-			s << chunk << " ";
+			// Don't report the effect name if we're changing the same effect.
+			bool different = track != this->lastTrack || fx != this->lastFx;
+			if (different) {
+				TrackFX_GetFXName(track, fx, chunk, sizeof(chunk));
+				s << chunk << " ";
+			}
+			this->lastTrack = track;
+			this->lastFx = fx;
+			different |= param != this->lastFxParam;
+			if (different) {
+				TrackFX_GetParamName(track, fx, param, chunk, sizeof(chunk));
+				s << chunk << " ";
+			}
+			this->lastFxParam = param;
 			TrackFX_FormatParamValue(track, fx, param, value, chunk,
 				sizeof(chunk));
 			if (chunk[0]) {
@@ -88,6 +97,9 @@ class Surface: public IReaperControlSurface {
 	}
 	DWORD lastChangeTime = 0;
 
+	MediaTrack* lastTrack = nullptr;
+	int lastFx = 0;
+	int lastFxParam = 0;
 };
 
 IReaperControlSurface* createSurface() {
