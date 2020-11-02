@@ -47,7 +47,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
-		if (!selected || !shouldReportSurfaceChanges) {
+		if (!selected || !shouldReportSurfaceChanges || isHandlingCommand) {
 			return;
 		}
 		// The last touched track won't be updated yet, so we pass the track
