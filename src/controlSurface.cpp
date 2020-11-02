@@ -51,8 +51,9 @@ class Surface: public IReaperControlSurface {
 		// The last touched track won't be updated yet, so we pass the track
 		// explicitly.
 		postGoToTrack(0, track);
+		this->lastTrack = track;
 	}
-	
+
 	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
 		if (call == CSURF_EXT_SETFXPARAM) {
 			if (!this->shouldHandleChange()) {
