@@ -2880,7 +2880,7 @@ void loadConfig() {
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
 	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
-		"reportSurfaceChanges")[0] != '0';
+		"reportSurfaceChanges")[0] == '1';
 }
 
 void config_onOk(HWND dialog) {
