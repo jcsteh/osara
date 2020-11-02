@@ -163,6 +163,7 @@
 #define REAPERAPI_WANT_GetMediaItemTakeInfo_Value
 #define REAPERAPI_WANT_SetMixerScroll
 #define REAPERAPI_WANT_GetSetAutomationItemInfo_String
+#define REAPERAPI_WANT_TrackFX_FormatParamValueNormalized
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -247,6 +248,7 @@ bool sendUiaNotification(const std::string& message, bool interrupt = true);
 extern bool isHandlingCommand;
 void reportTransportState(int state);
 void reportRepeat(bool repeat);
+void postGoToTrack(int command, MediaTrack* track);
 IReaperControlSurface* createSurface();
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);

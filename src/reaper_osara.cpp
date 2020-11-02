@@ -449,10 +449,9 @@ bool shouldReportTimeMovement() {
  */
 
 bool shouldReportFx = false;
-void postGoToTrack(int command) {
+void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	SetCursorContext(0, NULL);
-	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	ostringstream s;
@@ -508,6 +507,10 @@ void postGoToTrack(int command) {
 		// This command replaces the selection , so revert to contiguous selection.
 		isSelectionContiguous = true;
 	}
+}
+
+void postGoToTrack(int command) {
+	postGoToTrack(command, GetLastTouchedTrack());
 }
 
 void postToggleTrackMute(int command) {
@@ -2866,6 +2869,7 @@ map<pair<int, int>, Command*> commandsMap;
  ***/
 
 extern bool shouldReportNotes;
+extern bool shouldReportSurfaceChanges;
 
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
@@ -2875,6 +2879,8 @@ void loadConfig() {
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
+	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
+		"reportSurfaceChanges")[0] != '0';
 }
 
 void config_onOk(HWND dialog) {
@@ -2891,6 +2897,10 @@ void config_onOk(HWND dialog) {
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 	shouldReportNotes = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_NOTES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportNotes", shouldReportNotes ? "1" : "0", true);
+	shouldReportSurfaceChanges = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_SURFACE_CHANGES) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportSurfaceChanges",
+		shouldReportSurfaceChanges ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -2921,6 +2931,8 @@ void cmdConfig(Command* command) {
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
+		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
