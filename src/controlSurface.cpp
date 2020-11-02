@@ -12,6 +12,8 @@
 
 using namespace std;
 
+bool shouldReportSurfaceChanges = true;
+
 /*** A control surface to obtain certain info that can only be retrieved that way.
  */
 class Surface: public IReaperControlSurface {
@@ -45,7 +47,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
-		if (!selected) {
+		if (!selected || !shouldReportSurfaceChanges) {
 			return;
 		}
 		// The last touched track won't be updated yet, so we pass the track
@@ -98,6 +100,9 @@ class Surface: public IReaperControlSurface {
 
 	private:
 	bool shouldHandleChange() {
+		if (!shouldReportSurfaceChanges) {
+			return false;
+		}
 		DWORD now = GetTickCount();
 		DWORD prevChangeTime = lastChangeTime;
 		lastChangeTime = now;
