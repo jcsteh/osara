@@ -9,21 +9,40 @@
 #include <ole2.h>
 #include <tlhelp32.h>
 #include <atlcomcli.h>
+#include <memory>
 #include "osara.h"
 
 using namespace std;
 
 HWND uiaWnd = nullptr;
 const char* WINDOW_CLASS_NAME = "REAPEROSARANotificationWND";
-typedef HRESULT(WINAPI *UiaRaiseNotificationEvent_funcType)(
-	_In_ IRawElementProviderSimple* provider,
-	NotificationKind notificationKind,
-	NotificationProcessing notificationProcessing,
-	_In_opt_ BSTR displayString,
-	_In_ BSTR activityId
-);
-HMODULE uiAutomationCore = nullptr;
-UiaRaiseNotificationEvent_funcType uiaRaiseNotificationEvent_ptr = nullptr;
+
+// Some UIA functions aren't available in earlier versions of Windows, so we
+// must fetch those at runtime. Otherwise, OSARA will fail to load. This class
+// handles loading/freeing the dll and getting the required functions.
+class UiaCore {
+	private:
+	HMODULE dll = LoadLibraryA("UIAutomationCore.dll");
+
+	template<typename FuncType>
+	FuncType* getFunc(const char* funcName) {
+		return (FuncType*)GetProcAddress(this->dll, funcName);
+	}
+
+	public:
+	~UiaCore() {
+		FreeLibrary(this->dll);
+	}
+
+	decltype(UiaRaiseNotificationEvent)* RaiseNotificationEvent =
+		getFunc<decltype(UiaRaiseNotificationEvent)>("UiaRaiseNotificationEvent");
+	decltype(UiaDisconnectProvider)* DisconnectProvider = 
+		getFunc<decltype(UiaDisconnectProvider)>("UiaDisconnectProvider");
+	decltype(UiaDisconnectAllProviders)* DisconnectAllProviders =
+		getFunc<decltype(UiaDisconnectAllProviders)>("UiaDisconnectAllProviders");
+};
+
+unique_ptr<UiaCore> uiaCore;
 
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
 class UiaProvider : public IRawElementProviderSimple {
@@ -100,7 +119,7 @@ class UiaProvider : public IRawElementProviderSimple {
 
 	private:
 	virtual ~UiaProvider() {
-		UiaDisconnectProvider(this);
+		uiaCore->DisconnectProvider(this);
 	}
 
 	ULONG refCount; // Ref Count for this COM object
@@ -133,12 +152,12 @@ WNDCLASSEX getWindowClass() {
 WNDCLASSEX windowClass;
 
 bool initializeUia() {
-	uiAutomationCore = LoadLibraryA("UIAutomationCore.dll");
-	if (!uiAutomationCore) {
-		return false;
-	}
-	uiaRaiseNotificationEvent_ptr = (UiaRaiseNotificationEvent_funcType)GetProcAddress(uiAutomationCore, "UiaRaiseNotificationEvent");
-	if (!uiaRaiseNotificationEvent_ptr) {
+	uiaCore = make_unique<UiaCore>();
+	// If UiaRaiseNotificationEvent is available, UiaDisconnectProvider and
+	// UiaDisconnectAllProviders will also be available, so we don't need to
+	// check those.
+	if (!uiaCore->RaiseNotificationEvent) {
+		uiaCore = nullptr;
 		return false;
 	}
 	windowClass = getWindowClass();
@@ -180,12 +199,8 @@ bool terminateUia() {
 	if (!UnregisterClass(WINDOW_CLASS_NAME, pluginHInstance)) {
 		return false;
 	}
-	UiaDisconnectAllProviders();
-	uiaRaiseNotificationEvent_ptr = nullptr;
-	if (uiAutomationCore) {
-		FreeLibrary(uiAutomationCore);
-		uiAutomationCore = nullptr;
-	}
+	uiaCore->DisconnectAllProviders();
+	uiaCore = nullptr;
 	return true;
 }
 
@@ -237,7 +252,7 @@ bool sendUiaNotification(const string& message, bool interrupt) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
-	return (uiaRaiseNotificationEvent_ptr(
+	return (uiaCore->RaiseNotificationEvent(
 		uiaProvider,
 		NotificationKind_Other,
 		interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
