@@ -7,6 +7,8 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
+#include <WDL/db2val.h>
 #include "osara.h"
 #include "paramsUi.h"
 
@@ -46,6 +48,37 @@ class Surface: public IReaperControlSurface {
 		reportRepeat(repeat);
 	}
 
+	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
+		if (!this->shouldHandleChange()) {
+			return;
+		}
+		ostringstream s;
+		bool different = this->reportTrackIfDifferent(track, s);
+		different |= this->lastParam != PARAM_VOLUME;
+		if (different) {
+			s << "volume ";
+			this->lastParam = PARAM_VOLUME;
+		}
+		s << fixed << setprecision(2);
+		s << VAL2DB(volume);
+		outputMessage(s);
+	}
+
+	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
+		if (!this->shouldHandleChange()) {
+			return;
+		}
+		ostringstream s;
+		bool different = this->reportTrackIfDifferent(track, s);
+		different |= this->lastParam != PARAM_PAN;
+		if (different) {
+			s << "pan ";
+			this->lastParam = PARAM_PAN;
+		}
+		formatPan(pan, s);
+		outputMessage(s);
+	}
+
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
 		if (!selected || !shouldReportSurfaceChanges ||
 			// REAPER calls this a *lot*, even if the track was already selected; e.g.
@@ -83,19 +116,20 @@ class Surface: public IReaperControlSurface {
 			ostringstream s;
 			char chunk[256];
 			// Don't report the effect name if we're changing the same effect.
-			bool different = track != this->lastChangedTrack || fx != this->lastFx;
+			bool different = this->reportTrackIfDifferent(track, s);
+			different |= fx != this->lastFx;
 			if (different) {
 				TrackFX_GetFXName(track, fx, chunk, sizeof(chunk));
 				s << chunk << " ";
 			}
 			this->lastChangedTrack = track;
 			this->lastFx = fx;
-			different |= param != this->lastFxParam;
+			different |= param != this->lastParam;
 			if (different) {
 				TrackFX_GetParamName(track, fx, param, chunk, sizeof(chunk));
 				s << chunk << " ";
 			}
-			this->lastFxParam = param;
+			this->lastParam = param;
 			TrackFX_FormatParamValueNormalized(track, fx, param, normVal, chunk,
 				sizeof(chunk));
 			if (chunk[0]) {
@@ -126,10 +160,33 @@ class Surface: public IReaperControlSurface {
 	}
 	DWORD lastChangeTime = 0;
 
+	bool reportTrackIfDifferent(MediaTrack* track, ostringstream& output) {
+		bool different = track != this->lastChangedTrack;
+		if (different) {
+			this->lastChangedTrack = track;
+			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
+				nullptr);
+			if (trackNum <= 0) {
+				output << "master";
+			} else {
+				output << trackNum;
+				char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+				if (trackName) {
+					output << " " << trackName;
+				}
+			}
+			output << " ";
+		}
+		return different;
+	}
+
 	MediaTrack* lastSelectedTrack = nullptr;
 	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
-	int lastFxParam = 0;
+	const int PARAM_NONE = -1;
+	const int PARAM_VOLUME = -2;
+	const int PARAM_PAN = -3;
+	int lastParam = PARAM_NONE;
 };
 
 IReaperControlSurface* createSurface() {
