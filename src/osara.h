@@ -249,6 +249,7 @@ extern bool isHandlingCommand;
 void reportTransportState(int state);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
+void formatPan(double pan, std::ostringstream& output);
 IReaperControlSurface* createSurface();
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);

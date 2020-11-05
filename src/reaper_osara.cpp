@@ -745,6 +745,17 @@ void postChangeHorizontalZoom(int command) {
 	outputMessage(s);
 }
 
+void formatPan(double pan, ostringstream& output) {
+	pan *=100.0;
+	if (pan == 0) {
+		output << "center";
+	} else if (pan < 0) {
+		output << -pan << "% left";
+	} else {
+		output << pan << "% right";
+	}
+}
+
 void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -752,14 +763,8 @@ void postChangeTrackPan(int command) {
 	double pan =0.0;
 	if ( !GetTrackUIVolPan(track, NULL, &pan) )
 		return;
-	pan *=100.0;
 	ostringstream s;
-	if (pan == 0)
-		s << "center";
-	else if (pan < 0)
-		s << -pan << "% left";
-	else
-		s << pan << "% right";
+	formatPan(pan, s);
 	outputMessage(s);
 }
 
