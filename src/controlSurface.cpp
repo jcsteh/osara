@@ -47,13 +47,23 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
-		if (!selected || !shouldReportSurfaceChanges || isHandlingCommand) {
+		if (!selected || !shouldReportSurfaceChanges ||
+			// REAPER calls this a *lot*, even if the track was already selected; e.g.
+			// for mute, arm, solo, etc. Ignore this if we were already told about
+			// this track being selected.
+			track == lastSelectedTrack
+		) {
+			return;
+		}
+		// Cache the track even if we're handling a command because that command
+		// might be navigating tracks.
+		this->lastSelectedTrack = this->lastChangedTrack = track;
+		if (isHandlingCommand) {
 			return;
 		}
 		// The last touched track won't be updated yet, so we pass the track
 		// explicitly.
 		postGoToTrack(0, track);
-		this->lastTrack = track;
 	}
 
 	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
@@ -73,12 +83,12 @@ class Surface: public IReaperControlSurface {
 			ostringstream s;
 			char chunk[256];
 			// Don't report the effect name if we're changing the same effect.
-			bool different = track != this->lastTrack || fx != this->lastFx;
+			bool different = track != this->lastChangedTrack || fx != this->lastFx;
 			if (different) {
 				TrackFX_GetFXName(track, fx, chunk, sizeof(chunk));
 				s << chunk << " ";
 			}
-			this->lastTrack = track;
+			this->lastChangedTrack = track;
 			this->lastFx = fx;
 			different |= param != this->lastFxParam;
 			if (different) {
@@ -116,7 +126,8 @@ class Surface: public IReaperControlSurface {
 	}
 	DWORD lastChangeTime = 0;
 
-	MediaTrack* lastTrack = nullptr;
+	MediaTrack* lastSelectedTrack = nullptr;
+	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
 	int lastFxParam = 0;
 };
