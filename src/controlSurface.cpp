@@ -115,14 +115,12 @@ class Surface: public IReaperControlSurface {
 			double normVal = *(double*)parm3;
 			ostringstream s;
 			char chunk[256];
-			// Don't report the effect name if we're changing the same effect.
 			bool different = this->reportTrackIfDifferent(track, s);
 			different |= fx != this->lastFx;
 			if (different) {
 				TrackFX_GetFXName(track, fx, chunk, sizeof(chunk));
 				s << chunk << " ";
 			}
-			this->lastChangedTrack = track;
 			this->lastFx = fx;
 			different |= param != this->lastParam;
 			if (different) {
