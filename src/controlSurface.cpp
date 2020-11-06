@@ -96,7 +96,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
-		if (!this->shouldHandleChange()) {
+		if (isParamsDialogOpen || !this->shouldHandleChange()) {
 			return;
 		}
 		ostringstream s;
@@ -112,7 +112,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
-		if (!this->shouldHandleChange()) {
+		if (isParamsDialogOpen || !this->shouldHandleChange()) {
 			return;
 		}
 		ostringstream s;
