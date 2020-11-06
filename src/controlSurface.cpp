@@ -8,13 +8,60 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <map>
 #include <WDL/db2val.h>
+#include <cstdint>
 #include "osara.h"
 #include "paramsUi.h"
 
 using namespace std;
 
 bool shouldReportSurfaceChanges = true;
+
+// REAPER often notifies us about track states even if they haven't changed.
+// It also notifies us about these states when a track is first created.
+// We only want to report changes. So, we maintain a cache.
+// We don't want to report the first value we're notified about. That means
+// we need to know not just enabled/disabled, but whether the value has been
+// cached yet. So, we have two flags for each state: one for enabled, one for
+// disabled. If neither is set, that means uncached. We could have used a
+// struct with std::optional<bool>s, but that wastes a lot of memory. This way,
+// we can cache all of the states in 1 byte.
+const uint8_t TC_MUTED = 1 << 0;
+const uint8_t TC_UNMUTED = 1 << 1;
+const uint8_t TC_SOLOED = 1 << 2;
+const uint8_t TC_UNSOLOED = 1 << 3;
+const uint8_t TC_ARMED = 1 << 4;
+const uint8_t TC_UNARMED = 1 << 5;
+
+// Make it easier to manipulate these cached states.
+template<uint8_t enableFlag, uint8_t disableFlag>
+class TrackCacheState {
+	public:
+	TrackCacheState(uint8_t& value): value(value) {}
+
+	// Check if a supplied new state has changed from the cached state.
+	bool hasChanged(bool isEnabled) {
+		if (!(this->value & (enableFlag | disableFlag))) {
+			// Not cached yet, so we don't consider it changed.
+			return false;
+		}
+		bool wasEnabled = this->value & enableFlag;
+		return isEnabled != wasEnabled;
+	}
+
+	// Update the cached state.
+	void update(bool enabled) {
+		// Clear both the enable and disable flags for this state. In practice, only
+		// one of them should be set.
+		this->value &= ~(enableFlag | disableFlag);
+		// Set only the flag for the new state.
+		this->value |= enabled ? enableFlag : disableFlag;
+	}
+
+	private:
+	uint8_t& value;
+};
 
 /*** A control surface to obtain certain info that can only be retrieved that way.
  */
@@ -77,6 +124,48 @@ class Surface: public IReaperControlSurface {
 		}
 		formatPan(pan, s);
 		outputMessage(s);
+	}
+
+	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
+		if (!shouldReportSurfaceChanges) {
+			return;
+		}
+		auto cache = this->cachedTrackState<TC_MUTED, TC_UNMUTED>(track);
+		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(mute)) {
+			ostringstream s;
+			this->reportTrackIfDifferent(track, s);
+			s << (mute ? "muted" : "unmuted");
+			outputMessage(s);
+		}
+		cache.update(mute);
+	}
+
+	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) {
+		if (!shouldReportSurfaceChanges) {
+			return;
+		}
+		auto cache = this->cachedTrackState<TC_SOLOED, TC_UNSOLOED>(track);
+		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(solo)) {
+			ostringstream s;
+			this->reportTrackIfDifferent(track, s);
+			s << (solo ? "soloed" : "unsoloed");
+			outputMessage(s);
+		}
+		cache.update(solo);
+	}
+
+	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) {
+		if (!shouldReportSurfaceChanges) {
+			return;
+		}
+		auto cache = this->cachedTrackState<TC_ARMED, TC_UNARMED>(track);
+		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(arm)) {
+			ostringstream s;
+			this->reportTrackIfDifferent(track, s);
+			s << (arm ? "armed" : "unarmed");
+			outputMessage(s);
+		}
+		cache.update(arm);
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
@@ -178,6 +267,12 @@ class Surface: public IReaperControlSurface {
 		return different;
 	}
 
+	template<uint8_t enableFlag, uint8_t disableFlag>
+	TrackCacheState<enableFlag, disableFlag> cachedTrackState(MediaTrack* track) {
+		uint8_t& value = this->trackCache[track];
+		return TrackCacheState<enableFlag, disableFlag>(value);
+	}
+
 	MediaTrack* lastSelectedTrack = nullptr;
 	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
@@ -185,6 +280,7 @@ class Surface: public IReaperControlSurface {
 	const int PARAM_VOLUME = -2;
 	const int PARAM_PAN = -3;
 	int lastParam = PARAM_NONE;
+	map<MediaTrack*, uint8_t> trackCache;
 };
 
 IReaperControlSurface* createSurface() {
