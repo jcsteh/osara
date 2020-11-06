@@ -140,7 +140,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(mute);
 	}
 
-	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) {
+	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
 		if (!shouldReportSurfaceChanges) {
 			return;
 		}
@@ -154,7 +154,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(solo);
 	}
 
-	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) {
+	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
 		if (!shouldReportSurfaceChanges) {
 			return;
 		}
