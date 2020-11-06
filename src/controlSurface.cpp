@@ -144,6 +144,11 @@ class Surface: public IReaperControlSurface {
 		if (!shouldReportSurfaceChanges) {
 			return;
 		}
+		if (track == GetMasterTrack(nullptr) && !(GetMasterMuteSoloFlags() & 2)) {
+			// REAPER reports that the master track is soloed when you solo a track,
+			// but it isn't from the user perspective.
+			return;
+		}
 		auto cache = this->cachedTrackState<TC_SOLOED, TC_UNSOLOED>(track);
 		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(solo)) {
 			ostringstream s;
