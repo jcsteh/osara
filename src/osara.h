@@ -254,6 +254,8 @@ void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);
 IReaperControlSurface* createSurface();
+// envelopeCommands.cpp
+extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
 

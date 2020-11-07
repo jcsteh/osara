@@ -451,6 +451,7 @@ bool shouldReportTimeMovement() {
 bool shouldReportFx = false;
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
+	selectedEnvelopeIsTake = false;
 	SetCursorContext(0, NULL);
 	if (!track)
 		return;
@@ -964,6 +965,7 @@ void postSelectMultipleItems(int command) {
 	outputMessage(s);
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
+	selectedEnvelopeIsTake = true;
 	SetCursorContext(1, NULL);
 }
 
@@ -1968,6 +1970,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 
 		// Report the item.
 		fakeFocus = FOCUS_ITEM;
+		selectedEnvelopeIsTake = true;
 		SetCursorContext(1, NULL);
 		ostringstream s;
 		s << i + 1;

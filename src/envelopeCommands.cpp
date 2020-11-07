@@ -250,19 +250,10 @@ void cmdInsertEnvelopePoint(Command* command) {
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
 void cmdhSelectEnvelope(int direction) {
-	// If we're focused on a track or item, use the envelopes associated therewith.
-	// If we're focused on an envelope, use what we last used.
-	// This is necessary because the first envelope selection will focus the envelope
-	// and we want to allow the user to move past the first.
-	if (fakeFocus == FOCUS_TRACK)
-		selectedEnvelopeIsTake = false;
-	else if (fakeFocus == FOCUS_ITEM)
-		selectedEnvelopeIsTake = true;
-	else if (fakeFocus != FOCUS_ENVELOPE && fakeFocus != FOCUS_AUTOMATIONITEM)
-		return; // No envelopes for focus.
 	MediaTrack* track = NULL;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
+	// selectedEnvelopeIsTake is set when focus changes to track or item.
 	if (selectedEnvelopeIsTake) {
 		MediaItem* item = GetSelectedMediaItem(0, 0);
 		if (!item)
