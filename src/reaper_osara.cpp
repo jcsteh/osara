@@ -2461,12 +2461,21 @@ int countTakeMarkersInSelectedTakes() {
 	return count;
 }
 
-void cmdDeleteTakeMarker(Command* command) {
+void cmdhDeleteTakeMarkers(int command) {
 	int oldCount = countTakeMarkersInSelectedTakes();
-	Main_OnCommand(42386, 0); // Item: Delete take marker at cursor
-	if (countTakeMarkersInSelectedTakes() < oldCount) {
+	Main_OnCommand(command, 0);
+	int removed = oldCount - countTakeMarkersInSelectedTakes();
+	if (removed == 1) {
 		outputMessage("take marker deleted");
+	} else {
+		ostringstream s;
+		s << removed << " take markers deleted";
+		outputMessage(s);
 	}
+}
+
+void cmdDeleteTakeMarkers(Command* command) {
+	cmdhDeleteTakeMarkers(command->gaccel.accel.cmd);
 }
 
 void cmdRemoveFocus(Command* command) {
@@ -2496,7 +2505,7 @@ void cmdRemoveFocus(Command* command) {
 			cmdhDeleteEnvelopePointsOrAutoItems(42086, false, true); // Envelope: Delete automation items
 			break;
 		case FOCUS_TAKEMARKER:
-			cmdDeleteTakeMarker(nullptr);
+			cmdhDeleteTakeMarkers(42386); // Item: Delete take marker at cursor);
 			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
@@ -2847,7 +2856,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
-	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarker}, // Item: Delete take marker at cursor
+	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
+	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid

@@ -156,6 +156,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Set cursor to next take marker in selected items
 - Item: Set cursor to previous take marker in selected items
 - Item: Delete take marker at cursor
+- Item: Delete all take markers
 
 #### Takes
 - Take: Switch items to next take: T
