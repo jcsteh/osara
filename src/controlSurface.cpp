@@ -80,7 +80,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
-		if (!this->shouldHandleChange()) {
+		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		// Calculate integer based transport state
@@ -89,14 +89,14 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetRepeatState(bool repeat) override {
-		if (!this->shouldHandleChange()) {
+		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		reportRepeat(repeat);
 	}
 
 	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
-		if (isParamsDialogOpen || !this->shouldHandleChange()) {
+		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
 		ostringstream s;
@@ -112,7 +112,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
-		if (isParamsDialogOpen || !this->shouldHandleChange()) {
+		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
 		ostringstream s;
@@ -174,6 +174,9 @@ class Surface: public IReaperControlSurface {
 			outputMessage(s);
 		}
 		cache.update(arm);
+		// REAPER calls SetSurfaceVolume after arming a track. Ensure we don't
+		// report that, since nothing has really changed.
+		this->lastParamChangeTime = GetTickCount();
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
@@ -198,7 +201,7 @@ class Surface: public IReaperControlSurface {
 
 	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
 		if (call == CSURF_EXT_SETFXPARAM) {
-			if (!this->shouldHandleChange()) {
+			if (!this->shouldHandleParamChange()) {
 				return 0; // Unsupported.
 			}
 			auto track = (MediaTrack*)parm1;
@@ -246,13 +249,15 @@ class Surface: public IReaperControlSurface {
 			GetTickCount() - lastCommandTime <= 50;
 	}
 
-	bool shouldHandleChange() {
+	// Used for parameters we don't cache such as volume, pan and FX parameters.
+	// We cache states such as mute, solo and arm, so they don't use this.
+	bool shouldHandleParamChange() {
 		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return false;
 		}
 		DWORD now = GetTickCount();
-		DWORD prevChangeTime = lastChangeTime;
-		lastChangeTime = now;
+		DWORD prevChangeTime = this->lastParamChangeTime;
+		this->lastParamChangeTime = now;
 		if (!isHandlingCommand &&
 			// Only handle surface changes if the last change is 100ms or more ago.
 			now - prevChangeTime >= 100
@@ -261,7 +266,7 @@ class Surface: public IReaperControlSurface {
 		}
 		return false;
 	}
-	DWORD lastChangeTime = 0;
+	DWORD lastParamChangeTime = 0;
 
 	bool reportTrackIfDifferent(MediaTrack* track, ostringstream& output) {
 		bool different = track != this->lastChangedTrack;
