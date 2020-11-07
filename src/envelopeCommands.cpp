@@ -336,6 +336,7 @@ void cmdhSelectEnvelope(int direction) {
 	currentAutomationItem = -1;
 	currentEnvelopePoint.reset();
 	fakeFocus = FOCUS_ENVELOPE;
+	shouldMoveToAutoItem = true;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
 		// Send envelope. Get the name of the send.

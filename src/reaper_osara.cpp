@@ -448,10 +448,12 @@ bool shouldReportTimeMovement() {
  * This is used to report messages regarding the effect of the command, etc.
  */
 
+bool shouldMoveToAutoItem = false;
 bool shouldReportFx = false;
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
+	shouldMoveToAutoItem = false;
 	SetCursorContext(0, NULL);
 	if (!track)
 		return;
@@ -1998,7 +2000,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 }
 
 void cmdMoveToNextItem(Command* command) {
-	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(1);
 	} else {
 		moveToItem(1);
@@ -2006,7 +2008,7 @@ void cmdMoveToNextItem(Command* command) {
 }
 
 void cmdMoveToPrevItem(Command* command) {
-	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(-1);
 	} else {
 		moveToItem(-1);
