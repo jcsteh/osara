@@ -131,7 +131,8 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_MUTED, TC_UNMUTED>(track);
-		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(mute)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
+				cache.hasChanged(mute)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (mute ? "muted" : "unmuted");
@@ -150,7 +151,8 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_SOLOED, TC_UNSOLOED>(track);
-		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(solo)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
+				cache.hasChanged(solo)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (solo ? "soloed" : "unsoloed");
@@ -164,7 +166,8 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_ARMED, TC_UNARMED>(track);
-		if (!isHandlingCommand && !isParamsDialogOpen && cache.hasChanged(arm)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
+				cache.hasChanged(arm)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (arm ? "armed" : "unarmed");
@@ -185,7 +188,7 @@ class Surface: public IReaperControlSurface {
 		// Cache the track even if we're handling a command because that command
 		// might be navigating tracks.
 		this->lastSelectedTrack = this->lastChangedTrack = track;
-		if (isHandlingCommand) {
+		if (this->wasCausedByCommand()) {
 			return;
 		}
 		// The last touched track won't be updated yet, so we pass the track
@@ -235,8 +238,16 @@ class Surface: public IReaperControlSurface {
 	}
 
 	private:
+	bool wasCausedByCommand() {
+		return isHandlingCommand ||
+			// Sometimes, REAPER updates control surfaces after a command rather than
+			// during. If the last command OSARA handled was <= 50 ms ago, we assume
+			// this update was caused by that command.
+			GetTickCount() - lastCommandTime <= 50;
+	}
+
 	bool shouldHandleChange() {
-		if (!shouldReportSurfaceChanges) {
+		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return false;
 		}
 		DWORD now = GetTickCount();

@@ -180,6 +180,7 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 extern int lastCommandRepeatCount;
+extern DWORD lastCommandTime;
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;

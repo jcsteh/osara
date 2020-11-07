@@ -2953,6 +2953,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto it = postCommandsMap.find(command);
 		if (it != postCommandsMap.end()) {
 			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
 			if (hwnd) {
 				// #244: If the command was triggered via MIDI, pass the MIDI data when
 				// executing the command so that toggles, etc. work as expected.
@@ -2968,6 +2969,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto mIt = POST_COMMAND_MESSAGES.find(command);
 		if (mIt != POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
 			if (hwnd) {
 				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			} else {
@@ -2981,6 +2983,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto it = midiPostCommandsMap.find(command);
 		if (it != midiPostCommandsMap.end()) {
 			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second(command);
@@ -2990,6 +2993,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
 		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			outputMessage(mIt->second);
