@@ -164,6 +164,8 @@
 #define REAPERAPI_WANT_SetMixerScroll
 #define REAPERAPI_WANT_GetSetAutomationItemInfo_String
 #define REAPERAPI_WANT_TrackFX_FormatParamValueNormalized
+#define REAPERAPI_WANT_GetNumTakeMarkers
+#define REAPERAPI_WANT_GetTakeMarker
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -198,7 +200,8 @@ enum FakeFocus {
 	FOCUS_ENVELOPE,
 	FOCUS_AUTOMATIONITEM,
 	FOCUS_NOTE,
-	FOCUS_CC
+	FOCUS_CC,
+	FOCUS_TAKEMARKER
 };
 extern enum FakeFocus fakeFocus;
 

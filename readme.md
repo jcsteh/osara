@@ -24,7 +24,7 @@ Features:
 - Navigation and selection of chords and notes in the MIDI Editor
 
 ## Requirements
-OSARA requires REAPER 5.982 or later.
+OSARA requires REAPER 6.09 or later.
 The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
 It has only been tested with the NVDA and VoiceOver screen readers.
@@ -153,6 +153,9 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Xenakios/SWS: Nudge item volume down: Control+Shift+DownArrow
 - Xenakios/SWS: Nudge item volume up: Control+Shift+UpArrow
 - Item: Set item end to source media end
+- Item: Set cursor to next take marker in selected items
+- Item: Set cursor to previous take marker in selected items
+- Item: Delete take marker at cursor
 
 #### Takes
 - Take: Switch items to next take: T

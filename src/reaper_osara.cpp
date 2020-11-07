@@ -1186,6 +1186,41 @@ void postChangeItemGroup(int command) {
 	outputMessage(s);
 }
 
+void postGoToTakeMarker(int command) {
+	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0) {
+		return;
+	}
+	double cursor = GetCursorPosition();
+	ostringstream s;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take) {
+			continue;
+		}
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		// Take marker positions are relative to the start of the item and the
+		// take's play rate.
+		double cursorRel = (cursor - itemStart) * playRate;
+		int markerCount = GetNumTakeMarkers(take);
+		for (int m = 0; m < markerCount; ++m) {
+			char name[100];
+			double markerPos = GetTakeMarker(take, m, name, sizeof(name), nullptr);
+			if (markerPos == cursorRel) {
+				s << name << " take marker ";
+				fakeFocus = FOCUS_TAKEMARKER;
+			}
+		}
+	}
+	s << formatCursorPosition();
+	outputMessage(s);
+	if (GetPlayPosition() != cursor) {
+		SetEditCurPos(cursor, true, true); // Seek playback.
+	}
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1325,6 +1360,8 @@ PostCommand POST_COMMANDS[] = {
 	{40631, postCursorMovement}, // Go to end of time selection
 	{40032, postChangeItemGroup}, // Item grouping: Group items
 	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
+	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
+	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {
@@ -2408,6 +2445,30 @@ void cmdReportSelection(Command* command) {
 	outputMessage(s);
 }
 
+int countTakeMarkersInSelectedTakes() {
+	int count = 0;	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0) {
+		return 0;
+	}
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take) {
+			continue;
+		}
+		count += GetNumTakeMarkers(take);
+	}
+	return count;
+}
+
+void cmdDeleteTakeMarker(Command* command) {
+	int oldCount = countTakeMarkersInSelectedTakes();
+	Main_OnCommand(42386, 0); // Item: Delete take marker at cursor
+	if (countTakeMarkersInSelectedTakes() < oldCount) {
+		outputMessage("take marker deleted");
+	}
+}
+
 void cmdRemoveFocus(Command* command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
@@ -2433,6 +2494,9 @@ void cmdRemoveFocus(Command* command) {
 			break;
 		case FOCUS_AUTOMATIONITEM:
 			cmdhDeleteEnvelopePointsOrAutoItems(42086, false, true); // Envelope: Delete automation items
+			break;
+		case FOCUS_TAKEMARKER:
+			cmdDeleteTakeMarker(nullptr);
 			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
@@ -2783,6 +2847,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarker}, // Item: Delete take marker at cursor
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
