@@ -48,7 +48,6 @@
 #define REAPERAPI_WANT_parse_timestr_pos
 #define REAPERAPI_WANT_GetMasterTrackVisibility
 #define REAPERAPI_WANT_SetMasterTrackVisibility
-#define REAPERAPI_WANT_GetAppVersion
 #define REAPERAPI_WANT_SetCursorContext
 #define REAPERAPI_WANT_GetPlayPosition
 #define REAPERAPI_WANT_SetEditCurPos

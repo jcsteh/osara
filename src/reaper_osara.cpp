@@ -1497,38 +1497,6 @@ bool showReaperContextMenu(const int menu) {
 
 #ifdef _WIN32
 
-// A capturing lambda can't be passed as a Windows callback, hence the struct.
-typedef struct {
-	int index;
-	int foundCount;
-	HWND retHwnd;
-} GetTrackVuData;
-// Get the track VU window for the current track.
-HWND getTrackVu(MediaTrack* track) {
-	GetTrackVuData data;
-	data.index = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (data.index == -1) // Master
-		data.index = 0;
-	if (GetMasterTrackVisibility() & 1)
-		data.index += 1;
-	data.retHwnd = NULL;
-	data.foundCount = 0;
-	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
-		GetTrackVuData* data = (GetTrackVuData*)lParam;
-		WCHAR className[14];
-		if (GetClassNameW(testHwnd, className, 14) != 0
-			&& wcscmp(className, L"REAPERtrackvu") == 0
-			&& ++data->foundCount == data->index
-		)  {
-			data->retHwnd = testHwnd;
-			return false;
-		}
-		return true;
-	};
-	EnumChildWindows(mainHwnd, callback, (LPARAM)&data);
-	return data.retHwnd;
-}
-
 HWND getSendContainer(HWND hwnd) {
 	WCHAR className[21] = L"\0";
 	GetClassNameW(hwnd, className, ARRAYSIZE(className));
@@ -1603,34 +1571,6 @@ void sendMenu(HWND sendWindow) {
 	ScreenToClient(sendWindow, &point);
 	SendMessage(sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
 	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
-}
-
-void clickIoButton(MediaTrack* track, bool rightClick=false) {
-	HWND hwnd = getTrackVu(track);
-	if (!hwnd)
-		return; // Really shouldn't happen.
-	// Use MSAA to get the location of the I/O button.
-	hwnd = GetAncestor(hwnd, GA_PARENT);
-	IAccessible* acc = NULL;
-	VARIANT varChild;
-	DWORD childId = track == GetMasterTrack(0) ? 5 : 7;
-	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, childId, &acc, &varChild) != S_OK)
-		return;
-	long l, t, w, h;
-	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
-	acc->Release();
-	if (res != S_OK)
-		return;
-	// Click it!
-	POINT point = {l, t};
-	ScreenToClient(hwnd, &point);
-	SendMessage(hwnd,
-		rightClick ? WM_RBUTTONDOWN : WM_LBUTTONDOWN,
-		rightClick ? MK_RBUTTON : MK_LBUTTON,
-		MAKELPARAM(point.x, point.y));
-	SendMessage(hwnd,
-		rightClick ? WM_RBUTTONUP : WM_LBUTTONUP, 0,
-		MAKELPARAM(point.x, point.y));
 }
 
 bool maybeSwitchToFxPluginWindow() {
@@ -2320,21 +2260,10 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 }
 
 void cmdIoMaster(Command* command) {
-	if (GetAppVersion()[0] >= '6') {
-		// REAPER >= 6.01 has a builtin action for this.
-		Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
-		return;
-	}
-#ifdef _WIN32
-	// If the master track isn't visible, make it so temporarily.
-	int prevVisible = GetMasterTrackVisibility();
-	if (!(prevVisible & 1))
-		SetMasterTrackVisibility(prevVisible | 1);
-	clickIoButton(GetMasterTrack(0));
-	// Restore master invisibility if appropriate.
-	if (!(prevVisible & 1))
-		SetMasterTrackVisibility(prevVisible);
-#endif // _WIN32
+	// REAPER >= 6.01 has a builtin action for this. We keep this OSARA action
+	// for compatibility, but it should be removed when the key map is next
+	// revised.
+	Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
 }
 
 void cmdReportRippleMode(Command* command) {
