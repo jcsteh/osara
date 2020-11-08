@@ -88,6 +88,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - SWS: Select nearest next folder: Alt+PageDown
 - SWS: Select nearest previous folder: Alt+PageUp
 - Track: Remove tracks
+- Track: Select all tracks
 
 #### Adjusting Track Parameters
 - Track: Mute/unmute tracks: F5
@@ -210,6 +211,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
 - Envelope: Insert new point at current position (do not remove nearby points)
+- Envelope: Select all points
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode
@@ -274,6 +276,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Control+Shift+C
 - Item: Paste items/tracks: Control+V
+- Select all items/tracks/envelope points (depending on focus): control+a
 
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M

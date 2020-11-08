@@ -1225,6 +1225,29 @@ void postGoToTakeMarker(int command) {
 	}
 }
 
+void postSelectMultipleTracks(int command) {
+	int count = CountSelectedTracks(nullptr);
+	ostringstream s;
+	s << count << (count == 1 ? " track" : " tracks") << " selected";
+	outputMessage(s);
+}
+
+void postSelectAll(int command) {
+	switch (GetCursorContext2(true)) {
+		case 0: // Track
+			postSelectMultipleTracks(0);
+			return;
+		case 1: // Item
+			postSelectMultipleItems(0);
+			return;
+		case 2: // Envelope
+			postSelectMultipleEnvelopePoints(0);
+			return;
+		default:
+			return;
+	}
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1366,6 +1389,9 @@ PostCommand POST_COMMANDS[] = {
 	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
 	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
 	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
+	{40296, postSelectMultipleTracks}, // Track: Select all tracks
+	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
+	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {

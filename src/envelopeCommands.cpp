@@ -599,3 +599,14 @@ void cmdToggleTrackEnvelope(Command* command) {
 	s << name << " envelope";
 	outputMessage(s);
 }
+
+void postSelectMultipleEnvelopePoints(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int count = countSelectedEnvelopePoints(envelope);
+	ostringstream s;
+	s << count << (count == 1 ? " point" : " points") << " selected";
+	outputMessage(s);
+}
