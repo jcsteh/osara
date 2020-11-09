@@ -579,6 +579,22 @@ void postToggleMasterTrackFxBypass(int command) {
 	postToggleTrackFxBypass(GetMasterTrack(0));
 }
 
+void postToggleAllTracksFxBypass(int command) {
+	int count = CountTracks(nullptr);
+	if (count == 0) {
+		return;
+	}
+	bool bypassed = false;
+	for (int t = 0; t < count; ++t) {
+		MediaTrack* track = GetTrack(nullptr, t);
+		if (isTrackFxBypassed(track)) {
+			bypassed = true;
+			break;
+		}
+	}
+	outputMessage(bypassed ? "all tracks FX bypassed" : "all tracks FX active");
+}
+
 bool shouldReportScrub = true;
 
 void postCursorMovement(int command) {
@@ -1268,7 +1284,7 @@ PostCommand POST_COMMANDS[] = {
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
 	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
-	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
+	{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
