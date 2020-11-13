@@ -38,6 +38,7 @@
 #include "peakWatcher.h"
 #include "midiEditorCommands.h"
 #include "envelopeCommands.h"
+#include "buildVersion.h"
 
 using namespace std;
 
@@ -2859,6 +2860,14 @@ void cmdNudgeTimeSelection(Command* command) {
 	outputMessage(s);
 }
 
+void cmdAbout(Command* command) {
+	ostringstream s;
+	s << "OSARA: Open Source Accessibility for the REAPER Application\r\n" <<
+		"Version: " << OSARA_VERSION << "\r\n" <<
+		OSARA_COPYRIGHT;
+	reviewMessage("About OSARA", s.str().c_str());
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2982,6 +2991,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report global / Track Automation Mode"}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
