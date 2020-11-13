@@ -454,6 +454,32 @@ bool shouldReportTimeMovement() {
 	return !(GetPlayState() & 1);
 }
 
+INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
+	LPARAM lParam
+) {
+	switch (msg) {
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDCANCEL) {
+				DestroyWindow(dialog);
+				return TRUE;
+			}
+			break;
+		case WM_CLOSE:
+			DestroyWindow(dialog);
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void reviewMessage(const char* title, const char* message) {
+	HWND dialog = CreateDialog(pluginHInstance,
+		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), mainHwnd,
+		reviewMessage_dialogProc);
+	SetWindowText(dialog, title);
+	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
+	ShowWindow(dialog, SW_SHOWNORMAL);
+}
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
