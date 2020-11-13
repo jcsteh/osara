@@ -2343,8 +2343,9 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
-	ostringstream s;
+void formatTracksWithState(const char* prefix, TrackStateCheck checkState,
+	ostringstream& s
+) {
 	s << prefix << ": ";
 	int count = 0;
 	for (int i = 0; i < CountTracks(0); ++i) {
@@ -2361,6 +2362,11 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 	}
 	if (count == 0)
 		s << "none";
+}
+
+void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
+	ostringstream s;
+	formatTracksWithState(prefix, checkState, s);
 	outputMessage(s);
 }
 
