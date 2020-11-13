@@ -2375,7 +2375,11 @@ void cmdReportMutedTracks(Command* command) {
 }
 
 void cmdReportSoloedTracks(Command* command) {
-	reportTracksWithState("Soloed", isTrackSoloed);
+	ostringstream s;
+	formatTracksWithState("soloed", isTrackSoloed, s);
+	s << "; ";
+	formatTracksWithState("defeating solo", isTrackDefeatingSolo, s);
+	outputMessage(s);
 }
 
 void cmdReportArmedTracks(Command* command) {
