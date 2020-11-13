@@ -109,6 +109,9 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Nudge track pan right: Alt+Rightarrow
 - Master track: Toggle stereo/mono (L+R): shift+f9
 - Monitoring FX: Toggle bypass: Control+Shift+B
+- Track: Unmute all tracks: alt+f5
+- Track: Unsolo all tracks: alt+f6
+- Track: Unarm all tracks for recording: alt+f7
 
 #### Edit Cursor Movement
 - View: Move cursor left one pixel: Leftarrow

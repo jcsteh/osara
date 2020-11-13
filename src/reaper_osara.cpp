@@ -1470,6 +1470,9 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
 	{40778, "grid eighth"}, // Grid: Set to 1/8
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
+	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
+	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
