@@ -586,11 +586,17 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: View I/O for master track: shift+i
 - OSARA: Report ripple editing mode: control+shift+p
 - OSARA: Report muted tracks: Alt+shift+f5
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report soloed tracks: Alt+shift+f6
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report record armed tracks: Alt+shift+f7
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report tracks with record monitor on: Control+shift+f8
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report tracks with phase inverted: Alt+shift+f9
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report track/item/time selection (depending on focus): control+shift+space
+ - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): delete
 - OSARA: Report edit/play cursor position: control+shift+j
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .

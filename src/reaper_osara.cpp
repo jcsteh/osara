@@ -2370,16 +2370,20 @@ void cmdReportRippleMode(Command* command) {
 }
 
 void formatTracksWithState(const char* prefix, TrackStateCheck checkState,
-	ostringstream& s
+	ostringstream& s, bool multiLine
 ) {
-	s << prefix << ": ";
+	if (prefix) {
+		s << prefix << ":" <<
+			(multiLine ? "\r\n" : " ");
+	}
 	int count = 0;
 	for (int i = 0; i < CountTracks(0); ++i) {
 		MediaTrack* track = GetTrack(0, i);
 		if (checkState(track)) {
 			++count;
-			if (count > 1)
-				s << ", ";
+			if (count > 1) {
+				s << (multiLine ? "\r\n" : ", ");
+			}
 			s << i + 1;
 			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 			if (name && name[0])
@@ -2391,9 +2395,14 @@ void formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 }
 
 void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
+	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	formatTracksWithState(prefix, checkState, s);
-	outputMessage(s);
+	formatTracksWithState(multiLine ? nullptr : prefix, checkState, s, multiLine);
+	if (multiLine) {
+		reviewMessage(prefix, s.str().c_str());
+	} else {
+		outputMessage(s);
+	}
 }
 
 void cmdReportMutedTracks(Command* command) {
@@ -2401,11 +2410,16 @@ void cmdReportMutedTracks(Command* command) {
 }
 
 void cmdReportSoloedTracks(Command* command) {
+	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	formatTracksWithState("soloed", isTrackSoloed, s);
-	s << "; ";
-	formatTracksWithState("defeating solo", isTrackDefeatingSolo, s);
-	outputMessage(s);
+	formatTracksWithState("soloed", isTrackSoloed, s, multiLine);
+	s << (multiLine ? "\r\n\r\n" : "; ");
+	formatTracksWithState("defeating solo", isTrackDefeatingSolo, s, multiLine);
+	if (multiLine) {
+		reviewMessage("Soloed", s.str().c_str());
+	} else {
+		outputMessage(s);
+	}
 }
 
 void cmdReportArmedTracks(Command* command) {
