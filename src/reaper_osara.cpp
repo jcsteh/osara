@@ -2421,6 +2421,8 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 }
 
 void cmdReportSelection(Command* command) {
+	const bool multiLine = lastCommandRepeatCount == 1;
+	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
 	int count = 0;
 	int t;
@@ -2436,7 +2438,7 @@ void cmdReportSelection(Command* command) {
 				if (isTrackSelected(track)) {
 					++count;
 					if (count > 1)
-						s << ", ";
+						s << separator;
 					s << t + 1;
 					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 					if (name && name[0])
@@ -2453,7 +2455,7 @@ void cmdReportSelection(Command* command) {
 					if (isItemSelected(item)) {
 						++count;
 						if (count > 1)
-							s << ", ";
+							s << separator;
 						s << t + 1 << "." << i + 1;
 						MediaItem_Take* take = GetActiveTake(item);
 						if (take)
@@ -2467,8 +2469,8 @@ void cmdReportSelection(Command* command) {
 			double start, end;
 			GetSet_LoopTimeRange(false, false, &start, &end, false);
 			if (start != end) {
-				s << "start " << formatTime(start, TF_RULER, false, false) << ", "
-					<< "end " << formatTime(end, TF_RULER, false, false) << ", "
+				s << "start " << formatTime(start, TF_RULER, false, false) << separator
+					<< "end " << formatTime(end, TF_RULER, false, false) << separator
 					<< "length " << formatTime(end - start, TF_RULER, true, false);
 				count = 1;
 				resetTimeCache();
@@ -2478,9 +2480,15 @@ void cmdReportSelection(Command* command) {
 		default:
 			return;
 	}
-	if (count == 0)
-		s << "No selection";
-	outputMessage(s);
+	if (count == 0) {
+		outputMessage("No selection");
+		return;
+	}
+	if (multiLine) {
+		reviewMessage("Selection", s.str().c_str());
+	} else {
+		outputMessage(s);
+	}
 }
 
 int countTakeMarkersInSelectedTakes() {
