@@ -2422,19 +2422,20 @@ void cmdReportSelection(Command* command) {
 }
 
 int countTakeMarkersInSelectedTakes() {
-	int count = 0;	int itemCount = CountSelectedMediaItems(0);
+	int itemCount = CountSelectedMediaItems(0);
 	if (itemCount == 0) {
 		return 0;
 	}
+	int markerCount = 0;
 	for (int i = 0; i < itemCount; ++i) {
 		MediaItem* item = GetSelectedMediaItem(0, i);
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take) {
 			continue;
 		}
-		count += GetNumTakeMarkers(take);
+		markerCount += GetNumTakeMarkers(take);
 	}
-	return count;
+	return markerCount;
 }
 
 void cmdhDeleteTakeMarkers(int command) {
