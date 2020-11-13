@@ -5,8 +5,13 @@
 # License: GNU General Public License version 2.0
 
 Import("env")
-env.Append(CPPPATH=("#include", "#include/WDL"))
 
+env.Textfile(target="buildVersion.h", source=[
+	'const char OSARA_VERSION[] = "$version";',
+	'const char OSARA_COPYRIGHT[] = "$copyright";',
+]);
+
+env.Append(CPPPATH=(".", "#include", "#include/WDL"))
 sources = [
 	"reaper_osara.cpp",
 	"paramsUi.cpp",

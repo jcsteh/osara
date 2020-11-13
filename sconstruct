@@ -9,13 +9,16 @@ import os
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
-env = Environment(variables=vars,
-	copyright="Copyright (C) 2014-2017 NV Access Limited, James Teh & other contributors",
+env = Environment(tools = ["default", "textfile"],
+	variables=vars,
+	copyright="Copyright (C) 2014-2020 NV Access Limited, James Teh & other contributors",
 )
 
 if env["PLATFORM"] == "win32":
 	for arch, suffix in (("x86", "32"), ("x86_64", "64")):
-		archEnv = Environment(TARGET_ARCH=arch, libSuffix=suffix,
+		archEnv = Environment(tools = ["default", "textfile"],
+			TARGET_ARCH=arch, libSuffix=suffix,
+			version=env["version"], copyright=env["copyright"],
 			# Hack around an odd bug where some tool after msvc states that static and shared objects are different.
 			STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME=1)
 		archEnv.SConscript("src/archBuild_sconscript",
