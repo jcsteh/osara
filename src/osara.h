@@ -165,6 +165,7 @@
 #define REAPERAPI_WANT_TrackFX_FormatParamValueNormalized
 #define REAPERAPI_WANT_GetNumTakeMarkers
 #define REAPERAPI_WANT_GetTakeMarker
+#define REAPERAPI_WANT_GetTrackStateChunk
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

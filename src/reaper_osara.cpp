@@ -22,6 +22,7 @@
 #include <cassert>
 #include <math.h>
 #include <optional>
+#include <regex>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
@@ -331,6 +332,15 @@ bool isTrackSoloed(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
 }
 
+const regex RE_TRACK_STATE("\\sMUTESOLO \\d \\d (\\d)");
+bool isTrackDefeatingSolo(MediaTrack* track) {
+	char state[500];
+	GetTrackStateChunk(track, state, sizeof(state), false);
+	cmatch m;
+	regex_search(state, m, RE_TRACK_STATE);
+	return !m.empty() && m.str(1)[0] == '1';
+}
+
 bool isTrackArmed(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL);
 }
@@ -484,6 +494,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << " muted";
 	if (isTrackSoloed(track))
 		s << " soloed";
+	if (isTrackDefeatingSolo(track)) {
+		s << " defeating solo";
+	}
 	if (isTrackArmed(track))
 		s << " armed";
 	if (isTrackPhaseInverted(track))
@@ -1264,6 +1277,15 @@ void postSelectAll(int command) {
 	}
 }
 
+void postToggleTrackSoloDefeat(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	outputMessage(isTrackDefeatingSolo(track) ?
+		"defeating solo" : "not defeating solo");
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1408,6 +1430,7 @@ PostCommand POST_COMMANDS[] = {
 	{40296, postSelectMultipleTracks}, // Track: Select all tracks
 	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
 	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
+	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {

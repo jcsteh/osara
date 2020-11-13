@@ -112,6 +112,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Unmute all tracks: alt+f5
 - Track: Unsolo all tracks: alt+f6
 - Track: Unarm all tracks for recording: alt+f7
+- Track: Toggle track solo defeat: control+win+f6
 
 #### Edit Cursor Movement
 - View: Move cursor left one pixel: Leftarrow
