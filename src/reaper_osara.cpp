@@ -23,6 +23,7 @@
 #include <math.h>
 #include <optional>
 #include <regex>
+#include <set>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
@@ -64,6 +65,7 @@ int lastCommand = 0;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
 MediaItem* currentItem = nullptr;
+bool shouldMoveFromPlayCursor = false;
 
 /*** Utilities */
 
@@ -1523,6 +1525,14 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+};
+const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
+	40104, // View: Move cursor left one pixel
+	40105, // View: Move cursor right one pixel
+	41042, // Go forward one measure
+	41043, // Go back one measure
+	41044, // Go forward one beat
+	41045, // Go back one beat
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
@@ -3032,6 +3042,8 @@ void loadConfig() {
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
 	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
 		"reportSurfaceChanges")[0] == '1';
+	shouldMoveFromPlayCursor =
+		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
 }
 
 void config_onOk(HWND dialog) {
@@ -3052,6 +3064,10 @@ void config_onOk(HWND dialog) {
 		ID_CONFIG_REPORT_SURFACE_CHANGES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportSurfaceChanges",
 		shouldReportSurfaceChanges ? "1" : "0", true);
+	shouldMoveFromPlayCursor = IsDlgButtonChecked(dialog,
+		ID_CONFIG_MOVE_FROM_PLAY_CURSOR) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "moveFromPlayCursor",
+		shouldMoveFromPlayCursor ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -3084,6 +3100,8 @@ void cmdConfig(Command* command) {
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
 		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
+		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
@@ -3096,10 +3114,18 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 	int relMode=0, HWND hwnd=nullptr
 ) {
 	if (section==MAIN_SECTION) {
-		const auto it = postCommandsMap.find(command);
-		if (it != postCommandsMap.end()) {
+		const auto postIt = postCommandsMap.find(command);
+		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
 			lastCommandTime = GetTickCount();
+			if (shouldMoveFromPlayCursor) {
+				const auto cursorIt = MOVE_FROM_PLAY_CURSOR_COMMANDS.find(command);
+				if (cursorIt != MOVE_FROM_PLAY_CURSOR_COMMANDS.end()) {
+					if (GetPlayState() & 1) { // Playing
+						SetEditCurPos(GetPlayPosition(), false, false);
+					}
+				}
+			}
 			if (hwnd) {
 				// #244: If the command was triggered via MIDI, pass the MIDI data when
 				// executing the command so that toggles, etc. work as expected.
@@ -3107,7 +3133,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			} else {
 				Main_OnCommand(command, 0);
 			}
-			it->second(command);
+			postIt->second(command);
 			lastCommand=command;
 			isHandlingCommand = false;
 			return true;
