@@ -483,6 +483,9 @@ void reviewMessage(const char* title, const char* message) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
+// Functions exported from SWS
+const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
@@ -532,6 +535,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << " phase inverted";
 	if (isTrackFxBypassed(track))
 		s << " FX bypassed";
+	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
+		s << " notes";
+	}
 	if (trackNum > 0) { // Not master
 		int itemCount = CountTrackMediaItems(track);
 		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
@@ -3222,6 +3228,8 @@ bool handleMainCommandFallback(int command, int flag) {
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
 void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
+		"NF_GetSWSTrackNotes");
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
 		if (cmd)
