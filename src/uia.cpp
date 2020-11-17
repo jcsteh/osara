@@ -10,6 +10,7 @@
 #include <tlhelp32.h>
 #include <atlcomcli.h>
 #include <memory>
+#include <utility>
 #include "osara.h"
 
 using namespace std;
@@ -119,7 +120,6 @@ class UiaProvider : public IRawElementProviderSimple {
 
 	private:
 	virtual ~UiaProvider() {
-		uiaCore->DisconnectProvider(this);
 	}
 
 	ULONG refCount; // Ref Count for this COM object
@@ -190,7 +190,11 @@ bool initializeUia() {
 
 bool terminateUia() {
 	if (uiaProvider) {
+		// Null out uiaProvider so it can't be returned by WM_GETOBJECT during
+		// disconnection.
+		CComPtr<IRawElementProviderSimple> tmpProv = move(uiaProvider);
 		uiaProvider = nullptr;
+		uiaCore->DisconnectProvider(tmpProv);
 	}
 	ShowWindow(uiaWnd, SW_HIDE);
 	if (!DestroyWindow(uiaWnd)) {
