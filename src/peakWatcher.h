@@ -15,3 +15,4 @@ void cmdReportPeakWatcherT2C1(Command* command);
 void cmdReportPeakWatcherT2C2(Command* command);
 void cmdResetPeakWatcherT1(Command* command);
 void cmdResetPeakWatcherT2(Command* command);
+void cmdPausePeakWatcher(Command* command);

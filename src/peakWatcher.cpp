@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Peak Watcher code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2017 NV Access Limited
+ * Copyright 2015-2020 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -110,6 +110,15 @@ void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 }
 
+void pw_start() {
+	pw_timer = SetTimer(nullptr, 0, 30, pw_watcher);
+}
+
+void pw_stop() {
+	KillTimer(nullptr, pw_timer);
+	pw_timer = 0;
+}
+
 void pw_onOk(HWND dialog) {
 	// Retrieve the notification state for channels.
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
@@ -173,10 +182,10 @@ void pw_onOk(HWND dialog) {
 
 	if (pw_numTracksEnabled == 0 && pw_timer) {
 		// Peak watcher disabled completely.
-		KillTimer(NULL, pw_timer);
-		pw_timer = 0;
-	} else if (!pw_timer) // Previously disabled.
-		pw_timer = SetTimer(NULL, 0, 30, pw_watcher);
+		pw_stop();
+	} else if (!pw_timer) { // Previously disabled or paused.
+		pw_start();
+	}
 }
 
 INT_PTR CALLBACK pw_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -288,6 +297,10 @@ void pw_report(int trackIndex, int channel) {
 		outputMessage("Peak Watcher track disabled");
 		return;
 	}
+	if (!pw_timer) {
+		outputMessage("Peak Watcher paused");
+		return;
+	}
 	ostringstream s;
 	s << fixed << setprecision(1);
 	s << pwTrack.channels[channel].peak;
@@ -316,4 +329,19 @@ void cmdResetPeakWatcherT1(Command* command) {
 
 void cmdResetPeakWatcherT2(Command* command) {
 	pw_resetTrack(1, true);
+}
+
+void cmdPausePeakWatcher(Command* command) {
+	if (pw_timer) {
+		// Running.
+		pw_stop();
+		outputMessage("paused Peak Watcher");
+	} else if (pw_numTracksEnabled > 0) {
+		// Disabled.
+		pw_start();
+		outputMessage("resumed Peak Watcher");
+	} else {
+		// Paused.
+		outputMessage("Peak Watcher not enabled");
+	}
 }
