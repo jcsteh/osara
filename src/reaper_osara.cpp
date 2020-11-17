@@ -2902,13 +2902,10 @@ int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	HWND transDialog = (HWND)accelReg->user;
 	if (!IsWindow(transDialog)) {
 		// Dialog was closed. We don't need this hook any more.
-		plugin_register("-accelerator", &transDetect_accelReg);
+		plugin_register("-accelerator", accelReg);
 		return 0; // Normal handling.
 	}
-	if (msg->message != WM_KEYDOWN) {
-		return 0; // Normal handling.
-	}
-	if (GetParent(msg->hwnd) != transDialog) {
+	if (msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != transDialog) {
 		return 0; // Normal handling.
 	}
 	switch (msg->wParam) {
@@ -2930,6 +2927,12 @@ int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 }
 
 void cmdTransientDetectionSettings(Command* command) {
+	if (GetToggleCommandState(command->gaccel.accel.cmd)) {
+		// Dialog is showing. Just run the command to dismiss it.
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		plugin_register("-accelerator", &transDetect_accelReg);
+		return;
+	}
 	transDetect_accelReg.translateAccel = &transDetect_translateAccel;
 	transDetect_accelReg.isLocal = true;
 	// We must register the hook before the dialog appears or it won't work.
