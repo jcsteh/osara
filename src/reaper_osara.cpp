@@ -2893,6 +2893,52 @@ void cmdAbout(Command* command) {
 	reviewMessage("About OSARA", s.str().c_str());
 }
 
+// The Transient Detection Settings dialog deliberately passes most keys to the
+// main section. This makes it impossible for keyboard users to navigate.
+// To work around this, when this dialog is opened, we register an accelerator
+// hook which passes tab, arrow keys, etc. to the dialog.
+accelerator_register_t transDetect_accelReg;
+int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	HWND transDialog = (HWND)accelReg->user;
+	if (!IsWindow(transDialog)) {
+		// Dialog was closed. We don't need this hook any more.
+		plugin_register("-accelerator", &transDetect_accelReg);
+		return 0; // Normal handling.
+	}
+	if (msg->message != WM_KEYDOWN) {
+		return 0; // Normal handling.
+	}
+	if (GetParent(msg->hwnd) != transDialog) {
+		return 0; // Normal handling.
+	}
+	switch (msg->wParam) {
+		case VK_TAB:
+		case VK_RIGHT:
+		case VK_LEFT:
+		case VK_UP:
+		case VK_DOWN:
+		case VK_PRIOR:
+		case VK_NEXT:
+		case VK_HOME:
+		case VK_END:
+		case VK_SPACE:
+			return -1; // pass to window.
+		default:
+			break;
+	}
+	return 0; // Normal handling.
+}
+
+void cmdTransientDetectionSettings(Command* command) {
+	transDetect_accelReg.translateAccel = &transDetect_translateAccel;
+	transDetect_accelReg.isLocal = true;
+	// We must register the hook before the dialog appears or it won't work.
+	plugin_register("accelerator", &transDetect_accelReg);
+	// Open the dialog.
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -2953,6 +2999,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
+	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
