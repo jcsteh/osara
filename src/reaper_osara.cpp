@@ -2386,9 +2386,10 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-void formatTracksWithState(const char* prefix, TrackStateCheck checkState,
-	ostringstream& s, bool multiLine
+string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
+	bool multiLine, bool outputIfNone = true
 ) {
+	ostringstream s;
 	if (prefix) {
 		s << prefix << ":" <<
 			(multiLine ? "\r\n" : " ");
@@ -2407,16 +2408,21 @@ void formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 				s << " " << name;
 		}
 	}
-	if (count == 0)
+	if (count == 0) {
+		if (!outputIfNone) {
+			return "";
+		}
 		s << "none";
+	}
+	return s.str();
 }
 
 void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 	bool multiLine = lastCommandRepeatCount == 1;
-	ostringstream s;
-	formatTracksWithState(multiLine ? nullptr : prefix, checkState, s, multiLine);
+	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState,
+		multiLine);
 	if (multiLine) {
-		reviewMessage(prefix, s.str().c_str());
+		reviewMessage(prefix, s.c_str());
 	} else {
 		outputMessage(s);
 	}
@@ -2429,9 +2435,12 @@ void cmdReportMutedTracks(Command* command) {
 void cmdReportSoloedTracks(Command* command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	formatTracksWithState("soloed", isTrackSoloed, s, multiLine);
-	s << (multiLine ? "\r\n\r\n" : "; ");
-	formatTracksWithState("defeating solo", isTrackDefeatingSolo, s, multiLine);
+	s << formatTracksWithState("soloed", isTrackSoloed, multiLine);
+	string defeat = formatTracksWithState("defeating solo", isTrackDefeatingSolo,
+		multiLine, /* outputIfNone */ false);
+	if (!defeat.empty()) {
+		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
+	}
 	if (multiLine) {
 		reviewMessage("Soloed", s.str().c_str());
 	} else {
