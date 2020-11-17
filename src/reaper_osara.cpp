@@ -1321,6 +1321,22 @@ void postToggleTrackSoloDefeat(int command) {
 		"defeating solo" : "not defeating solo");
 }
 
+void postChangeTransientDetectionSensitivity(int command) {
+	double sensitivity = *(double*)get_config_var("transientsensitivity",
+		nullptr) * 100;
+	ostringstream s;
+	s << sensitivity << "% sensitivity";
+	outputMessage(s);
+}
+
+void postChangeTransientDetectionThreshold(int command) {
+	double threshold = *(double*)get_config_var("transientthreshold",
+		nullptr);
+	ostringstream s;
+	s << threshold << "dB threshold";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1466,6 +1482,10 @@ PostCommand POST_COMMANDS[] = {
 	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
 	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
 	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
+	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
+	{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
+	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
+	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {

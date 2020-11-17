@@ -241,6 +241,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Options: Solo in front: Control+Alt+F6
 - Pre-roll: Toggle pre-roll on record: Shift+`
 - SWS/AW: Toggle count-in before recording: Control+Shift+`
+- Transient detection sensitivity: Increase: alt+shift+pageUp
+- Transient detection sensitivity: Decrease: alt+shift+pageDown
+- Transient detection threshold: Increase: control+shift+pageUp
+- Transient detection threshold: Decrease: control+shift+pageDown
 
 #### Undo
 - Edit: Undo: Control+Z
