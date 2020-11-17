@@ -3234,9 +3234,16 @@ bool handleMainCommandFallback(int command, int flag) {
 	return false;
 }
 
+IReaperControlSurface* surface = nullptr;
+
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
 void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+#ifdef _WIN32
+	initializeUia();
+#endif
+	surface = createSurface();
+	plugin_register("csurf_inst", (void*)surface);
 	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
 		"NF_GetSWSTrackNotes");
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
@@ -3332,8 +3339,6 @@ void annotateSpuriousDialogs(HWND hwnd) {
 
 #endif // _WIN32
 
-IReaperControlSurface* surface = nullptr;
-
 extern "C" {
 
 REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
@@ -3354,7 +3359,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
-		initializeUia();
 #else
 		NSA11yWrapper::init();
 #endif
@@ -3390,8 +3394,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
-		surface = createSurface();
-		rec->Register("csurf_inst", (void*)surface);
 		registerExports(rec);
 		SetTimer(nullptr, 0, 0, delayedInit);
 #ifdef _WIN32
