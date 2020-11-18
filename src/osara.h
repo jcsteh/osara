@@ -166,6 +166,7 @@
 #define REAPERAPI_WANT_GetNumTakeMarkers
 #define REAPERAPI_WANT_GetTakeMarker
 #define REAPERAPI_WANT_GetTrackStateChunk
+#define REAPERAPI_WANT_get_config_var_string
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
