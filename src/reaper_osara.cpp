@@ -483,11 +483,12 @@ void reviewMessage(const char* title, const char* message) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
-unsigned long getConfigUndoMask() {
-	char bufOut[10];
-	if(!get_config_var_string("undomask", reinterpret_cast<char*>(&bufOut), 10))
+unsigned int getConfigUndoMask() {
+	int size{0};
+	unsigned int* undomask = static_cast<unsigned int*>(get_config_var("undomask", &size));
+	if(!undomask || (size!=sizeof(unsigned int)))
 		return 0;
-	return stoul(bufOut);
+	return *undomask;
 }
 
 // Functions exported from SWS
@@ -1973,7 +1974,7 @@ int int0 = 0;
 int int1 = 1;
 
 void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
-	unsigned long undoMask = getConfigUndoMask();
+	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
@@ -2067,7 +2068,7 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 }
 
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
-	unsigned long undoMask = getConfigUndoMask();
+	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask&1;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
