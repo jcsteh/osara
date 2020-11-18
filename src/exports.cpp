@@ -19,6 +19,10 @@ void* _vararg_osara_outputMessage(void** args, int nArgs) {
 	return nullptr;
 }
 
+bool osara_isShortcutHelpEnabled() {
+	return isShortcutHelpEnabled;
+}
+
 void registerExports(reaper_plugin_info_t* rec) {
 	rec->Register("API_osara_outputMessage", (void*)osara_outputMessage);
 	rec->Register("APIvararg_osara_outputMessage",
@@ -29,4 +33,6 @@ void registerExports(reaper_plugin_info_t* rec) {
 		"This should only be used in consultation with screen reader users. "
 		"Note that this may not work on Windows when certain GUI controls have "
 		"focus such as list boxes and trees.");
+	rec->Register("API_osara_isShortcutHelpEnabled",
+		(void*)osara_isShortcutHelpEnabled);
 }

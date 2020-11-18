@@ -183,6 +183,7 @@ typedef struct Command {
 } Command;
 extern int lastCommandRepeatCount;
 extern DWORD lastCommandTime;
+extern bool isShortcutHelpEnabled;
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;
