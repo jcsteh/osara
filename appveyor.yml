@@ -1,16 +1,19 @@
 version: "2020.1pre-{build}"
-image:
- - Visual Studio 2019
- - macos
 
 branches:
  only:
   - master
 
 environment:
- PY_PYTHON: 3.7-32
- encFileKey:
-  secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
+ matrix:
+  - job_name: Windows
+    appveyor_build_worker_image: Visual Studio 2019
+    PY_PYTHON: 3.7-32
+  - job_name: Mac
+    appveyor_build_worker_image: macos
+ global:
+  encFileKey:
+   secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
 
 init:
  - ps: |
@@ -69,7 +72,15 @@ deploy_script:
 
 notifications:
  - provider: GitHubPullRequest
-   on_build_success: false
-   on_build_failure: true
    on_build_status_changed: false
-   template: '{{#failed}} Build failed! See [{{status}} build]({{buildUrl}}) of [commit {{commitId}}]({{commitUrl}}) {{/failed}}'
+   template: |-
+    {{#passed}}Build succeeded!{{/passed}}{{#failed}}Build failed!{{/failed}} [Build {{&projectName}} {{buildVersion}} {{status}}]({{buildUrl}}) (commit {{commitUrl}} by @{{&commitAuthorUsername}})
+    {{#passed}}Downloads:{{#jobs}}
+    <details>
+    <summary>{{name}}</summary>
+
+    {{#artifacts}}
+    - [{{fileName}}]({{permalink}})
+    {{/artifacts}}
+    </details>
+    {{/jobs}}{{/passed}}
