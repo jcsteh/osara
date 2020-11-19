@@ -483,6 +483,14 @@ void reviewMessage(const char* title, const char* message) {
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
 
+unsigned int getConfigUndoMask() {
+	int size{0};
+	unsigned int* undomask = static_cast<unsigned int*>(get_config_var("undomask", &size));
+	if(!undomask || (size!=sizeof(unsigned int)))
+		return 0;
+	return *undomask;
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -1966,6 +1974,8 @@ int int0 = 0;
 int int1 = 1;
 
 void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
+	unsigned int undoMask = getConfigUndoMask();
+	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
 		outputMessage("No tracks");
@@ -2018,7 +2028,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	if (!select || track != origTrack || !wasSelected) {
 		// We're moving to a different track
 		// or we're on the same track but it's unselected.
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
 		if (clearSelection) {
 			Main_OnCommand(40297, 0); // Track: Unselect all tracks
@@ -2035,7 +2045,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		SetMixerScroll(track); // MCP
 		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Track Selection", 0);
 	}
 	postGoToTrack(0);
@@ -2058,6 +2068,8 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 }
 
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
+	unsigned int undoMask = getConfigUndoMask();
+	bool makeUndoPoint = undoMask&1;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -2089,7 +2101,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (direction == 1 ? pos < cursor : pos > cursor)
 			continue; // Not the right direction.
 		currentItem = item;
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
 		if (clearSelection) {
 			Main_OnCommand(40289, 0); // Item: Unselect all items
@@ -2097,7 +2109,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		}
 		if (select)
 			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Item Selection", 0);
 		SetEditCurPos(pos, true, true); // Seek playback.
 
