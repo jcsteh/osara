@@ -670,10 +670,14 @@ void postCursorMovementScrub(int command) {
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	ostringstream s;
-	s << selectedItemsCount << (selectedItemsCount == 1 ? " item" : " items") << " normalized";
-	if (command == 40254) {
-		// Item properties: Normalize multiple items to common gain
-		s << " to common gain";
+	if (selectedItemsCount == 0) {
+		s << "No selected items";
+	} else {
+		s << selectedItemsCount << (selectedItemsCount == 1 ? " item" : " items") << " normalized";
+		if (command == 40254) {
+			// Item properties: Normalize multiple items to common gain
+			s << " to common gain";
+		}
 	}
 	outputMessage(s);
 }
