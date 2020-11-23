@@ -667,6 +667,21 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
+void postItemNormalize(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(0);
+	ostringstream s;
+	if (selectedItemsCount == 0) {
+		s << "No selected items";
+	} else {
+		s << selectedItemsCount << (selectedItemsCount == 1 ? " item" : " items") << " normalized";
+		if (command == 40254) {
+			// Item properties: Normalize multiple items to common gain
+			s << " to common gain";
+		}
+	}
+	outputMessage(s);
+}
+
 void postCycleTrackFolderState(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -1370,6 +1385,8 @@ PostCommand POST_COMMANDS[] = {
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
+	{40108, postItemNormalize}, // Item properties: Normalize items
+	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
