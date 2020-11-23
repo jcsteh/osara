@@ -2424,6 +2424,18 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 	}
 }
 
+void cmdPropertiesFocus(Command* command) {
+	switch (fakeFocus) {
+		case FOCUS_ITEM:
+		case FOCUS_TAKEMARKER:
+			Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
+			break;
+		case FOCUS_AUTOMATIONITEM:
+			Main_OnCommand(42090, 0); // Envelope: Automation item properties...
+			break;
+	}
+}
+
 void cmdIoMaster(Command* command) {
 	// REAPER >= 6.01 has a builtin action for this. We keep this OSARA action
 	// for compatibility, but it should be removed when the key map is next
@@ -3082,6 +3094,7 @@ Command COMMANDS[] = {
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View propertiess for current media item / take / automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
