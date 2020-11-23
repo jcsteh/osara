@@ -2419,7 +2419,7 @@ void cmdReportRippleMode(Command* command) {
 }
 
 string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
-	bool multiLine, bool outputIfNone = true
+	bool includeMaster, bool multiLine, bool outputIfNone = true
 ) {
 	ostringstream s;
 	if (prefix) {
@@ -2427,17 +2427,23 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 			(multiLine ? "\r\n" : " ");
 	}
 	int count = 0;
-	for (int i = 0; i < CountTracks(0); ++i) {
-		MediaTrack* track = GetTrack(0, i);
+	for (int i = includeMaster ? -1 : 0; i < CountTracks(0); ++i) {
+		MediaTrack* track = (i == -1) ?
+			GetMasterTrack(nullptr) : GetTrack(nullptr, i);
 		if (checkState(track)) {
 			++count;
 			if (count > 1) {
 				s << (multiLine ? "\r\n" : ", ");
 			}
-			s << i + 1;
-			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-			if (name && name[0])
-				s << " " << name;
+			if (i == -1) {
+				s << "master";
+			} else {
+				s << i + 1;
+				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+				if (name && name[0]) {
+					s << " " << name;
+				}
+			}
 		}
 	}
 	if (count == 0) {
@@ -2449,10 +2455,12 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 	return s.str();
 }
 
-void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
+void reportTracksWithState(const char* prefix, TrackStateCheck checkState,
+	bool includeMaster
+) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState,
-		multiLine);
+		includeMaster, multiLine);
 	if (multiLine) {
 		reviewMessage(prefix, s.c_str());
 	} else {
@@ -2461,15 +2469,16 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
 }
 
 void cmdReportMutedTracks(Command* command) {
-	reportTracksWithState("Muted", isTrackMuted);
+	reportTracksWithState("Muted", isTrackMuted, /* includeMaster */ true);
 }
 
 void cmdReportSoloedTracks(Command* command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	s << formatTracksWithState("soloed", isTrackSoloed, multiLine);
+	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
+		multiLine);
 	string defeat = formatTracksWithState("defeating solo", isTrackDefeatingSolo,
-		multiLine, /* outputIfNone */ false);
+		/* includeMaster */ false, multiLine, /* outputIfNone */ false);
 	if (!defeat.empty()) {
 		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
 	}
@@ -2481,15 +2490,17 @@ void cmdReportSoloedTracks(Command* command) {
 }
 
 void cmdReportArmedTracks(Command* command) {
-	reportTracksWithState("Armed", isTrackArmed);
+	reportTracksWithState("Armed", isTrackArmed, /* includeMaster */ false);
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState("Monitored", isTrackMonitored);
+	reportTracksWithState("Monitored", isTrackMonitored,
+		/* includeMaster */ false);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState("Phase inverted", isTrackPhaseInverted);
+	reportTracksWithState("Phase inverted", isTrackPhaseInverted,
+		/* includeMaster */ false);
 }
 
 void cmdReportSelection(Command* command) {
