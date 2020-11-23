@@ -2433,6 +2433,8 @@ void cmdPropertiesFocus(Command* command) {
 		case FOCUS_AUTOMATIONITEM:
 			Main_OnCommand(42090, 0); // Envelope: Automation item properties...
 			break;
+		default:
+			break;
 	}
 }
 
