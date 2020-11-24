@@ -594,6 +594,7 @@ OSARA also includes some other miscellaneous actions.
 #### Main
 - OSARA: Move to next item (leaving other items selected): control+shift+rightArrow
 - OSARA: Move to previous item (leaving other items selected): control+shift+leftArrow
+- OSARA: View properties for current media item/take/automation item (depending on focus)
 - OSARA: View I/O for master track: shift+i
 - OSARA: Report ripple editing mode: control+shift+p
 - OSARA: Report muted tracks: Alt+shift+f5
