@@ -1000,7 +1000,7 @@ void postMidiChangeLength(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-		if (selectedNotes.size() == 0) {
+	if (selectedNotes.size() == 0) {
 		return;
 	}
 	bool generalize = false;
@@ -1119,6 +1119,59 @@ void postMidiChangePitch(int command) {
 		}
 	}
 	outputMessage(s);
+}
+
+void postMidiMoveStart(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	auto count = selectedNotes.size();
+	if (count == 0) {
+		return;
+	}
+	auto firstStart = selectedNotes.cbegin()->start;
+	bool generalize = count >= 8 || any_of(
+		selectedNotes.begin(), selectedNotes.end(),
+		[firstStart](MidiNote n) { return firstStart != n.start; }
+		);
+	if (!generalize) {
+		previewNotes(take, selectedNotes);
+	}
+	if (shouldReportNotes) {
+		ostringstream s;
+		if (generalize) {
+			s << count << (count == 1 ? " note" : " notes ");
+			switch (command) {
+				case 40181:
+					s << "pixel left";
+					break;
+				case 40182:
+					s << "pixel right";
+					break;
+				case 40183:
+					s << "grid unit left";
+					break;
+				case 40184:
+					s << "grid unit right";
+					break;				
+				default:
+					s << "start moved";
+					break;
+			}
+		} else{ 
+			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
+				if (note == selectedNotes.cbegin()) {
+					s << formatTime(note->start, TF_MEASURE) << " ";
+				}
+				s << getMidiNoteName(take, note->pitch, note->channel);
+				if (note != selectedNotes.cend() - 1) {
+					s << ", ";
+				}
+			}
+		}
+		outputMessage(s);
+	}
 }
 
 void postMidiChangeCCValue(int command) {

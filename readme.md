@@ -371,6 +371,10 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Shorten notes one pixel: Alt+NumPad1 or Alt+Shift+L
 - Edit: Lengthen notes one grid unit: NumPad3 or L
 - Edit: Shorten notes one grid unit: NumPad1 or Shift+L
+- Edit: Move notes left one pixel: Alt+NumPad4 or Alt+Shift+P
+- Edit: Move notes right one pixel: Alt+NumPad6 or Alt+P
+- Edit: Move notes left one grid unit: NumPad4 or Shift+P
+- Edit: Move notes right one grid unit: NumPad6 or P
 - Edit: Note velocity +01: NumPad9 or V
 - Edit: Note velocity +10: Alt+NumPad9 or Alt+V
 - Edit: Note velocity -01: NumPad7 or Shift+V
