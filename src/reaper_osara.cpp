@@ -2431,6 +2431,7 @@ void cmdPropertiesFocus(Command* command) {
 			Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
 			break;
 		case FOCUS_AUTOMATIONITEM:
+		case FOCUS_ENVELOPE:
 			Main_OnCommand(42090, 0); // Envelope: Automation item properties...
 			break;
 		default:
