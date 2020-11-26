@@ -1123,7 +1123,7 @@ void postMidiChangePitch(int command) {
 
 void postMidiMoveStart(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);	
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	auto count = selectedNotes.size();
