@@ -1038,7 +1038,10 @@ void postMidiChangeLength(int command) {
 					break;
 				case 40447:
 					s << "shortened grid unit";
-					break;				
+					break;
+				case 40633:
+					s << "length set to grid size";
+					break;
 				default:
 					s << "length changed";
 					break;
