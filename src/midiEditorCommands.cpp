@@ -207,23 +207,27 @@ void cmdMidiMoveCursor(Command* command) {
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int notes;
-	MIDI_CountEvts(take, &notes, NULL, NULL);
+	int noteCount;
+	MIDI_CountEvts(take, &noteCount, NULL, NULL);
 	double now = GetCursorPosition();
-	int count = 0;
 	// todo: Optimise; perhaps a binary search?
-	for (int n = 0; n < notes; ++n) {
-		double start;
-		MIDI_GetNote(take, n, NULL, NULL, &start, NULL, NULL, NULL, NULL);
+	vector<MidiNote> notes;
+	for (int n = 0; n < noteCount; ++n) {
+		double start, end;
+		int chan, pitch, vel;
+		MIDI_GetNote(take, n, NULL, NULL, &start, &end, &chan, &pitch, &vel);
 		start = MIDI_GetProjTimeFromPPQPos(take, start);
 		if (start > now) {
 			break;
 		}
 		if (start == now) {
-			++count;
+			end = MIDI_GetProjTimeFromPPQPos(take, end);
+			notes.push_back({chan, pitch, vel, 0, start, end});
 		}
 	}
+	auto count = notes.size();
 	if (count > 0) {
+		previewNotes(take, notes);
 		fakeFocus = FOCUS_NOTE;
 		s << " " << count << (count == 1 ? " note" : " notes");
 	}
