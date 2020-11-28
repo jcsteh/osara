@@ -1543,6 +1543,7 @@ PostCommand MIDI_POST_COMMANDS[] = {
 	{40676, postMidiChangeCCValue}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue}, // Edit: Decrease value a little bit for CC events
 	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
+	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
 	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
 	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
 	{0},

@@ -1042,6 +1042,9 @@ void postMidiChangeLength(int command) {
 				case 40633:
 					s << "length set to grid size";
 					break;
+				case 40765:
+					s << "made legato";
+					break;
 				default:
 					s << "length changed";
 					break;

@@ -372,6 +372,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Lengthen notes one grid unit: NumPad3 or L
 - Edit: Shorten notes one grid unit: NumPad1 or Shift+L
 - Edit: Set note lengths to grid size: Ctrl+Shift+L
+- Edit: Make notes legato, preserving note start times: G
 - Edit: Move notes left one pixel: Alt+NumPad4 or Alt+Shift+P
 - Edit: Move notes right one pixel: Alt+NumPad6 or Alt+P
 - Edit: Move notes left one grid unit: NumPad4 or Shift+P
