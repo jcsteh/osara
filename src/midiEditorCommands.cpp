@@ -355,6 +355,19 @@ bool isNoteSelected(MediaItem_Take* take, const int note) {
 	return sel;
 }
 
+int countSelectedNotes(MediaItem_Take* take, int offset=-1) {
+	int noteIndex = offset;
+	int count = 0;
+	for(;;){
+		noteIndex = MIDI_EnumSelNotes(take, noteIndex);
+		if (noteIndex == -1) {
+			break;
+		}
+		++count;
+	}
+	return count;
+}
+
 vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 	int noteIndex = offset;
 	vector<MidiNote> notes;
@@ -836,7 +849,7 @@ void cmdMidiMoveToPrevItem(Command* command) {
 void cmdMidiMoveToTrack(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-		MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	MediaItem* item = GetMediaItemTake_Item(take);
 	MediaTrack* track = GetMediaItem_Track(item);
 	int count = CountTrackMediaItems(track);
@@ -892,6 +905,34 @@ void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
 	Undo_EndBlock("OSARA: Select all notes with the same pitch within time selection",0);
 	ostringstream s;
 	s<< selectCount << " note"<<((selectCount==1)?"":"s")<<" selected";
+	outputMessage(s);
+}
+
+void cmdMidiNoteSplitOrJoin(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected note count before action.
+	auto oldCount = countSelectedNotes(take);
+	auto cmdId = command->gaccel.accel.cmd;
+	MIDIEditor_OnCommand(editor, cmdId);
+	auto newCount = countSelectedNotes(take);
+	if (oldCount == newCount) {
+		return;
+	}
+	ostringstream s;
+	s << oldCount << " notes ";
+	switch (cmdId) {
+		case 40046:
+			s << "split";
+			break;
+		case 40456:
+			s << "joined";
+			break;
+		default:
+			s << "transformed";
+			break;
+	}
+	s << " into " << newCount;
 	outputMessage(s);
 }
 
