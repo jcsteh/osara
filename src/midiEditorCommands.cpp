@@ -1094,11 +1094,11 @@ void postMidiChangePitch(int command) {
 			case 40178:
 				s << "semitone down";
 				break;
+			case 40179:
+				s << "octave up";
+				break;
 			case 40180:
 				s << "octave down";
-				break;
-			case 40181:
-				s << "octave up";
 				break;
 			case 41026:
 				s << "semitone up ignoring scale";
