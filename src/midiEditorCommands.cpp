@@ -216,15 +216,18 @@ void cmdMidiMoveCursor(Command* command) {
 		double start;
 		MIDI_GetNote(take, n, NULL, NULL, &start, NULL, NULL, NULL, NULL);
 		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		if (start > now)
+		if (start > now) {
 			break;
-		if (start == now)
+		}
+		if (start == now) {
 			++count;
+		}
 	}
-	if (count > 0)
+	if (count > 0) {
 		fakeFocus = FOCUS_NOTE;
 		s << " " << count << (count == 1 ? " note" : " notes");
-		outputMessage(s);
+	}
+	outputMessage(s);
 }
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
