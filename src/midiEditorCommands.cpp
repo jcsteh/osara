@@ -1003,6 +1003,10 @@ void postMidiChangeLength(int command) {
 	if (selectedNotes.size() == 0) {
 		return;
 	}
+	if (command == 40765 && selectedNotes.size() == 1) {
+		// Making notes legato doesn't do anything when only one note is selected.
+		return;
+	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
