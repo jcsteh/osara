@@ -1529,7 +1529,7 @@ PostCommand MIDI_POST_COMMANDS[] = {
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
 	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
 	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
-	{40435, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40434, postMidiSelectNotes}, // Select all notes with the same pitch
 	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
 	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
@@ -1539,9 +1539,11 @@ PostCommand MIDI_POST_COMMANDS[] = {
 	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
 	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
 	{40501, postMidiSelectNotes}, // Invert selection
+	{40633, postMidiChangeLength}, // Edit: Set note lengths to grid size
 	{40676, postMidiChangeCCValue}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue}, // Edit: Decrease value a little bit for CC events
 	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
+	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
 	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
 	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
 	{0},
@@ -3080,6 +3082,8 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
 	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
 	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure

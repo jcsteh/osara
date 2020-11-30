@@ -207,24 +207,31 @@ void cmdMidiMoveCursor(Command* command) {
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int notes;
-	MIDI_CountEvts(take, &notes, NULL, NULL);
+	int noteCount;
+	MIDI_CountEvts(take, &noteCount, NULL, NULL);
 	double now = GetCursorPosition();
-	int count = 0;
 	// todo: Optimise; perhaps a binary search?
-	for (int n = 0; n < notes; ++n) {
-		double start;
-		MIDI_GetNote(take, n, NULL, NULL, &start, NULL, NULL, NULL, NULL);
+	vector<MidiNote> notes;
+	for (int n = 0; n < noteCount; ++n) {
+		double start, end;
+		int chan, pitch, vel;
+		MIDI_GetNote(take, n, NULL, NULL, &start, &end, &chan, &pitch, &vel);
 		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		if (start > now)
+		if (start > now) {
 			break;
-		if (start == now)
-			++count;
+		}
+		if (start == now) {
+			end = MIDI_GetProjTimeFromPPQPos(take, end);
+			notes.push_back({chan, pitch, vel, 0, start, end});
+		}
 	}
-	if (count > 0)
+	auto count = notes.size();
+	if (count > 0) {
+		previewNotes(take, notes);
 		fakeFocus = FOCUS_NOTE;
 		s << " " << count << (count == 1 ? " note" : " notes");
-		outputMessage(s);
+	}
+	outputMessage(s);
 }
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
@@ -1044,6 +1051,10 @@ void postMidiChangeLength(int command) {
 	if (selectedNotes.size() == 0) {
 		return;
 	}
+	if (command == 40765 && selectedNotes.size() == 1) {
+		// Making notes legato doesn't do anything when only one note is selected.
+		return;
+	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
@@ -1079,7 +1090,13 @@ void postMidiChangeLength(int command) {
 					break;
 				case 40447:
 					s << "shortened grid unit";
-					break;				
+					break;
+				case 40633:
+					s << "length set to grid size";
+					break;
+				case 40765:
+					s << "made legato";
+					break;
 				default:
 					s << "length changed";
 					break;
@@ -1135,11 +1152,11 @@ void postMidiChangePitch(int command) {
 			case 40178:
 				s << "semitone down";
 				break;
+			case 40179:
+				s << "octave up";
+				break;
 			case 40180:
 				s << "octave down";
-				break;
-			case 40181:
-				s << "octave up";
 				break;
 			case 41026:
 				s << "semitone up ignoring scale";

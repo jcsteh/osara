@@ -325,6 +325,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 #### MIDI Editor
 - View: Go to start of file: Control+Home
 - View: Go to end of file: Control+End
+- Edit: Move edit cursor right one pixel: Alt+RightArrow or Control+Alt+Numpad6
+- Edit: Move edit cursor left one pixel: Alt+LeftArrow or Control+Alt+Numpad4
 - Edit: Move edit cursor right by grid: Alt+Shift+RightArrow or Control+Numpad6
 - Edit: Move edit cursor left by grid: Alt+Shift+LeftArrow or Control+Numpad4
 - Navigate: Move edit cursor right one measure: PageDown
@@ -371,6 +373,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Shorten notes one pixel: Alt+NumPad1 or Alt+Shift+L
 - Edit: Lengthen notes one grid unit: NumPad3 or L
 - Edit: Shorten notes one grid unit: NumPad1 or Shift+L
+- Edit: Set note lengths to grid size: Ctrl+Shift+L
+- Edit: Make notes legato, preserving note start times: G
 - Edit: Move notes left one pixel: Alt+NumPad4 or Alt+Shift+P
 - Edit: Move notes right one pixel: Alt+NumPad6 or Alt+P
 - Edit: Move notes left one grid unit: NumPad4 or Shift+P
