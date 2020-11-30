@@ -1003,6 +1003,10 @@ void postMidiChangeLength(int command) {
 	if (selectedNotes.size() == 0) {
 		return;
 	}
+	if (command == 40765 && selectedNotes.size() == 1) {
+		// Making notes legato doesn't do anything when only one note is selected.
+		return;
+	}
 	bool generalize = false;
 	if (selectedNotes.size() >= 8) {
 		generalize = true;
@@ -1038,7 +1042,13 @@ void postMidiChangeLength(int command) {
 					break;
 				case 40447:
 					s << "shortened grid unit";
-					break;				
+					break;
+				case 40633:
+					s << "length set to grid size";
+					break;
+				case 40765:
+					s << "made legato";
+					break;
 				default:
 					s << "length changed";
 					break;
