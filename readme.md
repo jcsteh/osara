@@ -383,6 +383,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Edit: Note velocity +10: Alt+NumPad9 or Alt+V
 - Edit: Note velocity -01: NumPad7 or Shift+V
 - Edit: Note velocity -10: Alt+NumPad7 or Alt+Shift+V
+- Edit: Join notes: J
+Edit: Split notes: S
 - Edit: Increase value a little bit for CC events: =
 - Edit: Decrease value a little bit for CC events: -
 - CC: Next CC lane: Control+Alt+=
