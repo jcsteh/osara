@@ -40,6 +40,7 @@
 #include "midiEditorCommands.h"
 #include "envelopeCommands.h"
 #include "buildVersion.h"
+#include "fxChain.h"
 
 using namespace std;
 
@@ -1924,7 +1925,7 @@ bool maybeAnnotatePreferenceDescription() {
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B') {
+			wParam != VK_F6 && wParam != 'B' && wParam != VK_DOWN) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1979,6 +1980,11 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
 			GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
+	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
+			GetKeyState(VK_MENU) & 0x8000) {
+		if (maybeOpenFxPresetDialog()) {
+			return 1;
+		}
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
