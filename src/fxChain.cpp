@@ -130,6 +130,9 @@ class PresetDialog {
 		int preset = this->getSelectedPreset();
 		if (preset != -1) {
 			ComboBox_SetCurSel(this->combo, preset);
+			LONG controlId = GetWindowLong(this->combo, GWL_ID);
+			SendMessage(GetParent(this->combo), WM_COMMAND,
+				MAKEWPARAM(controlId, CBN_SELCHANGE), (LPARAM)this->combo);
 		}
 	}
 
