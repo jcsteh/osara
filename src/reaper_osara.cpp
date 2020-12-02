@@ -534,9 +534,6 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << " muted";
 	if (isTrackSoloed(track))
 		s << " soloed";
-	if (isTrackDefeatingSolo(track)) {
-		s << " defeating solo";
-	}
 	if (isTrackArmed(track))
 		s << " armed";
 	if (isTrackPhaseInverted(track))
@@ -2508,11 +2505,6 @@ void cmdReportSoloedTracks(Command* command) {
 	ostringstream s;
 	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
 		multiLine);
-	string defeat = formatTracksWithState("defeating solo", isTrackDefeatingSolo,
-		/* includeMaster */ false, multiLine, /* outputIfNone */ false);
-	if (!defeat.empty()) {
-		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
-	}
 	if (multiLine) {
 		reviewMessage("Soloed", s.str().c_str());
 	} else {
