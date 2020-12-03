@@ -1661,6 +1661,14 @@ bool showReaperContextMenu(const int menu) {
 
 #ifdef _WIN32
 
+bool isClassName(HWND hwnd, string className) {
+	char buffer[50];
+	if (GetClassName(hwnd, buffer, sizeof(buffer)) == 0) {
+		return false;
+	}
+	return className.compare(buffer) == 0;
+}
+
 HWND getSendContainer(HWND hwnd) {
 	WCHAR className[21] = L"\0";
 	GetClassNameW(hwnd, className, ARRAYSIZE(className));
@@ -1921,11 +1929,38 @@ bool maybeAnnotatePreferenceDescription() {
 	return true;
 }
 
+// Overide the tab/shift+tab key in Save dialogs so it can reach REAPER specific
+// controls: Create subdirectory for project, etc.
+// Tab seems to completely skip these controls, even though WS_TABSTOP and
+// WS_EX_CONTROLPARENT are set correctly.
+bool maybeFixTabInSaveDialog(bool previous) {
+	HWND focus = GetFocus();
+	HWND parent = GetParent(focus);
+	if (
+		// Save as type combo box. The REAPER specific controls are after this.
+		!(isClassName(focus, "ComboBox") &&
+			isClassName(parent, "FloatNotifySink")) &&
+		// A REAPER specific control in the Save dialog.
+		!(isClassName(parent, "#32770") &&
+			isClassName(GetParent(parent), "FloatNotifySink")) &&
+		// The "Hide Folders" toolbar in the save dialog. The REAPER specific
+		// controls are before this.
+		!(isClassName(focus, "ToolbarWindow32") &&
+			isClassName(GetWindow(focus, GW_HWNDPREV), "DUIViewWndClassName"))
+	) {
+		return false;
+	}
+	HWND target = GetNextDlgTabItem(GetForegroundWindow(), focus, previous);
+	SetFocus(target);
+	return true;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B' && wParam != VK_DOWN) {
+			wParam != VK_F6 && wParam != 'B' &&
+			wParam != VK_TAB) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1980,6 +2015,11 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
 			GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
+	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
+			!(GetKeyState(VK_MENU) & 0x8000)) {
+		if (maybeFixTabInSaveDialog(GetKeyState(VK_SHIFT) & 0x8000)) {
+			return 1;
+		}
 	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
 			GetKeyState(VK_MENU) & 0x8000) {
 		if (maybeOpenFxPresetDialog()) {
