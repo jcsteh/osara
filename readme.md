@@ -581,6 +581,16 @@ Noncontiguous selection is also possible.
 You do this in the same way described above for tracks and items.
 That is, press shift+space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to switch to noncontiguous selection, move to other chords/notes with shift plus the arrow keys and press shift+space to select/unselect the current chord/note.
 
+### Navigating FX Presets Without Activating Them (Windows Only)
+REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
+Sometimes, you need to be able to examine the presets without activating each one.
+OSARA provides a dialog to facilitate this.
+
+You activate this dialog by pressing alt+downArrow when focused on REAPER's FX preset combo box.
+The dialog displays the preset list and allows you to navigate it with the keyboard without activating the preset.
+The Filter field allows you to filter the list to show only presets containing the entered text.
+Pressing the OK button activates the preset selected in the list.
+
 ### Configuration
 OSARA includes a Configuration dialog to adjust various settings.
 You open this dialog by pressing control+alt+shift+p (OSARA: Configuration).

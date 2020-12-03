@@ -40,6 +40,7 @@
 #include "midiEditorCommands.h"
 #include "envelopeCommands.h"
 #include "buildVersion.h"
+#include "fxChain.h"
 
 using namespace std;
 
@@ -1958,8 +1959,8 @@ bool maybeFixTabInSaveDialog(bool previous) {
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B'
-			&& wParam != VK_TAB) {
+			wParam != VK_F6 && wParam != 'B' &&
+			wParam != VK_TAB) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -2017,6 +2018,11 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
 			!(GetKeyState(VK_MENU) & 0x8000)) {
 		if (maybeFixTabInSaveDialog(GetKeyState(VK_SHIFT) & 0x8000)) {
+			return 1;
+		}
+	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
+			GetKeyState(VK_MENU) & 0x8000) {
+		if (maybeOpenFxPresetDialog()) {
 			return 1;
 		}
 	}
