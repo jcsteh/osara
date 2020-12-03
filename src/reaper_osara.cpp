@@ -1670,22 +1670,17 @@ bool isClassName(HWND hwnd, string className) {
 }
 
 HWND getSendContainer(HWND hwnd) {
-	WCHAR className[21] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Button") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Button")) {
+		return nullptr;
+	}
 	hwnd = GetWindow(hwnd, GW_HWNDPREV);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Static") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Static")) {
+		return nullptr;
+	}
 	hwnd = GetAncestor(hwnd, GA_PARENT);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "REAPERVirtWndDlgHost")) {
+		return nullptr;
+	}
 	return hwnd;
 }
 
@@ -1754,9 +1749,7 @@ bool isTrackViewWindow(HWND hwnd) {
 }
 
 bool isListView(HWND hwnd) {
-	WCHAR className[14] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	return wcscmp(className, L"SysListView32") == 0;
+	return isClassName(hwnd, "SysListView32");
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -1772,9 +1765,7 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
-	char className[8];
-	if (GetClassName(pref, className, sizeof(className))
-			&& strcmp(className, "Button") == 0
+	if (isClassName(pref, "Button")
 			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
 		return nullptr;
 	}
