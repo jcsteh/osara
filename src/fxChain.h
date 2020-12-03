@@ -6,4 +6,6 @@
  * License: GNU General Public License version 2.0
  */
 
+bool maybeSwitchToFxPluginWindow();
+bool maybeReportFxChainBypass(bool aboutToToggle=false);
 bool maybeOpenFxPresetDialog();

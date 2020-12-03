@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Code related to FX chain windows
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2020 James Teh
+ * Copyright 2016-2020 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -23,6 +23,108 @@
 using namespace std;
 
 #ifdef _WIN32
+
+bool maybeSwitchToFxPluginWindow() {
+	HWND window = GetForegroundWindow();
+	char name[8];
+	if (GetWindowText(window, name, sizeof(name)) == 0)
+		return false;
+	if (strncmp(name, "FX: ", 4) != 0 && // FX chain window
+		// floating FX window, for different plug-in types
+		strncmp(name, "DX: ", 4) != 0 &&
+		strncmp(name, "VST: ", 5) != 0 &&
+		strncmp(name, "VSTi: ", 6) != 0 &&
+		strncmp(name, "VST3: ", 6) != 0 &&
+		strncmp(name, "VST3i: ", 7) != 0
+	) {
+		return false;
+	}
+	// Descend. Observed as the first or as the last.
+	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
+		return false;
+	}
+	// This is a property page containing the plugin window among other things.
+	// set property page name, to avoid CPU/PDC label audition after switching
+	if (GetWindowText(window, name, sizeof(name)) == 0) {
+		SetWindowText(window, " ");
+	}
+	// Descend. Observed as the first or as the last. 
+	// Can not just search, we do not know the class nor name.
+	if (!(window = GetWindow(window, GW_CHILD)))
+		return false;
+	char classname[16];
+	if (!GetClassName(window, classname, sizeof(classname))) {
+		return false;
+	}
+	if (!strcmp(classname, "ComboBox")) {
+		// Plugin window should be the last.
+		if (!(window = GetWindow(window, GW_HWNDLAST))) {
+			return false;
+		}
+	} // else it is the first
+	// We have found plug-in window or its container
+	HWND plugin = window;
+	// if focus is already inside plug-in window, let F6 work as usual
+	HWND focus = GetFocus();
+	if ((focus == plugin) || (IsChild(plugin, focus))) {
+		return false;
+	}
+	// Try to focus the first child in Z order
+	HWND child;
+	while ((child = GetWindow(window, GW_CHILD))) {
+		window = child;
+	}
+	while (window) {
+		SetFocus(window);
+		if ((window == plugin) || (GetFocus() == window)) {
+			break; // success or the last possible attempt
+		}
+		window = GetParent(window);
+	}
+	return true;
+}
+
+// If an FX chain dialog is focused, report active/bypassed for the selected
+// effect.
+// We can't annotate the names of SysListView32 items, since screen readers have
+// special support for those and override MSAA. Instead, we do this when the
+// user is focused in the Notes text box. This is a big ugly hack, but it's
+// far better than nothing.
+bool maybeReportFxChainBypass(bool aboutToToggle) {
+	HWND focus = GetFocus();
+	if (GetWindowLongW(focus, GWL_ID) != 1191) {
+		// Not the notes field in the FX Chain dialog.
+		return false;
+	}
+	bool enabled = false;
+	if (fakeFocus == FOCUS_TRACK) {
+		MediaTrack* track = GetLastTouchedTrack();
+		if (!track) {
+			return false;
+		}
+		int fx = TrackFX_GetChainVisible(track);
+		if (fx < 0) {
+			return false;
+		}
+		enabled = TrackFX_GetEnabled(track, fx);
+	} else  {
+		MediaItem* item = GetSelectedMediaItem(0, 0);
+		MediaItem_Take* take = item ? GetActiveTake(item) : nullptr;
+		if (!take) {
+			return false;
+		}
+		int fx = TakeFX_GetChainVisible(take);
+		if (fx < 0) {
+			return false;
+		}
+		enabled = TakeFX_GetEnabled(take, fx);
+	}
+	if (aboutToToggle) {
+		enabled = !enabled;
+	}
+	outputMessage(enabled ? "active" : "bypassed", /* interrupt */ false);
+	return true;
+}
 
 class PresetDialog {
 	private:
