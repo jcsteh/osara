@@ -1389,6 +1389,8 @@ PostCommand POST_COMMANDS[] = {
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
+	{41040, postCursorMovement}, // Move edit cursor to start of next measure
+	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{41042, postCursorMovement}, // Go forward one measure
 	{41043, postCursorMovement}, // Go back one measure
 	{41044, postCursorMovement}, // Go forward one beat
@@ -1497,6 +1499,8 @@ PostCommand POST_COMMANDS[] = {
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
 	{40630, postCursorMovement}, // Go to start of time selection
 	{40631, postCursorMovement}, // Go to end of time selection
+	{40632, postCursorMovement}, // Go to start of loop
+	{40633, postCursorMovement}, // Go to end of loop
 	{40032, postChangeItemGroup}, // Item grouping: Group items
 	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
 	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items

@@ -119,6 +119,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - View: Move cursor right one pixel: Rightarrow
 - Transport: Go to start of project: Control+Home
 - Transport: Go to end of project: Control+End
+- Move edit cursor to start of next measure: Alt+End
+- Move edit cursor to start of current measure: Alt+Home
 - Go forward one measure: PageDown
 - Go back one measure: PageUp
 - Go forward one beat: Control+PageDown
@@ -266,6 +268,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Time selection: Set end point: ]
 - Loop points: Set start point: Alt+Shift+[
 - Loop points: Set end point: Alt+Shift+]
+- Go to start of loop: Alt+Shift+Home
+- Go to end of loop: Alt+Shift+End
 - Time selection: Remove contents of time selection (moving later items)
 - Time selection: Remove time selection and loop point selection: Escape
 - Unselect all tracks/items/envelope points: Shift+Escape
