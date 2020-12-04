@@ -202,6 +202,13 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		(UINT)max(DEFAULT_PREVIEW_LENGTH, (minLength * 1000)), previewDone);
 }
 
+void cancelMidiPreviewNotesOff() {
+	if (previewDoneTimer) {
+		KillTimer(nullptr, previewDoneTimer);
+		previewDoneTimer = 0;
+	}
+}
+
 void cmdMidiMoveCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);

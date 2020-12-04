@@ -42,3 +42,7 @@ void postMidiChangePitch(int command);
 void postMidiMoveStart(int command);
 void postMidiChangeCCValue(int command);
 void postMidiSwitchCCLane(int command);
+
+// This should be called when playback starts, as otherwise, pending note off
+// messages for OSARA MIDI preview might interfere with MIDI playback.
+void cancelMidiPreviewNotesOff();

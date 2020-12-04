@@ -13,6 +13,7 @@
 #include <cstdint>
 #include "osara.h"
 #include "paramsUi.h"
+#include "midiEditorCommands.h"
 
 using namespace std;
 
@@ -80,6 +81,9 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+		if (play) {
+			cancelMidiPreviewNotesOff();
+		}
 		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
