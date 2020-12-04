@@ -779,6 +779,9 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto cc = findCC(take, direction);
+	if (cc.channel == -1) {
+		return;
+	}
 	if (clearSelection || select) {
 		Undo_BeginBlock();
 	}
