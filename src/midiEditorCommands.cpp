@@ -155,6 +155,7 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	previewDoneTimer = 0;
+	KillTimer(nullptr, event);
 }
 
 // Used to find out the minimum note length.
