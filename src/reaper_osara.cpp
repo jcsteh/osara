@@ -1548,6 +1548,8 @@ PostCommand MIDI_POST_COMMANDS[] = {
 	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
 	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
 	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
+	{40481, postToggleMidiInputsAsStepInput}, // Options: MIDI inputs as step input mode
+	{40053, postToggleFunctionKeysAsStepInput}, // Options: F1-F12 as step input mode
 	{0},
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
@@ -2953,7 +2955,6 @@ void cmdConfig(Command* command);
 #define DEFACCEL {0, 0, 0}
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
-const int MIDI_EDITOR_SECTION = 32060;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.

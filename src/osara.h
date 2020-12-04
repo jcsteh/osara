@@ -166,6 +166,8 @@
 #define REAPERAPI_WANT_GetNumTakeMarkers
 #define REAPERAPI_WANT_GetTakeMarker
 #define REAPERAPI_WANT_GetTrackStateChunk
+#define REAPERAPI_WANT_GetToggleCommandState2
+#define REAPERAPI_WANT_SectionFromUniqueID
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

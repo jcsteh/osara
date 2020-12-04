@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include "midiEditorCommands.h"
 #include "osara.h"
 #ifdef _WIN32
 #include <Commctrl.h>
@@ -1287,5 +1288,21 @@ void postMidiSwitchCCLane(int command) {
 	char textBuffer[BUFFER_LENGTH];
 	MIDIEditor_GetSetting_str(editor, "last_clicked_cc_lane", textBuffer, BUFFER_LENGTH);
 	s << textBuffer;
+	outputMessage(s);
+}
+
+void postToggleMidiInputsAsStepInput(int command) {
+	ostringstream s;
+	s << (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION),
+		command) ? "enabled" : "disabled");
+	s << " MIDI inputs as step input";
+	outputMessage(s);
+}
+
+void postToggleFunctionKeysAsStepInput(int command) {
+	ostringstream s;
+	s << (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION),
+		command) ? "enabled" : "disabled");
+	s << " f1-f12 as step input";
 	outputMessage(s);
 }

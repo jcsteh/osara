@@ -8,6 +8,12 @@
 
 #include "osara.h"
 
+const int MIDI_EDITOR_SECTION = 32060;
+
+// This should be called when playback starts, as otherwise, pending note off
+// messages for OSARA MIDI preview might interfere with MIDI playback.
+void cancelMidiPreviewNotesOff();
+
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiToggleSelection(Command* command);
 void cmdMidiMoveToNextChord(Command* command);
@@ -42,7 +48,5 @@ void postMidiChangePitch(int command);
 void postMidiMoveStart(int command);
 void postMidiChangeCCValue(int command);
 void postMidiSwitchCCLane(int command);
-
-// This should be called when playback starts, as otherwise, pending note off
-// messages for OSARA MIDI preview might interfere with MIDI playback.
-void cancelMidiPreviewNotesOff();
+void postToggleMidiInputsAsStepInput(int command);
+void postToggleFunctionKeysAsStepInput(int command);
