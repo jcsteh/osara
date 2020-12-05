@@ -1358,6 +1358,13 @@ void postChangeTransientDetectionThreshold(int command) {
 	outputMessage(s);
 }
 
+void postToggleEnvelopePointsMoveWithMediaItems(int command) {
+	ostringstream s;
+	s << (GetToggleCommandState(command) ? "enabled" : "disabled") <<
+		" envelope points move with media items";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1513,6 +1520,7 @@ PostCommand POST_COMMANDS[] = {
 	{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
 	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
 	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
+	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
 	{0},
 };
 PostCommand MIDI_POST_COMMANDS[] = {

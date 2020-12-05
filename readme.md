@@ -249,6 +249,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Transient detection sensitivity: Decrease: alt+shift+pageDown
 - Transient detection threshold: Increase: control+shift+pageUp
 - Transient detection threshold: Decrease: control+shift+pageDown
+- Options: Envelope points move with media items
 
 #### Undo
 - Edit: Undo: Control+Z
