@@ -588,6 +588,9 @@ Noncontiguous selection is also possible.
 You do this in the same way described above for tracks and items.
 That is, press shift+space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to switch to noncontiguous selection, move to other chords/notes with shift plus the arrow keys and press shift+space to select/unselect the current chord/note.
 
+#### Note preview in de event list (Windows Only)
+When the MIDI Editor is set to Event List mode, REAPER presents a list with all the events in the current MIDI item. When a note gets focus in the list, OSARA will play a preview of the respective note.
+
 ### Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
 Sometimes, you need to be able to examine the presets without activating each one.
