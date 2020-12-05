@@ -14,7 +14,6 @@
 #include <sstream>
 
 #define REAPERAPI_MINIMAL
-#define REAPERAPI_WANT_ShowConsoleMsg
 #define REAPERAPI_WANT_GetLastTouchedTrack
 #define REAPERAPI_WANT_GetSetMediaTrackInfo
 #define REAPERAPI_WANT_TimeMap2_timeToBeats
