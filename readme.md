@@ -606,6 +606,7 @@ The dialog contains the following options:
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report time movement during playback/recording: When disabled, OSARA will not report actions during playback/recording which move the cursor or adjust positions or lengths.
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
+- Report markers during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
 - Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.

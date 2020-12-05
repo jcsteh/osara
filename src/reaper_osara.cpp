@@ -3108,6 +3108,7 @@ map<pair<int, int>, Command*> commandsMap;
 
 extern bool shouldReportNotes;
 extern bool shouldReportSurfaceChanges;
+extern bool shouldReportMarkersWhilePlaying;
 
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
@@ -3121,6 +3122,8 @@ void loadConfig() {
 		"reportSurfaceChanges")[0] == '1';
 	shouldMoveFromPlayCursor =
 		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
+	shouldReportMarkersWhilePlaying =
+		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
 }
 
 void config_onOk(HWND dialog) {
@@ -3145,6 +3148,10 @@ void config_onOk(HWND dialog) {
 		ID_CONFIG_MOVE_FROM_PLAY_CURSOR) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "moveFromPlayCursor",
 		shouldMoveFromPlayCursor ? "1" : "0", true);
+	shouldReportMarkersWhilePlaying = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying",
+		shouldReportMarkersWhilePlaying ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -3179,6 +3186,8 @@ void cmdConfig(Command* command) {
 		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
 		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING,
+		shouldReportMarkersWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }

@@ -55,12 +55,13 @@ BEGIN
 	CONTROL "Report position when &scrubbing", ID_CONFIG_REPORT_SCRUB, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 6, 140, 14
 	CONTROL "Report &time movement during playback/recording", ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 26, 140, 14
 	CONTROL "&Move relative to the play cursor for time movement commands during playback", ID_CONFIG_MOVE_FROM_PLAY_CURSOR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 46, 140, 14
-	CONTROL "Report &transport state (play, record, etc.)", ID_CONFIG_REPORT_TRANSPORT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 66, 140, 14
-	CONTROL "Report &FX when moving to tracks/takes", ID_CONFIG_REPORT_FX, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 86, 140, 14
-	CONTROL "Report MIDI &notes in MIDI editor", ID_CONFIG_REPORT_NOTES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 106, 140, 14
-	CONTROL "Report changes made via &control surfaces", ID_CONFIG_REPORT_SURFACE_CHANGES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 126, 140, 14
-	DEFPUSHBUTTON "OK", IDOK, 10, 146, 30, 14
-	PUSHBUTTON "Cancel", IDCANCEL, 110, 146, 40, 14
+	CONTROL "Report mar&kers during playback", ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 66, 140, 14
+	CONTROL "Report &transport state (play, record, etc.)", ID_CONFIG_REPORT_TRANSPORT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 86, 140, 14
+	CONTROL "Report &FX when moving to tracks/takes", ID_CONFIG_REPORT_FX, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 106, 140, 14
+	CONTROL "Report MIDI &notes in MIDI editor", ID_CONFIG_REPORT_NOTES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 126, 140, 14
+	CONTROL "Report changes made via &control surfaces", ID_CONFIG_REPORT_SURFACE_CHANGES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 146, 140, 14
+	DEFPUSHBUTTON "OK", IDOK, 10, 166, 30, 14
+	PUSHBUTTON "Cancel", IDCANCEL, 110, 166, 40, 14
 END
 
 ID_MESSAGE_REVIEW_DLG DIALOGEX 250, 125, 500, 500

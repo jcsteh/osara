@@ -18,6 +18,7 @@
 using namespace std;
 
 bool shouldReportSurfaceChanges = true;
+bool shouldReportMarkersWhilePlaying = false;
 
 // REAPER often notifies us about track states even if they haven't changed.
 // It also notifies us about these states when a track is first created.
@@ -78,6 +79,17 @@ class Surface: public IReaperControlSurface {
 
 	virtual const char* GetConfigString() override {
 		return "";
+	}
+
+	virtual void Run() override {
+		if (shouldReportMarkersWhilePlaying && GetPlayState() & 1) {
+			double playPos = GetPlayPosition();
+			if (playPos == this->lastPlayPos) {
+				return;
+			}
+			this->lastPlayPos = playPos;
+			this->reportMarker(playPos);
+		}
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
@@ -298,6 +310,40 @@ class Surface: public IReaperControlSurface {
 		return TrackCacheState<enableFlag, disableFlag>(value);
 	}
 
+	void reportMarker(double playPos) {
+		int marker, region;
+		double markerPos;
+		GetLastMarkerAndCurRegion(0, playPos, &marker, &region);
+		const char* name;
+		int number;
+		ostringstream s;
+		if (marker >= 0 && marker != this->lastMarker) {
+			EnumProjectMarkers(marker, nullptr, &markerPos, nullptr, &name, &number);
+			// Allow the cursor to be within 100ms, since this method is called
+			// periodically.
+			if (markerPos >= playPos - 0.1) {
+				if (name[0]) {
+					s << name << " marker" << " ";
+				} else {
+					s << "marker " << number << " ";
+				}
+			}
+		}
+		this->lastMarker = marker;
+		if (region >= 0 && region != this->lastRegion) {
+			EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
+			if (name[0]) {
+				s << name << " region ";
+			} else {
+				s << "region " << number << " ";
+			}
+		}
+		this->lastRegion = region;
+		if (s.tellp() > 0) {
+			outputMessage(s, /* interrupt */ false);
+		}
+	}
+
 	MediaTrack* lastSelectedTrack = nullptr;
 	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
@@ -306,6 +352,9 @@ class Surface: public IReaperControlSurface {
 	const int PARAM_PAN = -3;
 	int lastParam = PARAM_NONE;
 	map<MediaTrack*, uint8_t> trackCache;
+	double lastPlayPos = 0;
+	int lastMarker = -1;
+	int lastRegion = -1;
 };
 
 IReaperControlSurface* createSurface() {
