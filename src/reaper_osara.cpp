@@ -1924,7 +1924,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			return 1;
 		}
 	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
-			GetKeyState(VK_MENU) & 0x8000) {
+			GetKeyState(VK_MENU) & 0x8000 && !(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_CONTROL) & 0x8000)) {
+		// Alt+downArrow.
 		if (maybeOpenFxPresetDialog()) {
 			return 1;
 		}
