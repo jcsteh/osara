@@ -258,7 +258,7 @@ class PresetDialog {
 
 bool maybeOpenFxPresetDialog() {
 	HWND hwnd = GetFocus();
-	if (GetWindowLong(hwnd, GWL_ID) != 1000) {
+	if (GetWindowLong(hwnd, GWL_ID) != 1000 || !isClassName(hwnd, "ComboBox")) {
 		// Not the FX preset combo box.
 		return false;
 	}
