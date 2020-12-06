@@ -96,28 +96,24 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 		// Not the notes field in the FX Chain dialog.
 		return false;
 	}
-	bool enabled = false;
-	if (fakeFocus == FOCUS_TRACK) {
-		MediaTrack* track = GetLastTouchedTrack();
-		if (!track) {
-			return false;
-		}
-		int fx = TrackFX_GetChainVisible(track);
-		if (fx < 0) {
-			return false;
-		}
+	int trackNum, itemNum, fx;
+	int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+	if (type == 0) {
+		return false; // No FX chain focused.
+	}
+	MediaTrack* track = trackNum == 0 ?
+		GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+	bool enabled;
+	if (type == 1) { // Track
 		enabled = TrackFX_GetEnabled(track, fx);
-	} else  {
-		MediaItem* item = GetSelectedMediaItem(0, 0);
-		MediaItem_Take* take = item ? GetActiveTake(item) : nullptr;
-		if (!take) {
-			return false;
-		}
-		int fx = TakeFX_GetChainVisible(take);
-		if (fx < 0) {
-			return false;
-		}
+	} else if (type == 2) { // Item
+		MediaItem* item = GetTrackMediaItem(track, itemNum);
+		int takeNum = HIWORD(fx);
+		fx = LOWORD(fx);
+		MediaItem_Take* take = GetTake(item, takeNum);
 		enabled = TakeFX_GetEnabled(take, fx);
+	} else {
+		return false;
 	}
 	if (aboutToToggle) {
 		enabled = !enabled;

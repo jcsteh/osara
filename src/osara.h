@@ -168,6 +168,8 @@
 #define REAPERAPI_WANT_GetTrackStateChunk
 #define REAPERAPI_WANT_GetToggleCommandState2
 #define REAPERAPI_WANT_SectionFromUniqueID
+#define REAPERAPI_WANT_GetFocusedFX
+#define REAPERAPI_WANT_GetTake
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
