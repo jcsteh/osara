@@ -994,6 +994,62 @@ void cmdMidiFilterWindow(Command *command) {
 	}
 }
 
+void maybePreviewCurrentNoteInEventList(HWND hwnd) {
+	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	char text[50] = "\0";
+	// Get the text from the length column (2).
+	// If this column is empty, we aren't dealing with a note.
+	ListView_GetItemText(hwnd, focused, 2, text, sizeof(text));
+	if (!text[0]) {
+		return;
+	}
+	MidiNote note;
+	// Convert length to project time. text is always in measures.beats.
+	auto length = parse_timestr_len(text, 0, 2);
+	text[0] = '\0';
+	// Get the text from the position column (1).
+	ListView_GetItemText(hwnd, focused, 1, text, sizeof(text));
+	// Convert this to project time. text is always in measures.beats.
+	note.start = parse_timestr_pos(text, 2);
+	note.end = note.start + length;
+	text[0] = '\0';
+	// Get the text from the channel column (3).
+	ListView_GetItemText(hwnd, focused, 3, text, sizeof(text));
+	note.channel = atoi(text);
+	text[0] = '\0';
+	// Get the text from the parameter (note name) column (5).
+	ListView_GetItemText(hwnd, focused, 5, text, sizeof(text));
+	string noteNameWithOctave { text };
+	static const string noteNames[] = {"C", "C#", "D", "D#", "E", "F",
+		"F#", "G", "G#", "A", "A#", "B"};
+	// Loop through noteNames in reverse order so the sharp notes are handled first.
+	bool found = false;
+	for (int i = static_cast<int>(size(noteNames)) -1; i >= 0; --i) {
+		auto noteNameLength = noteNames[i].length();
+		if (noteNameWithOctave.compare(0, noteNameLength, noteNames[i]) != 0) {
+			continue;
+		}
+		found = true;
+		// The octave is a number in the range -1 up and until 9.
+		// Therefore, the number counts either one or two characters in noteNameWithOctave.
+		// If the note is explicitly named, the name comes after the octave and a space.
+		// As stoi simply ignores whitespace or the end of a string, all possible appearances should be covered.
+		int octave = stoi(noteNameWithOctave.substr(noteNameLength, 2));
+		note.pitch = ((octave + 1) * 12) + i;
+		break;
+	}
+	if (!found) {
+		return; // Note not found.
+	}
+	text[0] = '\0';
+	// Get the text from the value (velocity) column (6).
+	ListView_GetItemText(hwnd, focused, 6, text, sizeof(text));
+	note.velocity = atoi(text);
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	previewNotes(take, {note});
+}
+
 #endif // _WIN32
 
 void postMidiChangeVelocity(int command) {

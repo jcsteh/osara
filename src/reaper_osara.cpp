@@ -1766,6 +1766,11 @@ bool isListView(HWND hwnd) {
 	return isClassName(hwnd, "SysListView32");
 }
 
+bool isMidiEditorEventsListView(HWND hwnd) {
+	return isListView(hwnd)
+		&& isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
+}
+
 HWND getPreferenceDescHwnd(HWND pref) {
 	// A preference control is always in a property page inside a dialog.
 	// There may be nested property pages.
@@ -3356,6 +3361,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// Give these objects a non-generic role so NVDA doesn't fall back to
 			// screen scraping, which causes spurious messages to be reported.
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
+		}
+
+		if (isMidiEditorEventsListView(hwnd)) {
+			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
