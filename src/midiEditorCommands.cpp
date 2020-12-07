@@ -1023,14 +1023,23 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	static const string noteNames[] = {"C", "C#", "D", "D#", "E", "F",
 		"F#", "G", "G#", "A", "A#", "B"};
 	// Loop through noteNames in reverse order so the sharp notes are handled first.
+	bool found = false;
 	for (int i = static_cast<int>(size(noteNames)) -1; i >= 0; --i) {
 		auto noteNameLength = noteNames[i].length();
 		if (noteNameWithOctave.compare(0, noteNameLength, noteNames[i]) != 0) {
 			continue;
 		}
-		int octave = stoi(noteNameWithOctave.substr(noteNameLength, string::npos));
+		found = true;
+		// The octave is a number in the range -1 up and until 9.
+		// Therefore, the number counts either one or two characters in noteNameWithOctave.
+		// If the note is explicitly named, the name comes after the octave and a space.
+		// As stoi simply ignores whitespace or the end of a string, all possible appearances should be covered.
+		int octave = stoi(noteNameWithOctave.substr(noteNameLength, 2));
 		note.pitch = ((octave + 1) * 12) + i;
 		break;
+	}
+	if (!found) {
+		return; // Note not found.
 	}
 	text[0] = '\0';
 	// Get the text from the value (velocity) column (6).
