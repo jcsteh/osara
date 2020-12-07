@@ -996,29 +996,27 @@ void cmdMidiFilterWindow(Command *command) {
 
 void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
-	char text[50];
-	// Get the text from the type column (4).
-	ListView_GetItemText(hwnd, focused, 4, text, sizeof(text));
-	if (strcmp(text, "Note") != 0) {
+	char text[50] = "\0";
+	// Get the text from the length column (2).
+	// If this column is empty, we aren't dealing with a note.
+	ListView_GetItemText(hwnd, focused, 2, text, sizeof(text));
+	if (strcmp(text, "\0") == 0) {
 		return;
 	}
-	fill(begin(text), end(text), 0);
 	MidiNote note;
+	// Convert length to project time. text is always in measures.beats.
+	auto length = parse_timestr_len(text, 0, 2);
+	text[0] = '\0';
 	// Get the text from the position column (1).
 	ListView_GetItemText(hwnd, focused, 1, text, sizeof(text));
 	// Convert this to project time. text is always in measures.beats.
 	note.start = parse_timestr_pos(text, 2);
-	fill(begin(text), end(text), 0);
-	// Get the text from the length column (2).
-	ListView_GetItemText(hwnd, focused, 2, text, sizeof(text));
-	// Convert this to project time. text is always in measures.beats.
-	auto length = parse_timestr_len(text, 0, 2);
 	note.end = note.start + length;
-	fill(begin(text), end(text), 0);
+	text[0] = '\0';
 	// Get the text from the channel column (3).
 	ListView_GetItemText(hwnd, focused, 3, text, sizeof(text));
 	note.channel = atoi(text);
-	fill(begin(text), end(text), 0);
+	text[0] = '\0';
 	// Get the text from the parameter (note name) column (5).
 	ListView_GetItemText(hwnd, focused, 5, text, sizeof(text));
 	string noteNameWithOctave { text };
@@ -1034,7 +1032,7 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 		note.pitch = ((octave + 1) * 12) + i;
 		break;
 	}
-	fill(begin(text), end(text), 0);
+	text[0] = '\0';
 	// Get the text from the value (velocity) column (6).
 	ListView_GetItemText(hwnd, focused, 6, text, sizeof(text));
 	note.velocity = atoi(text);
