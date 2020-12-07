@@ -1000,7 +1000,7 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	// Get the text from the length column (2).
 	// If this column is empty, we aren't dealing with a note.
 	ListView_GetItemText(hwnd, focused, 2, text, sizeof(text));
-	if (strcmp(text, "\0") == 0) {
+	if (!text[0]) {
 		return;
 	}
 	MidiNote note;
