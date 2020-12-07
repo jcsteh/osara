@@ -3357,8 +3357,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
 		}
 
-		bool focusIsMidiEditorEventsListView = isMidiEditorEventsListView(hwnd);
-		if (focusIsMidiEditorEventsListView) {
+		if (isMidiEditorEventsListView(hwnd)) {
 			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
