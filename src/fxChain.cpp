@@ -262,6 +262,14 @@ bool maybeOpenFxPresetDialog() {
 	return true;
 }
 
+void CALLBACK fireValueChangeOnFocus(HWND hwnd, UINT msg, UINT_PTR event,
+	DWORD time
+) {
+	KillTimer(nullptr, event);
+	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
+		CHILDID_SELF);
+}
+
 bool maybeSwitchFxTab(bool previous) {
 	if (GetFocusedFX(nullptr, nullptr, nullptr) == 0) {
 		// No FX focused.
@@ -306,6 +314,10 @@ bool maybeSwitchFxTab(bool previous) {
 		s << text << " tabb";
 		outputMessage(s);
 	}
+	// The focused control doesn't change and it may not fire its own value
+	// change event, so fire one ourselves. However, we have to delay this
+	// because these ComboBox controls take a while to update.
+	SetTimer(nullptr, 0, 30, fireValueChangeOnFocus);
 	return true;
 }
 
