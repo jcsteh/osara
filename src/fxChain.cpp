@@ -262,4 +262,51 @@ bool maybeOpenFxPresetDialog() {
 	return true;
 }
 
+bool maybeSwitchFxTab(bool previous) {
+	if (GetFocusedFX(nullptr, nullptr, nullptr) == 0) {
+		// No FX focused.
+		return false;
+	}
+
+	HWND tabCtrl = nullptr;
+	auto findTabCtrl = [](HWND hwnd, LPARAM lParam) -> BOOL {
+		if (isClassName(hwnd, "SysTabControl32")) {
+			auto tabCtrl = (HWND*)lParam;
+			*tabCtrl = hwnd;
+			return FALSE; // Stop enumeration.
+		}
+		return TRUE; // Continue enumeration.
+	};
+	EnumChildWindows(GetForegroundWindow(), findTabCtrl, (LPARAM)&tabCtrl);
+	if (!tabCtrl) {
+		return false;
+	}
+
+	int selected = TabCtrl_GetCurSel(tabCtrl);
+	if (selected == -1) {
+		return false;
+	}
+	int count = TabCtrl_GetItemCount(tabCtrl);
+	if (previous) {
+		selected = selected > 0 ? selected - 1 : count - 1;
+	} else {
+		selected = selected < count - 1 ? selected + 1 : 0;
+	}
+	// We use SetCurFocus instead of SetCurSel because SetCurFocus sends
+	// notifications, but SetCurSel doesn't.
+	TabCtrl_SetCurFocus(tabCtrl, selected);
+	TCITEM item = {0};
+	item.mask = TCIF_TEXT;
+	char text[50] = "\0";
+	item.pszText = text;
+	item.cchTextMax = sizeof(text);
+	TabCtrl_GetItem(tabCtrl, selected, &item);
+	if (text[0]) {
+		ostringstream s;
+		s << text << " tabb";
+		outputMessage(s);
+	}
+	return true;
+}
+
 #endif // _WIN32

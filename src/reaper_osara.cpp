@@ -1920,7 +1920,11 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		maybeReportFxChainBypass(true);
 	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
 			!(GetKeyState(VK_MENU) & 0x8000)) {
-		if (maybeFixTabInSaveDialog(GetKeyState(VK_SHIFT) & 0x8000)) {
+		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
+		if (maybeFixTabInSaveDialog(shift)) {
+			return 1;
+		}
+		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
 			return 1;
 		}
 	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
