@@ -8,5 +8,6 @@
 
 bool maybeSwitchToFxPluginWindow();
 bool maybeReportFxChainBypass(bool aboutToToggle=false);
+bool maybeReportFxChainBypassDelayed();
 bool maybeOpenFxPresetDialog();
 bool maybeSwitchFxTab(bool previous);

@@ -84,16 +84,15 @@ bool maybeSwitchToFxPluginWindow() {
 	return true;
 }
 
-// If an FX chain dialog is focused, report active/bypassed for the selected
-// effect.
-// We can't annotate the names of SysListView32 items, since screen readers have
-// special support for those and override MSAA. Instead, we do this when the
-// user is focused in the Notes text box. This is a big ugly hack, but it's
-// far better than nothing.
+bool isFxListFocused() {
+	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
+		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
+}
+
+// If the FX list in an FX chain dialog is focused, report active/bypassed for
+// the selected effect.
 bool maybeReportFxChainBypass(bool aboutToToggle) {
-	HWND focus = GetFocus();
-	if (GetWindowLongW(focus, GWL_ID) != 1191) {
-		// Not the notes field in the FX Chain dialog.
+	if (!isFxListFocused()) {
 		return false;
 	}
 	int trackNum, itemNum, fx;
@@ -119,6 +118,28 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 		enabled = !enabled;
 	}
 	outputMessage(enabled ? "active" : "bypassed", /* interrupt */ false);
+	return true;
+}
+
+// When focusing a new effect, we delay reporting of bypass for three reasons:
+// 1. The value returned by GetFocusedFX might not be updated immediately.
+// 2. We want the bypass state to be consistently reported after the effect.
+// 3. We want to give braille users a chance to read the effect name before
+// the message with the bypass state clobbers it.
+UINT_PTR reportFxChainBypassTimer = 0;
+bool maybeReportFxChainBypassDelayed() {
+	if (reportFxChainBypassTimer) {
+		KillTimer(nullptr, reportFxChainBypassTimer);
+	}
+	if (!isFxListFocused()) {
+		return false;
+	}
+	auto callback = [](HWND hwnd, UINT msg, UINT_PTR event, DWORD time) -> void {
+		KillTimer(nullptr, event);
+		reportFxChainBypassTimer = 0;
+		maybeReportFxChainBypass(/* aboutToToggle */ false);
+	};
+	reportFxChainBypassTimer = SetTimer(nullptr, 0, 1000, callback);
 	return true;
 }
 

@@ -3407,9 +3407,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+		} else if (childId > CHILDID_SELF) {
+			maybeReportFxChainBypassDelayed();
 		} else {
-			maybeReportFxChainBypass()
-				|| maybeAnnotatePreferenceDescription();
+			maybeAnnotatePreferenceDescription();
 		}
 	}
 }
