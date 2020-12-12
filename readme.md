@@ -332,8 +332,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - View: Go to end of file: Control+End
 - Edit: Move edit cursor right one pixel: Alt+RightArrow or Control+Alt+Numpad6
 - Edit: Move edit cursor left one pixel: Alt+LeftArrow or Control+Alt+Numpad4
-- Edit: Move edit cursor right by grid: Alt+Shift+RightArrow or Control+Numpad6
-- Edit: Move edit cursor left by grid: Alt+Shift+LeftArrow or Control+Numpad4
+- Navigate: Move edit cursor right by grid: Alt+Shift+RightArrow or Control+Numpad6
+- Navigate: Move edit cursor left by grid: Alt+Shift+LeftArrow or Control+Numpad4
 - Navigate: Move edit cursor right one measure: PageDown
 - Navigate: Move edit cursor left one measure: PageUp
 - Edit: Increase pitch cursor one semitone: Alt+UpArrow or Ctrl+NumPad8
