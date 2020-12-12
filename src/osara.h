@@ -240,8 +240,6 @@ bool isTrackSelected(MediaTrack* track);
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 bool isClassName(HWND hwnd, std::string className);
-bool isMidiEditorEventListView(HWND hwnd);
-void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd);
 
 extern IAccPropServices* accPropServices;
 
