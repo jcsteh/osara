@@ -1370,6 +1370,12 @@ typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
 } PostCommand;
+
+typedef struct MidiPostCommand : PostCommand {
+	bool supportedInMidiEventList = false;
+	bool changesValueInMidiEventList = false;
+} MidiPostCommand;
+
 // For commands registered by other plug-ins.
 typedef struct {
 	const char* id;
@@ -1523,42 +1529,41 @@ PostCommand POST_COMMANDS[] = {
 	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
 	{0},
 };
-PostCommand MIDI_POST_COMMANDS[] = {
-	{40006, postMidiSelectNotes}, // Edit: Select all events
+MidiPostCommand MIDI_POST_COMMANDS[] = {
+	{40006, postMidiSelectNotes, true}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
-	{40177, postMidiChangePitch}, // Edit: Move notes up one semitone
-	{40178, postMidiChangePitch}, // Edit: Move notes down one semitone
-	{40179, postMidiChangePitch}, // Edit: Move notes up one octave
-	{40180, postMidiChangePitch}, // Edit: Move notes down one octave
+	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
+	{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
+	{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
+	{40180, postMidiChangePitch, true, true}, // Edit: Move notes down one octave
 	{40181, postMidiMoveStart}, // Edit: Move notes left one pixel
 	{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
-	{40183, postMidiMoveStart}, // Edit: Move notes left one grid unit
-	{40184, postMidiMoveStart}, // Edit: Move notes right one grid unit
+	{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
+	{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
 	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
 	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
 	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
-	{40434, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40434, postMidiSelectNotes, true}, // Select all notes with the same pitch
 	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
-	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
-	{40447, postMidiChangeLength}, // Edit: Shorten notes one grid unit
-	{40462, postMidiChangeVelocity}, // Edit: Note velocity +01
-	{40463, postMidiChangeVelocity}, // Edit: Note velocity +10
-	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
-	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
+	{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
+	{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
+	{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
+	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
+	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
+	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
 	{40501, postMidiSelectNotes}, // Invert selection
-	{40633, postMidiChangeLength}, // Edit: Set note lengths to grid size
-	{40676, postMidiChangeCCValue}, // Edit: Increase value a little bit for CC events
-	{40677, postMidiChangeCCValue}, // Edit: Decrease value a little bit for CC events
-	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
+	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
+	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
+	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
+	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
 	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
-	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
-	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
-	{40481, postToggleMidiInputsAsStepInput}, // Options: MIDI inputs as step input mode
-	{40053, postToggleFunctionKeysAsStepInput}, // Options: F1-F12 as step input mode
-	{0},
+	{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
+	{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
+	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
+	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
@@ -1605,6 +1610,7 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
+map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
@@ -1766,9 +1772,18 @@ bool isListView(HWND hwnd) {
 	return isClassName(hwnd, "SysListView32");
 }
 
-bool isMidiEditorEventsListView(HWND hwnd) {
+bool isMidiEditorEventListView(HWND hwnd) {
 	return isListView(hwnd)
 		&& isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
+}
+
+void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
+	int child = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	if (child == -1) {
+		return;
+	}
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT,
+		child + 1);
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -3029,19 +3044,26 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
 	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
 	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0,40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0,40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
+	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
@@ -3277,6 +3299,25 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			isHandlingCommand = false;
 			return true;
 		}
+	}else if (section==MIDI_EVENT_LIST_SECTION) {
+		const auto it = midiEventListPostCommandsMap.find(command);
+		if (it != midiEventListPostCommandsMap.end()) {
+			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			it->second.first(command);
+			#ifdef _WIN32
+			if (it->second.second) { // changesValueInMidiEventList
+				HWND focus = GetFocus();
+				if (focus && isMidiEditorEventListView(focus)) {
+					sendNameChangeEventToMidiEditorEventListItem(focus);
+				}
+			}
+			#endif
+			isHandlingCommand = false;
+			return true;
+		}
 	}
 	return false;
 }
@@ -3363,7 +3404,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
 		}
 
-		if (isMidiEditorEventsListView(hwnd)) {
+		if (isMidiEditorEventListView(hwnd)) {
 			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
@@ -3461,8 +3502,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 
-		for (int i = 0; MIDI_POST_COMMANDS[i].cmd; ++i) {
-			midiPostCommandsMap.insert(make_pair(MIDI_POST_COMMANDS[i].cmd, MIDI_POST_COMMANDS[i].execute));
+		for (auto &midiPostCommand: MIDI_POST_COMMANDS) {
+			midiPostCommandsMap.insert(make_pair(midiPostCommand.cmd, midiPostCommand.execute));
+			if (midiPostCommand.supportedInMidiEventList) {
+				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
+			}
 		}
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
