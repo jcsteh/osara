@@ -1015,7 +1015,7 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	text[0] = '\0';
 	// Get the text from the channel column (3).
 	ListView_GetItemText(hwnd, focused, 3, text, sizeof(text));
-	note.channel = atoi(text);
+	note.channel = atoi(text) -1;
 	text[0] = '\0';
 	// Get the text from the parameter (note name) column (5).
 	ListView_GetItemText(hwnd, focused, 5, text, sizeof(text));
