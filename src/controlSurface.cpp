@@ -274,13 +274,8 @@ class Surface: public IReaperControlSurface {
 		DWORD now = GetTickCount();
 		DWORD prevChangeTime = this->lastParamChangeTime;
 		this->lastParamChangeTime = now;
-		if (!isHandlingCommand &&
-			// Only handle surface changes if the last change is 100ms or more ago.
-			now - prevChangeTime >= 100
-		) {
-			return true;
-		}
-		return false;
+		// Only handle param changes if the last change was 100ms or more ago.
+		return now - prevChangeTime >= 100;
 	}
 	DWORD lastParamChangeTime = 0;
 
