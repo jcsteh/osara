@@ -3244,7 +3244,6 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto postIt = postCommandsMap.find(command);
 		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			if (shouldMoveFromPlayCursor) {
 				const auto cursorIt = MOVE_FROM_PLAY_CURSOR_COMMANDS.find(command);
 				if (cursorIt != MOVE_FROM_PLAY_CURSOR_COMMANDS.end()) {
@@ -3262,19 +3261,20 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			}
 			postIt->second(command);
 			lastCommand=command;
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
 		const auto mIt = POST_COMMAND_MESSAGES.find(command);
 		if (mIt != POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			if (hwnd) {
 				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			} else {
 				Main_OnCommand(command, 0);
 			}
 			outputMessage(mIt->second);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -3282,20 +3282,20 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto it = midiPostCommandsMap.find(command);
 		if (it != midiPostCommandsMap.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second(command);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
 		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
 		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			outputMessage(mIt->second);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -3331,14 +3331,15 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
 	) {
 		isHandlingCommand = true;
-		DWORD now = GetTickCount();
-		if (it->second->gaccel.accel.cmd == lastCommand && now - lastCommandTime < 500)
+		if (it->second->gaccel.accel.cmd == lastCommand &&
+				GetTickCount() - lastCommandTime < 500) {
 			++lastCommandRepeatCount;
-		else
+		} else {
 			lastCommandRepeatCount = 0;
-		lastCommandTime = now;
+		}
 		it->second->execute(it->second);
 		lastCommand = it->second->gaccel.accel.cmd;
+		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
 		return true;
 	} else if (isShortcutHelpEnabled) {
