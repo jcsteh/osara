@@ -184,6 +184,8 @@ class PresetDialog {
 		char rawText[100];
 		GetDlgItemText(this->dialog, ID_FXPRE_FILTER, rawText, sizeof(rawText));
 		string text = rawText;
+		// We want to match case insensitively, so convert to lower case.
+		transform(text.begin(), text.end(), text.begin(), ::tolower);
 		if (this->filter.compare(text) == 0) {
 			return; // No change.
 		}
