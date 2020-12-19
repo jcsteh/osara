@@ -634,18 +634,26 @@ void postMidiMovePitchCursor(int command) {
 void cmdMidiInsertNote(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount = MIDI_CountEvts(take, NULL, NULL, NULL);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	if (MIDI_CountEvts(take, NULL, NULL, NULL) <= oldCount)
+	int newCount;
+	MIDI_CountEvts(take, &newCount, nullptr, nullptr);
+	if (newCount <= oldCount) {
 		return; // Not inserted.
+	}
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Find the just inserted note based on its pitch, as that makes it unique.
-	auto note = *(find_if(
+	auto it = find_if(
 		selectedNotes.begin(), selectedNotes.end(),
 		[pitch](MidiNote n) { return n.pitch == pitch; }
-	));
+	);
+	if (it == selectedNotes.end()) {
+		return;
+	}
+	auto& note = *it;
 	// Play the inserted note.
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;

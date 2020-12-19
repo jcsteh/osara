@@ -3059,7 +3059,6 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
 	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
 	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
