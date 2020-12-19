@@ -37,7 +37,7 @@ function run(argv) {
 
 	var s = app.doShellScript;
 	try{
-		s(`mkdir '${target}/UserPlugins'`);
+		s(`mkdir -p '${target}/UserPlugins'`);
 	} catch (ignore){}// directory probably already exists
 	s(`cat '${source}/reaper_osara.dylib' > '${target}/UserPlugins/reaper_osara.dylib'`);
 	try{
