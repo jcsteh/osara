@@ -45,10 +45,10 @@
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_Undo_CanUndo2
 #define REAPERAPI_WANT_Undo_CanRedo2
+#define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_parse_timestr_pos
 #define REAPERAPI_WANT_GetMasterTrackVisibility
 #define REAPERAPI_WANT_SetMasterTrackVisibility
-#define REAPERAPI_WANT_GetAppVersion
 #define REAPERAPI_WANT_SetCursorContext
 #define REAPERAPI_WANT_GetPlayPosition
 #define REAPERAPI_WANT_SetEditCurPos
@@ -160,8 +160,21 @@
 #define REAPERAPI_WANT_Master_GetTempo
 #define REAPERAPI_WANT_CountTCPFXParms
 #define REAPERAPI_WANT_GetTCPFXParm
+#define REAPERAPI_WANT_GetMediaItemTakeInfo_Value
+#define REAPERAPI_WANT_SetMixerScroll
+#define REAPERAPI_WANT_GetSetAutomationItemInfo_String
+#define REAPERAPI_WANT_TrackFX_FormatParamValueNormalized
+#define REAPERAPI_WANT_GetNumTakeMarkers
+#define REAPERAPI_WANT_GetTakeMarker
+#define REAPERAPI_WANT_GetTrackStateChunk
+#define REAPERAPI_WANT_GetToggleCommandState2
+#define REAPERAPI_WANT_SectionFromUniqueID
+#define REAPERAPI_WANT_GetFocusedFX
+#define REAPERAPI_WANT_GetTake
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
+
+const char CONFIG_SECTION[] = "osara";
 
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
@@ -174,6 +187,8 @@ typedef struct Command {
 	void (*execute)(Command*);
 } Command;
 extern int lastCommandRepeatCount;
+extern DWORD lastCommandTime;
+extern bool isShortcutHelpEnabled;
 
 extern HINSTANCE pluginHInstance;
 extern HWND mainHwnd;
@@ -191,14 +206,16 @@ enum FakeFocus {
 	FOCUS_ENVELOPE,
 	FOCUS_AUTOMATIONITEM,
 	FOCUS_NOTE,
-	FOCUS_CC
+	FOCUS_CC,
+	FOCUS_TAKEMARKER
 };
 extern enum FakeFocus fakeFocus;
 
 extern bool isSelectionContiguous;
+extern bool shouldMoveToAutoItem;
 
-void outputMessage(const std::string& message);
-void outputMessage(std::ostringstream& message);
+void outputMessage(const std::string& message, bool interrupt = true);
+void outputMessage(std::ostringstream& message, bool interrupt = true);
 
 typedef enum {
 	TF_NONE,
@@ -214,14 +231,23 @@ std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=fa
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
 
+bool isTrackSelected(MediaTrack* track);
+
 #ifdef _WIN32
 #include <string>
 #include <oleacc.h>
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
+bool isClassName(HWND hwnd, std::string className);
 
 extern IAccPropServices* accPropServices;
+
+// uia.cpp
+bool initializeUia();
+bool terminateUia();
+bool shouldUseUiaNotifications();
+bool sendUiaNotification(const std::string& message, bool interrupt = true);
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
@@ -234,7 +260,11 @@ extern IAccPropServices* accPropServices;
 extern bool isHandlingCommand;
 void reportTransportState(int state);
 void reportRepeat(bool repeat);
+void postGoToTrack(int command, MediaTrack* track);
+void formatPan(double pan, std::ostringstream& output);
 IReaperControlSurface* createSurface();
+// envelopeCommands.cpp
+extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
 

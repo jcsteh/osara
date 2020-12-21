@@ -5,7 +5,7 @@
  * Copyright 2015-2018 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
-
+#include <optional>
 #include "osara.h"
 
 // Keeps track of the automation item the user last moved to.
@@ -26,6 +26,9 @@ void cmdMoveToNextEnvelopePointKeepSel(Command* command);
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command);
 void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true);
 bool toggleCurrentAutomationItemSelection();
+std::optional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void postToggleTrackVolumeEnvelope(int command);
 void postToggleTrackPanEnvelope(int command);
+void cmdToggleTrackEnvelope(Command* command);
+void postSelectMultipleEnvelopePoints(int command);

@@ -13,11 +13,17 @@
 #include <Windowsx.h>
 #include <Commctrl.h>
 #endif
+// Must be defined before any C++ STL header is included.
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <string>
 #include <sstream>
 #include <map>
 #include <iomanip>
+#include <cassert>
 #include <math.h>
+#include <optional>
+#include <regex>
+#include <set>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
@@ -33,6 +39,8 @@
 #include "peakWatcher.h"
 #include "midiEditorCommands.h"
 #include "envelopeCommands.h"
+#include "buildVersion.h"
+#include "fxChain.h"
 
 using namespace std;
 
@@ -54,9 +62,11 @@ int oldHour;
 FakeFocus fakeFocus = FOCUS_NONE;
 bool isShortcutHelpEnabled = false;
 bool isSelectionContiguous = true;
-Command* lastCommand = NULL;
+int lastCommand = 0;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
+MediaItem* currentItem = nullptr;
+bool shouldMoveFromPlayCursor = false;
 
 /*** Utilities */
 
@@ -82,7 +92,12 @@ string narrow(const wstring& text) {
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
+	if (shouldUseUiaNotifications()) {
+		if (sendUiaNotification(message, interrupt)) {
+			return;
+		}
+	}
 	// Tweak the MSAA accName for the current focus.
 	GUITHREADINFO guiThreadInfo;
 	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
@@ -108,14 +123,14 @@ void outputMessage(const string& message) {
 
 #else // _WIN32
 
-void outputMessage(const string& message) {
+void outputMessage(const string& message, bool interrupt) {
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
 #endif // _WIN32
 
-void outputMessage(ostringstream& message) {
-	outputMessage(message.str());
+void outputMessage(ostringstream& message, bool interrupt) {
+	outputMessage(message.str(), interrupt);
 }
 
 string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
@@ -178,7 +193,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_MINSEC: {
 			// Minutes:seconds
-			int minute = time / 60;
+			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
 				s << minute << " min ";
@@ -196,7 +211,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_FRAME: {
 			// Frames
-			int frame = time * TimeMap_curFrameRate(0, NULL);
+			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 			if (!useCache || oldFrame != frame) {
 				s << frame << (frame == 1 ? " frame" : " frames");
 				oldFrame = frame;
@@ -205,25 +220,25 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
-			int hour = time / 3600;
+			int hour = (int)(time / 3600);
 			time = fmod(time, 3600);
 			if (!useCache || oldHour != hour) {
 				s << hour << (hour == 1 ? " hour " : " hours ");
 				oldHour = hour;
 			}
-			int minute = time / 60;
+			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
 				s << minute << " min ";
 				oldMinute = minute;
 			}
-			int second = time;
+			int second = (int)time;
 			if (!useCache || oldSecond != second) {
 				s << second << " sec ";
 				oldSecond = second;
 			}
 			time = time - second;
-			int frame = time * TimeMap_curFrameRate(0, NULL);
+			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
 				s << frame << (frame == 1 ? " frame" : " frames");
 				oldFrame = frame;
@@ -236,6 +251,8 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			s << buf << " samples";
 			break;
 		}
+		default:
+			assert(false);
 	}
 	// #31: Clear cache for other units to avoid confusion if they are used later.
 	resetTimeCache(format);
@@ -317,6 +334,15 @@ bool isTrackSoloed(MediaTrack* track) {
 		return GetMasterMuteSoloFlags() & 2;
 	}
 	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
+}
+
+const regex RE_TRACK_STATE("\\sMUTESOLO \\d \\d (\\d)");
+bool isTrackDefeatingSolo(MediaTrack* track) {
+	char state[500];
+	GetTrackStateChunk(track, state, sizeof(state), false);
+	cmatch m;
+	regex_search(state, m, RE_TRACK_STATE);
+	return !m.empty() && m.str(1)[0] == '1';
 }
 
 bool isTrackArmed(MediaTrack* track) {
@@ -412,15 +438,74 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 	return false;
 }
 
+MediaItem* getItemWithFocus() {
+	// try to provide information based on the last item spoken by osara if it is selected
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+		&& IsMediaItemSelected(currentItem)
+	) 
+	return currentItem;
+	if(CountSelectedMediaItems(0)>0)
+		return GetSelectedMediaItem(0, 0);
+	return nullptr;
+}
+
+bool shouldReportTimeMovementWhilePlaying = true;
+bool shouldReportTimeMovement() {
+	if (shouldReportTimeMovementWhilePlaying) {
+		return true;
+	}
+	// Don't report if playing.
+	return !(GetPlayState() & 1);
+}
+
+INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
+	LPARAM lParam
+) {
+	switch (msg) {
+		case WM_COMMAND:
+			if (LOWORD(wParam) == IDCANCEL) {
+				DestroyWindow(dialog);
+				return TRUE;
+			}
+			break;
+		case WM_CLOSE:
+			DestroyWindow(dialog);
+			return TRUE;
+	}
+	return FALSE;
+}
+
+void reviewMessage(const char* title, const char* message) {
+	HWND dialog = CreateDialog(pluginHInstance,
+		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), mainHwnd,
+		reviewMessage_dialogProc);
+	SetWindowText(dialog, title);
+	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
+	ShowWindow(dialog, SW_SHOWNORMAL);
+}
+
+unsigned int getConfigUndoMask() {
+	int size{0};
+	unsigned int* undomask = static_cast<unsigned int*>(get_config_var("undomask", &size));
+	if(!undomask || (size!=sizeof(unsigned int)))
+		return 0;
+	return *undomask;
+}
+
+// Functions exported from SWS
+const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
+
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
  */
 
+bool shouldMoveToAutoItem = false;
 bool shouldReportFx = false;
-void postGoToTrack(int command) {
+void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
+	selectedEnvelopeIsTake = false;
+	shouldMoveToAutoItem = false;
 	SetCursorContext(0, NULL);
-	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	ostringstream s;
@@ -456,6 +541,9 @@ void postGoToTrack(int command) {
 		s << " phase inverted";
 	if (isTrackFxBypassed(track))
 		s << " FX bypassed";
+	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
+		s << " notes";
+	}
 	if (trackNum > 0) { // Not master
 		int itemCount = CountTrackMediaItems(track);
 		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
@@ -476,6 +564,10 @@ void postGoToTrack(int command) {
 		// This command replaces the selection , so revert to contiguous selection.
 		isSelectionContiguous = true;
 	}
+}
+
+void postGoToTrack(int command) {
+	postGoToTrack(command, GetLastTouchedTrack());
 }
 
 void postToggleTrackMute(int command) {
@@ -541,11 +633,29 @@ void postToggleMasterTrackFxBypass(int command) {
 	postToggleTrackFxBypass(GetMasterTrack(0));
 }
 
+void postToggleAllTracksFxBypass(int command) {
+	int count = CountTracks(nullptr);
+	if (count == 0) {
+		return;
+	}
+	bool bypassed = false;
+	for (int t = 0; t < count; ++t) {
+		MediaTrack* track = GetTrack(nullptr, t);
+		if (isTrackFxBypassed(track)) {
+			bypassed = true;
+			break;
+		}
+	}
+	outputMessage(bypassed ? "all tracks FX bypassed" : "all tracks FX active");
+}
+
 bool shouldReportScrub = true;
 
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
-	outputMessage(formatCursorPosition().c_str());
+	if (shouldReportTimeMovement()) {
+		outputMessage(formatCursorPosition().c_str());
+	}
 }
 
 void postCursorMovementScrub(int command) {
@@ -553,6 +663,21 @@ void postCursorMovementScrub(int command) {
 		postCursorMovement(command);
 	else
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
+}
+
+void postItemNormalize(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(0);
+	ostringstream s;
+	if (selectedItemsCount == 0) {
+		s << "No selected items";
+	} else {
+		s << selectedItemsCount << (selectedItemsCount == 1 ? " item" : " items") << " normalized";
+		if (command == 40254) {
+			// Item properties: Normalize multiple items to common gain
+			s << " to common gain";
+		}
+	}
+	outputMessage(s);
 }
 
 void postCycleTrackFolderState(int command) {
@@ -655,11 +780,10 @@ void postGoToSpecificMarker(int command) {
 	}
 }
 
-void postChangeTrackVolume(MediaTrack* track) {
-	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
-		return;
+void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
+	if(lastCommand != command) 
+		s << commandMessage;
 	s << fixed << setprecision(2);
 	s << VAL2DB(volume);
 	outputMessage(s);
@@ -667,13 +791,39 @@ void postChangeTrackVolume(MediaTrack* track) {
 
 void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeTrackVolume(track);
+	postChangeVolumeH(volume, command, "Track ");
 }
 
 void postChangeMasterTrackVolume(int command) {
-	postChangeTrackVolume(GetMasterTrack(0));
+	MediaTrack* track = GetMasterTrack(0);
+	double volume = 0.0;
+	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+		return;
+	postChangeVolumeH(volume, command, "Master ");
+}
+
+void postChangeItemVolume(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item)
+		return;
+	double volume = GetMediaItemInfo_Value(item, "D_VOL");
+	postChangeVolumeH(volume, command, "Item ");
+}
+
+void postChangeTakeVolume(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item)
+		return;
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take) {
+		return;
+	}
+	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
+	volume = fabs(volume);// volume is negative if take polarity is flipped
+	postChangeVolumeH(volume, command, "Take ");
 }
 
 void postChangeHorizontalZoom(int command) {
@@ -683,6 +833,17 @@ void postChangeHorizontalZoom(int command) {
 	outputMessage(s);
 }
 
+void formatPan(double pan, ostringstream& output) {
+	pan *=100.0;
+	if (pan == 0) {
+		output << "center";
+	} else if (pan < 0) {
+		output << -pan << "% left";
+	} else {
+		output << pan << "% right";
+	}
+}
+
 void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -690,14 +851,8 @@ void postChangeTrackPan(int command) {
 	double pan =0.0;
 	if ( !GetTrackUIVolPan(track, NULL, &pan) )
 		return;
-	pan *=100.0;
 	ostringstream s;
-	if (pan == 0)
-		s << "center";
-	else if (pan < 0)
-		s << -pan << "% left";
-	else
-		s << pan << "% right";
+	formatPan(pan, s);
 	outputMessage(s);
 }
 
@@ -897,6 +1052,7 @@ void postSelectMultipleItems(int command) {
 	outputMessage(s);
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
+	selectedEnvelopeIsTake = true;
 	SetCursorContext(1, NULL);
 }
 
@@ -1034,7 +1190,7 @@ void postTakeChannelMode(int command) {
 		outputMessage("no items selected");
 		return;
 	}
-	char* mode;
+	const char* mode;
 	switch(command) {
 		case 40176: {
 			mode = "normal";
@@ -1075,11 +1231,151 @@ void postTogglePlaybackPositionFollowsTimebase(int command) {
 	outputMessage(s);
 }
 
+void postTogglePreservePitchWhenPlayRateChanged(int command) {
+	ostringstream s;
+	s << ( GetToggleCommandState(command) ? "preserving" : "not preserving")
+		<< " pitch when changing play rate";
+	outputMessage(s);
+}
+
+void postSetItemEnd(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item)
+		return;
+	ostringstream s;
+	int selCount = CountSelectedMediaItems(0);
+	if(selCount > 1){
+		s << selCount << " item ends set to source media end";
+	} else {
+		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
+		s << "Item end set to source media end: ";
+		s << formatTime(endPos, TF_RULER, false, false, true);
+	}
+	outputMessage(s);
+}
+
+void postChangeItemGroup(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	int selCount = CountSelectedMediaItems(nullptr);
+	ostringstream s;
+	if (selCount == 1) {
+		s << "item";
+	} else {
+		s << selCount << " items";
+	}
+	int groupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
+	if (groupId) {
+		s << " added to group";
+	} else {
+		s << " removed from group";
+	}
+	outputMessage(s);
+}
+
+void postGoToTakeMarker(int command) {
+	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0) {
+		return;
+	}
+	double cursor = GetCursorPosition();
+	ostringstream s;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take) {
+			continue;
+		}
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		// Take marker positions are relative to the start of the item and the
+		// take's play rate.
+		double cursorRel = (cursor - itemStart) * playRate;
+		int markerCount = GetNumTakeMarkers(take);
+		for (int m = 0; m < markerCount; ++m) {
+			char name[100];
+			double markerPos = GetTakeMarker(take, m, name, sizeof(name), nullptr);
+			if (markerPos == cursorRel) {
+				s << name << " take marker ";
+				fakeFocus = FOCUS_TAKEMARKER;
+			}
+		}
+	}
+	s << formatCursorPosition();
+	outputMessage(s);
+	if (GetPlayPosition() != cursor) {
+		SetEditCurPos(cursor, true, true); // Seek playback.
+	}
+}
+
+void postSelectMultipleTracks(int command) {
+	int count = CountSelectedTracks(nullptr);
+	ostringstream s;
+	s << count << (count == 1 ? " track" : " tracks") << " selected";
+	outputMessage(s);
+}
+
+void postSelectAll(int command) {
+	switch (GetCursorContext2(true)) {
+		case 0: // Track
+			postSelectMultipleTracks(0);
+			return;
+		case 1: // Item
+			postSelectMultipleItems(0);
+			return;
+		case 2: // Envelope
+			postSelectMultipleEnvelopePoints(0);
+			return;
+		default:
+			return;
+	}
+}
+
+void postToggleTrackSoloDefeat(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	outputMessage(isTrackDefeatingSolo(track) ?
+		"defeating solo" : "not defeating solo");
+}
+
+void postChangeTransientDetectionSensitivity(int command) {
+	double sensitivity = *(double*)get_config_var("transientsensitivity",
+		nullptr) * 100;
+	ostringstream s;
+	s << sensitivity << "% sensitivity";
+	outputMessage(s);
+}
+
+void postChangeTransientDetectionThreshold(int command) {
+	double threshold = *(double*)get_config_var("transientthreshold",
+		nullptr);
+	ostringstream s;
+	s << threshold << "dB threshold";
+	outputMessage(s);
+}
+
+void postToggleEnvelopePointsMoveWithMediaItems(int command) {
+	ostringstream s;
+	s << (GetToggleCommandState(command) ? "enabled" : "disabled") <<
+		" envelope points move with media items";
+	outputMessage(s);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
 } PostCommand;
+
+typedef struct MidiPostCommand : PostCommand {
+	bool supportedInMidiEventList = false;
+	bool changesValueInMidiEventList = false;
+} MidiPostCommand;
+
 // For commands registered by other plug-ins.
 typedef struct {
 	const char* id;
@@ -1095,15 +1391,19 @@ PostCommand POST_COMMANDS[] = {
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
 	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
-	{40344, postToggleTrackFxBypass}, // Track: toggle FX bypass on all tracks
+	{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
+	{40108, postItemNormalize}, // Item properties: Normalize items
+	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
+	{41040, postCursorMovement}, // Move edit cursor to start of next measure
+	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{41042, postCursorMovement}, // Go forward one measure
 	{41043, postCursorMovement}, // Go back one measure
 	{41044, postCursorMovement}, // Go forward one beat
@@ -1176,6 +1476,7 @@ PostCommand POST_COMMANDS[] = {
 	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
 	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
 	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
+	{40521, postAdjustPlayRate}, // Set playrate to 1.0
 	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
 	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
 	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
@@ -1203,36 +1504,66 @@ PostCommand POST_COMMANDS[] = {
 	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
 	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
 	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
+	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
+	{41925, postChangeItemVolume}, // Item: Nudge items volume +1dB
+	{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
+	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
+	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
+	{40612, postSetItemEnd}, // Item: Set item end to source media end
+	{40630, postCursorMovement}, // Go to start of time selection
+	{40631, postCursorMovement}, // Go to end of time selection
+	{40632, postCursorMovement}, // Go to start of loop
+	{40633, postCursorMovement}, // Go to end of loop
+	{40032, postChangeItemGroup}, // Item grouping: Group items
+	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
+	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
+	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
+	{40296, postSelectMultipleTracks}, // Track: Select all tracks
+	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
+	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
+	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
+	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
+	{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
+	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
+	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
+	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
 	{0},
 };
-PostCommand MIDI_POST_COMMANDS[] = {
-	{40006, postMidiSelectNotes}, // Edit: Select all events
+MidiPostCommand MIDI_POST_COMMANDS[] = {
+	{40006, postMidiSelectNotes, true}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
-	{40177, postMidiChangePitch}, // Edit: Move notes up one semitone
-	{40178, postMidiChangePitch}, // Edit: Move notes down one semitone
-	{40180, postMidiChangePitch}, // Edit: Move notes down one octave
-	{40181, postMidiChangePitch}, // Edit: Move notes up one octave
+	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
+	{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
+	{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
+	{40180, postMidiChangePitch, true, true}, // Edit: Move notes down one octave
+	{40181, postMidiMoveStart}, // Edit: Move notes left one pixel
+	{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
+	{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
+	{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
 	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
 	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
 	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
-	{40435, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40434, postMidiSelectNotes, true}, // Select all notes with the same pitch
 	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
-	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
-	{40447, postMidiChangeLength}, // Edit: Shorten notes one grid unit
-	{40462, postMidiChangeVelocity}, // Edit: Note velocity +01
-	{40463, postMidiChangeVelocity}, // Edit: Note velocity +10
-	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
-	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
+	{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
+	{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
+	{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
+	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
+	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
+	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
 	{40501, postMidiSelectNotes}, // Invert selection
-	{40676, postMidiChangeCCValue}, // Edit: Increase value a little bit for CC events
-	{40677, postMidiChangeCCValue}, // Edit: Decrease value a little bit for CC events
-	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
-	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
-	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
-	{0},
+	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
+	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
+	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
+	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
+	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
+	{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
+	{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
+	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
+	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
@@ -1245,6 +1576,10 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
 	{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
 	{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
+	{"_XENAKIOS_NUDGETAKEVOLDOWN", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume down
+	{"_XENAKIOS_NUDGETAKEVOLUP", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume up
+	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
+	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{NULL},
 };
 map<int, PostCommandExecute> postCommandsMap;
@@ -1261,9 +1596,21 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
 	{40778, "grid eighth"}, // Grid: Set to 1/8
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
+	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
+	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+};
+const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
+	40104, // View: Move cursor left one pixel
+	40105, // View: Move cursor right one pixel
+	41042, // Go forward one measure
+	41043, // Go back one measure
+	41044, // Go forward one beat
+	41045, // Go back one beat
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
+map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
@@ -1326,61 +1673,34 @@ bool showReaperContextMenu(const int menu) {
 			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr,
 				currentAutomationItem + 1, 0);
 			return true;
+		default:
+			break;
 	}
 	return false;
 }
 
 #ifdef _WIN32
 
-// A capturing lambda can't be passed as a Windows callback, hence the struct.
-typedef struct {
-	int index;
-	int foundCount;
-	HWND retHwnd;
-} GetTrackVuData;
-// Get the track VU window for the current track.
-HWND getTrackVu(MediaTrack* track) {
-	GetTrackVuData data;
-	data.index = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (data.index == -1) // Master
-		data.index = 0;
-	if (GetMasterTrackVisibility() & 1)
-		data.index += 1;
-	data.retHwnd = NULL;
-	data.foundCount = 0;
-	WNDENUMPROC callback = [] (HWND testHwnd, LPARAM lParam) -> BOOL {
-		GetTrackVuData* data = (GetTrackVuData*)lParam;
-		WCHAR className[14];
-		if (GetClassNameW(testHwnd, className, 14) != 0
-			&& wcscmp(className, L"REAPERtrackvu") == 0
-			&& ++data->foundCount == data->index
-		)  {
-			data->retHwnd = testHwnd;
-			return false;
-		}
-		return true;
-	};
-	EnumChildWindows(mainHwnd, callback, (LPARAM)&data);
-	return data.retHwnd;
+bool isClassName(HWND hwnd, string className) {
+	char buffer[50];
+	if (GetClassName(hwnd, buffer, sizeof(buffer)) == 0) {
+		return false;
+	}
+	return className.compare(buffer) == 0;
 }
 
 HWND getSendContainer(HWND hwnd) {
-	WCHAR className[21] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Button") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Button")) {
+		return nullptr;
+	}
 	hwnd = GetWindow(hwnd, GW_HWNDPREV);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Static") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Static")) {
+		return nullptr;
+	}
 	hwnd = GetAncestor(hwnd, GA_PARENT);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "REAPERVirtWndDlgHost")) {
+		return nullptr;
+	}
 	return hwnd;
 }
 
@@ -1440,94 +1760,6 @@ void sendMenu(HWND sendWindow) {
 	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
 }
 
-void clickIoButton(MediaTrack* track, bool rightClick=false) {
-	HWND hwnd = getTrackVu(track);
-	if (!hwnd)
-		return; // Really shouldn't happen.
-	// Use MSAA to get the location of the I/O button.
-	hwnd = GetAncestor(hwnd, GA_PARENT);
-	IAccessible* acc = NULL;
-	VARIANT varChild;
-	DWORD childId = track == GetMasterTrack(0) ? 5 : 7;
-	if (AccessibleObjectFromEvent(hwnd, OBJID_CLIENT, childId, &acc, &varChild) != S_OK)
-		return;
-	long l, t, w, h;
-	HRESULT res = acc->accLocation(&l, &t, &w, &h, varChild);
-	acc->Release();
-	if (res != S_OK)
-		return;
-	// Click it!
-	POINT point = {l, t};
-	ScreenToClient(hwnd, &point);
-	SendMessage(hwnd,
-		rightClick ? WM_RBUTTONDOWN : WM_LBUTTONDOWN,
-		rightClick ? MK_RBUTTON : MK_LBUTTON,
-		MAKELPARAM(point.x, point.y));
-	SendMessage(hwnd,
-		rightClick ? WM_RBUTTONUP : WM_LBUTTONUP, 0,
-		MAKELPARAM(point.x, point.y));
-}
-
-bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
-	char name[8];
-	if (GetWindowText(window, name, sizeof(name)) == 0)
-		return false;
-	if (strncmp(name, "FX: ", 4) != 0 && // FX chain window
-		// floating FX window, for different plug-in types
-		strncmp(name, "DX: ", 4) != 0 &&
-		strncmp(name, "VST: ", 5) != 0 &&
-		strncmp(name, "VSTi: ", 6) != 0 &&
-		strncmp(name, "VST3: ", 6) != 0 &&
-		strncmp(name, "VST3i: ", 7) != 0
-	) {
-		return false;
-	}
-	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
-		return false;
-	}
-	// This is a property page containing the plugin window among other things.
-	// set property page name, to avoid CPU/PDC label audition after switching
-	if (GetWindowText(window, name, sizeof(name)) == 0) {
-		SetWindowText(window, " ");
-	}
-	// Descend. Observed as the first or as the last. 
-	// Can not just search, we do not know the class nor name.
-	if (!(window = GetWindow(window, GW_CHILD)))
-		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
-		// Plugin window should be the last.
-		if (!(window = GetWindow(window, GW_HWNDLAST))) {
-			return false;
-		}
-	} // else it is the first
-	// We have found plug-in window or its container
-	HWND plugin = window;
-	// if focus is already inside plug-in window, let F6 work as usual
-	HWND focus = GetFocus();
-	if ((focus == plugin) || (IsChild(plugin, focus))) {
-		return false;
-	}
-	// Try to focus the first child in Z order
-	HWND child;
-	while ((child = GetWindow(window, GW_CHILD))) {
-		window = child;
-	}
-	while (window) {
-		SetFocus(window);
-		if ((window == plugin) || (GetFocus() == window)) {
-			break; // success or the last possible attempt
-		}
-		window = GetParent(window);
-	}
-	return true;
-}
-
 bool isTrackViewWindow(HWND hwnd) {
 	WCHAR className[22] = L"\0";
 	GetClassNameW(hwnd, className, ARRAYSIZE(className));
@@ -1537,51 +1769,21 @@ bool isTrackViewWindow(HWND hwnd) {
 }
 
 bool isListView(HWND hwnd) {
-	WCHAR className[14] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	return wcscmp(className, L"SysListView32") == 0;
+	return isClassName(hwnd, "SysListView32");
 }
 
-// If an FX chain dialog is focused, report active/bypassed for the selected
-// effect.
-// We can't annotate the names of SysListView32 items, since screen readers have
-// special support for those and override MSAA. Instead, we do this when the
-// user is focused in the Notes text box. This is a big ugly hack, but it's
-// far better than nothing.
-bool maybeReportFxChainBypass(bool aboutToToggle=false) {
-	HWND focus = GetFocus();
-	if (GetWindowLongW(focus, GWL_ID) != 1191) {
-		// Not the notes field in the FX Chain dialog.
-		return false;
+bool isMidiEditorEventListView(HWND hwnd) {
+	return isListView(hwnd)
+		&& isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
+}
+
+void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
+	int child = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	if (child == -1) {
+		return;
 	}
-	bool enabled = false;
-	if (fakeFocus == FOCUS_TRACK) {
-		MediaTrack* track = GetLastTouchedTrack();
-		if (!track) {
-			return false;
-		}
-		int fx = TrackFX_GetChainVisible(track);
-		if (fx < 0) {
-			return false;
-		}
-		enabled = TrackFX_GetEnabled(track, fx);
-	} else  {
-		MediaItem* item = GetSelectedMediaItem(0, 0);
-		MediaItem_Take* take = item ? GetActiveTake(item) : nullptr;
-		if (!take) {
-			return false;
-		}
-		int fx = TakeFX_GetChainVisible(take);
-		if (fx < 0) {
-			return false;
-		}
-		enabled = TakeFX_GetEnabled(take, fx);
-	}
-	if (aboutToToggle) {
-		enabled = !enabled;
-	}
-	outputMessage(enabled ? "active" : "bypassed");
-	return true;
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT,
+		child + 1);
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -1593,13 +1795,11 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	HWND dialog = GetAncestor(parent, GA_ROOT);
-	if (dialog == parent) {
+	if (dialog == parent || dialog == mainHwnd) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
-	char className[8];
-	if (GetClassName(pref, className, sizeof(className))
-			&& strcmp(className, "Button") == 0
+	if (isClassName(pref, "Button")
 			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
 		return nullptr;
 	}
@@ -1652,11 +1852,38 @@ bool maybeAnnotatePreferenceDescription() {
 	return true;
 }
 
+// Overide the tab/shift+tab key in Save dialogs so it can reach REAPER specific
+// controls: Create subdirectory for project, etc.
+// Tab seems to completely skip these controls, even though WS_TABSTOP and
+// WS_EX_CONTROLPARENT are set correctly.
+bool maybeFixTabInSaveDialog(bool previous) {
+	HWND focus = GetFocus();
+	HWND parent = GetParent(focus);
+	if (
+		// Save as type combo box. The REAPER specific controls are after this.
+		!(isClassName(focus, "ComboBox") &&
+			isClassName(parent, "FloatNotifySink")) &&
+		// A REAPER specific control in the Save dialog.
+		!(isClassName(parent, "#32770") &&
+			isClassName(GetParent(parent), "FloatNotifySink")) &&
+		// The "Hide Folders" toolbar in the save dialog. The REAPER specific
+		// controls are before this.
+		!(isClassName(focus, "ToolbarWindow32") &&
+			isClassName(GetWindow(focus, GW_HWNDPREV), "DUIViewWndClassName"))
+	) {
+		return false;
+	}
+	HWND target = GetNextDlgTabItem(GetForegroundWindow(), focus, previous);
+	SetFocus(target);
+	return true;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B') {
+			wParam != VK_F6 && wParam != 'B' &&
+			wParam != VK_TAB) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
@@ -1711,6 +1938,22 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
 			GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
+	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
+			!(GetKeyState(VK_MENU) & 0x8000)) {
+		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
+		if (maybeFixTabInSaveDialog(shift)) {
+			return 1;
+		}
+		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
+			return 1;
+		}
+	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
+			GetKeyState(VK_MENU) & 0x8000 && !(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_CONTROL) & 0x8000)) {
+		// Alt+downArrow.
+		if (maybeOpenFxPresetDialog()) {
+			return 1;
+		}
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
@@ -1726,6 +1969,8 @@ int int0 = 0;
 int int1 = 1;
 
 void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
+	unsigned int undoMask = getConfigUndoMask();
+	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
 		outputMessage("No tracks");
@@ -1742,29 +1987,35 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		// #47: Deleting the last track results in no last touched track.
 		// Therefore, navigate to the last track.
 		num = count - 1;
+		origTrack = GetTrack(nullptr, num);
 	}
 	MediaTrack* track = origTrack;
 	// We use -1 for the master track.
 	for (; -1 <= num && num < count; num += direction) {
 		if (num == -1) {
-			if (!(GetMasterTrackVisibility() & 1))
-				continue; // Invisible.
-			track = GetMasterTrack(0);
-		} else {
-			track = GetTrack(0, num);
-			if (isTrackInClosedFolder(track)) {
-				// This track is inside a closed folder, so skip it.
-				if (direction == 1 && num == count - 1) {
-					// We're moving forward and we're on the last track.
-					// Therefore, go backward.
-					// Note that this can't happen when the user moves backward
-					// because the first track can never be inside a folder.
-					direction = -1;
+			if (!(GetMasterTrackVisibility() & 1)) {
+				// Invisible.
+				if (direction == -1) {
+					// We're moving backward and we're on the master track, which is
+					// invisible. Return to the original track.
+					track = origTrack;
+					break;
 				}
 				continue;
 			}
-			if (!IsTrackVisible(track, false))
+			track = GetMasterTrack(0);
+		} else {
+			track = GetTrack(nullptr, num);
+			if (!IsTrackVisible(track, false) || isTrackInClosedFolder(track)) {
+				// This track is invisible or inside a closed folder, so skip it.
+				if (direction == 1 && num == count - 1) {
+					// We're moving forward and we're on the last track, which is
+					// invisible. Return to the original track.
+					track = origTrack;
+					break;
+				}
 				continue;
+			}
 		}
 		break;
 	}
@@ -1772,7 +2023,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	if (!select || track != origTrack || !wasSelected) {
 		// We're moving to a different track
 		// or we're on the same track but it's unselected.
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
 		if (clearSelection) {
 			Main_OnCommand(40297, 0); // Track: Unselect all tracks
@@ -1785,9 +2036,11 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		// so we must first unselected.
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
+		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		SetMixerScroll(track); // MCP
 		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Track Selection", 0);
 	}
 	postGoToTrack(0);
@@ -1809,8 +2062,9 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
-MediaItem* currentItem = NULL;
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
+	unsigned int undoMask = getConfigUndoMask();
+	bool makeUndoPoint = undoMask&1;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -1842,7 +2096,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (direction == 1 ? pos < cursor : pos > cursor)
 			continue; // Not the right direction.
 		currentItem = item;
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
 		if (clearSelection) {
 			Main_OnCommand(40289, 0); // Item: Unselect all items
@@ -1850,12 +2104,13 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		}
 		if (select)
 			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
-		if (clearSelection || select)
+		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Item Selection", 0);
 		SetEditCurPos(pos, true, true); // Seek playback.
 
 		// Report the item.
 		fakeFocus = FOCUS_ITEM;
+		selectedEnvelopeIsTake = true;
 		SetCursorContext(1, NULL);
 		ostringstream s;
 		s << i + 1;
@@ -1883,7 +2138,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 }
 
 void cmdMoveToNextItem(Command* command) {
-	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(1);
 	} else {
 		moveToItem(1);
@@ -1891,7 +2146,7 @@ void cmdMoveToNextItem(Command* command) {
 }
 
 void cmdMoveToPrevItem(Command* command) {
-	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
+	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(-1);
 	} else {
 		moveToItem(-1);
@@ -2019,21 +2274,14 @@ void cmdMoveItems(Command* command) {
 }
 
 void cmdMoveItemEdge(Command* command) {
-	MediaItem* item;
-	// try to provide information based on the last item spoken by osara if it is selected
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& IsMediaItemSelected(currentItem)
-	) 
-	item = currentItem;
-	else if(CountSelectedMediaItems(0)>0)
-		item = GetSelectedMediaItem(0, 0);
-	else {
-		outputMessage("no items selected");
+	MediaItem* item = getItemWithFocus();
+	if (!item) {
+		outputMessage("No items selected");
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
 	ostringstream s;
-	if(lastCommand != command) { 
+	if(lastCommand != command->gaccel.accel.cmd) { 
 		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
 		const char* start;
 		// Skip the category before the colon (if any).
@@ -2049,7 +2297,7 @@ void cmdMoveItemEdge(Command* command) {
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	if(GetPlayState() & 1) { //don't talk while playing
+	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
@@ -2154,70 +2402,108 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 	}
 }
 
-void cmdIoMaster(Command* command) {
-	if (GetAppVersion()[0] >= '6') {
-		// REAPER >= 6.01 has a builtin action for this.
-		Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
-		return;
+void cmdPropertiesFocus(Command* command) {
+	if (shouldMoveToAutoItem) {
+		Main_OnCommand(42090, 0); // Envelope: Automation item properties...
+	} else {
+		Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
 	}
-#ifdef _WIN32
-	// If the master track isn't visible, make it so temporarily.
-	int prevVisible = GetMasterTrackVisibility();
-	if (!(prevVisible & 1))
-		SetMasterTrackVisibility(prevVisible | 1);
-	clickIoButton(GetMasterTrack(0));
-	// Restore master invisibility if appropriate.
-	if (!(prevVisible & 1))
-		SetMasterTrackVisibility(prevVisible);
-#endif // _WIN32
+}
+
+void cmdIoMaster(Command* command) {
+	// REAPER >= 6.01 has a builtin action for this. We keep this OSARA action
+	// for compatibility, but it should be removed when the key map is next
+	// revised.
+	Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
 }
 
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-void reportTracksWithState(const char* prefix, TrackStateCheck checkState) {
+string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
+	bool includeMaster, bool multiLine, bool outputIfNone = true
+) {
 	ostringstream s;
-	s << prefix << ": ";
+	if (prefix) {
+		s << prefix << ":" <<
+			(multiLine ? "\r\n" : " ");
+	}
 	int count = 0;
-	for (int i = 0; i < CountTracks(0); ++i) {
-		MediaTrack* track = GetTrack(0, i);
+	for (int i = includeMaster ? -1 : 0; i < CountTracks(0); ++i) {
+		MediaTrack* track = (i == -1) ?
+			GetMasterTrack(nullptr) : GetTrack(nullptr, i);
 		if (checkState(track)) {
 			++count;
-			if (count > 1)
-				s << ", ";
-			s << i + 1;
-			char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-			if (name && name[0])
-				s << " " << name;
+			if (count > 1) {
+				s << (multiLine ? "\r\n" : ", ");
+			}
+			if (i == -1) {
+				s << "master";
+			} else {
+				s << i + 1;
+				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+				if (name && name[0]) {
+					s << " " << name;
+				}
+			}
 		}
 	}
-	if (count == 0)
+	if (count == 0) {
+		if (!outputIfNone) {
+			return "";
+		}
 		s << "none";
-	outputMessage(s);
+	}
+	return s.str();
+}
+
+void reportTracksWithState(const char* prefix, TrackStateCheck checkState,
+	bool includeMaster
+) {
+	bool multiLine = lastCommandRepeatCount == 1;
+	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState,
+		includeMaster, multiLine);
+	if (multiLine) {
+		reviewMessage(prefix, s.c_str());
+	} else {
+		outputMessage(s);
+	}
 }
 
 void cmdReportMutedTracks(Command* command) {
-	reportTracksWithState("Muted", isTrackMuted);
+	reportTracksWithState("Muted", isTrackMuted, /* includeMaster */ true);
 }
 
 void cmdReportSoloedTracks(Command* command) {
-	reportTracksWithState("Soloed", isTrackSoloed);
+	bool multiLine = lastCommandRepeatCount == 1;
+	ostringstream s;
+	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
+		multiLine);
+	if (multiLine) {
+		reviewMessage("Soloed", s.str().c_str());
+	} else {
+		outputMessage(s);
+	}
 }
 
 void cmdReportArmedTracks(Command* command) {
-	reportTracksWithState("Armed", isTrackArmed);
+	reportTracksWithState("Armed", isTrackArmed, /* includeMaster */ false);
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState("Monitored", isTrackMonitored);
+	reportTracksWithState("Monitored", isTrackMonitored,
+		/* includeMaster */ false);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState("Phase inverted", isTrackPhaseInverted);
+	reportTracksWithState("Phase inverted", isTrackPhaseInverted,
+		/* includeMaster */ false);
 }
 
 void cmdReportSelection(Command* command) {
+	const bool multiLine = lastCommandRepeatCount == 1;
+	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
 	int count = 0;
 	int t;
@@ -2233,7 +2519,7 @@ void cmdReportSelection(Command* command) {
 				if (isTrackSelected(track)) {
 					++count;
 					if (count > 1)
-						s << ", ";
+						s << separator;
 					s << t + 1;
 					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 					if (name && name[0])
@@ -2250,7 +2536,7 @@ void cmdReportSelection(Command* command) {
 					if (isItemSelected(item)) {
 						++count;
 						if (count > 1)
-							s << ", ";
+							s << separator;
 						s << t + 1 << "." << i + 1;
 						MediaItem_Take* take = GetActiveTake(item);
 						if (take)
@@ -2264,18 +2550,60 @@ void cmdReportSelection(Command* command) {
 			double start, end;
 			GetSet_LoopTimeRange(false, false, &start, &end, false);
 			if (start != end) {
-				s << "start " << formatTime(start, TF_RULER, false, false) << ", "
-					<< "end " << formatTime(end, TF_RULER, false, false) << ", "
+				s << "start " << formatTime(start, TF_RULER, false, false) << separator
+					<< "end " << formatTime(end, TF_RULER, false, false) << separator
 					<< "length " << formatTime(end - start, TF_RULER, true, false);
 				count = 1;
 				resetTimeCache();
 			}
 			break;
 		}
+		default:
+			return;
 	}
-	if (count == 0)
-		s << "No selection";
-	outputMessage(s);
+	if (count == 0) {
+		outputMessage("No selection");
+		return;
+	}
+	if (multiLine) {
+		reviewMessage("Selection", s.str().c_str());
+	} else {
+		outputMessage(s);
+	}
+}
+
+int countTakeMarkersInSelectedTakes() {
+	int itemCount = CountSelectedMediaItems(0);
+	if (itemCount == 0) {
+		return 0;
+	}
+	int markerCount = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take) {
+			continue;
+		}
+		markerCount += GetNumTakeMarkers(take);
+	}
+	return markerCount;
+}
+
+void cmdhDeleteTakeMarkers(int command) {
+	int oldCount = countTakeMarkersInSelectedTakes();
+	Main_OnCommand(command, 0);
+	int removed = oldCount - countTakeMarkersInSelectedTakes();
+	if (removed == 1) {
+		outputMessage("take marker deleted");
+	} else {
+		ostringstream s;
+		s << removed << " take markers deleted";
+		outputMessage(s);
+	}
+}
+
+void cmdDeleteTakeMarkers(Command* command) {
+	cmdhDeleteTakeMarkers(command->gaccel.accel.cmd);
 }
 
 void cmdRemoveFocus(Command* command) {
@@ -2303,6 +2631,9 @@ void cmdRemoveFocus(Command* command) {
 			break;
 		case FOCUS_AUTOMATIONITEM:
 			cmdhDeleteEnvelopePointsOrAutoItems(42086, false, true); // Envelope: Delete automation items
+			break;
+		case FOCUS_TAKEMARKER:
+			cmdhDeleteTakeMarkers(42386); // Item: Delete take marker at cursor);
 			break;
 		default:
 			cmdRemoveTimeSelection(NULL);
@@ -2361,6 +2692,14 @@ void cmdToggleSelection(Command* command) {
 		case FOCUS_AUTOMATIONITEM:
 			select = toggleCurrentAutomationItemSelection();
 			break;
+		case FOCUS_ENVELOPE:
+		{
+			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
+			if(!selectOpt)
+				return;
+			select = *selectOpt;
+			break;
+		}
 		default:
 			return;
 	}
@@ -2564,12 +2903,12 @@ void cmdCycleMidiRecordingMode(Command* command) {
 }
 
 void cmdNudgeTimeSelection(Command* command) {
-	bool first= (lastCommand!=command);
+	bool first= (lastCommand!=command->gaccel.accel.cmd);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
-	if(GetPlayState() & 1) { // don't talk while playing
+	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	if(first) 
@@ -2587,13 +2926,69 @@ void cmdNudgeTimeSelection(Command* command) {
 	outputMessage(s);
 }
 
+void cmdAbout(Command* command) {
+	ostringstream s;
+	s << "OSARA: Open Source Accessibility for the REAPER Application\r\n" <<
+		"Version: " << OSARA_VERSION << "\r\n" <<
+		OSARA_COPYRIGHT;
+	reviewMessage("About OSARA", s.str().c_str());
+}
+
+// The Transient Detection Settings dialog deliberately passes most keys to the
+// main section. This makes it impossible for keyboard users to navigate.
+// To work around this, when this dialog is opened, we register an accelerator
+// hook which passes tab, arrow keys, etc. to the dialog.
+accelerator_register_t transDetect_accelReg;
+int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	HWND transDialog = (HWND)accelReg->user;
+	if (!IsWindow(transDialog)) {
+		// Dialog was closed. We don't need this hook any more.
+		plugin_register("-accelerator", accelReg);
+		return 0; // Normal handling.
+	}
+	if (msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != transDialog) {
+		return 0; // Normal handling.
+	}
+	switch (msg->wParam) {
+		case VK_TAB:
+		case VK_RIGHT:
+		case VK_LEFT:
+		case VK_UP:
+		case VK_DOWN:
+		case VK_PRIOR:
+		case VK_NEXT:
+		case VK_HOME:
+		case VK_END:
+		case VK_SPACE:
+			return -1; // pass to window.
+		default:
+			break;
+	}
+	return 0; // Normal handling.
+}
+
+void cmdTransientDetectionSettings(Command* command) {
+	if (GetToggleCommandState(command->gaccel.accel.cmd)) {
+		// Dialog is showing. Just run the command to dismiss it.
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		plugin_register("-accelerator", &transDetect_accelReg);
+		return;
+	}
+	transDetect_accelReg.translateAccel = &transDetect_translateAccel;
+	transDetect_accelReg.isLocal = true;
+	// We must register the hook before the dialog appears or it won't work.
+	plugin_register("accelerator", &transDetect_accelReg);
+	// Open the dialog.
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
-const int MIDI_EDITOR_SECTION = 32060;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
@@ -2644,16 +3039,30 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
 	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
+	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
+	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
+	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0,40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0,40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
@@ -2663,6 +3072,7 @@ Command COMMANDS[] = {
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View properties for current media item/take/automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
@@ -2673,6 +3083,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Pause/resume Peak Watcher"}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
@@ -2707,6 +3118,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report global / Track Automation Mode"}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -2734,27 +3146,52 @@ map<pair<int, int>, Command*> commandsMap;
  * For new settings, appropriate code needs to be added to loadConfig, config_onOk and cmdConfig.
  ***/
 
-const char CONFIG_SECTION[] = "osara";
-
 extern bool shouldReportNotes;
+extern bool shouldReportSurfaceChanges;
+extern bool shouldReportMarkersWhilePlaying;
 
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
 	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
+	shouldReportTimeMovementWhilePlaying =
+		GetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying")[0] != '0';
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
+	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
+		"reportSurfaceChanges")[0] == '1';
+	shouldMoveFromPlayCursor =
+		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
+	shouldReportMarkersWhilePlaying =
+		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
 }
 
 void config_onOk(HWND dialog) {
 	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
+	shouldReportTimeMovementWhilePlaying =
+		IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING)
+		== BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying",
+		shouldReportTimeMovementWhilePlaying ? "1" : "0", true);
 	shouldReportFx = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_FX) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
 	shouldReportTransport = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TRANSPORT) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 	shouldReportNotes = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_NOTES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportNotes", shouldReportNotes ? "1" : "0", true);
+	shouldReportSurfaceChanges = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_SURFACE_CHANGES) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportSurfaceChanges",
+		shouldReportSurfaceChanges ? "1" : "0", true);
+	shouldMoveFromPlayCursor = IsDlgButtonChecked(dialog,
+		ID_CONFIG_MOVE_FROM_PLAY_CURSOR) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "moveFromPlayCursor",
+		shouldMoveFromPlayCursor ? "1" : "0", true);
+	shouldReportMarkersWhilePlaying = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying",
+		shouldReportMarkersWhilePlaying ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -2780,9 +3217,17 @@ void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
+		shouldReportTimeMovementWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
+		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
+		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING,
+		shouldReportMarkersWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
@@ -2795,9 +3240,17 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 	int relMode=0, HWND hwnd=nullptr
 ) {
 	if (section==MAIN_SECTION) {
-		const auto it = postCommandsMap.find(command);
-		if (it != postCommandsMap.end()) {
+		const auto postIt = postCommandsMap.find(command);
+		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
+			if (shouldMoveFromPlayCursor) {
+				const auto cursorIt = MOVE_FROM_PLAY_CURSOR_COMMANDS.find(command);
+				if (cursorIt != MOVE_FROM_PLAY_CURSOR_COMMANDS.end()) {
+					if (GetPlayState() & 1) { // Playing
+						SetEditCurPos(GetPlayPosition(), false, false);
+					}
+				}
+			}
 			if (hwnd) {
 				// #244: If the command was triggered via MIDI, pass the MIDI data when
 				// executing the command so that toggles, etc. work as expected.
@@ -2805,7 +3258,9 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			} else {
 				Main_OnCommand(command, 0);
 			}
-			it->second(command);
+			postIt->second(command);
+			lastCommand=command;
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -2818,6 +3273,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 				Main_OnCommand(command, 0);
 			}
 			outputMessage(mIt->second);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -2828,6 +3284,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second(command);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -2837,6 +3294,26 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			outputMessage(mIt->second);
+			lastCommandTime = GetTickCount();
+			isHandlingCommand = false;
+			return true;
+		}
+	}else if (section==MIDI_EVENT_LIST_SECTION) {
+		const auto it = midiEventListPostCommandsMap.find(command);
+		if (it != midiEventListPostCommandsMap.end()) {
+			isHandlingCommand = true;
+			lastCommandTime = GetTickCount();
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			it->second.first(command);
+			#ifdef _WIN32
+			if (it->second.second) { // changesValueInMidiEventList
+				HWND focus = GetFocus();
+				if (focus && isMidiEditorEventListView(focus)) {
+					sendNameChangeEventToMidiEditorEventListItem(focus);
+				}
+			}
+			#endif
 			isHandlingCommand = false;
 			return true;
 		}
@@ -2853,14 +3330,15 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
 	) {
 		isHandlingCommand = true;
-		DWORD now = GetTickCount();
-		if (it->second == lastCommand && now - lastCommandTime < 500)
+		if (it->second->gaccel.accel.cmd == lastCommand &&
+				GetTickCount() - lastCommandTime < 500) {
 			++lastCommandRepeatCount;
-		else
+		} else {
 			lastCommandRepeatCount = 0;
-		lastCommandTime = now;
+		}
 		it->second->execute(it->second);
-		lastCommand = it->second;
+		lastCommand = it->second->gaccel.accel.cmd;
+		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
 		return true;
 	} else if (isShortcutHelpEnabled) {
@@ -2887,9 +3365,18 @@ bool handleMainCommandFallback(int command, int flag) {
 	return false;
 }
 
+IReaperControlSurface* surface = nullptr;
+
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
 void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+#ifdef _WIN32
+	initializeUia();
+#endif
+	surface = createSurface();
+	plugin_register("csurf_inst", (void*)surface);
+	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
+		"NF_GetSWSTrackNotes");
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
 		if (cmd)
@@ -2915,6 +3402,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// Give these objects a non-generic role so NVDA doesn't fall back to
 			// screen scraping, which causes spurious messages to be reported.
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
+		}
+
+		if (isMidiEditorEventListView(hwnd)) {
+			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
@@ -2957,9 +3448,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+		} else if (childId > CHILDID_SELF) {
+			maybeReportFxChainBypassDelayed();
 		} else {
-			maybeReportFxChainBypass()
-				|| maybeAnnotatePreferenceDescription();
+			maybeAnnotatePreferenceDescription();
 		}
 	}
 }
@@ -2983,8 +3475,6 @@ void annotateSpuriousDialogs(HWND hwnd) {
 
 #endif // _WIN32
 
-IReaperControlSurface* surface = nullptr;
-
 extern "C" {
 
 REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
@@ -2999,8 +3489,9 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		resetTimeCache();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK)
+		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
 			return 0;
+		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
@@ -3011,8 +3502,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 
-		for (int i = 0; MIDI_POST_COMMANDS[i].cmd; ++i) {
-			midiPostCommandsMap.insert(make_pair(MIDI_POST_COMMANDS[i].cmd, MIDI_POST_COMMANDS[i].execute));
+		for (auto &midiPostCommand: MIDI_POST_COMMANDS) {
+			midiPostCommandsMap.insert(make_pair(midiPostCommand.cmd, midiPostCommand.execute));
+			if (midiPostCommand.supportedInMidiEventList) {
+				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
+			}
 		}
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
@@ -3039,10 +3533,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		// Register hookcommand as well so custom actions at least work for the main section.
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
-		surface = createSurface();
-		rec->Register("csurf_inst", (void*)surface);
 		registerExports(rec);
-		SetTimer(NULL, NULL, 0, delayedInit);
+		SetTimer(nullptr, 0, 0, delayedInit);
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
 #endif
@@ -3054,6 +3546,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		UnhookWindowsHookEx(keyboardHook);
 		UnhookWinEvent(winEventHook);
+		terminateUia();
 		accPropServices->Release();
 #else
 		NSA11yWrapper::destroy();

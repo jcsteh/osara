@@ -5,8 +5,13 @@
 # License: GNU General Public License version 2.0
 
 Import("env")
-env.Append(CPPPATH=("#include", "#include/WDL"))
 
+env.Textfile(target="buildVersion.h", source=[
+	'const char OSARA_VERSION[] = "$version";',
+	'const char OSARA_COPYRIGHT[] = "$copyright";',
+]);
+
+env.Append(CPPPATH=(".", "#include", "#include/WDL"))
 sources = [
 	"reaper_osara.cpp",
 	"paramsUi.cpp",
@@ -15,15 +20,17 @@ sources = [
 	"envelopeCommands.cpp",
 	"controlSurface.cpp",
 	"exports.cpp",
+	"fxChain.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CPPFLAGS="/EHsc")
+	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX")
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
 	sources.extend((
+		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
 		env.RES("reaper_osara.rc"),
 	))
@@ -35,21 +42,25 @@ if env["PLATFORM"] == "win32":
 		"Shell32",
 		"Comdlg32",
 		"Advapi32",
+		"UIAutomationCore",
 	]
 
 else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	# Build a universal binary with both 32 and 64 bit.
-	archFlags = ("-arch", "i386", "-arch", "x86_64")
-	env.Append(CXXFLAGS=archFlags, LINKFLAGS=archFlags)
-	env.Append(CXXFLAGS=("-stdlib=libc++", "-std=c++17"))
+	coreFlags = "-mmacosx-version-min=10.7 -stdlib=libc++"
+	cxxFlags = coreFlags + " -std=c++17 -Werror"
+	env.Append(CXXFLAGS=cxxFlags)
+	env.Append(LINKFLAGS=coreFlags)
 	# SWELL files.
-	sources.extend(swellDir.File(f) for f in (
-		"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
-		"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
-		"swell-wnd.mm", "swell-modstub.mm",
+	sources.extend(
+		# Disable warnings for SWELL, since we don't have any control over those.
+		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + " -Wno-everything")
+		for f in (
+			"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
+			"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
+			"swell-wnd.mm", "swell-modstub.mm",
 	))
 	sources.append("osxa11y.mm")
 	libs = []

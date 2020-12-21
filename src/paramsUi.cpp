@@ -66,6 +66,8 @@ class ParamProvider {
 	ParamProvider(const string displayName): displayName(displayName) {
 	}
 
+	virtual ~ParamProvider() = default;
+
 	virtual unique_ptr<Param> makeParam() = 0;
 
 	const string displayName;
@@ -108,7 +110,7 @@ class ReaperObjParamSource: public ParamSource {
 	public:
 
 	int getParamCount() {
-		return this->params.size();
+		return (int)this->params.size();
 	}
 
 	string getParamName(int param) {
@@ -277,6 +279,10 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 };
 
+const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
+
+bool isParamsDialogOpen = false;
+
 class ParamsDialog {
 	private:
 	unique_ptr<ParamSource> source;
@@ -370,6 +376,27 @@ class ParamsDialog {
 		this->updateValue();
 	}
 
+	void saveWindowPos() {
+		RECT rect;
+		GetWindowRect(this->dialog, &rect);
+		ostringstream s;
+		s << rect.left << " " << rect.top << " " <<
+			(rect.right - rect.left) << " " << (rect.bottom - rect.top);
+		SetExtState(CONFIG_SECTION, CFGKEY_DIALOG_POS, s.str().c_str(), true);
+	}
+
+	void restoreWindowPos() {
+		const char* config = GetExtState(CONFIG_SECTION, CFGKEY_DIALOG_POS);
+		if (!config[0]) {
+			return;
+		}
+		istringstream s(config);
+		int x, y, w, h;
+		s >> x >> y >> w >> h;
+		SetWindowPos(this->dialog, nullptr, x, y, w, h,
+			SWP_NOACTIVATE | SWP_NOZORDER);
+	}
+
 	static INT_PTR CALLBACK dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
@@ -384,12 +411,14 @@ class ParamsDialog {
 					dialog->onValueEdited();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
+					dialog->saveWindowPos();
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
 				}
 				break;
 			case WM_CLOSE:
+				dialog->saveWindowPos();
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
@@ -435,6 +464,7 @@ class ParamsDialog {
 
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
+		isParamsDialogOpen = false;
 	}
 
 	bool shouldIncludeParam(string name) {
@@ -462,7 +492,7 @@ class ParamsDialog {
 			this->visibleParams.push_back(p);
 			ComboBox_AddString(this->paramCombo, name.c_str());
 			if (p == prevSelParam)
-				newComboSel = this->visibleParams.size() - 1;
+				newComboSel = (int)this->visibleParams.size() - 1;
 		}
 		ComboBox_SetCurSel(this->paramCombo, newComboSel);
 		if (this->visibleParams.empty()) {
@@ -477,6 +507,8 @@ class ParamsDialog {
 		char rawText[100];
 		GetDlgItemText(this->dialog, ID_PARAM_FILTER, rawText, sizeof(rawText));
 		string text = rawText;
+		// We want to match case insensitively, so convert to lower case.
+		transform(text.begin(), text.end(), text.begin(), ::tolower);
 		if (this->filter.compare(text) == 0)
 			return; // No change.
 		this->filter = text;
@@ -509,7 +541,9 @@ class ParamsDialog {
 		plugin_register("accelerator", &this->accelReg);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->updateParamList();
+		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
+		isParamsDialogOpen = true;
 	}
 
 };
@@ -741,10 +775,10 @@ class TrackParams: public ReaperObjParamSource {
 				GetTCPFXParm(nullptr, track, i, &fx, &param);
 				ostringstream displayName;
 				char name[256];
-				TrackFX_GetFXName(track, fx, name, sizeof(name));
-				displayName << name << " ";
 				TrackFX_GetParamName(track, fx, param, name, sizeof(name));
 				displayName << name;
+				TrackFX_GetFXName(track, fx, name, sizeof(name));
+				displayName << " (" << name << ")";
 				this->params.push_back(make_unique<TcpFxParamProvider>(displayName.str(),
 					*this->fxParams, fx, param));
 			}
@@ -877,7 +911,7 @@ FxList listFx(MediaItem_Take* track) {
 template<typename ReaperObj>
 void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	const auto fxList = listFx(obj);
-	const int fxCount = fxList.size();
+	const size_t fxCount = fxList.size();
 	int fx = -1;
 	if (fxCount == 0) {
 		outputMessage("No FX");
@@ -889,13 +923,13 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 		HMENU effects = CreatePopupMenu();
 		MENUITEMINFO itemInfo;
 		itemInfo.cbSize = sizeof(MENUITEMINFO);
-		for (int f = 0; f < fxCount; ++f) {
+		for (size_t f = 0; f < fxCount; ++f) {
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = fxList[f].first + 1;
 			itemInfo.dwTypeData = (char*)fxList[f].second.c_str();
-			itemInfo.cch = fxList[f].second.length();
-			InsertMenuItem(effects, f, true, &itemInfo);
+			itemInfo.cch = (UINT)fxList[f].second.length();
+			InsertMenuItem(effects, (UINT)f, true, &itemInfo);
 		}
 		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
 		DestroyMenu(effects);

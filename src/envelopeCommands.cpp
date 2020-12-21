@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2018 NV Access Limited, James Teh
+ * Copyright 2015-2020 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -12,6 +12,9 @@
 #include <tuple>
 #include <regex>
 #include <functional>
+#include <set>
+#include <algorithm>
+#include <optional>
 #include "osara.h"
 
 using namespace std;
@@ -152,7 +155,9 @@ int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	return numSel;
 }
 
-void moveToEnvelopePoint(int direction, bool clearSelection=true) {
+optional<int> currentEnvelopePoint{};
+
+void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
 	TrackEnvelope* envelope;
 	double offset;
 	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
@@ -174,10 +179,10 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
 	time += offset;
 	if ((direction == 1 && time < now)
-		// If this point is at the cursor, skip it only if it's selected.
+		// If this point is at the cursor, skip it only if it's the current point.
 		// This allows you to easily get to a point at the cursor
 		// while still allowing you to move beyond it once you do.
-		|| (direction == 1 && selected && time == now)
+		|| (direction == 1 && point == currentEnvelopePoint && time == now)
 		// Moving backward should skip the point at the cursor.
 		|| (direction == -1 && time >= now)
 	) {
@@ -192,9 +197,13 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	if (direction != 0 && direction == 1 ? time < now : time > now)
 		return; // No point in this direction.
 	fakeFocus = FOCUS_ENVELOPE;
-	if (clearSelection)
+	currentEnvelopePoint.emplace(point);
+	if (clearSelection) {
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
-	SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+		isSelectionContiguous = true;
+	}
+	if(select)
+		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
 	ostringstream s;
@@ -202,14 +211,30 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true) {
 	char out[64];
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
 	s << out;
-	if (!clearSelection) {
+	bool isSelected;
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
+	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
 		if (numSel > 1)
 			s << " selected";
+	} else {
+		s << " unselected ";
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
+}
+
+optional<bool> toggleCurrentEnvelopePointSelection() {
+	TrackEnvelope* envelope = GetSelectedEnvelope(0);
+	if (!envelope || !currentEnvelopePoint)
+		return nullopt;
+	bool isSelected;
+	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
+		return nullopt;
+	isSelected = !isSelected;
+	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	return {isSelected};
 }
 
 void cmdInsertEnvelopePoint(Command* command) {
@@ -225,19 +250,10 @@ void cmdInsertEnvelopePoint(Command* command) {
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
 void cmdhSelectEnvelope(int direction) {
-	// If we're focused on a track or item, use the envelopes associated therewith.
-	// If we're focused on an envelope, use what we last used.
-	// This is necessary because the first envelope selection will focus the envelope
-	// and we want to allow the user to move past the first.
-	if (fakeFocus == FOCUS_TRACK)
-		selectedEnvelopeIsTake = false;
-	else if (fakeFocus == FOCUS_ITEM)
-		selectedEnvelopeIsTake = true;
-	else if (fakeFocus != FOCUS_ENVELOPE && fakeFocus != FOCUS_AUTOMATIONITEM)
-		return; // No envelopes for focus.
 	MediaTrack* track = NULL;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
+	// selectedEnvelopeIsTake is set when focus changes to track or item.
 	if (selectedEnvelopeIsTake) {
 		MediaItem* item = GetSelectedMediaItem(0, 0);
 		if (!item)
@@ -295,14 +311,19 @@ void cmdhSelectEnvelope(int direction) {
 			}
 		}
 		env = getEnvelope(index);
-		char state[100];
+		char state[200];
 		GetEnvelopeStateChunk(env, state, sizeof(state), false);
 		regex_search(state, m, RE_ENVELOPE_STATE);
+		bool invisible = !m.empty() && m.str(4)[0] == '0';
 		if (env == origEnv) {
 			// We're back where we started. Don't try to go any further.
+			if (invisible) {
+				// This envelope is now invisible, so don't report it.
+				env = nullptr;
+			}
 			break;
 		}
-		if (!m.empty() && m.str(4)[0] == '0')
+		if (invisible)
 			continue; // Invisible, so skip.
 		break; // We found our envelope!
 	}
@@ -313,7 +334,9 @@ void cmdhSelectEnvelope(int direction) {
 
 	SetCursorContext(2, env);
 	currentAutomationItem = -1;
+	currentEnvelopePoint.reset();
 	fakeFocus = FOCUS_ENVELOPE;
+	shouldMoveToAutoItem = true;
 	ostringstream s;
 	if (!m.empty() && m.str(1).compare("AUX") == 0) {
 		// Send envelope. Get the name of the send.
@@ -351,19 +374,19 @@ void cmdSelectPreviousEnvelope(Command* command) {
 }
 
 void cmdMoveToNextEnvelopePoint(Command* command) {
-	moveToEnvelopePoint(1);
+	moveToEnvelopePoint(1, true, true);
 }
 
 void cmdMoveToPrevEnvelopePoint(Command* command) {
-	moveToEnvelopePoint(-1);
+	moveToEnvelopePoint(-1, true, true);
 }
 
 void cmdMoveToNextEnvelopePointKeepSel(Command* command) {
-	moveToEnvelopePoint(1, false);
+	moveToEnvelopePoint(1, false, isSelectionContiguous);
 }
 
 void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
-	moveToEnvelopePoint(-1, false);
+	moveToEnvelopePoint(-1, false, isSelectionContiguous);
 }
 
 void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) {
@@ -451,7 +474,14 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		// Report the automation item.
 		fakeFocus = FOCUS_AUTOMATIONITEM;
 		ostringstream s;
-		s << "Auto " << i + 1;
+		s << "Auto ";
+		char name[500];
+		GetSetAutomationItemInfo_String(envelope, i, "P_POOL_NAME", name, false);
+		if (name[0]) {
+			s << name;
+		} else {
+			s << i + 1;
+		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
 			if (countSelectedAutomationItems(envelope, true) > 1) {
@@ -484,7 +514,7 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	}
 	ostringstream s;
 	int count;
-	if (count = countSelectedAutomationItems(envelope)) {
+	if ((count = countSelectedAutomationItems(envelope))) {
 		s << count << (count == 1 ? " automation item" : " automation items");
 	} else {
 		count = countSelectedEnvelopePoints(envelope);
@@ -494,20 +524,26 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	outputMessage(s);
 }
 
-void reportToggleTrackEnvelope(char* envType) {
+bool isEnvelopeVisible(TrackEnvelope* envelope) {
+	char state[200];
+	GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
+	cmatch m;
+	regex_search(state, m, RE_ENVELOPE_STATE);
+	return !m.empty() && m.str(4)[0] == '1';
+}
+
+void reportToggleTrackEnvelope(const char* envType) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		return;
 	}
-	bool visible = false;
-	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV", envType);
-	if (envelope) {
-		char state[100];
-		GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
-		cmatch m;
-		regex_search(state, m, RE_ENVELOPE_STATE);
-		visible =  !m.empty() && m.str(4)[0] == '1';
+	if (!isTrackSelected(track)) {
+		outputMessage("track not selected");
+		return;
 	}
+	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
+		(void*)envType);
+	bool visible = envelope && isEnvelopeVisible(envelope);
 	ostringstream s;
 	s << (visible ? "showed " : "hid ");
 	char name[50];
@@ -522,4 +558,55 @@ void postToggleTrackVolumeEnvelope(int command) {
 
 void postToggleTrackPanEnvelope(int command) {
 	reportToggleTrackEnvelope("<PANENV2");
+}
+
+set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
+	set<TrackEnvelope*> envelopes;
+	int count = CountTrackEnvelopes(track);
+	for (int i = 0; i < count; ++i) {
+		TrackEnvelope* env = GetTrackEnvelope(track, i);
+		if (isEnvelopeVisible(env)) {
+			envelopes.emplace(env);
+		}
+	}
+	return envelopes;
+}
+
+void cmdToggleTrackEnvelope(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
+	ostringstream s;
+	if (after.size() == before.size()) {
+		outputMessage("no envelopes toggled");
+		return;
+	}
+	if (after.size() > before.size()) {
+		s << "showed ";
+	} else {
+		s << "hid ";
+	}
+	set<TrackEnvelope*> difference;
+	set_symmetric_difference(before.begin(), before.end(),
+		after.begin(), after.end(), inserter(difference, difference.end()));
+	TrackEnvelope* envelope = *difference.begin();
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	s << name << " envelope";
+	outputMessage(s);
+}
+
+void postSelectMultipleEnvelopePoints(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int count = countSelectedEnvelopePoints(envelope);
+	ostringstream s;
+	s << count << (count == 1 ? " point" : " points") << " selected";
+	outputMessage(s);
 }
