@@ -781,10 +781,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-// We cache the last reported control so we can report just the components which have changed.
-int oldControl = -1;
-
-void moveToCC(int direction, bool clearSelection=true, bool select=true, bool useCache=true) {
+void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto cc = findCC(take, direction);
@@ -808,10 +805,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	if (!useCache || cc.control != oldControl) {
-		s << getMidiControlName(take, cc.control, cc.channel) << ", ";
-		oldControl = cc.control;
-	}
+	s << getMidiControlName(take, cc.control, cc.channel) << ", ";
 	s << cc.value;
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << "unselected" << " ";
