@@ -1907,9 +1907,12 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			sendMenu(window);
 			return 1;
 		}
-	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
-		&& !(lParam & 0x80000000) // Key down
-		&& isListView(focus)
+	} else if (
+		(wParam == VK_APPS ||
+			(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000) ||
+			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000)) &&
+		!(lParam & 0x80000000) && // Key down
+		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
@@ -1919,8 +1922,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			POINT point = {rect.left + 10, rect.top + 10};
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
-			if (wParam == VK_APPS) {
-				// Applications key right clicks.
+			if (wParam == VK_APPS || wParam == VK_F10) {
+				// Applications/f10 key right clicks.
 				mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 				mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
 			} else {
