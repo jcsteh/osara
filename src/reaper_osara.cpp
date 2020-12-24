@@ -3036,8 +3036,6 @@ void cmdTransientDetectionSettings(Command* command) {
 void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
-const int MAIN_SECTION = 0;
-const int MIDI_EVENT_LIST_SECTION = 32061;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
