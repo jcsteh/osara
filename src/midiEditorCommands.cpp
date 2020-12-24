@@ -20,11 +20,14 @@
 
 using namespace std;
 
+// Note: while the below struct is called MidiControlChange in line with naming in Reaper,
+// It is also used for other MIDI messages.
 typedef struct {
 	int channel;
 	int index;
-	int control;
-	int value;
+	int message1;
+	int message2;
+	int message3;
 	double position;
 } MidiControlChange;
 
@@ -428,9 +431,9 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	}
 	int movement = direction == 0 ? 1 : direction;
 	bool found = false;
-	int chan, control, value;
+	int chan, msg1, msg2, msg3;
 	for (; 0 <= start && start < count; start += movement) {
-		MIDI_GetCC(take, start, NULL, NULL, &position, NULL, &chan, &control, &value);
+		MIDI_GetCC(take, start, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
 		if (movement == -1 ? position <= cursor : position >= cursor) {
 			currentCC = start;
@@ -441,7 +444,7 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	if (!found) {
 		return {-1};
 	}
-	return {chan, currentCC, control, value, position};
+	return {chan, currentCC, msg1, msg2, msg3, position};
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
@@ -463,10 +466,10 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 			break;
 		}
 		double position;
-		int chan, control, value;
-		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
+		int chan, msg1, msg2, msg3;
+		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, control, value, position});
+		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
 	}
 	return ccs;
 }
@@ -805,8 +808,8 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	s << getMidiControlName(take, cc.control, cc.channel) << ", ";
-	s << cc.value;
+	s << getMidiControlName(take, cc.message2, cc.channel) << ", ";
+	s << cc.message3;
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << "unselected" << " ";
 	}
@@ -1330,7 +1333,7 @@ void postMidiChangeCCValue(int command) {
 		}
 	} else{ 
 		auto cc = *selectedCCs.cbegin();
-		s << cc.value;
+		s << cc.message3;
 	}
 	outputMessage(s);
 }
