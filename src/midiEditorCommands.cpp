@@ -165,6 +165,9 @@ bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+		return;
+	}
 	if (!previewReg.src) {
 		// Initialise preview.
 #ifdef _WIN32
@@ -236,7 +239,9 @@ void cmdMidiMoveCursor(Command* command) {
 	}
 	auto count = notes.size();
 	if (count > 0) {
-		previewNotes(take, notes);
+		if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
+			previewNotes(take, notes);
+		}
 		fakeFocus = FOCUS_NOTE;
 		s << " " << count << (count == 1 ? " note" : " notes");
 	}
@@ -545,7 +550,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			selectNote(take, note);
 		notes.push_back({chan, pitch, vel, 0, start, end});
 	}
-	previewNotes(take, notes);
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
+		previewNotes(take, notes);
+	}
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
@@ -584,9 +591,12 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 		isSelectionContiguous = true;
 	}
-	if (select)
+	if (select) {
 		selectNote(take, note.index);
-	previewNotes(take, {note});
+	}
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
+		previewNotes(take, {note});
+	}
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (shouldReportNotes) {
@@ -625,7 +635,9 @@ void postMidiMovePitchCursor(int command) {
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes(take, {{chan, pitch, vel}});
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
+		previewNotes(take, {{chan, pitch, vel}});
+	}
 	if (shouldReportNotes) {
 		outputMessage(getMidiNoteName(take, pitch, chan));
 	}
@@ -654,8 +666,10 @@ void cmdMidiInsertNote(Command* command) {
 		return;
 	}
 	auto& note = *it;
-	// Play the inserted note.
-	previewNotes(take, {note});
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
+		// Play the inserted note.
+		previewNotes(take, {note});
+	}
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (shouldReportNotes) {
@@ -997,6 +1011,9 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 void maybePreviewCurrentNoteInEventList(HWND hwnd) {
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+		return;
+	}
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	char text[50] = "\0";
 	// Get the text from the length column (2).
@@ -1049,6 +1066,7 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	note.velocity = atoi(text);
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// As this whole function deals with previewing, check against REAPER's preview toggle is performed earlier.
 	previewNotes(take, {note});
 }
 
@@ -1140,7 +1158,7 @@ void postMidiChangeLength(int command) {
 			));
 		}
 	}
-	if (!generalize) {
+	if (!generalize && GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
 		previewNotes(take, selectedNotes);
 	}
 	if (shouldReportNotes) {
@@ -1263,7 +1281,7 @@ void postMidiMoveStart(int command) {
 		selectedNotes.begin(), selectedNotes.end(),
 		[firstStart](MidiNote n) { return firstStart != n.start; }
 		);
-	if (!generalize) {
+	if (!generalize && GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {
 		previewNotes(take, selectedNotes);
 	}
 	if (shouldReportNotes) {

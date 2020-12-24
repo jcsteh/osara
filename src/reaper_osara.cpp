@@ -2994,8 +2994,6 @@ void cmdTransientDetectionSettings(Command* command) {
 void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
-const int MAIN_SECTION = 0;
-const int MIDI_EVENT_LIST_SECTION = 32061;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
@@ -3411,7 +3409,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
 		}
 
-		if (isMidiEditorEventListView(hwnd)) {
+		if (isMidiEditorEventListView(hwnd) && GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {
 			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
