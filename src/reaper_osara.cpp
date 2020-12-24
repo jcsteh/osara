@@ -1890,28 +1890,32 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	HWND focus = GetFocus();
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	HWND window;
-	if (wParam == VK_APPS && lParam & 0x80000000) {
-		if (isTrackViewWindow(focus)) {
-			// Reaper doesn't handle the applications key for these windows.
-			// Display the appropriate context menu depending on fakeFocus.
-			if (GetKeyState(VK_CONTROL) & 0x8000) {
-				showReaperContextMenu(1);
-			} else if (GetKeyState(VK_MENU) & 0x8000) {
-				showReaperContextMenu(2);
-			} else {
-				showReaperContextMenu(0);
-			}
-			return 1;
-		} else if (window = getSendContainer(focus)) {
-			sendMenu(window);
-			return 1;
+	const bool isKeyDown = !(lParam & 0x80000000);
+	if (wParam == VK_APPS && isKeyDown && isTrackViewWindow(focus)) {
+		// Reaper doesn't handle the applications key for these windows and it
+		// doesn't work even when bound to an action. (Shift+f10 is handled by
+		// action bindings.)
+		// Display the appropriate context menu depending on fakeFocus.
+		if (GetKeyState(VK_CONTROL) & 0x8000) {
+			showReaperContextMenu(1);
+		} else if (GetKeyState(VK_MENU) & 0x8000) {
+			showReaperContextMenu(2);
+		} else {
+			showReaperContextMenu(0);
 		}
-	} else if (
-		(wParam == VK_APPS ||
-			(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000) ||
-			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000)) &&
-		!(lParam & 0x80000000) && // Key down
+		return 1;
+	}
+	const bool isContextMenu = isKeyDown && (
+		wParam == VK_APPS ||
+		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000));
+	HWND window;
+	if (isContextMenu && (window = getSendContainer(focus))) {
+		sendMenu(window);
+		return 1;
+	}
+	if (
+		(isContextMenu ||
+			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000 && isKeyDown)) &&
 		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
@@ -1935,13 +1939,13 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			return 1;
 		}
-	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
+	} else if (wParam == VK_F6 && isKeyDown) {
 		if (maybeSwitchToFxPluginWindow())
 			return 1;
-	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
+	} else if (wParam == 'B' && isKeyDown &&
 			GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
-	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
+	} else if (wParam == VK_TAB && isKeyDown &&
 			!(GetKeyState(VK_MENU) & 0x8000)) {
 		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
 		if (maybeFixTabInSaveDialog(shift)) {
@@ -1950,7 +1954,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
 			return 1;
 		}
-	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
+	} else if (wParam == VK_DOWN && isKeyDown &&
 			GetKeyState(VK_MENU) & 0x8000 && !(GetKeyState(VK_SHIFT) & 0x8000) &&
 			!(GetKeyState(VK_CONTROL) & 0x8000)) {
 		// Alt+downArrow.
