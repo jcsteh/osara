@@ -694,12 +694,39 @@ void postCycleTrackFolderCollapsed(int command) {
 	outputMessage(getFolderCompacting(track));
 }
 
+int findRegionEndingAt(double wantedEndPos) {
+	double start = wantedEndPos;
+	for (; ;) {
+		if (start == 0) {
+			return -1;
+		}
+		// GetLastMarkerAndCurRegion doesn't return a region at its end position,
+		// so subtract a bit.
+		double tempPos = max(start - 0.001, 0);
+		int region;
+		GetLastMarkerAndCurRegion(nullptr, tempPos, nullptr, &region);
+		if (region < 0) {
+			return -1;
+		}
+		double end;
+		EnumProjectMarkers(region, nullptr, &start, &end, nullptr, nullptr);
+		if (end == wantedEndPos) {
+			return region;
+		}
+		// If there are overlapping regions, GetLastMarkerAndCurRegion will return
+		// the region which starts nearest to the given position. There might be a
+		// region which starts earlier but ends earlier. The next iteration will
+		// try the region just prior to this region's start position.
+	}
+	return -1;
+}
+
 void postGoToMarker(int command) {
 	ostringstream s;
 	int marker, region;
 	double markerPos;
 	double cursorPos = GetCursorPosition();
-	GetLastMarkerAndCurRegion(0, cursorPos, &marker, &region);
+	GetLastMarkerAndCurRegion(nullptr, cursorPos, &marker, &region);
 	const char* name;
 	int number;
 	if (marker >= 0) {
@@ -712,15 +739,30 @@ void postGoToMarker(int command) {
 				s << "marker " << number << " ";
 		}
 	}
-	if (region >= 0) {
-		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
-		fakeFocus = FOCUS_REGION;
-		if (name[0])
-			s << name << " region ";
-		else
-			s << "region " << number << " ";
-	}
 	double start, end;
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, &start, &end, &name, &number);
+		if (start == cursorPos) {
+			fakeFocus = FOCUS_REGION;
+			if (name[0]) {
+				s << name << " region ";
+			} else {
+				s << "region " << number << " ";
+			}
+			s << "start ";
+		}
+	}
+	region = findRegionEndingAt(cursorPos);
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
+		fakeFocus = FOCUS_REGION;
+		if (name[0]) {
+			s << name << " region ";
+		} else {
+			s << "region " << number << " ";
+		}
+		s << "end ";
+	}
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start != end) {
 		if (cursorPos == start)
