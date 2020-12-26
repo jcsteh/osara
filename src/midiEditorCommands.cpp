@@ -770,8 +770,8 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
-	const char* controlName = GetTrackMIDINoteName(tracknumber - 1, 128 + control, channel); // track number is zero based, controls start at 128
 	ostringstream s;
+	const char* controlName = GetTrackMIDINoteName(tracknumber - 1, 128 + control, channel); // track number is zero based, controls start at 128
 	s << control;
 	if (controlName) {
 		s << " (" << controlName << ")";
@@ -808,8 +808,23 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	s << getMidiControlName(take, cc.message2, cc.channel) << ", ";
-	s << cc.message3;
+	if (cc.message1 == 0xA0) {
+		s << "Poly Aftertouch ";
+		// Note: separate the note and value with two spaces to avoid treatment as thausands separator.
+		s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
+		s << cc.message3;
+	} else if (cc.message1 == 0xB0) {
+		s << "Control ";
+		s << getMidiControlName(take, cc.message2, cc.channel) << ", ";
+		s << cc.message3;
+	} else if (cc.message1 == 0xC0) {
+		s << "Program " << cc.message2;
+	} else if (cc.message1 == 0xD0) {
+		s << "Channel pressure " << cc.message2;
+	} else if (cc.message1 == 0xE0) {
+		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+		s << "Pitchhhh Bend " << pitchBendValue;
+	}
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << "unselected" << " ";
 	}
@@ -1316,7 +1331,7 @@ void postMidiChangeCCValue(int command) {
 	}
 	ostringstream s;
 	if (count > 1) {
-		s << count << " control values ";
+		s << count << " values ";
 		switch (command) {
 			case 40676: {
 				s << "increased";
@@ -1333,7 +1348,18 @@ void postMidiChangeCCValue(int command) {
 		}
 	} else{ 
 		auto cc = *selectedCCs.cbegin();
-		s << cc.message3;
+		if (cc.message1 == 0xA0) {
+			// Note: separate the note and value with two spaces to avoid treatment as thausands separator.
+			s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
+			s << cc.message3;
+		} else if (cc.message1 == 0xB0) {
+			s << cc.message3;
+		} else if (cc.message1 == 0xC0 || cc.message1 == 0xD0) {
+			s << cc.message2;
+		} else if (cc.message1 == 0xE0) {
+			auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+			s << pitchBendValue;
+		}
 	}
 	outputMessage(s);
 }
