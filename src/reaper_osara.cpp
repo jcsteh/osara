@@ -3409,7 +3409,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
 		}
 
-		if (isMidiEditorEventListView(hwnd) && GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {
+		if (isMidiEditorEventListView(hwnd)) {
 			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
