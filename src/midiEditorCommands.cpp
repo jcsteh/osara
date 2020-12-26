@@ -168,7 +168,7 @@ bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
-	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
 		return;
 	}
 	if (!previewReg.src) {
@@ -1019,7 +1019,7 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 void maybePreviewCurrentNoteInEventList(HWND hwnd) {
-	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
 		return;
 	}
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
