@@ -619,7 +619,6 @@ The dialog contains the following options:
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
- Currently, the only parameter changes supported are track FX parameters, but this may be expanded in future.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
