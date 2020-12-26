@@ -810,7 +810,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	s << formatCursorPosition(TF_MEASURE) << " ";
 	if (cc.message1 == 0xA0) {
 		s << "Poly Aftertouch ";
-		// Note: separate the note and value with two spaces to avoid treatment as thausands separator.
+		// Note: separate the note and value with two spaces to avoid treatment as thousands separator.
 		s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
 		s << cc.message3;
 	} else if (cc.message1 == 0xB0) {
