@@ -194,6 +194,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Markers: Go to marker 08: 8
 - Markers: Go to marker 09: 9
 - Markers: Go to marker 10: 0
+- Markers: Insert marker at current position: m
 - Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
 - Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
 - Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
@@ -204,6 +205,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Regions: Go to region 08 after current region finishes playing (smooth seek): Alt+8
 - Regions: Go to region 09 after current region finishes playing (smooth seek): Alt+9
 - Regions: Go to region 10 after current region finishes playing (smooth seek): Alt+0
+- Markers: Insert region from time selection: shift+r
 
 #### Time Signature/Tempo Markers
 - Move edit cursor to previous tempo or time signature change: Shift+;
@@ -610,6 +612,7 @@ The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report time movement during playback/recording: When disabled, OSARA will not report actions during playback/recording which move the cursor or adjust positions or lengths.
+ Although not strictly time movement, this also includes inserting markers or regions.
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
 - Report markers during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
 - Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.

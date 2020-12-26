@@ -3032,6 +3032,68 @@ void cmdTransientDetectionSettings(Command* command) {
 	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
 }
 
+void cmdInsertMarker(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
+		return; // Not inserted.
+	}
+	int marker;
+	GetLastMarkerAndCurRegion(nullptr, GetCursorPosition(), &marker, nullptr);
+	if (marker < 0) {
+		return;
+	}
+	int number;
+	EnumProjectMarkers(marker, nullptr, nullptr, nullptr, nullptr, &number);
+	ostringstream s;
+	s << "marker " << number << " inserted";
+	outputMessage(s);
+}
+
+void cmdInsertRegion(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int oldCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int newCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	if (newCount == oldCount) {
+		return; // Not inserted.
+	}
+	double selStart;
+	GetSet_LoopTimeRange(false, false, &selStart, nullptr, false);
+	int region;
+	GetLastMarkerAndCurRegion(nullptr, selStart, nullptr, &region);
+	if (region < 0) {
+		return;
+	}
+	// if there are multiple regions starting at the same position, REAPER might
+	// not return the region just added. Find the most recently added.
+	for (int m = region + 1; m < newCount; ++m) {
+		bool isRegion;
+		double start;
+		EnumProjectMarkers(m, &isRegion, &start, nullptr, nullptr, nullptr);
+		if (start > selStart) {
+			break;
+		}
+		assert(start == selStart);
+		if (!isRegion) {
+			continue;
+		}
+		region = m;
+	}
+	int number;
+	EnumProjectMarkers(region, nullptr, nullptr, nullptr, nullptr, &number);
+	ostringstream s;
+	s << "region " << number << " inserted";
+	outputMessage(s);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3090,6 +3152,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
+	{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
+	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
