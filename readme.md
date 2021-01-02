@@ -194,6 +194,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Markers: Go to marker 08: 8
 - Markers: Go to marker 09: 9
 - Markers: Go to marker 10: 0
+- Markers: Insert marker at current position: m
 - Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
 - Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
 - Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
@@ -204,6 +205,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Regions: Go to region 08 after current region finishes playing (smooth seek): Alt+8
 - Regions: Go to region 09 after current region finishes playing (smooth seek): Alt+9
 - Regions: Go to region 10 after current region finishes playing (smooth seek): Alt+0
+- Markers: Insert region from time selection: shift+r
 
 #### Time Signature/Tempo Markers
 - Move edit cursor to previous tempo or time signature change: Shift+;
@@ -401,18 +403,18 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track input, track area, track routing, item, ruler, envelope point and automation item context menus.
 
-To open the context menu for the element you are working with, press the applications key on Windows or Control+1 on Mac.
+To open the context menu for the element you are working with, press the applications key or shift+f10 on Windows, or Control+1 on Mac.
 For example, if you have just moved to a track, it will open the track input context menu for that track.
 If you have just moved the edit cursor, it will open the context menu for the ruler.
 
 For tracks, there are three context menus:
 
 1. Track input: Allows you to set the input to use when recording, etc.
- You access this by just pressing the applications key on Windows or Control+1 on Mac.
+ You access this by just pressing the applications key or shift+f10 on Windows, or Control+1 on Mac.
 2. Track area: Provides options for inserting, duplicating and removing tracks, etc.
- You access this by pressing control+applications on Windows or Control+2 on Mac.
+ You access this by pressing control+applications or control+shift+f10 on Windows, or Control+2 on Mac.
 3. Routing: Allows you to quickly add and remove sends, receives and outputs without opening the I/O window.
- You access this by pressing alt+applications on Windows or Control+3 on Mac.
+ You access this by pressing alt+applications or control+alt+shift+f10 on Windows, or Control+3 on Mac.
 
 ### Parameter Lists
 OSARA can display a list of parameters for various elements such as tracks, items and effects.
@@ -530,7 +532,7 @@ In the Track I/O window, there are various controls for each send, receive or ha
 Unfortunately, these controls cannot be reached with the tab key and it is tedious at best to access these with screen reader review functions.
 
 When you tab to the Delete button for a send/receive/output, the name of the send/receive/output will first be reported.
-You can then press the Applications key to access a menu of additional options.
+You can then press the Applications key or shift+f10 to access a menu of additional options.
 
 ### Manually Moving Stretch Markers
 REAPER includes actions to snap stretch markers to the grid.
@@ -610,13 +612,13 @@ The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report time movement during playback/recording: When disabled, OSARA will not report actions during playback/recording which move the cursor or adjust positions or lengths.
+ Although not strictly time movement, this also includes inserting markers or regions.
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
 - Report markers during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
 - Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
- Currently, the only parameter changes supported are track FX parameters, but this may be expanded in future.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 

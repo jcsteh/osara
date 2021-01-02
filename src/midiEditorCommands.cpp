@@ -20,11 +20,14 @@
 
 using namespace std;
 
+// Note: while the below struct is called MidiControlChange in line with naming in Reaper,
+// It is also used for other MIDI messages.
 typedef struct {
 	int channel;
 	int index;
-	int control;
-	int value;
+	int message1;
+	int message2;
+	int message3;
 	double position;
 } MidiControlChange;
 
@@ -198,6 +201,9 @@ bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 }
 
 void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
+	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+		return;
+	}
 	if (!previewReg.src) {
 		// Initialise preview.
 #ifdef _WIN32
@@ -457,9 +463,9 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	}
 	int movement = direction == 0 ? 1 : direction;
 	bool found = false;
-	int chan, control, value;
+	int chan, msg1, msg2, msg3;
 	for (; 0 <= start && start < count; start += movement) {
-		MIDI_GetCC(take, start, NULL, NULL, &position, NULL, &chan, &control, &value);
+		MIDI_GetCC(take, start, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
 		if (movement == -1 ? position <= cursor : position >= cursor) {
 			currentCC = start;
@@ -470,7 +476,7 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	if (!found) {
 		return {-1};
 	}
-	return {chan, currentCC, control, value, position};
+	return {chan, currentCC, msg1, msg2, msg3, position};
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
@@ -492,10 +498,10 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 			break;
 		}
 		double position;
-		int chan, control, value;
-		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, NULL, &chan, &control, &value);
+		int chan, msg1, msg2, msg3;
+		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, control, value, position});
+		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
 	}
 	return ccs;
 }
@@ -613,8 +619,9 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 		isSelectionContiguous = true;
 	}
-	if (select)
+	if (select) {
 		selectNote(take, note.index);
+	}
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
@@ -683,7 +690,7 @@ void cmdMidiInsertNote(Command* command) {
 		return;
 	}
 	auto& note = *it;
-	// Play the inserted note.
+	// Play the inserted note when preview is enabled.
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
@@ -796,8 +803,8 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
-	const char* controlName = GetTrackMIDINoteName(tracknumber - 1, 128 + control, channel); // track number is zero based, controls start at 128
 	ostringstream s;
+	const char* controlName = GetTrackMIDINoteName(tracknumber - 1, 128 + control, channel); // track number is zero based, controls start at 128
 	s << control;
 	if (controlName) {
 		s << " (" << controlName << ")";
@@ -810,10 +817,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-// We cache the last reported control so we can report just the components which have changed.
-int oldControl = -1;
-
-void moveToCC(int direction, bool clearSelection=true, bool select=true, bool useCache=true) {
+void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto cc = findCC(take, direction);
@@ -837,11 +841,23 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true, bool us
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	if (!useCache || cc.control != oldControl) {
-		s << getMidiControlName(take, cc.control, cc.channel) << ", ";
-		oldControl = cc.control;
+	if (cc.message1 == 0xA0) {
+		s << "Poly Aftertouch ";
+		// Note: separate the note and value with two spaces to avoid treatment as thousands separator.
+		s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
+		s << cc.message3;
+	} else if (cc.message1 == 0xB0) {
+		s << "Control ";
+		s << getMidiControlName(take, cc.message2, cc.channel) << ", ";
+		s << cc.message3;
+	} else if (cc.message1 == 0xC0) {
+		s << "Program " << cc.message2;
+	} else if (cc.message1 == 0xD0) {
+		s << "Channel pressure " << cc.message2;
+	} else if (cc.message1 == 0xE0) {
+		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+		s << "Pitchhhh Bend " << pitchBendValue;
 	}
-	s << cc.value;
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << "unselected" << " ";
 	}
@@ -1032,6 +1048,9 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 void maybePreviewCurrentNoteInEventList(HWND hwnd) {
+	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+		return;
+	}
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	char text[50] = "\0";
 	// Get the text from the length column (2).
@@ -1348,7 +1367,7 @@ void postMidiChangeCCValue(int command) {
 	}
 	ostringstream s;
 	if (count > 1) {
-		s << count << " control values ";
+		s << count << " values ";
 		switch (command) {
 			case 40676: {
 				s << "increased";
@@ -1365,7 +1384,18 @@ void postMidiChangeCCValue(int command) {
 		}
 	} else{ 
 		auto cc = *selectedCCs.cbegin();
-		s << cc.value;
+		if (cc.message1 == 0xA0) {
+			// Note: separate the note and value with two spaces to avoid treatment as thausands separator.
+			s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
+			s << cc.message3;
+		} else if (cc.message1 == 0xB0) {
+			s << cc.message3;
+		} else if (cc.message1 == 0xC0 || cc.message1 == 0xD0) {
+			s << cc.message2;
+		} else if (cc.message1 == 0xE0) {
+			auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+			s << pitchBendValue;
+		}
 	}
 	outputMessage(s);
 }

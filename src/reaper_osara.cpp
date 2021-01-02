@@ -694,12 +694,39 @@ void postCycleTrackFolderCollapsed(int command) {
 	outputMessage(getFolderCompacting(track));
 }
 
+int findRegionEndingAt(double wantedEndPos) {
+	double start = wantedEndPos;
+	for (; ;) {
+		if (start == 0) {
+			return -1;
+		}
+		// GetLastMarkerAndCurRegion doesn't return a region at its end position,
+		// so subtract a bit.
+		double tempPos = max(start - 0.001, 0);
+		int region;
+		GetLastMarkerAndCurRegion(nullptr, tempPos, nullptr, &region);
+		if (region < 0) {
+			return -1;
+		}
+		double end;
+		EnumProjectMarkers(region, nullptr, &start, &end, nullptr, nullptr);
+		if (end == wantedEndPos) {
+			return region;
+		}
+		// If there are overlapping regions, GetLastMarkerAndCurRegion will return
+		// the region which starts nearest to the given position. There might be a
+		// region which starts earlier but ends earlier. The next iteration will
+		// try the region just prior to this region's start position.
+	}
+	return -1;
+}
+
 void postGoToMarker(int command) {
 	ostringstream s;
 	int marker, region;
 	double markerPos;
 	double cursorPos = GetCursorPosition();
-	GetLastMarkerAndCurRegion(0, cursorPos, &marker, &region);
+	GetLastMarkerAndCurRegion(nullptr, cursorPos, &marker, &region);
 	const char* name;
 	int number;
 	if (marker >= 0) {
@@ -712,15 +739,30 @@ void postGoToMarker(int command) {
 				s << "marker " << number << " ";
 		}
 	}
-	if (region >= 0) {
-		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
-		fakeFocus = FOCUS_REGION;
-		if (name[0])
-			s << name << " region ";
-		else
-			s << "region " << number << " ";
-	}
 	double start, end;
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, &start, &end, &name, &number);
+		if (start == cursorPos) {
+			fakeFocus = FOCUS_REGION;
+			if (name[0]) {
+				s << name << " region ";
+			} else {
+				s << "region " << number << " ";
+			}
+			s << "start ";
+		}
+	}
+	region = findRegionEndingAt(cursorPos);
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
+		fakeFocus = FOCUS_REGION;
+		if (name[0]) {
+			s << name << " region ";
+		} else {
+			s << "region " << number << " ";
+		}
+		s << "end ";
+	}
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start != end) {
 		if (cursorPos == start)
@@ -1890,26 +1932,33 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	HWND focus = GetFocus();
 	if (!focus)
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	HWND window;
-	if (wParam == VK_APPS && lParam & 0x80000000) {
-		if (isTrackViewWindow(focus)) {
-			// Reaper doesn't handle the applications key for these windows.
-			// Display the appropriate context menu depending on fakeFocus.
-			if (GetKeyState(VK_CONTROL) & 0x8000) {
-				showReaperContextMenu(1);
-			} else if (GetKeyState(VK_MENU) & 0x8000) {
-				showReaperContextMenu(2);
-			} else {
-				showReaperContextMenu(0);
-			}
-			return 1;
-		} else if (window = getSendContainer(focus)) {
-			sendMenu(window);
-			return 1;
+	const bool isKeyDown = !(lParam & 0x80000000);
+	if (wParam == VK_APPS && isKeyDown && isTrackViewWindow(focus)) {
+		// Reaper doesn't handle the applications key for these windows and it
+		// doesn't work even when bound to an action. (Shift+f10 is handled by
+		// action bindings.)
+		// Display the appropriate context menu depending on fakeFocus.
+		if (GetKeyState(VK_CONTROL) & 0x8000) {
+			showReaperContextMenu(1);
+		} else if (GetKeyState(VK_MENU) & 0x8000) {
+			showReaperContextMenu(2);
+		} else {
+			showReaperContextMenu(0);
 		}
-	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
-		&& !(lParam & 0x80000000) // Key down
-		&& isListView(focus)
+		return 1;
+	}
+	const bool isContextMenu = isKeyDown && (
+		wParam == VK_APPS ||
+		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000));
+	HWND window;
+	if (isContextMenu && (window = getSendContainer(focus))) {
+		sendMenu(window);
+		return 1;
+	}
+	if (
+		(isContextMenu ||
+			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000 && isKeyDown)) &&
+		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
@@ -1919,8 +1968,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			POINT point = {rect.left + 10, rect.top + 10};
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
-			if (wParam == VK_APPS) {
-				// Applications key right clicks.
+			if (wParam == VK_APPS || wParam == VK_F10) {
+				// Applications/f10 key right clicks.
 				mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 				mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
 			} else {
@@ -1932,13 +1981,13 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			return 1;
 		}
-	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
+	} else if (wParam == VK_F6 && isKeyDown) {
 		if (maybeSwitchToFxPluginWindow())
 			return 1;
-	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
+	} else if (wParam == 'B' && isKeyDown &&
 			GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
-	} else if (wParam == VK_TAB && !(lParam & 0x80000000) &&
+	} else if (wParam == VK_TAB && isKeyDown &&
 			!(GetKeyState(VK_MENU) & 0x8000)) {
 		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
 		if (maybeFixTabInSaveDialog(shift)) {
@@ -1947,7 +1996,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
 			return 1;
 		}
-	} else if (wParam == VK_DOWN && !(lParam & 0x80000000) &&
+	} else if (wParam == VK_DOWN && isKeyDown &&
 			GetKeyState(VK_MENU) & 0x8000 && !(GetKeyState(VK_SHIFT) & 0x8000) &&
 			!(GetKeyState(VK_CONTROL) & 0x8000)) {
 		// Alt+downArrow.
@@ -2983,12 +3032,72 @@ void cmdTransientDetectionSettings(Command* command) {
 	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
 }
 
+void cmdInsertMarker(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
+		return; // Not inserted.
+	}
+	int marker;
+	GetLastMarkerAndCurRegion(nullptr, GetCursorPosition(), &marker, nullptr);
+	if (marker < 0) {
+		return;
+	}
+	int number;
+	EnumProjectMarkers(marker, nullptr, nullptr, nullptr, nullptr, &number);
+	ostringstream s;
+	s << "marker " << number << " inserted";
+	outputMessage(s);
+}
+
+void cmdInsertRegion(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int oldCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int newCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	if (newCount == oldCount) {
+		return; // Not inserted.
+	}
+	double selStart;
+	GetSet_LoopTimeRange(false, false, &selStart, nullptr, false);
+	int region;
+	GetLastMarkerAndCurRegion(nullptr, selStart, nullptr, &region);
+	if (region < 0) {
+		return;
+	}
+	// if there are multiple regions starting at the same position, REAPER might
+	// not return the region just added. Find the most recently added.
+	for (int m = region + 1; m < newCount; ++m) {
+		bool isRegion;
+		double start;
+		EnumProjectMarkers(m, &isRegion, &start, nullptr, nullptr, nullptr);
+		if (start > selStart) {
+			break;
+		}
+		assert(start == selStart);
+		if (!isRegion) {
+			continue;
+		}
+		region = m;
+	}
+	int number;
+	EnumProjectMarkers(region, nullptr, nullptr, nullptr, nullptr, &number);
+	ostringstream s;
+	s << "region " << number << " inserted";
+	outputMessage(s);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
-const int MAIN_SECTION = 0;
-const int MIDI_EVENT_LIST_SECTION = 32061;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
@@ -3043,6 +3152,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
+	{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
+	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
