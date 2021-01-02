@@ -3,7 +3,6 @@ version: "2021.1pre-{build}"
 branches:
  only:
   - master
-  - macOsTest
 
 environment:
  matrix:
