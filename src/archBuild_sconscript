@@ -49,7 +49,9 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	coreFlags = "-mmacosx-version-min=10.7 -stdlib=libc++"
+	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
+		"-arch x86_64 -arch arm64 "
+		"-isysroot /Applications/Xcode-12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 	cxxFlags = coreFlags + " -std=c++17 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
