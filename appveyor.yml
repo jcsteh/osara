@@ -1,4 +1,4 @@
-version: "2020.1pre-{build}"
+version: "2021.1pre-{build}"
 
 branches:
  only:
@@ -8,7 +8,7 @@ environment:
  matrix:
   - job_name: Windows
     appveyor_build_worker_image: Visual Studio 2019
-    PY_PYTHON: 3.7-32
+    PY_PYTHON: 3.9-32
   - job_name: Mac
     appveyor_build_worker_image: macos
  global:
@@ -50,7 +50,7 @@ install:
  - git submodule update --init
 
 build_script:
- - ps: If ($IsWindows) { $scons = "c:\python37\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.7/bin/scons" }
+ - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.9/bin/scons" }
  - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh"'
 
 artifacts:
