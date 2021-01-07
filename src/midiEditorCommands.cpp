@@ -40,10 +40,12 @@ struct MidiNote {
 	int index;
 	double start;
 	double end;
+
 	double getLength() const {
 		return max (0, (end - start));
 	}
 };
+
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
@@ -605,7 +607,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << ", ";
 	}
 	if (shouldReportNotes) {
-		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+		s << FormatNoteLength(note.start, note.end);
 	}
 	outputMessage(s);
 }
@@ -667,7 +669,7 @@ void cmdMidiInsertNote(Command* command) {
 	ostringstream s;
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
-		s << formatTime(note.getLength(), TF_MEASURE, true, false, false);
+		s << FormatNoteLength(note.start, note.end);
 		s << ", ";
 	}
 	s << formatCursorPosition(TF_MEASURE);
@@ -1199,7 +1201,7 @@ void postMidiChangeLength(int command) {
 		} else{ 
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
 				s << getMidiNoteName(take, note->pitch, note->channel) << " ";
-				s			<< formatTime(note->getLength(), TF_MEASURE, true, false, false);
+				s << FormatNoteLength(note->start, note->end);
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
 				}

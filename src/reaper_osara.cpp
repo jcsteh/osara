@@ -277,6 +277,37 @@ void resetTimeCache(TimeFormat excludeFormat) {
 	}
 }
 
+string FormatNoteLength(double start, double end) {
+	int measureLength;
+	double startBeats;
+	double endBeats;
+	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
+	TimeMap2_timeToBeats(NULL, end, NULL, NULL, &endBeats, NULL);
+	double lengthBeats = endBeats-startBeats;
+	int bars = int(lengthBeats)/measureLength;
+	int remBeats = int(lengthBeats)%measureLength;
+	int percent = lround((lengthBeats-int(lengthBeats))*100);
+	if(percent>99) {
+		percent = 0;
+		++remBeats;
+	}
+	if(remBeats==measureLength) {
+		remBeats = 0;
+		++bars;
+	}
+	ostringstream s;
+	if(bars>0) {
+		s<< bars << (bars==1?" bar ":" bars ");
+	}
+	if(remBeats>0){
+		s << remBeats << (remBeats==1?" beat ":" beats ");
+	}
+	if(percent>0) {
+		s << percent << " percent ";
+	}
+	return s.str();
+}
+
 string formatCursorPosition(TimeFormat format, bool useCache) {
 	return formatTime(GetCursorPosition(), format, false, useCache);
 }
