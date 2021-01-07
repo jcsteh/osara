@@ -46,7 +46,6 @@ struct MidiNote {
 	}
 };
 
-
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;

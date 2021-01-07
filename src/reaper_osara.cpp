@@ -281,7 +281,7 @@ string FormatNoteLength(double start, double end) {
 	int measureLength;
 	double startBeats;
 	double endBeats;
-	TimeMap2_timeToBeats(NULL, start, NULL, &measureLength, &startBeats, NULL);
+	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
 	TimeMap2_timeToBeats(NULL, end, NULL, NULL, &endBeats, NULL);
 	double lengthBeats = endBeats-startBeats;
 	int bars = int(lengthBeats)/measureLength;
