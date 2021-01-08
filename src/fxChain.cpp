@@ -6,7 +6,9 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
+// osara.h includes windows.h, which must be included before other Windows
+// headers.
+#include "osara.h"
 #ifdef _WIN32
 # include <windowsx.h>
 # include <CommCtrl.h>
@@ -17,7 +19,6 @@
 #include <iomanip>
 #include <memory>
 #include <WDL/win32_utf8.h>
-#include "osara.h"
 #include "resource.h"
 
 using namespace std;

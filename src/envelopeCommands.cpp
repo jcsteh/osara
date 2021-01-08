@@ -6,7 +6,6 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <tuple>

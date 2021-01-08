@@ -49,19 +49,14 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	coreFlags = "-mmacosx-version-min=10.7 -stdlib=libc++"
+	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
+		"-arch x86_64 -arch arm64 "
+		"-isysroot /Applications/Xcode-12.3.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 	cxxFlags = coreFlags + " -std=c++17 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
-	# SWELL files.
-	sources.extend(
-		# Disable warnings for SWELL, since we don't have any control over those.
-		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + " -Wno-everything")
-		for f in (
-			"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
-			"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
-			"swell-wnd.mm", "swell-modstub.mm",
-	))
+	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
+	sources.append(swellDir.File("swell-modstub.mm"))
 	sources.append("osxa11y.mm")
 	libs = []
 	# OS X frameworks.
