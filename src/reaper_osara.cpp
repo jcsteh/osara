@@ -1456,6 +1456,7 @@ typedef struct {
 
 PostCommand POST_COMMANDS[] = {
 	{40001, postGoToTrack}, // Track: Insert new track
+	{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
 	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
 	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track

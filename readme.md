@@ -91,6 +91,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Track: Select all tracks
 
 #### Adjusting Track Parameters
+- Track: Toggle mute for selected tracks
 - Track: Mute/unmute tracks: F5
 - Track: Solo/unsolo tracks: F6
 - Toggle record arming for current (last touched) track: F7
