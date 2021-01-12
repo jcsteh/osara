@@ -1459,6 +1459,7 @@ PostCommand POST_COMMANDS[] = {
 	{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
 	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
+	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
 	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
