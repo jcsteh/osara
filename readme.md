@@ -310,6 +310,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Grid: Set to 1/24 (1/16 triplet): control+shift+7
 - Grid: Set to 1/8: control+shift+8
 - Grid: Set to 1/12 (1/8 triplet): control+shift+9
+- Grid: Set to 1/64
 
 #### Project Tabs
 - Close current project tab: control+f4
@@ -360,6 +361,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Grid: Set to 1/8: 8, control+shift+8
 - Grid: Set to 1/12 (1/8 triplet): 9, control+shift+9
 - Grid: Set to 1/48 (1/32 triplet): 0
+- Grid: Set to 1/64
 - Set length for next inserted note: 1: control+1
 - Set length for next inserted note: 1/2: control+2
 - Set length for next inserted note: 1/32: control+3
