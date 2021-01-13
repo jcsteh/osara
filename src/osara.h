@@ -179,6 +179,7 @@
 #define REAPERAPI_WANT_SectionFromUniqueID
 #define REAPERAPI_WANT_GetFocusedFX
 #define REAPERAPI_WANT_GetTake
+#define REAPERAPI_WANT_GetTrackUIMute
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

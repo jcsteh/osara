@@ -351,11 +351,9 @@ void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCatego
 typedef bool(*TrackStateCheck)(MediaTrack* track);
 
 bool isTrackMuted(MediaTrack* track) {
-	if (track == GetMasterTrack(0)) {
-		// Method for normal tracks doesn't seem to work for master.
-		return GetMasterMuteSoloFlags() & 1;
-	}
-	return *(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL);
+	bool muted = false;
+	GetTrackUIMute(track, &muted);
+	return muted;
 }
 
 bool isTrackSoloed(MediaTrack* track) {
