@@ -754,6 +754,9 @@ class TrackParams: public ReaperObjParamSource {
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + "mute", this->track, category, i, "B_MUTE",
 				ReaperObjToggleParam::make));
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + "mono", this->track, category, i, "B_MONO",
+				ReaperObjToggleParam::make));
 		}
 	}
 
