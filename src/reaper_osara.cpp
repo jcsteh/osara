@@ -1997,7 +1997,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (item != -1) {
 			RECT rect;
 			ListView_GetItemRect(focus, item, &rect, LVIR_BOUNDS);
-			POINT point = {rect.left + 10, rect.top + 10};
+			POINT point = {rect.left + (rect.right - rect.left) / 2,
+				rect.top + (rect.bottom - rect.top) / 2};
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
 			if (wParam == VK_APPS || wParam == VK_F10) {
