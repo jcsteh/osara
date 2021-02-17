@@ -43,3 +43,30 @@ void initTranslation() {
 	ifstream input(path);
 	tinygettext::POParser::parse(path, input, translationDict);
 }
+
+BOOL CALLBACK translateWindow(HWND hwnd, LPARAM lParam) {
+	auto context = (char*)lParam;
+	char text[500] = "\0";
+	GetWindowText(hwnd, text, sizeof(text));
+	if (!text[0]) {
+		return true;
+	}
+	string translated = translate_ctxt(context, text);
+	if (translated == text) {
+		// No translation.
+		return true;
+	}
+	SetWindowText(hwnd, translated.c_str());
+	return true;
+}
+
+void translateDialog(HWND dialog) {
+	char context[100];
+	// We use the caption of the dialog as the translation context.
+	GetWindowText(dialog, context, sizeof(context));
+	auto lParam = (LPARAM)context;
+	// Translate dialog title.
+	translateWindow(dialog, lParam);
+	// Translate controls.
+	EnumChildWindows(dialog, translateWindow, lParam);
+}

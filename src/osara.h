@@ -290,5 +290,6 @@ extern bool selectedEnvelopeIsTake;
 void registerExports(reaper_plugin_info_t* rec);
 // translation.cpp
 void initTranslation();
+void translateDialog(HWND dialog);
 
 #endif
