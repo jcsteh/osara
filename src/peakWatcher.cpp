@@ -224,6 +224,7 @@ void cmdPeakWatcher(Command* command) {
 		return;
 	ostringstream s;
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), mainHwnd, pw_dialogProc);
+	translateDialog(dialog);
 
 	for (int pwt = 0; pwt < PW_NUM_TRACKS; ++pwt) {
 		HWND trackSel = GetDlgItem(dialog, ID_PEAK_TRACK1 + pwt);
