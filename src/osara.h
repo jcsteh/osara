@@ -20,6 +20,7 @@
 #endif
 #include <string>
 #include <sstream>
+#include <tinygettext/dictionary.hpp>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -180,6 +181,8 @@
 #define REAPERAPI_WANT_GetFocusedFX
 #define REAPERAPI_WANT_GetTake
 #define REAPERAPI_WANT_GetTrackUIMute
+#define REAPERAPI_WANT_GetResourcePath
+#define REAPERAPI_WANT_get_ini_file
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -228,6 +231,11 @@ extern bool shouldMoveToAutoItem;
 
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
+
+extern tinygettext::Dictionary translationDict;
+#define translate(msg) translationDict.translate(msg)
+#define translate_ctxt(context, msg) \
+	translationDict.translate_ctxt(context, msg)
 
 typedef enum {
 	TF_NONE,
@@ -280,5 +288,7 @@ IReaperControlSurface* createSurface();
 extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
+// translation.cpp
+void initTranslation();
 
 #endif

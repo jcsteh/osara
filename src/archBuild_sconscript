@@ -29,6 +29,7 @@ sources = [
 	"controlSurface.cpp",
 	"exports.cpp",
 	"fxChain.cpp",
+	"translation.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
