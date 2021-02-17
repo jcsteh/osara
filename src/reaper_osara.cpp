@@ -2055,7 +2055,8 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
-		outputMessage("No tracks");
+		// Translators: Reported when there are no tracks to navigate to.
+		outputMessage(translate("no tracks"));
 		return;
 	}
 	int num;
