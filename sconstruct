@@ -5,6 +5,7 @@
 # License: GNU General Public License version 2.0
 
 import os
+from makePot import makePot
 
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
@@ -52,3 +53,8 @@ else: # Mac
 
 	env.Alias("installer", installer)
 	env.Default(installer)
+
+pot = env.Command("locale/osara_${version}.pot",
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc")],
+	makePot)
+env.Alias("pot", pot)
