@@ -236,6 +236,8 @@ extern tinygettext::Dictionary translationDict;
 #define translate(msg) translationDict.translate(msg)
 #define translate_ctxt(context, msg) \
 	translationDict.translate_ctxt(context, msg)
+#define translate_plural(msg, msgPlural, num) \
+	translationDict.translate_plural(msg, msgPlural, num)
 
 typedef enum {
 	TF_NONE,

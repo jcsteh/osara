@@ -35,7 +35,12 @@ msgstr ""
 		if context:
 			out.write('msgctxt "%s"\n' % context)
 		out.write('msgid "%s"\n' % data["msgid"])
-		out.write('msgstr ""\n')
+		if "plural" in data:
+			out.write('msgid_plural "%s"\n' % data["plural"])
+			out.write('msgstr[0] ""\n')
+			out.write('msgstr[1] ""\n')
+		else:
+			out.write('msgstr ""\n')
 		out.write("\n")
 
 RE_TRANSLATORS_COMMENT = re.compile(r"^\s*// Translators: (.*)$")
@@ -82,6 +87,7 @@ def addCppTranslateFirstString(input):
 
 RE_CPP_TRANSLATE = re.compile(r'\btranslate\("(?P<msgid>.*?)"\)')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)\)')
+RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\("(?P<msgid>.*?)",\s*"(?P<plural>.*?)", .*?\)')
 RE_CPP_TRANSLATE_FIRST_STRING_BEGIN = re.compile(r"^\s*// translate firstString begin$")
 def addCpp(input):
 	for line in input:
@@ -91,7 +97,8 @@ def addCpp(input):
 			addCppTranslateFirstString(input)
 			continue
 		m = (RE_CPP_TRANSLATE.search(line) or
-			RE_CPP_TRANSLATE_CTXT.search(line))
+			RE_CPP_TRANSLATE_CTXT.search(line) or
+			RE_CPP_TRANSLATE_PLURAL.search(line))
 		if m:
 			addMessage(m.groupdict())
 
