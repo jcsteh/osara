@@ -1656,6 +1656,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 };
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40625, "set selection start"}, // Time selection: Set start point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
@@ -1672,6 +1673,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+	// translate firstString end
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -1685,6 +1687,7 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
 	{40190, "grid thirty second"}, // Grid: Set to 1/32
@@ -1706,6 +1709,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41073, "length eighth"}, // Set length for next inserted note: 1/8
 	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
 	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
+	// translate firstString end
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -3417,7 +3421,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			} else {
 				Main_OnCommand(command, 0);
 			}
-			outputMessage(mIt->second);
+			outputMessage(translate(mIt->second));
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
@@ -3438,7 +3442,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			isHandlingCommand = true;
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
-			outputMessage(mIt->second);
+			outputMessage(translate(mIt->second));
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
