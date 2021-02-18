@@ -3219,6 +3219,7 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
 	// Our own commands.
+	// translate firstString begin
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View properties for current media item/take/automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
@@ -3287,6 +3288,7 @@ Command COMMANDS[] = {
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
+	// translate firstString end
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
@@ -3636,6 +3638,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		mainHwnd = rec->hwnd_main;
 		loadConfig();
 		resetTimeCache();
+		initTranslation();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
@@ -3663,12 +3666,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				// This is our own command.
 				if (COMMANDS[i].section == MAIN_SECTION) {
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+					COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
 					rec->Register("gaccel", &COMMANDS[i].gaccel);
 				} else {
 					custom_action_register_t action;
 					action.uniqueSectionId = COMMANDS[i].section;
 					action.idStr = COMMANDS[i].id;
-					action.name = COMMANDS[i].gaccel.desc;
+					action.name = translate(COMMANDS[i].gaccel.desc);
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
 				}
 			}
@@ -3684,7 +3688,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		registerExports(rec);
 		SetTimer(nullptr, 0, 0, delayedInit);
-		initTranslation();
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
 #endif
