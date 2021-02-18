@@ -33,6 +33,7 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
+#include <fmt/core.h>
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -42,6 +43,7 @@
 #include "fxChain.h"
 
 using namespace std;
+using fmt::format;
 
 HINSTANCE pluginHInstance;
 HWND mainHwnd;
@@ -312,21 +314,28 @@ string formatCursorPosition(TimeFormat format, bool useCache) {
 }
 
 const char* formatFolderState(int state, bool reportTrack=true) {
-	if (state == 0)
-		return reportTrack ? "track" : NULL;
-	else if (state == 1)
-		return "folder";
-	return "end of folder";
+	if (state == 0) {
+		// Translators: A track which isn't a folder.
+		return reportTrack ? translate("track") : nullptr;
+	} else if (state == 1) {
+		// Translators: A track which is a folder.
+		return translate("folder");
+	}
+	// Translators: A track which ends its folder.
+	return translate("end of folder");
 }
 
 const char* getFolderCompacting(MediaTrack* track) {
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
 		case 0:
-			return "open";
+			// Translators: An open track folder.
+			return translate("open");
 		case 1:
-			return "small";
+			// Translators: An open (but small visually) track folder.
+			return translate("small");
 		case 2:
-			return "closed";
+			// Translators: A closed track folder.
+			return translate("closed");
 	}
 	return ""; // Should never happen.
 }
@@ -538,9 +547,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 		return;
 	ostringstream s;
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum <= 0)
-		s << "master";
-	else {
+	if (trackNum <= 0) {
+		// Translators: Reported when navigating to the master track.
+		s << translate("master");
+	} else {
 		s << trackNum;
 		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 		if (folderDepth == 1) { // Folder
@@ -555,30 +565,44 @@ void postGoToTrack(int command, MediaTrack* track) {
 	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
-		if (CountSelectedTracks(0) > 1)
-			s << " selected";
-	} else
-		s << " unselected";
-	if (isTrackMuted(track))
-		s << " muted";
-	if (isTrackSoloed(track))
-		s << " soloed";
-	if (isTrackArmed(track))
-		s << " armed";
-	if (isTrackPhaseInverted(track))
-		s << " phase inverted";
-	if (isTrackFxBypassed(track))
-		s << " FX bypassed";
+		if (CountSelectedTracks(0) > 1) {
+			s << " " << translate("selected");
+		}
+	} else {
+		s << " " << translate("unselected");
+	}
+	if (isTrackMuted(track)) {
+		s << " " << translate("muted");
+	}
+	if (isTrackSoloed(track)) {
+		s << " " << translate("soloed");
+	}
+	if (isTrackArmed(track)) {
+		s << " " << translate("armed");
+	}
+	if (isTrackPhaseInverted(track)) {
+		s << " " << translate("phase inverted");
+	}
+	if (isTrackFxBypassed(track)) {
+		s << " " << translate("FX bypassed");
+	}
 	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
-		s << " notes";
+		// Translators: Reported when navigating to a track which has track notes.
+		s << " " << translate("notes");
 	}
 	if (trackNum > 0) { // Not master
 		int itemCount = CountTrackMediaItems(track);
-		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+		// Translators: Reported when navigating tracks to indicate how many items
+		// the track has. {} will be replaced by the number of items; e.g.
+		// "2 items".
+		s << " " << format(translate_plural("{} item", "{} items", itemCount),
+			itemCount);
 	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
-		s << "; FX: ";
+		// Translators: Reported when navigating tracks before listing the effects on
+		// the track.
+		s << "; " << translate("FX:") << " ";
 		char name[256];
 		for (int f = 0; f < count; ++f) {
 			if (f > 0)
