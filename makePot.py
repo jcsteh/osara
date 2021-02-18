@@ -67,11 +67,28 @@ def addMessage(data):
 		comments.extend(lastTranslatorsComment)
 		lastTranslatorsComment = []
 
+RE_CPP_TRANSLATE_FIRST_STRING_END = re.compile(r"^\s*// translate firstString end$")
+RE_CPP_TRANSLATE_FIRST_STRING = re.compile(r'^\s*[^/].*?"(?P<msgid>.*?)"')
+def addCppTranslateFirstString(input):
+	for line in input:
+		if handleTranslatorsComment(line):
+			continue
+		if RE_CPP_TRANSLATE_FIRST_STRING_END.match(line):
+			break
+		m = RE_CPP_TRANSLATE_FIRST_STRING.match(line)
+		if m:
+			data = m.groupdict()
+			addMessage(data)
+
 RE_CPP_TRANSLATE = re.compile(r'\btranslate\("(?P<msgid>.*?)"\)')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)\)')
+RE_CPP_TRANSLATE_FIRST_STRING_BEGIN = re.compile(r"^\s*// translate firstString begin$")
 def addCpp(input):
 	for line in input:
 		if handleTranslatorsComment(line):
+			continue
+		if RE_CPP_TRANSLATE_FIRST_STRING_BEGIN.match(line):
+			addCppTranslateFirstString(input)
 			continue
 		m = (RE_CPP_TRANSLATE.search(line) or
 			RE_CPP_TRANSLATE_CTXT.search(line))
