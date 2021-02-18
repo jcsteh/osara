@@ -3390,6 +3390,7 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 
 void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
+	translateDialog(dialog);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
