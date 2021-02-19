@@ -90,8 +90,10 @@ Section "OSARA plug-in" SecPlugin
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
 	File /oname=OSARA.ReaperKeyMap "..\config\windows\reaper-kb.ini"
+	CreateDirectory "$INSTDIR\osara\locale"
+	SetOutPath "$INSTDIR\osara\locale"
+	File "..\locale\*.po"
 	${Unless} $portable = ${BST_CHECKED}
-		CreateDirectory "$INSTDIR\osara"
 		WriteUninstaller "$INSTDIR\osara\uninstall.exe"
 		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"
 		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayVersion" "${VERSION}"

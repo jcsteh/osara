@@ -44,6 +44,8 @@ function run(argv) {
 		s(`mkdir '${target}/KeyMaps'`);
 	} catch(ignore) {} // directory probably already exists
 	s(`cp '${source}/OSARA.ReaperKeyMap' '${target}/KeyMaps/'`);
+	s(`mkdir -p '${target}/osara/locale'`);
+	s(`cp '${source}/locale/*' '${target}/osara/locale/'`);
 	var res = app.displayDialog(
 		"Do you want to replace the existing keymap with the Osara keymap?", {
 		buttons: ["Yes", "No"],
