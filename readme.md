@@ -683,6 +683,35 @@ If you need help, please subscribe to the [Reapers Without Peepers discussion gr
 ## Reporting Issues
 Issues should be reported [on GitHub](https://github.com/jcsteh/osara/issues).
 
+## Translating
+This section is for those interested in translating OSARA into their language.
+
+OSARA can be translated using gettext PO files.
+If a REAPER language pack is installed, OSARA will attempt to load a translation based on the name of the REAPER language pack.
+OSARA can only load PO files in the UTF-8 encoding.
+
+To translate OSARA:
+
+1. If you haven't already, [download Poedit](https://poedit.net/download) and install it.
+2. Install the REAPER language pack you want to use.
+3. Download the gettext template for translators from the [OSARA Development Snapshots](https://osara.reaperaccessibility.com/snapshots/) page.
+4. Rename the template to have the same name as the REAPER language pack, but with a .po extension.
+ For example, if you have installed German.ReaperLangpack, rename the template to German.po.
+5. Open your REAPER resource folder.
+ Use the Show REAPER resource path action in REAPER if you don't know where that is.
+6. Open the osara folder (or create it if it doesn't exist).
+7. Inside the osara folder, open the locale folder (or create it if it doesn't exist).
+8. Move the .po file (from step 3) to that locale folder.
+9. Open the PO file in Poedit.
+10. Translate some or all of the messages and save the translation.
+11. Restart REAPER.
+12. If you make further changes, restart REAPER for the changes to take effect.
+
+Once you've finished your translation, you can submit it for inclusion in OSARA via a [GitHub pull request](https://github.com/jcsteh/osara/issues/new) if you are comfortable using git or by attaching it to a [GitHub issue](https://github.com/jcsteh/osara/issues/new) if you aren't.
+
+When new messages are added to OSARA, you'll need to download the new gettext template for translators and merge it with your translation.
+In Poedit, you can do this by selecting Update from POT file in the Catalog menu.
+
 ## Building
 This section is for those interested in building OSARA from source code.
 
