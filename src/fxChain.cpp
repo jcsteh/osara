@@ -263,6 +263,7 @@ class PresetDialog {
 	PresetDialog(HWND presetCombo): combo(presetCombo) {
 		this->dialog = CreateDialog(pluginHInstance,
 			MAKEINTRESOURCE(ID_FX_PRESET_DLG), mainHwnd, PresetDialog::dialogProc);
+		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		this->list = GetDlgItem(this->dialog, ID_FXPRE_PRESET);
 		WDL_UTF8_HookListView(this->list);

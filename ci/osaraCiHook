@@ -44,6 +44,11 @@ def writeSnapshotIndex(winData, macData):
 			f.write(
 				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/installer/{data[installer]}">Download OSARA {data[version]} for {data[osName]}</a> ({data[date]})</li>\n'
 				.format(data=data))
+		if winData.get("pot"):
+			f.write(
+				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/locale/{data[pot]}">Download gettext template for translators {data[version]}</a></li>\n'
+				.format(data=winData))
+
 		f.write(
 			"</ul>\n"
 			"</body>\n"

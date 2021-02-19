@@ -52,11 +52,15 @@ install:
 
 build_script:
  - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.9/bin/scons" }
- - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh"'
+ # We only build the pot on Windows. The choice of which OS is
+ # arbitrary, but there's no point in building it on both.
+ - ps: If ($IsWindows) { $targets = "installer", "pot" }
+ - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets'
 
 artifacts:
  - path: installer/*.exe
  - path: installer/*.dmg
+ - path: locale/*.pot
 
 deploy_script:
  - ps: |
@@ -68,6 +72,7 @@ deploy_script:
        version=$env:APPVEYOR_BUILD_VERSION;
        installer=$installer
       }
+      if ($IsWindows) { $data["pot"] = Get-ChildItem -Name locale/*.pot }
       ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
      }
 

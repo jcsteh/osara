@@ -33,6 +33,7 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
+#include <fmt/core.h>
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -42,6 +43,7 @@
 #include "fxChain.h"
 
 using namespace std;
+using fmt::format;
 
 HINSTANCE pluginHInstance;
 HWND mainHwnd;
@@ -312,21 +314,28 @@ string formatCursorPosition(TimeFormat format, bool useCache) {
 }
 
 const char* formatFolderState(int state, bool reportTrack=true) {
-	if (state == 0)
-		return reportTrack ? "track" : NULL;
-	else if (state == 1)
-		return "folder";
-	return "end of folder";
+	if (state == 0) {
+		// Translators: A track which isn't a folder.
+		return reportTrack ? translate("track") : nullptr;
+	} else if (state == 1) {
+		// Translators: A track which is a folder.
+		return translate("folder");
+	}
+	// Translators: A track which ends its folder.
+	return translate("end of folder");
 }
 
 const char* getFolderCompacting(MediaTrack* track) {
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
 		case 0:
-			return "open";
+			// Translators: An open track folder.
+			return translate("open");
 		case 1:
-			return "small";
+			// Translators: An open (but small visually) track folder.
+			return translate("small");
 		case 2:
-			return "closed";
+			// Translators: A closed track folder.
+			return translate("closed");
 	}
 	return ""; // Should never happen.
 }
@@ -538,9 +547,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 		return;
 	ostringstream s;
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum <= 0)
-		s << "master";
-	else {
+	if (trackNum <= 0) {
+		// Translators: Reported when navigating to the master track.
+		s << translate("master");
+	} else {
 		s << trackNum;
 		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
 		if (folderDepth == 1) { // Folder
@@ -555,30 +565,44 @@ void postGoToTrack(int command, MediaTrack* track) {
 	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
-		if (CountSelectedTracks(0) > 1)
-			s << " selected";
-	} else
-		s << " unselected";
-	if (isTrackMuted(track))
-		s << " muted";
-	if (isTrackSoloed(track))
-		s << " soloed";
-	if (isTrackArmed(track))
-		s << " armed";
-	if (isTrackPhaseInverted(track))
-		s << " phase inverted";
-	if (isTrackFxBypassed(track))
-		s << " FX bypassed";
+		if (CountSelectedTracks(0) > 1) {
+			s << " " << translate("selected");
+		}
+	} else {
+		s << " " << translate("unselected");
+	}
+	if (isTrackMuted(track)) {
+		s << " " << translate("muted");
+	}
+	if (isTrackSoloed(track)) {
+		s << " " << translate("soloed");
+	}
+	if (isTrackArmed(track)) {
+		s << " " << translate("armed");
+	}
+	if (isTrackPhaseInverted(track)) {
+		s << " " << translate("phase inverted");
+	}
+	if (isTrackFxBypassed(track)) {
+		s << " " << translate("FX bypassed");
+	}
 	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
-		s << " notes";
+		// Translators: Reported when navigating to a track which has track notes.
+		s << " " << translate("notes");
 	}
 	if (trackNum > 0) { // Not master
 		int itemCount = CountTrackMediaItems(track);
-		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+		// Translators: Reported when navigating tracks to indicate how many items
+		// the track has. {} will be replaced by the number of items; e.g.
+		// "2 items".
+		s << " " << format(translate_plural("{} item", "{} items", itemCount),
+			itemCount);
 	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
-		s << "; FX: ";
+		// Translators: Reported when navigating tracks before listing the effects on
+		// the track.
+		s << "; " << translate("FX:") << " ";
 		char name[256];
 		for (int f = 0; f < count; ++f) {
 			if (f > 0)
@@ -1656,6 +1680,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 };
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40625, "set selection start"}, // Time selection: Set start point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
@@ -1672,6 +1697,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+	// translate firstString end
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -1685,6 +1711,7 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
 	{40190, "grid thirty second"}, // Grid: Set to 1/32
@@ -1706,6 +1733,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41073, "length eighth"}, // Set length for next inserted note: 1/8
 	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
 	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
+	// translate firstString end
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -2055,7 +2083,8 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
-		outputMessage("No tracks");
+		// Translators: Reported when there are no tracks to navigate to.
+		outputMessage(translate("no tracks"));
 		return;
 	}
 	int num;
@@ -3214,6 +3243,7 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
 	// Our own commands.
+	// translate firstString begin
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View properties for current media item/take/automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
@@ -3282,6 +3312,7 @@ Command COMMANDS[] = {
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
+	// translate firstString end
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
@@ -3359,6 +3390,7 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 
 void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
+	translateDialog(dialog);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
@@ -3416,7 +3448,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			} else {
 				Main_OnCommand(command, 0);
 			}
-			outputMessage(mIt->second);
+			outputMessage(translate(mIt->second));
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
@@ -3437,7 +3469,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			isHandlingCommand = true;
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
-			outputMessage(mIt->second);
+			outputMessage(translate(mIt->second));
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
@@ -3631,6 +3663,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		mainHwnd = rec->hwnd_main;
 		loadConfig();
 		resetTimeCache();
+		initTranslation();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
@@ -3658,12 +3691,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				// This is our own command.
 				if (COMMANDS[i].section == MAIN_SECTION) {
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+					COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
 					rec->Register("gaccel", &COMMANDS[i].gaccel);
 				} else {
 					custom_action_register_t action;
 					action.uniqueSectionId = COMMANDS[i].section;
 					action.idStr = COMMANDS[i].id;
-					action.name = COMMANDS[i].gaccel.desc;
+					action.name = translate(COMMANDS[i].gaccel.desc);
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
 				}
 			}
