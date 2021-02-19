@@ -34,6 +34,7 @@
 #include "osara.h"
 #include <WDL/db2val.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -44,6 +45,7 @@
 
 using namespace std;
 using fmt::format;
+using namespace fmt::literals;
 
 HINSTANCE pluginHInstance;
 HWND mainHwnd;
@@ -410,52 +412,73 @@ const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
 		case -1:
-			return "none";
+			// Translators: An automation mode.
+			return translate("none");
 		case 0:
-			return "trim/read";
+			// Translators: An automation mode.
+			return translate("trim/read");
 		case 1:
-			return "read";
+			// Translators: An automation mode.
+			return translate("read");
 		case 2:
-			return "touch";
+			// Translators: An automation mode.
+			return translate("touch");
 		case 3:
-			return "write";
+			// Translators: An automation mode.
+			return translate("write");
 		case 4:
-			return "latch";
+			// Translators: An automation mode.
+			return translate("latch");
 		case 5:
-			return "latch preview";
+			// Translators: An automation mode.
+			return translate("latch preview");
 		case 6:
-			return "bypass";
+			// Translators: An automation mode.
+			return translate("bypass");
 		default:
-			return "unknown";
+			// Translators: An automation mode OSARA doesn't know about.
+			return translate("unknown");
 	}
 }
 
 const char* recordingModeAsString(int mode) {
 	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
 		case 0:
-			return "input";
+			// Translators: A recording mode.
+			return translate("input");
 		case 1:
-			return "output (stereo)";
+			// Translators: A recording mode.
+			return translate("output (stereo)");
 		case 2:
-			return "disabled";
+			// Translators: A recording mode.
+			return translate("disabled");
 		case 3:
-			return "output (stereo, latency compensated)";
+			// Translators: A recording mode.
+			return translate("output (stereo, latency compensated)");
 		case 4:
-			return "output (midi)";
+			// Translators: A recording mode.
+			return translate("output (midi)");
 		case 5:
-			return "output (mono)";
+			// Translators: A recording mode.
+			return translate("output (mono)");
 		case 6:
-			return "output (mono, latency compensated)";
+			// Translators: A recording mode.
+			return translate("output (mono, latency compensated)");
 		case 7:
-			return "midi overdub";
+			// Translators: A recording mode.
+			return translate("midi overdub");
 		case 8:
-			return "midi replace";
+			// Translators: A recording mode.
+			return translate("midi replace");
 		case 9:
-			return "midi touch-replace";
+			// Translators: A recording mode.
+			return translate("midi touch-replace");
 		case 16:
-			return "midi latch-replace";
+			// Translators: A recording mode.
+			return translate("midi latch-replace");
 		default:
-			return "unknown";
+			// Translators: A recording mode OSARA doesn't know about.
+			return translate("unknown");
 	}
 }
 
@@ -626,21 +649,27 @@ void postToggleTrackMute(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackMuted(track) ? "muted" : "unmuted");
+	outputMessage(isTrackMuted(track) ?
+		translate("muted") :
+		translate("unmuted"));
 }
 
 void postToggleTrackSolo(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackSoloed(track) ? "soloed" : "unsoloed");
+	outputMessage(isTrackSoloed(track) ?
+		translate("soloed") :
+		translate("unsoloed"));
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackArmed(track) ? "armed" : "unarmed");
+	outputMessage(isTrackArmed(track) ?
+		translate("armed") :
+		translate("unarmed"));
 }
 
 void postCycleTrackMonitor(int command) {
@@ -649,13 +678,15 @@ void postCycleTrackMonitor(int command) {
 		return;
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
 		case 0:
-			outputMessage("record monitor off");
+			outputMessage(translate("record monitor off"));
 			break;
 		case 1:
-			outputMessage("normal");
+			// Translators: Record monitor set to normal.
+			outputMessage(translate("normal"));
 			break;
 		case 2:
-			outputMessage("not when playing");
+			// Translators: Record monitor set to not when playing.
+			outputMessage(translate("not when playing"));
 	}
 }
 
@@ -663,11 +694,15 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase normal");
+	outputMessage(isTrackPhaseInverted(track) ?
+		translate("phase inverted") :
+		translate("phase normal"));
 }
 
 void postToggleTrackFxBypass(MediaTrack* track) {
-	outputMessage(isTrackFxBypassed(track) ? "FX bypassed" : "FX active");
+	outputMessage(isTrackFxBypassed(track) ?
+		translate("FX bypassed") :
+		translate("FX active"));
 }
 
 void postToggleTrackFxBypass(int command) {
@@ -698,7 +733,9 @@ void postToggleAllTracksFxBypass(int command) {
 			break;
 		}
 	}
-	outputMessage(bypassed ? "all tracks FX bypassed" : "all tracks FX active");
+	outputMessage(bypassed ?
+		translate("all tracks FX bypassed") :
+		translate("all tracks FX active"));
 }
 
 bool shouldReportScrub = true;
@@ -719,17 +756,24 @@ void postCursorMovementScrub(int command) {
 
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
-	ostringstream s;
 	if (selectedItemsCount == 0) {
-		s << "No selected items";
-	} else {
-		s << selectedItemsCount << (selectedItemsCount == 1 ? " item" : " items") << " normalized";
-		if (command == 40254) {
-			// Item properties: Normalize multiple items to common gain
-			s << " to common gain";
-		}
+		outputMessage(translate("no selected items"));
+		return;
 	}
-	outputMessage(s);
+	if (command == 40254) {
+		// Item properties: Normalize multiple items to common gain
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items normalized to common gain".
+		outputMessage(format(
+			translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
+			selectedItemsCount));
+	} else {
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items normalized".
+		outputMessage(format(
+			translate_plural("{} item normalized", "{} items normalized", selectedItemsCount),
+			selectedItemsCount));
+	}
 }
 
 void postCycleTrackFolderState(int command) {
@@ -817,17 +861,29 @@ void postGoToMarker(int command) {
 	}
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start != end) {
-		if (cursorPos == start)
-			s << "selection start ";
-		if (cursorPos == end)
-			s << "selection end ";
+		if (cursorPos == start) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// start of the time selection.
+			s << translate("selection start ");
+		}
+		if (cursorPos == end) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// end of the time selection.
+			s << translate("selection end ");
+		}
 	}
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	if (start != end) {
-		if (cursorPos == start)
-			s << "loop start ";
-		if (cursorPos == end)
-			s << "loop end ";
+		if (cursorPos == start) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// loop start point.
+			s << translate("loop start ");
+		}
+		if (cursorPos == end) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// loop end point.
+			s << translate("loop end ");
+		}
 	}
 	s << formatCursorPosition();
 	if (s.tellp() > 0)
@@ -921,20 +977,24 @@ void postChangeTakeVolume(int command) {
 }
 
 void postChangeHorizontalZoom(int command) {
-	ostringstream s;
-	s << fixed << setprecision(3);
-	s << GetHZoomLevel() << " pixels/second";
-	outputMessage(s);
+	// Translators: Reported when zooming in or out horizontally. {:g} will be
+	// replaced with the number of pixels per second; e.g. 100 pixels/second.
+	outputMessage(format(translate("{:g} pixels/second"), GetHZoomLevel()));
 }
 
 void formatPan(double pan, ostringstream& output) {
 	pan *=100.0;
 	if (pan == 0) {
-		output << "center";
+		// Translators: Panned to the center.
+		output << translate("center");
 	} else if (pan < 0) {
-		output << -pan << "% left";
+		// Translators: Panned to the left. {:g} will be replaced with the amount;
+		// e.g. "20% left".
+		output << format(translate("{:g}% left"), -pan);
 	} else {
-		output << pan << "% right";
+		// Translators: Panned to the right. {:g} will be replaced with the amount;
+		// e.g. "20% right".
+		output << format(translate("{:g}% right"), pan);
 	}
 }
 
@@ -951,19 +1011,19 @@ void postChangeTrackPan(int command) {
 }
 
 void postCycleRippleMode(int command) {
-	ostringstream s;
-	s << "ripple ";
-	if (GetToggleCommandState(40310))
-		s << "per-track";
-	else if (GetToggleCommandState(40311))
-		s << "all tracks";
-	else
-		s << "off";
-	outputMessage(s);
+	if (GetToggleCommandState(40310)) {
+		outputMessage(translate("ripple per-track"));
+	} else if (GetToggleCommandState(40311)) {
+		outputMessage(translate("ripple all tracks"));
+	} else {
+		outputMessage(translate("ripple off"));
+	}
 }
 
 void reportRepeat(bool repeat) {
-	outputMessage(repeat ? "repeat on" : "repeat off");
+	outputMessage(repeat ?
+		translate("repeat on") :
+		translate("repeat off"));
 }
 
 void postToggleRepeat(int command) {
@@ -976,7 +1036,9 @@ void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
 	int count = TakeFX_GetCount(take);
 	if (count == 0)
 		return;
-	s << "; FX: ";
+	// Translators: Reported when switching takes before listing the effects on
+	// the take.
+	s << "; " << translate("FX: ");
 	char name[256];
 	for (int f = 0; f < count; ++f) {
 		if (f > 0)
@@ -1035,9 +1097,16 @@ void postMoveToTimeSig(int command) {
 		return;
 	fakeFocus = FOCUS_TIMESIG;
 	ostringstream s;
-	s << "tempo " << bpm;
-	if (sigNum > 0)
-		s << " time sig " << sigNum << "/" << sigDenom;
+	// Translators: Reported when moving to a tempo change. {} will be replaced
+	// with the tempo in bpm; e.g. "tempo 100".
+	s << format(translate("tempo {}"), bpm);
+	if (sigNum > 0) {
+		// Translators: Reported when moving to a time signature change. {num} will
+		// be replaced with the time signature numerator. {denom} will be replaced
+		// with the time signature denominator. For example: "time sig 6/8".
+		s << " " << format(translate("time sig {num}/{denom}"),
+			"num"_a=sigNum, "denom"_a=sigDenom);
+	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
 }
@@ -1089,7 +1158,8 @@ void postGoToStretch(int command) {
 	if (found) {
 		fakeFocus = FOCUS_STRETCH;
 		lastStretchPos = cursor;
-		s << "stretch marker ";
+		// Translators: Reported when moving to a stretch marker.
+		s << translate("stretch marker") << " ";
 	} else
 		lastStretchPos = -1;
 	s << formatCursorPosition();
@@ -1114,25 +1184,30 @@ void postTrackIo(int command) {
 }
 
 void postToggleMetronome(int command) {
-	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("metronome on") :
+		translate("metronome off"));
 }
 
 void postToggleMasterTrackVisible(int command) {
-	outputMessage(GetToggleCommandState(command) ? "master track visible" : "master track hidden");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("master track visible") :
+		translate("master track hidden"));
 }
 
 bool shouldReportTransport = true;
 void reportTransportState(int state) {
 	if (!shouldReportTransport)
 		return;
-	if (state & 2)
-		outputMessage("pause");
-	else if (state & 4)
-		outputMessage("record");
-	else if (state & 1)
-		outputMessage("play");
-	else
-		outputMessage("stop");
+	if (state & 2) {
+		outputMessage(translate("pause"));
+	} else if (state & 4) {
+		outputMessage(translate("record"));
+	} else if (state & 1) {
+		outputMessage(translate("play"));
+	} else {
+		outputMessage(translate("stop"));
+	}
 }
 
 void postChangeTransportState(int command) {
@@ -1141,9 +1216,11 @@ void postChangeTransportState(int command) {
 
 void postSelectMultipleItems(int command) {
 	int count = CountSelectedMediaItems(0);
-	ostringstream s;
-	s << count << (count == 1 ? " item" : " items") << " selected";
-	outputMessage(s);
+	// Translators: Reported when items are selected. {} will be replaced with
+	// the number of items; e.g. "2 items selected".
+	outputMessage(format(
+		translate_plural("{} item selected", "{} items selected", count),
+		count));
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
@@ -1154,7 +1231,8 @@ void postRenameTrack(int command) {
 	if (!GetLastTouchedTrack())
 		return;
 	// #82: On Windows, this will end up as the label of the track name text box.
-	outputMessage("Track name");
+	// Translators: Reported when prompting for the name of a track.
+	outputMessage(translate("Track name"));
 }
 
 bool isItemMuted(MediaItem* item) {
@@ -1168,7 +1246,8 @@ void postToggleItemMute(int command) {
 	if(count==0)
 		return;
 	if(count==1)  {
-		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"muted":"unmuted");
+		outputMessage(isItemMuted(GetSelectedMediaItem(0,0)) ?
+			translate("muted") : translate("unmuted"));
 		return;
 	}
 	for (int i=0; i<count; ++i) {
@@ -1179,11 +1258,21 @@ void postToggleItemMute(int command) {
 	}
 	ostringstream s;
 	if(muteCount>0){
-		s<<muteCount<<" item"<<((muteCount==1)?"":"s") <<" muted";
-		s<<((unmuteCount>0)?", ":"");
+		// Translators: Reported when multiple items are muted. {} will be replaced
+		// with the number of items; e.g. "2 items muted".
+		s << format(translate_plural("{} item muted", "{} items muted", muteCount),
+			muteCount);
+		if (unmuteCount > 0) {
+			s << ", ";
+		}
 	}
-	if(unmuteCount>0) 
-		s<<unmuteCount<<" item"<<((unmuteCount==1)?"":"s") <<" unmuted";
+	if(unmuteCount>0)  {
+		// Translators: Reported when multiple items are unmuted. {} will be
+		// replaced with the number of items; e.g. "2 items unmuted".
+		s << format(
+			translate_plural("{} item unmuted", "{} items unmuted", unmuteCount),
+			unmuteCount);
+	}
 	outputMessage(s);
 }
 
@@ -1201,60 +1290,79 @@ void postToggleItemSolo(int command) {
 		}
 	}
 	if(selectedCount==1) {
-		outputMessage(soloed?"soloed":"unsoloed");
+		outputMessage(soloed ? translate("soloed") : translate("unsoloed"));
 		return;
 	}
-	ostringstream s;
-	s<<selectedCount<<" items "<<(soloed?"soloed":"unsoloed");
-	outputMessage(s);
+	if (soloed) {
+		// Translators: Reported when multiple items are soloed. {} will be replaced
+		// with the number of items; e.g. "2 items soloed".
+		outputMessage(format(
+			translate_plural("{} item soloed", "{} items soloed", selectedCount),
+			selectedCount));
+	} else {
+		// Translators: Reported when multiple items are unsoloed. {} will be
+		// replaced with the number of items; e.g. "2 items unsoloed".
+		outputMessage(format(
+			translate_plural("{} item unsoloed", "{} items unsoloed", selectedCount),
+			selectedCount));
+	}
 }
 
 void postSetSelectionEnd(int command) {
-	outputMessage("set selection end");
+	outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
 }
 
 void postToggleMasterMono(int command) {
-	outputMessage(GetToggleCommandState(command) ? "master mono" : "master stereo");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("master mono") : translate("master stereo"));
 }
 
 void postToggleAutoCrossfade(int command) {
-	outputMessage(GetToggleCommandState(command) ? "crossfade on" : "crossfade off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("crossfade on") : translate("crossfade off"));
 }
 
 void postToggleLocking(int command) {
-	outputMessage(GetToggleCommandState(command) ? "locking on" : "locking off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("locking on") : translate("locking off"));
 }
 
 void postToggleSoloInFront(int command) {
-	outputMessage(GetToggleCommandState(command) ? "solo in front" : "normal solo");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("solo in front") :
+		// Translators: Solo in front was turned off.
+		translate("normal solo"));
 }
 
 void postAdjustPlayRate(int command) {
 	double rate = Master_GetPlayRate(nullptr);
-	ostringstream s;
-	s << fixed << setprecision(3);
-	s << rate << " play rate";
-	outputMessage(s);
+	// Translators: Reported when the play rate is adjusted. {:g} will be replaced
+	// with the play rate; e.g. "1.5 play rate".
+	outputMessage(format(translate("{:g} play rate"), rate));
 }
 
 void postToggleMonitoringFxBypass(int command) {
-	outputMessage(GetToggleCommandState(command) ? "FX bypassed" : "fx active");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("FX bypassed") : translate("fx active"));
 }
 
 void postCycleRecordMode(int command) {
 	if (GetToggleCommandState(40252)) {
-		outputMessage("normal record");
+		// Translators: Record mode set to normal.
+		outputMessage(translate("normal record"));
 	} else if (GetToggleCommandState(40253)) {
-		outputMessage("selected item auto-punch");
+		outputMessage(translate("selected item auto-punch"));
 	} else if (GetToggleCommandState(40076)) {
-		outputMessage("time selection auto-punch");
+		outputMessage(translate("time selection auto-punch"));
 	}
 }
 
 void postChangeGlobalAutomationOverride(int command) {
 	ostringstream s;
-	s << "Override ";
+	// Translators: When changing the global automation override, reported prior
+	// to the chosen automation mode.
+	s << translate("override") << " ";
 	s << automationModeAsString(GetGlobalAutomationOverride());
 	outputMessage(s);
 }
@@ -1262,20 +1370,24 @@ void postChangeGlobalAutomationOverride(int command) {
 void postReverseTake(int command) {
 	int count = CountSelectedMediaItems(0);
 	if(count==0) {
-		outputMessage("no items selected");
+		outputMessage(translate("no items selected"));
 		return;
 	}
-	ostringstream s;
-	s<<count<<((count==1)?" take ":" takes ")<<"reversed";
-	outputMessage(s);
+	// Translators: Reported when reversing takes. {} will be replaced by the
+	// number of takes; e.g. "2 takes reversed".
+	outputMessage(format(
+		translate_plural("{} take reversed", "{} takes reversed", count),
+		count));
 }
 
 void postTogglePreRoll(int command) {
-	outputMessage(GetToggleCommandState(command) ? "pre roll on":"pre roll off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("pre roll on") : translate("pre roll off"));
 }
 
 void postToggleCountIn(int command) {
-	outputMessage(GetToggleCommandState(command) ? "count in on":"count in off");
+	outputMessage(GetToggleCommandState(command) ? 
+		translate("count in on") : translate("count in off"));
 }
 
 void postTakeChannelMode(int command) {
