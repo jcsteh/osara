@@ -11,6 +11,7 @@
 #include <tinygettext/dictionary.hpp>
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
+#include <WDL/win32_utf8.h>
 
 using namespace std;
 
