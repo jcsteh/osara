@@ -1934,7 +1934,8 @@ void sendMenu(HWND sendWindow) {
 	HMENU menu = CreatePopupMenu();
 	MENUITEMINFO itemInfo;
 	itemInfo.cbSize = sizeof(MENUITEMINFO);
-	itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+	// MIIM_TYPE is deprecated, but win32_utf8 still relies on it.
+	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	itemInfo.fType = MFT_STRING;
 	child.vt = VT_I4;
 	int item = 0;
