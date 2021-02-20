@@ -139,7 +139,13 @@ class ReaperObjToggleParam: public ReaperObjParam {
 	}
 
 	string getValueText(double value) {
-		return value ? "on" : "off";
+		return value ?
+			// Translators: Reported in Parameters dialogs for a toggle (such as mute)
+			// which is on.
+			translate("on") :
+			// Translators: Reported in Parameters dialogs for a toggle (such as mute)
+			// which is off.
+			translate("off");
 	}
 
 	void setValue(double value) {
@@ -525,6 +531,7 @@ class ParamsDialog {
 			return;
 		}
 		this->dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PARAMS_DLG), mainHwnd, ParamsDialog::dialogProc);
+		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
@@ -587,7 +594,7 @@ class FxParams: public ParamSource {
 	}
 
 	string getTitle() {
-		return "FX Parameters";
+		return translate("FX Parameters");
 	}
 
 	int getParamCount() {
@@ -746,30 +753,34 @@ class TrackParams: public ReaperObjParamSource {
 				dispPrefix << trackName << " ";
 			dispPrefix << categoryName << " ";
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "volume", this->track, category, i, "D_VOL",
+				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "pan", this->track, category, i, "D_PAN",
+				dispPrefix.str() + translate("pan"), this->track, category, i, "D_PAN",
 				ReaperObjPanParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "mute", this->track, category, i, "B_MUTE",
+				dispPrefix.str() + translate("mute"), this->track, category, i, "B_MUTE",
 				ReaperObjToggleParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "mono", this->track, category, i, "B_MONO",
+				dispPrefix.str() + translate("mono"), this->track, category, i, "B_MONO",
 				ReaperObjToggleParam::make));
 		}
 	}
 
 	public:
 	TrackParams(MediaTrack* track): track(track) {
-		this->params.push_back(make_unique<TrackParamProvider>("Volume", track,
-			"D_VOL", ReaperObjVolParam::make));
-		this->params.push_back(make_unique<TrackParamProvider>("Pan", track,
-			"D_PAN", ReaperObjPanParam::make));
-		this->params.push_back(make_unique<TrackParamProvider>("Mute", track,
-			"B_MUTE", ReaperObjToggleParam::make));
-		this->addSendParams(0, "send", "P_DESTTRACK");
-		this->addSendParams(-1, "receive", "P_SRCTRACK");
+		this->params.push_back(make_unique<TrackParamProvider>(translate("volume"),
+			track, "D_VOL", ReaperObjVolParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>(translate("pan"),
+			track, "D_PAN", ReaperObjPanParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>(translate("mute"),
+			track, "B_MUTE", ReaperObjToggleParam::make));
+		// Translators: Indicates a parameter for a track send in the Track Parameters
+		// dialog.
+		this->addSendParams(0, translate("send"), "P_DESTTRACK");
+		// Translators: Indicates a parameter for a track receive in the Track
+		// Parameters dialog.
+		this->addSendParams(-1, translate("receive"), "P_SRCTRACK");
 
 		int fxParamCount = CountTCPFXParms(nullptr, track);
 		if (fxParamCount > 0) {
@@ -790,7 +801,7 @@ class TrackParams: public ReaperObjParamSource {
 	}
 
 	string getTitle() {
-		return "Track Parameters";
+		return translate("Track Parameters");
 	}
 };
 
@@ -827,25 +838,27 @@ class TakeParamProvider: public ReaperObjParamProvider {
 class ItemParams: public ReaperObjParamSource {
 	public:
 	ItemParams(MediaItem* item) {
-		this->params.push_back(make_unique<ItemParamProvider>("Item volume", item,
-			"D_VOL", ReaperObjVolParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("item volume"), item, "D_VOL", ReaperObjVolParam::make));
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
 		if (MediaItem_Take* take = GetActiveTake(item)) {
-			this->params.push_back(make_unique<TakeParamProvider>("Take volume", take,
-				"D_VOL", ReaperObjVolParam::make));
-			this->params.push_back(make_unique<TakeParamProvider>("Take pan", take,
-				"D_PAN", ReaperObjPanParam::make));
+			this->params.push_back(make_unique<TakeParamProvider>(
+				translate("take volume"), take, "D_VOL", ReaperObjVolParam::make));
+			this->params.push_back(make_unique<TakeParamProvider>(
+				translate("take pan"), take, "D_PAN", ReaperObjPanParam::make));
 		}
-		this->params.push_back(make_unique<ItemParamProvider>("Mute", item,
-			"B_MUTE", ReaperObjToggleParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>("Fade in length",
-			item, "D_FADEINLEN", ReaperObjLenParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>("Fade out length",
-			item, "D_FADEOUTLEN", ReaperObjLenParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(translate("mute"),
+			item, "B_MUTE", ReaperObjToggleParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("fade in length"), item, "D_FADEINLEN",
+			ReaperObjLenParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("Fade out length"), item, "D_FADEOUTLEN",
+			ReaperObjLenParam::make));
 	}
 
 	string getTitle() {
-		return "Item Parameters";
+		return translate("Item Parameters");
 	}
 };
 
@@ -888,14 +901,20 @@ FxList listFx(MediaTrack* track) {
 	}
 	string suffix;
 	if (track == GetMasterTrack(0)) {
-		suffix = " [monitor]";
+		// Translators: In the menu of effects when opening the FX Parameters
+		// dialog, this is presented after effects which are monitoring FX.
+		suffix = translate("[monitor]");
 	} else {
-		suffix = " [input]";
+		// Translators: In the menu of effects when opening the FX Parameters
+		// dialog, this is presented after effects which are input FX.
+		suffix = translate("[input]");
 	}
 	for (int index = 0; index < recCount; ++index) {
 		const int rawIndex = 0x1000000 + index;
 		TrackFX_GetFXName(track, rawIndex, rawName, sizeof(rawName));
-		string name = rawName + suffix;
+		string name(rawName);
+		name += " ";
+		name += suffix;
 		fxList.push_back({rawIndex, name});
 	}
 	return fxList;
@@ -918,7 +937,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	const size_t fxCount = fxList.size();
 	int fx = -1;
 	if (fxCount == 0) {
-		outputMessage("No FX");
+		outputMessage(translate("no FX"));
 		return;
 	} else if (fxCount == 1)
 		fx = fxList[0].first;
