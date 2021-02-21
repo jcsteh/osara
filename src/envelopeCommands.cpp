@@ -14,9 +14,11 @@
 #include <set>
 #include <algorithm>
 #include <optional>
+#include <fmt/core.h>
 #include "osara.h"
 
 using namespace std;
+using fmt::format;
 
 bool selectedEnvelopeIsTake = false;
 int currentAutomationItem = -1;
@@ -215,10 +217,11 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
-		if (numSel > 1)
-			s << " selected";
+		if (numSel > 1) {
+			s << " " << translate("selected");
+		}
 	} else {
-		s << " unselected ";
+		s << " " << translate("unselected ");
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
@@ -354,12 +357,16 @@ void cmdhSelectEnvelope(int direction) {
 	}
 	char name[50];
 	GetEnvelopeName(env, name, sizeof(name));
-	s << name << " envelope";
+	// Translators: Reported when selecting an envelope. {} will be replaced
+	// with the name of the envelope; e.g. "volume envelope".
+	s << format(translate("{} envelope"), name);
 	if (!m.empty()) {
-		if (m.str(3)[0] == '0')
-			s << " bypassed";
-		if (m.str(5)[0] == '1')
-			s << " armed";
+		if (m.str(3)[0] == '0') {
+			s << " " << translate("bypassed");
+		}
+		if (m.str(5)[0] == '1') {
+			s << " " << translate("armed");
+		}
 	}
 	outputMessage(s);
 }
@@ -473,21 +480,22 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		// Report the automation item.
 		fakeFocus = FOCUS_AUTOMATIONITEM;
 		ostringstream s;
-		s << "Auto ";
 		char name[500];
 		GetSetAutomationItemInfo_String(envelope, i, "P_POOL_NAME", name, false);
 		if (name[0]) {
-			s << name;
+			// Translators: Reported when moving to an automation item. {} will be
+			// replaced with the name or number of the automation item; e.g. "auto 2".
+			s << format(translate("auto {}"), name);
 		} else {
-			s << i + 1;
+			s << format(translate("auto {}"), i + 1);
 		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
 			if (countSelectedAutomationItems(envelope, true) > 1) {
-				s << " selected";
+				s << " " << translate("selected");
 			}
 		} else {
-			s << " unselected";
+			s << " " << translate("unselected");
 		}
 		s << " " << formatCursorPosition();
 		outputMessage(s);
@@ -543,12 +551,17 @@ void reportToggleTrackEnvelope(const char* envType) {
 	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
 		(void*)envType);
 	bool visible = envelope && isEnvelopeVisible(envelope);
-	ostringstream s;
-	s << (visible ? "showed " : "hid ");
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
-	s << name << " envelope";
-	outputMessage(s);
+	if (visible) {
+		// Translators: Reported when showing an envelope. {} will be replaced with
+		// the name of the envelope; e.g. "showed volume envelope".
+		outputMessage(format(translate("showed {} envelope"), name));
+	} else {
+		// Translators: Reported when hiding an envelope. {} will be replaced with
+		// the name of the envelope; e.g. "hid volume envelope".
+		outputMessage(format(translate("hid {} envelope"), name));
+	}
 }
 
 void postToggleTrackVolumeEnvelope(int command) {
@@ -579,15 +592,9 @@ void cmdToggleTrackEnvelope(Command* command) {
 	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
-	ostringstream s;
 	if (after.size() == before.size()) {
 		outputMessage(translate("no envelopes toggled"));
 		return;
-	}
-	if (after.size() > before.size()) {
-		s << "showed ";
-	} else {
-		s << "hid ";
 	}
 	set<TrackEnvelope*> difference;
 	set_symmetric_difference(before.begin(), before.end(),
@@ -595,8 +602,11 @@ void cmdToggleTrackEnvelope(Command* command) {
 	TrackEnvelope* envelope = *difference.begin();
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
-	s << name << " envelope";
-	outputMessage(s);
+	if (after.size() > before.size()) {
+		outputMessage(format(translate("showed {} envelope"), name));
+	} else {
+		outputMessage(format(translate("hid {} envelope"), name));
+	}
 }
 
 void postSelectMultipleEnvelopePoints(int command) {

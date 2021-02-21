@@ -1455,9 +1455,10 @@ void postTakeChannelMode(int command) {
 
 void postChangeTempo(int command) {
 	double tempo = Master_GetTempo();
+	// Translators: Reported when changing the tempo. {} will be replaced with
+	// the new tempo; e.g. "50 bpm".
 	ostringstream s;
-	s << tempo << " BPM";
-	outputMessage(s);
+	outputMessage(format(translate("{} bpm"), tempo));
 }
 
 void postTogglePlaybackPositionFollowsTimebase(int command) {
@@ -2373,17 +2374,26 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 			s << " " << GetTakeName(take);
 		if (isItemSelected(item)) {
 			// One selected item is the norm, so don't report selected in this case.
-			if (CountSelectedMediaItems(0) > 1)
-				s << " selected";
-		} else
-			s << " unselected";
-		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL))
-			s << " muted";
-		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1)
-			s << " locked";
+			if (CountSelectedMediaItems(0) > 1) {
+				s << " " << translate("selected");
+			}
+		} else {
+			s << " " << translate("unselected");
+		}
+		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL)) {
+			s << " " << translate("muted");
+		}
+		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1) {
+			// Translators: Used when navigating items to indicate that an item is
+			// locked.
+			s << " " << translate("locked");
+		}
 		int takeCount = CountTakes(item);
-		if (takeCount > 1)
-			s << " " << takeCount << " takes";
+		if (takeCount > 1) {
+			// Translators: Used when navigating items to indicate the number of
+			// takes. {} will be replaced with the number; e.g. "2 takes".
+			s << " " << format(translate("{} takes"), takeCount);
+		}
 		s << " " << formatCursorPosition();
 		addTakeFxNames(take, s);
 		outputMessage(s);
@@ -2412,9 +2422,9 @@ void cmdUndo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	ostringstream s;
-	s << "Undo " << text;
-	outputMessage(s);
+	// Translators: Reported when undoing an action. {}
+	// will be replaced with the name of the action; e.g. "undo Remove tracks".
+	outputMessage(format(translate("undo {}"), text));
 }
 
 void cmdRedo(Command* command) {
@@ -2422,9 +2432,9 @@ void cmdRedo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	ostringstream s;
-	s << "Redo " << text;
-	outputMessage(s);
+	// Translators: Reported when redoing an action. {}
+	// will be replaced with the name of the action; e.g. "redo Remove tracks".
+	outputMessage(format(translate("redo {}"), text));
 }
 
 void cmdSplitItems(Command* command) {
@@ -2457,8 +2467,9 @@ void cmdPaste(Command* command) {
 		s << added << (added == 1 ? " point" : " points") << " added";
 	else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0)
 		s << added << (added == 1 ? " automation item" : " automation items") << " added";
-	else
-		s << "nothing pasted";
+	else {
+		s << translate("nothing pasted");
+	}
 	outputMessage(s);
 }
 
@@ -2561,8 +2572,11 @@ void cmdMoveItemEdge(Command* command) {
 		s<<formatTime(newStart, TF_RULER, false, true);
 	else if(newEnd!=oldEnd)
 		s<<formatTime(newEnd, TF_RULER, false, true);
-	else
-		s<<"no change";
+	else {
+		// Translators: Reported when moving items to indicate that no movement
+		// occurred.
+		s << translate("no change");
+	}
 	outputMessage(s);
 }
 
@@ -2696,7 +2710,7 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 				s << (multiLine ? "\r\n" : ", ");
 			}
 			if (i == -1) {
-				s << "master";
+				s << translate("master");
 			} else {
 				s << i + 1;
 				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
@@ -2710,7 +2724,9 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 		if (!outputIfNone) {
 			return "";
 		}
-		s << "none";
+		// Translators: Used when reporting all tracks which are muted, soloed, etc.
+		// to indicate that no tracks are muted, soloed, etc.
+		s << translate("none");
 	}
 	return s.str();
 }
@@ -2768,7 +2784,7 @@ void cmdReportSelection(Command* command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			if (isTrackSelected(GetMasterTrack(0))) {
-				s << "master";
+				s << translate("master");
 				count = 1;
 			}
 			for (t = 0; t < CountTracks(0); ++t) {
@@ -3258,9 +3274,9 @@ void cmdInsertMarker(Command* command) {
 	}
 	int number;
 	EnumProjectMarkers(marker, nullptr, nullptr, nullptr, nullptr, &number);
-	ostringstream s;
-	s << "marker " << number << " inserted";
-	outputMessage(s);
+	// Translators: Reported when inserting a marker. {} will be replaced with the
+	// number of the new marker; e.g. "marker 2 inserted".
+	outputMessage(format(translate("marker {} inserted"), number));
 }
 
 void cmdInsertRegion(Command* command) {
@@ -3298,9 +3314,9 @@ void cmdInsertRegion(Command* command) {
 	}
 	int number;
 	EnumProjectMarkers(region, nullptr, nullptr, nullptr, nullptr, &number);
-	ostringstream s;
-	s << "region " << number << " inserted";
-	outputMessage(s);
+	// Translators: Reported when inserting a region. {} will be replaced with the
+	// number of the new region; e.g. "region 2 inserted".
+	outputMessage(format(translate("region {} inserted"), number));
 }
 
 // See the Configuration section of the code below.

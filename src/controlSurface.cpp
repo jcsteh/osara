@@ -119,7 +119,7 @@ class Surface: public IReaperControlSurface {
 		bool different = this->reportTrackIfDifferent(track, s);
 		different |= this->lastParam != PARAM_VOLUME;
 		if (different) {
-			s << "volume ";
+			s << translate("volume") << " ";
 			this->lastParam = PARAM_VOLUME;
 		}
 		s << fixed << setprecision(2);
@@ -135,7 +135,7 @@ class Surface: public IReaperControlSurface {
 		bool different = this->reportTrackIfDifferent(track, s);
 		different |= this->lastParam != PARAM_PAN;
 		if (different) {
-			s << "pan ";
+			s << translate("pan") << " ";
 			this->lastParam = PARAM_PAN;
 		}
 		formatPan(pan, s);
@@ -286,7 +286,7 @@ class Surface: public IReaperControlSurface {
 			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
 				nullptr);
 			if (trackNum <= 0) {
-				output << "master";
+				output << translate("master");
 			} else {
 				output << trackNum;
 				char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);

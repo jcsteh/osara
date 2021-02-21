@@ -19,9 +19,11 @@
 #include <iomanip>
 #include <memory>
 #include <WDL/win32_utf8.h>
+#include <fmt/core.h>
 #include "resource.h"
 
 using namespace std;
+using fmt::format;
 
 #ifdef _WIN32
 
@@ -335,9 +337,9 @@ bool maybeSwitchFxTab(bool previous) {
 	item.cchTextMax = sizeof(text);
 	TabCtrl_GetItem(tabCtrl, selected, &item);
 	if (text[0]) {
-		ostringstream s;
-		s << text << " tabb";
-		outputMessage(s);
+		// Translators: Reported when switching tabs in an effect such as ReaEQ.
+		// {} will be replaced with the name of the tab; e.g. "1 tab".
+		outputMessage(format(translate("{} tab"), text));
 	}
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this

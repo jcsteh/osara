@@ -20,9 +20,11 @@
 #endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
+#include <fmt/core.h>
 #include "resource.h"
 
 using namespace std;
+using fmt::format;
 
 const int PW_NUM_TRACKS = 2;
 const int PW_NUM_CHANNELS = 2;
@@ -101,12 +103,18 @@ void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 						// Only report the track name if watching more than one track
 						// and a channel actually changed for this track.
 						int trackNum = (int)(size_t)GetSetMediaTrackInfo(pwTrack.track, "IP_TRACKNUMBER", NULL);
-						if (trackNum <= 0)
-							s << "master ";
-						else
-							s << "track " << trackNum << " ";
+						if (trackNum <= 0) {
+							s << translate("master") << " ";
+						} else {
+							// Translators: used when Peak Watcher notifies about a peak.
+							// {} will be replaced with the track number; e.g. "track 2".
+							s << format(translate("track {}"), trackNum) << " ";
+						}
 					}
-					s << "chan " << c + 1 << ": " << newPeak;
+					// Translators: used when Peak Watcher notifies about a peak. This is
+					// placed after the track and before the peak value.
+					// {} will be replaced with the channel number; e.g. "chan 2".
+					s << format(translate("chan {}:"), c + 1) << " " << newPeak;
 					outputMessage(s);
 				}
 			}
@@ -247,8 +255,11 @@ void cmdPeakWatcher(Command* command) {
 		MediaTrack* currentTrack = GetLastTouchedTrack();
 		for (int t = 0; t < trackCount; ++t) {
 			track = GetTrack(0, t);
-			if (track == currentTrack)
-				s << "current ";
+			if (track == currentTrack) {
+				// Translators: Used in the lists of tracks in the Peak Watcher dialog
+				// to indicate the current track.
+				s << translate("current") << " ";
+			}
 			s << (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 			char* name;
 			if ((name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr))) {

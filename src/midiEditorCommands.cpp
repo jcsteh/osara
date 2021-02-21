@@ -556,8 +556,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	if (!select && !isNoteSelected(take, chord.first))
-		s << "unselected" << " ";
+	if (!select && !isNoteSelected(take, chord.first)) {
+		s << translate("unselected") << " ";
+	}
 	if (shouldReportNotes) {
 		int count = chord.second - chord.first + 1;
 		s << count << (count == 1 ? " note" : " notes");
@@ -601,7 +602,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << getMidiNoteName(take, note.pitch, note.channel);
 	}
 	if (!select && !isNoteSelected(take, note.index)) {
-		s << " unselected ";
+		s << " " << translate("unselected ");
 	} else if (shouldReportNotes) {
 		s << ", ";
 	}
