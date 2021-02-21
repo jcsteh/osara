@@ -2169,8 +2169,17 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (item != -1) {
 			RECT rect;
 			ListView_GetItemRect(focus, item, &rect, LVIR_BOUNDS);
-			POINT point = {rect.left + (rect.right - rect.left) / 2,
-				rect.top + (rect.bottom - rect.top) / 2};
+			POINT point;
+			if (GetWindowLong(focus, GWL_ID) == 1071) {
+				// In the Project Render Metadata list, we need to click in the centre of
+				// the item.
+				point = {rect.left + (rect.right - rect.left) / 2,
+					rect.top + (rect.bottom - rect.top) / 2};
+			} else {
+				// #478: Clicking in the centre of the Media Explorer list misbehaves for
+				// some users, so use the top left for most lists.
+				point = {rect.left, rect.top};
+			}
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
 			if (wParam == VK_APPS || wParam == VK_F10) {
