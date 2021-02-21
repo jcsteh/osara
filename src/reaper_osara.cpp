@@ -173,18 +173,35 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			}
 			if (!useCache || measure != oldMeasure) {
 				if (isLength) {
-					if (includeZeros || measure != 0)
-						s << measure << (measure == 1 ? " bar " : " bars ");
-				} else
-					s << "bar " << measure << " ";
+					if (includeZeros || measure != 0) {
+						// Translators: Used when reporting a length of time in measures.
+						// {} will be replaced with the number of measures; e.g.
+						// "2 bars".
+						s << fmt::format(
+							translate_plural("{} bar", "{} bars", measure), measure)
+							<< " ";
+					}
+				} else {
+					// Translators: Used when reporting the measure of a time position.
+					// {} will be replaced with the measure number; e.g. "bar 2".
+					s << fmt::format(translate("bar {}"), measure) << " ";
+				}
 				oldMeasure = measure;
 			}
 			if (!useCache || wholeBeat != oldBeat) {
 				if (isLength) {
-					if (includeZeros || wholeBeat != 0)
-						s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
-				} else
-					s << "beat " << wholeBeat << " ";
+					if (includeZeros || wholeBeat != 0) {
+						// Translators: Used when reporting a length of time in beats.
+						// {} will be replaced with the number of beats; e.g. "2 beats".
+						s << fmt::format(
+							translate_plural("{} beat", "{} beats", wholeBeat),
+							wholeBeat) << " ";
+					}
+				} else {
+					// Translators: Used when reporting the beat of a time position.
+					// {} will be replaced with the beat number; e.g. "beat 2".
+					s << fmt::format(translate("beat {}"), wholeBeat) << " ";
+				}
 				oldBeat = wholeBeat;
 			}
 			if (!useCache || beatPercent != oldBeatPercent) {
@@ -199,24 +216,29 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
-				s << minute << " min ";
+				// Translators: Used when reporting a time in minutes. {} will be
+				// replaced with the number of minutes; e.g. "2 min".
+				s << fmt::format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
-			s << fixed << setprecision(3);
-			s << time << " sec";
+			// Translators: Used when reporting a time in seconds. {:.3f} will be
+			// replaced with the number of seconds; e.g. "2 sec".
+			s << fmt::format(translate("{:#.3f} sec"), time);
 			break;
 		}
 		case TF_SEC: {
 			// Seconds
-			s << fixed << setprecision(3);
-			s << time << " sec";
+			s << fmt::format(translate("{:.3f} sec"), time);
 			break;
 		}
 		case TF_FRAME: {
 			// Frames
 			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 			if (!useCache || oldFrame != frame) {
-				s << frame << (frame == 1 ? " frame" : " frames");
+				// Translators: Used when reporting a time in frames. {} will be
+				// replaced with the number of frames; e.g. "2 frames".
+				s << fmt::format(
+					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -226,24 +248,30 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			int hour = (int)(time / 3600);
 			time = fmod(time, 3600);
 			if (!useCache || oldHour != hour) {
-				s << hour << (hour == 1 ? " hour " : " hours ");
+				// Translators: used when reporting a time in hours. {} will be replaced
+				// with the number of hours; e.g. "2 hours".
+				s << fmt::format(
+					translate_plural("{} hour", "{} hours", hour), hour) << " ";
 				oldHour = hour;
 			}
 			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
-				s << minute << " min ";
+				s << fmt::format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
 			int second = (int)time;
 			if (!useCache || oldSecond != second) {
-				s << second << " sec ";
+				// Translators: Used when reporting a time in seconds. {} will be
+				// replaced with the number of seconds; e.g. "2 sec".
+				s << fmt::format(translate("{} sec"), second) << " ";
 				oldSecond = second;
 			}
 			time = time - second;
 			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
-				s << frame << (frame == 1 ? " frame" : " frames");
+				s << fmt::format(
+					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -251,7 +279,9 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		case TF_SAMPLE: {
 			char buf[20];
 			format_timestr_pos(time, buf, sizeof(buf), 4);
-			s << buf << " samples";
+			// Translators: Used when reporting a time in samples. {} will be replaced
+			// with the number of samples; e.g. "2 samples".
+			s << fmt::format(translate("{} samples"), buf);
 			break;
 		}
 		default:
