@@ -481,7 +481,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 void cmdMidiToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
-		outputMessage("noncontiguous selection");
+		outputMessage(translate("noncontiguous selection"));
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
@@ -920,14 +920,14 @@ void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
 	double tsStart,tsEnd;
 	GetSet_LoopTimeRange(false, false, &tsStart, &tsEnd, false);
 	if(tsStart == tsEnd) {
-		outputMessage("No time selection");
+		outputMessage(translate("no time selection"));
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int selNote = MIDI_EnumSelNotes(take, -1);
 	if(selNote==-1) {
-		outputMessage("No notes selected");
+		outputMessage(translate("no notes selected"));
 		return;
 	}
 	int selPitch;

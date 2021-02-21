@@ -54,9 +54,12 @@ void pw_resetTrack(int trackIndex, bool report=false) {
 	}
 	if (report) {
 		if (!pwTrack.track && !pwTrack.follow) {
-			outputMessage("Peak Watcher track disabled");
+			// Translators: Reported when the user tries to reset a Peak Watcher
+			// track, but that Peak Watcher track is disabled.
+			outputMessage(translate("Peak Watcher track disabled"));
 		} else {
-			outputMessage("reset");
+			// Translators: Reported when the user resets a Peak Watcher track.
+			outputMessage(translate("reset"));
 		}
 	}
 }
@@ -296,11 +299,15 @@ void pw_report(int trackIndex, int channel) {
 	assert(channel < PW_NUM_CHANNELS);
 	auto& pwTrack = pw_tracks[trackIndex];
 	if (!pwTrack.track && !pwTrack.follow) {
-		outputMessage("Peak Watcher track disabled");
+		// Translators: Reported when the user tries to report a Peak Watcher
+		// channel, but the Peak Watcher track is disabled.
+		outputMessage(translate("Peak Watcher track disabled"));
 		return;
 	}
 	if (!pw_timer) {
-		outputMessage("Peak Watcher paused");
+		// Translators: Reported when the user tries to report a Peak Watcher
+		// channel, but the Peak Watcher is paused.
+		outputMessage(translate("Peak Watcher paused"));
 		return;
 	}
 	ostringstream s;
@@ -337,13 +344,13 @@ void cmdPausePeakWatcher(Command* command) {
 	if (pw_timer) {
 		// Running.
 		pw_stop();
-		outputMessage("paused Peak Watcher");
+		outputMessage(translate("paused Peak Watcher"));
 	} else if (pw_numTracksEnabled > 0) {
-		// Disabled.
-		pw_start();
-		outputMessage("resumed Peak Watcher");
-	} else {
 		// Paused.
-		outputMessage("Peak Watcher not enabled");
+		pw_start();
+		outputMessage(translate("resumed Peak Watcher"));
+	} else {
+		// Disabled.
+		outputMessage(translate("Peak Watcher not enabled"));
 	}
 }

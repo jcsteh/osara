@@ -1393,7 +1393,7 @@ void postToggleCountIn(int command) {
 void postTakeChannelMode(int command) {
 	int count = CountSelectedMediaItems(0);
 	if(count==0) {
-		outputMessage("no items selected");
+		outputMessage(translate("no items selected"));
 		return;
 	}
 	const char* mode;
@@ -2476,8 +2476,9 @@ void cmdRemoveTimeSelection(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
-	if (start != end)
-		outputMessage("Contents of time selection removed");
+	if (start != end) {
+		outputMessage(translate("contents of time selection removed"));
+	}
 }
 
 void cmdMoveItems(Command* command) {
@@ -2500,7 +2501,7 @@ void cmdMoveItems(Command* command) {
 void cmdMoveItemEdge(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
-		outputMessage("No items selected");
+		outputMessage(translate("no items selected"));
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
@@ -2539,21 +2540,21 @@ void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
 	if (CountProjectMarkers(0, NULL, NULL) != count)
-		outputMessage("marker deleted");
+		outputMessage(translate("marker deleted"));
 }
 
 void cmdDeleteRegion(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40615, 0); // Markers: Delete region near cursor
 	if (CountProjectMarkers(0, NULL, NULL) != count)
-		outputMessage("region deleted");
+		outputMessage(translate("region deleted"));
 }
 
 void cmdDeleteTimeSig(Command* command) {
 	int count = CountTempoTimeSigMarkers(0);
 	Main_OnCommand(40617, 0); // Markers: Delete time signature marker near cursor
 	if (CountTempoTimeSigMarkers(0) != count)
-		outputMessage("time signature deleted");
+		outputMessage(translate("time signature deleted"));
 }
 
 void cmdRemoveStretch(Command* command) {
@@ -2566,7 +2567,7 @@ void cmdRemoveStretch(Command* command) {
 	int count = GetTakeNumStretchMarkers(take);
 	Main_OnCommand(41859, 0); // Item: remove stretch marker at current position
 	if (GetTakeNumStretchMarkers(take) != count)
-		outputMessage("stretch marker deleted");
+		outputMessage(translate("stretch marker deleted"));
 }
 
 void cmdClearTimeLoopSel(Command* command) {
@@ -2581,7 +2582,7 @@ void cmdClearTimeLoopSel(Command* command) {
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	cur += start + end;
 	if (old != cur)
-		outputMessage("Cleared time/loop selection");
+		outputMessage(translate("cleared time/loop selection"));
 }
 
 void cmdUnselAllTracksItemsPoints(Command* command) {
@@ -2591,7 +2592,7 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
 	if (old != cur)
-		outputMessage("Unselected tracks/items/envelope points");
+		outputMessage(translate("unselected tracks/items/envelope points"));
 }
 
 void cmdSwitchProjectTab(Command* command) {
@@ -2606,7 +2607,9 @@ void cmdSwitchProjectTab(Command* command) {
 	if (newName[0]) {
 		outputMessage(newName);
 	} else {
-		outputMessage("[Unsaved]");
+		// Translators: Reported when switching to a project tab containing an
+		// unsaved project.
+		outputMessage(translate("[Unsaved]"));
 	}
 }
 
@@ -2786,7 +2789,7 @@ void cmdReportSelection(Command* command) {
 			return;
 	}
 	if (count == 0) {
-		outputMessage("No selection");
+		outputMessage(translate("no selection"));
 		return;
 	}
 	if (multiLine) {
@@ -2818,7 +2821,7 @@ void cmdhDeleteTakeMarkers(int command) {
 	Main_OnCommand(command, 0);
 	int removed = oldCount - countTakeMarkersInSelectedTakes();
 	if (removed == 1) {
-		outputMessage("take marker deleted");
+		outputMessage(translate("take marker deleted"));
 	} else {
 		ostringstream s;
 		s << removed << " take markers deleted";
@@ -2894,7 +2897,7 @@ void cmdReportCursorPosition(Command* command) {
 void cmdToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
-		outputMessage("noncontiguous selection");
+		outputMessage(translate("noncontiguous selection"));
 		return;
 	}
 	bool select;
@@ -2956,8 +2959,9 @@ void cmdMoveStretch(Command* command) {
 		done = true;
 	}
 	Undo_EndBlock("Move stretch marker", UNDO_STATE_ITEMS);
-	if (done)
-		outputMessage("stretch marker moved");
+	if (done) {
+		outputMessage(translate("stretch marker moved"));
+	}
 }
 
 void reportPeak(MediaTrack* track, int channel) {
@@ -2997,7 +3001,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 	for (int i = count - 1; i >= 0; --i)
 		DeleteTempoTimeSigMarker(0, i);
 	Undo_EndBlock("Delete all time signature markers", UNDO_STATE_ALL);
-	outputMessage("Deleted all time signature markers");
+	outputMessage(translate("deleted all time signature markers"));
 }
 
 void moveToTransient(bool previous) {
@@ -3062,17 +3066,17 @@ void cmdReportAutomationMode(Command* command) {
 void cmdToggleGlobalAutomationLatchPreview(Command* command) {
 	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
 		SetGlobalAutomationOverride(-1);
-		outputMessage("Global automation override off");
+		outputMessage(translate("global automation override off"));
 	} else { //not in latch preview.
 		SetGlobalAutomationOverride(5);
-		outputMessage("Global automation override latch preview");
+		outputMessage(translate("global automation override latch preview"));
 	}
 }
 
 void cmdCycleTrackAutomation(Command* command) {
 	int count = CountSelectedTracks2(0, true);
 	if (count == 0) {
-		outputMessage("No selected tracks");
+		outputMessage(translate("no selected tracks"));
 		return;
 	}
 	int oldmode = GetTrackAutomationMode(GetLastTouchedTrack());
@@ -3092,7 +3096,7 @@ void cmdCycleTrackAutomation(Command* command) {
 void cmdCycleMidiRecordingMode(Command* command) {
 	int count = CountSelectedTracks2(0, false);
 	if (count == 0) {
-		outputMessage("No selected tracks");
+		outputMessage(translate("no selected tracks"));
 		return;
 	}
 	int oldmode = (int)GetMediaTrackInfo_Value(GetLastTouchedTrack(), "I_RECMODE");

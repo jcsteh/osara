@@ -327,7 +327,7 @@ void cmdhSelectEnvelope(int direction) {
 		break; // We found our envelope!
 	}
 	if (!env) {
-		outputMessage("no visible envelopes");
+		outputMessage(translate("no visible envelopes"));
 		return;
 	}
 
@@ -537,7 +537,7 @@ void reportToggleTrackEnvelope(const char* envType) {
 		return;
 	}
 	if (!isTrackSelected(track)) {
-		outputMessage("track not selected");
+		outputMessage(translate("track not selected"));
 		return;
 	}
 	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
@@ -581,7 +581,7 @@ void cmdToggleTrackEnvelope(Command* command) {
 	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
 	ostringstream s;
 	if (after.size() == before.size()) {
-		outputMessage("no envelopes toggled");
+		outputMessage(translate("no envelopes toggled"));
 		return;
 	}
 	if (after.size() > before.size()) {
