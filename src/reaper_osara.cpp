@@ -330,10 +330,12 @@ string FormatNoteLength(double start, double end) {
 	}
 	ostringstream s;
 	if(bars>0) {
-		s<< bars << (bars==1?" bar ":" bars ");
+		s << fmt::format(
+			translate_plural("{} bar", "{} bars", bars), bars) << " ";
 	}
 	if(remBeats>0){
-		s << remBeats << (remBeats==1?" beat ":" beats ");
+		s << fmt::format(
+			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
 	}
 	if(percent>0) {
 		s << percent << " percent ";

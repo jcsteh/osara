@@ -151,7 +151,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(mute)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (mute ? "muted" : "unmuted");
+			s << (mute ? translate("muted") : translate("unmuted"));
 			outputMessage(s);
 		}
 		cache.update(mute);
@@ -171,7 +171,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(solo)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (solo ? "soloed" : "unsoloed");
+			s << (solo ? translate("soloed") : translate("unsoloed"));
 			outputMessage(s);
 		}
 		cache.update(solo);
@@ -186,7 +186,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(arm)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (arm ? "armed" : "unarmed");
+			s << (arm ? translate("armed") : translate("unarmed"));
 			outputMessage(s);
 		}
 		cache.update(arm);

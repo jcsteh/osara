@@ -15,10 +15,12 @@
 #include <algorithm>
 #include <optional>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include "osara.h"
 
 using namespace std;
 using fmt::format;
+using namespace fmt::literals;
 
 bool selectedEnvelopeIsTake = false;
 int currentAutomationItem = -1;
@@ -98,7 +100,6 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		oldItems = CountAutomationItems(envelope);
 	}
 	Main_OnCommand(command, 0);
-	ostringstream s;
 	int removed;
 	// Check items first, since deleting an item might also implicitly remove
 	// points.
@@ -107,15 +108,21 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		// If no items wer removed, fall through to the points check below unless
 		// we're not checking points, in which case report 0 items.
 		if (removed > 0 || !checkPoints) {
-			s << removed << (removed == 1 ? " automation item" : " automation items") << " removed";
-			outputMessage(s);
+			// Translators: Reported when removing automation items. {} will be
+			// replaced with the number of items; e.g. "2 automation items removed".
+			outputMessage(format(
+				translate_plural("{} automation item removed", "{} automation items removed", removed),
+				removed));
 			return;
 		}
 	}
 	if (checkPoints) {
 		removed = oldPoints - countEnvelopePointsIncludingAutoItems(envelope);
-		s << removed << (removed == 1 ? " point" : " points") << " removed";
-		outputMessage(s);
+		// Translators: Reported when removing envelope points. {} will be
+		// replaced with the number of points; e.g. "2 points removed".
+		outputMessage(format(
+			translate_plural("{} point removed", "{} points removed", removed),
+			removed));
 	}
 }
 
@@ -207,11 +214,14 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
-	ostringstream s;
-	s << "point " << point + 1 << " value ";
 	char out[64];
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
-	s << out;
+	ostringstream s;
+	// Translators: Reported when moving to an envelope point. {point} will be
+	// replaced with the number of the point. {} will be replaced with the value.
+	// For example: "point 1 value 0.00 dB".
+	s << format(translate("point {point} value {value}"),
+		"point"_a=point, "value"_a=out);
 	bool isSelected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
 	if (isSelected) {
@@ -273,7 +283,8 @@ void cmdhSelectEnvelope(int direction) {
 		getEnvelope = [track] (int index) { return GetTrackEnvelope(track, index); };
 	}
 	if (count == 0) {
-		outputMessage(selectedEnvelopeIsTake ? "no take envelopes" : "no track envelopes");
+		outputMessage(selectedEnvelopeIsTake ?
+			translate("no take envelopes") : translate("no track envelopes"));
 		return;
 	}
 
@@ -519,16 +530,21 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	if (!envelope) {
 		return;
 	}
-	ostringstream s;
 	int count;
 	if ((count = countSelectedAutomationItems(envelope))) {
-		s << count << (count == 1 ? " automation item" : " automation items");
+		// Translators: Reported when copying automation items. {} will be replaced
+		// with the number of items; e.g. "2 automation items copied".
+		outputMessage(format(
+			translate_plural("{} automation item copied", "{} automation items copied", count),
+			count));
 	} else {
 		count = countSelectedEnvelopePoints(envelope);
-		s << count << (count == 1 ? " envelope point" : " envelope points");
+		// Translators: Reported when copying envelope points. {} will be replaced
+		// with the number of points; e.g. "2 envelope points copied".
+		outputMessage(format(
+			translate_plural("{} envelope point copied", "{} envelope points copied", count),
+			count));
 	}
-	s << " copied";
-	outputMessage(s);
 }
 
 bool isEnvelopeVisible(TrackEnvelope* envelope) {
@@ -615,7 +631,9 @@ void postSelectMultipleEnvelopePoints(int command) {
 		return;
 	}
 	int count = countSelectedEnvelopePoints(envelope);
-	ostringstream s;
-	s << count << (count == 1 ? " point" : " points") << " selected";
-	outputMessage(s);
+	// Translators: Reported when selecting envelope points. {} will be replaced
+	// with the number of points; e.g. "2 points selected".
+	outputMessage(format(
+		translate_plural("{} point selected", "{} points selected", count),
+		count));
 }

@@ -120,7 +120,8 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	if (aboutToToggle) {
 		enabled = !enabled;
 	}
-	outputMessage(enabled ? "active" : "bypassed", /* interrupt */ false);
+	outputMessage(enabled ? translate("active") : translate("bypassed"),
+		/* interrupt */ false);
 	return true;
 }
 

@@ -251,8 +251,32 @@ void cmdMidiMoveCursor(Command* command) {
 }
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
-	static const char* names[] = {"c", "c sharp", "d", "d sharp", "e", "f",
-		"f sharp", "g", "g sharp", "a", "a sharp", "b"};
+	static const char* names[] = {
+		// Translators: The name of a musical note.
+		translate("c"),
+		// Translators: The name of a musical note.
+		translate("c sharp"),
+		// Translators: The name of a musical note.
+		translate("d"),
+		// Translators: The name of a musical note.
+		translate("d sharp"),
+		// Translators: The name of a musical note.
+		translate("e"),
+		// Translators: The name of a musical note.
+		translate("f"),
+		// Translators: The name of a musical note.
+		translate("f sharp"),
+		// Translators: The name of a musical note.
+		translate("g"),
+		// Translators: The name of a musical note.
+		translate("g sharp"),
+		// Translators: The name of a musical note.
+		translate("a"),
+		// Translators: The name of a musical note.
+		translate("a sharp"),
+		// Translators: The name of a musical note.
+		translate("b")
+	};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
 	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
