@@ -102,7 +102,7 @@ def addCpp(input):
 		if m:
 			addMessage(m.groupdict())
 
-RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
+RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
 def addRc(input):
 	context = None
 	for line in input:
