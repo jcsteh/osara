@@ -33,7 +33,11 @@ sources = [
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX")
+	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX "
+		# #479: fmt/format.h includes UTF-8 characters in comments. However, cl
+		# treats the file as ANSI unless it has a BOM. This causes a warning (and
+		# thus an error) on systems with certain locales. Just disable this warning.
+		"/wd4819")
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
