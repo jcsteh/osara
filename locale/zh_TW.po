@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-02-24 10:21\n"
+"PO-Revision-Date: 2021-02-24 21:21\n"
 
 msgid "volume"
 msgstr "音量"
@@ -31,6 +31,26 @@ msgstr "預備錄音"
 #. Reported when navigating to the master track.
 msgid "master"
 msgstr "主控"
+
+#. Reported when moving to a named project marker. {} will
+#. be replaced with the marker's name; e.g. "intro marker".
+msgid "{} marker"
+msgstr ""
+
+#. Reported when moving to an unnamed project marker. {}
+#. will be replaced with the marker's name; e.g. "marker 2".
+msgid "marker {}"
+msgstr ""
+
+#. Reported when playback reaches a named region. {} will
+#. be replaced with the region's name; e.g. "intro region".
+msgid "{} region"
+msgstr ""
+
+#. Reported when playback reaches an unnamed region. {}
+#. will be replaced with the region's number; e.g. "region 2".
+msgid "region {}"
+msgstr ""
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
@@ -465,6 +485,8 @@ msgstr[0] "{} 項目"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
+#. Reported when switching takes before listing the effects on
+#. the take.
 msgid "FX:"
 msgstr "FX"
 
@@ -481,6 +503,7 @@ msgid "record monitor off"
 msgstr "錄音監聽關"
 
 #. Record monitor set to normal.
+#. A take channel mode.
 msgid "normal"
 msgstr "正常"
 
@@ -514,6 +537,28 @@ msgstr[0] "{} 項目歸一化為共同增益"
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} 項目歸一化"
+
+#. Reported when moving to the start of a named region. {}
+#. will be replaced with the region's name; e.g. "intro region start".
+msgid "{} region start"
+msgstr ""
+
+#. Reported when moving to the start of an unnamed region.
+#. {} will be replaced with the region's number; e.g.
+#. "region 2 start".
+msgid "region {} start"
+msgstr ""
+
+#. Reported when moving to the end of a named region. {}
+#. will be replaced with the region's name; e.g. "intro region end".
+msgid "{} region end"
+msgstr ""
+
+#. Reported when moving to the end of an unnamed region.
+#. {} will be replaced with the region's number; e.g.
+#. "region 2 end".
+msgid "region {} end"
+msgstr ""
 
 #. Reported when moving by marker and the cursor lands at the
 #. start of the time selection.
@@ -569,10 +614,17 @@ msgstr "重複開"
 msgid "repeat off"
 msgstr "重複關"
 
-#. Reported when switching takes before listing the effects on
-#. the take.
-msgid "FX: "
-msgstr "FX:"
+#. Reported when copying tracks. {} will be replaced with
+#. the number of tracks; e.g. "2 tracks copied".
+msgid "{} track copied"
+msgid_plural "{} tracks copied"
+msgstr[0] ""
+
+#. Reported when copying items. {} will be replaced with
+#. the number of items; e.g. "2 items copied".
+msgid "{} item copied"
+msgid_plural "{} items copied"
+msgstr[0] ""
 
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
@@ -701,10 +753,46 @@ msgstr "預捲開"
 msgid "count in on"
 msgstr "預示開"
 
+#. A take channel mode.
+msgid "mono (left)"
+msgstr ""
+
+#. A take channel mode.
+msgid "mono (downmix)"
+msgstr ""
+
+#. A take channel mode.
+msgid "mono (right)"
+msgstr ""
+
+#. A take channel mode OSARA doesn't know about.
+msgid "unknown mode"
+msgstr ""
+
+#. Reported when setting the channel mode of takes.
+#. {count} will be replaced with the number of takes affected.
+#. {mode} will be replaced with the mode being set.
+#. For example: "set 2 takes to mono (left)"
+msgid "set {count} take to {mode}"
+msgid_plural "set {count} takes to {mode}"
+msgstr[0] ""
+
 #. Reported when changing the tempo. {} will be replaced with
 #. the new tempo; e.g. "50 bpm".
 msgid "{} bpm"
 msgstr "{} bpm"
+
+msgid "enabled playback position follows project timebase when changing tempo"
+msgstr ""
+
+msgid "disabled playback position follows project timebase when changing tempo"
+msgstr ""
+
+msgid "preserving pitch when changing play rate"
+msgstr ""
+
+msgid "not preserving pitch when changing play rate"
+msgstr ""
 
 msgid "set selection start"
 msgstr "設置選區開始"
@@ -865,6 +953,12 @@ msgstr "全局自動化覆蓋鎖存預覽"
 
 msgid "no selected tracks"
 msgstr "未選中軌道"
+
+msgid "time selection start"
+msgstr ""
+
+msgid "time selection end"
+msgstr ""
 
 #. Reported when inserting a marker. {} will be replaced with the
 #. number of the new marker; e.g. "marker 2 inserted".
