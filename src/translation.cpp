@@ -8,12 +8,20 @@
 
 #include <string>
 #include <fstream>
+#include <map>
 #include <tinygettext/dictionary.hpp>
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
 #include <WDL/win32_utf8.h>
 
 using namespace std;
+
+// Maps REAPER language pack names to locale codes used by OSARA. There can
+// be (and often are) multiple REAPER language packs per language.
+map<string, string> REAPER_LANG_TO_CODE = {
+	{"pt-BR", "pt_BR"},
+	{"Reaper+SWS_CHSDOU", "zh_CN"},
+};
 
 tinygettext::Dictionary translationDict;
 
@@ -29,12 +37,17 @@ void initTranslation() {
 	}
 	// We can't use std::filesystem::path because it isn't supported until MacOS 10.15. Grrr!
 	string name(langpack);
-	// Replace .ReaperLangPack extension with .po.
+	// Strip .ReaperLangPack extension.
 	auto extPos = name.rfind(".");
 	if (extPos == string::npos) {
 		return;
 	}
 	name.erase(extPos);
+	// Check if we've mapped this REAPER language pack to a locale.
+	const auto nameIt = REAPER_LANG_TO_CODE.find(name);
+	if (nameIt != REAPER_LANG_TO_CODE.end()) {
+		name = nameIt->second;
+	}
 	name += ".po";
 	// OSARA translations are stored in osara/locale in the REAPER resource
 	// directory.
