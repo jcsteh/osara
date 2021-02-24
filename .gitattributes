@@ -13,3 +13,4 @@ sconstruct text
 *.yml text
 *.sh eol=lf
 *.py text
+*.po text
