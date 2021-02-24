@@ -14,6 +14,8 @@ environment:
  global:
   encFileKey:
    secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
+  crowdinAuthToken:
+   secure: 7DTljIEjNzKsCtWTf9iKT8LhRApXcEnPVzIoN1puxBeGhQlp9UcHOT/LQIp4Ddo6jU74HoZn4D9UzdjsEgRgEj34QGDv+gjpsc9HN9PevKho1TYfAZDEAVM0OZl2NaVt
 
 init:
  - ps: |
@@ -24,7 +26,7 @@ init:
        Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
       }
      }
- - cmd: py -m pip install scons
+ - cmd: py -m pip --disable-pip-version-check install --no-warn-script-location scons
  - sh: pip3 install --user scons
 
 clone_depth: 1
@@ -74,6 +76,13 @@ deploy_script:
       }
       if ($IsWindows) { $data["pot"] = Get-ChildItem -Name locale/*.pot }
       ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
+      if ($IsWindows) {
+       py -m pip --disable-pip-version-check install --no-warn-script-location requests
+       # We must explicitly specify the Python version here because
+       # crowdinSync has a shebang line which causes the wrong version to be
+       # used.
+       py -3.9-32 ci\crowdinSync uploadPot
+      }
      }
 
 notifications:

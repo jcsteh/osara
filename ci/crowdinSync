@@ -1,0 +1,85 @@
+#!/usr/bin/python3
+
+import time
+import os
+import glob
+import sys
+import zipfile
+import shutil
+import subprocess
+import requests
+
+AUTH_TOKEN = os.getenv("crowdinAuthToken")
+if not AUTH_TOKEN:
+	raise ValueError("crowdinAuthToken environment variable not set")
+PROJECT_ID = 442894
+POT_FILE_ID = 4
+TMP_DOWNLOAD_PATH = "locale.zip"
+
+def request(path, method=requests.get, headers={}, **kwargs):
+	headers["Authorization"] = "Bearer %s" % AUTH_TOKEN
+	r = method("https://api.crowdin.com/api/v2/%s" % path, headers=headers,
+		**kwargs)
+	# Convert errors to exceptions.
+	r.raise_for_status()
+	return r
+
+def projectRequest(path, **kwargs):
+	return request("projects/%d/%s" % (PROJECT_ID, path), **kwargs)
+
+def downloadTranslations():
+	print("Requesting Crowdin build")
+	r = projectRequest("translations/builds", method=requests.post, json={})
+	buildId = r.json()["data"]["id"]
+	print("Requesting translations download")
+	while True:
+		r = projectRequest("translations/builds/%d/download" % buildId)
+		if r.status_code == 200:
+			break
+		if r.status_code == 202:
+			print("Crowdin build in progress, retrying")
+			time.sleep(5)
+	url = r.json()["data"]["url"]
+	print("Downloading translations")
+	r = requests.get(url, stream=True)
+	r.raise_for_status()
+	# zipfile barfs with r.raw as an input stream, so we have to copy to a
+	# temporary file.
+	shutil.copyfileobj(r.raw, open(TMP_DOWNLOAD_PATH, "wb"))
+
+def syncTranslations():
+	#print("Pulling from GitHub")
+	#subprocess.check_call(("git", "pull"))
+	downloadTranslations()
+	print("Extracting translations")
+	with zipfile.ZipFile(TMP_DOWNLOAD_PATH) as zf:
+		zf.extractall()
+	os.remove(TMP_DOWNLOAD_PATH)
+	print("Committing new translations")
+	subprocess.check_call(("git", "add", *glob.glob("locale/*.po")))
+	subprocess.check_call(("git", "commit", "-m", "Update translations."))
+	#print("Pushing to GitHub")
+	#subprocess.check_call(("git", "push"))
+
+def uploadPot():
+	potPath = glob.glob("locale/*.pot")[0]
+	fn = os.path.basename(potPath)
+	pot = open(potPath, "rb")
+	print("Uploading pot to Crowdin temporary storage")
+	r = request("storages", method=requests.post,
+		headers={"Crowdin-API-FileName": "osara.po"}, data=pot)
+	r.raise_for_status()
+	storageId = r.json()["data"]["id"]
+	print("Updating pot file on Crowdin")
+	r = projectRequest("files/%d" % POT_FILE_ID, method=requests.put,
+		json={"storageId": storageId})
+	return r
+
+if __name__ == "__main__":
+	command = sys.argv[1]
+	if command == "syncTranslations":
+		syncTranslations()
+	elif command == "uploadPot":
+		uploadPot()
+	else:
+		raise ValueError("Unknown command")
