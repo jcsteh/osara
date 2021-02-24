@@ -1,0 +1,1220 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: osara\n"
+"X-Crowdin-Project-ID: 442894\n"
+"X-Crowdin-Language: zh-CN\n"
+"X-Crowdin-File: osara.po\n"
+"X-Crowdin-File-ID: 4\n"
+"Project-Id-Version: osara\n"
+"Language-Team: Chinese Simplified\n"
+"Language: zh_CN\n"
+"PO-Revision-Date: 2021-02-24 10:21\n"
+
+msgid "volume"
+msgstr "音量"
+
+msgid "pan"
+msgstr "声像"
+
+msgid "muted"
+msgstr "静音"
+
+msgid "soloed"
+msgstr "独奏"
+
+msgid "armed"
+msgstr "录音准备"
+
+#. Reported when navigating to the master track.
+msgid "master"
+msgstr "主控轨"
+
+#. Reported when removing automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items removed".
+msgid "{} automation item removed"
+msgid_plural "{} automation items removed"
+msgstr[0] "{} 自动化对象已删除"
+
+#. Reported when removing envelope points. {} will be
+#. replaced with the number of points; e.g. "2 points removed".
+msgid "{} point removed"
+msgid_plural "{} points removed"
+msgstr[0] "{} 点已删除"
+
+#. Reported when moving to an envelope point. {point} will be
+#. replaced with the number of the point. {} will be replaced with the value.
+#. For example: "point 1 value 0.00 dB".
+msgid "point {point} value {value}"
+msgstr "点 {point} 值 {value}"
+
+msgid "selected"
+msgstr "选中"
+
+msgid "unselected "
+msgstr "未选中 "
+
+msgid "no take envelopes"
+msgstr "无片段 包络"
+
+msgid "no visible envelopes"
+msgstr "无可见 包络"
+
+#. Reported when selecting an envelope. {} will be replaced
+#. with the name of the envelope; e.g. "volume envelope".
+msgid "{} envelope"
+msgstr "{} 包络"
+
+msgid "bypassed"
+msgstr "取消旁通"
+
+#. Reported when moving to an automation item. {} will be
+#. replaced with the name or number of the automation item; e.g. "auto 2".
+msgid "auto {}"
+msgstr "速率 {}"
+
+msgid "unselected"
+msgstr "未选中"
+
+#. Reported when copying automation items. {} will be replaced
+#. with the number of items; e.g. "2 automation items copied".
+msgid "{} automation item copied"
+msgid_plural "{} automation items copied"
+msgstr[0] "{} 已复制自动化对象"
+
+#. Reported when copying envelope points. {} will be replaced
+#. with the number of points; e.g. "2 envelope points copied".
+msgid "{} envelope point copied"
+msgid_plural "{} envelope points copied"
+msgstr[0] "{} 已复制包络点"
+
+msgid "track not selected"
+msgstr "未选择轨道"
+
+#. Reported when showing an envelope. {} will be replaced with
+#. the name of the envelope; e.g. "showed volume envelope".
+msgid "showed {} envelope"
+msgstr "显示 {} 包络"
+
+#. Reported when hiding an envelope. {} will be replaced with
+#. the name of the envelope; e.g. "hid volume envelope".
+msgid "hid {} envelope"
+msgstr "隐藏 {} 包络"
+
+msgid "no envelopes toggled"
+msgstr "未切换 包络"
+
+#. Reported when selecting envelope points. {} will be replaced
+#. with the number of points; e.g. "2 points selected".
+msgid "{} point selected"
+msgid_plural "{} points selected"
+msgstr[0] "{} 点 已选中"
+
+msgid "active"
+msgstr "活动"
+
+#. Reported when switching tabs in an effect such as ReaEQ.
+#. {} will be replaced with the name of the tab; e.g. "1 tab".
+msgid "{} tab"
+msgstr "{} 选项卡"
+
+#. The name of a musical note.
+msgid "c"
+msgstr "c"
+
+#. The name of a musical note.
+msgid "c sharp"
+msgstr "c 升"
+
+#. The name of a musical note.
+msgid "d"
+msgstr "d"
+
+#. The name of a musical note.
+msgid "d sharp"
+msgstr "d 升"
+
+#. The name of a musical note.
+msgid "e"
+msgstr "e"
+
+#. The name of a musical note.
+msgid "f"
+msgstr "f"
+
+#. The name of a musical note.
+msgid "f sharp"
+msgstr "f 升"
+
+#. The name of a musical note.
+msgid "g"
+msgstr "g"
+
+#. The name of a musical note.
+msgid "g sharp"
+msgstr "g 升"
+
+#. The name of a musical note.
+msgid "a"
+msgstr "a"
+
+#. The name of a musical note.
+msgid "a sharp"
+msgstr "a 升"
+
+#. The name of a musical note.
+msgid "b"
+msgstr "b"
+
+msgid "noncontiguous selection"
+msgstr "非连续选择"
+
+msgid "no time selection"
+msgstr "无时间选择"
+
+msgid "no notes selected"
+msgstr "未选择音符"
+
+#. Reported in Parameters dialogs for a toggle (such as mute)
+#. which is on.
+msgid "on"
+msgstr "开"
+
+#. Reported in Parameters dialogs for a toggle (such as mute)
+#. which is off.
+msgid "off"
+msgstr "关"
+
+msgid "FX Parameters"
+msgstr "FX 参数"
+
+msgid "mute"
+msgstr "静默"
+
+msgid "mono"
+msgstr "单声道"
+
+#. Indicates a parameter for a track send in the Track Parameters
+#. dialog.
+msgid "send"
+msgstr "发送"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog.
+msgid "receive"
+msgstr "接收"
+
+msgid "Track Parameters"
+msgstr "轨道参数"
+
+msgid "item volume"
+msgstr "对象 音量"
+
+msgid "take volume"
+msgstr "片段 音量"
+
+msgid "take pan"
+msgstr "片段 声像"
+
+msgid "fade in length"
+msgstr "淡入 长度"
+
+msgid "Fade out length"
+msgstr "淡出 长度"
+
+msgid "Item Parameters"
+msgstr "对象 参数"
+
+#. In the menu of effects when opening the FX Parameters
+#. dialog, this is presented after effects which are monitoring FX.
+msgid "[monitor]"
+msgstr "[监听]"
+
+#. In the menu of effects when opening the FX Parameters
+#. dialog, this is presented after effects which are input FX.
+msgid "[input]"
+msgstr "[输入]"
+
+msgid "no FX"
+msgstr "无 FS"
+
+#. Reported when the user tries to reset a Peak Watcher
+#. track, but that Peak Watcher track is disabled.
+#. Reported when the user tries to report a Peak Watcher
+#. channel, but the Peak Watcher track is disabled.
+msgid "Peak Watcher track disabled"
+msgstr "峰值观察器轨道 已禁用"
+
+#. Reported when the user resets a Peak Watcher track.
+msgid "reset"
+msgstr "复位"
+
+#. used when Peak Watcher notifies about a peak.
+#. {} will be replaced with the track number; e.g. "track 2".
+msgid "track {}"
+msgstr "轨道 {}"
+
+#. used when Peak Watcher notifies about a peak. This is
+#. placed after the track and before the peak value.
+#. {} will be replaced with the channel number; e.g. "chan 2".
+msgid "chan {}:"
+msgstr "通道 {}:"
+
+#. Used in the lists of tracks in the Peak Watcher dialog
+#. to indicate the current track.
+msgid "current"
+msgstr "当前"
+
+#. Reported when the user tries to report a Peak Watcher
+#. channel, but the Peak Watcher is paused.
+msgid "Peak Watcher paused"
+msgstr "峰值观察器已暂停"
+
+msgid "paused Peak Watcher"
+msgstr "暂停峰值观察器"
+
+msgid "resumed Peak Watcher"
+msgstr "恢复峰值观察器"
+
+msgid "Peak Watcher not enabled"
+msgstr "峰值观察器 未启用"
+
+#. Used when reporting a length of time in measures.
+#. {} will be replaced with the number of measures; e.g.
+#. "2 bars".
+msgid "{} bar"
+msgid_plural "{} bars"
+msgstr[0] "{} 小节"
+
+#. Used when reporting the measure of a time position.
+#. {} will be replaced with the measure number; e.g. "bar 2".
+msgid "bar {}"
+msgstr "{} 小节"
+
+#. Used when reporting a length of time in beats.
+#. {} will be replaced with the number of beats; e.g. "2 beats".
+msgid "{} beat"
+msgid_plural "{} beats"
+msgstr[0] "拍 {}"
+
+#. Used when reporting the beat of a time position.
+#. {} will be replaced with the beat number; e.g. "beat 2".
+msgid "beat {}"
+msgstr "拍 {}"
+
+#. Used when reporting a time in minutes. {} will be
+#. replaced with the number of minutes; e.g. "2 min".
+msgid "{} min"
+msgstr "{} 分"
+
+#. Used when reporting a time in seconds. {:.3f} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{:#.3f} sec"
+msgstr "{:#.3f} 秒"
+
+msgid "{:.3f} sec"
+msgstr "{:.3f} 秒"
+
+#. Used when reporting a time in frames. {} will be
+#. replaced with the number of frames; e.g. "2 frames".
+msgid "{} frame"
+msgid_plural "{} frames"
+msgstr[0] "{} 帧"
+
+#. used when reporting a time in hours. {} will be replaced
+#. with the number of hours; e.g. "2 hours".
+msgid "{} hour"
+msgid_plural "{} hours"
+msgstr[0] "{} 时"
+
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} 秒"
+
+#. Used when reporting a time in samples. {} will be replaced
+#. with the number of samples; e.g. "2 samples".
+msgid "{} samples"
+msgstr "{} 采样点"
+
+#. A track which isn't a folder.
+msgid "track"
+msgstr "轨道"
+
+#. A track which is a folder.
+msgid "folder"
+msgstr "文件夹"
+
+#. A track which ends its folder.
+msgid "end of folder"
+msgstr "文件夹尾"
+
+#. An open track folder.
+msgid "open"
+msgstr "打开"
+
+#. An open (but small visually) track folder.
+msgid "small"
+msgstr "小"
+
+#. A closed track folder.
+msgid "closed"
+msgstr "关闭"
+
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "无"
+
+#. An automation mode.
+msgid "trim/read"
+msgstr "修剪/读取"
+
+#. An automation mode.
+msgid "read"
+msgstr "阅读"
+
+#. An automation mode.
+msgid "touch"
+msgstr "触控"
+
+#. An automation mode.
+msgid "write"
+msgstr "写入"
+
+#. An automation mode.
+msgid "latch"
+msgstr "锁存器"
+
+#. An automation mode.
+msgid "latch preview"
+msgstr "锁存器 预览"
+
+#. An automation mode.
+msgid "bypass"
+msgstr "旁通"
+
+#. An automation mode OSARA doesn't know about.
+#. A recording mode OSARA doesn't know about.
+msgid "unknown"
+msgstr "未知"
+
+#. A recording mode.
+msgid "input"
+msgstr "输入"
+
+#. A recording mode.
+msgid "output (stereo)"
+msgstr "输出（立体声）"
+
+#. A recording mode.
+msgid "disabled"
+msgstr "已禁用"
+
+#. A recording mode.
+msgid "output (stereo, latency compensated)"
+msgstr "输出（立体声，延迟补偿）"
+
+#. A recording mode.
+msgid "output (midi)"
+msgstr "输出（midi）"
+
+#. A recording mode.
+msgid "output (mono)"
+msgstr "输出（单声道）"
+
+#. A recording mode.
+msgid "output (mono, latency compensated)"
+msgstr "输出（单声道，延迟补偿）"
+
+#. A recording mode.
+msgid "midi overdub"
+msgstr "midi 配音"
+
+#. A recording mode.
+msgid "midi replace"
+msgstr "midi 替换"
+
+#. A recording mode.
+msgid "midi touch-replace"
+msgstr "midi 触控-替换"
+
+#. A recording mode.
+msgid "midi latch-replace"
+msgstr "midi 锁存器 替换"
+
+msgid "phase inverted"
+msgstr "相位倒置"
+
+msgid "FX bypassed"
+msgstr "FS 旁通"
+
+#. Reported when navigating to a track which has track notes.
+msgid "notes"
+msgstr "音符"
+
+#. Reported when navigating tracks to indicate how many items
+#. the track has. {} will be replaced by the number of items; e.g.
+#. "2 items".
+msgid "{} item"
+msgid_plural "{} items"
+msgstr[0] "{} 对象"
+
+#. Reported when navigating tracks before listing the effects on
+#. the track.
+msgid "FX:"
+msgstr "FX:"
+
+msgid "unmuted"
+msgstr "取消静音"
+
+msgid "unsoloed"
+msgstr "取消独奏"
+
+msgid "unarmed"
+msgstr "取消录音准备"
+
+msgid "record monitor off"
+msgstr "录音监听关"
+
+#. Record monitor set to normal.
+msgid "normal"
+msgstr "正常监听输入"
+
+#. Record monitor set to not when playing.
+msgid "not when playing"
+msgstr "监听输入"
+
+msgid "phase normal"
+msgstr "相位正常"
+
+msgid "FX active"
+msgstr "FS 活动"
+
+msgid "all tracks FX bypassed"
+msgstr "所有轨道 FS 已旁通"
+
+msgid "all tracks FX active"
+msgstr "所有轨道 FS 活动"
+
+msgid "no selected items"
+msgstr "无选定对象"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items normalized to common gain".
+msgid "{} item normalized to common gain"
+msgid_plural "{} items normalized to common gain"
+msgstr[0] "{} 对象 标准化为公共增益"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items normalized".
+msgid "{} item normalized"
+msgid_plural "{} items normalized"
+msgstr[0] "{} 对象 标准化"
+
+#. Reported when moving by marker and the cursor lands at the
+#. start of the time selection.
+msgid "selection start "
+msgstr "选择开始点 "
+
+#. Reported when moving by marker and the cursor lands at the
+#. end of the time selection.
+msgid "selection end "
+msgstr "选择结束点 "
+
+#. Reported when moving by marker and the cursor lands at the
+#. loop start point.
+msgid "loop start "
+msgstr "循环 开始 "
+
+#. Reported when moving by marker and the cursor lands at the
+#. loop end point.
+msgid "loop end "
+msgstr "循环 结束 "
+
+#. Reported when zooming in or out horizontally. {:g} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+msgid "{:g} pixels/second"
+msgstr "{:g} 像素/秒"
+
+#. Panned to the center.
+msgid "center"
+msgstr "中心"
+
+#. Panned to the left. {:g} will be replaced with the amount;
+#. e.g. "20% left".
+msgid "{:g}% left"
+msgstr "{:g}% 左"
+
+#. Panned to the right. {:g} will be replaced with the amount;
+#. e.g. "20% right".
+msgid "{:g}% right"
+msgstr "{:g}% 右"
+
+msgid "ripple per-track"
+msgstr "波纹 每条 轨"
+
+msgid "ripple all tracks"
+msgstr "波纹 全部 轨"
+
+msgid "ripple off"
+msgstr "波纹 关"
+
+msgid "repeat on"
+msgstr "重复播放 开"
+
+msgid "repeat off"
+msgstr "重复播放 关"
+
+#. Reported when switching takes before listing the effects on
+#. the take.
+msgid "FX: "
+msgstr "FX: "
+
+#. Reported when moving to a tempo change. {} will be replaced
+#. with the tempo in bpm; e.g. "tempo 100".
+msgid "tempo {}"
+msgstr "速度 {}"
+
+#. Reported when moving to a time signature change. {num} will
+#. be replaced with the time signature numerator. {denom} will be replaced
+#. with the time signature denominator. For example: "time sig 6/8".
+msgid "time sig {num}/{denom}"
+msgstr "时间信号{num}/{denom}"
+
+#. Reported when moving to a stretch marker.
+msgid "stretch marker"
+msgstr "拉伸标记"
+
+msgid "metronome on"
+msgstr "节拍器 开"
+
+msgid "metronome off"
+msgstr "节拍器 关"
+
+msgid "master track visible"
+msgstr "主控轨 可见"
+
+msgid "master track hidden"
+msgstr "主控轨 隐藏"
+
+msgid "pause"
+msgstr "暂停"
+
+msgid "record"
+msgstr "录音"
+
+msgid "play"
+msgstr "播放"
+
+msgid "stop"
+msgstr "停止"
+
+#. Reported when items are selected. {} will be replaced with
+#. the number of items; e.g. "2 items selected".
+msgid "{} item selected"
+msgid_plural "{} items selected"
+msgstr[0] "{} 对象 已选中"
+
+#. Reported when prompting for the name of a track.
+msgid "Track name"
+msgstr "轨道名称"
+
+#. Reported when multiple items are muted. {} will be replaced
+#. with the number of items; e.g. "2 items muted".
+msgid "{} item muted"
+msgid_plural "{} items muted"
+msgstr[0] "{} 对象 已静音"
+
+#. Reported when multiple items are unmuted. {} will be
+#. replaced with the number of items; e.g. "2 items unmuted".
+msgid "{} item unmuted"
+msgid_plural "{} items unmuted"
+msgstr[0] "{} 对象 取消静音"
+
+#. Reported when multiple items are soloed. {} will be replaced
+#. with the number of items; e.g. "2 items soloed".
+msgid "{} item soloed"
+msgid_plural "{} items soloed"
+msgstr[0] "{} 对象 已独奏"
+
+#. Reported when multiple items are unsoloed. {} will be
+#. replaced with the number of items; e.g. "2 items unsoloed".
+msgid "{} item unsoloed"
+msgid_plural "{} items unsoloed"
+msgstr[0] "{} 对象 取消独奏"
+
+msgid "set selection end"
+msgstr "设置选择结束"
+
+msgid "master mono"
+msgstr "主控 单声道"
+
+msgid "crossfade on"
+msgstr "交叉渐变 开"
+
+msgid "locking on"
+msgstr "锁定 开"
+
+msgid "solo in front"
+msgstr "独奏在前"
+
+#. Solo in front was turned off.
+msgid "normal solo"
+msgstr "正常 独奏"
+
+#. Reported when the play rate is adjusted. {:g} will be replaced
+#. with the play rate; e.g. "1.5 play rate".
+msgid "{:g} play rate"
+msgstr "{:g} 播放速率"
+
+#. Record mode set to normal.
+msgid "normal record"
+msgstr "录音 正常"
+
+msgid "selected item auto-punch"
+msgstr "所选项目自动穿插"
+
+msgid "time selection auto-punch"
+msgstr "时间选择自动穿插"
+
+#. When changing the global automation override, reported prior
+#. to the chosen automation mode.
+msgid "override"
+msgstr "覆盖"
+
+msgid "no items selected"
+msgstr "未选择任何对象"
+
+#. Reported when reversing takes. {} will be replaced by the
+#. number of takes; e.g. "2 takes reversed".
+msgid "{} take reversed"
+msgid_plural "{} takes reversed"
+msgstr[0] "{} 片段反向"
+
+msgid "pre roll on"
+msgstr "预卷 开"
+
+msgid "count in on"
+msgstr "预示 开"
+
+#. Reported when changing the tempo. {} will be replaced with
+#. the new tempo; e.g. "50 bpm".
+msgid "{} bpm"
+msgstr "bpm {}"
+
+msgid "set selection start"
+msgstr "设置选择开始"
+
+msgid "set loop start"
+msgstr "设置循环开始"
+
+msgid "set loop end"
+msgstr "设置循环结束"
+
+msgid "grid whole"
+msgstr "整 格"
+
+msgid "grid half"
+msgstr "半 格"
+
+msgid "grid thirty second"
+msgstr "32分 网格"
+
+msgid "grid quarter"
+msgstr "4分 网格"
+
+msgid "grid quarter triplet"
+msgstr "4分 3连音 网格"
+
+msgid "grid sixteenth"
+msgstr "16 分网格"
+
+msgid "grid sixteenth triplet"
+msgstr "16分 3连音 网格"
+
+msgid "grid eighth"
+msgstr "8分 网格"
+
+msgid "grid eighth triplet"
+msgstr "8分 3连音 网格"
+
+msgid "grid sixty forth"
+msgstr "64分 网格"
+
+msgid "all tracks unmuted"
+msgstr "取消静音 所有轨道"
+
+msgid "all tracks unsoloed"
+msgstr "取消独奏 所有轨道"
+
+msgid "all tracks unarmed"
+msgstr "全部轨道 取消录音准备"
+
+msgid "grid thirty second triplet"
+msgstr "32分 3连音 网格"
+
+msgid "length whole"
+msgstr "全音 长度"
+
+msgid "length half"
+msgstr "半音 长度"
+
+msgid "length thirty second"
+msgstr "32分 长度"
+
+msgid "length quarter"
+msgstr "4分 长度"
+
+msgid "length quarter triplet"
+msgstr "4分 3连音 长度"
+
+msgid "length sixteenth"
+msgstr "16分 长度"
+
+msgid "length sixteenth triplet"
+msgstr "16分 3连音 长度"
+
+msgid "length eighth"
+msgstr "8分 长度"
+
+msgid "length eighth triplet"
+msgstr "8分 3连音 长度"
+
+msgid "length thirty second triplet"
+msgstr "32分 3连音 长度"
+
+#. Reported when there are no tracks to navigate to.
+msgid "no tracks"
+msgstr "无 轨道"
+
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "锁定"
+
+#. Used when navigating items to indicate the number of
+#. takes. {} will be replaced with the number; e.g. "2 takes".
+msgid "{} takes"
+msgstr "{} 片段"
+
+#. Reported when undoing an action. {}
+#. will be replaced with the name of the action; e.g. "undo Remove tracks".
+msgid "undo {}"
+msgstr "撤销 {}"
+
+#. Reported when redoing an action. {}
+#. will be replaced with the name of the action; e.g. "redo Remove tracks".
+msgid "redo {}"
+msgstr "重做 {}"
+
+msgid "nothing pasted"
+msgstr "无粘贴"
+
+msgid "contents of time selection removed"
+msgstr "删除时间选择的内容"
+
+#. Reported when moving items to indicate that no movement
+#. occurred.
+msgid "no change"
+msgstr "无变化"
+
+msgid "marker deleted"
+msgstr "标记已删除"
+
+msgid "region deleted"
+msgstr "区域已删除"
+
+msgid "time signature deleted"
+msgstr "时间拍号已删除"
+
+msgid "stretch marker deleted"
+msgstr "拉伸标记 已删除"
+
+msgid "cleared time/loop selection"
+msgstr "清除时间/循环选择"
+
+msgid "unselected tracks/items/envelope points"
+msgstr "未选中的轨道/对象/包络点"
+
+#. Reported when switching to a project tab containing an
+#. unsaved project.
+msgid "[Unsaved]"
+msgstr "[未保存]"
+
+msgid "no selection"
+msgstr "无 选择"
+
+msgid "take marker deleted"
+msgstr "删除 片段 标记"
+
+msgid "stretch marker moved"
+msgstr "拉伸标记 已移动"
+
+msgid "deleted all time signature markers"
+msgstr "删除所有时间拍号标记"
+
+msgid "global automation override off"
+msgstr "全局自动化覆盖关闭"
+
+msgid "global automation override latch preview"
+msgstr "全局自动化覆盖锁存器预览"
+
+msgid "no selected tracks"
+msgstr "无选中轨道"
+
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "已插入标记 {}"
+
+#. Reported when inserting a region. {} will be replaced with the
+#. number of the new region; e.g. "region 2 inserted".
+msgid "region {} inserted"
+msgstr "{} 已插入区域"
+
+msgid "OSARA: Move to next item (leaving other items selected)"
+msgstr "OSARA:移动到下一个对象（选择其他对象）"
+
+msgid "OSARA: Move to previous item (leaving other items selected)"
+msgstr "OSARA:移到上一个对象（保留选中的其他对象）"
+
+msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
+msgstr "OSARA:查看当前媒体对象/片段/自动化对象的属性（取决于焦点）"
+
+msgid "OSARA: View parameters for current track/item (depending on focus)"
+msgstr "OSARA：查看当前轨道/对象的参数（取决于焦点）"
+
+msgid "OSARA: View FX parameters for current track/take (depending on focus)"
+msgstr "OSARA:查看当前轨道/片段的FX参数（取决于焦点）"
+
+msgid "OSARA: View FX parameters for master track"
+msgstr "OSARA:查看主控轨的 FX 参数"
+
+msgid "OSARA: View Peak Watcher"
+msgstr "OSARA: 查看峰值观察器"
+
+msgid "OSARA: Report Peak Watcher value for channel 1 of first track"
+msgstr "OSARA：报告第一轨道通道1的峰值观察值"
+
+msgid "OSARA: Report Peak Watcher value for channel 2 of first track"
+msgstr "OSARA：报告第一轨道通道2的峰值观察值"
+
+msgid "OSARA: Report Peak Watcher value for channel 1 of second track"
+msgstr "OSARA：报告第二轨道通道1的峰值观察值"
+
+msgid "OSARA: Report Peak Watcher value for channel 2 of second track"
+msgstr "OSARA：报告第二轨道通道2的峰值观察值"
+
+msgid "OSARA: Reset Peak Watcher for first track"
+msgstr "OSARA: 重置第一轨道的峰值观察器"
+
+msgid "OSARA: Reset Peak Watcher for second track"
+msgstr "OSARA: 重置第二轨道的峰值观察器"
+
+msgid "OSARA: Pause/resume Peak Watcher"
+msgstr "OSARA: 暂停/恢复峰值观察器"
+
+msgid "OSARA: View I/O for master track"
+msgstr "OSARA: 查看主控轨的I/O"
+
+msgid "OSARA: Report ripple editing mode"
+msgstr "OSARA: 报告波纹编辑模式"
+
+msgid "OSARA: Report muted tracks"
+msgstr "OSARA： 报告静音轨道"
+
+msgid "OSARA: Report soloed tracks"
+msgstr "OSARA： 报告独奏轨道"
+
+msgid "OSARA: Report record armed tracks"
+msgstr "OSARA： 报告 准备录音 轨道"
+
+msgid "OSARA: Report tracks with record monitor on"
+msgstr "OSARA： 通过录音监视状态报告轨道"
+
+msgid "OSARA: Report tracks with phase inverted"
+msgstr "OSARA： 报告相位反转的轨道"
+
+msgid "OSARA: Report track/item/time selection (depending on focus)"
+msgstr "OSARA： 报告轨道/对象/时间选择（取决于焦点）"
+
+msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
+msgstr "OSARA: 删除对象/轨道/时间选择内容/标记/包络点（取决于焦点）"
+
+msgid "OSARA: Toggle shortcut help"
+msgstr "OSARA: 切换快捷方式帮助"
+
+msgid "OSARA: Report edit/play cursor position"
+msgstr "OSARA：报告编辑/播放光标位置"
+
+msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
+msgstr "OSARA: 启用当前轨道/对象的非连续选择/切换选择（取决于焦点）"
+
+msgid "OSARA: Move last focused stretch marker to current edit cursor position"
+msgstr "OSARA: 将最后一个聚焦的拉伸标记移动到当前编辑光标位置"
+
+msgid "OSARA: Report current peak for channel 1 of current track"
+msgstr "OSARA： 报告当前轨道的通道1的电平峰值"
+
+msgid "OSARA: Report current peak for channel 2 of current track"
+msgstr "OSARA： 报告当前轨道2通道的电平峰值"
+
+msgid "OSARA: Report current peak for channel 1 of master track"
+msgstr "OSARA： 报告主控轨1通道的电平峰值"
+
+msgid "OSARA: Report current peak for channel 2 of master track"
+msgstr "OSARA： 报告主控轨2通道的电平峰值"
+
+msgid "OSARA: Delete all time signature markers"
+msgstr "OSARA: 删除所有时间标记"
+
+msgid "OSARA: Select next track/take envelope (depending on focus)"
+msgstr "OSARA： 选择下一轨道/片段 包络（取决于焦点）"
+
+msgid "OSARA: Select previous track/take envelope (depending on focus)"
+msgstr "OSARA： 选择上一轨道/片段 包络（取决于焦点）"
+
+msgid "OSARA: Move to next envelope point"
+msgstr "OSARA： 移到下一个包络点"
+
+msgid "OSARA: Move to previous envelope point"
+msgstr "OSARA: 移到上一个包络点"
+
+msgid "OSARA: Move to next envelope point (leaving other points selected)"
+msgstr "OSARA： 移动到下一个包络点（选择其他点）"
+
+msgid "OSARA: Move to previous envelope point (leaving other points selected)"
+msgstr "OSARA: 移到上一个包络点（保留其他处于选中状态的点）"
+
+msgid "OSARA: Move to next transient"
+msgstr "OSARA： 转到下一个瞬态"
+
+msgid "OSARA: Move to previous transient"
+msgstr "OSARA： 转到上一个瞬态"
+
+msgid "OSARA: Show first context menu (depending on focus)"
+msgstr "OSARA： 显示第一个上下文菜单（取决于焦点）"
+
+msgid "OSARA: Show second context menu (depending on focus)"
+msgstr "OSARA： 显示第二个上下文菜单（取决于焦点）"
+
+msgid "OSARA: Show third context menu (depending on focus)"
+msgstr "OSARA： 显示第三个上下文菜单（取决于焦点）"
+
+msgid "OSARA: Cycle through midi recording modes of selected tracks"
+msgstr "OSARA： 循环选择轨道的 midi 录制模式"
+
+msgid "OSARA: Configuration"
+msgstr "OSARA: 配置"
+
+msgid "OSARA: Report global / Track Automation Mode"
+msgstr "OSARA： 报告全局/跟踪自动化模式"
+
+msgid "OSARA: Toggle global automation override between latch preview and off"
+msgstr "OSARA: 在锁存器预览和关闭之间 切换全局自动化覆盖"
+
+msgid "OSARA: Cycle automation mode of selected tracks"
+msgstr "OSARA： 选定轨道的循环自动化模式"
+
+msgid "OSARA: About"
+msgstr "OSARA: 关于"
+
+msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
+msgstr "OSARA: 启用当前和弦/音符的非连续选择/切换选择"
+
+msgid "OSARA: Move to next chord"
+msgstr "OSARA： 移到下一个和弦"
+
+msgid "OSARA: Move to previous chord"
+msgstr "OSARA: 移到上一个和弦"
+
+msgid "OSARA: Move to next chord and add to selection"
+msgstr "OSARA: 移动到下一个和弦并添加到选择中"
+
+msgid "OSARA: Move to previous chord and add to selection"
+msgstr "OSARA: 移到上一个和弦并添加到选择中"
+
+msgid "OSARA: Move to next note in chord"
+msgstr "OSARA: 移到和弦的下一个音符"
+
+msgid "OSARA: Move to previous note in chord"
+msgstr "OSARA: 移到和弦的上一个音符"
+
+msgid "OSARA: Move to next note in chord and add to selection"
+msgstr "OSARA： 移动到和弦的下一个音符并添加到所选内容中"
+
+msgid "OSARA: Move to previous note in chord and add to selection"
+msgstr "OSARA: 移到和弦中的上一个音符并添加到所选内容中"
+
+msgid "OSARA: Move to next CC"
+msgstr "OSARA: 转到下一个CC"
+
+msgid "OSARA: Move to previous CC"
+msgstr "OSARA: 转到上一个CC"
+
+msgid "OSARA: Move to next CC and add to selection"
+msgstr "OSARA： 转到下一个CC并添加到所选内容"
+
+msgid "OSARA: Move to previous CC and add to selection"
+msgstr "OSARA： 转到上一个CC并添加到所选内容"
+
+msgid "OSARA: Move to previous midi item on track"
+msgstr "OSARA： 移动到轨道上的上一个midi对象"
+
+msgid "OSARA: Move to next midi item on track"
+msgstr "OSARA: 移动到轨道上的下一个 midi 对象"
+
+msgid "OSARA: Select all notes with the same pitch starting in time selection"
+msgstr "OSARA： 从时间选择开始，选择所有音高相同的音符"
+
+msgid "OSARA: Focus event nearest edit cursor"
+msgstr "OSARA: 焦点事件最近的编辑光标"
+
+msgctxt "Parameters"
+msgid "Parameters"
+msgstr "参数"
+
+msgctxt "Parameters"
+msgid "Parameter:"
+msgstr "参数："
+
+msgctxt "Parameters"
+msgid "Value:"
+msgstr "值："
+
+msgctxt "Parameters"
+msgid "Filter:"
+msgstr "参数 过滤器："
+
+msgctxt "Parameters"
+msgid "&Close"
+msgstr "关闭(&C)"
+
+msgctxt "Peak Watcher"
+msgid "Peak Watcher"
+msgstr "峰值观察器"
+
+msgctxt "Peak Watcher"
+msgid "First track:"
+msgstr "峰值观察器第一轨道："
+
+msgctxt "Peak Watcher"
+msgid "Second track:"
+msgstr "峰值观察器第二轨道："
+
+msgctxt "Peak Watcher"
+msgid "Notify automatically for channels:"
+msgstr "峰值观察器自动通知通道："
+
+msgctxt "Peak Watcher"
+msgid "&1"
+msgstr "峰值观察器 1"
+
+msgctxt "Peak Watcher"
+msgid "&2"
+msgstr "峰值观察器 2"
+
+msgctxt "Peak Watcher"
+msgid "When &level reaches (dB):"
+msgstr "峰值观察器当电平达到（dB）（&L）："
+
+msgctxt "Peak Watcher"
+msgid "Hold peaks:"
+msgstr "峰值观察器保持峰值："
+
+msgctxt "Peak Watcher"
+msgid "&disabled"
+msgstr "峰值监视器已禁用（&D）"
+
+msgctxt "Peak Watcher"
+msgid "&until reset"
+msgstr "峰值监视器&直到重置"
+
+msgctxt "Peak Watcher"
+msgid "for (&ms):"
+msgstr "峰值监视器（&M）"
+
+msgctxt "Peak Watcher"
+msgid "&Reset"
+msgstr "复位(&R)"
+
+msgctxt "Peak Watcher"
+msgid "&OK"
+msgstr "确认(&O)"
+
+msgctxt "Peak Watcher"
+msgid "&Cancel"
+msgstr "取消（&C）"
+
+msgctxt "OSARA Configuration"
+msgid "OSARA Configuration"
+msgstr "OSARA 配置"
+
+msgctxt "OSARA Configuration"
+msgid "Report position when &scrubbing"
+msgstr "擦洗时报告位置(&S)"
+
+msgctxt "OSARA Configuration"
+msgid "Report &time movement during playback/recording"
+msgstr "报告播放/录制期间的时间移动(&T)"
+
+msgctxt "OSARA Configuration"
+msgid "&Move relative to the play cursor for time movement commands during playback"
+msgstr "在播放的时候,光标跟随播放指针移动(&M)"
+
+msgctxt "OSARA Configuration"
+msgid "Report mar&kers during playback"
+msgstr "播放期间报告标记(&K)"
+
+msgctxt "OSARA Configuration"
+msgid "Report &transport state (play, record, etc.)"
+msgstr "报告和传输状态（播放、录制等）(&T)"
+
+msgctxt "OSARA Configuration"
+msgid "Report &FX when moving to tracks/takes"
+msgstr "移到轨道/片段时报告FX(&F)"
+
+msgctxt "OSARA Configuration"
+msgid "Report MIDI &notes in MIDI editor"
+msgstr "在MIDI编辑器中报告MIDI音符(&N)"
+
+msgctxt "OSARA Configuration"
+msgid "Report changes made via &control surfaces"
+msgstr "报告通过控制面所做的更改(&C)"
+
+msgctxt "OSARA Configuration"
+msgid "OK"
+msgstr "确认"
+
+msgctxt "OSARA Configuration"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "Message"
+msgid "Message"
+msgstr "信息"
+
+msgctxt "Message"
+msgid "&Close"
+msgstr "关闭(&C)"
+
+msgctxt "FX Preset"
+msgid "FX Preset"
+msgstr "FS 预设"
+
+msgctxt "FX Preset"
+msgid "Filter:"
+msgstr "FS 过滤器："
+
+msgctxt "FX Preset"
+msgid "&OK"
+msgstr "确认(&O)"
+
+msgctxt "FX Preset"
+msgid "&Cancel"
+msgstr "取消（&C）"
+
