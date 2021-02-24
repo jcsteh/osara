@@ -861,10 +861,15 @@ void postGoToMarker(int command) {
 		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
 		if (markerPos == cursorPos) {
 			fakeFocus = FOCUS_MARKER;
-			if (name[0])
-				s << name << " marker" << " ";
-			else
-				s << "marker " << number << " ";
+			if (name[0]) {
+				// Translators: Reported when moving to a named project marker. {} will
+				// be replaced with the marker's name; e.g. "intro marker".
+				s << format(translate("{} marker"), name) << " ";
+			} else {
+				// Translators: Reported when moving to an unnamed project marker. {}
+				// will be replaced with the marker's name; e.g. "marker 2".
+				s << format(translate("marker {}"), number) << " ";
+			}
 		}
 	}
 	double start, end;
@@ -873,11 +878,15 @@ void postGoToMarker(int command) {
 		if (start == cursorPos) {
 			fakeFocus = FOCUS_REGION;
 			if (name[0]) {
-				s << name << " region ";
+				// Translators: Reported when moving to the start of a named region. {}
+				// will be replaced with the region's name; e.g. "intro region start".
+				s << format(translate("{} region start"), name) << " ";
 			} else {
-				s << "region " << number << " ";
+				// Translators: Reported when moving to the start of an unnamed region.
+				// {} will be replaced with the region's number; e.g.
+				// "region 2 start".
+				s << format(translate("region {} start"), number) << " ";
 			}
-			s << "start ";
 		}
 	}
 	region = findRegionEndingAt(cursorPos);
@@ -885,11 +894,15 @@ void postGoToMarker(int command) {
 		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
 		fakeFocus = FOCUS_REGION;
 		if (name[0]) {
-			s << name << " region ";
+			// Translators: Reported when moving to the end of a named region. {}
+			// will be replaced with the region's name; e.g. "intro region end".
+			s << format(translate("{} region end"), name) << " ";
 		} else {
-			s << "region " << number << " ";
+			// Translators: Reported when moving to the end of an unnamed region.
+			// {} will be replaced with the region's number; e.g.
+			// "region 2 end".
+			s << format(translate("region {} end"), number) << " ";
 		}
-		s << "end ";
 	}
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start != end) {
@@ -1095,26 +1108,32 @@ void postSwitchToTake(int command) {
 }
 
 void postCopy(int command) {
-	ostringstream s;
 	int count;
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
-			if ((count = CountSelectedTracks(0)) > 0)
-				s << count << (count == 1 ? " track" : " tracks") << " copied";
-			break;
+			if ((count = CountSelectedTracks(0)) > 0) {
+				// Translators: Reported when copying tracks. {} will be replaced with
+				// the number of tracks; e.g. "2 tracks copied".
+				outputMessage(format(
+					translate_plural("{} track copied", "{} tracks copied", count),
+					count));
+			}
+			return;
 		case 1: // Item
-			if ((count = CountSelectedMediaItems(0)) > 0)
-				s << count << (count == 1 ? " item" : " items") << " copied";
-			break;
+			if ((count = CountSelectedMediaItems(0)) > 0) {
+				// Translators: Reported when copying items. {} will be replaced with
+				// the number of items; e.g. "2 items copied".
+				outputMessage(format(
+					translate_plural("{} item copied", "{} items copied", count),
+					count));
+			}
+			return;
 		case 2: // Envelope
 			reportCopiedEnvelopePointsOrAutoItems();
-			// A message was already reported, so return here;
-			// don't let the outputMessage below squelch it.
 			return;
 		default:
 			return;
 	}
-	outputMessage(s);
 }
 
 void postMoveToTimeSig(int command) {
@@ -1431,50 +1450,56 @@ void postTakeChannelMode(int command) {
 	const char* mode;
 	switch(command) {
 		case 40176: {
-			mode = "normal";
+			// Translators: A take channel mode.
+			mode = translate("normal");
 			break;
 		}
 		case 40179: {
-			mode = "mono (left)";
+			// Translators: A take channel mode.
+			mode = translate("mono (left)");
 			break;
 		}
 		case 40178: {
-			mode = "mono (downmix)";
+			// Translators: A take channel mode.
+			mode = translate("mono (downmix)");
 			break;
 		}
 		case 40180: {
-			mode = "mono (right)";
+			// Translators: A take channel mode.
+			mode = translate("mono (right)");
 			break;
 		}
 		default: {
-			mode = "unknown mode";
+			// Translators: A take channel mode OSARA doesn't know about.
+			mode = translate("unknown mode");
 		}
 	}
-	ostringstream s;
-	s<< "set " << count <<((count==1)?" take ":" takes ") << "to " << mode;
-	outputMessage(s);
+	// Translators: Reported when setting the channel mode of takes.
+	// {count} will be replaced with the number of takes affected.
+	// {mode} will be replaced with the mode being set.
+	// For example: "set 2 takes to mono (left)"
+	outputMessage(format(
+		translate_plural("set {count} take to {mode}", "set {count} takes to {mode}", count),
+		"count"_a=count, "mode"_a=mode));
 }
 
 void postChangeTempo(int command) {
 	double tempo = Master_GetTempo();
 	// Translators: Reported when changing the tempo. {} will be replaced with
 	// the new tempo; e.g. "50 bpm".
-	ostringstream s;
 	outputMessage(format(translate("{} bpm"), tempo));
 }
 
 void postTogglePlaybackPositionFollowsTimebase(int command) {
-	ostringstream s;
-	s << ( GetToggleCommandState(command) ? "Enabled" : "Disabled" );
-	s << " playback position follows project timebase when changing tempo" ;
-	outputMessage(s);
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled playback position follows project timebase when changing tempo") :
+		translate("disabled playback position follows project timebase when changing tempo"));
 }
 
 void postTogglePreservePitchWhenPlayRateChanged(int command) {
-	ostringstream s;
-	s << ( GetToggleCommandState(command) ? "preserving" : "not preserving")
-		<< " pitch when changing play rate";
-	outputMessage(s);
+	outputMessage(GetToggleCommandState(command) ?
+		translate("preserving pitch when changing play rate") :
+		translate("not preserving pitch when changing play rate"));
 }
 
 void postSetItemEnd(int command) {
@@ -3200,12 +3225,14 @@ void cmdNudgeTimeSelection(Command* command) {
 		resetTimeCache();
 	ostringstream s;
 	if(newStart!=oldStart) {
-		if(first)
-			s<<"time selection start ";
+		if(first) {
+			s << translate("time selection start") << " ";
+		}
 		s<<formatTime(newStart, TF_RULER, false, true, false);
 	} else if(newEnd!=oldEnd) {
-		if(first)
-			s<<"time selection end ";
+		if(first) {
+			s << translate("time selection end") << " ";
+		}
 		s<<formatTime(newEnd, TF_RULER, false, true, false);
 	}
 	outputMessage(s);

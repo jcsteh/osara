@@ -11,11 +11,13 @@
 #include <map>
 #include <WDL/db2val.h>
 #include <cstdint>
+#include <fmt/core.h>
 #include "osara.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 
 using namespace std;
+using fmt::format;
 
 bool shouldReportSurfaceChanges = true;
 bool shouldReportMarkersWhilePlaying = false;
@@ -318,9 +320,9 @@ class Surface: public IReaperControlSurface {
 			// periodically.
 			if (markerPos >= playPos - 0.1) {
 				if (name[0]) {
-					s << name << " marker" << " ";
+					s << format(translate("{} marker"), name) << " ";
 				} else {
-					s << "marker " << number << " ";
+					s << format(translate("marker {}"), number) << " ";
 				}
 			}
 		}
@@ -328,9 +330,13 @@ class Surface: public IReaperControlSurface {
 		if (region >= 0 && region != this->lastRegion) {
 			EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
 			if (name[0]) {
-				s << name << " region ";
+				// Translators: Reported when playback reaches a named region. {} will
+				// be replaced with the region's name; e.g. "intro region".
+				s << format(translate("{} region"), name) << " ";
 			} else {
-				s << "region " << number << " ";
+				// Translators: Reported when playback reaches an unnamed region. {}
+				// will be replaced with the region's number; e.g. "region 2".
+				s << format(translate("region {}"), number) << " ";
 			}
 		}
 		this->lastRegion = region;
