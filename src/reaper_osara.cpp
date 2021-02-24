@@ -1070,7 +1070,7 @@ void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
 		return;
 	// Translators: Reported when switching takes before listing the effects on
 	// the take.
-	s << "; " << translate("FX: ");
+	s << "; " << translate("FX:") << " ";
 	char name[256];
 	for (int f = 0; f < count; ++f) {
 		if (f > 0)
