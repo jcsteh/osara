@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-02-24 21:21\n"
+"PO-Revision-Date: 2021-02-25 11:34\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -143,7 +143,7 @@ msgstr "Ativado"
 #. Reported when switching tabs in an effect such as ReaEQ.
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
-msgstr "Aba"
+msgstr "{} aba"
 
 #. The name of a musical note.
 msgid "c"
@@ -260,7 +260,7 @@ msgstr "[retorno]"
 #. In the menu of effects when opening the FX Parameters
 #. dialog, this is presented after effects which are input FX.
 msgid "[input]"
-msgstr "Entrada"
+msgstr "[Entrada]"
 
 msgid "no FX"
 msgstr "Sem fx"
@@ -764,8 +764,8 @@ msgstr "Nenhum item selecionado"
 #. number of takes; e.g. "2 takes reversed".
 msgid "{} take reversed"
 msgid_plural "{} takes reversed"
-msgstr[0] "{} take invertido"
-msgstr[1] "{} takes invertidos"
+msgstr[0] "{} take invertida"
+msgstr[1] "{} takes invertidas"
 
 msgid "pre roll on"
 msgstr "Pré roll ativado"
@@ -952,7 +952,7 @@ msgstr "pistas / itens / pontos de envelope não selecionados"
 #. Reported when switching to a project tab containing an
 #. unsaved project.
 msgid "[Unsaved]"
-msgstr "não salvo"
+msgstr "[não salvo]"
 
 msgid "no selection"
 msgstr "Sem seleção"

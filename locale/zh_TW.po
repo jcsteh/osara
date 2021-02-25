@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-02-24 21:21\n"
+"PO-Revision-Date: 2021-02-25 11:34\n"
 
 msgid "volume"
 msgstr "音量"
@@ -35,22 +35,22 @@ msgstr "主控"
 #. Reported when moving to a named project marker. {} will
 #. be replaced with the marker's name; e.g. "intro marker".
 msgid "{} marker"
-msgstr ""
+msgstr "{} 標記"
 
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 msgid "marker {}"
-msgstr ""
+msgstr "標記 {} "
 
 #. Reported when playback reaches a named region. {} will
 #. be replaced with the region's name; e.g. "intro region".
 msgid "{} region"
-msgstr ""
+msgstr "{} 區間"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
 msgid "region {}"
-msgstr ""
+msgstr "區間 {} "
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
@@ -130,7 +130,7 @@ msgstr "無包絡切換"
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] "{} 對象選中"
+msgstr[0] "{} 點選中"
 
 msgid "active"
 msgstr "活躍"
@@ -138,7 +138,7 @@ msgstr "活躍"
 #. Reported when switching tabs in an effect such as ReaEQ.
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
-msgstr "{} Tab"
+msgstr "{} 標籤"
 
 #. The name of a musical note.
 msgid "c"
@@ -214,7 +214,7 @@ msgid "mute"
 msgstr "靜音"
 
 msgid "mono"
-msgstr "單通道"
+msgstr "單聲道"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -311,7 +311,7 @@ msgstr[0] "{} 小節"
 #. Used when reporting the measure of a time position.
 #. {} will be replaced with the measure number; e.g. "bar 2".
 msgid "bar {}"
-msgstr "小節 {}"
+msgstr "{} 節"
 
 #. Used when reporting a length of time in beats.
 #. {} will be replaced with the number of beats; e.g. "2 beats".
@@ -322,7 +322,7 @@ msgstr[0] "{} 拍"
 #. Used when reporting the beat of a time position.
 #. {} will be replaced with the beat number; e.g. "beat 2".
 msgid "beat {}"
-msgstr "拍 {}"
+msgstr "{} 拍"
 
 #. Used when reporting a time in minutes. {} will be
 #. replaced with the number of minutes; e.g. "2 min".
@@ -444,11 +444,11 @@ msgstr "輸出 (midi)"
 
 #. A recording mode.
 msgid "output (mono)"
-msgstr "輸出（單通道）"
+msgstr "輸出（單聲道）"
 
 #. A recording mode.
 msgid "output (mono, latency compensated)"
-msgstr "輸出（單通道，延遲補償）"
+msgstr "輸出（單聲道，延遲補償）"
 
 #. A recording mode.
 msgid "midi overdub"
@@ -524,7 +524,7 @@ msgid "all tracks FX active"
 msgstr "所有軌道 FX 活躍"
 
 msgid "no selected items"
-msgstr "無對象選中"
+msgstr "無項目選中"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized to common gain".
@@ -541,24 +541,24 @@ msgstr[0] "{} 項目歸一化"
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
 msgid "{} region start"
-msgstr ""
+msgstr "{} 區間開始"
 
 #. Reported when moving to the start of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 start".
 msgid "region {} start"
-msgstr ""
+msgstr "區間 {} 開始"
 
 #. Reported when moving to the end of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region end".
 msgid "{} region end"
-msgstr ""
+msgstr "{} 區間結束"
 
 #. Reported when moving to the end of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 end".
 msgid "region {} end"
-msgstr ""
+msgstr "區間 {} 結束"
 
 #. Reported when moving by marker and the cursor lands at the
 #. start of the time selection.
@@ -618,13 +618,13 @@ msgstr "重複關"
 #. the number of tracks; e.g. "2 tracks copied".
 msgid "{} track copied"
 msgid_plural "{} tracks copied"
-msgstr[0] ""
+msgstr[0] "{} 軌道複製"
 
 #. Reported when copying items. {} will be replaced with
 #. the number of items; e.g. "2 items copied".
 msgid "{} item copied"
 msgid_plural "{} items copied"
-msgstr[0] ""
+msgstr[0] "{} 項目複製"
 
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
@@ -691,7 +691,7 @@ msgstr[0] "{} 項目取消靜音"
 #. with the number of items; e.g. "2 items soloed".
 msgid "{} item soloed"
 msgid_plural "{} items soloed"
-msgstr[0] "{} 項目靜音"
+msgstr[0] "{} 項目獨奏"
 
 #. Reported when multiple items are unsoloed. {} will be
 #. replaced with the number of items; e.g. "2 items unsoloed".
@@ -703,7 +703,7 @@ msgid "set selection end"
 msgstr "設置選區結束"
 
 msgid "master mono"
-msgstr "主控單通道"
+msgstr "主控單聲道"
 
 msgid "crossfade on"
 msgstr "交叉淡化開"
@@ -728,7 +728,7 @@ msgid "normal record"
 msgstr "標準錄音"
 
 msgid "selected item auto-punch"
-msgstr "自動穿插選中的對象"
+msgstr "自動穿插選中的項目"
 
 msgid "time selection auto-punch"
 msgstr "自動穿插時間選區"
@@ -755,19 +755,19 @@ msgstr "預示開"
 
 #. A take channel mode.
 msgid "mono (left)"
-msgstr ""
+msgstr "單聲道（左）"
 
 #. A take channel mode.
 msgid "mono (downmix)"
-msgstr ""
+msgstr "單聲道（縮混）"
 
 #. A take channel mode.
 msgid "mono (right)"
-msgstr ""
+msgstr "單聲道（右）"
 
 #. A take channel mode OSARA doesn't know about.
 msgid "unknown mode"
-msgstr ""
+msgstr "未知模式"
 
 #. Reported when setting the channel mode of takes.
 #. {count} will be replaced with the number of takes affected.
@@ -775,7 +775,7 @@ msgstr ""
 #. For example: "set 2 takes to mono (left)"
 msgid "set {count} take to {mode}"
 msgid_plural "set {count} takes to {mode}"
-msgstr[0] ""
+msgstr[0] "設置 {count} 片段到 {mode}"
 
 #. Reported when changing the tempo. {} will be replaced with
 #. the new tempo; e.g. "50 bpm".
@@ -783,16 +783,16 @@ msgid "{} bpm"
 msgstr "{} bpm"
 
 msgid "enabled playback position follows project timebase when changing tempo"
-msgstr ""
+msgstr "改變速率時啟用播放位置遵循工程時基"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr ""
+msgstr "改變速率時禁用播放位置遵循工程時基"
 
 msgid "preserving pitch when changing play rate"
-msgstr ""
+msgstr "改變播放速率時保持音高"
 
 msgid "not preserving pitch when changing play rate"
-msgstr ""
+msgstr "改變播放速率時不保持音高"
 
 msgid "set selection start"
 msgstr "設置選區開始"
@@ -903,7 +903,7 @@ msgid "nothing pasted"
 msgstr "沒有粘貼"
 
 msgid "contents of time selection removed"
-msgstr "時間選區的內容已刪除"
+msgstr "時間選區的內容已移除"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
@@ -931,7 +931,7 @@ msgstr "取消選中軌道/對象/包絡點"
 #. Reported when switching to a project tab containing an
 #. unsaved project.
 msgid "[Unsaved]"
-msgstr "[未保存]"
+msgstr "[未儲存]"
 
 msgid "no selection"
 msgstr "未選取"
@@ -940,7 +940,7 @@ msgid "take marker deleted"
 msgstr "片段標記刪除"
 
 msgid "stretch marker moved"
-msgstr "拉伸標記移除"
+msgstr "拉伸標記移動"
 
 msgid "deleted all time signature markers"
 msgstr "刪除所有拍號標記"
@@ -955,10 +955,10 @@ msgid "no selected tracks"
 msgstr "未選中軌道"
 
 msgid "time selection start"
-msgstr ""
+msgstr "時間選區開始"
 
 msgid "time selection end"
-msgstr ""
+msgstr "時間選區結束"
 
 #. Reported when inserting a marker. {} will be replaced with the
 #. number of the new marker; e.g. "marker 2 inserted".
