@@ -21,6 +21,9 @@ using namespace std;
 map<string, string> REAPER_LANG_TO_CODE = {
 	{"pt-BR", "pt_BR"},
 	{"Reaper+SWS_CHSDOU", "zh_CN"},
+	{"REAPER_zh_CN_www.szzyyzz.com", "zh_CN"},
+	{"REAPER_SWS_french", "fr_FR"},
+	{"Reaper5965_fr_sws_wip", "fr_FR"},
 };
 
 tinygettext::Dictionary translationDict;
