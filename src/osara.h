@@ -20,7 +20,6 @@
 #endif
 #include <string>
 #include <sstream>
-#include <tinygettext/dictionary.hpp>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -231,13 +230,6 @@ extern bool shouldMoveToAutoItem;
 
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
-
-extern tinygettext::Dictionary translationDict;
-#define translate(msg) translationDict.translate(msg)
-#define translate_ctxt(context, msg) \
-	translationDict.translate_ctxt(context, msg)
-#define translate_plural(msg, msgPlural, num) \
-	translationDict.translate_plural(msg, msgPlural, num)
 
 typedef enum {
 	TF_NONE,

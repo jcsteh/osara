@@ -25,6 +25,7 @@
 #include <WDL/wdltypes.h>
 #include <reaper/reaper_plugin.h>
 #include "resource.h"
+#include "translation.h"
 
 using namespace std;
 

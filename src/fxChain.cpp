@@ -19,11 +19,10 @@
 #include <iomanip>
 #include <memory>
 #include <WDL/win32_utf8.h>
-#include <fmt/core.h>
 #include "resource.h"
+#include "translation.h"
 
 using namespace std;
-using fmt::format;
 
 #ifdef _WIN32
 
