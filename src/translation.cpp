@@ -13,6 +13,7 @@
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
 #include <WDL/win32_utf8.h>
+#include "translation.h"
 
 using namespace std;
 

@@ -14,12 +14,10 @@
 #include <set>
 #include <algorithm>
 #include <optional>
-#include <fmt/core.h>
-#include <fmt/format.h>
 #include "osara.h"
+#include "translation.h"
 
 using namespace std;
-using fmt::format;
 using namespace fmt::literals;
 
 bool selectedEnvelopeIsTake = false;

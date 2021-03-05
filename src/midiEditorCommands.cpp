@@ -13,6 +13,7 @@
 #include <map>
 #include "midiEditorCommands.h"
 #include "osara.h"
+#include "translation.h"
 #ifdef _WIN32
 #include <Commctrl.h>
 #endif

@@ -20,11 +20,10 @@
 #endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
-#include <fmt/core.h>
 #include "resource.h"
+#include "translation.h"
 
 using namespace std;
-using fmt::format;
 
 const int PW_NUM_TRACKS = 2;
 const int PW_NUM_CHANNELS = 2;

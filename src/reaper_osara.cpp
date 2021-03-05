@@ -33,8 +33,6 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -42,9 +40,9 @@
 #include "envelopeCommands.h"
 #include "buildVersion.h"
 #include "fxChain.h"
+#include "translation.h"
 
 using namespace std;
-using fmt::format;
 using namespace fmt::literals;
 
 HINSTANCE pluginHInstance;
@@ -136,23 +134,26 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
-string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
+string formatTime(double time, TimeFormat timeFormat, bool isLength,
+	bool useCache, bool includeZeros
+) {
 	ostringstream s;
-	if (format == TF_RULER) {
-		if (GetToggleCommandState(40365))
-			format = TF_MINSEC;
-		else if (GetToggleCommandState(40368))
-			format = TF_SEC;
-		else if (GetToggleCommandState(41973))
-			format = TF_FRAME;
-		else if (GetToggleCommandState(40370))
-			format = TF_HMSF;
-		else if (GetToggleCommandState(40369))
-			format = TF_SAMPLE;
-		else
-			format = TF_MEASURE;
+	if (timeFormat == TF_RULER) {
+		if (GetToggleCommandState(40365)) {
+			timeFormat = TF_MINSEC;
+		} else if (GetToggleCommandState(40368)) {
+			timeFormat = TF_SEC;
+		} else if (GetToggleCommandState(41973)) {
+			timeFormat = TF_FRAME;
+		} else if (GetToggleCommandState(40370)) {
+			timeFormat = TF_HMSF;
+		} else if (GetToggleCommandState(40369)) {
+			timeFormat = TF_SAMPLE;
+		} else {
+			timeFormat = TF_MEASURE;
+		}
 	}
-	switch (format) {
+	switch (timeFormat) {
 		case TF_MEASURE: {
 			int measure;
 			int measureLength;
@@ -177,14 +178,14 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 						// Translators: Used when reporting a length of time in measures.
 						// {} will be replaced with the number of measures; e.g.
 						// "2 bars".
-						s << fmt::format(
+						s << format(
 							translate_plural("{} bar", "{} bars", measure), measure)
 							<< " ";
 					}
 				} else {
 					// Translators: Used when reporting the measure of a time position.
 					// {} will be replaced with the measure number; e.g. "bar 2".
-					s << fmt::format(translate("bar {}"), measure) << " ";
+					s << format(translate("bar {}"), measure) << " ";
 				}
 				oldMeasure = measure;
 			}
@@ -193,14 +194,14 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 					if (includeZeros || wholeBeat != 0) {
 						// Translators: Used when reporting a length of time in beats.
 						// {} will be replaced with the number of beats; e.g. "2 beats".
-						s << fmt::format(
+						s << format(
 							translate_plural("{} beat", "{} beats", wholeBeat),
 							wholeBeat) << " ";
 					}
 				} else {
 					// Translators: Used when reporting the beat of a time position.
 					// {} will be replaced with the beat number; e.g. "beat 2".
-					s << fmt::format(translate("beat {}"), wholeBeat) << " ";
+					s << format(translate("beat {}"), wholeBeat) << " ";
 				}
 				oldBeat = wholeBeat;
 			}
@@ -218,17 +219,17 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			if (!useCache || oldMinute != minute) {
 				// Translators: Used when reporting a time in minutes. {} will be
 				// replaced with the number of minutes; e.g. "2 min".
-				s << fmt::format(translate("{} min"), minute) << " ";
+				s << format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
 			// Translators: Used when reporting a time in seconds. {:.3f} will be
 			// replaced with the number of seconds; e.g. "2 sec".
-			s << fmt::format(translate("{:#.3f} sec"), time);
+			s << format(translate("{:#.3f} sec"), time);
 			break;
 		}
 		case TF_SEC: {
 			// Seconds
-			s << fmt::format(translate("{:.3f} sec"), time);
+			s << format(translate("{:.3f} sec"), time);
 			break;
 		}
 		case TF_FRAME: {
@@ -237,7 +238,7 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			if (!useCache || oldFrame != frame) {
 				// Translators: Used when reporting a time in frames. {} will be
 				// replaced with the number of frames; e.g. "2 frames".
-				s << fmt::format(
+				s << format(
 					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
@@ -250,27 +251,27 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			if (!useCache || oldHour != hour) {
 				// Translators: used when reporting a time in hours. {} will be replaced
 				// with the number of hours; e.g. "2 hours".
-				s << fmt::format(
+				s << format(
 					translate_plural("{} hour", "{} hours", hour), hour) << " ";
 				oldHour = hour;
 			}
 			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
-				s << fmt::format(translate("{} min"), minute) << " ";
+				s << format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
 			int second = (int)time;
 			if (!useCache || oldSecond != second) {
 				// Translators: Used when reporting a time in seconds. {} will be
 				// replaced with the number of seconds; e.g. "2 sec".
-				s << fmt::format(translate("{} sec"), second) << " ";
+				s << format(translate("{} sec"), second) << " ";
 				oldSecond = second;
 			}
 			time = time - second;
 			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
-				s << fmt::format(
+				s << format(
 					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
@@ -281,14 +282,14 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			format_timestr_pos(time, buf, sizeof(buf), 4);
 			// Translators: Used when reporting a time in samples. {} will be replaced
 			// with the number of samples; e.g. "2 samples".
-			s << fmt::format(translate("{} samples"), buf);
+			s << format(translate("{} samples"), buf);
 			break;
 		}
 		default:
 			assert(false);
 	}
 	// #31: Clear cache for other units to avoid confusion if they are used later.
-	resetTimeCache(format);
+	resetTimeCache(timeFormat);
 	return s.str();
 }
 
@@ -330,11 +331,11 @@ string FormatNoteLength(double start, double end) {
 	}
 	ostringstream s;
 	if(bars>0) {
-		s << fmt::format(
+		s << format(
 			translate_plural("{} bar", "{} bars", bars), bars) << " ";
 	}
 	if(remBeats>0){
-		s << fmt::format(
+		s << format(
 			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
 	}
 	if(percent>0) {

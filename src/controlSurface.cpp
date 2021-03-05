@@ -11,13 +11,12 @@
 #include <map>
 #include <WDL/db2val.h>
 #include <cstdint>
-#include <fmt/core.h>
 #include "osara.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
+#include "translation.h"
 
 using namespace std;
-using fmt::format;
 
 bool shouldReportSurfaceChanges = true;
 bool shouldReportMarkersWhilePlaying = false;
