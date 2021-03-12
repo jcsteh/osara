@@ -1507,16 +1507,21 @@ void postSetItemEnd(int command) {
 	MediaItem* item = getItemWithFocus();
 	if(!item)
 		return;
-	ostringstream s;
 	int selCount = CountSelectedMediaItems(0);
 	if(selCount > 1){
-		s << selCount << " item ends set to source media end";
+		// Translators: Reported when setting the ends of multiple items to the end
+		// of their source media. {} will be replaced with the number of items; e.g.
+		// "2 item ends set to source media end"
+		outputMessage(format(translate("{} item ends set to source media end"),
+			selCount));
 	} else {
 		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
-		s << "Item end set to source media end: ";
-		s << formatTime(endPos, TF_RULER, false, false, true);
+		// Translators: Reported when setting the end of a single item to its source
+		// media end. {} will be replaced with the end time; e.g.
+		// "item end set to source media end: bar 3 beat 1 25%"
+		outputMessage(format(translate("item end set to source media end: {}"),
+			formatTime(endPos, TF_RULER, false, false, true)));
 	}
-	outputMessage(s);
 }
 
 void postChangeItemGroup(int command) {
@@ -1525,19 +1530,20 @@ void postChangeItemGroup(int command) {
 		return;
 	}
 	int selCount = CountSelectedMediaItems(nullptr);
-	ostringstream s;
-	if (selCount == 1) {
-		s << "item";
-	} else {
-		s << selCount << " items";
-	}
 	int groupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
 	if (groupId) {
-		s << " added to group";
+		// Translators: Reported when adding items to a group. {} will be replaced
+		// with the number of items; e.g. "2 items added to group".
+		outputMessage(format(
+			translate_plural("item added to group", "{} items added to group", selCount),
+			selCount));
 	} else {
-		s << " removed from group";
+		// Translators: Reported when removing items from a group. {} will be
+		// replaced with the number of items; e.g. "2 items removed from group".
+		outputMessage(format(
+			translate_plural("item removed from group", "{} items removed from group", selCount),
+			selCount));
 	}
-	outputMessage(s);
 }
 
 void postGoToTakeMarker(int command) {
@@ -1563,7 +1569,9 @@ void postGoToTakeMarker(int command) {
 			char name[100];
 			double markerPos = GetTakeMarker(take, m, name, sizeof(name), nullptr);
 			if (markerPos == cursorRel) {
-				s << name << " take marker ";
+				// Translators: Reported when moving to a take marker. {} will be
+				// replaced with the name of the marker; e.g. "fix take marker".
+				s << format(translate("{} take marker "), name);
 				fakeFocus = FOCUS_TAKEMARKER;
 			}
 		}
@@ -1577,9 +1585,10 @@ void postGoToTakeMarker(int command) {
 
 void postSelectMultipleTracks(int command) {
 	int count = CountSelectedTracks(nullptr);
-	ostringstream s;
-	s << count << (count == 1 ? " track" : " tracks") << " selected";
-	outputMessage(s);
+	// Translators: Reported when an action selects tracks. {} will be replaced
+	// with the number of tracks; e.g. "2 tracks selected".
+	outputMessage(format(
+		translate_plural("{} track selected", "{} tracks selected", count), count));
 }
 
 void postSelectAll(int command) {
@@ -1604,7 +1613,7 @@ void postToggleTrackSoloDefeat(int command) {
 		return;
 	}
 	outputMessage(isTrackDefeatingSolo(track) ?
-		"defeating solo" : "not defeating solo");
+		translate("defeating solo") : translate("not defeating solo"));
 }
 
 void postChangeTransientDetectionSensitivity(int command) {
@@ -1618,9 +1627,9 @@ void postChangeTransientDetectionSensitivity(int command) {
 void postChangeTransientDetectionThreshold(int command) {
 	double threshold = *(double*)get_config_var("transientthreshold",
 		nullptr);
-	ostringstream s;
-	s << threshold << "dB threshold";
-	outputMessage(s);
+	// Translators: Reported when changing the transient detection threshold.
+	// {:g} will be replaced with the threshold; e.g. "{} dB threshold".
+	outputMessage(format(translate("{:g} dB threshold"), threshold));
 }
 
 void postToggleEnvelopePointsMoveWithMediaItems(int command) {
@@ -2903,13 +2912,11 @@ void cmdhDeleteTakeMarkers(int command) {
 	int oldCount = countTakeMarkersInSelectedTakes();
 	Main_OnCommand(command, 0);
 	int removed = oldCount - countTakeMarkersInSelectedTakes();
-	if (removed == 1) {
-		outputMessage(translate("take marker deleted"));
-	} else {
-		ostringstream s;
-		s << removed << " take markers deleted";
-		outputMessage(s);
-	}
+	// Translators: Reported when deleting take markers. {} will be replaced with
+	// the number of markers; e.g. "2 take markers deleted".
+	outputMessage(format(
+		translate_plural("take marker deleted", "{} take markers deleted", removed),
+		removed));
 }
 
 void cmdDeleteTakeMarkers(Command* command) {
@@ -2952,7 +2959,8 @@ void cmdRemoveFocus(Command* command) {
 
 void cmdShortcutHelp(Command* command) {
 	isShortcutHelpEnabled = !isShortcutHelpEnabled;
-	outputMessage(isShortcutHelpEnabled ? "shortcut help on" : "shortcut help off");
+	outputMessage(isShortcutHelpEnabled ?
+		translate("shortcut help on") : translate("shortcut help off"));
 }
 
 void cmdReportCursorPosition(Command* command) {
@@ -3013,7 +3021,7 @@ void cmdToggleSelection(Command* command) {
 		default:
 			return;
 	}
-	outputMessage(select ? "selected" : "unselected");
+	outputMessage(select ? translate("selected") : translate("unselected"));
 }
 
 void cmdMoveStretch(Command* command) {

@@ -546,7 +546,7 @@ void cmdMidiToggleSelection(Command* command) {
 		default:
 			return;
 	}
-	outputMessage(select ? "selected" : "unselected");
+	outputMessage(select ? translate("selected") : translate("unselected"));
 }
 
 void moveToChord(int direction, bool clearSelection=true, bool select=true) {
