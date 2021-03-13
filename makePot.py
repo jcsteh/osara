@@ -6,6 +6,7 @@
 
 import re
 from collections import OrderedDict
+import itertools
 
 # Maps (context, msgid) to a dict of message data. We need this so we output
 # only one entry for each message.
@@ -96,10 +97,10 @@ def addCpp(input):
 		if RE_CPP_TRANSLATE_FIRST_STRING_BEGIN.match(line):
 			addCppTranslateFirstString(input)
 			continue
-		m = (RE_CPP_TRANSLATE.search(line) or
-			RE_CPP_TRANSLATE_CTXT.search(line) or
-			RE_CPP_TRANSLATE_PLURAL.search(line))
-		if m:
+		matches = itertools.chain(RE_CPP_TRANSLATE.finditer(line),
+			RE_CPP_TRANSLATE_CTXT.finditer(line),
+			RE_CPP_TRANSLATE_PLURAL.finditer(line))
+		for m in matches:
 			addMessage(m.groupdict())
 
 RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
