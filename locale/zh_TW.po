@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-03-07 21:59\n"
+"PO-Revision-Date: 2021-03-14 10:46\n"
 
 msgid "volume"
 msgstr "音量"
@@ -22,11 +22,20 @@ msgstr "生像"
 msgid "muted"
 msgstr "靜音"
 
+msgid "unmuted"
+msgstr "取消靜音"
+
 msgid "soloed"
 msgstr "獨奏"
 
+msgid "unsoloed"
+msgstr "取消獨奏"
+
 msgid "armed"
 msgstr "預備錄音"
+
+msgid "unarmed"
+msgstr "取消預備錄音"
 
 #. Reported when navigating to the master track.
 msgid "master"
@@ -78,6 +87,9 @@ msgstr "未選中"
 
 msgid "no take envelopes"
 msgstr "無片段包絡"
+
+msgid "no track envelopes"
+msgstr "無軌道包絡"
 
 msgid "no visible envelopes"
 msgstr "無可見包絡"
@@ -146,7 +158,7 @@ msgstr "C"
 
 #. The name of a musical note.
 msgid "c sharp"
-msgstr "C 升"
+msgstr "升 C"
 
 #. The name of a musical note.
 msgid "d"
@@ -154,7 +166,7 @@ msgstr "D"
 
 #. The name of a musical note.
 msgid "d sharp"
-msgstr "D 升"
+msgstr "升 D"
 
 #. The name of a musical note.
 msgid "e"
@@ -166,7 +178,7 @@ msgstr "F"
 
 #. The name of a musical note.
 msgid "f sharp"
-msgstr "F 升"
+msgstr "升 F"
 
 #. The name of a musical note.
 msgid "g"
@@ -174,7 +186,7 @@ msgstr "G"
 
 #. The name of a musical note.
 msgid "g sharp"
-msgstr "G 升"
+msgstr "升 G"
 
 #. The name of a musical note.
 msgid "a"
@@ -182,7 +194,7 @@ msgstr "A"
 
 #. The name of a musical note.
 msgid "a sharp"
-msgstr "A 升"
+msgstr "升 A"
 
 #. The name of a musical note.
 msgid "b"
@@ -265,7 +277,7 @@ msgstr "無 FX"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher track is disabled.
 msgid "Peak Watcher track disabled"
-msgstr "峰值查看氣禁用"
+msgstr "峰值查看氣的軌道禁用"
 
 #. Reported when the user resets a Peak Watcher track.
 msgid "reset"
@@ -490,15 +502,6 @@ msgstr[0] "{} 項目"
 msgid "FX:"
 msgstr "FX"
 
-msgid "unmuted"
-msgstr "取消靜音"
-
-msgid "unsoloed"
-msgstr "取消獨奏"
-
-msgid "unarmed"
-msgstr "取消預備錄音"
-
 msgid "record monitor off"
 msgstr "錄音監聽關"
 
@@ -705,11 +708,20 @@ msgstr "設置選區結束"
 msgid "master mono"
 msgstr "主控單聲道"
 
+msgid "master stereo"
+msgstr "主控立體聲"
+
 msgid "crossfade on"
 msgstr "交叉淡化開"
 
+msgid "crossfade off"
+msgstr "交叉淡化關"
+
 msgid "locking on"
 msgstr "鎖定開"
+
+msgid "locking off"
+msgstr "鎖定關"
 
 msgid "solo in front"
 msgstr "獨奏在前"
@@ -722,6 +734,9 @@ msgstr "正常獨奏"
 #. with the play rate; e.g. "1.5 play rate".
 msgid "{:g} play rate"
 msgstr "{:g} 播放率"
+
+msgid "fx active"
+msgstr "FX 活躍"
 
 #. Record mode set to normal.
 msgid "normal record"
@@ -750,8 +765,14 @@ msgstr[0] "{} 片段反轉"
 msgid "pre roll on"
 msgstr "預捲開"
 
+msgid "pre roll off"
+msgstr "預捲關"
+
 msgid "count in on"
 msgstr "預示開"
+
+msgid "count in off"
+msgstr "預示關"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -793,6 +814,52 @@ msgstr "改變播放速率時保持音高"
 
 msgid "not preserving pitch when changing play rate"
 msgstr "改變播放速率時不保持音高"
+
+#. Reported when setting the ends of multiple items to the end
+#. of their source media. {} will be replaced with the number of items; e.g.
+#. "2 item ends set to source media end"
+msgid "{} item ends set to source media end"
+msgstr "{} 項目結尾設置為源媒體結尾"
+
+#. Reported when setting the end of a single item to its source
+#. media end. {} will be replaced with the end time; e.g.
+#. "item end set to source media end: bar 3 beat 1 25%"
+msgid "item end set to source media end: {}"
+msgstr "項目結尾設置為源媒體結尾：{}"
+
+#. Reported when adding items to a group. {} will be replaced
+#. with the number of items; e.g. "2 items added to group".
+msgid "item added to group"
+msgid_plural "{} items added to group"
+msgstr[0] "{} 項目已添加到分組"
+
+#. Reported when removing items from a group. {} will be
+#. replaced with the number of items; e.g. "2 items removed from group".
+msgid "item removed from group"
+msgid_plural "{} items removed from group"
+msgstr[0] "{} 項目從分組中移除"
+
+#. Reported when moving to a take marker. {} will be
+#. replaced with the name of the marker; e.g. "fix take marker".
+msgid "{} take marker "
+msgstr "{} 片段標記"
+
+#. Reported when an action selects tracks. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks selected".
+msgid "{} track selected"
+msgid_plural "{} tracks selected"
+msgstr[0] "{} 軌道選中"
+
+msgid "defeating solo"
+msgstr "獨奏失效"
+
+msgid "not defeating solo"
+msgstr "取消獨奏失效"
+
+#. Reported when changing the transient detection threshold.
+#. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
+msgid "{:g} dB threshold"
+msgstr "{:g} dB 閾值"
 
 msgid "set selection start"
 msgstr "設置選區開始"
@@ -936,8 +1003,17 @@ msgstr "[未儲存]"
 msgid "no selection"
 msgstr "未選取"
 
+#. Reported when deleting take markers. {} will be replaced with
+#. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
-msgstr "片段標記刪除"
+msgid_plural "{} take markers deleted"
+msgstr[0] "片段標記刪除"
+
+msgid "shortcut help on"
+msgstr "熱鍵幫助開"
+
+msgid "shortcut help off"
+msgstr "熱鍵幫助關"
 
 msgid "stretch marker moved"
 msgstr "拉伸標記移動"

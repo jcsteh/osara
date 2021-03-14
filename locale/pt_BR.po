@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-03-07 21:59\n"
+"PO-Revision-Date: 2021-03-14 10:46\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -22,11 +22,20 @@ msgstr "Pan"
 msgid "muted"
 msgstr "silenciado"
 
+msgid "unmuted"
+msgstr "Não silenciado"
+
 msgid "soloed"
 msgstr "solo ativado"
 
+msgid "unsoloed"
+msgstr "Solo desativado"
+
 msgid "armed"
 msgstr "armado"
+
+msgid "unarmed"
+msgstr "Desarmado"
 
 #. Reported when navigating to the master track.
 msgid "master"
@@ -80,6 +89,9 @@ msgstr "não selecionado"
 
 msgid "no take envelopes"
 msgstr "sem envelope de trechos (takes)"
+
+msgid "no track envelopes"
+msgstr "Sem envelope de pistas"
 
 msgid "no visible envelopes"
 msgstr "nenhum envelope visível"
@@ -500,15 +512,6 @@ msgstr[1] "{} itens"
 msgid "FX:"
 msgstr "FX"
 
-msgid "unmuted"
-msgstr "Não silenciado"
-
-msgid "unsoloed"
-msgstr "Solo desativado"
-
-msgid "unarmed"
-msgstr "Desarmado"
-
 msgid "record monitor off"
 msgstr "Retorno de gravação desligado"
 
@@ -724,11 +727,20 @@ msgstr "Definir fim da seleção"
 msgid "master mono"
 msgstr "Master mono"
 
+msgid "master stereo"
+msgstr "Master em estéreo"
+
 msgid "crossfade on"
 msgstr "Crossfade ligado"
 
+msgid "crossfade off"
+msgstr "Crossfade desligado"
+
 msgid "locking on"
 msgstr "Trava ligada"
+
+msgid "locking off"
+msgstr "Trava desligada"
 
 msgid "solo in front"
 msgstr "Solo na frente"
@@ -741,6 +753,9 @@ msgstr "Solo normal"
 #. with the play rate; e.g. "1.5 play rate".
 msgid "{:g} play rate"
 msgstr "{:g} taxa de reprodução"
+
+msgid "fx active"
+msgstr "FX ativado"
 
 #. Record mode set to normal.
 msgid "normal record"
@@ -770,8 +785,14 @@ msgstr[1] "{} trechos invertidos"
 msgid "pre roll on"
 msgstr "Pré roll ativado"
 
+msgid "pre roll off"
+msgstr "pré-roll desativado"
+
 msgid "count in on"
 msgstr "Contagem ligada"
+
+msgid "count in off"
+msgstr "contagem desligada"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -814,6 +835,55 @@ msgstr "Preservando a tonalidade ao alterar a taxa de reprodução"
 
 msgid "not preserving pitch when changing play rate"
 msgstr "Sem preservar a tonalidade ao alterar a taxa de reprodução"
+
+#. Reported when setting the ends of multiple items to the end
+#. of their source media. {} will be replaced with the number of items; e.g.
+#. "2 item ends set to source media end"
+msgid "{} item ends set to source media end"
+msgstr "final do item definido como final da mídia de origem"
+
+#. Reported when setting the end of a single item to its source
+#. media end. {} will be replaced with the end time; e.g.
+#. "item end set to source media end: bar 3 beat 1 25%"
+msgid "item end set to source media end: {}"
+msgstr "final do item definido como final da mídia de origem: {}"
+
+#. Reported when adding items to a group. {} will be replaced
+#. with the number of items; e.g. "2 items added to group".
+msgid "item added to group"
+msgid_plural "{} items added to group"
+msgstr[0] "Item adicionado ao grupo"
+msgstr[1] "Itens adicionados ao grupo"
+
+#. Reported when removing items from a group. {} will be
+#. replaced with the number of items; e.g. "2 items removed from group".
+msgid "item removed from group"
+msgid_plural "{} items removed from group"
+msgstr[0] "Item removido do grupo"
+msgstr[1] "Itens removidos do grupo"
+
+#. Reported when moving to a take marker. {} will be
+#. replaced with the name of the marker; e.g. "fix take marker".
+msgid "{} take marker "
+msgstr "{} marcador de take"
+
+#. Reported when an action selects tracks. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks selected".
+msgid "{} track selected"
+msgid_plural "{} tracks selected"
+msgstr[0] "{} pista selecionada"
+msgstr[1] "{} pistas selecionadas"
+
+msgid "defeating solo"
+msgstr "Solo derrotado"
+
+msgid "not defeating solo"
+msgstr "Solo não derrotado"
+
+#. Reported when changing the transient detection threshold.
+#. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
+msgid "{:g} dB threshold"
+msgstr "{:g} DB de Treshold"
 
 msgid "set selection start"
 msgstr "Definir início da seleção"
@@ -957,8 +1027,18 @@ msgstr "[não salvo]"
 msgid "no selection"
 msgstr "Sem seleção"
 
+#. Reported when deleting take markers. {} will be replaced with
+#. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
-msgstr "Marcador de trecho (take) excluído"
+msgid_plural "{} take markers deleted"
+msgstr[0] "{} marcador de trecho (take) excluído"
+msgstr[1] "{} marcadores de trechos (takes) excluídos"
+
+msgid "shortcut help on"
+msgstr "Atalho de ajuda ligado"
+
+msgid "shortcut help off"
+msgstr "Atalho de ajuda desligado"
 
 msgid "stretch marker moved"
 msgstr "Marcador elástico movido"

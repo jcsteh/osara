@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-03-07 21:59\n"
+"PO-Revision-Date: 2021-03-14 10:46\n"
 
 msgid "volume"
 msgstr "volume"
@@ -22,11 +22,20 @@ msgstr "panoramique"
 msgid "muted"
 msgstr "muet"
 
+msgid "unmuted"
+msgstr "muet désactivé"
+
 msgid "soloed"
 msgstr "en solo"
 
+msgid "unsoloed"
+msgstr "solo désactivé"
+
 msgid "armed"
 msgstr "armé"
+
+msgid "unarmed"
+msgstr "désarmé"
 
 #. Reported when navigating to the master track.
 msgid "master"
@@ -80,6 +89,9 @@ msgstr "non sélectionné "
 
 msgid "no take envelopes"
 msgstr "pas d'enveloppe de prise"
+
+msgid "no track envelopes"
+msgstr "pas d'enveloppe de piste"
 
 msgid "no visible envelopes"
 msgstr "pas d'enveloppe visible"
@@ -500,15 +512,6 @@ msgstr[1] "{} objets"
 msgid "FX:"
 msgstr "FX:"
 
-msgid "unmuted"
-msgstr "muet désactivé"
-
-msgid "unsoloed"
-msgstr "solo désactivé"
-
-msgid "unarmed"
-msgstr "désarmé"
-
 msgid "record monitor off"
 msgstr "moniteur en enregistrement désactivé"
 
@@ -724,11 +727,20 @@ msgstr "fin de sélection réglée"
 msgid "master mono"
 msgstr "master mono"
 
+msgid "master stereo"
+msgstr "master stéréo"
+
 msgid "crossfade on"
 msgstr "crossfade activé"
 
+msgid "crossfade off"
+msgstr "fondu enchaîné désactivé"
+
 msgid "locking on"
 msgstr "verrouillage activée"
+
+msgid "locking off"
+msgstr "verrouillage désactivé"
 
 msgid "solo in front"
 msgstr "solo en avant plan"
@@ -741,6 +753,9 @@ msgstr "solo normal"
 #. with the play rate; e.g. "1.5 play rate".
 msgid "{:g} play rate"
 msgstr "{:g} vitesse de lecture"
+
+msgid "fx active"
+msgstr "fx activé"
 
 #. Record mode set to normal.
 msgid "normal record"
@@ -770,8 +785,14 @@ msgstr[1] "{} prises renversées"
 msgid "pre roll on"
 msgstr "préroll activé"
 
+msgid "pre roll off"
+msgstr "pré-décompte désactivé"
+
 msgid "count in on"
 msgstr "comptage activé"
+
+msgid "count in off"
+msgstr "comptage désactivé"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -814,6 +835,55 @@ msgstr "préserver la hauteur tonale quand la vitesse de lecture change"
 
 msgid "not preserving pitch when changing play rate"
 msgstr "ne pas préserver la hauteur tonale quand la vitesse de lecture change"
+
+#. Reported when setting the ends of multiple items to the end
+#. of their source media. {} will be replaced with the number of items; e.g.
+#. "2 item ends set to source media end"
+msgid "{} item ends set to source media end"
+msgstr "{} fin des objets réglés sur la fin du média source"
+
+#. Reported when setting the end of a single item to its source
+#. media end. {} will be replaced with the end time; e.g.
+#. "item end set to source media end: bar 3 beat 1 25%"
+msgid "item end set to source media end: {}"
+msgstr "fin de l'objet réglé sur la fin du média source {}"
+
+#. Reported when adding items to a group. {} will be replaced
+#. with the number of items; e.g. "2 items added to group".
+msgid "item added to group"
+msgid_plural "{} items added to group"
+msgstr[0] "{} objets ajoutés au groupe"
+msgstr[1] "{} objets ajoutés au groupe"
+
+#. Reported when removing items from a group. {} will be
+#. replaced with the number of items; e.g. "2 items removed from group".
+msgid "item removed from group"
+msgid_plural "{} items removed from group"
+msgstr[0] "{} objets supprimés du groupe"
+msgstr[1] "{} objets supprimés du groupe"
+
+#. Reported when moving to a take marker. {} will be
+#. replaced with the name of the marker; e.g. "fix take marker".
+msgid "{} take marker "
+msgstr "{} marqueur de prise "
+
+#. Reported when an action selects tracks. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks selected".
+msgid "{} track selected"
+msgid_plural "{} tracks selected"
+msgstr[0] "{} pistes sélectionnées"
+msgstr[1] "{} pistes sélectionnées"
+
+msgid "defeating solo"
+msgstr "solo défaite activé"
+
+msgid "not defeating solo"
+msgstr "solo défaite désactivé"
+
+#. Reported when changing the transient detection threshold.
+#. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
+msgid "{:g} dB threshold"
+msgstr "{:g} dB seuil"
 
 msgid "set selection start"
 msgstr "début de sélection réglée"
@@ -957,8 +1027,18 @@ msgstr "non sauvé"
 msgid "no selection"
 msgstr "aucune sélection"
 
+#. Reported when deleting take markers. {} will be replaced with
+#. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
-msgstr "marqueur de prise supprimé"
+msgid_plural "{} take markers deleted"
+msgstr[0] "{} marqueurs de prise supprimés"
+msgstr[1] "{} marqueurs de prise supprimés"
+
+msgid "shortcut help on"
+msgstr "aide raccourcis activée"
+
+msgid "shortcut help off"
+msgstr "aide raccourcis désactivée"
 
 msgid "stretch marker moved"
 msgstr "marqueur élastique déplacé"
