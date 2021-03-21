@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-03-14 10:46\n"
+"PO-Revision-Date: 2021-03-21 15:00\n"
 
 msgid "volume"
 msgstr "volume"
@@ -885,6 +885,12 @@ msgstr "solo défaite désactivé"
 msgid "{:g} dB threshold"
 msgstr "{:g} dB seuil"
 
+msgid "enabled envelope points move with media items"
+msgstr "points d'enveloppe se déplacent avec les objets média (actif)"
+
+msgid "disabled envelope points move with media items"
+msgstr "points d'enveloppe se déplacent avec les objets média (inactif)"
+
 msgid "set selection start"
 msgstr "début de sélection réglée"
 
@@ -990,8 +996,50 @@ msgstr "annulé {}"
 msgid "redo {}"
 msgstr "refait {}"
 
+#. Reported when items are added. {} will be replaced with the
+#. number of items; e.g. "2 items added".
+msgid "{} item added"
+msgid_plural "{} items added"
+msgstr[0] "{} objets ajoutés"
+msgstr[1] "{} objets ajoutés"
+
+#. Reported when tracks are added. {} will be replaced with the
+#. number of tracks; e.g. "2 tracks added".
+msgid "{} track added"
+msgid_plural "{} tracks added"
+msgstr[0] "{} pistes ajoutées"
+msgstr[1] "{} pistes ajoutées"
+
+#. Reported when envelope points are added. {} will be replaced
+#. with the number of points; e.g. "2 points added".
+msgid "{} point added"
+msgid_plural "{} points added"
+msgstr[0] "{} points ajoutés"
+msgstr[1] "{} points ajoutés"
+
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} objets d'automatisation ajoutés"
+msgstr[1] "{} objets d'automatisation ajoutés"
+
 msgid "nothing pasted"
 msgstr "rien à coller"
+
+#. Reported when tracks are removed. {} will be replaced with the
+#. number of tracks; e.g. "2 tracks removed".
+msgid "{} track removed"
+msgid_plural "{} tracks removed"
+msgstr[0] "{} pistes supprimées"
+msgstr[1] "{} pistes supprimées"
+
+#. Reported when items are removed. {} will be replaced with the
+#. number of items; e.g. "2 items removed".
+msgid "{} item removed"
+msgid_plural "{} items removed"
+msgstr[0] "{} objet supprimé"
+msgstr[1] "{} objets supprimés"
 
 msgid "contents of time selection removed"
 msgstr "contenu de la sélection temporelle supprimé"
@@ -1023,6 +1071,21 @@ msgstr "piste / objet / enveloppe dé-sélectionné"
 #. unsaved project.
 msgid "[Unsaved]"
 msgstr "non sauvé"
+
+#. Used when reporting the time selection. {} will be
+#. replaced with the start time; e.g. "start bar 2 beat 1 0%".
+msgid "start {}"
+msgstr "début {}"
+
+#. Used when reporting the time selection. {} will be
+#. replaced with the end time; e.g. "end bar 4 beat 1 0%".
+msgid "end {}"
+msgstr "fin {}"
+
+#. Used when reporting the time selection. {} will be
+#. replaced with the length; e.g. "length 2 bars 0 beats 0%".
+msgid "length {}"
+msgstr "longueur {}"
 
 msgid "no selection"
 msgstr "aucune sélection"

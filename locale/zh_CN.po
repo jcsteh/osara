@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-03-14 10:46\n"
+"PO-Revision-Date: 2021-03-21 15:00\n"
 
 msgid "volume"
 msgstr "音量"
@@ -65,13 +65,13 @@ msgstr "区间 {}"
 #. replaced with the number of items; e.g. "2 automation items removed".
 msgid "{} automation item removed"
 msgid_plural "{} automation items removed"
-msgstr[0] "{} 自动化对象删除"
+msgstr[0] "{} 自动化对象移除"
 
 #. Reported when removing envelope points. {} will be
 #. replaced with the number of points; e.g. "2 points removed".
 msgid "{} point removed"
 msgid_plural "{} points removed"
-msgstr[0] "{} 点删除"
+msgstr[0] "{} 点移除"
 
 #. Reported when moving to an envelope point. {point} will be
 #. replaced with the number of the point. {} will be replaced with the value.
@@ -861,6 +861,12 @@ msgstr "取消独奏失效"
 msgid "{:g} dB threshold"
 msgstr "{:g} dB阈值"
 
+msgid "enabled envelope points move with media items"
+msgstr "启用包络点随媒体项目移动"
+
+msgid "disabled envelope points move with media items"
+msgstr "禁用包络点随媒体项目移动"
+
 msgid "set selection start"
 msgstr "设置选区开始"
 
@@ -966,11 +972,47 @@ msgstr "{} 撤消"
 msgid "redo {}"
 msgstr "{} 重做"
 
+#. Reported when items are added. {} will be replaced with the
+#. number of items; e.g. "2 items added".
+msgid "{} item added"
+msgid_plural "{} items added"
+msgstr[0] "{} 对象 添加"
+
+#. Reported when tracks are added. {} will be replaced with the
+#. number of tracks; e.g. "2 tracks added".
+msgid "{} track added"
+msgid_plural "{} tracks added"
+msgstr[0] "{} 轨道添加"
+
+#. Reported when envelope points are added. {} will be replaced
+#. with the number of points; e.g. "2 points added".
+msgid "{} point added"
+msgid_plural "{} points added"
+msgstr[0] "{} 包络点添加"
+
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} 自动化对象添加"
+
 msgid "nothing pasted"
 msgstr "无内容粘贴"
 
+#. Reported when tracks are removed. {} will be replaced with the
+#. number of tracks; e.g. "2 tracks removed".
+msgid "{} track removed"
+msgid_plural "{} tracks removed"
+msgstr[0] "{} 轨道移除"
+
+#. Reported when items are removed. {} will be replaced with the
+#. number of items; e.g. "2 items removed".
+msgid "{} item removed"
+msgid_plural "{} items removed"
+msgstr[0] "{} 对象 移除"
+
 msgid "contents of time selection removed"
-msgstr "删除时间选区的内容"
+msgstr "移除时间选区的内容"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
@@ -978,16 +1020,16 @@ msgid "no change"
 msgstr "无变化"
 
 msgid "marker deleted"
-msgstr "标记删除"
+msgstr "标记移除"
 
 msgid "region deleted"
-msgstr "区间删除"
+msgstr "区间移除"
 
 msgid "time signature deleted"
-msgstr "拍号删除"
+msgstr "拍号移除"
 
 msgid "stretch marker deleted"
-msgstr "拉伸标记删除"
+msgstr "拉伸标记移除"
 
 msgid "cleared time/loop selection"
 msgstr "清除时间/循环选区"
@@ -1000,6 +1042,21 @@ msgstr "取消选定轨道/对象/包络点"
 msgid "[Unsaved]"
 msgstr "[未保存]"
 
+#. Used when reporting the time selection. {} will be
+#. replaced with the start time; e.g. "start bar 2 beat 1 0%".
+msgid "start {}"
+msgstr "开始 {}"
+
+#. Used when reporting the time selection. {} will be
+#. replaced with the end time; e.g. "end bar 4 beat 1 0%".
+msgid "end {}"
+msgstr "结束 {}"
+
+#. Used when reporting the time selection. {} will be
+#. replaced with the length; e.g. "length 2 bars 0 beats 0%".
+msgid "length {}"
+msgstr "长度 {}"
+
 msgid "no selection"
 msgstr "无选择"
 
@@ -1007,7 +1064,7 @@ msgstr "无选择"
 #. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
 msgid_plural "{} take markers deleted"
-msgstr[0] "片段标记删除"
+msgstr[0] "片段标记移除"
 
 msgid "shortcut help on"
 msgstr "快捷帮助开"
@@ -1019,7 +1076,7 @@ msgid "stretch marker moved"
 msgstr "拉伸标记移动"
 
 msgid "deleted all time signature markers"
-msgstr "删除全部拍号标记"
+msgstr "移除全部拍号标记"
 
 msgid "global automation override off"
 msgstr "关闭全局自动化覆盖"
@@ -1113,7 +1170,7 @@ msgid "OSARA: Report track/item/time selection (depending on focus)"
 msgstr "OSARA:报告轨道/对象/时间选区(取决于焦点)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
-msgstr "OSARA:删除对象/轨道/时间选区的内容/标记/包络点(取决于焦点)"
+msgstr "OSARA:移除对象/轨道/时间选区的内容/标记/包络点(取决于焦点)"
 
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA:切换快捷方式帮助"
@@ -1140,7 +1197,7 @@ msgid "OSARA: Report current peak for channel 2 of master track"
 msgstr "OSARA:报告主控轨通道2的当前峰值\""
 
 msgid "OSARA: Delete all time signature markers"
-msgstr "OSARA:删除全部拍号标记"
+msgstr "OSARA:移除全部拍号标记"
 
 msgid "OSARA: Select next track/take envelope (depending on focus)"
 msgstr "OSARA:选择下一条轨道/片段包络(取决于焦点)"
