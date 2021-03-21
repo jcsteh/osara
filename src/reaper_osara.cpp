@@ -1633,10 +1633,9 @@ void postChangeTransientDetectionThreshold(int command) {
 }
 
 void postToggleEnvelopePointsMoveWithMediaItems(int command) {
-	ostringstream s;
-	s << (GetToggleCommandState(command) ? "enabled" : "disabled") <<
-		" envelope points move with media items";
-	outputMessage(s);
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled envelope points move with media items") :
+		translate("disabled envelope points move with media items"));
 }
 
 typedef void (*PostCommandExecute)(int);
@@ -2487,9 +2486,10 @@ void cmdSplitItems(Command* command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	int added = CountMediaItems(0) - oldCount;
-	ostringstream s;
-	s << added << (added == 1 ? " item" : " items") << " added";
-	outputMessage(s);
+	// Translators: Reported when items are added. {} will be replaced with the
+	// number of items; e.g. "2 items added".
+	outputMessage(format(
+		translate_plural("{} item added", "{} items added", added), added));
 }
 
 void cmdPaste(Command* command) {
@@ -2503,29 +2503,43 @@ void cmdPaste(Command* command) {
 		oldAutoItems = CountAutomationItems(envelope);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	ostringstream s;
 	int added;
-	if ((added = CountTracks(0) - oldTracks) > 0)
-		s << added << (added == 1 ? " track" : " tracks") << " added";
-	else if ((added = CountMediaItems(0) - oldItems) > 0)
-		s << added << (added == 1 ? " item" : " items") << " added";
-	else if (envelope && (added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints) > 0)
-		s << added << (added == 1 ? " point" : " points") << " added";
-	else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0)
-		s << added << (added == 1 ? " automation item" : " automation items") << " added";
-	else {
-		s << translate("nothing pasted");
+	if ((added = CountTracks(0) - oldTracks) > 0) {
+		// Translators: Reported when tracks are added. {} will be replaced with the
+		// number of tracks; e.g. "2 tracks added".
+		outputMessage(format(
+			translate_plural("{} track added", "{} tracks added", added), added));
+	} else if ((added = CountMediaItems(0) - oldItems) > 0) {
+		outputMessage(format(
+			translate_plural("{} item added", "{} items added", added), added));
+	} else if (envelope &&
+			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
+			> 0) {
+		// Translators: Reported when envelope points are added. {} will be replaced
+		// with the number of points; e.g. "2 points added".
+		outputMessage(format(
+			translate_plural("{} point added", "{} points added", added), added));
+	} else if (envelope &&
+			(added = CountAutomationItems(envelope) - oldAutoItems)
+			> 0) {
+		// Translators: Reported when automation items are added. {} will be
+		// replaced with the number of items; e.g. "2 automation items added".
+		outputMessage(format(
+			translate_plural("{} automation item added", "{} automation items added", added), added));
+	} else {
+		outputMessage(translate("nothing pasted"));
 	}
-	outputMessage(s);
 }
 
 void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountTracks(0);
-	ostringstream s;
-	s << removed << (removed == 1 ? " track" : " tracks") << " removed";
-	outputMessage(s);
+	// Translators: Reported when tracks are removed. {} will be replaced with the
+	// number of tracks; e.g. "2 tracks removed".
+	outputMessage(format(
+		translate_plural("{} track removed", "{} tracks removed", removed),
+		removed));
 }
 
 void cmdRemoveTracks(Command* command) {
@@ -2536,9 +2550,11 @@ void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
-	ostringstream s;
-	s << removed << (removed == 1 ? " item" : " items") << " removed";
-	outputMessage(s);
+	// Translators: Reported when items are removed. {} will be replaced with the
+	// number of items; e.g. "2 items removed".
+	outputMessage(format(
+		translate_plural("{} item removed", "{} items removed", removed),
+		removed));
 }
 
 void cmdRemoveItems(Command* command) {
@@ -2869,9 +2885,19 @@ void cmdReportSelection(Command* command) {
 			double start, end;
 			GetSet_LoopTimeRange(false, false, &start, &end, false);
 			if (start != end) {
-				s << "start " << formatTime(start, TF_RULER, false, false) << separator
-					<< "end " << formatTime(end, TF_RULER, false, false) << separator
-					<< "length " << formatTime(end - start, TF_RULER, true, false);
+				s <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the start time; e.g. "start bar 2 beat 1 0%".
+					format(translate("start {}"),
+						formatTime(start, TF_RULER, false, false)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the end time; e.g. "end bar 4 beat 1 0%".
+					format(translate("end {}"),
+						formatTime(end, TF_RULER, false, false)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
+					format(translate("length {}"),
+						formatTime(end - start, TF_RULER, true, false));
 				count = 1;
 				resetTimeCache();
 			}
