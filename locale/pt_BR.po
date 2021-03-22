@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-03-21 15:00\n"
+"PO-Revision-Date: 2021-03-22 02:25\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -502,7 +502,7 @@ msgstr "notas"
 #. "2 items".
 msgid "{} item"
 msgid_plural "{} items"
-msgstr[0] "{} item\\m"
+msgstr[0] "{} item"
 msgstr[1] "{} itens"
 
 #. Reported when navigating tracks before listing the effects on
@@ -800,7 +800,7 @@ msgstr "Mono (esquerda)"
 
 #. A take channel mode.
 msgid "mono (downmix)"
-msgstr ""
+msgstr "downmix (mono)"
 
 #. A take channel mode.
 msgid "mono (right)"
@@ -886,10 +886,10 @@ msgid "{:g} dB threshold"
 msgstr "{:g} DB de Treshold"
 
 msgid "enabled envelope points move with media items"
-msgstr ""
+msgstr "os pontos de envelope se movem com os itens de mídia (habilitado)"
 
 msgid "disabled envelope points move with media items"
-msgstr ""
+msgstr "os pontos de envelope se movem com os itens de mídia (desabilitado)"
 
 msgid "set selection start"
 msgstr "Definir início da seleção"
@@ -1000,29 +1000,29 @@ msgstr "refazer {}"
 #. number of items; e.g. "2 items added".
 msgid "{} item added"
 msgid_plural "{} items added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} item adicionado"
+msgstr[1] "{} itens adicionados"
 
 #. Reported when tracks are added. {} will be replaced with the
 #. number of tracks; e.g. "2 tracks added".
 msgid "{} track added"
 msgid_plural "{} tracks added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista adicionada"
+msgstr[1] "{} pistas adicionadas"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
 msgid "{} point added"
 msgid_plural "{} points added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} ponto adicionado"
+msgstr[1] "{} pontos adicionados"
 
 #. Reported when automation items are added. {} will be
 #. replaced with the number of items; e.g. "2 automation items added".
 msgid "{} automation item added"
 msgid_plural "{} automation items added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} item de automação adicionado"
+msgstr[1] "{} itens de automação adicionados"
 
 msgid "nothing pasted"
 msgstr "Nada colado"
@@ -1031,15 +1031,15 @@ msgstr "Nada colado"
 #. number of tracks; e.g. "2 tracks removed".
 msgid "{} track removed"
 msgid_plural "{} tracks removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista removida"
+msgstr[1] "{} pistas removidas"
 
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
 msgid_plural "{} items removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} item removido"
+msgstr[1] "{} itens removidos"
 
 msgid "contents of time selection removed"
 msgstr "Conteúdo da seleção de tempo removido"
@@ -1075,17 +1075,17 @@ msgstr "[não salvo]"
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
 msgid "start {}"
-msgstr ""
+msgstr "Início {}"
 
 #. Used when reporting the time selection. {} will be
 #. replaced with the end time; e.g. "end bar 4 beat 1 0%".
 msgid "end {}"
-msgstr ""
+msgstr "Final {}"
 
 #. Used when reporting the time selection. {} will be
 #. replaced with the length; e.g. "length 2 bars 0 beats 0%".
 msgid "length {}"
-msgstr ""
+msgstr "Comprimento {}"
 
 msgid "no selection"
 msgstr "Sem seleção"
@@ -1462,7 +1462,7 @@ msgstr "Fechar"
 
 msgctxt "FX Preset"
 msgid "FX Preset"
-msgstr ""
+msgstr "Pré-ajustes de FX"
 
 msgctxt "FX Preset"
 msgid "Filter:"

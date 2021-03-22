@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-03-21 15:00\n"
+"PO-Revision-Date: 2021-03-22 00:38\n"
 
 msgid "volume"
 msgstr "音量"
@@ -83,7 +83,7 @@ msgid "selected"
 msgstr "选定"
 
 msgid "unselected "
-msgstr "取消选定"
+msgstr "取消选中"
 
 msgid "no take envelopes"
 msgstr "无片段包络"
@@ -108,7 +108,7 @@ msgid "auto {}"
 msgstr "自动 {}"
 
 msgid "unselected"
-msgstr "取消选定"
+msgstr "取消选中"
 
 #. Reported when copying automation items. {} will be replaced
 #. with the number of items; e.g. "2 automation items copied".
@@ -123,7 +123,7 @@ msgid_plural "{} envelope points copied"
 msgstr[0] "{} 包络点复制"
 
 msgid "track not selected"
-msgstr "未选择轨道"
+msgstr "未选中轨道"
 
 #. Reported when showing an envelope. {} will be replaced with
 #. the name of the envelope; e.g. "showed volume envelope".
@@ -142,7 +142,7 @@ msgstr "无包络切换"
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] "{} 点已选定"
+msgstr[0] "{} 点已选中"
 
 msgid "active"
 msgstr "活动"
@@ -527,7 +527,7 @@ msgid "all tracks FX active"
 msgstr "全部轨道FX活动"
 
 msgid "no selected items"
-msgstr "无选定对象"
+msgstr "无选中对象"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized to common gain".
@@ -672,7 +672,7 @@ msgstr "停止"
 #. the number of items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
-msgstr[0] "{} 对象选定"
+msgstr[0] "{} 对象选中"
 
 #. Reported when prompting for the name of a track.
 msgid "Track name"
@@ -743,7 +743,7 @@ msgid "normal record"
 msgstr "正常录制"
 
 msgid "selected item auto-punch"
-msgstr "选定对象自动穿入穿出"
+msgstr "选中对象自动穿入穿出"
 
 msgid "time selection auto-punch"
 msgstr "时间选区自动穿入穿出"
@@ -848,7 +848,7 @@ msgstr "{} 片段 标记 "
 #. with the number of tracks; e.g. "2 tracks selected".
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
-msgstr[0] "{} 轨道选择"
+msgstr[0] "{} 轨道选中"
 
 msgid "defeating solo"
 msgstr "独奏失效"
@@ -1035,7 +1035,7 @@ msgid "cleared time/loop selection"
 msgstr "清除时间/循环选区"
 
 msgid "unselected tracks/items/envelope points"
-msgstr "取消选定轨道/对象/包络点"
+msgstr "取消选中轨道/对象/包络点"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -1085,7 +1085,7 @@ msgid "global automation override latch preview"
 msgstr "全局自动化覆盖锁存器预览"
 
 msgid "no selected tracks"
-msgstr "无选定轨"
+msgstr "无选中轨"
 
 msgid "time selection start"
 msgstr "时间选择开始"
@@ -1104,10 +1104,10 @@ msgid "region {} inserted"
 msgstr "区间 {} 插入"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
-msgstr "OSARA:移到下一对象(保留其它选定对象)"
+msgstr "OSARA:移到下一对象(保留其它选中对象)"
 
 msgid "OSARA: Move to previous item (leaving other items selected)"
-msgstr "OSARA:移到上一对象(保留其它选定对象)"
+msgstr "OSARA:移到上一对象(保留其它选中对象)"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA:查看当前媒体对象/片段/自动化对象的属性(取决于焦点)"
@@ -1212,10 +1212,10 @@ msgid "OSARA: Move to previous envelope point"
 msgstr "OSARA:移到上一包络点"
 
 msgid "OSARA: Move to next envelope point (leaving other points selected)"
-msgstr "OSARA:移到下一包络点(保持其它选定点)"
+msgstr "OSARA:移到下一包络点(保持其它选中的点)"
 
 msgid "OSARA: Move to previous envelope point (leaving other points selected)"
-msgstr "OSARA:移到上一包络点(保持其它选定点)"
+msgstr "OSARA:移到上一包络点(保持其它选中的点)"
 
 msgid "OSARA: Move to next transient"
 msgstr "OSARA:移到下一瞬态\""
@@ -1233,7 +1233,7 @@ msgid "OSARA: Show third context menu (depending on focus)"
 msgstr "OSARA:显示第3个关联上下文菜单(取决于焦点)"
 
 msgid "OSARA: Cycle through midi recording modes of selected tracks"
-msgstr "OSARA:循环浏览选定轨的midi录制模式"
+msgstr "OSARA:循环浏览选中轨的midi录制模式"
 
 msgid "OSARA: Configuration"
 msgstr "OSARA:配置"
@@ -1245,7 +1245,7 @@ msgid "OSARA: Toggle global automation override between latch preview and off"
 msgstr "OSARA:在锁存器预览和关闭之间切换全局自动化覆盖"
 
 msgid "OSARA: Cycle automation mode of selected tracks"
-msgstr "OSARA:选定轨的循环自动化模式"
+msgstr "OSARA:选中轨的循环自动化模式"
 
 msgid "OSARA: About"
 msgstr "OSARA:关于"
