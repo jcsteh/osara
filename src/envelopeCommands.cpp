@@ -229,7 +229,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 			s << " " << translate("selected");
 		}
 	} else {
-		s << " " << translate("unselected ");
+		s << " " << translate("unselected");
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);

@@ -627,7 +627,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << getMidiNoteName(take, note.pitch, note.channel);
 	}
 	if (!select && !isNoteSelected(take, note.index)) {
-		s << " " << translate("unselected ");
+		s << " " << translate("unselected") << " ";
 	} else if (shouldReportNotes) {
 		s << ", ";
 	}
