@@ -910,12 +910,12 @@ void postGoToMarker(int command) {
 		if (cursorPos == start) {
 			// Translators: Reported when moving by marker and the cursor lands at the
 			// start of the time selection.
-			s << translate("selection start ");
+			s << translate("selection start") << " ";
 		}
 		if (cursorPos == end) {
 			// Translators: Reported when moving by marker and the cursor lands at the
 			// end of the time selection.
-			s << translate("selection end ");
+			s << translate("selection end") << " ";
 		}
 	}
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
@@ -923,12 +923,12 @@ void postGoToMarker(int command) {
 		if (cursorPos == start) {
 			// Translators: Reported when moving by marker and the cursor lands at the
 			// loop start point.
-			s << translate("loop start ");
+			s << translate("loop start") << " ";
 		}
 		if (cursorPos == end) {
 			// Translators: Reported when moving by marker and the cursor lands at the
 			// loop end point.
-			s << translate("loop end ");
+			s << translate("loop end") << " ";
 		}
 	}
 	s << formatCursorPosition();
@@ -1571,7 +1571,7 @@ void postGoToTakeMarker(int command) {
 			if (markerPos == cursorRel) {
 				// Translators: Reported when moving to a take marker. {} will be
 				// replaced with the name of the marker; e.g. "fix take marker".
-				s << format(translate("{} take marker "), name);
+				s << format(translate("{} take marker"), name) << " ";
 				fakeFocus = FOCUS_TAKEMARKER;
 			}
 		}
