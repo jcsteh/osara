@@ -473,21 +473,25 @@ This can be done for one or two tracks.
 To use Peak Watcher:
 
 1. Press Alt+w (OSARA: View Peak Watcher).
-2. From the First track combo box, select one of the following:
+2. From the Level type combo box, select the type of level you want to use: dB peak or several LUFS options.
+ The LUFS options require the JS: EBUR128 Loudness Measurement V2.11 (TBProAudio) effect to be installed.
+ You can [download it from TBProAudio](https://www.tbproaudio.de/download).
+ OSARA will add the effect to tracks automatically and remove it when it is no longer required.
+3. From the First track combo box, select one of the following:
  - None: Select this if you do not wish to monitor a track.
  - Follow current track: Select this if you want to watch peaks for whatever track you move to in your project.
  - Master: This watches peaks for the master track.
  - Otherwise, you can choose any track in your project.
-3. If you wish to monitor a second track, you can choose another track from the Second track combo box.
-4. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level (in dB).
-5. The Hold peaks grouping allows you to specify whether the highest peak remains as the reported peak level and for how long.
- Holding peaks gives you time to examine the peak level, even if the audio level dropped immediately after the peak occurred.
+4. If you wish to monitor a second track, you can choose another track from the Second track combo box.
+5. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level.
+6. The Hold highest level grouping allows you to specify whether the highest level remains as the reported level and for how long.
+ Holding the highest level gives you time to examine the highest level, even if the audio level dropped immediately after the highest level occurred.
  There are three options:
- - disabled: Don't hold peaks at all.
- - until reset: Hold peaks until the Peak Watcher is reset.
- - for (ms): Allows you to specify a time in milliseconds for which peaks will be held.
-6. Press the Reset button to reset the reported peak levels if they are being held.
-7. When you are done, press the OK button to accept any changes or the Cancel button to discard them.
+ - disabled: Don't hold the highest level at all.
+ - until reset: Hold the highest level until the Peak Watcher is reset.
+ - for (ms): Allows you to specify a time in milliseconds for which the highest level will be held.
+7. Press the Reset button to reset the reported peak levels if they are being held.
+8. When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
 At any time, you can report or reset the peak levels for either of the tracks being watched using the following actions:
 
