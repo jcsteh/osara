@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-03-21 15:00\n"
+"PO-Revision-Date: 2021-04-01 13:20\n"
 
 msgid "volume"
 msgstr "volume"
@@ -84,8 +84,8 @@ msgstr "valeur {value} de point {point}"
 msgid "selected"
 msgstr "sélectionné"
 
-msgid "unselected "
-msgstr "non sélectionné "
+msgid "unselected"
+msgstr "non sélectionné"
 
 msgid "no take envelopes"
 msgstr "pas d'enveloppe de prise"
@@ -108,9 +108,6 @@ msgstr "désactivé"
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
 msgstr "auto {}"
-
-msgid "unselected"
-msgstr "non sélectionné"
 
 #. Reported when copying automation items. {} will be replaced
 #. with the number of items; e.g. "2 automation items copied".
@@ -577,23 +574,23 @@ msgstr "fin {} région"
 
 #. Reported when moving by marker and the cursor lands at the
 #. start of the time selection.
-msgid "selection start "
-msgstr "début de sélection "
+msgid "selection start"
+msgstr "début de sélection"
 
 #. Reported when moving by marker and the cursor lands at the
 #. end of the time selection.
-msgid "selection end "
-msgstr "fin de sélection "
+msgid "selection end"
+msgstr "fin de sélection"
 
 #. Reported when moving by marker and the cursor lands at the
 #. loop start point.
-msgid "loop start "
-msgstr "début de boucle "
+msgid "loop start"
+msgstr "début de boucle"
 
 #. Reported when moving by marker and the cursor lands at the
 #. loop end point.
-msgid "loop end "
-msgstr "fin de boucle "
+msgid "loop end"
+msgstr "fin de boucle"
 
 #. Reported when zooming in or out horizontally. {:g} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -864,8 +861,8 @@ msgstr[1] "{} objets supprimés du groupe"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
-msgid "{} take marker "
-msgstr "{} marqueur de prise "
+msgid "{} take marker"
+msgstr "{} marqueur de prise"
 
 #. Reported when an action selects tracks. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks selected".
