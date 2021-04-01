@@ -20,6 +20,7 @@ using namespace std;
 // Maps REAPER language pack names to locale codes used by OSARA. There can
 // be (and often are) multiple REAPER language packs per language.
 map<string, string> REAPER_LANG_TO_CODE = {
+	{"DE_(+SWS)", "de_DE"},
 	{"pt-BR", "pt_BR"},
 	{"Reaper+SWS_CHSDOU", "zh_CN"},
 	{"REAPER_zh_CN_www.szzyyzz.com", "zh_CN"},
