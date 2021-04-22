@@ -1,0 +1,1378 @@
+// Copyright 2020, tb-software.com
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without modification, are permitted 
+// provided that the following conditions are met:
+//
+// Redistributions of source code must retain the above copyright notice, this list of conditions 
+// and the following disclaimer. 
+//
+// Redistributions in binary form must reproduce the above copyright notice, this list of conditions 
+// and the following disclaimer in the documentation and/or other materials provided with the distribution. 
+//
+// The name of tb-software.com may not be used to endorse or 
+// promote products derived from this software without specific prior written permission. 
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR 
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+// FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS 
+// BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES 
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR 
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, 
+// STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
+// THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+// EBUR128 RMS Measurement classes
+// by TBProAudio 2020 (www.tb-software.com)
+//
+// NOTE: PASSING THE TESTS FROM EBU LOUDNESS TEST SET DOES NOT MEAN THAT THE LIBRARY IS 100% EBU R 128 COMPLIANT!
+// NOTE: PLEASE USE THIS LIBARY ON YOUR OWN RISKS!
+//
+// - All in One EBR128 Loudness Measurement Class
+// - passes all stereo sample files from "EBU Loudness test set - v03 - 15 Sep 2011", multichannel will follow
+// - including class for prefiltering according ITU Filter settings
+// - including class for measuring Momentary/Shortterm Loudness
+// - including class for measuring Integrated Loudness (currently 1 hour max)
+// - including class for measuring Loudness Range (currently 1 hour max)
+// - including class for measuring TruePeak based on ITU 1770
+// - ... and as a goodie a small memory manager class (extra inc file), qsort and bspline
+// - of course the library is far from being perfect and highly optimized, some stuff is simply left for debugging purpose
+// 
+// Change log
+// V1.0: First public release
+// V1.1: Changed Usage of Memorymanager
+// V1.2: Bug Fixing
+// V1.3: Increased precision, multichannel, reduced number of ext libraries
+// V1.4: Improved TP detection
+// V1.7: TP Measurement based on ITU 1770
+// V1.8: TP measurement adjusted according BS 1770 beyond 44/48K, SL/ML update every 100ms according EBU R128 spec 
+// V1.9: TP measurement according BS.1770-4
+// V2.0: TP measurement round fix
+// V2.1: Option to disable TP measurement
+// V2.2: Small code optimizations, LRA fix
+//
+// Usage:
+//
+// @init
+//  EBUR128LM.LM_EBUR128_Init();
+//
+// @block
+//   EBUR128LM.LM_EBUR128_GetML_LUFS();
+//   EBUR128LM.LM_EBUR128_GetMLMax_LUFS();
+//   EBUR128LM.LM_EBUR128_GetSL_LUFS();
+//   EBUR128LM.LM_EBUR128_GetSLMax_LUFS();
+//   EBUR128LM.LM_EBUR128_GetIL_LUFS();
+//   EBUR128LM.LM_EBUR128_GetTP_dbFS();
+//  EBUR128LM.LM_EBUR128_GetRLA_LU();
+//
+// @sample
+//  EBUR128LM.LM_EBUR128_Process(spl0, spl1)
+//
+
+desc: EBUR128 Loudness Measurement classes + utilities
+
+@init
+
+function EBU_MSAMPLE2DBFS(x)
+local (ret)
+(
+  (abs(x) > 0.00000007) ? ret = log(abs(x)) * 8.6858896380650365530225783783321 : ret = -144; 
+  ret;
+);
+
+function EBU_MDBFS2SAMPLE(x)
+local (ret)
+(
+  (x < -144) ? ret = 0.0 : ret = exp(x * 0.11512925464970228420089957273422);
+  ret;
+);
+
+function EBU_MSAMPLE2DBFS_E(x)
+local (ret)
+(
+  (abs(x) <  6.309*10^-15) ? ret = -144 : ret = 4.342944819 * log(abs(x)) - 0.691; 
+  ret;
+);
+
+function EBU_dround(x n)
+local (scale)
+(
+  scale = pow(10.0, n);
+  floor(x * scale + 0.5) / scale;
+);
+
+// Timer
+function EBU_Time_Init_Ms(t_ms, _srate)
+(
+  this.time_max = (0.001*t_ms*_srate)|0;
+  this.time_cnt = 0;
+);
+
+function EBU_Time_Count()
+local (ret)
+(
+  ret = 0;
+  this.time_cnt += 1;
+  (this.time_cnt == this.time_max) ?
+  (
+    this.time_cnt = 0;
+    ret = 1;
+  );
+  ret;
+);
+
+////////////////////////////////////////////////////////////////////////////
+// Class ITU Filter
+function ITU_Filter_Init(_FC, _VB, _VL, _VH, _Q, _srate)
+(
+  // Init Buffer
+  this.x0nm1  = 0.0;
+  this.x0nm2  = 0.0;
+  this.x0n    = 0.0;
+  this.y0nm1  = 0.0;
+  this.y0nm2  = 0.0;
+  this.y0n    = 0.0;
+  
+  this.x1nm1  = 0.0;
+  this.x1nm2  = 0.0;
+  this.x1n    = 0.0;
+  this.y1nm1  = 0.0;
+  this.y1nm2  = 0.0;
+  this.y1n    = 0.0;
+
+  this.fs = _srate;
+  this.fc = _FC; 
+  this.vb = _VB; 
+  this.vl = _VL; 
+  this.vh = _VH; 
+  this.q =  _Q;
+
+  this.omega = tan($pi*this.fc/this.fs);
+  this.osq = this.omega*this.omega;
+  this.div = this.osq+(this.omega/this.q)+1.0;
+
+  // Final Params
+  this.a0 = 1.0;
+  this.a1 = (2.0*(this.osq-1.0)) /this.div; 
+  this.a2 = (this.osq-(this.omega / this.q)+1.0) / this.div;
+  this.b0 = (this.vl * this.osq+this.vb*(this.omega/this.q)+this.vh) / this.div; 
+  this.b1 = (2.0*( this.vl * this.osq-this.vh)) / this.div; 
+  this.b2 = (this.vl * this.osq-this.vb * (this.omega/this.q)+this.vh) / this.div;      
+);
+
+function ITU_Filter_Reset()
+(
+  // Init Buffer
+  this.x0nm1  = 0.0;
+  this.x0nm2  = 0.0;
+  this.x0n    = 0.0;
+  this.y0nm1  = 0.0;
+  this.y0nm2  = 0.0;
+  this.y0n    = 0.0;
+  
+  this.x1nm1  = 0.0;
+  this.x1nm2  = 0.0;
+  this.x1n    = 0.0;
+  this.y1nm1  = 0.0;
+  this.y1nm2  = 0.0;
+  this.y1n    = 0.0;
+);
+
+function ITU_Filter_Process(_in0 _in1)
+(
+  // Simple BiQuad Filtering
+  // Left Channel
+  this.x0n = _in0;
+      
+  this.y0n = (this.b0*this.x0n 
+             + this.b1*this.x0nm1 
+            + this.b2*this.x0nm2 
+            - this.a1*this.y0nm1 
+            - this.a2*this.y0nm2)/this.a0;
+  
+  this.x0nm2 = this.x0nm1;
+  this.x0nm1 = this.x0n;
+  
+  this.y0nm2 = this.y0nm1;
+  this.y0nm1 = this.y0n;
+  
+  this.out0  = this.y0n;
+  
+  // Right Channel
+  this.x1n = _in1;
+  
+  this.y1n = (this.b0*this.x1n 
+            + this.b1*this.x1nm1 
+            + this.b2*this.x1nm2 
+            - this.a1*this.y1nm1 
+            - this.a2*this.y1nm2)/this.a0;
+  
+  this.x1nm2 = this.x1nm1;
+  this.x1nm1 = this.x1n;
+  
+  this.y1nm2 = this.y1nm1;
+  this.y1nm1 = this.y1n;
+  
+  this.out1  = this.y1n;
+);
+
+// Multichannel version
+function ITU_Filter_Init_N(_FC, _VB, _VL, _VH, _Q, _srate)
+(
+  // Init Buffer
+  this.x0nm1  = 0.0;
+  this.x0nm2  = 0.0;
+  this.x0n    = 0.0;
+  this.y0nm1  = 0.0;
+  this.y0nm2  = 0.0;
+  this.y0n    = 0.0;
+  
+  this.fs = _srate;
+  this.fc = _FC; 
+  this.vb = _VB; 
+  this.vl = _VL; 
+  this.vh = _VH; 
+  this.q =  _Q;
+
+  this.omega = tan($pi*this.fc/this.fs);
+  this.osq = this.omega*this.omega;
+  this.div = this.osq+(this.omega/this.q)+1.0;
+
+  // Final Params
+  this.a0 = 1.0;
+  this.a1 = (2.0*(this.osq-1.0)) /this.div; 
+  this.a2 = (this.osq-(this.omega / this.q)+1.0) / this.div;
+  this.b0 = (this.vl * this.osq+this.vb*(this.omega/this.q)+this.vh) / this.div; 
+  this.b1 = (2.0*( this.vl * this.osq-this.vh)) / this.div; 
+  this.b2 = (this.vl * this.osq-this.vb * (this.omega/this.q)+this.vh) / this.div;      
+);
+
+function ITU_Filter_Reset_N()
+(
+  // Init Buffer
+  this.x0nm1  = 0.0;
+  this.x0nm2  = 0.0;
+  this.x0n    = 0.0;
+  this.y0nm1  = 0.0;
+  this.y0nm2  = 0.0;
+  this.y0n    = 0.0;
+);
+
+function ITU_Filter_Process_N(_in0)
+(
+  // Simple BiQuad Filtering
+  // Left Channel
+  this.x0n = _in0;
+      
+  this.y0n = (this.b0*this.x0n 
+             + this.b1*this.x0nm1 
+            + this.b2*this.x0nm2 
+            - this.a1*this.y0nm1 
+            - this.a2*this.y0nm2)/this.a0;
+  
+  this.x0nm2 = this.x0nm1;
+  this.x0nm1 = this.x0n;
+  
+  this.y0nm2 = this.y0nm1;
+  this.y0nm1 = this.y0n;
+  
+  this.out0  = this.y0n;
+);
+
+///////////////////////////////////////////////////////////////
+// ISDP based on ITU OS + Filter
+function EBU_ISPD_ITU_Reset()
+(
+  memset(this.xv, 0, this.FILTER_ORDER);
+  this.truepeak_max_val = 0.0;
+  this.maxPeak = 0.0;
+  this.memIndex = 0;
+);
+
+function EBU_ISPD_ITU_Init(_srate)
+local(i, idx)
+(
+  this.FILTER_ORDER = 49;
+  this.MAX_OS_LENGTH = 4;
+
+  this.NZEROS = this.FILTER_ORDER;
+  this.memIndex = 0;
+  this.maxPeak = 0.0;
+  this.sum = 0.0;
+    
+  this.stuffedInput = MM.MemMgr_Alloc(this.MAX_OS_LENGTH);
+  memset(this.stuffedInput, 0, this.MAX_OS_LENGTH);
+   
+  this.xv = MM.MemMgr_Alloc(this.FILTER_ORDER);
+  memset(this.xv, 0, this.FILTER_ORDER);
+  
+  this.xcoeffs_4x = MM.MemMgr_Alloc(this.FILTER_ORDER);
+  this.xcoeffs_2x = MM.MemMgr_Alloc(this.FILTER_ORDER);
+  
+  // Preset 4x OS
+  
+  idx = -1;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.0113627589;
+  this.xcoeffs_4x[idx += 1] = -0.0191044694;
+  this.xcoeffs_4x[idx += 1] = -0.0159103563;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.0215911641;
+  this.xcoeffs_4x[idx += 1] = 0.0352705360;
+  this.xcoeffs_4x[idx += 1] = 0.0286867231;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.0376174666;
+  this.xcoeffs_4x[idx += 1] = -0.0607635168;
+  this.xcoeffs_4x[idx += 1] = -0.0490561018;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.0641652807;
+  this.xcoeffs_4x[idx += 1] = 0.1042508861;
+  this.xcoeffs_4x[idx += 1] = 0.0851524187;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.1167752969;
+  this.xcoeffs_4x[idx += 1] = -0.1977195989;
+  this.xcoeffs_4x[idx += 1] = -0.1714597373;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.2948842718;
+  this.xcoeffs_4x[idx += 1] = 0.6316796740;
+  this.xcoeffs_4x[idx += 1] = 0.8985659968;
+  this.xcoeffs_4x[idx += 1] = 1.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.8985659968;
+  this.xcoeffs_4x[idx += 1] = 0.6316796740;
+  this.xcoeffs_4x[idx += 1] = 0.2948842718;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.1714597373;
+  this.xcoeffs_4x[idx += 1] = -0.1977195989;
+  this.xcoeffs_4x[idx += 1] = -0.1167752969;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.0851524187;
+  this.xcoeffs_4x[idx += 1] = 0.1042508861;
+  this.xcoeffs_4x[idx += 1] = 0.0641652807;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.0490561018;
+  this.xcoeffs_4x[idx += 1] = -0.0607635168;
+  this.xcoeffs_4x[idx += 1] = -0.0376174666;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+  this.xcoeffs_4x[idx += 1] = 0.0286867231;
+  this.xcoeffs_4x[idx += 1] = 0.0352705360;
+  this.xcoeffs_4x[idx += 1] = 0.0215911641;
+  this.xcoeffs_4x[idx += 1] = -0.0000000000;
+  this.xcoeffs_4x[idx += 1] = -0.0159103563;
+  this.xcoeffs_4x[idx += 1] = -0.0191044694;
+  this.xcoeffs_4x[idx += 1] = -0.0113627589;
+  this.xcoeffs_4x[idx += 1] = 0.0000000000;
+
+
+  idx = -1;
+  this.xcoeffs_2x[idx += 1] =   0.001912918642744588;
+  this.xcoeffs_2x[idx += 1] =  -0.001622223835405095;
+  this.xcoeffs_2x[idx += 1] =  -0.002870219057571959;
+  this.xcoeffs_2x[idx += 1] =   0.002774635317194337;
+  this.xcoeffs_2x[idx += 1] =   0.003966195370374999;
+  this.xcoeffs_2x[idx += 1] =  -0.004406815935365670;
+  this.xcoeffs_2x[idx += 1] =  -0.005172619829429318;
+  this.xcoeffs_2x[idx += 1] =   0.006649157462491229;
+  this.xcoeffs_2x[idx += 1] =   0.006451761533900594;
+  this.xcoeffs_2x[idx += 1] =  -0.009676046249418955;
+  this.xcoeffs_2x[idx += 1] =  -0.007758030866817651;
+  this.xcoeffs_2x[idx += 1] =   0.013743734151640718;
+  this.xcoeffs_2x[idx += 1] =   0.009040313953467792;
+  this.xcoeffs_2x[idx += 1] =  -0.019272628316417718;
+  this.xcoeffs_2x[idx += 1] =  -0.010244849872253043;
+  this.xcoeffs_2x[idx += 1] =   0.027042350089154149;
+  this.xcoeffs_2x[idx += 1] =   0.011318450576424728;
+  this.xcoeffs_2x[idx += 1] =  -0.038723702267571707;
+  this.xcoeffs_2x[idx += 1] =  -0.012211826725127460;
+  this.xcoeffs_2x[idx += 1] =   0.058688503245713466;
+  this.xcoeffs_2x[idx += 1] =   0.012882765802252449;
+  this.xcoeffs_2x[idx += 1] =  -0.103056384364792919;
+  this.xcoeffs_2x[idx += 1] =  -0.013298914104807488;
+  this.xcoeffs_2x[idx += 1] =   0.317283598034910852;
+  this.xcoeffs_2x[idx += 1] =   0.513439941396824806;
+  this.xcoeffs_2x[idx += 1] =   0.317283598034910852;
+  this.xcoeffs_2x[idx += 1] =  -0.013298914104807488;
+  this.xcoeffs_2x[idx += 1] =  -0.103056384364792919;
+  this.xcoeffs_2x[idx += 1] =   0.012882765802252449;
+  this.xcoeffs_2x[idx += 1] =   0.058688503245713466;
+  this.xcoeffs_2x[idx += 1] =  -0.012211826725127460;
+  this.xcoeffs_2x[idx += 1] =  -0.038723702267571707;
+  this.xcoeffs_2x[idx += 1] =   0.011318450576424728;
+  this.xcoeffs_2x[idx += 1] =   0.027042350089154149;
+  this.xcoeffs_2x[idx += 1] =  -0.010244849872253043;
+  this.xcoeffs_2x[idx += 1] =  -0.019272628316417718;
+  this.xcoeffs_2x[idx += 1] =   0.009040313953467792;
+  this.xcoeffs_2x[idx += 1] =   0.013743734151640718;
+  this.xcoeffs_2x[idx += 1] =  -0.007758030866817651;
+  this.xcoeffs_2x[idx += 1] =  -0.009676046249418955;
+  this.xcoeffs_2x[idx += 1] =   0.006451761533900594;
+  this.xcoeffs_2x[idx += 1] =   0.006649157462491229;
+  this.xcoeffs_2x[idx += 1] =  -0.005172619829429318;
+  this.xcoeffs_2x[idx += 1] =  -0.004406815935365670;
+  this.xcoeffs_2x[idx += 1] =   0.003966195370374999;
+  this.xcoeffs_2x[idx += 1] =   0.002774635317194337;
+  this.xcoeffs_2x[idx += 1] =  -0.002870219057571959;
+  this.xcoeffs_2x[idx += 1] =  -0.001622223835405095;
+  this.xcoeffs_2x[idx += 1] =   0.001912918642744588;
+
+  this.xcoeffs = this.xcoeffs_4x;
+  this.CUR_OS_LENGTH = 4;
+
+    (_srate <= 48000) ?
+    (
+  this.xcoeffs = this.xcoeffs_4x;
+  this.CUR_OS_LENGTH = 4;
+    )
+    :
+    (_srate <= (2 * 48000)) ?
+    (
+  this.xcoeffs = this.xcoeffs_2x;
+  this.CUR_OS_LENGTH = 2;
+    )
+    :
+    (
+  this.xcoeffs = this.xcoeffs_2x;
+  this.CUR_OS_LENGTH = 1;
+    );
+    
+    this.GAIN = 0;
+    idx = 0;
+    loop(this.FILTER_ORDER,
+      this.GAIN += this.xcoeffs[idx];
+      idx += 1;
+    );    
+    
+    this.GAIN1 = EBU_MDBFS2SAMPLE(12.04);
+    
+    this.EBU_ISPD_ITU_Reset();
+);
+
+function EBU_ISPD_ITU_Process(_input)
+local(i,j)
+(
+    _input /= this.GAIN1;
+
+    this.maxPeak = 0.0;
+    
+    (this.CUR_OS_LENGTH == 1) ?
+    (
+      this.maxPeak = max(this.maxPeak, abs(_input)); 
+      this.truepeak_max_val = max(this.truepeak_max_val, this.maxPeak);
+    )
+    :
+    (
+      this.stuffedInput[0] = this.CUR_OS_LENGTH*_input/this.GAIN;
+      i = 0;
+      loop
+      (
+        this.CUR_OS_LENGTH,
+
+  //      this.xv[this.memIndex] = this.CUR_OS_LENGTH*this.stuffedInput[i]/this.GAIN;
+        this.xv[this.memIndex] = this.stuffedInput[i];
+        this.sum = 0.0;
+
+        j = (this.NZEROS-1) - i;
+        while(j >= 0)
+        (
+    this.sum += (this.xcoeffs[j]*this.xv[(this.memIndex + j + 1) % (this.NZEROS)]);
+    j -= this.CUR_OS_LENGTH;  
+        );
+
+        this.memIndex = (this.memIndex + 1) % (this.NZEROS);
+        this.maxPeak = max(this.maxPeak, abs(this.sum) * this.GAIN1); 
+        this.truepeak_max_val = max(this.truepeak_max_val, this.maxPeak);
+
+        i += 1;    
+     );
+    );
+);
+
+function EBU_ISPD_ITU_Get_MaxTruePeakVal()
+(
+  this.truepeak_max_val;
+);
+
+function EBU_ISPD_ITU_Get_TruePeakVal()
+(
+  this.maxPeak;
+);
+
+function EBU_ISPD_ITU_Get_TruePeakValMax_db()
+(
+  EBU_dround(EBU_MSAMPLE2DBFS(this.truepeak_max_val),1);
+);
+
+////////////////////////////////////////////////////////////////////////////
+// Momentary/Shortterm Loudness Measurement Class (400ms, 3000ms), ML, SL
+
+function RMS_MS_Reset()
+(
+  memset(this.buffer , 0, this.max_count);
+  this.bufIdx       = 0;
+
+  this.sum          = 0;
+  this.prev_val     = 0;
+  this.rms_val      = 0;
+  this.rms_val_min  = 0;
+  this.rms_val_max  = 0;
+
+  this.rms_val_min_db   = -144;
+  this.rms_val_max_db   = -144;
+  this.rms_val_db   = -144;
+    
+  this.BlockReady   = 0;
+  this.ValueReady   = 0;
+  
+  this.update_timer = 0;
+);
+
+
+function RMS_MS_Init(buffer, time_constant_ms, overlap_pct, _srate)
+(
+  // Buffer
+  this.buffer = buffer;
+  this.time_constant_ms = time_constant_ms;
+  this.max_count    = (0.001*this.time_constant_ms*_srate)|0;
+
+  // Update timer
+  this.overlap_pct  = overlap_pct;
+  this.time_update_ms = this.time_constant_ms * (1.0 - this.overlap_pct);
+  this.update_timer_max = (0.001*this.time_update_ms*_srate)|0;
+);
+
+function RMS_MS_Process(_in0, _in1)
+local(rms_amp2) 
+(
+  rms_amp2 = _in0*_in0 + _in1*_in1;
+    
+  this.sum  += rms_amp2;    
+  this.prev_val = this.buffer [this.bufIdx];
+  this.buffer [this.bufIdx] = rms_amp2;
+    
+  this.bufIdx += 1;
+  
+   // Buffer full
+  (this.bufIdx >= this.max_count) ? 
+  (
+    this.bufIdx = 0;
+    this.BlockReady = 1;
+  );
+
+  // Overlapped value
+  this.update_timer += 1;
+  this.ValueReady = 0;
+  (this.update_timer >= this.update_timer_max) ?
+  (
+    this.update_timer = 0;
+    this.ValueReady   = 1;
+  );
+  
+  (this.BlockReady == 0) ?
+  (
+	(this.ValueReady == 1) ?
+	(
+		this.rms_val = this.rms_val_min = this.rms_val_max = this.sum/this.max_count;
+	);
+  ):
+  (
+    this.sum  -= this.prev_val;
+	this.sum = max(this.sum, 0.0);
+
+	(this.ValueReady == 1) ?
+	(
+		this.rms_val = this.sum/this.max_count;
+		this.rms_val_min = min(this.rms_val_min, this.rms_val);
+		this.rms_val_max = max(this.rms_val_max, this.rms_val);
+	);
+  );
+  
+  this.BlockReady;    
+);
+
+// MultiChannel
+function RMS_MS_Process_N(_in0, _in1, _in2, _in3, _in4, _in5, _ch_mode)
+local(rms_amp2, add_gain3, add_gain4, add_gain5) 
+(
+  add_gain3 = 1.0;
+  add_gain4 = 1.0;
+  add_gain5 = 1.0;
+
+  (_ch_mode == 2) ?   // 5 Channels
+  (
+      add_gain3 = 1.41;
+      add_gain4 = 1.41;
+      add_gain5 = 0;
+  );
+  (_ch_mode == 3) ?   // 6 Channels
+  (
+      add_gain3 = 0.0;
+      add_gain4 = 1.41;
+      add_gain5 = 1.41;
+  );
+
+  rms_amp2 = _in0*_in0 + _in1*_in1 + _in2*_in2 + _in3*_in3*add_gain3 + _in4*_in4*add_gain4 + _in5*_in5*add_gain5;
+    
+  this.sum  += rms_amp2;    
+  this.prev_val = this.buffer [this.bufIdx];
+  this.buffer [this.bufIdx] = rms_amp2;
+    
+  this.bufIdx += 1;
+  
+   // Buffer full
+  (this.bufIdx >= this.max_count) ? 
+  (
+    this.bufIdx = 0;
+    this.BlockReady = 1;
+  );
+
+  // Overlapped value
+  this.update_timer += 1;
+  this.ValueReady = 0;
+  (this.update_timer >= this.update_timer_max) ?
+  (
+    this.update_timer = 0;
+    this.ValueReady   = 1;
+  );
+  
+  (this.BlockReady == 0) ?
+  (
+	(this.ValueReady == 1) ?
+	(
+		this.rms_val = this.rms_val_min = this.rms_val_max = this.sum/this.max_count;
+	);
+  ):
+  (
+    this.sum  -= this.prev_val;
+	this.sum = max(this.sum, 0.0);
+
+	(this.ValueReady == 1) ?
+	(
+		this.rms_val = this.sum/this.max_count;
+		this.rms_val_min = min(this.rms_val_min, this.rms_val);
+		this.rms_val_max = max(this.rms_val_max, this.rms_val);
+	);
+  );
+  
+  this.BlockReady;    
+);
+
+function RMS_MS_GetVal_db()
+(
+  this.rms_val_db        = EBU_dround(EBU_MSAMPLE2DBFS_E((this.rms_val)),1);
+);
+
+function RMS_MS_GetMaxVal_db()
+(
+  this.rms_val_max_db = EBU_dround(EBU_MSAMPLE2DBFS_E((this.rms_val_max)),1);
+);
+
+function RMS_MS_GetMinVal_db()
+(
+  this.rms_val_min_db = EBU_dround(EBU_MSAMPLE2DBFS_E((this.rms_val_min)),1);
+);
+
+function RMS_MS_GetVal()
+(
+  this.rms_val;
+);
+
+function RMS_MS_IsBlockReady()
+(
+  this.BlockReady;
+);
+
+function RMS_MS_IsValueReady()
+(
+  this.ValueReady;
+);
+
+////////////////////////////////////////////////////////////////////////////
+// Loudness Integrator class IL
+function RMS_I_Init(buffer, buffer_size)
+(
+  this.sum        = 0.0;                      // Summed RMS_I value
+  this.tmp_rms_val_db = -141;                 // RMS value, required for gating calc
+
+  // Intergrated RMS, gated
+  this.g_buffer = buffer;                    // Stores rms_400 values
+  this.g_buffer_size = buffer_size;          // Max Buffer size
+  memset(this.g_buffer , 0, this.g_buffer_size);
+  this.g_nSamples     = 0;
+  this.g_nSamples_full     = 0;
+  
+  this.g_rms_val_db = -141;
+  
+  // Gate Limits
+  this.EBU_Abs_Gate_db = -70;
+  this.EBU_Rel_Gate_db = -10;  
+);
+
+function RMSInt_Reset()
+(
+  memset(this.g_buffer , 0, this.g_buffer_size);
+  this.sum        = 0.0;                      // Summed RMS_I value
+  this.tmp_rms_val_db = -141;                 // RMS value, required for gating calc
+
+  // Intergrated RMS, gated
+  this.g_nSamples     = 0;
+  this.g_nSamples_full     = 0;
+
+  this.g_rms_val_db = -141;
+);
+
+// Calculates RMS value based on gate value in db
+function RMSInt_CalcRMSGate(buffer, count, gate_db)
+local(i, rms_final_count, rms_final, rms_tmp_db)
+(
+  i = 0;
+  rms_final_count = 0;
+  rms_final = 0;
+  loop(count, 
+    rms_tmp_db = EBU_MSAMPLE2DBFS_E(buffer[i]);
+    (rms_tmp_db >= gate_db) ? 
+    (
+      rms_final += buffer[i];
+      rms_final_count += 1;
+    );
+    i += 1;
+  ); 
+  
+  EBU_MSAMPLE2DBFS_E(rms_final/rms_final_count);
+);
+
+function RMSInt_Process(rms_400_val)  // Called every 100ms
+local(buffer_count)
+(
+  this.rms_400_val_db = EBU_MSAMPLE2DBFS_E((rms_400_val));
+  // Check absolute Gate
+  (this.rms_400_val_db >= this.EBU_Abs_Gate_db) ? 
+  (
+    // remove old value
+    this.sum -= this.g_buffer[this.g_nSamples];
+    
+	(this.sum < 0.0) ? this.sum = 0.0;
+	
+    // Add new value
+    this.sum += rms_400_val;
+
+    // store RMS_M values
+    this.g_buffer[this.g_nSamples] = rms_400_val; 
+    this.g_nSamples += 1;
+  );
+
+  buffer_count = this.g_nSamples;
+  (this.g_nSamples_full == 1) ? // buffer full
+    buffer_count = this.g_buffer_size;
+
+  // Select absolute RMS_I value for relative gating
+  (buffer_count) ?
+  (
+    this.tmp_rms_val_db = EBU_MSAMPLE2DBFS_E(this.sum/buffer_count);
+  ) :
+  (
+    this.tmp_rms_val_db = this.g_rms_val_db;  
+  );
+    
+  // Calculated finale IL value base on current TL value and relative gate
+  (buffer_count) ?
+    this.g_rms_val_db = RMSInt_CalcRMSGate( this.g_buffer,buffer_count,this.tmp_rms_val_db + this.EBU_Rel_Gate_db);
+ 
+  // Finally check if RMS_I buffer is full!!!
+  (this.g_nSamples >= this.g_buffer_size) ?
+  (
+    this.g_nSamples = 0;    // set counter/bufferindex to 0
+    this.g_nSamples_full = 1;  // mark buffer as full
+  );
+);
+
+function RMSInt_GetVal_db()
+(
+  EBU_dround(this.g_rms_val_db,1);
+);
+
+///////////////////////////////////////////////////////////////////////////
+// Loudness Range Measurement Class (LRA)
+function LRA_Init(_stl_buf0, _stl_buf1, _stl_count, qsbuf1, qsbuf2)
+(
+  // Init
+  this.stl_buf_ori  = _stl_buf0;
+  this.stl_buf      = _stl_buf1;
+  this.stl_maxcount = _stl_count;
+  memset(this.stl_buf_ori , 0, this.stl_maxcount);
+  memset(this.stl_buf , 0, this.stl_maxcount);
+
+  // Init Gates and Loudness Distribution Limits
+  this.ABS_THRES = -70;
+  this.REL_THRES = -20;
+  this.PRC_LOW   = 10;
+  this.PRC_HIGH  = 95;
+  
+  // Buffer for QSort
+  this.qsort_beg = qsbuf1;
+  this.qsort_end = qsbuf2;
+  memset(this.qsort_beg , 0, 300);
+  memset(this.qsort_end , 0, 300);
+  
+  this.LRA = 0;
+
+  this.sum = 0;
+  this.stl_count = 0;
+  this.stl_count_full = 0;
+);
+
+function LRA_Reset()
+(
+  memset(this.stl_buf_ori , 0, this.stl_maxcount);
+  memset(this.stl_buf , 0, this.stl_maxcount);
+  memset(this.qsort_beg , 0, 300);
+  memset(this.qsort_end , 0, 300);
+
+  this.LRA = 0;
+
+  this.sum = 0;
+  this.stl_count = 0;
+  this.stl_count_full = 0;
+);
+
+//  quickSort: public-domain C implementation by Darel Rex Finley.
+function QSort(arr, elements, beg, end)
+local (int  piv, i, L, R, swap)
+(
+  i = 0;
+  beg[0]=0; end[0]=elements;
+  
+  while (i>=0) 
+  (
+    L=beg[i]; R=end[i]-1;
+    (L<R) ? 
+    (
+      piv=arr[L];
+      while (L<R) 
+      (
+        while ((arr[R]>=piv) && (L<R)) (R-=1;); 
+        (L<R) ? (arr[L]=arr[R];L+=1;);
+        while ((arr[L]<=piv) && (L<R)) (L+=1;); 
+        (L<R) ? (arr[R]=arr[L];R-=1;);
+      );
+
+      arr[L]=piv; beg[i+1]=L+1; end[i+1]=end[i]; end[i]=L; i+=1;
+      (end[i]-beg[i]>end[i-1]-beg[i-1]) ? 
+      (
+        swap=beg[i]; beg[i]=beg[i-1]; beg[i-1]=swap;
+        swap=end[i]; end[i]=end[i-1]; end[i-1]=swap; 
+      )
+    ) : 
+    (
+      i-=1; 
+    )
+  )
+);
+
+// Remove all values which are below gate value in db
+// return number of remaining values
+function LRA_FilterBufferGate(arr, n, gate_db)
+local(i,j)
+(
+  i = 0;
+  j = 0;
+  loop(n,
+    (EBU_MSAMPLE2DBFS_E(arr[i]) >= gate_db) ? 
+    (
+      arr[j] = arr[i];
+      i += 1;
+      j += 1;
+    ) :
+    (
+      i += 1;
+    );
+  );
+  j;
+);
+
+// Do the processing every 1000ms
+function LRA_Process(rms_3000_val)
+local(i, buffer_count)
+(
+  this.rms_3000_val_db = EBU_MSAMPLE2DBFS_E(rms_3000_val);
+
+  // Absolute Gate
+  (this.rms_3000_val_db >= this.ABS_THRES) ? 
+  (
+    // Remove old value
+    this.sum -= this.stl_buf_ori[this.stl_count];
+
+	this.sum = max(this.sum, 0.0);
+	
+    // Add new value
+    this.sum += rms_3000_val;
+
+    // store abs gated RMS_S values
+    this.stl_buf_ori[this.stl_count] = rms_3000_val; 
+    this.stl_count += 1;
+
+    // This is the reference ubgated RMS value für rel gate
+	(this.stl_count_full) ?
+	(
+		this.rms_valug_db = EBU_MSAMPLE2DBFS_E((this.sum/this.stl_maxcount));
+	):
+	(
+		this.rms_valug_db = EBU_MSAMPLE2DBFS_E((this.sum/this.stl_count));
+	);
+  );
+
+  buffer_count = this.stl_count;
+  (this.stl_count_full == 1) ?
+    buffer_count = this.stl_maxcount;
+  
+  (buffer_count) ?
+  ( 
+    // Copy to working buffer
+    memcpy(this.stl_buf, this.stl_buf_ori, buffer_count);
+
+    // Relative Gate
+    // calculate rel gate in db
+    this.rel_gate_db = this.rms_valug_db + this.REL_THRES;
+    // filter buffer 
+    this.rel_gate_count = LRA_FilterBufferGate(this.stl_buf, buffer_count, this.rms_valug_db + this.REL_THRES);
+
+    QSort(this.stl_buf, this.rel_gate_count, this.qsort_beg, this.qsort_end);
+
+    this.stl_perc_low_db  = EBU_MSAMPLE2DBFS_E((this.stl_buf[EBU_dround((this.rel_gate_count-1)*this.PRC_LOW/100,0)]));
+    this.stl_perc_high_db = EBU_MSAMPLE2DBFS_E((this.stl_buf[EBU_dround((this.rel_gate_count-1)*this.PRC_HIGH/100,0)]));
+
+    this.LRA = max((this.stl_perc_high_db - this.stl_perc_low_db), 0.0); // in LU
+  );
+
+  // Finally check if LRA buffer is full!!!
+  (this.stl_count == this.stl_maxcount) ? 
+  (
+   this.stl_count       = 0;
+  this.stl_count_full = 1;
+  );
+);
+
+function LRA_GetVal_LU()
+(
+  EBU_dround(this.LRA,1);
+);
+
+function LRA_GetLowVal_LUFS()
+(
+  this.stl_perc_low_db;
+);
+
+function LRA_GetHighVal_LU()
+(
+  this.stl_perc_high_db;
+);
+
+function LRA_GetCount()
+(
+  (this.stl_count_full == 1) ? this.stl_maxcount:this.stl_count;
+);
+
+
+///////////////////////////////////////////////////////////////////////////
+// EBUR128 Measurement AIO class
+// Stereo
+
+function LM_EBUR128_Reset()
+(
+  // ITU Filter
+  this.ITU_Filter_HS.ITU_Filter_Reset();
+  this.ITU_Filter_LC.ITU_Filter_Reset();
+
+  // RMS_M  (Momentary)
+  this.RMS_M.RMS_MS_Reset();
+
+  // RMS_S  (ShortTerm)
+  this.RMS_S.RMS_MS_Reset();
+
+  // RMS_I
+  this.RMS_I.RMSInt_Reset();
+  
+  // RLA 
+  this.LRA.LRA_Reset();
+
+  // TruePeak
+  this.TPN_DET0.EBU_ISPD_ITU_Reset(_spl0); 
+  this.TPN_DET1.EBU_ISPD_ITU_Reset(_spl1);
+
+);
+
+// called within @init section
+function LM_EBUR128_Init(_srate)
+(
+  // Setup ITU 1770 Pre-Filter HighShelf/LowCut
+    this.ITU_Filter_HS.ITU_Filter_Init(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_LC.ITU_Filter_Init(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+
+  // RMS_M  (ML)
+  // Setup ML Buffer size
+  this.rms_bufN400_Max_ms = 400;                                         // 400ms
+  this.rms_bufN400_Max    = (0.001*this.rms_bufN400_Max_ms*_srate)|0; 
+
+  this.rms_buf0  = MM.MemMgr_Alloc(this.rms_bufN400_Max);   // We use our memory manager just allocate only required memory  
+  this.RMS_M.RMS_MS_Init(this.rms_buf0, this.rms_bufN400_Max_ms, 1.0 - 100.0/400.0, _srate);  // Init
+
+  // RMS_S  (SL)
+  // Setup SL Buffer size
+  this.rms_bufN3000_Max_ms = 3000;                                        // 3000ms
+  this.rms_bufN3000_Max    = (0.001*this.rms_bufN3000_Max_ms*_srate)|0;
+
+  this.rms_buf1  = MM.MemMgr_Alloc(this.rms_bufN3000_Max);  
+  this.RMS_S.RMS_MS_Init(this.rms_buf1, this.rms_bufN3000_Max_ms, 1.0 - 100.0/3000.0, _srate);
+
+  // RMS_I  (IL)
+  // Max RMS_I Buffer size
+  this.rms_bufN_MaxInt_s = 60*60;                                       // 3600 sec == 1 hour max
+  this.rms_bufN_MaxInt   = (10 * this.rms_bufN_MaxInt_s)|0;             // stores every 100ms RMS_M values
+  this.rms_buf2  = MM.MemMgr_Alloc(this.rms_bufN_MaxInt);   
+  this.RMS_I.RMS_I_Init(this.rms_buf2,this.rms_bufN_MaxInt);
+
+  // LRA    (LRA)
+  //this.rms_bufN_MaxRLA_s = 60*60;                                        	  // 3600 sec == 1 hour max
+  this.rms_bufN_MaxRLA_s = 3.0;                                        	  	  // sliding 3s, tech3342.pdf
+  this.rms_bufN_MaxRLA   = (10 * this.rms_bufN_MaxRLA_s)|0;           // stores every 100ms RMS_S value
+
+  this.LRAbuf1   = MM.MemMgr_Alloc(this.rms_bufN_MaxRLA);
+  this.LRAbuf2   = MM.MemMgr_Alloc(this.rms_bufN_MaxRLA);
+  this.LRAbuf3   = MM.MemMgr_Alloc(300);
+  this.LRAbuf4   = MM.MemMgr_Alloc(300);  
+
+  this.LRA.LRA_Init(this.LRAbuf1, this.LRAbuf2, this.rms_bufN_MaxRLA, this.LRAbuf3, this.LRAbuf4);
+
+  // TP_DET (TruePeak Detection)
+  this.TPN_DET0.EBU_ISPD_ITU_Init(_srate); 
+  this.TPN_DET1.EBU_ISPD_ITU_Init(_srate);
+
+  MM.pos;                // as we use a memory manager, just return end of our memory used
+);
+
+// called within @sample section
+function LM_EBUR128_Process(_spl0, _spl1)
+(
+  // Process Signal ITU 1770 Pre-Filter HighShelf/LowCut   
+  this.in0 = _spl0;
+  this.in1 = _spl1;
+  this.ITU_Filter_HS.ITU_Filter_Process(this.in0, this.in1);
+  this.in0 = this.ITU_Filter_HS.out0;
+  this.in1 = this.ITU_Filter_HS.out1;
+  this.ITU_Filter_LC.ITU_Filter_Process(this.in0, this.in1);    
+  this.in0 = this.ITU_Filter_LC.out0;
+  this.in1 = this.ITU_Filter_LC.out1;
+   
+  // Momentary Loudness (400ms)
+  this.RMS_M.RMS_MS_Process(this.in0, this.in1);
+  
+  // Shortterm Loudness (3000ms)
+  this.RMS_S.RMS_MS_Process(this.in0, this.in1);
+
+  // Integrated Loudness, every 100ms
+  (this.RMS_M.RMS_MS_IsValueReady()) ? 
+  (
+    this.RMS_I.RMSInt_Process(this.RMS_M.RMS_MS_GetVal());
+  );
+
+  // Loudness Range every 1000ms
+  (this.RMS_S.RMS_MS_IsValueReady() && this.RMS_S.RMS_MS_IsBlockReady()) ?
+  (
+    this.LRA.LRA_Process(this.RMS_S.RMS_MS_GetVal());
+  );
+    
+  // TruePeak Detection
+  this.TPN_DET0.EBU_ISPD_ITU_Process(_spl0); 
+  this.TPN_DET1.EBU_ISPD_ITU_Process(_spl1);
+
+);
+
+///////////////////////////////////////////////////////////
+// MultiChannel
+
+function LM_EBUR128_Reset_MultiCh()
+(
+  // TruePeak
+  this.TPN_DET0.EBU_ISPD_ITU_Reset(); 
+  this.TPN_DET1.EBU_ISPD_ITU_Reset(); 
+  this.TPN_DET2.EBU_ISPD_ITU_Reset(); 
+  this.TPN_DET3.EBU_ISPD_ITU_Reset(); 
+  this.TPN_DET4.EBU_ISPD_ITU_Reset(); 
+  this.TPN_DET5.EBU_ISPD_ITU_Reset(); 
+
+  // ITU Filter
+  this.ITU_Filter_HS0.ITU_Filter_Reset_N();
+  this.ITU_Filter_HS1.ITU_Filter_Reset_N();
+  this.ITU_Filter_HS2.ITU_Filter_Reset_N();
+  this.ITU_Filter_HS3.ITU_Filter_Reset_N();
+  this.ITU_Filter_HS4.ITU_Filter_Reset_N();
+  this.ITU_Filter_HS5.ITU_Filter_Reset_N();
+  
+  this.ITU_Filter_LC0.ITU_Filter_Reset_N();
+  this.ITU_Filter_LC1.ITU_Filter_Reset_N();
+  this.ITU_Filter_LC2.ITU_Filter_Reset_N();
+  this.ITU_Filter_LC3.ITU_Filter_Reset_N();
+  this.ITU_Filter_LC4.ITU_Filter_Reset_N();
+  this.ITU_Filter_LC5.ITU_Filter_Reset_N();
+
+  // RMS_M  (Momentary)
+  this.RMS_M.RMS_MS_Reset();
+
+  // RMS_S  (ShortTerm)
+  this.RMS_S.RMS_MS_Reset();
+
+  // RMS_I
+  this.RMS_I.RMSInt_Reset();
+  
+  // RLA 
+  this.LRA.LRA_Reset();
+);
+
+function LM_EBUR128_Init_MultiCh(_srate)
+(
+  // Setup ITU 1770 Pre-Filter HighShelf/LowCut
+  this.ITU_Filter_HS0.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_HS1.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_HS2.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_HS3.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_HS4.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+  this.ITU_Filter_HS5.ITU_Filter_Init_N(1681.97445095553190,1.25872093023256,1.0,1.58486470113086,0.70717523695542, _srate);
+
+  this.ITU_Filter_LC0.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  this.ITU_Filter_LC1.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  this.ITU_Filter_LC2.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  this.ITU_Filter_LC3.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  this.ITU_Filter_LC4.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  this.ITU_Filter_LC5.ITU_Filter_Init_N(38.13547087611304,0.0,0.0,1.00499489871469,0.50032703732504, _srate);
+  
+  // TP_DET (TruePeak Detection)
+
+  this.TPN_DET0.EBU_ISPD_ITU_Init(_srate); 
+  this.TPN_DET1.EBU_ISPD_ITU_Init(_srate);
+  this.TPN_DET2.EBU_ISPD_ITU_Init(_srate);
+  this.TPN_DET3.EBU_ISPD_ITU_Init(_srate);
+  this.TPN_DET4.EBU_ISPD_ITU_Init(_srate);
+  this.TPN_DET5.EBU_ISPD_ITU_Init(_srate);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  // RMS_M  (ML)
+  // Setup ML Buffer size
+  this.rms_bufN400_Max_ms = 400;                                           // 400ms
+  this.rms_bufN400_Max    = (0.001*this.rms_bufN400_Max_ms*_srate)|0; 
+
+  this.rms_buf0  = MM.MemMgr_Alloc(this.rms_bufN400_Max);                 // We use our memory manager just allocate only required memory  
+  
+  this.RMS_M.RMS_MS_Init(this.rms_buf0, this.rms_bufN400_Max_ms, 1.0 - 100.0/400.0, _srate);    // Init
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  // RMS_S  (SL)
+  // Setup SL Buffer size
+  this.rms_bufN3000_Max_ms = 3000;                                         // 3000ms
+  this.rms_bufN3000_Max    = (0.001*this.rms_bufN3000_Max_ms*_srate)|0;
+
+  this.rms_buf1  = MM.MemMgr_Alloc(this.rms_bufN3000_Max);  
+  
+  this.RMS_S.RMS_MS_Init(this.rms_buf1, this.rms_bufN3000_Max_ms, 1.0 - 100.0/3000.0, _srate);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  // RMS_I  (IL)
+  // Max RMS_I Buffer size
+  this.rms_bufN_MaxInt_s = 60*60;                                        // 3600 sec == 1 hour max
+  this.rms_bufN_MaxInt   = (10 * this.rms_bufN_MaxInt_s)|0;              // stores every 100ms RMS_M values
+  
+  this.rms_buf2  = MM.MemMgr_Alloc(this.rms_bufN_MaxInt);   
+  
+  this.RMS_I.RMS_I_Init(this.rms_buf2,this.rms_bufN_MaxInt);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+  // LRA    (LRA)
+  //this.rms_bufN_MaxRLA_s = 60*60;                                        	  // 3600 sec == 1 hour max
+  this.rms_bufN_MaxRLA_s = 3.0;                                        	  	  // sliding 3s, tech3342.pdf
+  this.rms_bufN_MaxRLA   = (10 * this.rms_bufN_MaxRLA_s)|0;                   // stores every 100ms RMS_S values
+
+  this.LRAbuf1   = MM.MemMgr_Alloc(this.rms_bufN_MaxRLA);
+  this.LRAbuf2   = MM.MemMgr_Alloc(this.rms_bufN_MaxRLA);
+  this.LRAbuf3   = MM.MemMgr_Alloc(300);
+  this.LRAbuf4   = MM.MemMgr_Alloc(300);  
+  
+  this.LRA.LRA_Init(this.LRAbuf1, this.LRAbuf2, this.rms_bufN_MaxRLA, this.LRAbuf3, this.LRAbuf4);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////
+
+   MM.pos;                // as we use a memory manager, just return end of our memory used
+);
+
+// called within @sample section, Multi Channel Version
+function LM_EBUR128_Process_MultiCh(_spl0, _spl1, _spl2, _spl3, _spl4, _spl5, _ch_mode, _tp_enabled, _lra_enabled)
+(
+  // Process Signal ITU 1770 Pre-Filter HighShelf/LowCut   
+  this.in0 = _spl0;
+  this.in1 = _spl1;
+  this.in2 = _spl2;
+  this.in3 = _spl3;
+  this.in4 = _spl4;
+  this.in5 = _spl5;
+  
+  (_ch_mode == 0) ? // Stereo
+  (
+    this.in2 = 0;
+    this.in3 = 0;
+    this.in4 = 0;
+    this.in5 = 0;
+  );
+  
+  (_ch_mode == 1) ? // Quadro
+  (
+    this.in4 = 0;
+    this.in5 = 0;
+  );
+
+  (_ch_mode == 2) ? // 4+1
+  (
+    this.in5 = 0;
+  );
+  
+ 
+  // TruePeak Detection
+  (_tp_enabled) ?
+  (
+    this.TPN_DET0.EBU_ISPD_ITU_Process(this.in0); 
+    this.TPN_DET1.EBU_ISPD_ITU_Process(this.in1); 
+    (_ch_mode > 0) ? 
+    (
+      this.TPN_DET2.EBU_ISPD_ITU_Process(this.in2); 
+      this.TPN_DET3.EBU_ISPD_ITU_Process(this.in3);
+    );
+    (_ch_mode > 1) ?
+    (
+      this.TPN_DET4.EBU_ISPD_ITU_Process(this.in4);
+    );
+    (_ch_mode > 2) ?
+    (
+      this.TPN_DET5.EBU_ISPD_ITU_Process(this.in5);
+    );
+  );
+
+  // HighShelf
+  this.ITU_Filter_HS0.ITU_Filter_Process_N(this.in0);
+  this.in0 = this.ITU_Filter_HS0.out0;
+
+  this.ITU_Filter_HS1.ITU_Filter_Process_N(this.in1);
+  this.in1 = this.ITU_Filter_HS1.out0;
+  
+  this.ITU_Filter_HS2.ITU_Filter_Process_N(this.in2);
+  this.in2 = this.ITU_Filter_HS2.out0;
+  
+  this.ITU_Filter_HS3.ITU_Filter_Process_N(this.in3);
+  this.in3 = this.ITU_Filter_HS3.out0;
+  
+  this.ITU_Filter_HS4.ITU_Filter_Process_N(this.in4);
+  this.in4 = this.ITU_Filter_HS4.out0;
+  
+  this.ITU_Filter_HS5.ITU_Filter_Process_N(this.in5);
+  this.in5 = this.ITU_Filter_HS5.out0;
+      
+  // LowCut
+  this.ITU_Filter_LC0.ITU_Filter_Process_N(this.in0);    
+  this.in0 = this.ITU_Filter_LC0.out0;
+
+  this.ITU_Filter_LC1.ITU_Filter_Process_N(this.in1);    
+  this.in1 = this.ITU_Filter_LC1.out0;
+   
+  this.ITU_Filter_LC2.ITU_Filter_Process_N(this.in2);    
+  this.in2 = this.ITU_Filter_LC2.out0;
+   
+  this.ITU_Filter_LC3.ITU_Filter_Process_N(this.in3);    
+  this.in3 = this.ITU_Filter_LC3.out0;
+   
+  this.ITU_Filter_LC4.ITU_Filter_Process_N(this.in4);    
+  this.in4 = this.ITU_Filter_LC4.out0;
+   
+  this.ITU_Filter_LC5.ITU_Filter_Process_N(this.in5);    
+  this.in5 = this.ITU_Filter_LC5.out0;
+  
+  this.ch_mode = _ch_mode;  // Normal
+       
+  // Momentary Loudness (400ms)
+  this.RMS_M.RMS_MS_Process_N(this.in0, this.in1, this.in2, this.in3, this.in4, this.in5, this.ch_mode);
+  
+  // Shortterm Loudness (3000ms)
+  this.RMS_S.RMS_MS_Process_N(this.in0, this.in1, this.in2, this.in3, this.in4, this.in5, this.ch_mode);
+
+  // Integrated Loudness, every 100ms
+  (this.RMS_M.RMS_MS_IsValueReady()) ? 
+  (
+    this.RMS_I.RMSInt_Process(this.RMS_M.RMS_MS_GetVal());
+  );
+
+  // Loudness Range every 100ms
+  (_lra_enabled) ?
+  (
+	(this.RMS_S.RMS_MS_IsValueReady() && this.RMS_S.RMS_MS_IsBlockReady()) ?
+    (
+      this.LRA.LRA_Process(this.RMS_S.RMS_MS_GetVal());
+    );
+  );
+);
+
+// Get all necessary values out of the box
+function LM_EBUR128_GetML_LUFS()
+(
+  this.RMS_M.RMS_MS_GetVal_db();
+);
+
+function LM_EBUR128_GetMLMax_LUFS()
+(
+  this.RMS_M.RMS_MS_GetMaxVal_db();
+);
+
+function LM_EBUR128_GetSL_LUFS()
+(
+  this.RMS_S.RMS_MS_GetVal_db();
+);
+
+function LM_EBUR128_GetSLMax_LUFS()
+(
+  this.RMS_S.RMS_MS_GetMaxVal_db();
+);
+
+function LM_EBUR128_GetIL_LUFS()
+(
+  this.RMS_I.RMSInt_GetVal_db();
+);
+
+function LM_EBUR128_GetTP_dbFS()
+local (maxtp_db)
+(
+
+  maxtp_db = -144;
+  maxtp_db = max(maxtp_db, this.TPN_DET0.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  maxtp_db = max(maxtp_db, this.TPN_DET1.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  maxtp_db = max(maxtp_db, this.TPN_DET2.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  maxtp_db = max(maxtp_db, this.TPN_DET3.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  maxtp_db = max(maxtp_db, this.TPN_DET4.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  maxtp_db = max(maxtp_db, this.TPN_DET5.EBU_ISPD_ITU_Get_TruePeakValMax_db()); 
+  
+  maxtp_db;
+);
+
+function LM_EBUR128_GetLRA_LU()
+(
+  this.LRA.LRA_GetVal_LU();
+);
+
+function LM_EBUR128_GetLRA_Low()
+(
+  this.LRA.LRA_GetLowVal_LUFS();
+);
+
+function LM_EBUR128_GetLRA_High()
+(
+  this.LRA.LRA_GetHighVal_LU();
+);
+
+function LM_EBUR128_GetLRA_Count()
+(
+  this.LRA.LRA_GetCount();
+);
+
+
+// EO@init
