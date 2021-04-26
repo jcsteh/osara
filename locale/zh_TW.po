@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-04-01 13:20\n"
+"PO-Revision-Date: 2021-04-26 11:20\n"
 
 msgid "volume"
 msgstr "音量"
@@ -269,6 +269,18 @@ msgstr "[輸入]"
 msgid "no FX"
 msgstr "無 FX"
 
+msgid "peak dB"
+msgstr "峰值 dB"
+
+msgid "integrated LUFS"
+msgstr "積分 LUFS"
+
+msgid "momentary LUFS"
+msgstr "瞬時 LUFS"
+
+msgid "short term LUFS"
+msgstr "短期 LUFS"
+
 #. Reported when the user tries to reset a Peak Watcher
 #. track, but that Peak Watcher track is disabled.
 #. Reported when the user tries to report a Peak Watcher
@@ -290,6 +302,12 @@ msgstr "軌道 {}"
 #. {} will be replaced with the channel number; e.g. "chan 2".
 msgid "chan {}:"
 msgstr "通道 {}:"
+
+#. used when Peak Watcher notifies about a peak for cases
+#. where the channel is irrelevant. This is placed after the track and
+#. before the peak value.
+msgid "level"
+msgstr "水平"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -1323,6 +1341,10 @@ msgid "Peak Watcher"
 msgstr "峰值查看氣"
 
 msgctxt "Peak Watcher"
+msgid "Level type:"
+msgstr "水平類型："
+
+msgctxt "Peak Watcher"
 msgid "First track:"
 msgstr "第一軌道"
 
@@ -1343,12 +1365,12 @@ msgid "&2"
 msgstr "2"
 
 msgctxt "Peak Watcher"
-msgid "When &level reaches (dB):"
-msgstr "當水平達到(dB):"
+msgid "When &level reaches:"
+msgstr "當水平達到："
 
 msgctxt "Peak Watcher"
-msgid "Hold peaks:"
-msgstr "保持峰值:"
+msgid "Hold highest level:"
+msgstr "保持最高水平："
 
 msgctxt "Peak Watcher"
 msgid "&disabled"

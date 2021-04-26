@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-04-01 13:20\n"
+"PO-Revision-Date: 2021-04-26 11:20\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -274,6 +274,18 @@ msgstr "Entrada"
 msgid "no FX"
 msgstr "sin efectos"
 
+msgid "peak dB"
+msgstr "decibelios del pico"
+
+msgid "integrated LUFS"
+msgstr "loops integrados"
+
+msgid "momentary LUFS"
+msgstr "loops instantáneos"
+
+msgid "short term LUFS"
+msgstr "loops de corta duración"
+
 #. Reported when the user tries to reset a Peak Watcher
 #. track, but that Peak Watcher track is disabled.
 #. Reported when the user tries to report a Peak Watcher
@@ -295,6 +307,12 @@ msgstr "pista {}"
 #. {} will be replaced with the channel number; e.g. "chan 2".
 msgid "chan {}:"
 msgstr "canal {}:"
+
+#. used when Peak Watcher notifies about a peak for cases
+#. where the channel is irrelevant. This is placed after the track and
+#. before the peak value.
+msgid "level"
+msgstr "Nivel"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -1354,6 +1372,10 @@ msgid "Peak Watcher"
 msgstr "Visor de picos"
 
 msgctxt "Peak Watcher"
+msgid "Level type:"
+msgstr "Tipo de nivel"
+
+msgctxt "Peak Watcher"
 msgid "First track:"
 msgstr "Primera pista:"
 
@@ -1374,12 +1396,12 @@ msgid "&2"
 msgstr "&2"
 
 msgctxt "Peak Watcher"
-msgid "When &level reaches (dB):"
-msgstr "Cuando nive&l alcance (db):"
+msgid "When &level reaches:"
+msgstr "Cuando &nivel alcance:"
 
 msgctxt "Peak Watcher"
-msgid "Hold peaks:"
-msgstr "Mantener picos:"
+msgid "Hold highest level:"
+msgstr "Mantener el más alto nivel:"
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
