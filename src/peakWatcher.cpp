@@ -113,7 +113,7 @@ const struct {
 	},
 	{"short term LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getSpecificTrackFxParam(track, FX_EBUR128, 12);
+			return getSpecificTrackFxParam(track, FX_EBUR128, 11);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteEbur128,
