@@ -118,6 +118,13 @@ const struct {
 		/* separateChannels */ false,
 		/* reset */ deleteEbur128,
 	},
+	{"true peak dBTP",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getSpecificTrackFxParam(track, FX_EBUR128, 13);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteEbur128,
+	},
 	// translate firstString end
 };
 constexpr unsigned int PW_NUM_LEVEL_TYPES = sizeof(PW_LEVEL_TYPES) /
