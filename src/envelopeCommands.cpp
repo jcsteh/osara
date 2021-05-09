@@ -163,6 +163,24 @@ int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 
 optional<int> currentEnvelopePoint{};
 
+const char* getEnvelopeShapeName(int shape) {
+	static const char* names[] = {
+		// Translators: A shape for an envelope point.
+		translate("linear"),
+		// Translators: A shape for an envelope point.
+		translate("square"),
+		// Translators: A shape for an envelope point.
+		translate("slow start/end"),
+		// Translators: A shape for an envelope point.
+		translate("fast start"),
+		// Translators: A shape for an envelope point.
+		translate("fast end"),
+		// Translators: A shape for an envelope point.
+		translate("bezier"),
+	};
+	return names[shape];
+}
+
 void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
 	TrackEnvelope* envelope;
 	double offset;
@@ -181,8 +199,10 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		++point;
 	}
 	double time, value;
+	int shape;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
+		&shape, nullptr, &selected);
 	time += offset;
 	if ((direction == 1 && time < now)
 		// If this point is at the cursor, skip it only if it's the current point.
@@ -196,7 +216,8 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		int newPoint = point + direction;
 		if (0 <= newPoint && newPoint < count) {
 			point = newPoint;
-			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
+			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
+				&shape, nullptr, &selected);
 			time += offset;
 		}
 	}
@@ -216,10 +237,11 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
 	ostringstream s;
 	// Translators: Reported when moving to an envelope point. {point} will be
-	// replaced with the number of the point. {} will be replaced with the value.
-	// For example: "point 1 value 0.00 dB".
-	s << format(translate("point {point} value {value}"),
-		"point"_a=point, "value"_a=out);
+	// replaced with the number of the point. {value} will be replaced with its
+	// value. {shape} will be replaced with its shape.
+	// For example: "point 1 value 0.00 dB linear".
+	s << format(translate("point {point} value {value} {shape}"),
+		"point"_a=point, "value"_a=out, "shape"_a=getEnvelopeShapeName(shape));
 	bool isSelected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
 	if (isSelected) {
