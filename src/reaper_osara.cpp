@@ -1270,9 +1270,9 @@ void postSelectMultipleItems(int command) {
 	int count = CountSelectedMediaItems(0);
 	// Translators: Reported when items are selected. {} will be replaced with
 	// the number of items; e.g. "2 items selected".
-	outputMessage(format(
-		translate_plural("{} item selected", "{} items selected", count),
-		count));
+	//outputMessage(format(
+	//	translate_plural("{} item selected", "{} items selected", count),
+	//	count));
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
