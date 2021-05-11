@@ -619,6 +619,7 @@ The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
 - Report time movement during playback/recording: When disabled, OSARA will not report actions during playback/recording which move the cursor or adjust positions or lengths.
+ This includes item navigation.
  Although not strictly time movement, this also includes inserting markers or regions.
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
 - Report markers during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.

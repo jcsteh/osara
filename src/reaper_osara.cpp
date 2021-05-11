@@ -2407,11 +2407,14 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Item Selection", 0);
 		SetEditCurPos(pos, true, true); // Seek playback.
-
-		// Report the item.
 		fakeFocus = FOCUS_ITEM;
 		selectedEnvelopeIsTake = true;
 		SetCursorContext(1, NULL);
+		if (!shouldReportTimeMovement()) {
+			return;
+		}
+
+		// Report the item.
 		ostringstream s;
 		s << i + 1;
 		MediaItem_Take* take = GetActiveTake(item);
