@@ -729,17 +729,21 @@ If you aren't sure, run `git submodule update` after every git pull, merge or ch
 ### Dependencies
 To build OSARA, you will need:
 
+- Several git submodules used by OSARA.
+	See the note about submodules in the previous section.
 - Windows only: Microsoft Visual Studio 2019 Community:
 	* [Download Visual Studio 2019 Community](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=Community&rel=16)
 	* When installing Visual Studio, you need to enable the following:
 		- On the Workloads tab, in the Windows group: Desktop development with C++
-- Mac only: Either the [command line developer tools](https://developer.apple.com/library/ios/technotes/tn2339/_index.html) or Xcode 12.3:
-	* You can download Xcode from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
+- Mac only: Xcode 12.3:
+	* You can download Xcode 12.3 from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
 - Python, version 3.7 or later:
 	* This is needed by SCons.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
-	* Once Python is installed, you should be able to install SCons by simply running this at the command line: `pip install scons`
+	* Once Python is installed, you should be able to install SCons by running this at the command line:
+		* Windows: `py -3 -m pip install scons`
+		* Mac: `pip3 install scons`
 - Windows only: [NSIS](https://nsis.sourceforge.io/Download), version 3.03 or later
 
 ### How to Build
