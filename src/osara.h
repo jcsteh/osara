@@ -184,6 +184,9 @@
 #define REAPERAPI_WANT_get_ini_file
 #define REAPERAPI_WANT_TrackFX_AddByName
 #define REAPERAPI_WANT_TrackFX_Delete
+#define REAPERAPI_WANT_GetSetTrackGroupMembership
+#define REAPERAPI_WANT_GetSetTrackGroupMembershipHigh
+#define REAPERAPI_WANT_GetSetProjectInfo_String
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
