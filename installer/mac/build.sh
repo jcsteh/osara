@@ -18,5 +18,5 @@ cd ../..
 rm -f $dmg
 # We seem to need a delay here to avoid an "hdiutil: create failed - Resource busy" error.
 sleep 1
-hdiutil create -volname "OSARA $version" -srcfolder content $dmg
+hdiutil create -fs HFS+ -volname "OSARA $version" -srcfolder content $dmg
 rm -rf content/copying.txt content/.data
