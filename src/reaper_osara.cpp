@@ -2489,15 +2489,31 @@ void cmdPaste(Command* command) {
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	int added;
+	// We want to report both tracks and items if both got added; e.g.
+	// "1 track 2 items added".
+	ostringstream s;
 	if ((added = CountTracks(0) - oldTracks) > 0) {
-		// Translators: Reported when tracks are added. {} will be replaced with the
-		// number of tracks; e.g. "2 tracks added".
-		outputMessage(format(
-			translate_plural("{} track added", "{} tracks added", added), added));
-	} else if ((added = CountMediaItems(0) - oldItems) > 0) {
-		outputMessage(format(
-			translate_plural("{} item added", "{} items added", added), added));
-	} else if (envelope &&
+		// Translators: Reported when tracks are added. Other things might be added
+		// at the same time (e.g. items), so other messages may surround this.
+		// {} will be replaced with the number of tracks; e.g. "2 tracks".
+		s << format(translate_plural("{} track", "{} tracks", added), added);
+	}
+	if ((added = CountMediaItems(0) - oldItems) > 0) {
+		if (s.tellp() > 0) {
+			s << " ";
+		}
+		// Translators: Reported when items are added. Other things might be added
+		// at the same time (e.g. tracks), so other messages may surround this.
+		// {} will be replaced with the number of items; e.g. "2 items".
+		s << format(translate_plural("{} item", "{} items", added), added);
+	}
+	if (s.tellp() > 0) {
+		// Translators: Reported after the number of tracks and/or items added.
+		s << " " << translate("added");
+		outputMessage(s);
+		return;
+	}
+	if (envelope &&
 			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
 			> 0) {
 		// Translators: Reported when envelope points are added. {} will be replaced
