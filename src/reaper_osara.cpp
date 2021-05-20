@@ -585,6 +585,47 @@ unsigned int getConfigUndoMask() {
 	return *undomask;
 }
 
+struct {
+	const char* displayName;
+	const char* name;
+} TRACK_GROUP_TOGGLES[] = {
+	// translate firstString begin
+	{"volume lead", "VOLUME_LEAD"},
+	{"volume follow", "VOLUME_FOLLOW"},
+	{"VCA lead", "VOLUME_VCA_LEAD"},
+	{"VCA follow", "VOLUME_VCA_FOLLOW"},
+	{"pan lead", "PAN_LEAD"},
+	{"pan follow", "PAN_FOLLOW"},
+	{"width lead", "WIDTH_LEAD"},
+	{"width follow", "WIDTH_FOLLOW"},
+	{"mute lead", "MUTE_LEAD"},
+	{"mute follow", "MUTE_FOLLOW"},
+	{"solo lead", "SOLO_LEAD"},
+	{"solo follow", "SOLO_FOLLOW"},
+	{"record arm lead", "RECARM_LEAD"},
+	{"record arm follow", "RECARM_FOLLOW"},
+	{"polarity lead", "POLARITY_LEAD"},
+	{"polarity follow", "POLARITY_FOLLOW"},
+	{"automation mode lead", "AUTOMODE_LEAD"},
+	{"automation mode follow", "AUTOMODE_FOLLOW"},
+	{"reverse volume", "VOLUME_REVERSE"},
+	{"reverse pan", "PAN_REVERSE"},
+	{"reverse width", "WIDTH_REVERSE"},
+	{"do not lead when following", "NO_LEAD_WHEN_FOLLOW"},
+	{"VCA pre-FX follow", "VOLUME_VCA_FOLLOW_ISPREFX"},
+	// translate firstString end
+};
+
+bool isTrackGrouped(MediaTrack* track) {
+	for (auto& toggle : TRACK_GROUP_TOGGLES) {
+		if (GetSetTrackGroupMembership(track, toggle.name, 0, 0) ||
+				GetSetTrackGroupMembershipHigh(track, toggle.name, 0, 0)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -653,6 +694,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// "2 items".
 		s << " " << format(translate_plural("{} item", "{} items", itemCount),
 			itemCount);
+	}
+	if (isTrackGrouped(track)) {
+		// Translators: Reported when navigating to a track which is grouped.
+		s << " " << translate("grouped");
 	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
@@ -3420,6 +3465,52 @@ void cmdChangeItemGroup(Command* command) {
 	}
 }
 
+void cmdReportTrackGroups(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	map<int, vector<const char*>> groups;
+	for (auto& toggle : TRACK_GROUP_TOGGLES) {
+		int mask = GetSetTrackGroupMembership(track, toggle.name, 0, 0);
+		for (int g = 0; g < 32; ++g) {
+			if (mask & (1 << g)) {
+				groups[g].push_back(toggle.displayName);
+			}
+		}
+	}
+	ostringstream s;
+	for (auto [group, toggles] : groups) {
+		if (s.tellp() > 0) {
+			s << "; ";
+		}
+		ostringstream desc;
+		desc << "TRACK_GROUP_NAME:" << group + 1;
+		char groupName[200];
+		GetSetProjectInfo_String(nullptr, desc.str().c_str(), groupName, false);
+		if (groupName[0]) {
+			s << groupName;
+		} else {
+			s << group + 1;
+		}
+		s << ": ";
+		bool first = true;
+		for (auto* toggle : toggles) {
+			if (first) {
+				first = false;
+			} else {
+				s << ", ";
+			}
+			s << translate(toggle);
+		}
+	}
+	if (s.tellp() == 0) {
+		outputMessage("track not grouped");
+		return;
+	}
+	outputMessage(s);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3559,6 +3650,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
