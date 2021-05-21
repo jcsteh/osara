@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2019 NV Access Limited, James Teh
+ * Copyright 2014-2021 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -441,6 +441,10 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
+bool isFreeItemPositioningEnabled(MediaTrack* track) {
+	return *(int*)GetSetMediaTrackInfo(track, "B_FREEMODE", NULL);
+}
+
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
@@ -694,6 +698,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// "2 items".
 		s << " " << format(translate_plural("{} item", "{} items", itemCount),
 			itemCount);
+	}
+	if (isFreeItemPositioningEnabled(track)) {
+		s << " " << translate("free item positioning");
 	}
 	if (isTrackGrouped(track)) {
 		// Translators: Reported when navigating to a track which is grouped.
@@ -1661,6 +1668,16 @@ void postToggleEnvelopePointsMoveWithMediaItems(int command) {
 		translate("disabled envelope points move with media items"));
 }
 
+void postToggleFreeItemPositioning(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr) ?
+		translate("enabled free item positioning") :
+		translate("disabled free item positioning"));
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1823,6 +1840,7 @@ PostCommand POST_COMMANDS[] = {
 	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
 	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
 	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
+	{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
