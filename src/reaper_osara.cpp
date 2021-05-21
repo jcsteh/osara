@@ -442,7 +442,7 @@ bool isItemSelected(MediaItem* item) {
 }
 
 bool isFreeItemPositioningEnabled(MediaTrack* track) {
-	return *(int*)GetSetMediaTrackInfo(track, "B_FREEMODE", NULL);
+	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
 }
 
 const char* automationModeAsString(int mode) {
