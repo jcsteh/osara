@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-04-26 11:20\n"
+"PO-Revision-Date: 2021-05-21 10:53\n"
 
 msgid "volume"
 msgstr "volume"
@@ -75,11 +75,36 @@ msgid_plural "{} points removed"
 msgstr[0] "{} point supprimé"
 msgstr[1] "{} points supprimés"
 
+#. A shape for an envelope point.
+msgid "linear"
+msgstr "linéaire"
+
+#. A shape for an envelope point.
+msgid "square"
+msgstr "carré"
+
+#. A shape for an envelope point.
+msgid "slow start/end"
+msgstr "début/fin lent"
+
+#. A shape for an envelope point.
+msgid "fast start"
+msgstr "début rapide"
+
+#. A shape for an envelope point.
+msgid "fast end"
+msgstr "fin rapide"
+
+#. A shape for an envelope point.
+msgid "bezier"
+msgstr "bezier"
+
 #. Reported when moving to an envelope point. {point} will be
-#. replaced with the number of the point. {} will be replaced with the value.
-#. For example: "point 1 value 0.00 dB".
-msgid "point {point} value {value}"
-msgstr "valeur {value} de point {point}"
+#. replaced with the number of the point. {value} will be replaced with its
+#. value. {shape} will be replaced with its shape.
+#. For example: "point 1 value 0.00 dB linear".
+msgid "point {point} value {value} {shape}"
+msgstr "point {point} valeur {value} {shape}"
 
 msgid "selected"
 msgstr "sélectionné"
@@ -285,6 +310,9 @@ msgstr "LUFS momentané"
 
 msgid "short term LUFS"
 msgstr "LUFS court terme"
+
+msgid "true peak dBTP"
+msgstr ""
 
 #. Reported when the user tries to reset a Peak Watcher
 #. track, but that Peak Watcher track is disabled.
@@ -502,6 +530,75 @@ msgstr "remplacement MIDI touché"
 msgid "midi latch-replace"
 msgstr "remplacement MIDI latch"
 
+msgid "volume lead"
+msgstr ""
+
+msgid "volume follow"
+msgstr ""
+
+msgid "VCA lead"
+msgstr ""
+
+msgid "VCA follow"
+msgstr ""
+
+msgid "pan lead"
+msgstr ""
+
+msgid "pan follow"
+msgstr ""
+
+msgid "width lead"
+msgstr ""
+
+msgid "width follow"
+msgstr ""
+
+msgid "mute lead"
+msgstr ""
+
+msgid "mute follow"
+msgstr ""
+
+msgid "solo lead"
+msgstr ""
+
+msgid "solo follow"
+msgstr ""
+
+msgid "record arm lead"
+msgstr ""
+
+msgid "record arm follow"
+msgstr ""
+
+msgid "polarity lead"
+msgstr ""
+
+msgid "polarity follow"
+msgstr ""
+
+msgid "automation mode lead"
+msgstr ""
+
+msgid "automation mode follow"
+msgstr ""
+
+msgid "reverse volume"
+msgstr ""
+
+msgid "reverse pan"
+msgstr ""
+
+msgid "reverse width"
+msgstr ""
+
+msgid "do not lead when following"
+msgstr ""
+
+msgid "VCA pre-FX follow"
+msgstr ""
+
 msgid "phase inverted"
 msgstr "phase inversée"
 
@@ -515,10 +612,17 @@ msgstr "notes"
 #. Reported when navigating tracks to indicate how many items
 #. the track has. {} will be replaced by the number of items; e.g.
 #. "2 items".
+#. Reported when items are added. Other things might be added
+#. at the same time (e.g. tracks), so other messages may surround this.
+#. {} will be replaced with the number of items; e.g. "2 items".
 msgid "{} item"
 msgid_plural "{} items"
 msgstr[0] "{} objet"
 msgstr[1] "{} objets"
+
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr ""
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -863,20 +967,6 @@ msgstr "{} fin des objets réglés sur la fin du média source"
 msgid "item end set to source media end: {}"
 msgstr "fin de l'objet réglé sur la fin du média source {}"
 
-#. Reported when adding items to a group. {} will be replaced
-#. with the number of items; e.g. "2 items added to group".
-msgid "item added to group"
-msgid_plural "{} items added to group"
-msgstr[0] "{} objets ajoutés au groupe"
-msgstr[1] "{} objets ajoutés au groupe"
-
-#. Reported when removing items from a group. {} will be
-#. replaced with the number of items; e.g. "2 items removed from group".
-msgid "item removed from group"
-msgid_plural "{} items removed from group"
-msgstr[0] "{} objets supprimés du groupe"
-msgstr[1] "{} objets supprimés du groupe"
-
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
 msgid "{} take marker"
@@ -996,6 +1086,11 @@ msgstr "aucune piste"
 msgid "locked"
 msgstr "verrouillé"
 
+#. Used when navigating items to indicate that an item is
+#. grouped. {} will be replaced with the group number; e.g. "group 1".
+msgid "group {}"
+msgstr "groupe {}"
+
 #. Used when navigating items to indicate the number of
 #. takes. {} will be replaced with the number; e.g. "2 takes".
 msgid "{} takes"
@@ -1018,12 +1113,17 @@ msgid_plural "{} items added"
 msgstr[0] "{} objets ajoutés"
 msgstr[1] "{} objets ajoutés"
 
-#. Reported when tracks are added. {} will be replaced with the
-#. number of tracks; e.g. "2 tracks added".
-msgid "{} track added"
-msgid_plural "{} tracks added"
-msgstr[0] "{} pistes ajoutées"
-msgstr[1] "{} pistes ajoutées"
+#. Reported when tracks are added. Other things might be added
+#. at the same time (e.g. items), so other messages may surround this.
+#. {} will be replaced with the number of tracks; e.g. "2 tracks".
+msgid "{} track"
+msgid_plural "{} tracks"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported after the number of tracks and/or items added.
+msgid "added"
+msgstr ""
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
@@ -1148,6 +1248,22 @@ msgstr "marqueur {} inséré"
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
 msgstr "région {} insérée"
+
+#. Reported when adding items to a group. {count} will be
+#. replaced with the number of items. {group} will be replaced with the
+#. group number. For example: "2 items added to group 1".
+msgid "item added to group {group}"
+msgid_plural "{count} items added to group {group}"
+msgstr[0] "{count} objets ajouté au groupe {group}"
+msgstr[1] "{count} objets ajouté au groupe {group}"
+
+#. Reported when removing items from a group. {count} will be
+#. replaced with the number of items. {group} will be replaced with the group
+#. number. For example: "2 items removed from group 1".
+msgid "item removed from group {group}"
+msgid_plural "{count} items removed from group {group}"
+msgstr[0] "{count} objets supprimés du groupe {group}"
+msgstr[1] "{count} objets supprimés du groupe {group}"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: déplacement au prochain objet sans dé-sélectionner les autres objets"
@@ -1296,6 +1412,9 @@ msgstr "OSARA:  bascule entre les mode d'automatisation pour la piste sélection
 msgid "OSARA: About"
 msgstr "OSARA: A propos"
 
+msgid "OSARA: Report groups for current track"
+msgstr ""
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection discontinue / bascule en sélection dé-sélection de la note / l'accord courant"
 
@@ -1352,16 +1471,16 @@ msgid "Parameters"
 msgstr "Paramètres"
 
 msgctxt "Parameters"
-msgid "Parameter:"
-msgstr "Paramètre:"
+msgid "&Parameter:"
+msgstr "&Paramètre:"
 
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "Valeur:"
 
 msgctxt "Parameters"
-msgid "Filter:"
-msgstr "Filtre:"
+msgid "&Filter:"
+msgstr "&Filtre :"
 
 msgctxt "Parameters"
 msgid "&Close"
