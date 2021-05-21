@@ -6,7 +6,7 @@
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
 It was heavily inspired by and based on the concepts of the ReaAccess extension, but was created as a potential replacement because ReaAccess seems to have been abandoned and was not developed openly.
-It runs on both Windows and Mac, though it is currently very experimental on Mac ad is not yet fully functional.
+It runs on both Windows and Mac, though it is currently very experimental on Mac and is not yet fully functional.
 
 Features:
 
@@ -89,6 +89,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - SWS: Select nearest previous folder: Alt+PageUp
 - Track: Remove tracks
 - Track: Select all tracks
+- Track properties: Toggle free item positioning
 
 #### Adjusting Track Parameters
 - Track: Toggle mute for selected tracks
