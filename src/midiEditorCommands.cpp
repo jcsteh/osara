@@ -1142,10 +1142,10 @@ void postMidiChangeVelocity(int command) {
 				s << "velocity +1";
 				break;
 			case 40463:
-				s << "velocity -1";
+				s << "velocity +10";
 				break;
 			case 40464:
-				s << "velocity +10";
+				s << "velocity -1";
 				break;
 			case 40465:
 				s << "velocity -10";
