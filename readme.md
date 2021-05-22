@@ -108,6 +108,9 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down: Alt+Shift+DownArrow
 - Track: Nudge master track volume up: Shift+F12
 - Track: Nudge master track volume down: Shift+F11
+- Xenakios/SWS: Nudge master volume 1 dB up
+- Xenakios/SWS: Nudge master volume 1 dB down
+- Xenakios/SWS: Set master volume to 0 dB
 - Track: Nudge track pan left: Alt+Leftarrow
 - Track: Nudge track pan right: Alt+Rightarrow
 - Master track: Toggle stereo/mono (L+R): shift+f9
