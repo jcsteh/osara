@@ -1882,6 +1882,9 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
 	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
+	{"_XENAKIOS_NUDMASVOL1DBU", postChangeTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB up
+	{"_XENAKIOS_NUDMASVOL1DBD", postChangeTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB down
+	{"_XENAKIOS_SETMASTVOLTO0", postChangeTrackVolume}, // Xenakios/SWS: Set master volume to 0 dB
 	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
