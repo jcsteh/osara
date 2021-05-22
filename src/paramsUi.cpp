@@ -430,44 +430,75 @@ class ParamsDialog {
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
+			case WM_ACTIVATE:
+				if (LOWORD(wParam) == WA_INACTIVE) {
+					// If something steals focus, close the dialog. Otherwise, we won't
+					// unregister the key hook,  surface feedback won't report FX parameter
+					// changes and there will be a dialog left open the user can't get to
+					// easily.
+					PostMessage(dialogHwnd, WM_CLOSE, 0, 0);
+					return TRUE;
+				}
 		}
 		return FALSE;
 	}
 
 	accelerator_register_t accelReg;
 	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-		// We handle key presses for the slider ourselves.
 		ParamsDialog* dialog = (ParamsDialog*)accelReg->user;
-		if (msg->message != WM_KEYDOWN || msg->hwnd != dialog->slider) {
-			return 0;
+		if (msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) {
+			return 0; // Not interested.
 		}
-		double newVal = dialog->val;
-		switch (msg->wParam) {
-			case VK_UP:
-			case VK_RIGHT:
-				newVal += dialog->param->step;
-				break;
-			case VK_DOWN:
-			case VK_LEFT:
-				newVal -= dialog->param->step;
-				break;
-			case VK_PRIOR:
-				newVal += dialog->param->largeStep;
-				break;
-			case VK_NEXT:
-				newVal -= dialog->param->largeStep;
-				break;
-			case VK_HOME:
-				newVal = dialog->param->max;
-				break;
-			case VK_END:
-				newVal = dialog->param->min;
-				break;
-			default:
-				return -1;
+		if (msg->hwnd == dialog->slider) {
+			// We handle key presses for the slider ourselves.
+			double newVal = dialog->val;
+			bool consumed = true;
+			switch (msg->wParam) {
+				case VK_UP:
+				case VK_RIGHT:
+					newVal += dialog->param->step;
+					break;
+				case VK_DOWN:
+				case VK_LEFT:
+					newVal -= dialog->param->step;
+					break;
+				case VK_PRIOR:
+					newVal += dialog->param->largeStep;
+					break;
+				case VK_NEXT:
+					newVal -= dialog->param->largeStep;
+					break;
+				case VK_HOME:
+					newVal = dialog->param->max;
+					break;
+				case VK_END:
+					newVal = dialog->param->min;
+					break;
+				default:
+					consumed = false;
+			}
+			if (consumed) {
+				dialog->onSliderChange(newVal);
+				return 1; // Eat the keystroke.
+			}
 		}
-		dialog->onSliderChange(newVal);
-		return 1;
+		if (msg->wParam == VK_SPACE) {
+			// Let REAPER handle the space key so control+space works.
+			return 0; // Not interested.
+		}
+		if (
+			// A function key.
+			(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
+			// Anything with both alt and shift.
+			(GetAsyncKeyState(VK_MENU) & 0x8000 &&
+				GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
+			// Anything with the control key, but only if not in a text box.
+			(!isClassName(GetFocus(), "Edit") &&
+				GetAsyncKeyState(VK_CONTROL) & 0x8000)
+		) {
+			return -666; // Force to main window.
+		}
+		return -1; // Pass to our window.
 	}
 
 	~ParamsDialog() {
@@ -544,6 +575,8 @@ class ParamsDialog {
 		// We also snap to changes in value text, which is even tricky on Windows.
 		// Therefore, we just use the slider as a placeholder and handle key
 		// presses ourselves.
+		// We also use this key handler to pass some keys through to the main
+		// window.
 		this->accelReg.translateAccel = &this->translateAccel;
 		this->accelReg.isLocal = true;
 		this->accelReg.user = (void*)this;
