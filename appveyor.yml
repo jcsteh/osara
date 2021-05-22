@@ -72,6 +72,7 @@ deploy_script:
        os=$(If ($IsWindows) { "win" } Else { "mac" });
        jobId=$env:APPVEYOR_JOB_ID;
        version=$env:APPVEYOR_BUILD_VERSION;
+       commit=$env:APPVEYOR_REPO_COMMIT;
        installer=$installer
       }
       if ($IsWindows) { $data["pot"] = Get-ChildItem -Name locale/*.pot }

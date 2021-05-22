@@ -48,6 +48,10 @@ def writeSnapshotIndex(winData, macData):
 			f.write(
 				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/locale/{data[pot]}">Download gettext template for translators {data[version]}</a></li>\n'
 				.format(data=winData))
+		if winData.get("commit"):
+			f.write(
+				'<li><a href="https://github.com/jcsteh/osara/commits/{data[commit]}">Change log</a></li>\n'
+				.format(data=winData))
 
 		f.write(
 			"</ul>\n"
