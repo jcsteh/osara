@@ -2006,8 +2006,6 @@ bool showReaperContextMenu(const int menu) {
 	return false;
 }
 
-#ifdef _WIN32
-
 bool isClassName(HWND hwnd, string className) {
 	char buffer[50];
 	if (GetClassName(hwnd, buffer, sizeof(buffer)) == 0) {
@@ -2015,6 +2013,8 @@ bool isClassName(HWND hwnd, string className) {
 	}
 	return className.compare(buffer) == 0;
 }
+
+#ifdef _WIN32
 
 HWND getSendContainer(HWND hwnd) {
 	if (!isClassName(hwnd, "Button")) {

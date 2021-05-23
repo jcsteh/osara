@@ -259,7 +259,6 @@ bool isTrackSelected(MediaTrack* track);
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
-bool isClassName(HWND hwnd, std::string className);
 
 extern IAccPropServices* accPropServices;
 
@@ -276,6 +275,8 @@ bool sendUiaNotification(const std::string& message, bool interrupt = true);
 #define ComboBox_AddString(hwnd, str) (int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
 #define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
+
+bool isClassName(HWND hwnd, std::string className);
 
 extern bool isHandlingCommand;
 void reportTransportState(int state);
