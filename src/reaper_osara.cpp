@@ -872,6 +872,10 @@ void postCycleTrackFolderCollapsed(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
+	if (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", nullptr) != 1) {
+		outputMessage(translate("not a folder"));
+		return;
+	}
 	outputMessage(getFolderCompacting(track));
 }
 
