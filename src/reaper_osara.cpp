@@ -653,16 +653,6 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << translate("master");
 	} else {
 		s << trackNum;
-		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-		if (folderDepth == 1) { // Folder
-			s << " " << getFolderCompacting(track);
-		}
-		const char* message = formatFolderState(folderDepth, false);
-		if (message)
-			s << " " << message;
-		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-		if (trackName)
-			s << " " << trackName;
 	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
@@ -672,20 +662,39 @@ void postGoToTrack(int command, MediaTrack* track) {
 	} else {
 		s << " " << translate("unselected");
 	}
+	if (isTrackArmed(track)) {
+		s << " " << translate("armed");
+	}
 	if (isTrackMuted(track)) {
 		s << " " << translate("muted");
 	}
 	if (isTrackSoloed(track)) {
 		s << " " << translate("soloed");
 	}
-	if (isTrackArmed(track)) {
-		s << " " << translate("armed");
-	}
 	if (isTrackPhaseInverted(track)) {
 		s << " " << translate("phase inverted");
 	}
 	if (isTrackFxBypassed(track)) {
 		s << " " << translate("FX bypassed");
+	}
+	if (trackNum > 0) { // Not master
+		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH",
+			nullptr);
+		if (folderDepth == 1) { // Folder
+			s << " " << getFolderCompacting(track);
+		}
+		const char* message = formatFolderState(folderDepth, false);
+		if (message) {
+			s << " " << message;
+		}
+		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+		if (trackName) {
+			s << " " << trackName;
+		}
+	}
+	if (isTrackGrouped(track)) {
+		// Translators: Reported when navigating to a track which is grouped.
+		s << " " << translate("grouped");
 	}
 	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
 		// Translators: Reported when navigating to a track which has track notes.
@@ -698,13 +707,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// "2 items".
 		s << " " << format(translate_plural("{} item", "{} items", itemCount),
 			itemCount);
-	}
-	if (isFreeItemPositioningEnabled(track)) {
-		s << " " << translate("free item positioning");
-	}
-	if (isTrackGrouped(track)) {
-		// Translators: Reported when navigating to a track which is grouped.
-		s << " " << translate("grouped");
+		if (isFreeItemPositioningEnabled(track)) {
+			s << " " << translate("free item positioning");
+		}
 	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
@@ -2463,9 +2468,6 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		// Report the item.
 		ostringstream s;
 		s << i + 1;
-		MediaItem_Take* take = GetActiveTake(item);
-		if (take)
-			s << " " << GetTakeName(take);
 		if (isItemSelected(item)) {
 			// One selected item is the norm, so don't report selected in this case.
 			if (CountSelectedMediaItems(0) > 1) {
@@ -2487,6 +2489,10 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 			// Translators: Used when navigating items to indicate that an item is
 			// grouped. {} will be replaced with the group number; e.g. "group 1".
 			s << " " << format(translate("group {}"), groupId);
+		}
+		MediaItem_Take* take = GetActiveTake(item);
+		if (take) {
+			s << " " << GetTakeName(take);
 		}
 		int takeCount = CountTakes(item);
 		if (takeCount > 1) {
