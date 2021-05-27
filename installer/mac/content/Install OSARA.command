@@ -7,6 +7,8 @@ var finder = Application("Finder");
 
 function isPortableReaper ( dir ) {
 	return (
+		finder.exists(Path(dir + "/REAPER.app")) ||
+		finder.exists(Path(dir + "/REAPER-ARM.app")) ||
 		finder.exists(Path(dir + "/REAPER64.app")) ||
 		finder.exists(Path(dir + "REAPER32.app")) )
 }
