@@ -638,6 +638,7 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
+bool shouldReportTrackNumbers = true;
 bool shouldReportFx = false;
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
@@ -647,49 +648,68 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (!track)
 		return;
 	ostringstream s;
+	auto separate = [&s]() {
+		if (s.tellp() > 0) {
+			s << " ";
+		}
+	};
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 	if (trackNum <= 0) {
 		// Translators: Reported when navigating to the master track.
 		s << translate("master");
-	} else {
+	} else if (shouldReportTrackNumbers) {
 		s << trackNum;
 	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
 		if (CountSelectedTracks(0) > 1) {
-			s << " " << translate("selected");
+			separate();
+			s << translate("selected");
 		}
 	} else {
-		s << " " << translate("unselected");
+		separate();
+		s << translate("unselected");
 	}
 	if (isTrackArmed(track)) {
-		s << " " << translate("armed");
+		separate();
+		s << translate("armed");
 	}
 	if (isTrackMuted(track)) {
-		s << " " << translate("muted");
+		separate();
+		s << translate("muted");
 	}
 	if (isTrackSoloed(track)) {
-		s << " " << translate("soloed");
+		separate();
+		s << translate("soloed");
 	}
 	if (isTrackPhaseInverted(track)) {
-		s << " " << translate("phase inverted");
+		separate();
+		s << translate("phase inverted");
 	}
 	if (isTrackFxBypassed(track)) {
-		s << " " << translate("FX bypassed");
+		separate();
+		s << translate("FX bypassed");
 	}
 	if (trackNum > 0) { // Not master
 		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH",
 			nullptr);
 		if (folderDepth == 1) { // Folder
-			s << " " << getFolderCompacting(track);
+			separate();
+			s << getFolderCompacting(track);
 		}
 		const char* message = formatFolderState(folderDepth, false);
 		if (message) {
-			s << " " << message;
+			separate();
+			s << message;
 		}
+		separate();
 		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
-		if (trackName) {
-			s << " " << trackName;
+		if (trackName && trackName[0]) {
+			s << trackName;
+		} else if (!shouldReportTrackNumbers) {
+			// There's no name and track number reporting is disabled. We report the
+			// number in lieu of the name.
+			s << trackNum;
 		}
 	}
 	if (isTrackGrouped(track)) {
@@ -2851,10 +2871,19 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 			if (i == -1) {
 				s << translate("master");
 			} else {
-				s << i + 1;
-				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+				if (shouldReportTrackNumbers) {
+					s << i + 1;
+				}
+				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 				if (name && name[0]) {
-					s << " " << name;
+					if (shouldReportTrackNumbers) {
+						s << " ";
+					}
+					s << name;
+				} else if (!shouldReportTrackNumbers) {
+					// There's no name and track number reporting is disabled. We report
+					// the number in lieu of the name.
+					s << i + 1;
 				}
 			}
 		}
@@ -2917,32 +2946,15 @@ void cmdReportSelection(Command* command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
-	int count = 0;
-	int t;
-	MediaTrack* track;
 	switch (fakeFocus) {
-		case FOCUS_TRACK: {
-			if (isTrackSelected(GetMasterTrack(0))) {
-				s << translate("master");
-				count = 1;
-			}
-			for (t = 0; t < CountTracks(0); ++t) {
-				track = GetTrack(0, t);
-				if (isTrackSelected(track)) {
-					++count;
-					if (count > 1)
-						s << separator;
-					s << t + 1;
-					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-					if (name && name[0])
-						s << " " << name;
-				}
-			}
+		case FOCUS_TRACK:
+			s << formatTracksWithState(nullptr, isTrackSelected,
+				/* includeMaster */ true, multiLine, /* outputIfNone */ false);
 			break;
-		}
 		case FOCUS_ITEM: {
-			for (t = 0; t < CountTracks(0); ++t) {
-				track = GetTrack(0, t);
+			int count = 0;
+			for (int t = 0; t < CountTracks(0); ++t) {
+				MediaTrack* track = GetTrack(0, t);
 				for (int i = 0; i < CountTrackMediaItems(track); ++i) {
 					MediaItem* item = GetTrackMediaItem(track, i);
 					if (isItemSelected(item)) {
@@ -2975,7 +2987,6 @@ void cmdReportSelection(Command* command) {
 					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
 					format(translate("length {}"),
 						formatTime(end - start, TF_RULER, true, false));
-				count = 1;
 				resetTimeCache();
 			}
 			break;
@@ -2983,7 +2994,7 @@ void cmdReportSelection(Command* command) {
 		default:
 			return;
 	}
-	if (count == 0) {
+	if (s.tellp() == 0) {
 		outputMessage(translate("no selection"));
 		return;
 	}
@@ -3728,6 +3739,8 @@ void loadConfig() {
 		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
 	shouldReportMarkersWhilePlaying =
 		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
+	shouldReportTrackNumbers =
+		GetExtState(CONFIG_SECTION, "reportTrackNumbers")[0] != '0';
 }
 
 void config_onOk(HWND dialog) {
@@ -3756,6 +3769,10 @@ void config_onOk(HWND dialog) {
 		ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying",
 		shouldReportMarkersWhilePlaying ? "1" : "0", true);
+	shouldReportTrackNumbers = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_TRACK_NUMBERS) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportTrackNumbers",
+		shouldReportTrackNumbers ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -3793,6 +3810,8 @@ void cmdConfig(Command* command) {
 		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING,
 		shouldReportMarkersWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRACK_NUMBERS,
+		shouldReportTrackNumbers ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
