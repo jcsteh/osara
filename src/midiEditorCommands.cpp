@@ -31,7 +31,7 @@ typedef struct {
 	double position;
 } MidiControlChange;
 
-const double DEFAULT_PREVIEW_LENGTH = 0.3;
+const UINT DEFAULT_PREVIEW_LENGTH = 300; // ms
 
 struct MidiNote {
 	int channel;
@@ -208,7 +208,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(nullptr, 0,
-		(UINT)max(DEFAULT_PREVIEW_LENGTH, (minLength * 1000)), previewDone);
+		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
 }
 
 void cancelMidiPreviewNotesOff() {
