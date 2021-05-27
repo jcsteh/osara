@@ -50,6 +50,8 @@ class Param {
 	virtual void setValue(double value) = 0;
 	virtual void setValueFromEdited(const string& text) {
 	}
+	virtual void showEnvelope() {
+	}
 };
 
 class ParamSource {
@@ -418,6 +420,8 @@ class ParamsDialog {
 				} else if (LOWORD(wParam) == ID_PARAM_VAL_EDIT && HIWORD(wParam) ==EN_KILLFOCUS) {
 					dialog->onValueEdited();
 					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_ENVELOPE) {
+					dialog->param->showEnvelope();
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
 					DestroyWindow(dialogHwnd);
@@ -612,6 +616,12 @@ class FxParams: public ParamSource {
 		double*, bool*);
 	bool (*_SetParam)(ReaperObj*, int, int, double);
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
+	TrackEnvelope* (*_GetEnvelope)(ReaperObj*, int, int, bool);
+
+	// The function to get a track FX envelope doesn't fit the pattern: it's
+	// called GetFXEnvelope. We use a template function to get the right name
+	// depending on the object type.
+	const char* apiNameForGetEnvelope();
 
 	public:
 
@@ -625,6 +635,7 @@ class FxParams: public ParamSource {
 			"_GetParameterStepSizes").c_str());
 		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
 		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
+		*(void**)&this->_GetEnvelope = plugin_getapi(this->apiNameForGetEnvelope());
 	}
 
 	string getTitle() {
@@ -650,6 +661,16 @@ class FxParams: public ParamSource {
 		return this->getParam(this->fx, param);
 	}
 };
+
+template<>
+const char* FxParams<MediaTrack>::apiNameForGetEnvelope() {
+	return "GetFXEnvelope";
+}
+
+template<>
+const char* FxParams<MediaItem_Take>::apiNameForGetEnvelope() {
+	return "TakeFX_GetEnvelope";
+}
 
 template<typename ReaperObj>
 class FxParam: public Param {
@@ -712,6 +733,11 @@ class FxParam: public Param {
 
 	void setValueFromEdited(const string& text) {
 		this->setValue(atof(text.c_str()));
+	}
+
+	void showEnvelope() {
+		this->source._GetEnvelope(this->source.obj, this->fx, this->param,
+			/* create */ true);
 	}
 };
 
