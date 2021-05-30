@@ -670,7 +670,13 @@ void postGoToTrack(int command, MediaTrack* track) {
 		separate();
 		s << translate("unselected");
 	}
-	if (isTrackArmed(track)) {
+	const bool armed = isTrackArmed(track);
+	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM",
+		nullptr);
+	// This will be null in REAPER < 6.30.
+	const bool autoArm = pAutoArm ? *pAutoArm : false;
+	// If auto armed, don't report this before the track name.
+	if (armed && !autoArm) {
 		separate();
 		s << translate("armed");
 	}
@@ -710,6 +716,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (armed && autoArm) {
+			separate();
+			s << translate("armed");
 		}
 	}
 	if (isTrackGrouped(track)) {
