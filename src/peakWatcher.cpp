@@ -125,6 +125,20 @@ const struct {
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
+	{"integrated RMS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 2, 1.0, 12);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"momentary RMS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 1, 1.0, 11);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
 	{"true peak dBTP",
 		/* getValue */ [](MediaTrack* track, int channel) {
 			return getLoudnessMeterParam(track, 0, 1.0, 10);
