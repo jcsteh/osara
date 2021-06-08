@@ -48,31 +48,38 @@ int pw_hold = 0;
 int pw_numTracksEnabled = 0;
 UINT_PTR pw_timer = 0;
 
-// Get a specific parameter from a specific named effect. If the effect isn't
-// present, it will be added.
-double getSpecificTrackFxParam(MediaTrack* track, const char* fxName,
-	int param
+const char FX_LOUDNESS_METER[] = "loudness_meter";
+
+double getLoudnessMeterParam(MediaTrack* track,
+	int configParam, double configValue, int queryParam
 ) {
-	int fx = TrackFX_AddByName(track, fxName, /* recFX */ false,
-		1 /* create if not found */);
+	int fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
+		0 /* don't create */);
 	if (fx == -1) {
-		return -150.0;
+		// Add the effect.
+		fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
+			1 /* create if not found */);
+		if (fx == -1) {
+			// Effect doesn't exist!
+			return -150.0;
+		}
+		// Turn off all level types except the one we need.
+		for (int param = 0; param <= 6; ++param) {
+			TrackFX_SetParam(track, fx, param,
+				param == configParam ? configValue : 0.0);
+		}
+		// Turn off reset on playback start.
+		TrackFX_SetParam(track, fx, 9, 0.0);
 	}
-	return TrackFX_GetParam(track, fx, param, nullptr, nullptr);
+	return TrackFX_GetParam(track, fx, queryParam, nullptr, nullptr);
 }
 
-void deleteTrackFx(MediaTrack* track, const char* fxName) {
-	int fx = TrackFX_AddByName(track, fxName, /* recFX */ false,
+void deleteLoudnessMeter(MediaTrack* track) {
+	int fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
 		0 /* don't create */);
 	if (fx != -1) {
 		TrackFX_Delete(track, fx);
 	}
-}
-
-const char FX_EBUR128[] = "ebur128_analysis";
-
-void deleteEbur128(MediaTrack* track) {
-	deleteTrackFx(track, FX_EBUR128);
 }
 
 // Level types.
@@ -99,31 +106,31 @@ const struct {
 	},
 	{"integrated LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getSpecificTrackFxParam(track, FX_EBUR128, 8);
+			return getLoudnessMeterParam(track, 5, 1.0, 15);
 		},
 		/* separateChannels */ false,
-		/* reset */ deleteEbur128,
+		/* reset */ deleteLoudnessMeter,
 	},
 	{"momentary LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getSpecificTrackFxParam(track, FX_EBUR128, 9);
+			return getLoudnessMeterParam(track, 3, 1.0, 13);
 		},
 		/* separateChannels */ false,
-		/* reset */ deleteEbur128,
+		/* reset */ deleteLoudnessMeter,
 	},
 	{"short term LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getSpecificTrackFxParam(track, FX_EBUR128, 11);
+			return getLoudnessMeterParam(track, 4, 1.0, 14);
 		},
 		/* separateChannels */ false,
-		/* reset */ deleteEbur128,
+		/* reset */ deleteLoudnessMeter,
 	},
 	{"true peak dBTP",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getSpecificTrackFxParam(track, FX_EBUR128, 13);
+			return getLoudnessMeterParam(track, 0, 1.0, 10);
 		},
 		/* separateChannels */ false,
-		/* reset */ deleteEbur128,
+		/* reset */ deleteLoudnessMeter,
 	},
 	// translate firstString end
 };
