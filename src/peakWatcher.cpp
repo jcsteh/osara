@@ -125,6 +125,13 @@ const struct {
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
+	{"loudness range LU",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 4, 2.0, 16);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
 	{"integrated RMS",
 		/* getValue */ [](MediaTrack* track, int channel) {
 			return getLoudnessMeterParam(track, 2, 1.0, 12);

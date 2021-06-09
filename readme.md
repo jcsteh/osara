@@ -477,7 +477,7 @@ This can be done for one or two tracks.
 To use Peak Watcher:
 
 1. Press Alt+w (OSARA: View Peak Watcher).
-2. From the Level type combo box, select the type of level you want to use: peak dB, several LUFS options, several RMS options or true peak dBTP.
+2. From the Level type combo box, select the type of level you want to use: peak dB, several LUFS options, loudness range LU, several RMS options or true peak dBTP.
  All options except peak dB use the JS: Loudness Meter Peak/RMS/LUFS (Cockos) effect, which is included with REAPER.
  OSARA will add the effect to tracks automatically and remove it when it is no longer required.
 3. From the First track combo box, select one of the following:
