@@ -24,6 +24,11 @@
 
 using namespace std;
 
+bool isFxListFocused() {
+	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
+		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
+}
+
 #ifdef _WIN32
 
 bool maybeSwitchToFxPluginWindow() {
@@ -84,11 +89,6 @@ bool maybeSwitchToFxPluginWindow() {
 		window = GetParent(window);
 	}
 	return true;
-}
-
-bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
-		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
 }
 
 // If the FX list in an FX chain dialog is focused, report active/bypassed for

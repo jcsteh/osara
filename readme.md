@@ -431,7 +431,7 @@ This is useful for parameters which are tedious or impossible to access otherwis
 
 #### Track/Item Parameters
 To access the parameter list for a track or an item, select the track or item you wish to work with.
-Then, press alt+p (OSARA: View parameters for current track/item).
+Then, press alt+p (OSARA: View parameters for current track/item/FX (depending on focus)).
 
 #### FX Parameters
 Many effects are unfortunately either partially or completely inaccessible.
@@ -446,6 +446,9 @@ To access it:
 2. Alternatively, to access FX parameters for the master track, press shift+p (OSARA: View FX parameters for master track).
 3. If there is more than one effect on the track, select the desired effect from the menu.
  If there are input or monitoring FX on the track, these will be included in the menu as well with an appropriate suffix.
+
+You can also access the FX parameter list from the FX chain dialog.
+To do this, select the effect in the list and then press alt+p (OSARA: View parameters for current track/item/FX (depending on focus)).
 
 Note that only some effects expose easily readable values, while others expose only percentages.
 Even for effects that do expose easily readable values, the editable text is an internal number and probably won't correspond to the readable value on the slider.

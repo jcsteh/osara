@@ -24,6 +24,7 @@
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
 #include <reaper/reaper_plugin.h>
+#include "fxChain.h"
 #include "resource.h"
 #include "translation.h"
 
@@ -304,6 +305,8 @@ class ParamsDialog {
 	unique_ptr<Param> param;
 	double val;
 	string valText;
+	HWND prevFocus;
+	bool isDestroying = false;
 
 	void updateValueText() {
 		if (this->valText.empty()) {
@@ -420,6 +423,7 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
+					dialog->isDestroying = true;
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
@@ -427,15 +431,18 @@ class ParamsDialog {
 				break;
 			case WM_CLOSE:
 				dialog->saveWindowPos();
+				dialog->isDestroying = true;
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
 			case WM_ACTIVATE:
-				if (LOWORD(wParam) == WA_INACTIVE) {
+				if (!dialog->isDestroying && LOWORD(wParam) == WA_INACTIVE) {
 					// If something steals focus, close the dialog. Otherwise, we won't
 					// unregister the key hook,  surface feedback won't report FX parameter
 					// changes and there will be a dialog left open the user can't get to
 					// easily.
+					// Do not try to restore focus as we close.
+					dialog->prevFocus = nullptr;
 					PostMessage(dialogHwnd, WM_CLOSE, 0, 0);
 					return TRUE;
 				}
@@ -504,6 +511,12 @@ class ParamsDialog {
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
 		isParamsDialogOpen = false;
+		// Try to restore focus back to where it was when the dialog was opened.
+		// This is particularly useful in the FX chain dialog because this doesn't
+		// regain focus by itself if something else (like us) steals the focus.
+		if (this->prevFocus) {
+			SetFocus(this->prevFocus);
+		}
 	}
 
 	bool shouldIncludeParam(string name) {
@@ -562,6 +575,7 @@ class ParamsDialog {
 			delete this;
 			return;
 		}
+		this->prevFocus = GetFocus();
 		this->dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PARAMS_DLG), mainHwnd, ParamsDialog::dialogProc);
 		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
@@ -898,6 +912,24 @@ class ItemParams: public ReaperObjParamSource {
 
 void cmdParamsFocus(Command* command) {
 	unique_ptr<ParamSource> source;
+	if (isFxListFocused()) {
+		int trackNum, itemNum, fx;
+		int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+		MediaTrack* track = trackNum == 0 ?
+			GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+		if (type == 1) { // Track
+			source = make_unique<FxParams<MediaTrack>>(track, "TrackFX", fx);
+		} else if (type == 2) { // Item
+			MediaItem* item = GetTrackMediaItem(track, itemNum);
+			int takeNum = HIWORD(fx);
+			fx = LOWORD(fx);
+			MediaItem_Take* take = GetTake(item, takeNum);
+			source = make_unique<FxParams<MediaItem_Take>>(take, "TakeFX", fx);
+		}
+		new ParamsDialog(move(source));
+		return;
+	}
+
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			MediaTrack* track = GetLastTouchedTrack();
