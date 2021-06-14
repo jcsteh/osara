@@ -1782,6 +1782,7 @@ PostCommand POST_COMMANDS[] = {
 	{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
 	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
 	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
+	{41190, postChangeHorizontalZoom}, // View: Set horizontal zoom to default project setting
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
