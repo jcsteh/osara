@@ -241,8 +241,9 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - FX: Show/hide track envelope for last touched FX parameter
 
 #### Zoom
-- Zoom out horizontal: - or NumPad-
-- Zoom in horizontal: = or NumPad+
+- View: Zoom out horizontal: - or NumPad-
+- View: Zoom in horizontal: = or NumPad+
+- View: Set horizontal zoom to default project setting
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
