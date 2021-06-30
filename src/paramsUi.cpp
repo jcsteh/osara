@@ -611,21 +611,33 @@ class ParamsDialog {
 // and with the prefix by passing it and fetching the functions dynamically.
 template<typename ReaperObj>
 class FxParam;
+template<typename ReaperObj>
+class FxNamedConfigParam;
 
 template<typename ReaperObj>
 class FxParams: public ParamSource {
 	friend class FxParam<ReaperObj>;
+	friend class FxNamedConfigParam<ReaperObj>;
 
 	private:
 	ReaperObj* obj;
 	int fx;
+	// Named config params can't be enumerated, so we have to build a list of
+	// these based on the effect and the known named parameters it supports. See
+	// initNamedConfigParams().
+	vector<FxNamedConfigParam<ReaperObj>> namedConfigParams;
 	int (*_GetNumParams)(ReaperObj*, int);
+	bool (*_GetFXName)(ReaperObj*, int, char*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
 	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
 	bool (*_GetParameterStepSizes)(ReaperObj*, int, int, double*, double*,
 		double*, bool*);
 	bool (*_SetParam)(ReaperObj*, int, int, double);
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
+	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
+	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
+
+	void initNamedConfigParams();
 
 	public:
 
@@ -633,12 +645,21 @@ class FxParams: public ParamSource {
 			obj(obj), fx(fx) {
 		// Get functions.
 		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
+		*(void**)&this->_GetFXName = plugin_getapi(
+			(apiPrefix + "_GetFXName").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
 		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
 		*(void**)&this->_GetParameterStepSizes = plugin_getapi((apiPrefix +
 			"_GetParameterStepSizes").c_str());
 		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
 		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
+		*(void**)&this->_GetNamedConfigParm = plugin_getapi(
+			(apiPrefix + "_GetNamedConfigParm").c_str());
+		*(void**)&this->_SetNamedConfigParm = plugin_getapi(
+			(apiPrefix + "_SetNamedConfigParm").c_str());
+		if (fx >= 0) {
+			this->initNamedConfigParams();
+		}
 	}
 
 	string getTitle() {
@@ -646,22 +667,36 @@ class FxParams: public ParamSource {
 	}
 
 	int getParamCount() {
-		return this->_GetNumParams(this->obj, this->fx);
+		// Any named config params come first, followed by normal params.
+		return (int)this->namedConfigParams.size() +
+			this->_GetNumParams(this->obj, this->fx);
 	}
 
 	string getParamName(int param) {
-		char name[256];
-		this->_GetParamName(this->obj, this->fx, param, name, sizeof(name));
+		ostringstream ns;
+		auto namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			ns << this->namedConfigParams[param].getDisplayName();
+		} else {
+			char name[256];
+			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
+				sizeof(name));
+			ns << name;
+		}
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ostringstream ns;
-		ns << name << " (" << param + 1 << ")";
+		ns << " (" << param + 1 << ")";
 		return ns.str();
 	}
 
 	unique_ptr<Param> getParam(int fx, int param);
 	unique_ptr<Param> getParam(int param) {
-		return this->getParam(this->fx, param);
+		auto namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			return make_unique<FxNamedConfigParam<ReaperObj>>(
+				this->namedConfigParams[param]);
+		}
+		return this->getParam(this->fx, param - namedCount);
 	}
 };
 
@@ -728,6 +763,117 @@ class FxParam: public Param {
 		this->setValue(atof(text.c_str()));
 	}
 };
+
+// The possible values for an FX named config param. The first string is the
+// display name. The second is the name to pass to the API.
+using FxNamedConfigParamValues = vector<pair<const char*, const char*>>;
+
+template<typename ReaperObj>
+class FxNamedConfigParam: public Param {
+	private:
+	FxParams<ReaperObj>& source;
+	int fx;
+	const string displayName;
+	const string name;
+	const FxNamedConfigParamValues& values;
+
+	public:
+
+	FxNamedConfigParam(FxParams<ReaperObj>& source,
+			const string displayName, const string name,
+			const FxNamedConfigParamValues& values):
+			Param(), source(source), displayName(displayName), name(name),
+			values(values) {
+		this->min = 0;
+		this->max = (double)values.size() - 1;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	double getValue() {
+		char valueStr[50];
+		valueStr[0] = '\0';
+		this->source._GetNamedConfigParm(this->source.obj, this->source.fx,
+			this->name.c_str(), valueStr, sizeof(valueStr));
+		if (!valueStr[0]) {
+			return 0.0;
+		}
+		for (int v = 0; v < (int)this->values.size(); ++v) {
+			if (strcmp(valueStr, this->values[v].second) == 0) {
+				return v;
+			}
+		}
+		return 0.0;
+	}
+
+	string getValueText(double value) {
+		return translate(this->values[(int)value].first);
+	}
+
+	void setValue(double value) {
+		const char* valueStr = this->values[(int)value].second;
+		this->source._SetNamedConfigParm(this->source.obj, this->source.fx,
+			this->name.c_str(), valueStr);
+	}
+
+	const string getDisplayName() {
+		return this->displayName;
+	}
+};
+
+const FxNamedConfigParamValues TOGGLE_FX_NAMED_CONFIG_PARAM_VALUES = {
+	// translate firstString begin
+	{"off", "0"},
+	{"on", "1"},
+	// translate firstString end
+};
+const FxNamedConfigParamValues REAEQ_BAND_TYPE_VALUES = {
+	// translate firstString begin
+	{"low shelf", "0"},
+	{"high shelf", "1"},
+	{"band", "8"},
+	{"low pass", "3"},
+	{"high pass", "4"},
+	{"all pass", "5"},
+	{"notch", "6"},
+	{"band pass", "7"},
+	{"band (alt)", "9"},
+	{"band (alt 2)", "2"},
+	// translate firstString end
+};
+
+template<typename ReaperObj>
+void FxParams<ReaperObj>::initNamedConfigParams() {
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	if (strcmp(fxName, "VST: ReaEQ (Cockos)") == 0) {
+		for (int band = 0; ; ++band) {
+			ostringstream name;
+			name << "BANDENABLED" << band;
+			char type[2];
+			if (!this->_GetNamedConfigParm(this->obj, this->fx, name.str().c_str(),
+					type, sizeof(type))) {
+				// This band doesn't exist.
+				break;
+			}
+			// Translators: A parameter in the FX Parameters dialog which adjusts
+			// whether a ReaEQ band is enabled. {} will be replaced with the band
+			// number; e.g. "band 2 enable".
+			string dispName = format(translate("Band {} enable"), band + 1);
+			this->namedConfigParams.push_back(FxNamedConfigParam(*this, dispName,
+				name.str(), TOGGLE_FX_NAMED_CONFIG_PARAM_VALUES));
+			name.str("");
+			name << "BANDTYPE" << band;
+			// Translators: A parameter in the FX Parameters dialog which adjusts
+			// the type of a ReaEQ band. {} will be replaced with the band number;
+			// e.g. "band 2 type".
+			dispName = format(translate("Band {} type"), band + 1);
+			this->namedConfigParams.push_back(FxNamedConfigParam(*this, dispName,
+				name.str(), REAEQ_BAND_TYPE_VALUES));
+		}
+	}
+}
 
 template<typename ReaperObj>
 unique_ptr<Param> FxParams<ReaperObj>::getParam(int fx, int param) {
