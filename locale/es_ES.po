@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-05-21 10:53\n"
+"PO-Revision-Date: 2021-06-30 22:56\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -534,7 +534,7 @@ msgid "volume lead"
 msgstr ""
 
 msgid "volume follow"
-msgstr ""
+msgstr "seguir volumen"
 
 msgid "VCA lead"
 msgstr ""
@@ -605,6 +605,10 @@ msgstr "fase invertida"
 msgid "FX bypassed"
 msgstr "FX ignorado"
 
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr ""
+
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
 msgstr "notas"
@@ -620,8 +624,7 @@ msgid_plural "{} items"
 msgstr[0] "{} ítem"
 msgstr[1] "{} ítems"
 
-#. Reported when navigating to a track which is grouped.
-msgid "grouped"
+msgid "free item positioning"
 msgstr ""
 
 #. Reported when navigating tracks before listing the effects on
@@ -671,6 +674,9 @@ msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} ítem normalizado"
 msgstr[1] "{} ítems normalizados"
+
+msgid "not a folder"
+msgstr "no es una carpeta"
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -996,6 +1002,12 @@ msgstr "activado los puntos de envolventes se mueven con los ítems"
 msgid "disabled envelope points move with media items"
 msgstr "desActivado: los puntos de envolventes se mueven con los ítems"
 
+msgid "enabled free item positioning"
+msgstr ""
+
+msgid "disabled free item positioning"
+msgstr "desactivado el posicionamiento libre de ítem"
+
 msgid "set selection start"
 msgstr "comienzo de selección fijado"
 
@@ -1146,7 +1158,7 @@ msgstr "nada pegado"
 #. number of tracks; e.g. "2 tracks removed".
 msgid "{} track removed"
 msgid_plural "{} tracks removed"
-msgstr[0] "{} pista elininada"
+msgstr[0] "{} pista eliminada"
 msgstr[1] "{} pistas eliminadas"
 
 #. Reported when items are removed. {} will be replaced with the
@@ -1274,8 +1286,8 @@ msgstr "OSARA: mover al ítem anterior, dejando los otros seleccionados"
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: ver propiedades de media item/toma/automatización ítem actual, dependiendo del foco"
 
-msgid "OSARA: View parameters for current track/item (depending on focus)"
-msgstr "OSARA: ver parámetros de pista/ítem actual, dependiendo del foco"
+msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
+msgstr "OSARA: Ver parámetros para la pista/ítem/FX actual (dependiendo del foco)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: ver parámetros de pista/toma actual, dependiendo del foco"
@@ -1413,7 +1425,7 @@ msgid "OSARA: About"
 msgstr "OSARA: acerca de"
 
 msgid "OSARA: Report groups for current track"
-msgstr ""
+msgstr "OSARA: Anunciar grupos para la pista actual"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
@@ -1569,6 +1581,10 @@ msgstr "Anuncia ma&rcadores durante reproducción"
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
 msgstr "Anuncia &estado de reproducción/grabación etc."
+
+msgctxt "OSARA Configuration"
+msgid "Report t&rack numbers"
+msgstr "Anuncia número de p&ista"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"

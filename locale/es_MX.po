@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2021-05-21 10:53\n"
+"PO-Revision-Date: 2021-06-30 22:56\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -524,86 +524,90 @@ msgstr "reemplazar Todo"
 
 #. A recording mode.
 msgid "midi touch-replace"
-msgstr "reemplazar Todo"
+msgstr "reemplazar lo que toquemos"
 
 #. A recording mode.
 msgid "midi latch-replace"
 msgstr "reemplazar desde que Comencemos a Tocar"
 
 msgid "volume lead"
-msgstr ""
+msgstr "liderar volumen"
 
 msgid "volume follow"
-msgstr ""
+msgstr "seguir volumen"
 
 msgid "VCA lead"
-msgstr ""
+msgstr "Liderar VCA"
 
 msgid "VCA follow"
-msgstr ""
+msgstr "Seguir VCA"
 
 msgid "pan lead"
-msgstr ""
+msgstr "liderar panorama"
 
 msgid "pan follow"
-msgstr ""
+msgstr "seguir panorama"
 
 msgid "width lead"
-msgstr ""
+msgstr "liderar tamaño"
 
 msgid "width follow"
-msgstr ""
+msgstr "seguir tamaño"
 
 msgid "mute lead"
-msgstr ""
+msgstr "liderar muteado"
 
 msgid "mute follow"
-msgstr ""
+msgstr "seguir muteado"
 
 msgid "solo lead"
-msgstr ""
+msgstr "liderar solo"
 
 msgid "solo follow"
-msgstr ""
+msgstr "seguir solo"
 
 msgid "record arm lead"
-msgstr ""
+msgstr "liderar grabación armada"
 
 msgid "record arm follow"
-msgstr ""
+msgstr "seguir grabación armada"
 
 msgid "polarity lead"
-msgstr ""
+msgstr "liderar polaridad"
 
 msgid "polarity follow"
-msgstr ""
+msgstr "seguir polaridad"
 
 msgid "automation mode lead"
-msgstr ""
+msgstr "liderar modo de automatización"
 
 msgid "automation mode follow"
-msgstr ""
+msgstr "seguir modo de automatización"
 
 msgid "reverse volume"
-msgstr ""
+msgstr "revertir volumen"
 
 msgid "reverse pan"
-msgstr ""
+msgstr "revertir panorama"
 
 msgid "reverse width"
-msgstr ""
+msgstr "revertir tamaño"
 
 msgid "do not lead when following"
-msgstr ""
+msgstr "no liderar al seguir"
 
 msgid "VCA pre-FX follow"
-msgstr ""
+msgstr "Seguir VCA pre-FX"
 
 msgid "phase inverted"
 msgstr "fase invertida"
 
 msgid "FX bypassed"
 msgstr "FX desactivado"
+
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr "en grupos"
 
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
@@ -620,9 +624,8 @@ msgid_plural "{} items"
 msgstr[0] "{} ítem"
 msgstr[1] "{} ítems"
 
-#. Reported when navigating to a track which is grouped.
-msgid "grouped"
-msgstr ""
+msgid "free item positioning"
+msgstr "con colocación libre de ítems"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -671,6 +674,9 @@ msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} ítem normalizado"
 msgstr[1] "{} ítems normalizados"
+
+msgid "not a folder"
+msgstr "no es una carpeta"
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -944,10 +950,10 @@ msgid "{} bpm"
 msgstr "{} bpm"
 
 msgid "enabled playback position follows project timebase when changing tempo"
-msgstr "habilitar que la posición de reproducción siga la base de tiempo del proyecto al cambiar el tempo"
+msgstr "la posición de reproducción sigue la base de tiempo del proyecto al cambiar el tempo"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr "deshabilitar que la posición de reproducción siga la base de tiempo del proyecto al cambiar el tempo"
+msgstr "la posición de reproducción no sigue la base de tiempo del proyecto al cambiar el tempo"
 
 msgid "preserving pitch when changing play rate"
 msgstr "se mantiene el tono al cambiar la velocidad de reproducción"
@@ -959,7 +965,7 @@ msgstr "no se mantiene el tono al cambiar la velocidad de reproducción"
 #. of their source media. {} will be replaced with the number of items; e.g.
 #. "2 item ends set to source media end"
 msgid "{} item ends set to source media end"
-msgstr "el extremo de {} ítem se estableció al final del archivo original"
+msgstr "el extremo del {} ítem se estableció al final del archivo original"
 
 #. Reported when setting the end of a single item to its source
 #. media end. {} will be replaced with the end time; e.g.
@@ -995,6 +1001,12 @@ msgstr "los puntos de la envolvente se mueven con los ítems de audio"
 
 msgid "disabled envelope points move with media items"
 msgstr "los puntos de la envolvente no se mueven con los ítems de audio"
+
+msgid "enabled free item positioning"
+msgstr "habilitar colocación libre de ítems"
+
+msgid "disabled free item positioning"
+msgstr "deshabilitar colocación libre de ítems"
 
 msgid "set selection start"
 msgstr "inicio de selección establecido"
@@ -1123,7 +1135,7 @@ msgstr[1] "{} pistas"
 
 #. Reported after the number of tracks and/or items added.
 msgid "added"
-msgstr "agregada"
+msgstr "desde el portapapeles"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
@@ -1274,8 +1286,8 @@ msgstr "OSARA: Mover al ítem anterior (dejando otros ítems seleccionados)"
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: Ver propiedades para el ítem de audio actual / toma / ítem de automatización (según el foco)"
 
-msgid "OSARA: View parameters for current track/item (depending on focus)"
-msgstr "OSARA: Ver parámetros para la pista / ítem actual (según el foco)"
+msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
+msgstr "OSARA: Ver parámetros para la pista/ítem/FX actual (según el foco)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: ver los parámetros de efectos para la pista / toma actual (según el foco)"
@@ -1413,7 +1425,7 @@ msgid "OSARA: About"
 msgstr "OSARA: Acerca de"
 
 msgid "OSARA: Report groups for current track"
-msgstr ""
+msgstr "OSARA: Anuncia los grupos para la pista actual"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: habilitar/deshabilitar la selección separada en el acorde/nota actual"
@@ -1571,6 +1583,10 @@ msgid "Report &transport state (play, record, etc.)"
 msgstr "Anunciar &estado de transporte (reproducción, grabación, etc.)"
 
 msgctxt "OSARA Configuration"
+msgid "Report t&rack numbers"
+msgstr "Anunciar números de p&ista"
+
+msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
 msgstr "Anunciar &FX al pasar a pistas / tomas"
 
@@ -1584,7 +1600,7 @@ msgstr "Anunciar los cambios realizados a través de superficies de &control"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
-msgstr "OK"
+msgstr "Aceptar"
 
 msgctxt "OSARA Configuration"
 msgid "Cancel"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-05-21 10:53\n"
+"PO-Revision-Date: 2021-06-30 22:56\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -605,6 +605,10 @@ msgstr "Fase invertida"
 msgid "FX bypassed"
 msgstr "FX ignorado"
 
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr ""
+
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
 msgstr "notas"
@@ -620,8 +624,7 @@ msgid_plural "{} items"
 msgstr[0] "{} item"
 msgstr[1] "{} itens"
 
-#. Reported when navigating to a track which is grouped.
-msgid "grouped"
+msgid "free item positioning"
 msgstr ""
 
 #. Reported when navigating tracks before listing the effects on
@@ -671,6 +674,9 @@ msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} item normalizado"
 msgstr[1] "{} itens normalizados"
+
+msgid "not a folder"
+msgstr ""
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -996,6 +1002,12 @@ msgstr "os pontos de envelope se movem com os itens de mídia (habilitado)"
 msgid "disabled envelope points move with media items"
 msgstr "os pontos de envelope se movem com os itens de mídia (desabilitado)"
 
+msgid "enabled free item positioning"
+msgstr ""
+
+msgid "disabled free item positioning"
+msgstr ""
+
 msgid "set selection start"
 msgstr "Definir início da seleção"
 
@@ -1274,8 +1286,8 @@ msgstr "OSARA: Mover para o item anterior (deixando outros itens selecionados)"
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: Exibir propriedades para item de mídia / trechos/ item de automação atual (dependendo do foco)"
 
-msgid "OSARA: View parameters for current track/item (depending on focus)"
-msgstr "OSARA: Ver os parâmetros da pista / item atual (dependendo do foco)"
+msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
+msgstr ""
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: Ver os parâmetros FX para a pista / trecho atual (dependendo do foco)"
@@ -1569,6 +1581,10 @@ msgstr "Anunciar marcadores durante a reprodução"
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
 msgstr "Anuncia estado de reprodução / gravação"
+
+msgctxt "OSARA Configuration"
+msgid "Report t&rack numbers"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"

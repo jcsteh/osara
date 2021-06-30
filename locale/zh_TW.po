@@ -11,13 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-05-21 10:53\n"
+"PO-Revision-Date: 2021-06-30 22:56\n"
 
 msgid "volume"
 msgstr "音量"
 
 msgid "pan"
-msgstr "生像"
+msgstr "聲像"
 
 msgid "muted"
 msgstr "靜音"
@@ -32,10 +32,10 @@ msgid "unsoloed"
 msgstr "取消獨奏"
 
 msgid "armed"
-msgstr "預備錄音"
+msgstr "待錄"
 
 msgid "unarmed"
-msgstr "取消預備錄音"
+msgstr "取消待錄"
 
 #. Reported when navigating to the master track.
 msgid "master"
@@ -596,6 +596,10 @@ msgstr "翻轉像位"
 msgid "FX bypassed"
 msgstr "FX 旁通"
 
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr "分組"
+
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
 msgstr "備註"
@@ -610,9 +614,8 @@ msgid "{} item"
 msgid_plural "{} items"
 msgstr[0] "{} 對象"
 
-#. Reported when navigating to a track which is grouped.
-msgid "grouped"
-msgstr "分組"
+msgid "free item positioning"
+msgstr "自由對象定位"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -659,6 +662,9 @@ msgstr[0] "{} 對象歸一化為共同增益"
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} 對象歸一化"
+
+msgid "not a folder"
+msgstr "非資料夾"
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -974,6 +980,12 @@ msgstr "啟用包絡點隨媒體對象一起移動"
 msgid "disabled envelope points move with media items"
 msgstr "禁用包絡點隨媒體對象一起移動"
 
+msgid "enabled free item positioning"
+msgstr "啟用自由對象定位"
+
+msgid "disabled free item positioning"
+msgstr "禁用自由對象定位"
+
 msgid "set selection start"
 msgstr "設置選區開始"
 
@@ -1020,7 +1032,7 @@ msgid "all tracks unsoloed"
 msgstr "所有軌道取消獨奏"
 
 msgid "all tracks unarmed"
-msgstr "所有軌道取消預備錄音"
+msgstr "所有軌道取消待錄"
 
 msgid "grid thirty second triplet"
 msgstr "32分3聯音網格"
@@ -1243,8 +1255,8 @@ msgstr "OSARA: 移到上一個對象（離開的對象被選中）"
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: 查看當前媒體對象/片段/自動化對象的屬性（取決於焦點）"
 
-msgid "OSARA: View parameters for current track/item (depending on focus)"
-msgstr "查看當前軌道或對象的參數（取決於焦點）"
+msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
+msgstr "查看當前軌道/對象/FX的參數（取決於焦點）"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: 查看當前軌道或片段的FX 參數（取決於焦點）"
@@ -1289,7 +1301,7 @@ msgid "OSARA: Report soloed tracks"
 msgstr "OSARA: 報告獨奏的軌道"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: 報告預備錄音的軌道"
+msgstr "OSARA: 報告待錄的軌道"
 
 msgid "OSARA: Report tracks with record monitor on"
 msgstr "OSARA: 報告監聽的軌道"
@@ -1441,7 +1453,7 @@ msgstr "參數"
 
 msgctxt "Parameters"
 msgid "&Parameter:"
-msgstr "&Parameter參數"
+msgstr "參數(&P)"
 
 msgctxt "Parameters"
 msgid "Value:"
@@ -1449,11 +1461,11 @@ msgstr "值"
 
 msgctxt "Parameters"
 msgid "&Filter:"
-msgstr "&Filter過濾器："
+msgstr "過濾器：(&F)"
 
 msgctxt "Parameters"
 msgid "&Close"
-msgstr "&close關閉"
+msgstr "關閉(&C)"
 
 msgctxt "Peak Watcher"
 msgid "Peak Watcher"
@@ -1493,11 +1505,11 @@ msgstr "保持最高水平："
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
-msgstr "禁用"
+msgstr "禁用(&D)"
 
 msgctxt "Peak Watcher"
 msgid "&until reset"
-msgstr "直到重設"
+msgstr "直到重設(&U)"
 
 msgctxt "Peak Watcher"
 msgid "for (&ms):"
@@ -1505,15 +1517,15 @@ msgstr "對 (&ms):"
 
 msgctxt "Peak Watcher"
 msgid "&Reset"
-msgstr "重設"
+msgstr "重設(&R)"
 
 msgctxt "Peak Watcher"
 msgid "&OK"
-msgstr "確定"
+msgstr "確定(&O)"
 
 msgctxt "Peak Watcher"
 msgid "&Cancel"
-msgstr "取消"
+msgstr "取消(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
@@ -1521,35 +1533,39 @@ msgstr "OSARA 配置設定"
 
 msgctxt "OSARA Configuration"
 msgid "Report position when &scrubbing"
-msgstr "擦帶時報告位置"
+msgstr "擦帶時報告位置(&S)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &time movement during playback/recording"
-msgstr "在播放/ 錄音期間報告時間移動"
+msgstr "在播放/ 錄音期間報告時間移動(&T)"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "在播放期間跟著播放光標移動相關時間位置"
+msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers during playback"
-msgstr "在播放過程中報告標記"
+msgstr "在播放過程中報告標記(&K)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
-msgstr "報告走代狀態播放、錄音等"
+msgstr "報告走代狀態播放、錄音等(&T)"
+
+msgctxt "OSARA Configuration"
+msgid "Report t&rack numbers"
+msgstr "朗讀軌道號(&R)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr "移至軌道/片段時報告FX"
+msgstr "移至軌道/片段時報告FX(&F)"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr "在MIDI編輯器報告MIDI音符"
+msgstr "在MIDI編輯器報告MIDI音符(&N)"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr "報告通過＆控制界面進行的更改"
+msgstr "報告通過＆控制界面進行的更改(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
@@ -1565,7 +1581,7 @@ msgstr "訊息"
 
 msgctxt "Message"
 msgid "&Close"
-msgstr "關閉"
+msgstr "關閉)&C)"
 
 msgctxt "FX Preset"
 msgid "FX Preset"
@@ -1577,9 +1593,9 @@ msgstr "過濾器:"
 
 msgctxt "FX Preset"
 msgid "&OK"
-msgstr "確定"
+msgstr "確定(&O)"
 
 msgctxt "FX Preset"
 msgid "&Cancel"
-msgstr "取消"
+msgstr "取消)&C)"
 

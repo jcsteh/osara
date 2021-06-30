@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-05-21 10:53\n"
+"PO-Revision-Date: 2021-06-30 22:56\n"
 
 msgid "volume"
 msgstr "volume"
@@ -300,7 +300,7 @@ msgid "no FX"
 msgstr "pas d'effet"
 
 msgid "peak dB"
-msgstr "crête en dB"
+msgstr "pic en dB"
 
 msgid "integrated LUFS"
 msgstr "integrated LUFS"
@@ -312,7 +312,7 @@ msgid "short term LUFS"
 msgstr "LUFS court terme"
 
 msgid "true peak dBTP"
-msgstr ""
+msgstr "pic réelle dBTP"
 
 #. Reported when the user tries to reset a Peak Watcher
 #. track, but that Peak Watcher track is disabled.
@@ -531,79 +531,83 @@ msgid "midi latch-replace"
 msgstr "remplacement MIDI latch"
 
 msgid "volume lead"
-msgstr ""
+msgstr "volume parent"
 
 msgid "volume follow"
-msgstr ""
+msgstr "volume suiveur"
 
 msgid "VCA lead"
-msgstr ""
+msgstr "VCA meneur"
 
 msgid "VCA follow"
-msgstr ""
+msgstr "VCA suiveur"
 
 msgid "pan lead"
-msgstr ""
+msgstr "pan meneur"
 
 msgid "pan follow"
-msgstr ""
+msgstr "pan suiveur"
 
 msgid "width lead"
-msgstr ""
+msgstr "largeur meneur"
 
 msgid "width follow"
-msgstr ""
+msgstr "largeur suiveur"
 
 msgid "mute lead"
-msgstr ""
+msgstr "muet meneur"
 
 msgid "mute follow"
-msgstr ""
+msgstr "muet suiveur"
 
 msgid "solo lead"
-msgstr ""
+msgstr "solo meneur"
 
 msgid "solo follow"
-msgstr ""
+msgstr "solo suiveur"
 
 msgid "record arm lead"
-msgstr ""
+msgstr "armement d'enregistrement meneur"
 
 msgid "record arm follow"
-msgstr ""
+msgstr "armement d'enregistrement suiveur"
 
 msgid "polarity lead"
-msgstr ""
+msgstr "polarité meneur"
 
 msgid "polarity follow"
-msgstr ""
+msgstr "polarité suiveur"
 
 msgid "automation mode lead"
-msgstr ""
+msgstr "mode d'automatisation meneur"
 
 msgid "automation mode follow"
-msgstr ""
+msgstr "mode d'automatisation suiveur"
 
 msgid "reverse volume"
-msgstr ""
+msgstr "volume inversé"
 
 msgid "reverse pan"
-msgstr ""
+msgstr "pan inversé"
 
 msgid "reverse width"
-msgstr ""
+msgstr "largeur inversée"
 
 msgid "do not lead when following"
-msgstr ""
+msgstr "ne pas mener en cas de suivi"
 
 msgid "VCA pre-FX follow"
-msgstr ""
+msgstr "VCA pré-FX suiveur"
 
 msgid "phase inverted"
 msgstr "phase inversée"
 
 msgid "FX bypassed"
 msgstr "FX désactivé"
+
+#. Reported when navigating to a track which is grouped.
+msgid "grouped"
+msgstr "groupé"
 
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
@@ -620,9 +624,8 @@ msgid_plural "{} items"
 msgstr[0] "{} objet"
 msgstr[1] "{} objets"
 
-#. Reported when navigating to a track which is grouped.
-msgid "grouped"
-msgstr ""
+msgid "free item positioning"
+msgstr "positionnement libre des objets"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -671,6 +674,9 @@ msgid "{} item normalized"
 msgid_plural "{} items normalized"
 msgstr[0] "{} objet normalisé"
 msgstr[1] "{} objets normalisés"
+
+msgid "not a folder"
+msgstr "pas un dossier"
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -996,6 +1002,12 @@ msgstr "points d'enveloppe se déplacent avec les objets média (actif)"
 msgid "disabled envelope points move with media items"
 msgstr "points d'enveloppe se déplacent avec les objets média (inactif)"
 
+msgid "enabled free item positioning"
+msgstr "positionnement libre des objets activé"
+
+msgid "disabled free item positioning"
+msgstr "positionnement libre des objets désactivé"
+
 msgid "set selection start"
 msgstr "début de sélection réglée"
 
@@ -1118,12 +1130,12 @@ msgstr[1] "{} objets ajoutés"
 #. {} will be replaced with the number of tracks; e.g. "2 tracks".
 msgid "{} track"
 msgid_plural "{} tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} piste"
+msgstr[1] "{} pistes"
 
 #. Reported after the number of tracks and/or items added.
 msgid "added"
-msgstr ""
+msgstr "ajouté"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
@@ -1274,8 +1286,8 @@ msgstr "OSARA: déplacement au précédent objet sans dé-sélectionner les autr
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: voir les propriétés pour l'objet / la prise / l'automatisation d'objet courant (en fonction du focus)"
 
-msgid "OSARA: View parameters for current track/item (depending on focus)"
-msgstr "OSARA: voir les propriétés pour la piste / l'objet courant (en fonction du focus)"
+msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
+msgstr "OSARA: voir les paramètres pour la piste/objet"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA : Voir les paramètres FX pour la piste/prise actuelle (en fonction du focus)"
@@ -1413,7 +1425,7 @@ msgid "OSARA: About"
 msgstr "OSARA: A propos"
 
 msgid "OSARA: Report groups for current track"
-msgstr ""
+msgstr "OSARA: annoncer le groupe de la piste courante"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection discontinue / bascule en sélection dé-sélection de la note / l'accord courant"
@@ -1492,7 +1504,7 @@ msgstr "Visualiseur de pique"
 
 msgctxt "Peak Watcher"
 msgid "Level type:"
-msgstr "visualiseur de crête:"
+msgstr "Visualiseur de pic:"
 
 msgctxt "Peak Watcher"
 msgid "First track:"
@@ -1516,11 +1528,11 @@ msgstr "&2"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"
-msgstr "Visualiseur de crête:"
+msgstr "Visualiseur de pic:"
 
 msgctxt "Peak Watcher"
 msgid "Hold highest level:"
-msgstr "Visualiseur de crête"
+msgstr "Visualiseur de pic:"
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
@@ -1569,6 +1581,10 @@ msgstr "Annoncer les marqueurs durant la lecture"
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
 msgstr "Annoncer l'état du transport (lecture, enregistrement, etc)"
+
+msgctxt "OSARA Configuration"
+msgid "Report t&rack numbers"
+msgstr "Annoncer le numéro de la piste"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
