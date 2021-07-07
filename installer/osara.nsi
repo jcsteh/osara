@@ -93,9 +93,6 @@ Section "OSARA plug-in" SecPlugin
 	CreateDirectory "$INSTDIR\osara\locale"
 	SetOutPath "$INSTDIR\osara\locale"
 	File "..\locale\*.po"
-	CreateDirectory "$INSTDIR\Effects\osara"
-	SetOutPath "$INSTDIR\Effects\osara"
-	File "..\include\EBUR128\*"
 	${Unless} $portable = ${BST_CHECKED}
 		WriteUninstaller "$INSTDIR\osara\uninstall.exe"
 		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"

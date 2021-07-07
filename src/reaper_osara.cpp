@@ -408,13 +408,10 @@ bool isTrackSoloed(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
 }
 
-const regex RE_TRACK_STATE("\\sMUTESOLO \\d \\d (\\d)");
 bool isTrackDefeatingSolo(MediaTrack* track) {
-	char state[500];
-	GetTrackStateChunk(track, state, sizeof(state), false);
-	cmatch m;
-	regex_search(state, m, RE_TRACK_STATE);
-	return !m.empty() && m.str(1)[0] == '1';
+	auto defeat = (bool*)GetSetMediaTrackInfo(track, "B_SOLO_DEFEAT", nullptr);
+	// This will be null in REAPER < 6.30.
+	return defeat ? *defeat : false;
 }
 
 bool isTrackArmed(MediaTrack* track) {
@@ -670,7 +667,13 @@ void postGoToTrack(int command, MediaTrack* track) {
 		separate();
 		s << translate("unselected");
 	}
-	if (isTrackArmed(track)) {
+	const bool armed = isTrackArmed(track);
+	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM",
+		nullptr);
+	// This will be null in REAPER < 6.30.
+	const bool autoArm = pAutoArm ? *pAutoArm : false;
+	// If auto armed, don't report this before the track name.
+	if (armed && !autoArm) {
 		separate();
 		s << translate("armed");
 	}
@@ -681,6 +684,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (isTrackSoloed(track)) {
 		separate();
 		s << translate("soloed");
+	}
+	if (isTrackDefeatingSolo(track)) {
+		separate();
+		s << translate("defeating solo");
 	}
 	if (isTrackPhaseInverted(track)) {
 		separate();
@@ -710,6 +717,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (armed && autoArm) {
+			separate();
+			s << translate("armed");
 		}
 	}
 	if (isTrackGrouped(track)) {
@@ -1671,7 +1682,14 @@ void postToggleTrackSoloDefeat(int command) {
 	if (!track) {
 		return;
 	}
-	outputMessage(isTrackDefeatingSolo(track) ?
+	// We don't use isTrackDefeatingSolo() because it returns false even if
+	// this is REAPER < 6.30. We want to report nothing if this REAPER is too old
+	// to support this.
+	auto defeat = (bool*)GetSetMediaTrackInfo(track, "B_SOLO_DEFEAT", nullptr);
+	if (!defeat) {
+		return;
+	}
+	outputMessage(*defeat ?
 		translate("defeating solo") : translate("not defeating solo"));
 }
 
@@ -2922,6 +2940,12 @@ void cmdReportSoloedTracks(Command* command) {
 	ostringstream s;
 	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
 		multiLine);
+	string defeat = formatTracksWithState(translate("defeating solo"),
+		isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
+		/* outputIfNone */ false);
+	if (!defeat.empty()) {
+		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
+	}
 	if (multiLine) {
 		reviewMessage("Soloed", s.str().c_str());
 	} else {
