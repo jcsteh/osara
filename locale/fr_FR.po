@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-06-30 22:56\n"
+"PO-Revision-Date: 2021-07-11 11:35\n"
 
 msgid "volume"
 msgstr "volume"
@@ -249,6 +249,48 @@ msgstr "inactif"
 msgid "FX Parameters"
 msgstr "Paramètre FX"
 
+msgid "low shelf"
+msgstr "plateau bas"
+
+msgid "high shelf"
+msgstr "plateau haut"
+
+msgid "band"
+msgstr "bande"
+
+msgid "low pass"
+msgstr "passe bas"
+
+msgid "high pass"
+msgstr "passe haut"
+
+msgid "all pass"
+msgstr "passe tout"
+
+msgid "notch"
+msgstr "coupe bande"
+
+msgid "band pass"
+msgstr "passe-bande"
+
+msgid "band (alt)"
+msgstr "bande (alt)"
+
+msgid "band (alt 2)"
+msgstr "bande (alt 2)"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. whether a ReaEQ band is enabled. {} will be replaced with the band
+#. number; e.g. "band 2 enable".
+msgid "Band {} enable"
+msgstr "Bande {} activé"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. the type of a ReaEQ band. {} will be replaced with the band number;
+#. e.g. "band 2 type".
+msgid "Band {} type"
+msgstr "Bande {} type"
+
 msgid "mute"
 msgstr "muet"
 
@@ -303,13 +345,22 @@ msgid "peak dB"
 msgstr "pic en dB"
 
 msgid "integrated LUFS"
-msgstr "integrated LUFS"
+msgstr "LUFS intégré"
 
 msgid "momentary LUFS"
 msgstr "LUFS momentané"
 
 msgid "short term LUFS"
 msgstr "LUFS court terme"
+
+msgid "loudness range LU"
+msgstr "étendue de loudness LU"
+
+msgid "integrated RMS"
+msgstr "RMS intégré"
+
+msgid "momentary RMS"
+msgstr "RMS momentané"
 
 msgid "true peak dBTP"
 msgstr "pic réelle dBTP"
@@ -598,6 +649,9 @@ msgstr "ne pas mener en cas de suivi"
 
 msgid "VCA pre-FX follow"
 msgstr "VCA pré-FX suiveur"
+
+msgid "defeating solo"
+msgstr "solo défaite activé"
 
 msgid "phase inverted"
 msgstr "phase inversée"
@@ -984,9 +1038,6 @@ msgid "{} track selected"
 msgid_plural "{} tracks selected"
 msgstr[0] "{} pistes sélectionnées"
 msgstr[1] "{} pistes sélectionnées"
-
-msgid "defeating solo"
-msgstr "solo défaite activé"
 
 msgid "not defeating solo"
 msgstr "solo défaite désactivé"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-06-30 22:56\n"
+"PO-Revision-Date: 2021-07-11 11:35\n"
 
 msgid "volume"
 msgstr "音量"
@@ -244,6 +244,48 @@ msgstr "关"
 msgid "FX Parameters"
 msgstr "FX参数"
 
+msgid "low shelf"
+msgstr "低架"
+
+msgid "high shelf"
+msgstr "高架"
+
+msgid "band"
+msgstr "频带"
+
+msgid "low pass"
+msgstr "低通"
+
+msgid "high pass"
+msgstr "高通"
+
+msgid "all pass"
+msgstr "全通"
+
+msgid "notch"
+msgstr "凹陷"
+
+msgid "band pass"
+msgstr "带通"
+
+msgid "band (alt)"
+msgstr "频带(alt)"
+
+msgid "band (alt 2)"
+msgstr "频带 (alt 2)"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. whether a ReaEQ band is enabled. {} will be replaced with the band
+#. number; e.g. "band 2 enable".
+msgid "Band {} enable"
+msgstr "频带 {} 启用"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. the type of a ReaEQ band. {} will be replaced with the band number;
+#. e.g. "band 2 type".
+msgid "Band {} type"
+msgstr "频带 {} 类型"
+
 msgid "mute"
 msgstr "静音"
 
@@ -305,6 +347,15 @@ msgstr "瞬时 LUFS"
 
 msgid "short term LUFS"
 msgstr "短期 LUFS"
+
+msgid "loudness range LU"
+msgstr ""
+
+msgid "integrated RMS"
+msgstr ""
+
+msgid "momentary RMS"
+msgstr ""
 
 msgid "true peak dBTP"
 msgstr "真实峰值 dBTP"
@@ -589,6 +640,9 @@ msgstr "跟随模式不主导"
 
 msgid "VCA pre-FX follow"
 msgstr "VCA FX-前跟随"
+
+msgid "defeating solo"
+msgstr "独奏失效"
 
 msgid "phase inverted"
 msgstr "相位倒置"
@@ -962,9 +1016,6 @@ msgstr "{} 片段标记"
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
 msgstr[0] "{} 轨道已选中"
-
-msgid "defeating solo"
-msgstr "独奏失效"
 
 msgid "not defeating solo"
 msgstr "取消独奏失效"

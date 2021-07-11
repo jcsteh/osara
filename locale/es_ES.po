@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-06-30 22:56\n"
+"PO-Revision-Date: 2021-07-11 11:35\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -249,6 +249,48 @@ msgstr "desactivado"
 msgid "FX Parameters"
 msgstr "Parámetros de FX"
 
+msgid "low shelf"
+msgstr ""
+
+msgid "high shelf"
+msgstr ""
+
+msgid "band"
+msgstr ""
+
+msgid "low pass"
+msgstr ""
+
+msgid "high pass"
+msgstr ""
+
+msgid "all pass"
+msgstr ""
+
+msgid "notch"
+msgstr ""
+
+msgid "band pass"
+msgstr ""
+
+msgid "band (alt)"
+msgstr ""
+
+msgid "band (alt 2)"
+msgstr ""
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. whether a ReaEQ band is enabled. {} will be replaced with the band
+#. number; e.g. "band 2 enable".
+msgid "Band {} enable"
+msgstr ""
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. the type of a ReaEQ band. {} will be replaced with the band number;
+#. e.g. "band 2 type".
+msgid "Band {} type"
+msgstr "Banda {} clase"
+
 msgid "mute"
 msgstr "silencio"
 
@@ -310,6 +352,15 @@ msgstr "loops instantáneos"
 
 msgid "short term LUFS"
 msgstr "loops de corta duración"
+
+msgid "loudness range LU"
+msgstr ""
+
+msgid "integrated RMS"
+msgstr ""
+
+msgid "momentary RMS"
+msgstr "RMS momentáneo"
 
 msgid "true peak dBTP"
 msgstr ""
@@ -598,6 +649,9 @@ msgstr ""
 
 msgid "VCA pre-FX follow"
 msgstr ""
+
+msgid "defeating solo"
+msgstr "rechazar solo"
 
 msgid "phase inverted"
 msgstr "fase invertida"
@@ -984,9 +1038,6 @@ msgid "{} track selected"
 msgid_plural "{} tracks selected"
 msgstr[0] "{} pistas seleccionadas"
 msgstr[1] "{} pistas seleccionadas"
-
-msgid "defeating solo"
-msgstr "rechazar solo"
 
 msgid "not defeating solo"
 msgstr "no rechazar solo"

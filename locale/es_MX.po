@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2021-06-30 22:56\n"
+"PO-Revision-Date: 2021-07-11 11:35\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -249,6 +249,48 @@ msgstr "apagado"
 msgid "FX Parameters"
 msgstr "Parámetros de FX"
 
+msgid "low shelf"
+msgstr "filtro de shelving bajo"
+
+msgid "high shelf"
+msgstr "filtro de shelving alto"
+
+msgid "band"
+msgstr "banda"
+
+msgid "low pass"
+msgstr "filtro de paso bajo"
+
+msgid "high pass"
+msgstr "filtro de paso alto"
+
+msgid "all pass"
+msgstr "sin filtro"
+
+msgid "notch"
+msgstr "filtro notch"
+
+msgid "band pass"
+msgstr "filtro de paso de banda"
+
+msgid "band (alt)"
+msgstr "banda (alt)"
+
+msgid "band (alt 2)"
+msgstr "banda (alt 2)"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. whether a ReaEQ band is enabled. {} will be replaced with the band
+#. number; e.g. "band 2 enable".
+msgid "Band {} enable"
+msgstr "Banda {} habilitada"
+
+#. A parameter in the FX Parameters dialog which adjusts
+#. the type of a ReaEQ band. {} will be replaced with the band number;
+#. e.g. "band 2 type".
+msgid "Band {} type"
+msgstr "Tipo de la banda {}"
+
 msgid "mute"
 msgstr "muteado"
 
@@ -310,6 +352,15 @@ msgstr "lUFS momentáneo"
 
 msgid "short term LUFS"
 msgstr "lUFS corto"
+
+msgid "loudness range LU"
+msgstr "rango de resonancia LU"
+
+msgid "integrated RMS"
+msgstr "rms integrado"
+
+msgid "momentary RMS"
+msgstr "rms momentáneo"
 
 msgid "true peak dBTP"
 msgstr "pico dBTP positivo"
@@ -598,6 +649,9 @@ msgstr "no liderar al seguir"
 
 msgid "VCA pre-FX follow"
 msgstr "Seguir VCA pre-FX"
+
+msgid "defeating solo"
+msgstr "solo derrotado"
 
 msgid "phase inverted"
 msgstr "fase invertida"
@@ -985,9 +1039,6 @@ msgid_plural "{} tracks selected"
 msgstr[0] "{} pista seleccionada"
 msgstr[1] "{} pistas seleccionadas"
 
-msgid "defeating solo"
-msgstr "solo derrotado"
-
 msgid "not defeating solo"
 msgstr "solo no derrotado"
 
@@ -1290,10 +1341,10 @@ msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
 msgstr "OSARA: Ver parámetros para la pista/ítem/FX actual (según el foco)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
-msgstr "OSARA: ver los parámetros de efectos para la pista / toma actual (según el foco)"
+msgstr "OSARA: ver los parámetros de FX para la pista / toma actual (según el foco)"
 
 msgid "OSARA: View FX parameters for master track"
-msgstr "OSARA: ver los parámetros de efectos para la pista master"
+msgstr "OSARA: ver los parámetros de FX para la pista master"
 
 msgid "OSARA: View Peak Watcher"
 msgstr "OSARA: Mostrar Visor de Picos"
