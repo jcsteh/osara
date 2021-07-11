@@ -59,7 +59,15 @@ void initTranslation() {
 	string path(GetResourcePath());
 	path += "/osara/locale/";
 	path += name;
+#ifdef _WIN32
+	// REAPER provides UTF-8 strings. However, on Windows, ifstream will
+	// interpret a narrow (8 bit) string as an ANSI string. The easiest way to
+	// deal with this is to convert the string to UTF-16, which Windows will
+	// interpret correctly.
+	ifstream input(widen(path));
+#else
 	ifstream input(path);
+#endif
 	tinygettext::POParser::parse(path, input, translationDict);
 }
 
