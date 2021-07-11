@@ -1092,6 +1092,9 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 		try {
 			octave = stoi(noteNameWithOctave.substr(noteNameLength, 2));
 		} catch (invalid_argument) {
+			// If a REAPER language pack translates note names, we might get something
+			// unexpected here. There's nothing we can do to compensate, so just
+			// gracefully ignore this.
 			continue;
 		}
 		note.pitch = ((octave + 1) * 12) + i;
