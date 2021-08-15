@@ -3120,8 +3120,20 @@ void cmdReportCursorPosition(Command* command) {
 	} else {
 		tf = TF_RULER;
 	}
-	double pos = GetPlayState() & 1 ? GetPlayPosition() : GetCursorPosition();
-	outputMessage(formatTime(pos, tf, false, false));
+	int state = GetPlayState();
+	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	ostringstream s;
+	s << formatTime(pos, tf, false, false) << " ";
+	if (state & 2) {
+		s << translate("paused");
+	} else if (state & 4) {
+		s << translate("recording");
+	} else if (state & 1) {
+		s << translate("playing");
+	} else {
+		s << translate("stopped");
+	}
+	outputMessage(s);
 }
 
 void cmdToggleSelection(Command* command) {
@@ -3692,7 +3704,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position and transport state"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move last focused stretch marker to current edit cursor position"}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of current track"}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
