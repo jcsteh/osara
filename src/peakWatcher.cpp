@@ -395,13 +395,13 @@ void cmdPeakWatcher(Command* command) {
 		WDL_UTF8_HookComboBox(trackSel);
 		auto& pwTrack = pw_tracks[pwt];
 		// Populate the list of what to watch.
-		ComboBox_AddString(trackSel, "None");
+		ComboBox_AddString(trackSel, translate("none"));
 		if (!pwTrack.follow && !pwTrack.track)
 			ComboBox_SetCurSel(trackSel, PWT_DISABLED);
-		ComboBox_AddString(trackSel, "Follow current track");
+		ComboBox_AddString(trackSel, translate("follow current track"));
 		if (pwTrack.follow)
 			ComboBox_SetCurSel(trackSel, PWT_FOLLOW);
-		ComboBox_AddString(trackSel, "Master");
+		ComboBox_AddString(trackSel, translate("master"));
 		MediaTrack* track = GetMasterTrack(0);
 		if (pwTrack.track == track)
 			ComboBox_SetCurSel(trackSel, PWT_MASTER);
