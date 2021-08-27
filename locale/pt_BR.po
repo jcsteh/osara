@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-07-11 11:35\n"
+"PO-Revision-Date: 2021-08-27 00:56\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -393,6 +393,15 @@ msgstr "Canal {}"
 msgid "level"
 msgstr "nível"
 
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "nenhuma"
+
+msgid "follow current track"
+msgstr ""
+
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
 msgid "current"
@@ -497,12 +506,6 @@ msgstr "pequeno"
 #. A closed track folder.
 msgid "closed"
 msgstr "Fechado"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "nenhuma"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1281,6 +1284,18 @@ msgstr "ajuda de comandos ativada"
 msgid "shortcut help off"
 msgstr "Ajuda de comandos desativada"
 
+msgid "paused"
+msgstr ""
+
+msgid "recording"
+msgstr ""
+
+msgid "playing"
+msgstr ""
+
+msgid "stopped"
+msgstr ""
+
 msgid "stretch marker moved"
 msgstr "Marcador elástico movido"
 
@@ -1400,8 +1415,8 @@ msgstr "OSARA: Remove itens / pistas / conteúdo da seleção de tempo / marcado
 msgid "OSARA: Toggle shortcut help"
 msgstr "Osara:  Alternar ajuda de atalhos"
 
-msgid "OSARA: Report edit/play cursor position"
-msgstr "OSARA: Reportar posição do cursor de edição / reprodução"
+msgid "OSARA: Report edit/play cursor position and transport state"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Habilita a seleção não contígua ou alterna a seleção da pista / item atual (dependendo do foco)"

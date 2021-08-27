@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2021-07-11 11:35\n"
+"PO-Revision-Date: 2021-08-27 00:56\n"
 
 msgid "volume"
 msgstr "Lautstärke"
@@ -253,43 +253,43 @@ msgid "low shelf"
 msgstr ""
 
 msgid "high shelf"
-msgstr ""
+msgstr "Höhen Shelf"
 
 msgid "band"
-msgstr ""
+msgstr "Band"
 
 msgid "low pass"
-msgstr ""
+msgstr "Tiefpass"
 
 msgid "high pass"
-msgstr ""
+msgstr "Hochpass"
 
 msgid "all pass"
-msgstr ""
+msgstr "Alle Pass"
 
 msgid "notch"
-msgstr ""
+msgstr "Notch"
 
 msgid "band pass"
-msgstr ""
+msgstr "Bandpass"
 
 msgid "band (alt)"
-msgstr ""
+msgstr "Band (alt)"
 
 msgid "band (alt 2)"
-msgstr ""
+msgstr "Band (alt 2)"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. whether a ReaEQ band is enabled. {} will be replaced with the band
 #. number; e.g. "band 2 enable".
 msgid "Band {} enable"
-msgstr ""
+msgstr "Band {} aktivieren"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. the type of a ReaEQ band. {} will be replaced with the band number;
 #. e.g. "band 2 type".
 msgid "Band {} type"
-msgstr ""
+msgstr "Band {} Typ"
 
 msgid "mute"
 msgstr "Stummschalten"
@@ -354,13 +354,13 @@ msgid "short term LUFS"
 msgstr "kurzzeitige LUFS"
 
 msgid "loudness range LU"
-msgstr ""
+msgstr "Lautheit Range LU"
 
 msgid "integrated RMS"
-msgstr ""
+msgstr "Integrierte RMS"
 
 msgid "momentary RMS"
-msgstr ""
+msgstr "Momentane RMS"
 
 msgid "true peak dBTP"
 msgstr ""
@@ -392,6 +392,15 @@ msgstr "Kanal {}:"
 #. before the peak value.
 msgid "level"
 msgstr "Level"
+
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "keine"
+
+msgid "follow current track"
+msgstr "Aktuellem Track folgen"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -497,12 +506,6 @@ msgstr "schmal"
 #. A closed track folder.
 msgid "closed"
 msgstr "eingeklappt"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "keine"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1281,6 +1284,18 @@ msgstr "Tastenkombinationen Hilfe aktiviert"
 msgid "shortcut help off"
 msgstr "Tastenkombinationen Hilfe deaktiviert"
 
+msgid "paused"
+msgstr "pausiert"
+
+msgid "recording"
+msgstr "nimmt auf"
+
+msgid "playing"
+msgstr "spielt ab"
+
+msgid "stopped"
+msgstr "angehalten"
+
 msgid "stretch marker moved"
 msgstr "Stretch Marker verschoben"
 
@@ -1338,7 +1353,7 @@ msgid "OSARA: View properties for current media item/take/automation item (depen
 msgstr "Osara: Zeige Eigenschaften des aktuellen Media Items / Takes / Automation Items (abhängig vom Fokus)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
-msgstr ""
+msgstr "OSARA: Zeige Parameter des aktuellen Tracks / Items / FX (abhängig vom Fokus)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "Osara: zeige FX Parameter des aktuellen Tracks / Takes (abhängig vom Fokus)"
@@ -1400,8 +1415,8 @@ msgstr "Osara: entferne Tracks / Items / Inhalt der Zeitauswahl / Marker / Autom
 msgid "OSARA: Toggle shortcut help"
 msgstr "Osara: Tastenkombinationen Hilfe umschalten"
 
-msgid "OSARA: Report edit/play cursor position"
-msgstr "Osara: Report Wiedergabe / Edit Cursor Position"
+msgid "OSARA: Report edit/play cursor position and transport state"
+msgstr "OSARA: Position des Edit / Play Cursors und Transport Status melden"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "Osara: Aktivieren der nicht zusammenhängenden Selektion  / Umschalten Selektion von Tracks / Items (abhängig vom Fokus)"

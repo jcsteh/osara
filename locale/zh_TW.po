@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-07-11 11:35\n"
+"PO-Revision-Date: 2021-08-27 00:56\n"
 
 msgid "volume"
 msgstr "音量"
@@ -346,7 +346,7 @@ msgid "momentary LUFS"
 msgstr "瞬時 LUFS"
 
 msgid "short term LUFS"
-msgstr "短期 LUFS"
+msgstr "短時 LUFS"
 
 msgid "loudness range LU"
 msgstr "響度範圍 LU"
@@ -387,6 +387,15 @@ msgstr "通道 {}:"
 #. before the peak value.
 msgid "level"
 msgstr "水平"
+
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "沒有"
+
+msgid "follow current track"
+msgstr "追蹤當前軌道"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -488,12 +497,6 @@ msgstr "小"
 #. A closed track folder.
 msgid "closed"
 msgstr "關閉"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "沒有"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1252,6 +1255,18 @@ msgstr "熱鍵幫助開"
 msgid "shortcut help off"
 msgstr "熱鍵幫助關"
 
+msgid "paused"
+msgstr "已暫停"
+
+msgid "recording"
+msgstr "錄音中"
+
+msgid "playing"
+msgstr "播放中"
+
+msgid "stopped"
+msgstr "已停止"
+
 msgid "stretch marker moved"
 msgstr "拉伸標記移動"
 
@@ -1369,8 +1384,8 @@ msgstr "OSARA: 移除對象、軌道、時間選區、包絡點 （取決於焦�
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切換熱鍵幫助"
 
-msgid "OSARA: Report edit/play cursor position"
-msgstr "OSARA: 報告當前編輯/ 播放光標位置"
+msgid "OSARA: Report edit/play cursor position and transport state"
+msgstr "OSARA: 報告當前編輯/ 播放光標位置及走帶狀態"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦點）"
