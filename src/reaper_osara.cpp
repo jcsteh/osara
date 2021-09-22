@@ -339,7 +339,7 @@ string formatNoteLength(double start, double end) {
 			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
 	}
 	if(percent>0) {
-		s << percent << " percent ";
+		s << percent << "%";
 	}
 	return s.str();
 }
