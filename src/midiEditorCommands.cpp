@@ -632,7 +632,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 		s << ", ";
 	}
 	if (shouldReportNotes) {
-		s << FormatNoteLength(note.start, note.end);
+		s << formatNoteLength(note.start, note.end);
 	}
 	outputMessage(s);
 }
@@ -694,7 +694,7 @@ void cmdMidiInsertNote(Command* command) {
 	ostringstream s;
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
-		s << FormatNoteLength(note.start, note.end);
+		s << formatNoteLength(note.start, note.end);
 		s << ", ";
 	}
 	s << formatCursorPosition(TF_MEASURE);
@@ -1234,7 +1234,7 @@ void postMidiChangeLength(int command) {
 		} else{ 
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
 				s << getMidiNoteName(take, note->pitch, note->channel) << " ";
-				s << FormatNoteLength(note->start, note->end);
+				s << formatNoteLength(note->start, note->end);
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
 				}

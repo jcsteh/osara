@@ -311,7 +311,7 @@ void resetTimeCache(TimeFormat excludeFormat) {
 	}
 }
 
-string FormatNoteLength(double start, double end) {
+string formatNoteLength(double start, double end) {
 	int measureLength;
 	double startBeats;
 	double endBeats;
