@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-08-27 00:56\n"
+"PO-Revision-Date: 2021-09-29 10:31\n"
 
 msgid "volume"
 msgstr "音量"
@@ -395,7 +395,7 @@ msgid "none"
 msgstr "无"
 
 msgid "follow current track"
-msgstr ""
+msgstr "跟随当前轨道"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -1256,16 +1256,16 @@ msgid "shortcut help off"
 msgstr "快捷帮助关"
 
 msgid "paused"
-msgstr ""
+msgstr "已暂停"
 
 msgid "recording"
-msgstr ""
+msgstr "录音中"
 
 msgid "playing"
-msgstr ""
+msgstr "播放中"
 
 msgid "stopped"
-msgstr ""
+msgstr "已停止"
 
 msgid "stretch marker moved"
 msgstr "已移动的拉伸标记"
@@ -1385,7 +1385,7 @@ msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切换快捷方式帮助"
 
 msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr ""
+msgstr "OSARA: 报告编辑/播放光标位置和走带状态"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 启用不连续选择/切换当前轨/对象的选择(取决于焦点)"
