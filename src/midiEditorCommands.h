@@ -28,6 +28,7 @@ void postMidiMovePitchCursor(int command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 void postMidiSelectNotes(int command);
+void postMidiSelectEvents(int command);
 void cmdMidiMoveToNextCC(Command* command);
 void cmdMidiMoveToPreviousCC(Command* command);
 void cmdMidiMoveToNextCCKeepSel(Command* command);

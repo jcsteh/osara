@@ -1892,7 +1892,7 @@ PostCommand POST_COMMANDS[] = {
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
-	{40006, postMidiSelectNotes, true}, // Edit: Select all events
+	{40006, postMidiSelectEvents, true}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
@@ -1916,7 +1916,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
 	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
 	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
-	{40501, postMidiSelectNotes}, // Invert selection
+	{40501, postMidiSelectEvents}, // Invert selection
 	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events

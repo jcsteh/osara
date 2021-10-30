@@ -729,6 +729,23 @@ void postMidiSelectNotes(int command) {
 	outputMessage(s);
 }
 
+void postMidiSelectEvents(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int evtIndex=-1;
+	int count=0;
+	for(;;){
+		evtIndex = MIDI_EnumSelEvts(take, evtIndex);
+		if (evtIndex == -1)
+			break;
+		++count;
+	}
+	// fakeFocus = FOCUS_NOTE;
+	ostringstream s;
+	s << count << " event" << ((count == 1) ? "" : "s") << " selected";
+	outputMessage(s);
+}
+
 const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
 	static map<int, string> names = {
 		{0, "Bank Select MSB"},
