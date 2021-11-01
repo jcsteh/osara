@@ -135,7 +135,7 @@ void outputMessage(ostringstream& message, bool interrupt) {
 }
 
 string formatTime(double time, TimeFormat timeFormat, bool isLength,
-	bool useCache, bool includeZeros
+	bool useCache, bool includeZeros, bool includeProjectStartOffset
 ) {
 	ostringstream s;
 	if (timeFormat == TF_RULER) {
@@ -152,6 +152,10 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 		} else {
 			timeFormat = TF_MEASURE;
 		}
+	}
+	if (includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
+		ReaProject* proj = EnumProjects(-1, nullptr, 0);
+		time += GetProjectTimeOffset(proj, timeFormat == TF_MINSEC || timeFormat == TF_SEC);
 	}
 	switch (timeFormat) {
 		case TF_MEASURE: {

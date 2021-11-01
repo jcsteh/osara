@@ -145,6 +145,7 @@
 #define REAPERAPI_WANT_get_config_var
 #define REAPERAPI_WANT_EnumProjects
 #define REAPERAPI_WANT_GetProjectName
+#define REAPERAPI_WANT_GetProjectTimeOffset REAPERAPI_WANT_GetProjectTimeOffset
 #define REAPERAPI_WANT_plugin_register
 #define REAPERAPI_WANT_GetTrackUIVolPan
 #define REAPERAPI_WANT_GetGlobalAutomationOverride
@@ -246,7 +247,7 @@ typedef enum {
 	TF_SAMPLE
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
-std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true, bool includeZeros=true);
+std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true, bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
