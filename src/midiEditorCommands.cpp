@@ -736,14 +736,19 @@ void postMidiSelectEvents(int command) {
 	int count=0;
 	for(;;){
 		evtIndex = MIDI_EnumSelEvts(take, evtIndex);
-		if (evtIndex == -1)
+		if (evtIndex == -1) {
 			break;
+		}
 		++count;
 	}
-	// fakeFocus = FOCUS_NOTE;
-	ostringstream s;
-	s << count << " event" << ((count == 1) ? "" : "s") << " selected";
-	outputMessage(s);
+	if (fakeFocus != FOCUS_NOTE && fakeFocus != FOCUS_CC) {
+		fakeFocus = FOCUS_NOTE;
+	}
+	// Translators: Reported when selecting events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 events selected".
+	outputMessage(format(
+		translate_plural("{} event selected", "{} events selected", count),
+		count));
 }
 
 const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
