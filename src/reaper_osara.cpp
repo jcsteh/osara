@@ -153,9 +153,11 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			timeFormat = TF_MEASURE;
 		}
 	}
-	if (includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
-		ReaProject* proj = EnumProjects(-1, nullptr, 0);
-		time += GetProjectTimeOffset(proj, timeFormat == TF_MINSEC || timeFormat == TF_SEC);
+	if (includeProjectStartOffset) {
+		if (timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
+			ReaProject* proj = EnumProjects(-1, nullptr, 0);
+			time += GetProjectTimeOffset(proj, false);
+		}
 	}
 	switch (timeFormat) {
 		case TF_MEASURE: {
