@@ -135,7 +135,7 @@ void outputMessage(ostringstream& message, bool interrupt) {
 }
 
 string formatTime(double time, TimeFormat timeFormat, bool isLength,
-	bool useCache, bool includeZeros
+	bool useCache, bool includeZeros, bool includeProjectStartOffset
 ) {
 	ostringstream s;
 	if (timeFormat == TF_RULER) {
@@ -152,6 +152,9 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 		} else {
 			timeFormat = TF_MEASURE;
 		}
+	}
+	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
+		time += GetProjectTimeOffset(nullptr, false);
 	}
 	switch (timeFormat) {
 		case TF_MEASURE: {
@@ -171,6 +174,12 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			if (!isLength) {
 				++measure;
 				++wholeBeat;
+				if (includeProjectStartOffset) {
+					int size = 0;
+					int index = projectconfig_var_getoffs("projmeasoffs", &size);
+					assert(size == sizeof(int));
+					measure += *(int*)projectconfig_var_addr(nullptr, index);
+				}
 			}
 			if (!useCache || measure != oldMeasure) {
 				if (isLength) {
