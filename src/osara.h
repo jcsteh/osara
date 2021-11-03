@@ -143,6 +143,8 @@
 #define REAPERAPI_WANT_GetMediaTrackInfo_Value
 #define REAPERAPI_WANT_GetTrackMIDINoteName
 #define REAPERAPI_WANT_get_config_var
+#define REAPERAPI_WANT_projectconfig_var_addr
+#define REAPERAPI_WANT_projectconfig_var_getoffs
 #define REAPERAPI_WANT_EnumProjects
 #define REAPERAPI_WANT_GetProjectName
 #define REAPERAPI_WANT_GetProjectTimeOffset REAPERAPI_WANT_GetProjectTimeOffset
