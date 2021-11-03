@@ -147,7 +147,7 @@
 #define REAPERAPI_WANT_projectconfig_var_getoffs
 #define REAPERAPI_WANT_EnumProjects
 #define REAPERAPI_WANT_GetProjectName
-#define REAPERAPI_WANT_GetProjectTimeOffset REAPERAPI_WANT_GetProjectTimeOffset
+#define REAPERAPI_WANT_GetProjectTimeOffset
 #define REAPERAPI_WANT_plugin_register
 #define REAPERAPI_WANT_GetTrackUIVolPan
 #define REAPERAPI_WANT_GetGlobalAutomationOverride
