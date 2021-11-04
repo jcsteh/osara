@@ -868,6 +868,12 @@ void postToggleAllTracksFxBypass(int command) {
 		translate("all tracks FX active"));
 }
 
+void postToggleLastFocusedFxDeltaSolo(int command) {
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled delta solo") :
+		translate("disabled delta solo"));
+}
+
 bool shouldReportScrub = true;
 
 void postCursorMovement(int command) {
@@ -1763,6 +1769,7 @@ PostCommand POST_COMMANDS[] = {
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
 	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
+	{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project

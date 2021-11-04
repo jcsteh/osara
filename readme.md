@@ -185,6 +185,9 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Xenakios/SWS: Nudge active take volume up: Control+UpArrow
 - Xenakios/SWS: Nudge active take volume down: Control+DownArrow
 
+#### FX
+FX: Toggle delta solo for last focused FX
+
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
