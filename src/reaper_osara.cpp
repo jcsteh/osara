@@ -870,8 +870,8 @@ void postToggleAllTracksFxBypass(int command) {
 
 void postToggleLastFocusedFxDeltaSolo(int command) {
 	outputMessage(GetToggleCommandState(command) ?
-		translate("delta solo on") :
-		translate("delta solo off"));
+		translate("enabled delta solo") :
+		translate("disabled delta solo"));
 }
 
 bool shouldReportScrub = true;
