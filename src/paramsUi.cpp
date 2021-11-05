@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <memory>
+#include <regex>
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
@@ -629,6 +630,7 @@ class FxParams: public ParamSource {
 	int (*_GetNumParams)(ReaperObj*, int);
 	bool (*_GetFXName)(ReaperObj*, int, char*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
+	bool (*_GetParamIdent)(ReaperObj*, int, int, char*, int);
 	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
 	bool (*_GetParameterStepSizes)(ReaperObj*, int, int, double*, double*,
 		double*, bool*);
@@ -648,6 +650,7 @@ class FxParams: public ParamSource {
 		*(void**)&this->_GetFXName = plugin_getapi(
 			(apiPrefix + "_GetFXName").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
+		*(void**)&this->_GetParamIdent = plugin_getapi((apiPrefix + "_GetParamName").c_str());
 		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
 		*(void**)&this->_GetParameterStepSizes = plugin_getapi((apiPrefix +
 			"_GetParameterStepSizes").c_str());
@@ -679,6 +682,9 @@ class FxParams: public ParamSource {
 			ns << this->namedConfigParams[param].getDisplayName();
 		} else {
 			char name[256];
+			this->_GetParamIdent(this->obj, this->fx, param - namedCount, name,
+				sizeof(name));
+			ns << name << " ";
 			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
 				sizeof(name));
 			ns << name;
@@ -946,6 +952,18 @@ class TrackParams: public ReaperObjParamSource {
 			if (trackName)
 				dispPrefix << trackName << " ";
 			dispPrefix << categoryName << " ";
+			auto env = (TrackEnvelope*)GetSetTrackSendInfo(this->track, category, i, "P_ENV:<VOLENV", NULL);
+			dispPrefix << env << " ";
+			char state[200];
+			//InsertEnvelopePoint(env, 0, 0, 0, 0, 0, nullptr);
+			GetEnvelopeStateChunk(env, state, sizeof(state), false);
+			cmatch m;
+			const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
+			regex_search(state, m, RE_ENVELOPE_STATE);
+			dispPrefix << state << " ";
+			*const_cast<char*>(m[4].first) = '1';
+			dispPrefix << state << " ";
+			dispPrefix << SetEnvelopeStateChunk(env, state, true) << " ";
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make));

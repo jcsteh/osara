@@ -187,6 +187,9 @@
 #define REAPERAPI_WANT_GetSetTrackGroupMembership
 #define REAPERAPI_WANT_GetSetTrackGroupMembershipHigh
 #define REAPERAPI_WANT_GetSetProjectInfo_String
+#define REAPERAPI_WANT_InsertEnvelopePoint
+#define REAPERAPI_WANT_SetEnvelopeStateChunk
+#define REAPERAPI_WANT_TrackFX_GetParamIdent
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
