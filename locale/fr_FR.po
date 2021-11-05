@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-08-27 00:56\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "volume"
@@ -229,6 +229,13 @@ msgstr "si"
 
 msgid "noncontiguous selection"
 msgstr "sélection discontinue"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} événement sélectionné"
+msgstr[1] "{} événement sélectionné"
 
 msgid "no time selection"
 msgstr "aucune sélection temporelle"
@@ -714,6 +721,12 @@ msgstr "tous les FX des pistes désactivé"
 
 msgid "all tracks FX active"
 msgstr "tous les FX des pistes activés"
+
+msgid "enabled delta solo"
+msgstr "delta solo activé"
+
+msgid "disabled delta solo"
+msgstr "delta solo désactivé"
 
 msgid "no selected items"
 msgstr "pas d'objet sélectionné"

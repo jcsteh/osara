@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2021-09-29 10:31\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -229,6 +229,13 @@ msgstr "si"
 
 msgid "noncontiguous selection"
 msgstr "selección separada"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "no time selection"
 msgstr "sin selección de tiempo"
@@ -714,6 +721,12 @@ msgstr "desactivar FX en todas las pistas"
 
 msgid "all tracks FX active"
 msgstr "activar FX en todas las pistas"
+
+msgid "enabled delta solo"
+msgstr ""
+
+msgid "disabled delta solo"
+msgstr ""
 
 msgid "no selected items"
 msgstr "no hay ítems seleccionados"

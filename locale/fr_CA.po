@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2021-10-05 11:24\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "volume"
@@ -20,7 +20,7 @@ msgid "pan"
 msgstr "panoramique"
 
 msgid "muted"
-msgstr "en sourdine"
+msgstr "sourdine activée"
 
 msgid "unmuted"
 msgstr "sourdine désactivée"
@@ -85,7 +85,7 @@ msgstr "carrée"
 
 #. A shape for an envelope point.
 msgid "slow start/end"
-msgstr "début/fin lent"
+msgstr "début, fin lente"
 
 #. A shape for an envelope point.
 msgid "fast start"
@@ -145,8 +145,8 @@ msgstr[1] "{} objets d'automatisation copiés"
 #. with the number of points; e.g. "2 envelope points copied".
 msgid "{} envelope point copied"
 msgid_plural "{} envelope points copied"
-msgstr[0] "{} points d'enveloppe copiés"
-msgstr[1] "{} point d'enveloppe copié"
+msgstr[0] "{} point d'enveloppe copiée"
+msgstr[1] "{} points d'enveloppe copiées"
 
 msgid "track not selected"
 msgstr "piste non sélectionnée"
@@ -230,6 +230,13 @@ msgstr "si"
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
 
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} événement sélectionné"
+msgstr[1] "{} événements sélectionné"
+
 msgid "no time selection"
 msgstr "aucune sélection temporelle"
 
@@ -283,7 +290,7 @@ msgstr "bande (alt 2)"
 #. whether a ReaEQ band is enabled. {} will be replaced with the band
 #. number; e.g. "band 2 enable".
 msgid "Band {} enable"
-msgstr "Bande {} activé"
+msgstr "Bande {} activée"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. the type of a ReaEQ band. {} will be replaced with the band number;
@@ -370,7 +377,7 @@ msgstr "Crête réelle, dB, TP"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher track is disabled.
 msgid "Peak Watcher track disabled"
-msgstr "Observateur de crête de piste, désactivé"
+msgstr "L'observateur de crête de piste est désactivé"
 
 #. Reported when the user resets a Peak Watcher track.
 msgid "reset"
@@ -385,7 +392,7 @@ msgstr "piste {}"
 #. placed after the track and before the peak value.
 #. {} will be replaced with the channel number; e.g. "chan 2".
 msgid "chan {}:"
-msgstr "canal:"
+msgstr "canal {}:"
 
 #. used when Peak Watcher notifies about a peak for cases
 #. where the channel is irrelevant. This is placed after the track and
@@ -410,7 +417,7 @@ msgstr "actuelle"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher is paused.
 msgid "Peak Watcher paused"
-msgstr "Observateur de crête de piste, désactivé"
+msgstr "L'observateur de crête est en pause"
 
 msgid "paused Peak Watcher"
 msgstr "observateur de crête, en pause"
@@ -714,6 +721,12 @@ msgstr "fX de toutes les pistes, contournées"
 
 msgid "all tracks FX active"
 msgstr "fX de toutes les pistes, activées"
+
+msgid "enabled delta solo"
+msgstr ""
+
+msgid "disabled delta solo"
+msgstr ""
 
 msgid "no selected items"
 msgstr "aucun Objets n'est sélectionné"
@@ -1509,10 +1522,10 @@ msgid "OSARA: Move to previous chord and add to selection"
 msgstr "OSARA: Sélectionne l'accord précédent et ajoute à la sélection"
 
 msgid "OSARA: Move to next note in chord"
-msgstr "OSARA: Sélectionne la note suivante de l'accordOSARA: Sélectionne la note précédente de l'accord"
+msgstr "OSARA: Sélectionne la note suivante de l'accord"
 
 msgid "OSARA: Move to previous note in chord"
-msgstr "OSARA: Sélectionne la note suivante de l'accord et ajoute à la sélection"
+msgstr "OSARA: Sélectionne la note précédente de l'accord"
 
 msgid "OSARA: Move to next note in chord and add to selection"
 msgstr "OSARA: Sélectionne la note suivante de l'accord et ajoute à la sélection"
@@ -1630,7 +1643,7 @@ msgstr "Configuration d'OSARA"
 
 msgctxt "OSARA Configuration"
 msgid "Report position when &scrubbing"
-msgstr "Énoncer la position du &scrubb"
+msgstr "Énoncer la position du &scrub"
 
 msgctxt "OSARA Configuration"
 msgid "Report &time movement during playback/recording"

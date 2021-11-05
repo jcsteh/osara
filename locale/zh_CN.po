@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-09-29 10:31\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "音量"
@@ -224,6 +224,12 @@ msgstr "B"
 
 msgid "noncontiguous selection"
 msgstr "不连续选择"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} 事件已选定"
 
 msgid "no time selection"
 msgstr "无时间选择"
@@ -704,6 +710,12 @@ msgstr "全部轨道FX已旁路"
 
 msgid "all tracks FX active"
 msgstr "全部轨道FX活动"
+
+msgid "enabled delta solo"
+msgstr "启用delta独奏"
+
+msgid "disabled delta solo"
+msgstr "禁用delta独奏"
 
 msgid "no selected items"
 msgstr "无选定对象"

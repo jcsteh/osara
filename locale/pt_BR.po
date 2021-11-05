@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2021-08-27 00:56\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -77,7 +77,7 @@ msgstr[1] "{} pontos removidos"
 
 #. A shape for an envelope point.
 msgid "linear"
-msgstr ""
+msgstr "Linear"
 
 #. A shape for an envelope point.
 msgid "square"
@@ -230,6 +230,13 @@ msgstr "Si"
 msgid "noncontiguous selection"
 msgstr "Seleção não contígua"
 
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "no time selection"
 msgstr "Sem seleção de tempo"
 
@@ -250,46 +257,46 @@ msgid "FX Parameters"
 msgstr "Parâmetros do FX"
 
 msgid "low shelf"
-msgstr ""
+msgstr "Corte de graves"
 
 msgid "high shelf"
-msgstr ""
+msgstr "Corte de agudos"
 
 msgid "band"
-msgstr ""
+msgstr "banda"
 
 msgid "low pass"
-msgstr ""
+msgstr "passa-baixo"
 
 msgid "high pass"
-msgstr ""
+msgstr "passa-alto"
 
 msgid "all pass"
-msgstr ""
+msgstr "passa tudo"
 
 msgid "notch"
-msgstr ""
+msgstr "entalhe"
 
 msgid "band pass"
-msgstr ""
+msgstr "passa-banda"
 
 msgid "band (alt)"
-msgstr ""
+msgstr "banda (alt)"
 
 msgid "band (alt 2)"
-msgstr ""
+msgstr "banda (alt2)"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. whether a ReaEQ band is enabled. {} will be replaced with the band
 #. number; e.g. "band 2 enable".
 msgid "Band {} enable"
-msgstr ""
+msgstr "banda {} permitida"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. the type of a ReaEQ band. {} will be replaced with the band number;
 #. e.g. "band 2 type".
 msgid "Band {} type"
-msgstr ""
+msgstr "banda {} tipo"
 
 msgid "mute"
 msgstr "silenciar"
@@ -354,13 +361,13 @@ msgid "short term LUFS"
 msgstr "LUFS de curta duração"
 
 msgid "loudness range LU"
-msgstr ""
+msgstr "Faixa de ruído LU"
 
 msgid "integrated RMS"
-msgstr ""
+msgstr "RMS integrado"
 
 msgid "momentary RMS"
-msgstr ""
+msgstr "RMS momentâmeo"
 
 msgid "true peak dBTP"
 msgstr "pico verdadeiro de dBTP"
@@ -400,7 +407,7 @@ msgid "none"
 msgstr "nenhuma"
 
 msgid "follow current track"
-msgstr ""
+msgstr "seguir a pista atual"
 
 #. Used in the lists of tracks in the Peak Watcher dialog
 #. to indicate the current track.
@@ -585,73 +592,73 @@ msgid "midi latch-replace"
 msgstr "midi cadeado-substituir"
 
 msgid "volume lead"
-msgstr ""
+msgstr "liberar volume"
 
 msgid "volume follow"
-msgstr ""
+msgstr "seguir volume"
 
 msgid "VCA lead"
-msgstr ""
+msgstr "liberar VCA"
 
 msgid "VCA follow"
-msgstr ""
+msgstr "Seguir VCA"
 
 msgid "pan lead"
-msgstr ""
+msgstr "liberar pan"
 
 msgid "pan follow"
-msgstr ""
+msgstr "seguir pan"
 
 msgid "width lead"
-msgstr ""
+msgstr "liberar largura"
 
 msgid "width follow"
-msgstr ""
+msgstr "seguir largura"
 
 msgid "mute lead"
-msgstr ""
+msgstr "liberar silêncio"
 
 msgid "mute follow"
-msgstr ""
+msgstr "seguir silêncio"
 
 msgid "solo lead"
-msgstr ""
+msgstr "liberar solo"
 
 msgid "solo follow"
-msgstr ""
+msgstr "seguir solo"
 
 msgid "record arm lead"
-msgstr ""
+msgstr "liberar gravação armada"
 
 msgid "record arm follow"
-msgstr ""
+msgstr "seguir gravação armada"
 
 msgid "polarity lead"
-msgstr ""
+msgstr "liberar polaridade"
 
 msgid "polarity follow"
-msgstr ""
+msgstr "seguir polaridade"
 
 msgid "automation mode lead"
-msgstr ""
+msgstr "liberar modo de automação"
 
 msgid "automation mode follow"
-msgstr ""
+msgstr "seguir modo de automação"
 
 msgid "reverse volume"
-msgstr ""
+msgstr "volume inverso"
 
 msgid "reverse pan"
-msgstr ""
+msgstr "pan inverso"
 
 msgid "reverse width"
-msgstr ""
+msgstr "largura inversa"
 
 msgid "do not lead when following"
-msgstr ""
+msgstr "não liberar ao seguir"
 
 msgid "VCA pre-FX follow"
-msgstr ""
+msgstr "seguir VCA pré-FX "
 
 msgid "defeating solo"
 msgstr "solo rejeitado"
@@ -664,7 +671,7 @@ msgstr "FX ignorado"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
-msgstr ""
+msgstr "agrupado"
 
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
@@ -682,7 +689,7 @@ msgstr[0] "{} item"
 msgstr[1] "{} itens"
 
 msgid "free item positioning"
-msgstr ""
+msgstr "posição livre do ítem"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -715,6 +722,12 @@ msgstr "Todas as pistas de FX ignoradas"
 msgid "all tracks FX active"
 msgstr "Todas as pistas de FX ativadas"
 
+msgid "enabled delta solo"
+msgstr ""
+
+msgid "disabled delta solo"
+msgstr ""
+
 msgid "no selected items"
 msgstr "Sem itens selecionados"
 
@@ -733,7 +746,7 @@ msgstr[0] "{} item normalizado"
 msgstr[1] "{} itens normalizados"
 
 msgid "not a folder"
-msgstr ""
+msgstr "Não é uma pista do tipo pasta"
 
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
@@ -1057,10 +1070,10 @@ msgid "disabled envelope points move with media items"
 msgstr "os pontos de envelope se movem com os itens de mídia (desabilitado)"
 
 msgid "enabled free item positioning"
-msgstr ""
+msgstr "permitido livre posicionamento do ítem"
 
 msgid "disabled free item positioning"
-msgstr ""
+msgstr "não permitido livre posicionamento do ítem"
 
 msgid "set selection start"
 msgstr "Definir início da seleção"
@@ -1184,12 +1197,12 @@ msgstr[1] "{} itens adicionados"
 #. {} will be replaced with the number of tracks; e.g. "2 tracks".
 msgid "{} track"
 msgid_plural "{} tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista"
+msgstr[1] "{} pistas"
 
 #. Reported after the number of tracks and/or items added.
 msgid "added"
-msgstr ""
+msgstr "adicionado"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
@@ -1285,16 +1298,16 @@ msgid "shortcut help off"
 msgstr "Ajuda de comandos desativada"
 
 msgid "paused"
-msgstr ""
+msgstr "pausado"
 
 msgid "recording"
-msgstr ""
+msgstr "gravando"
 
 msgid "playing"
-msgstr ""
+msgstr "reproduzindo"
 
 msgid "stopped"
-msgstr ""
+msgstr "parado"
 
 msgid "stretch marker moved"
 msgstr "Marcador elástico movido"
@@ -1353,7 +1366,7 @@ msgid "OSARA: View properties for current media item/take/automation item (depen
 msgstr "OSARA: Exibir propriedades para item de mídia / trechos/ item de automação atual (dependendo do foco)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
-msgstr ""
+msgstr "OSARA: Ver os parâmetros da pista / item / FX atual (dependendo do foco)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: Ver os parâmetros FX para a pista / trecho atual (dependendo do foco)"
@@ -1416,7 +1429,7 @@ msgid "OSARA: Toggle shortcut help"
 msgstr "Osara:  Alternar ajuda de atalhos"
 
 msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr ""
+msgstr "OSARA: Reportar edição / reprodução da posição do cursor e estado de transporte"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Habilita a seleção não contígua ou alterna a seleção da pista / item atual (dependendo do foco)"
@@ -1491,7 +1504,7 @@ msgid "OSARA: About"
 msgstr "Osara:  Sobre"
 
 msgid "OSARA: Report groups for current track"
-msgstr ""
+msgstr "OSARA:  Reportar grupos da pista atual"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Habilitar seleção não contígua ou alternar a seleção do acorde / nota atual"
@@ -1650,7 +1663,7 @@ msgstr "Anuncia estado de reprodução / gravação"
 
 msgctxt "OSARA Configuration"
 msgid "Report t&rack numbers"
-msgstr ""
+msgstr "Anunciar número das pistas"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"

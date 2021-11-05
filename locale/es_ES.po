@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-08-27 00:56\n"
+"PO-Revision-Date: 2021-11-05 13:08\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -229,6 +229,13 @@ msgstr "si"
 
 msgid "noncontiguous selection"
 msgstr "selección no contígua"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "no time selection"
 msgstr "no hay selección de tiempo"
@@ -597,61 +604,61 @@ msgid "VCA follow"
 msgstr ""
 
 msgid "pan lead"
-msgstr ""
+msgstr "manejo panorama"
 
 msgid "pan follow"
-msgstr ""
+msgstr "seguir panorama"
 
 msgid "width lead"
-msgstr ""
+msgstr "manejo de anchura"
 
 msgid "width follow"
-msgstr ""
+msgstr "seguir anchura"
 
 msgid "mute lead"
-msgstr ""
+msgstr "manejo mute"
 
 msgid "mute follow"
-msgstr ""
+msgstr "seguir mute"
 
 msgid "solo lead"
-msgstr ""
+msgstr "manejo de solo"
 
 msgid "solo follow"
-msgstr ""
+msgstr "seguimiento de solo"
 
 msgid "record arm lead"
-msgstr ""
+msgstr "manejo de armado"
 
 msgid "record arm follow"
-msgstr ""
+msgstr "seguimiento de armado"
 
 msgid "polarity lead"
-msgstr ""
+msgstr "manejo de polaridad"
 
 msgid "polarity follow"
-msgstr ""
+msgstr "seguimiento de polaridad"
 
 msgid "automation mode lead"
-msgstr ""
+msgstr "manejo del modo de automatización"
 
 msgid "automation mode follow"
-msgstr ""
+msgstr "seguimiento del modo de automatización"
 
 msgid "reverse volume"
-msgstr ""
+msgstr "invertir volumen"
 
 msgid "reverse pan"
-msgstr ""
+msgstr "invertir panorama"
 
 msgid "reverse width"
-msgstr ""
+msgstr "invertir anchura"
 
 msgid "do not lead when following"
-msgstr ""
+msgstr "no manejar cuando seguimiento"
 
 msgid "VCA pre-FX follow"
-msgstr ""
+msgstr "Seguir VCA pre-fx"
 
 msgid "defeating solo"
 msgstr "rechazar solo"
@@ -664,7 +671,7 @@ msgstr "FX ignorado"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
-msgstr ""
+msgstr "agrupado"
 
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
@@ -682,7 +689,7 @@ msgstr[0] "{} ítem"
 msgstr[1] "{} ítems"
 
 msgid "free item positioning"
-msgstr ""
+msgstr "posición libre de items"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
@@ -714,6 +721,12 @@ msgstr "ignorados fx de todas las pistas"
 
 msgid "all tracks FX active"
 msgstr "activos fx de todas las pistas"
+
+msgid "enabled delta solo"
+msgstr "delta solo activado"
+
+msgid "disabled delta solo"
+msgstr "delta solo desactivado"
 
 msgid "no selected items"
 msgstr "no hay ítems seleccionados"
@@ -1057,7 +1070,7 @@ msgid "disabled envelope points move with media items"
 msgstr "desActivado: los puntos de envolventes se mueven con los ítems"
 
 msgid "enabled free item positioning"
-msgstr ""
+msgstr "posición libre de items activado"
 
 msgid "disabled free item positioning"
 msgstr "desactivado el posicionamiento libre de ítem"
@@ -1155,7 +1168,7 @@ msgstr "bloqueado"
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
 msgid "group {}"
-msgstr ""
+msgstr "grupo {}"
 
 #. Used when navigating items to indicate the number of
 #. takes. {} will be replaced with the number; e.g. "2 takes".
@@ -1184,12 +1197,12 @@ msgstr[1] "{} ítems agregados"
 #. {} will be replaced with the number of tracks; e.g. "2 tracks".
 msgid "{} track"
 msgid_plural "{} tracks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pistas"
+msgstr[1] "{} pistas"
 
 #. Reported after the number of tracks and/or items added.
 msgid "added"
-msgstr ""
+msgstr "se añade"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
@@ -1285,16 +1298,16 @@ msgid "shortcut help off"
 msgstr "ayuda de comandos desactivada"
 
 msgid "paused"
-msgstr ""
+msgstr "pausado"
 
 msgid "recording"
-msgstr ""
+msgstr "grabando"
 
 msgid "playing"
-msgstr ""
+msgstr "reproduciendo"
 
 msgid "stopped"
-msgstr ""
+msgstr "parado"
 
 msgid "stretch marker moved"
 msgstr "marcador elástico movido"
@@ -1332,8 +1345,8 @@ msgstr "región {} insertada"
 #. group number. For example: "2 items added to group 1".
 msgid "item added to group {group}"
 msgid_plural "{count} items added to group {group}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{count} items añadido al grupo {group}"
+msgstr[1] "{count} añadido al grupo {Group}"
 
 #. Reported when removing items from a group. {count} will be
 #. replaced with the number of items. {group} will be replaced with the group
