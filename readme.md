@@ -39,8 +39,7 @@ Once you have downloaded the installer, simply run it and follow the instruction
 Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
 The installer installs the extension into your user configuration, not the program directory.
 
-By default, the OSARA key map will be installed, completely replacing your existing key map.
-If you do not wish this to occur, you can uncheck the "Replace existing key map with OSARA key map" option.
+If you wish to completely replace your existing key map with the OSARA key map (which is recommended), answer yes when prompted.
 If the installer does replace the key map, a backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
