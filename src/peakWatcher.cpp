@@ -70,6 +70,8 @@ double getLoudnessMeterParam(MediaTrack* track,
 		}
 		// Turn off reset on playback start.
 		TrackFX_SetParam(track, fx, 10, 0.0);
+		// set output loudness values as automation to all
+		TrackFX_SetParam(track, fx, 14, 1.0);
 	}
 	return TrackFX_GetParam(track, fx, queryParam, nullptr, nullptr);
 }
@@ -106,49 +108,49 @@ const struct {
 	},
 	{"integrated LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 6, 1.0, 19);
+			return getLoudnessMeterParam(track, 6, 1.0, 20);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"momentary LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 3, 1.0, 17);
+			return getLoudnessMeterParam(track, 3, 1.0, 18);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"short term LUFS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 4, 1.0, 18);
+			return getLoudnessMeterParam(track, 4, 1.0, 19);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"loudness range LU",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 5, 1.0, 20);
+			return getLoudnessMeterParam(track, 5, 1.0, 21);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"integrated RMS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 2, 1.0, 16);
+			return getLoudnessMeterParam(track, 2, 1.0, 17);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"momentary RMS",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 1, 1.0, 15);
+			return getLoudnessMeterParam(track, 1, 1.0, 16);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
 	},
 	{"true peak dBTP",
 		/* getValue */ [](MediaTrack* track, int channel) {
-			return getLoudnessMeterParam(track, 0, 1.0, 14);
+			return getLoudnessMeterParam(track, 0, 1.0, 15);
 		},
 		/* separateChannels */ false,
 		/* reset */ deleteLoudnessMeter,
