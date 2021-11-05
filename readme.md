@@ -24,7 +24,7 @@ Features:
 - Navigation and selection of chords and notes in the MIDI Editor
 
 ## Requirements
-OSARA requires REAPER 6.30 or later.
+OSARA requires REAPER 6.32 or later.
 The [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
 
 It has only been tested with the NVDA and VoiceOver screen readers.
