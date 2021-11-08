@@ -19,6 +19,7 @@
 #endif
 
 using namespace std;
+using namespace fmt::literals;
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
 // It is also used for other MIDI messages.
@@ -242,11 +243,12 @@ void cmdMidiMoveCursor(Command* command) {
 			notes.push_back({chan, pitch, vel, 0, start, end});
 		}
 	}
-	auto count = notes.size();
+	int count = static_cast<int>(notes.size());
 	if (count > 0) {
 		previewNotes(take, notes);
 		fakeFocus = FOCUS_NOTE;
-		s << " " << count << (count == 1 ? " note" : " notes");
+		s << " " << format(
+			translate_plural("{} note", "{} notes", count), count);
 	}
 	outputMessage(s);
 }
@@ -586,7 +588,10 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	}
 	if (shouldReportNotes) {
 		int count = chord.second - chord.first + 1;
-		s << count << (count == 1 ? " note" : " notes");
+		// Translators: used when reporting the number of notes in a chord.
+		// {} will be replaced by the number of notes. E.g. "3 notes"
+		s << format(
+			translate_plural("{} note", "{} notes", count), count);
 	}
 	outputMessage(s);
 }
@@ -707,9 +712,10 @@ void cmdMidiDeleteEvents(Command* command) {
 	int oldCount = MIDI_CountEvts(take, NULL, NULL, NULL);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int removed = oldCount - MIDI_CountEvts(take, NULL, NULL, NULL);
-	ostringstream s;
-	s << removed << (removed == 1 ? " event" : " events") << " removed";
-	outputMessage(s);
+	// Translators: Used when events are deleted in the MIDI editor. {} is
+	// replaced by the number of events. E.g. "3 events removed"
+	outputMessage(format(
+		translate_plural("{} event removed", "{} events removed", removed), removed));
 }
 
 void postMidiSelectNotes(int command) {
@@ -724,9 +730,11 @@ void postMidiSelectNotes(int command) {
 		++count;
 	}
 	fakeFocus = FOCUS_NOTE;
-	ostringstream s;
-	s << count << " note" << ((count == 1) ? "" : "s") << " selected";
-	outputMessage(s);
+	// Translators: used when notes are selected in the MIDI editor.
+	// {} is replaced by the number of notes. E.g. "4 notes selected"
+	outputMessage(format(
+		translate_plural("{} note selected", "{} notes selected", count ),
+		count ));
 }
 
 void postMidiSelectEvents(int command) {
@@ -753,6 +761,7 @@ void postMidiSelectEvents(int command) {
 
 const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
 	static map<int, string> names = {
+		// translate firstString begin
 		{0, "Bank Select MSB"},
 		{1, "Mod Wheel MSB"},
 		{2, "Breath MSB"},
@@ -820,6 +829,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 		{125, "Omni Off"},
 		{126, "Mono On"},
 		{127, "Poly On"}
+		// translate firstString end
 	};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
@@ -831,7 +841,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	} else {
 		auto it = names.find(control);
 		if (it != names.end()) {
-			s << " (" << it->second << ")";
+			s << " (" << translate(it->second) << ")";
 		}
 	}
 	return s.str();
@@ -862,24 +872,30 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
 	if (cc.message1 == 0xA0) {
-		s << "Poly Aftertouch ";
-		// Note: separate the note and value with two spaces to avoid treatment as thousands separator.
-		s << getMidiNoteName(take, cc.message2, cc.channel) << "  ";
-		s << cc.message3;
+		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
+		// name and {value} will be replaced with the aftertouch value; e.g.
+		// "Poly Aftertouch c sharp 4  96"
+		s << format(translate("Poly Aftertouch {note}  {value}"),
+			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
 	} else if (cc.message1 == 0xB0) {
-		s << "Control ";
-		s << getMidiControlName(take, cc.message2, cc.channel) << ", ";
-		s << cc.message3;
+		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+		s << format(translate("Control {control}, {value}"),
+		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
+		"value"_a=cc.message3);
 	} else if (cc.message1 == 0xC0) {
-		s << "Program " << cc.message2;
+		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
+		s << format(translate("Program {}"), cc.message2);
 	} else if (cc.message1 == 0xD0) {
-		s << "Channel pressure " << cc.message2;
+		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		s << format(translate("Channel pressure {}"), cc.message2);
 	} else if (cc.message1 == 0xE0) {
 		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
-		s << "Pitchhhh Bend " << pitchBendValue;
+		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
+		s << format(translate("Pitch Bend {}"), pitchBendValue);
 	}
 	if (!select && !isCCSelected(take, cc.index)) {
-		s << "unselected" << " ";
+		s << " " << translate("unselected");
 	}
 	outputMessage(s);
 }
@@ -960,7 +976,9 @@ void cmdMidiMoveToTrack(Command* command) {
 	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 	if (trackName)
 		s << " " << trackName;
-	s << " item " << itemNum << " " << GetTakeName(take);
+	s << " " << format(
+		translate("item {num} {name}"),
+		"num"_a=itemNum, "name"_a=GetTakeName(take));
 	outputMessage(s);
 }
 
@@ -995,9 +1013,10 @@ void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
 		}
 	}
 	Undo_EndBlock("OSARA: Select all notes with the same pitch within time selection",0);
-	ostringstream s;
-	s<< selectCount << " note"<<((selectCount==1)?"":"s")<<" selected";
-	outputMessage(s);
+	// Translators: used when notes are selected in the MIDI editor.
+	// {} is replaced by the number of notes. E.g. "4 notes selected"
+	outputMessage(format(
+		translate_plural("{} note selected", "{} notes selected", selectCount), selectCount ));
 }
 
 void cmdMidiNoteSplitOrJoin(Command* command) {
@@ -1011,21 +1030,30 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 	if (oldCount == newCount) {
 		return;
 	}
-	ostringstream s;
-	s << oldCount << " notes ";
 	switch (cmdId) {
 		case 40046:
-			s << "split";
+			// Translators: used when splitting notes in the midi editor.
+			// {oldCount} is replaced by the number of notes that were selected
+			// before the command.  This is the number the plural form is based
+			// on. {newCount} is replaced by the number of selected notes after
+			// the command. E.g. "1 note split into 2"
+			outputMessage(format(
+				translate_plural("{oldCount} note split into {newCount}", "{oldCount} notes split into {newCount}", oldCount),
+				"oldCount"_a=oldCount, "newcount"_a=newCount));
 			break;
 		case 40456:
-			s << "joined";
+			// Translators: used when joining notes in the midi editor.
+			// {oldCount} is replaced by the number of notes that were selected
+			// before the command.  This is the number the plural form is based
+			// on. {newCount} is replaced by the number of selected notes after
+			// the command. E.g. "2 notes joined into 1"
+			outputMessage(format(
+				translate_plural("{oldCount} note joined into {newCount}", "{oldCount} notes joined into {newCount}", oldCount),
+				"oldCount"_a=oldCount, "newCount"_a=newCount));
 			break;
 		default:
-			s << "transformed";
 			break;
 	}
-	s << " into " << newCount;
-	outputMessage(s);
 }
 
 #ifdef _WIN32
@@ -1165,23 +1193,24 @@ void postMidiChangeVelocity(int command) {
 	// The Reaper action takes care of note preview.
 	ostringstream s;
 	if (generalize) {
-		auto count = selectedNotes.size();
-		s << count << (count == 1 ? " note" : " notes ");
+		int count = static_cast<int>(selectedNotes.size());
+		s << format(
+			translate_plural("{} note", "{} notes", count), count) << " ";
 		switch (command) {
 			case 40462:
-				s << "velocity +1";
+				s << translate("velocity +1");
 				break;
 			case 40463:
-				s << "velocity +10";
+				s << translate("velocity +10");
 				break;
 			case 40464:
-				s << "velocity -1";
+				s << translate("velocity -1");
 				break;
 			case 40465:
-				s << "velocity -10";
+				s << translate("velocity -10");
 				break;
 			default:
-				s << "velocity changed";
+				s << translate("velocity changed");
 				break;
 		}
 	} else{
@@ -1228,29 +1257,56 @@ void postMidiChangeLength(int command) {
 	if (shouldReportNotes) {
 		ostringstream s;
 		if (generalize) {
-			auto count = selectedNotes.size();
-			s << count << (count == 1 ? " note" : " notes ");
+			int count = static_cast<int>(selectedNotes.size());
 			switch (command) {
 				case 40444:
-					s << "lengthened pixel";
+					// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. "3
+					// notes lengthened pixel"
+					s << format(
+						translate_plural("{} note lengthened pixel", "{} notes lengthened pixel", count), count);
 					break;
 				case 40445:
-					s << "shortened pixel";
+					// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. "3
+					// notes shortened pixel"
+					s << format(
+						translate_plural("{} note shortened pixel", "{} notes shortened pixel", count), count);
 					break;
 				case 40446:
-					s << "lengthened grid unit";
+					// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes lengthened grid unit"
+					s << format(
+						translate_plural("{} note lengthened grid unit", "{} notes lengthened grid unit", count), count);
 					break;
 				case 40447:
-					s << "shortened grid unit";
+										// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes shortened grid unit"
+					s << format(
+						translate_plural("{} note shortened grid unit", "{} notes shortened grid unit", count), count);
 					break;
 				case 40633:
-					s << "length set to grid size";
+					// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes set length to grid size"
+					s << format(
+						translate_plural("{} note set length to grid size", "{} notes length set to grid size", count), count);
 					break;
 				case 40765:
-					s << "made legato";
+					// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes made legato"
+					s << format(
+						translate_plural("{} note made legato", "{} notes made legato", count), count);
 					break;
 				default:
-					s << "length changed";
+										// Translators: Used when changing note length in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes length changed"
+					s << format(
+						translate_plural("{} note length changed", "{} notes length changed", count), count);
 					break;
 			}
 		} else{ 
@@ -1295,29 +1351,56 @@ void postMidiChangePitch(int command) {
 	// The Reaper action takes care of note preview.
 	ostringstream s;
 	if (generalize) {
-		auto count = selectedNotes.size();
-		s << count << (count == 1 ? " note" : " notes ");
+		int count = static_cast<int>(selectedNotes.size());
 		switch (command) {
 			case 40177:
-				s << "semitone up";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes semitone up"
+				s << format(
+					translate_plural("{} note semitone up", "{} notes semitone up", count), count);
 				break;
 			case 40178:
-				s << "semitone down";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes semitone down"
+				s << format(
+					translate_plural("{} note semitone down", "{} notes semitone down", count), count);
 				break;
 			case 40179:
-				s << "octave up";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes octave up"
+				s << format(
+					translate_plural("{} note octave up", "{} notes octave up", count), count);
 				break;
 			case 40180:
-				s << "octave down";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes octave down"
+				s << format(
+					translate_plural("{} note octave down", "{} notes octave down", count), count);
 				break;
 			case 41026:
-				s << "semitone up ignoring scale";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes semitone up ignoring scale"
+				s << format(
+					translate_plural("{} note semitone up ignoring scale", "{} notes semitone up ignoring scale", count), count);
 				break;
 			case 41027:
-				s << "semitone down ignoring scale";
+				// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes semitone down ignoring scale"
+				s << format(
+					translate_plural("{} note semitone down ignoring scale", "{} notes semitone down ignoring scale", count), count);
 				break;
 			default:
-				s << "pitch changed";
+			// Translators: Used when changing note pitch in the MIDI
+				// editor. {} is replaced by the number of notes, e.g. 
+				// "3 notes pitch changed"
+				s << format(
+					translate_plural("{} note pitch changed", "{} notes pitch changed", count), count);
 				break;
 		}
 	} else{ 
@@ -1336,7 +1419,7 @@ void postMidiMoveStart(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-	auto count = selectedNotes.size();
+	int count = static_cast<int>(selectedNotes.size());
 	if (count == 0) {
 		return;
 	}
@@ -1351,22 +1434,41 @@ void postMidiMoveStart(int command) {
 	if (shouldReportNotes) {
 		ostringstream s;
 		if (generalize) {
-			s << count << (count == 1 ? " note" : " notes ");
 			switch (command) {
 				case 40181:
-					s << "pixel left";
+					// Translators: Used when moving notes in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes pixel left"
+					s << format(
+						translate_plural("{} note pixel left", "{} notes pixel left", count), count);
 					break;
 				case 40182:
-					s << "pixel right";
+				// Translators: Used when moving notes in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes pixel right"
+					s << format(
+						translate_plural("{} note pixel right", "{} notes pixel right", count), count);
 					break;
 				case 40183:
-					s << "grid unit left";
+					// Translators: Used when moving notes in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes grid unit left"
+					s << format(
+						translate_plural("{} note grid unit left", "{} notes grid unit left", count), count);
 					break;
 				case 40184:
-					s << "grid unit right";
+					// Translators: Used when moving notes in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes grid unit right"
+					s << format(
+						translate_plural("{} note grid unit right", "{} notes grid unit right", count), count);
 					break;				
 				default:
-					s << "start moved";
+					// Translators: Used when moving notes in the MIDI
+					// editor. {} is replaced by the number of notes, e.g. 
+					// "3 notes pixel left"
+					s << format(
+						translate_plural("{} note start moved", "{} notes start moved", count), count);
 					break;
 			}
 		} else{ 
@@ -1389,24 +1491,32 @@ void postMidiChangeCCValue(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	auto count = selectedCCs.size();
+	int count = static_cast<int>(selectedCCs.size());
 	if (count == 0) {
 		return;
 	}
 	ostringstream s;
 	if (count > 1) {
-		s << count << " values ";
 		switch (command) {
 			case 40676: {
-				s << "increased";
+				// Translators: Used when MIDI CCs change. {} is replaced by the
+				// number of values changed. E.g. "2 values increased"
+				s << format(
+					translate_plural("{} value increase", "{} values increased", count), count);
 				break;
 			}
 			case 40677: {
-				s << "decreased";
+				// Translators: Used when MIDI CCs change. {} is replaced by the
+				// number of values changed. E.g. "2 values decreased"
+				s << format(
+					translate_plural("{} value decreased", "{} values decreased", count), count);
 				break;
 			}
 			default: {
-				s << "changed";
+				// Translators: Used when MIDI CCs change. {} is replaced by the
+				// number of values changed. E.g. "2 values changed"
+				s << format(
+					translate_plural("{} value changed", "{} values changed", count), count);
 				break;
 			}
 		}
@@ -1443,17 +1553,18 @@ void postMidiSwitchCCLane(int command) {
 }
 
 void postToggleMidiInputsAsStepInput(int command) {
-	ostringstream s;
-	s << (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION),
-		command) ? "enabled" : "disabled");
-	s << " MIDI inputs as step input";
-	outputMessage(s);
+	bool enabled = GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command);
+	if(enabled){
+		outputMessage(translate("Enabled MIDI inputs as step input"));
+	} else {
+		outputMessage(translate("Disabled MIDI inputs as step input"));
+	}
 }
 
 void postToggleFunctionKeysAsStepInput(int command) {
-	ostringstream s;
-	s << (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION),
-		command) ? "enabled" : "disabled");
-	s << " f1-f12 as step input";
-	outputMessage(s);
+	if(GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command)) {
+		outputMessage(translate("Enabled  f1-f12 as step input"));
+	} else {
+		outputMessage(translate("Disabled  f1-f12 as step input"));
+	}
 }
