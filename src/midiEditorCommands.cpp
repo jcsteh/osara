@@ -976,6 +976,9 @@ void cmdMidiMoveToTrack(Command* command) {
 	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
 	if (trackName)
 		s << " " << trackName;
+	// Translators: Used when reporting activation of the next/previous track in
+	// the MIDI editor. {num} will be replaced with the item number. {name} will
+	// be replaced with its name. For example: "item 2 chorus".
 	s << " " << format(
 		translate("item {num} {name}"),
 		"num"_a=itemNum, "name"_a=GetTakeName(take));
@@ -1302,7 +1305,7 @@ void postMidiChangeLength(int command) {
 						translate_plural("{} note made legato", "{} notes made legato", count), count);
 					break;
 				default:
-										// Translators: Used when changing note length in the MIDI
+					// Translators: Used when changing note length in the MIDI
 					// editor. {} is replaced by the number of notes, e.g. 
 					// "3 notes length changed"
 					s << format(
@@ -1553,8 +1556,7 @@ void postMidiSwitchCCLane(int command) {
 }
 
 void postToggleMidiInputsAsStepInput(int command) {
-	bool enabled = GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command);
-	if(enabled){
+	if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command)) {
 		outputMessage(translate("Enabled MIDI inputs as step input"));
 	} else {
 		outputMessage(translate("Disabled MIDI inputs as step input"));
