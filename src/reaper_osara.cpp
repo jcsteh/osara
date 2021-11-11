@@ -1073,10 +1073,25 @@ void postGoToSpecificMarker(int command) {
 			continue;
 		fakeFocus = reg ? FOCUS_REGION : FOCUS_MARKER;
 		ostringstream s;
-		if (name[0])
-			s << name << (reg ? " region " : " marker ");
-		else
-			s << (reg ? "region " : "marker ") << num << " ";
+		if (name[0]){
+			if(reg){
+				// Translators: used when reporting a named region. {} will be
+				// replaced with the name of the region; e.g. "intro region"
+				s << format(translate("{} region"), name);
+			} else {
+				// Translators: used when reporting a named marker. {} will be
+				// replaced with the name of the marker; e.g. "v2 marker"
+				s << format(translate("{} marker"), name);
+			}
+		} else{ // unnamed
+			if(reg){
+				// Translators: used to report an unnamed region. {} is replaced with the region number.  
+				s << format(translate("region {}"), num) << " ";
+			} else {
+				// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+				s << format(translate("marker {}"), num) << " ";
+			}
+		}
 		s << formatCursorPosition();
 		outputMessage(s);
 		return;
@@ -1086,7 +1101,7 @@ void postGoToSpecificMarker(int command) {
 void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
 	if(lastCommand != command) 
-		s << commandMessage;
+		s << commandMessage << " ";
 	s << fixed << setprecision(2);
 	s << VAL2DB(volume);
 	outputMessage(s);
@@ -1097,7 +1112,7 @@ void postChangeTrackVolume(int command) {
 	double volume = 0.0;
 	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeVolumeH(volume, command, "Track ");
+	postChangeVolumeH(volume, command, translate("Track"));
 }
 
 void postChangeMasterTrackVolume(int command) {
@@ -1105,7 +1120,7 @@ void postChangeMasterTrackVolume(int command) {
 	double volume = 0.0;
 	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeVolumeH(volume, command, "Master ");
+	postChangeVolumeH(volume, command, translate("Master"));
 }
 
 void postChangeItemVolume(int command) {
@@ -1113,7 +1128,7 @@ void postChangeItemVolume(int command) {
 	if(!item)
 		return;
 	double volume = GetMediaItemInfo_Value(item, "D_VOL");
-	postChangeVolumeH(volume, command, "Item ");
+	postChangeVolumeH(volume, command, translate("Item"));
 }
 
 void postChangeTakeVolume(int command) {
@@ -1126,7 +1141,7 @@ void postChangeTakeVolume(int command) {
 	}
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
 	volume = fabs(volume);// volume is negative if take polarity is flipped
-	postChangeVolumeH(volume, command, "Take ");
+	postChangeVolumeH(volume, command, translate("Take"));
 }
 
 void postChangeHorizontalZoom(int command) {
@@ -1711,9 +1726,10 @@ void postToggleTrackSoloDefeat(int command) {
 void postChangeTransientDetectionSensitivity(int command) {
 	double sensitivity = *(double*)get_config_var("transientsensitivity",
 		nullptr) * 100;
-	ostringstream s;
-	s << sensitivity << "% sensitivity";
-	outputMessage(s);
+		// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+		// E.g. "13% sensitivity"
+	outputMessage(format(translate(
+		"{:g}% sensitivity"), sensitivity));
 }
 
 void postChangeTransientDetectionThreshold(int command) {
@@ -2948,13 +2964,13 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState,
 }
 
 void cmdReportMutedTracks(Command* command) {
-	reportTracksWithState("Muted", isTrackMuted, /* includeMaster */ true);
+	reportTracksWithState(translate("Muted"), isTrackMuted, /* includeMaster */ true);
 }
 
 void cmdReportSoloedTracks(Command* command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
+	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true,
 		multiLine);
 	string defeat = formatTracksWithState(translate("defeating solo"),
 		isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
@@ -2963,23 +2979,23 @@ void cmdReportSoloedTracks(Command* command) {
 		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
 	}
 	if (multiLine) {
-		reviewMessage("Soloed", s.str().c_str());
+		reviewMessage(translate("Soloed"), s.str().c_str());
 	} else {
 		outputMessage(s);
 	}
 }
 
 void cmdReportArmedTracks(Command* command) {
-	reportTracksWithState("Armed", isTrackArmed, /* includeMaster */ false);
+	reportTracksWithState(translate("Armed"), isTrackArmed, /* includeMaster */ false);
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState("Monitored", isTrackMonitored,
+	reportTracksWithState(translate("Monitored"), isTrackMonitored,
 		/* includeMaster */ false);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState("Phase inverted", isTrackPhaseInverted,
+	reportTracksWithState(translate("Phase inverted"), isTrackPhaseInverted,
 		/* includeMaster */ false);
 }
 
@@ -3311,14 +3327,21 @@ void cmdShowContextMenu3(Command* command) {
 
 void cmdReportAutomationMode(Command* command) {
 	// This reports the global automation override if set, otherwise the current track automation mode.
-	ostringstream s;
 	MediaTrack* track = GetLastTouchedTrack();
-	if (GetGlobalAutomationOverride() >= 0) {
-		s << "global automation override " << automationModeAsString(GetGlobalAutomationOverride());
+	const int globalMode = GetGlobalAutomationOverride() ;
+	if (globalMode >= 0) {
+		// Translators: Used to report global automation override mode.  {} is
+		// replaced with the mode; e.g. "Global automation override latch
+		// preview"
+		outputMessage(format(translate(
+			"global automation override {}"), automationModeAsString(globalMode)));
 	} else {
-		s << "track automation mode " << automationModeAsString(GetTrackAutomationMode(track));
+		// Translators: Used to report track automation override mode.  {} is
+		// replaced with the mode; e.g. "track automation override latch
+		// preview"
+		outputMessage(format(translate(
+			"track automation mode {}"), automationModeAsString(GetTrackAutomationMode(track))));
 	}
-	outputMessage(s);
 }
 
 void cmdToggleGlobalAutomationLatchPreview(Command* command) {
@@ -3344,11 +3367,10 @@ void cmdCycleTrackAutomation(Command* command) {
 	for (int tracknum = 0; tracknum < count; ++tracknum) {
 		SetTrackAutomationMode(GetSelectedTrack2(0, tracknum, true), newmode);
 	}
-	ostringstream s;
-	s << "automation mode ";
-	s << automationModeAsString(newmode);
-	s << " for selected tracks";
-	outputMessage(s);
+	// Translators: Report the track automation mode. {} is replaced with the
+	// automation mode; e.g. "automation mode trim/read for selected tracks"
+	outputMessage(format(translate(
+		"automation mode {} for selected tracks"), automationModeAsString(newmode)));
 }
 
 void cmdCycleMidiRecordingMode(Command* command) {
@@ -3416,10 +3438,13 @@ void cmdNudgeTimeSelection(Command* command) {
 
 void cmdAbout(Command* command) {
 	ostringstream s;
-	s << "OSARA: Open Source Accessibility for the REAPER Application\r\n" <<
-		"Version: " << OSARA_VERSION << "\r\n" <<
+	// Translators: about dialog
+	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
+	// Translators: osara version. {} is replaced with the version; e.g.
+	// "Version: 2021.1pre-588,0531135a"
+		format(translate("Version: {}"), OSARA_VERSION) << "\r\n" <<
 		OSARA_COPYRIGHT;
-	reviewMessage("About OSARA", s.str().c_str());
+	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
 // The Transient Detection Settings dialog deliberately passes most keys to the
@@ -3600,7 +3625,7 @@ void cmdReportTrackGroups(Command* command) {
 		}
 	}
 	if (s.tellp() == 0) {
-		outputMessage("track not grouped");
+		outputMessage(translate("track not grouped"));
 		return;
 	}
 	outputMessage(s);
