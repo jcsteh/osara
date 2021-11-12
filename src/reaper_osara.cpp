@@ -1073,8 +1073,8 @@ void postGoToSpecificMarker(int command) {
 			continue;
 		fakeFocus = reg ? FOCUS_REGION : FOCUS_MARKER;
 		ostringstream s;
-		if (name[0]){
-			if(reg){
+		if (name[0]) {
+			if (reg) {
 				// Translators: used when reporting a named region. {} will be
 				// replaced with the name of the region; e.g. "intro region"
 				s << format(translate("{} region"), name);
@@ -1086,13 +1086,13 @@ void postGoToSpecificMarker(int command) {
 		} else{ // unnamed
 			if(reg){
 				// Translators: used to report an unnamed region. {} is replaced with the region number.  
-				s << format(translate("region {}"), num) << " ";
+				s << format(translate("region {}"), num);
 			} else {
 				// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
-				s << format(translate("marker {}"), num) << " ";
+				s << format(translate("marker {}"), num);
 			}
 		}
-		s << formatCursorPosition();
+		s << " " << formatCursorPosition();
 		outputMessage(s);
 		return;
 	}
@@ -1728,8 +1728,8 @@ void postChangeTransientDetectionSensitivity(int command) {
 		nullptr) * 100;
 		// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
 		// E.g. "13% sensitivity"
-	outputMessage(format(translate(
-		"{:g}% sensitivity"), sensitivity));
+	outputMessage(format(
+		translate("{:g}% sensitivity"), sensitivity));
 }
 
 void postChangeTransientDetectionThreshold(int command) {
@@ -3333,14 +3333,16 @@ void cmdReportAutomationMode(Command* command) {
 		// Translators: Used to report global automation override mode.  {} is
 		// replaced with the mode; e.g. "Global automation override latch
 		// preview"
-		outputMessage(format(translate(
-			"global automation override {}"), automationModeAsString(globalMode)));
+		outputMessage(format(
+			translate("global automation override {}"),
+			automationModeAsString(globalMode)));
 	} else {
 		// Translators: Used to report track automation override mode.  {} is
 		// replaced with the mode; e.g. "track automation override latch
 		// preview"
-		outputMessage(format(translate(
-			"track automation mode {}"), automationModeAsString(GetTrackAutomationMode(track))));
+		outputMessage(format(
+			translate("track automation mode {}"),
+			automationModeAsString(GetTrackAutomationMode(track))));
 	}
 }
 
@@ -3369,8 +3371,9 @@ void cmdCycleTrackAutomation(Command* command) {
 	}
 	// Translators: Report the track automation mode. {} is replaced with the
 	// automation mode; e.g. "automation mode trim/read for selected tracks"
-	outputMessage(format(translate(
-		"automation mode {} for selected tracks"), automationModeAsString(newmode)));
+	outputMessage(format(
+		translate("automation mode {} for selected tracks"),
+		automationModeAsString(newmode)));
 }
 
 void cmdCycleMidiRecordingMode(Command* command) {
@@ -3438,7 +3441,7 @@ void cmdNudgeTimeSelection(Command* command) {
 
 void cmdAbout(Command* command) {
 	ostringstream s;
-	// Translators: about dialog
+	// Translators: OSARA's full name presented in the About dialog.
 	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
 	// Translators: osara version. {} is replaced with the version; e.g.
 	// "Version: 2021.1pre-588,0531135a"
