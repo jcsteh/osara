@@ -1104,7 +1104,7 @@ map<string, string> parseEventData(std::string const& source) {
 	string key, val;
 	istringstream s(source);
 	while(getline(getline(s, key, '='), val, ' ')) {
-        m[key] = val;
+		m[key] = val;
 	}
 	return m;
 }
