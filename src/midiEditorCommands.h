@@ -50,7 +50,7 @@ void cmdMidiNoteSplitOrJoin(Command* command);
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);
-void maybePreviewCurrentNoteInEventList(HWND hwnd);
+void maybeHandleEventListItemFocus(HWND hwnd);
 #endif
 
 void postMidiChangeVelocity(int command);

@@ -3874,6 +3874,7 @@ map<pair<int, int>, Command*> commandsMap;
  ***/
 
 extern bool shouldReportNotes;
+extern bool editCursorShouldFollowEventListFocus;
 extern bool shouldReportSurfaceChanges;
 extern bool shouldReportMarkersWhilePlaying;
 
@@ -3885,6 +3886,8 @@ void loadConfig() {
 	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
 	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
 	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
+	editCursorShouldFollowEventListFocus = GetExtState(CONFIG_SECTION,
+		"editCursorFollowsEventListFocus")[0] == '1';
 	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
 		"reportSurfaceChanges")[0] == '1';
 	shouldMoveFromPlayCursor =
@@ -3909,6 +3912,8 @@ void config_onOk(HWND dialog) {
 	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
 	shouldReportNotes = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_NOTES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportNotes", shouldReportNotes ? "1" : "0", true);
+	editCursorShouldFollowEventListFocus = IsDlgButtonChecked(dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "editCursorFollowsEventListFocus", editCursorShouldFollowEventListFocus ? "1" : "0", true);
 	shouldReportSurfaceChanges = IsDlgButtonChecked(dialog,
 		ID_CONFIG_REPORT_SURFACE_CHANGES) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "reportSurfaceChanges",
@@ -3957,6 +3962,7 @@ void cmdConfig(Command* command) {
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS, editCursorShouldFollowEventListFocus ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
 		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
@@ -4159,7 +4165,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		}
 
 		if (isMidiEditorEventListView(hwnd)) {
-			maybePreviewCurrentNoteInEventList(hwnd);
+			maybeHandleEventListItemFocus(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.

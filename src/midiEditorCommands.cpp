@@ -134,6 +134,7 @@ UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 bool shouldReportNotes = true;
+bool editCursorShouldFollowEventListFocus = false;
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
@@ -1348,7 +1349,7 @@ void cmdMidiFilterWindow(Command *command) {
 	}
 }
 
-void maybePreviewCurrentNoteInEventList(HWND hwnd) {
+void maybeHandleEventListItemFocus(HWND hwnd) {
 	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
 		return;
 	}
@@ -1361,6 +1362,17 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 		return;
 	}
 	auto eventValueMap = parseEventData(eventData);
+	// Check whether this event has a position.
+	auto posIt = eventValueMap.find("pos");
+	if (posIt == eventValueMap.end()) {
+		// no position
+		return;
+	}
+	auto posQn = stof((*posIt).second);
+	auto pos = TimeMap2_QNToTime(nullptr, posQn);
+	if (editCursorShouldFollowEventListFocus) {
+		SetEditCurPos(pos, true, false);
+	}
 	// Check whether this is a note
 	auto lenIt = eventValueMap.find("len");
 	if (lenIt == eventValueMap.end()) {
@@ -1369,9 +1381,8 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 	}
 	MidiNote note;
 	auto lengthQn = stof((*lenIt).second);
-	auto startQn = stof(eventValueMap.at("pos"));
-	auto endQn = startQn + lengthQn;
-	note.start = TimeMap2_QNToTime(nullptr, startQn);
+	auto endQn = posQn + lengthQn;
+	note.start = pos;
 	note.end = TimeMap2_QNToTime(nullptr, endQn);
 	auto msg = stoi(eventValueMap.at("msg"), nullptr, 16);
 	note.pitch = (msg >> 8) & 0xff;
