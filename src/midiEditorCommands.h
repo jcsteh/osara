@@ -10,9 +10,10 @@
 
 const int MIDI_EDITOR_SECTION = 32060;
 
-// This should be called when playback starts, as otherwise, pending note off
+// This can be called when playback starts, as otherwise, pending note off
 // messages for OSARA MIDI preview might interfere with MIDI playback.
-void cancelMidiPreviewNotesOff();
+// On the other hand, if the preview has to be canceled as well, the notesOff parameter can be used.
+void cancelMidiPreviewDoneTimer(bool notesOff=true);
 
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiToggleSelection(Command* command);
