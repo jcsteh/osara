@@ -134,7 +134,9 @@ UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 bool shouldReportNotes = true;
+#ifdef _WIN32
 bool editCursorShouldFollowEventListFocus = false;
+#endif
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
