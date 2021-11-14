@@ -1078,7 +1078,8 @@ void cmdFocusNearestMidiEvent(Command* command) {
 	double cursorPos = GetCursorPosition();
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(focus));
-	for (int i = 0; i < MIDIEditor_GetSetting_int(editor, "list_cnt"); ++i) {
+	auto listCount = MIDIEditor_GetSetting_int(editor, "list_cnt");
+	for (int i = 0; i < listCount; ++i) {
 		auto setting = format("list_{}", i);
 		char eventData[255] = "\0";
 		if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
