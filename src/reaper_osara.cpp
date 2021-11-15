@@ -71,6 +71,7 @@ bool shouldMoveFromPlayCursor = false;
 
 /*** Utilities */
 
+bool muteNextMessage = false;
 #ifdef _WIN32
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
@@ -94,6 +95,9 @@ string narrow(const wstring& text) {
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		return;
+	}
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;
@@ -125,6 +129,9 @@ void outputMessage(const string& message, bool interrupt) {
 #else // _WIN32
 
 void outputMessage(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		return;
+	}
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
@@ -3634,6 +3641,10 @@ void cmdReportTrackGroups(Command* command) {
 	outputMessage(s);
 }
 
+void cmdMuteNextMessage(Command* command){
+	muteNextMessage = true;
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3774,6 +3785,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -4005,12 +4017,16 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		lastCommand = it->second->gaccel.accel.cmd;
 		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
+		if(it->second->execute != cmdMuteNextMessage) {
+			muteNextMessage = false;
+		} 
 		return true;
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
 	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {
+				muteNextMessage = false;
 		return true;
 	}
 	return false;
@@ -4024,9 +4040,14 @@ bool handleMainCommandFallback(int command, int flag) {
 		isHandlingCommand = true;
 		it->second->execute(it->second);
 		isHandlingCommand = false;
+		if(it->second->execute != cmdMuteNextMessage) {
+			muteNextMessage = false;
+		} 
 		return true;
-	} else if (handlePostCommand(MAIN_SECTION, command))
+	} else if (handlePostCommand(MAIN_SECTION, command)){
+		muteNextMessage = false;
 		return true;
+	}
 	return false;
 }
 
