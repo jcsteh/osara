@@ -1362,15 +1362,15 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	if (!shouldPreviewNotes && !editCursorShouldFollowEventListFocus) {
 		return;
 	}
+	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	if (childId == CHILDID_SELF) {
-		if (editCursorShouldFollowEventListFocus) {
+		if (editCursorShouldFollowEventListFocus && focused == -1) {
 			focusNearestMidiEvent(hwnd);
 		}
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
-	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	auto setting = format("list_{}", focused);
 	char eventData[255] = "\0";
 	if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
