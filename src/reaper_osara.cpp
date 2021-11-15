@@ -4026,7 +4026,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		return true;
 	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {
-				muteNextMessage = false;
+		muteNextMessage = false;
 		return true;
 	}
 	return false;
