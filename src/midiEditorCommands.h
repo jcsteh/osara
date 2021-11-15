@@ -10,10 +10,16 @@
 
 const int MIDI_EDITOR_SECTION = 32060;
 
-// This can be called when playback starts, as otherwise, pending note off
+// Stops the notes currently being previewed.
+// If sendNoteOff is true, note off messages are sent immediately.
+// This is used to silence the preview.
+// If sendNoteOff is false, note off messages are queued but not yet sent.
+// This is used when stopping a note preview that is immediately followed by a new preview.
+void previewNotesOff(bool sendNoteOff=true);
+
+// This must be called when playback starts, as otherwise, pending note off
 // messages for OSARA MIDI preview might interfere with MIDI playback.
-// On the other hand, if the preview has to be canceled as well, the notesOff parameter can be used.
-void cancelMidiPreviewDoneTimer(bool notesOff=true);
+bool cancelMidiPreviewDoneTimer();
 
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiToggleSelection(Command* command);

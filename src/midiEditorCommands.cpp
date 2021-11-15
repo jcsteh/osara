@@ -142,17 +142,19 @@ PreviewSource previewSource;
 preview_register_t previewReg = {0};
 
 // Queue note off events for the notes currently being previewed.
-// This function also sends the events.
-void previewNotesOff() {
+// when sendNoteOff is true, this function  also sends the events.
+void previewNotesOff(bool sendNoteOff) {
 	for (auto note = previewingNotes.cbegin(); note != previewingNotes.cend(); ++note) {
 		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_OFF | note->channel),
 			(unsigned char)note->pitch, (unsigned char)note->velocity}};
 		previewSource.events.push_back(event);
 	}
-	// Send the events.
-	previewReg.curpos = 0.0;
-	PlayTrackPreview(&previewReg);
+	if (sendNoteOff) {
+		// Send the events.
+		previewReg.curpos = 0.0;
+		PlayTrackPreview(&previewReg);
+	}
 	previewingNotes.clear();
 }
 
@@ -161,7 +163,9 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	if (event != previewDoneTimer) {
 		return; // Cancelled.
 	}
-	cancelMidiPreviewDoneTimer(true);
+	if (cancelMidiPreviewDoneTimer()) {
+		previewNotesOff(true);
+	}
 }
 
 // Used to find out the minimum note length.
@@ -184,7 +188,9 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewReg.m_out_chan = -1; // Use .preview_track.
 	}
 	// Stop the current preview.
-	cancelMidiPreviewDoneTimer(true);
+	if (cancelMidiPreviewDoneTimer()) {
+		previewNotesOff(false);
+	}
 	// Queue note on events for the new notes.
 	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
 		MIDI_event_t event = {0, 3, {
@@ -206,14 +212,13 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
 }
 
-void cancelMidiPreviewDoneTimer(bool notesOff) {
+bool cancelMidiPreviewDoneTimer() {
 	if (previewDoneTimer) {
 		KillTimer(nullptr, previewDoneTimer);
 		previewDoneTimer = 0;
-		if (notesOff) {
-			previewNotesOff();
-		}
+		return true;
 	}
+	return false;
 }
 
 void cmdMidiMoveCursor(Command* command) {

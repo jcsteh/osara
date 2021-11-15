@@ -95,7 +95,7 @@ class Surface: public IReaperControlSurface {
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
 		if (play) {
-			cancelMidiPreviewDoneTimer(false);
+			cancelMidiPreviewDoneTimer();
 		}
 		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;

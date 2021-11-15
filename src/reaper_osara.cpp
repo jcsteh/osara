@@ -2285,7 +2285,7 @@ bool maybeFixTabInSaveDialog(bool previous) {
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	const bool isKeyDown = !(lParam & 0x80000000);\
+	const bool isKeyDown = !(lParam & 0x80000000);
 	if (!isKeyDown || code != HC_ACTION || (
 		wParam != VK_APPS && wParam != VK_RETURN &&
 				wParam != VK_F6 && wParam != 'B' &&
@@ -2312,7 +2312,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		return 1;
 	}
 	if (wParam == VK_CONTROL) {
-		cancelMidiPreviewDoneTimer(true);
+		if (cancelMidiPreviewDoneTimer()) {
+			previewNotesOff(true);
+		}
 		return 1;
 	}
 	const bool isContextMenu = wParam == VK_APPS ||
