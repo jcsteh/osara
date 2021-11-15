@@ -4173,7 +4173,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		}
 
 		if (isMidiEditorEventListView(hwnd)) {
-			maybeHandleEventListItemFocus(hwnd);
+			maybeHandleEventListItemFocus(hwnd, childId);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.

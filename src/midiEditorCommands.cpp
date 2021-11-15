@@ -1301,13 +1301,10 @@ map<string, string> parseEventData(string const& source) {
 	return m;
 }
 
-void cmdFocusNearestMidiEvent(Command* command) {
-	HWND focus = GetFocus();
-	if (!focus)
-		return;
+void focusNearestMidiEvent(HWND hwnd) {
 	double cursorPos = GetCursorPosition();
 	HWND editor = MIDIEditor_GetActive();
-	assert(editor == GetParent(focus));
+	assert(editor == GetParent(hwnd));
 	auto listCount = MIDIEditor_GetSetting_int(editor, "list_cnt");
 	for (int i = 0; i < listCount; ++i) {
 		auto setting = format("list_{}", i);
@@ -1326,19 +1323,28 @@ void cmdFocusNearestMidiEvent(Command* command) {
 		auto eventPos = TimeMap2_QNToTime(nullptr, eventPosQn);
 		if (eventPos >= cursorPos) {
 			// This item is at or just after the cursor.
-			int oldFocus = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
-			// Focus and select this item.
-			ListView_SetItemState(focus, i,
-				LVIS_FOCUSED | LVIS_SELECTED, LVIS_FOCUSED | LVIS_SELECTED);
-			ListView_EnsureVisible (focus, i, false);
+			int oldFocus = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+			int lvBitMask = LVIS_FOCUSED | LVIS_SELECTED;
+			// select and focus this item
+			ListView_SetItemState(hwnd, i,
+				lvBitMask, lvBitMask);
+			ListView_EnsureVisible (hwnd, i, false);
 			if (oldFocus != -1 && oldFocus != i) {
 				// Unselect the previously focused item.
-				ListView_SetItemState(focus, oldFocus,
+				ListView_SetItemState(hwnd, oldFocus,
 					0, LVIS_SELECTED);
 			}
 			break;
 		}
 	}
+}
+
+void cmdFocusNearestMidiEvent(Command* command) {
+	HWND hwnd= GetFocus();
+	if (!hwnd) {
+		return;
+	}
+	focusNearestMidiEvent(hwnd);
 }
 
 void cmdMidiFilterWindow(Command *command) {
@@ -1351,13 +1357,20 @@ void cmdMidiFilterWindow(Command *command) {
 	}
 }
 
-void maybeHandleEventListItemFocus(HWND hwnd) {
-	if (!GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041)) {  // Options: Preview notes when inserting or editing
+void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
+	bool shouldPreviewNotes = GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041);  // Options: Preview notes when inserting or editing
+	if (!shouldPreviewNotes && !editCursorShouldFollowEventListFocus) {
 		return;
 	}
-	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	if (childId == CHILDID_SELF) {
+		if (editCursorShouldFollowEventListFocus) {
+			focusNearestMidiEvent(hwnd);
+		}
+		return;
+	}
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
+	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	auto setting = format("list_{}", focused);
 	char eventData[255] = "\0";
 	if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
@@ -1374,6 +1387,9 @@ void maybeHandleEventListItemFocus(HWND hwnd) {
 	auto pos = TimeMap2_QNToTime(nullptr, posQn);
 	if (editCursorShouldFollowEventListFocus) {
 		SetEditCurPos(pos, true, false);
+	}
+	if (!shouldPreviewNotes) {
+		return;
 	}
 	// Check whether this is a note
 	auto lenIt = eventValueMap.find("len");
