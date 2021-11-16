@@ -2312,7 +2312,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		return 1;
 	}
 	if (wParam == VK_CONTROL) {
-		if (cancelMidiPreviewDoneTimer()) {
+		if (cancelPendingMidiPreviewNotesOff()) {
 			previewNotesOff(true);
 		}
 		return 1;

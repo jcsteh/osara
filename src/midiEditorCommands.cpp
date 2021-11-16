@@ -164,7 +164,7 @@ void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	if (event != previewDoneTimer) {
 		return; // Cancelled.
 	}
-	bool canceled = cancelMidiPreviewNotesOff();
+	bool canceled = cancelPendingMidiPreviewNotesOff();
 	assert(canceled);
 	previewNotesOff(true);
 }
@@ -189,7 +189,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewReg.m_out_chan = -1; // Use .preview_track.
 	}
 	// Stop the current preview.
-	if (cancelMidiPreviewNotesOff()) {
+	if (cancelPendingMidiPreviewNotesOff()) {
 		previewNotesOff(false);
 	}
 	// Queue note on events for the new notes.
@@ -213,7 +213,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
 }
 
-bool cancelMidiPreviewNotesOff() {
+bool cancelPendingMidiPreviewNotesOff() {
 	if (previewDoneTimer) {
 		KillTimer(nullptr, previewDoneTimer);
 		previewDoneTimer = 0;

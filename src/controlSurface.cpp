@@ -95,7 +95,7 @@ class Surface: public IReaperControlSurface {
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
 		if (play) {
-			cancelMidiPreviewNotesOff();
+			cancelPendingMidiPreviewNotesOff();
 		}
 		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
