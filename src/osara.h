@@ -55,6 +55,7 @@
 #define REAPERAPI_WANT_Undo_CanRedo2
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_parse_timestr_pos
+#define REAPERAPI_WANT_TimeMap2_QNToTime
 #define REAPERAPI_WANT_GetMasterTrackVisibility
 #define REAPERAPI_WANT_SetMasterTrackVisibility
 #define REAPERAPI_WANT_SetCursorContext
@@ -98,6 +99,7 @@
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
 #define REAPERAPI_WANT_MIDIEditor_GetActive
 #define REAPERAPI_WANT_MIDIEditor_GetTake
+#define REAPERAPI_WANT_MIDIEditor_GetSetting_str
 #define REAPERAPI_WANT_MIDI_CountEvts
 #define REAPERAPI_WANT_MIDI_GetNote
 #define REAPERAPI_WANT_MIDI_SetNote

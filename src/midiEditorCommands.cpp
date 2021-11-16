@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <cassert>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "translation.h"
@@ -1062,17 +1063,39 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 }
 
 #ifdef _WIN32
+map<string, string> parseEventData(string const& source) {
+	map<string, string> m;
+	string key, val;
+	istringstream s(source);
+	while(getline(getline(s, key, '='), val, ' ')) {
+		m[key] = val;
+	}
+	return m;
+}
+
 void cmdFocusNearestMidiEvent(Command* command) {
 	HWND focus = GetFocus();
 	if (!focus)
 		return;
 	double cursorPos = GetCursorPosition();
-	for (int i = 0; i < ListView_GetItemCount(focus); ++i) {
-		char text[50];
-		// Get the text from the position column (1).
-		ListView_GetItemText(focus, i, 1, text, sizeof(text));
-		// Convert this to project time. text is always in measures.beats.
-		double eventPos = parse_timestr_pos(text, 2);
+	HWND editor = MIDIEditor_GetActive();
+	assert(editor == GetParent(focus));
+	auto listCount = MIDIEditor_GetSetting_int(editor, "list_cnt");
+	for (int i = 0; i < listCount; ++i) {
+		auto setting = format("list_{}", i);
+		char eventData[255] = "\0";
+		if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
+			continue;
+		}
+		auto eventValueMap = parseEventData(eventData);
+		// Check whether this event has a position
+		auto posIt = eventValueMap.find("pos");
+		if (posIt == eventValueMap.end()) {
+			// no position
+			continue;
+		}
+		auto eventPosQn = stof((*posIt).second);
+		auto eventPos = TimeMap2_QNToTime(nullptr, eventPosQn);
 		if (eventPos >= cursorPos) {
 			// This item is at or just after the cursor.
 			int oldFocus = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
@@ -1105,64 +1128,30 @@ void maybePreviewCurrentNoteInEventList(HWND hwnd) {
 		return;
 	}
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
-	char text[50] = "\0";
-	// Get the text from the length column (2).
-	// If this column is empty, we aren't dealing with a note.
-	ListView_GetItemText(hwnd, focused, 2, text, sizeof(text));
-	if (!text[0]) {
+	HWND editor = MIDIEditor_GetActive();
+	assert(editor == GetParent(hwnd));
+	auto setting = format("list_{}", focused);
+	char eventData[255] = "\0";
+	if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
+		return;
+	}
+	auto eventValueMap = parseEventData(eventData);
+	// Check whether this is a note
+	auto lenIt = eventValueMap.find("len");
+	if (lenIt == eventValueMap.end()) {
+		// No Note
 		return;
 	}
 	MidiNote note;
-	// Convert length to project time. text is always in measures.beats.
-	auto length = parse_timestr_len(text, 0, 2);
-	text[0] = '\0';
-	// Get the text from the position column (1).
-	ListView_GetItemText(hwnd, focused, 1, text, sizeof(text));
-	// Convert this to project time. text is always in measures.beats.
-	note.start = parse_timestr_pos(text, 2);
-	note.end = note.start + length;
-	text[0] = '\0';
-	// Get the text from the channel column (3).
-	ListView_GetItemText(hwnd, focused, 3, text, sizeof(text));
-	note.channel = atoi(text) -1;
-	text[0] = '\0';
-	// Get the text from the parameter (note name) column (5).
-	ListView_GetItemText(hwnd, focused, 5, text, sizeof(text));
-	string noteNameWithOctave { text };
-	static const string noteNames[] = {"C", "C#", "D", "D#", "E", "F",
-		"F#", "G", "G#", "A", "A#", "B"};
-	// Loop through noteNames in reverse order so the sharp notes are handled first.
-	bool found = false;
-	for (int i = static_cast<int>(size(noteNames)) -1; i >= 0; --i) {
-		auto noteNameLength = noteNames[i].length();
-		if (noteNameWithOctave.compare(0, noteNameLength, noteNames[i]) != 0) {
-			continue;
-		}
-		found = true;
-		// The octave is a number in the range -1 up and until 9.
-		// Therefore, the number counts either one or two characters in noteNameWithOctave.
-		// If the note is explicitly named, the name comes after the octave and a space.
-		// As stoi simply ignores whitespace or the end of a string, all possible appearances should be covered.
-		int octave;
-		try {
-			octave = stoi(noteNameWithOctave.substr(noteNameLength, 2));
-		} catch (invalid_argument) {
-			// If a REAPER language pack translates note names, we might get something
-			// unexpected here. There's nothing we can do to compensate, so just
-			// gracefully ignore this.
-			continue;
-		}
-		note.pitch = ((octave + 1) * 12) + i;
-		break;
-	}
-	if (!found) {
-		return; // Note not found.
-	}
-	text[0] = '\0';
-	// Get the text from the value (velocity) column (6).
-	ListView_GetItemText(hwnd, focused, 6, text, sizeof(text));
-	note.velocity = atoi(text);
-	HWND editor = MIDIEditor_GetActive();
+	auto lengthQn = stof((*lenIt).second);
+	auto startQn = stof(eventValueMap.at("pos"));
+	auto endQn = startQn + lengthQn;
+	note.start = TimeMap2_QNToTime(nullptr, startQn);
+	note.end = TimeMap2_QNToTime(nullptr, endQn);
+	auto msg = stoi(eventValueMap.at("msg"), nullptr, 16);
+	note.pitch = (msg >> 8) & 0xff;
+	note.channel = (msg >> 16) &0xf;
+	note.velocity = msg & 0xff;
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	previewNotes(take, {note});
 }
