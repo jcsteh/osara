@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2021-11-05 13:08\n"
+"PO-Revision-Date: 2021-11-16 11:12\n"
 
 msgid "volume"
 msgstr "volume"
@@ -43,21 +43,27 @@ msgstr "master"
 
 #. Reported when moving to a named project marker. {} will
 #. be replaced with the marker's name; e.g. "intro marker".
+#. used when reporting a named marker. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker"
 msgid "{} marker"
 msgstr "{} Marqueur"
 
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
+#. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
 msgstr "marqueur {}"
 
 #. Reported when playback reaches a named region. {} will
 #. be replaced with the region's name; e.g. "intro region".
+#. used when reporting a named region. {} will be
+#. replaced with the name of the region; e.g. "intro region"
 msgid "{} region"
 msgstr "{} région"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
+#. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
 msgstr "région {}"
 
@@ -179,6 +185,13 @@ msgstr "active"
 msgid "{} tab"
 msgstr "{} onglet"
 
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} note"
+msgid_plural "{} notes"
+msgstr[0] "{} note"
+msgstr[1] "{} notes"
+
 #. The name of a musical note.
 msgid "c"
 msgstr "do"
@@ -230,6 +243,22 @@ msgstr "si"
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
 
+#. Used when events are deleted in the MIDI editor. {} is
+#. replaced by the number of events. E.g. "3 events removed"
+msgid "{} event removed"
+msgid_plural "{} events removed"
+msgstr[0] "{} événement supprimé"
+msgstr[1] "{} événements supprimés"
+
+#. used when notes are selected in the MIDI editor.
+#. {} is replaced by the number of notes. E.g. "4 notes selected"
+#. used when notes are selected in the MIDI editor.
+#. {} is replaced by the number of notes. E.g. "4 notes selected"
+msgid "{} note selected"
+msgid_plural "{} notes selected"
+msgstr[0] "{} note sélectionnée"
+msgstr[1] "{} notes sélectionnées"
+
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
@@ -237,11 +266,458 @@ msgid_plural "{} events selected"
 msgstr[0] "{} événement sélectionné"
 msgstr[1] "{} événements sélectionné"
 
+msgid "Bank Select MSB"
+msgstr "Banque MSB sélectionnée"
+
+msgid "Mod Wheel MSB"
+msgstr "Roue de modulation"
+
+msgid "Breath MSB"
+msgstr "Souffle MSB"
+
+msgid "Foot Pedal MSB"
+msgstr "Pédale MSB"
+
+msgid "Portamento MSB"
+msgstr "Portamento MSB"
+
+msgid "Data Entry MSB"
+msgstr "Saisie des données MSB"
+
+msgid "Volume MSB"
+msgstr "Volume MSB"
+
+msgid "Balance MSB"
+msgstr "Balance MSB"
+
+msgid "Pan Position MSB"
+msgstr "Position du panoramique MSB"
+
+msgid "Expression MSB"
+msgstr "Expression MSB"
+
+msgid "Control 1 MSB"
+msgstr "Contrôle 1 MSB"
+
+msgid "Control 2 MSB"
+msgstr "Contrôle 2 MSB"
+
+msgid "GP Slider 1"
+msgstr "Curseur GP 1"
+
+msgid "GP Slider 2"
+msgstr "Curseur GP 2"
+
+msgid "GP Slider 3"
+msgstr "Curseur GP 3"
+
+msgid "GP Slider 4"
+msgstr "Curseur GP 4"
+
+msgid "Bank Select LSB"
+msgstr "Sélection de banque LSB"
+
+msgid "Mod Wheel LSB"
+msgstr "Molette de modulation LSB"
+
+msgid "Breath LSB"
+msgstr "Souffle LSB"
+
+msgid "Foot Pedal LSB"
+msgstr "Pédale LSB"
+
+msgid "Portamento LSB"
+msgstr "Portamento LSB"
+
+msgid "Data Entry LSB"
+msgstr "Saisie de données LSB"
+
+msgid "Volume LSB"
+msgstr "Volume LSB"
+
+msgid "Balance LSB"
+msgstr "Balance LSB"
+
+msgid "Pan Position LSB"
+msgstr "Position du panoramique LSB"
+
+msgid "Expression LSB"
+msgstr "Expression LSB"
+
+msgid "Control 1 LSB"
+msgstr "Contrôle 1 LSB"
+
+msgid "Control 2 LSB"
+msgstr "Contrôle 2 LSB"
+
+msgid "Hold Pedal (on/off)"
+msgstr "Maintenir la pédale (actif/inactif)"
+
+msgid "Portamento (on/off)"
+msgstr "Portamento (actif/inactif)"
+
+msgid "Sostenuto (on/off)"
+msgstr "Sostenuto (actif/inactif)"
+
+msgid "Soft Pedal (on/off)"
+msgstr "Pédale étouffoirs (actif/inactif)"
+
+msgid "Legato Pedal (on/off)"
+msgstr "Pédale Legato (actif/inactif)"
+
+msgid "Hold 2 Pedal (on/off)"
+msgstr "Maintenir 2 pédales (actif/inactif)"
+
+msgid "Sound Variation"
+msgstr "Variation sonore"
+
+msgid "Timbre/Resonance"
+msgstr "Timbre/Résonance"
+
+msgid "Sound Release"
+msgstr "Relâchement du son"
+
+msgid "Sound Attack"
+msgstr "Attaque sonore"
+
+msgid "Brightness/Cutoff Freq"
+msgstr "Luminosité/Fréquence de coupure"
+
+msgid "Sound Control 6"
+msgstr "Contrôle du son 6"
+
+msgid "Sound Control 7"
+msgstr "Contrôle du son 7"
+
+msgid "Sound Controll 8"
+msgstr "Contrôle du son 8"
+
+msgid "Sound Control 9"
+msgstr "Contrôle du son 9"
+
+msgid "Sound Control 10"
+msgstr "Contrôle du son 10"
+
+msgid "GP Button 1 (on/off)"
+msgstr "Bouton GP 1 (actif/inactif)"
+
+msgid "GP Button 2 (on/off)"
+msgstr "Bouton GP 2 (actif/inactif)"
+
+msgid "GP Button 3 (on/off)"
+msgstr "Bouton GP 3 (actif/inactif)"
+
+msgid "GP Button 4 (on/off)"
+msgstr "Bouton GP 4 (actif/inactif)"
+
+msgid "Effects Level"
+msgstr "Niveau des Fx"
+
+msgid "Tremolo Level"
+msgstr "Niveau du trémolo"
+
+msgid "Chorus Level"
+msgstr "Niveau du Chorus"
+
+msgid "Celeste Level"
+msgstr "Niveau du Celeste"
+
+msgid "Phaser Level"
+msgstr "Niveau du Phaser"
+
+msgid "Data Button Inc"
+msgstr "Bouton de données Inc"
+
+msgid "Data Button Dec"
+msgstr "Bouton de données Dec"
+
+msgid "Non-Reg Parm LSB"
+msgstr "Non-Reg Parm LSB"
+
+msgid "Non-Reg Parm MSB"
+msgstr "Non-Reg Parm MSB"
+
+msgid "Reg Parm LSB"
+msgstr "Reg Parm LSB"
+
+msgid "Reg Parm MSB"
+msgstr "Reg Parm MSB"
+
+msgid "All Sound Off"
+msgstr "Tous les sons désactivés"
+
+msgid "Reset"
+msgstr "Réinitialiser"
+
+msgid "Local"
+msgstr "Local"
+
+msgid "All Notes Off"
+msgstr "Toutes les notes désactivées"
+
+msgid "Omni On"
+msgstr "Omni activé"
+
+msgid "Omni Off"
+msgstr "Omni désactivé"
+
+msgid "Mono On"
+msgstr "Mono activé"
+
+msgid "Poly On"
+msgstr "Poly activé"
+
+#. MIDI poly aftertouch. {note} will be replaced with the note
+#. name and {value} will be replaced with the aftertouch value; e.g.
+#. "Poly Aftertouch c sharp 4  96"
+msgid "Poly Aftertouch {note}  {value}"
+msgstr "Poly Aftertouch {note}  {value}"
+
+#. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+msgid "Control {control}, {value}"
+msgstr "Contrôle {control}, {value}"
+
+msgid "Program {}"
+msgstr "Programme {}"
+
+msgid "Channel pressure {}"
+msgstr "Pression du canal {}"
+
+#. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
+msgid "Pitch Bend {}"
+msgstr "Pitch Bend {}"
+
+#. Used when reporting activation of the next/previous track in
+#. the MIDI editor. {num} will be replaced with the item number. {name} will
+#. be replaced with its name. For example: "item 2 chorus".
+msgid "item {num} {name}"
+msgstr "objet {num} {name}"
+
 msgid "no time selection"
 msgstr "aucune sélection temporelle"
 
 msgid "no notes selected"
 msgstr "aucune note n'est sélectionnée"
+
+#. used when splitting notes in the midi editor.
+#. {oldCount} is replaced by the number of notes that were selected
+#. before the command.  This is the number the plural form is based
+#. on. {newCount} is replaced by the number of selected notes after
+#. the command. E.g. "1 note split into 2"
+msgid "{oldCount} note split into {newCount}"
+msgid_plural "{oldCount} notes split into {newCount}"
+msgstr[0] "{oldCount} note scindée en {newCount}"
+msgstr[1] "{oldCount} notes scindées en {newCount}"
+
+#. used when joining notes in the midi editor.
+#. {oldCount} is replaced by the number of notes that were selected
+#. before the command.  This is the number the plural form is based
+#. on. {newCount} is replaced by the number of selected notes after
+#. the command. E.g. "2 notes joined into 1"
+msgid "{oldCount} note joined into {newCount}"
+msgid_plural "{oldCount} notes joined into {newCount}"
+msgstr[0] "{oldCount} note joine à {newCount}"
+msgstr[1] "{oldCount} notes joines aux {newCount}"
+
+msgid "velocity +1"
+msgstr "vélocité +1"
+
+msgid "velocity +10"
+msgstr "vélocité +10"
+
+msgid "velocity -1"
+msgstr "vélocité -1"
+
+msgid "velocity -10"
+msgstr "vélocité -10"
+
+msgid "velocity changed"
+msgstr "vélocité changée"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. "3
+#. notes lengthened pixel"
+msgid "{} note lengthened pixel"
+msgid_plural "{} notes lengthened pixel"
+msgstr[0] "{} note allongée d'un pixel"
+msgstr[1] "{} notes allongées d'un pixel"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. "3
+#. notes shortened pixel"
+msgid "{} note shortened pixel"
+msgid_plural "{} notes shortened pixel"
+msgstr[0] "{} note raccourci d'un pixel"
+msgstr[1] "{} notes raccourcis d'un pixel"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes lengthened grid unit"
+msgid "{} note lengthened grid unit"
+msgid_plural "{} notes lengthened grid unit"
+msgstr[0] "{} note allongée d'une unité de grille"
+msgstr[1] "{} notes allongées d'une unité de grille"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes shortened grid unit"
+msgid "{} note shortened grid unit"
+msgid_plural "{} notes shortened grid unit"
+msgstr[0] "{} note raccourcie d'une unité de grille"
+msgstr[1] "{} notes raccourcies d'une unité de grille"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes set length to grid size"
+msgid "{} note set length to grid size"
+msgid_plural "{} notes length set to grid size"
+msgstr[0] "{} note définie selon la longueur de division de la grille"
+msgstr[1] "{} notes définies selon la longueur de division de la grille"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes made legato"
+msgid "{} note made legato"
+msgid_plural "{} notes made legato"
+msgstr[0] "{} note en legato"
+msgstr[1] "{} notes en legato"
+
+#. Used when changing note length in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes length changed"
+msgid "{} note length changed"
+msgid_plural "{} notes length changed"
+msgstr[0] "{} note dont la longueur est modifiée"
+msgstr[1] "{} notes dont la longueur est modifiées"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes semitone up"
+msgid "{} note semitone up"
+msgid_plural "{} notes semitone up"
+msgstr[0] "{} note un demi-ton vers le haut"
+msgstr[1] "{} notes un demi-ton vers le haut"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes semitone down"
+msgid "{} note semitone down"
+msgid_plural "{} notes semitone down"
+msgstr[0] "{} note un demi-ton vers le bas"
+msgstr[1] "{} notes un demi-ton vers le bas"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes octave up"
+msgid "{} note octave up"
+msgid_plural "{} notes octave up"
+msgstr[0] "{} note un octave vers le haut"
+msgstr[1] "{} notes un octave vers le haut"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes octave down"
+msgid "{} note octave down"
+msgid_plural "{} notes octave down"
+msgstr[0] "{} note un octave vers le bas"
+msgstr[1] "{} notes un octave vers le bas"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes semitone up ignoring scale"
+msgid "{} note semitone up ignoring scale"
+msgid_plural "{} notes semitone up ignoring scale"
+msgstr[0] "{} note un demi-ton vers le haut en ignorant la gamme"
+msgstr[1] "{} notes un demi-ton vers le haut en ignorant la gamme"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes semitone down ignoring scale"
+msgid "{} note semitone down ignoring scale"
+msgid_plural "{} notes semitone down ignoring scale"
+msgstr[0] "{} note un demi-ton vers le bas en ignorant la gamme"
+msgstr[1] "{} notes un demi-ton vers le bas en ignorant la gamme"
+
+#. Used when changing note pitch in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes pitch changed"
+msgid "{} note pitch changed"
+msgid_plural "{} notes pitch changed"
+msgstr[0] "{} note dont la hauteur tonale est modifiée"
+msgstr[1] "{} notes dont la hauteur tonale est modifiée"
+
+#. Used when moving notes in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes pixel left"
+msgid "{} note pixel left"
+msgid_plural "{} notes pixel left"
+msgstr[0] "{} note déplacée d'un pixel vers la gauche"
+msgstr[1] "{} notes déplacées d'un pixel vers la gauche"
+
+#. Used when moving notes in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes pixel right"
+msgid "{} note pixel right"
+msgid_plural "{} notes pixel right"
+msgstr[0] "{} note déplacée d'un pixel à droite"
+msgstr[1] "{} note déplacée d'un pixel à droite"
+
+#. Used when moving notes in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes grid unit left"
+msgid "{} note grid unit left"
+msgid_plural "{} notes grid unit left"
+msgstr[0] "{} note déplacée d'une unité de grille vers la gauche"
+msgstr[1] "{} notes déplacées d'une unité de grille vers la gauche"
+
+#. Used when moving notes in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes grid unit right"
+msgid "{} note grid unit right"
+msgid_plural "{} notes grid unit right"
+msgstr[0] "{} note déplacée vers la droite sur la grille"
+msgstr[1] "{} notes déplacées vers la droite sur la grille"
+
+#. Used when moving notes in the MIDI
+#. editor. {} is replaced by the number of notes, e.g. 
+#. "3 notes pixel left"
+msgid "{} note start moved"
+msgid_plural "{} notes start moved"
+msgstr[0] "{} note du début déplacée"
+msgstr[1] "{} notes du début déplacées"
+
+#. Used when MIDI CCs change. {} is replaced by the
+#. number of values changed. E.g. "2 values increased"
+msgid "{} value increase"
+msgid_plural "{} values increased"
+msgstr[0] "{} valeur augmentée"
+msgstr[1] "{} valeurs augmentées"
+
+#. Used when MIDI CCs change. {} is replaced by the
+#. number of values changed. E.g. "2 values decreased"
+msgid "{} value decreased"
+msgid_plural "{} values decreased"
+msgstr[0] "{} valeur diminuée"
+msgstr[1] "{} valeurs diminuées"
+
+#. Used when MIDI CCs change. {} is replaced by the
+#. number of values changed. E.g. "2 values changed"
+msgid "{} value changed"
+msgid_plural "{} values changed"
+msgstr[0] "{} valeur modifiée"
+msgstr[1] "{} valeurs modifiées"
+
+msgid "Enabled MIDI inputs as step input"
+msgstr "Entrées MIDI activées comme entrée pas à pas"
+
+msgid "Disabled MIDI inputs as step input"
+msgstr "Entrées MIDI désactivées comme entrée pas à pas"
+
+msgid "Enabled  f1-f12 as step input"
+msgstr "Activé f1 à f12 comme entrée pas à pas"
+
+msgid "Disabled  f1-f12 as step input"
+msgstr "Désactivé f1 à f12 comme entrée pas à pas"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -723,10 +1199,10 @@ msgid "all tracks FX active"
 msgstr "fX de toutes les pistes, activées"
 
 msgid "enabled delta solo"
-msgstr ""
+msgstr "delta solo activé"
 
 msgid "disabled delta solo"
-msgstr ""
+msgstr "delta solo désactivé"
 
 msgid "no selected items"
 msgstr "aucun Objets n'est sélectionné"
@@ -789,6 +1265,18 @@ msgstr "début de la boucle"
 #. loop end point.
 msgid "loop end"
 msgstr "fin de la boucle"
+
+msgid "Track"
+msgstr "Piste"
+
+msgid "Master"
+msgstr "Master"
+
+msgid "Item"
+msgstr "Objet"
+
+msgid "Take"
+msgstr "Prise"
 
 #. Reported when zooming in or out horizontally. {:g} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -1058,6 +1546,11 @@ msgstr[1] "{} pistes sélectionnées"
 msgid "not defeating solo"
 msgstr "solo défait désactivé"
 
+#. report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+#. E.g. "13% sensitivity"
+msgid "{:g}% sensitivity"
+msgstr "{:g}% de sensibilité"
+
 #. Reported when changing the transient detection threshold.
 #. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
 msgid "{:g} dB threshold"
@@ -1266,6 +1759,21 @@ msgstr "piste, Objet, enveloppe, désélectionné"
 msgid "[Unsaved]"
 msgstr "[Pas sauvegardé]"
 
+msgid "Muted"
+msgstr "En sourdine"
+
+msgid "Soloed"
+msgstr "En solo"
+
+msgid "Armed"
+msgstr "Armée"
+
+msgid "Monitored"
+msgstr "Monitoré"
+
+msgid "Phase inverted"
+msgstr "Phase inversée"
+
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
 msgid "start {}"
@@ -1315,6 +1823,18 @@ msgstr "marqueur d'étirement déplacé"
 msgid "deleted all time signature markers"
 msgstr "suppression de tous les marqueurs de signature rythmique"
 
+#. Used to report global automation override mode.  {} is
+#. replaced with the mode; e.g. "Global automation override latch
+#. preview"
+msgid "global automation override {}"
+msgstr "passer outre l'automatisation globale {}"
+
+#. Used to report track automation override mode.  {} is
+#. replaced with the mode; e.g. "track automation override latch
+#. preview"
+msgid "track automation mode {}"
+msgstr "mode d'automatisation de piste {}"
+
 msgid "global automation override off"
 msgstr "passer outre l'automatisation global désactivée"
 
@@ -1324,11 +1844,28 @@ msgstr "aperçu du passer outre l'automatisation globale, surpasser"
 msgid "no selected tracks"
 msgstr "aucune piste sélectionné"
 
+#. Report the track automation mode. {} is replaced with the
+#. automation mode; e.g. "automation mode trim/read for selected tracks"
+msgid "automation mode {} for selected tracks"
+msgstr "mode d'automatisation {} pour les pistes sélectionnées"
+
 msgid "time selection start"
 msgstr "début de la sélection temporelle"
 
 msgid "time selection end"
 msgstr "fin de la sélection temporelle"
+
+#. OSARA's full name presented in the About dialog.
+msgid "OSARA: Open Source Accessibility for the REAPER Application"
+msgstr "OSARA : Accessibilité Open Source pour l'application REAPER"
+
+#. osara version. {} is replaced with the version; e.g.
+#. "Version: 2021.1pre-588,0531135a"
+msgid "Version: {}"
+msgstr "Version: {}"
+
+msgid "About OSARA"
+msgstr "À propos d'OSARA"
 
 #. Reported when inserting a marker. {} will be replaced with the
 #. number of the new marker; e.g. "marker 2 inserted".
@@ -1355,6 +1892,9 @@ msgid "item removed from group {group}"
 msgid_plural "{count} items removed from group {group}"
 msgstr[0] "objets supprimés du groupe {group}"
 msgstr[1] "{count} Objets supprimés du groupe {group}"
+
+msgid "track not grouped"
+msgstr "piste non groupéepiste non groupée"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Sélectionne l'objet suivant (en laissant les autres objets sélectionnés)"
@@ -1505,6 +2045,9 @@ msgstr "OSARA: À propos"
 
 msgid "OSARA: Report groups for current track"
 msgstr "OSARA: Énonce le groupe de la piste actuelle"
+
+msgid "OSARA: Mute next message from OSARA"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
