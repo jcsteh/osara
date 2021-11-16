@@ -199,6 +199,7 @@ const char CONFIG_SECTION[] = "osara";
 
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
+const int MEDIA_EXPLORER_SECTION = 32063;
 
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;

@@ -694,6 +694,9 @@ OSARA also includes some other miscellaneous actions.
 #### MIDI Event List Editor
 - OSARA: Focus event nearest edit cursor: control+f
 
+### Muting OSARA messages in custom/cycle actions
+The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action. It should be placed before each action to be muted.
+
 ## Support
 If you need help, please subscribe to the [Reapers Without Peepers discussion group](https://groups.io/g/rwp) and ask your questions there.
 
