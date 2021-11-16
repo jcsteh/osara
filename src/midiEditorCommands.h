@@ -19,7 +19,8 @@ void previewNotesOff(bool sendNoteOff=true);
 
 // This must be called when playback starts, as otherwise, pending note off
 // messages for OSARA MIDI preview might interfere with MIDI playback.
-bool cancelMidiPreviewDoneTimer();
+// Returns true when previewDoneTimer was set at the time of calling the function, false otherwise.
+bool cancelMidiPreviewNotesOff();
 
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiToggleSelection(Command* command);
