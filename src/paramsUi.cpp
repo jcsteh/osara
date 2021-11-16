@@ -6,13 +6,15 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <vector>
 #include <algorithm>
 #include <iomanip>
 #include <memory>
+// osara.h includes windows.h, which must be included before other Windows
+// headers.
+#include "osara.h"
 #ifdef _WIN32
 #include <initguid.h>
 #include <Windowsx.h>
@@ -22,8 +24,9 @@
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
 #include <reaper/reaper_plugin.h>
-#include "osara.h"
+#include "fxChain.h"
 #include "resource.h"
+#include "translation.h"
 
 using namespace std;
 
@@ -138,7 +141,13 @@ class ReaperObjToggleParam: public ReaperObjParam {
 	}
 
 	string getValueText(double value) {
-		return value ? "on" : "off";
+		return value ?
+			// Translators: Reported in Parameters dialogs for a toggle (such as mute)
+			// which is on.
+			translate("on") :
+			// Translators: Reported in Parameters dialogs for a toggle (such as mute)
+			// which is off.
+			translate("off");
 	}
 
 	void setValue(double value) {
@@ -296,6 +305,8 @@ class ParamsDialog {
 	unique_ptr<Param> param;
 	double val;
 	string valText;
+	HWND prevFocus;
+	bool isDestroying = false;
 
 	void updateValueText() {
 		if (this->valText.empty()) {
@@ -412,6 +423,7 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
+					dialog->isDestroying = true;
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
@@ -419,52 +431,92 @@ class ParamsDialog {
 				break;
 			case WM_CLOSE:
 				dialog->saveWindowPos();
+				dialog->isDestroying = true;
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
+			case WM_ACTIVATE:
+				if (!dialog->isDestroying && LOWORD(wParam) == WA_INACTIVE) {
+					// If something steals focus, close the dialog. Otherwise, we won't
+					// unregister the key hook,  surface feedback won't report FX parameter
+					// changes and there will be a dialog left open the user can't get to
+					// easily.
+					// Do not try to restore focus as we close.
+					dialog->prevFocus = nullptr;
+					PostMessage(dialogHwnd, WM_CLOSE, 0, 0);
+					return TRUE;
+				}
 		}
 		return FALSE;
 	}
 
 	accelerator_register_t accelReg;
 	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-		// We handle key presses for the slider ourselves.
 		ParamsDialog* dialog = (ParamsDialog*)accelReg->user;
-		if (msg->message != WM_KEYDOWN || msg->hwnd != dialog->slider) {
-			return 0;
+		if (msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) {
+			return 0; // Not interested.
 		}
-		double newVal = dialog->val;
-		switch (msg->wParam) {
-			case VK_UP:
-			case VK_RIGHT:
-				newVal += dialog->param->step;
-				break;
-			case VK_DOWN:
-			case VK_LEFT:
-				newVal -= dialog->param->step;
-				break;
-			case VK_PRIOR:
-				newVal += dialog->param->largeStep;
-				break;
-			case VK_NEXT:
-				newVal -= dialog->param->largeStep;
-				break;
-			case VK_HOME:
-				newVal = dialog->param->max;
-				break;
-			case VK_END:
-				newVal = dialog->param->min;
-				break;
-			default:
-				return -1;
+		if (msg->hwnd == dialog->slider) {
+			// We handle key presses for the slider ourselves.
+			double newVal = dialog->val;
+			bool consumed = true;
+			switch (msg->wParam) {
+				case VK_UP:
+				case VK_RIGHT:
+					newVal += dialog->param->step;
+					break;
+				case VK_DOWN:
+				case VK_LEFT:
+					newVal -= dialog->param->step;
+					break;
+				case VK_PRIOR:
+					newVal += dialog->param->largeStep;
+					break;
+				case VK_NEXT:
+					newVal -= dialog->param->largeStep;
+					break;
+				case VK_HOME:
+					newVal = dialog->param->max;
+					break;
+				case VK_END:
+					newVal = dialog->param->min;
+					break;
+				default:
+					consumed = false;
+			}
+			if (consumed) {
+				dialog->onSliderChange(newVal);
+				return 1; // Eat the keystroke.
+			}
 		}
-		dialog->onSliderChange(newVal);
-		return 1;
+		if (msg->wParam == VK_SPACE) {
+			// Let REAPER handle the space key so control+space works.
+			return 0; // Not interested.
+		}
+		if (
+			// A function key.
+			(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
+			// Anything with both alt and shift.
+			(GetAsyncKeyState(VK_MENU) & 0x8000 &&
+				GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
+			// Anything with the control key, but only if not in a text box.
+			(!isClassName(GetFocus(), "Edit") &&
+				GetAsyncKeyState(VK_CONTROL) & 0x8000)
+		) {
+			return -666; // Force to main window.
+		}
+		return -1; // Pass to our window.
 	}
 
 	~ParamsDialog() {
 		plugin_register("-accelerator", &this->accelReg);
 		isParamsDialogOpen = false;
+		// Try to restore focus back to where it was when the dialog was opened.
+		// This is particularly useful in the FX chain dialog because this doesn't
+		// regain focus by itself if something else (like us) steals the focus.
+		if (this->prevFocus) {
+			SetFocus(this->prevFocus);
+		}
 	}
 
 	bool shouldIncludeParam(string name) {
@@ -507,6 +559,8 @@ class ParamsDialog {
 		char rawText[100];
 		GetDlgItemText(this->dialog, ID_PARAM_FILTER, rawText, sizeof(rawText));
 		string text = rawText;
+		// We want to match case insensitively, so convert to lower case.
+		transform(text.begin(), text.end(), text.begin(), ::tolower);
 		if (this->filter.compare(text) == 0)
 			return; // No change.
 		this->filter = text;
@@ -521,7 +575,9 @@ class ParamsDialog {
 			delete this;
 			return;
 		}
+		this->prevFocus = GetFocus();
 		this->dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PARAMS_DLG), mainHwnd, ParamsDialog::dialogProc);
+		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
@@ -533,6 +589,8 @@ class ParamsDialog {
 		// We also snap to changes in value text, which is even tricky on Windows.
 		// Therefore, we just use the slider as a placeholder and handle key
 		// presses ourselves.
+		// We also use this key handler to pass some keys through to the main
+		// window.
 		this->accelReg.translateAccel = &this->translateAccel;
 		this->accelReg.isLocal = true;
 		this->accelReg.user = (void*)this;
@@ -553,21 +611,33 @@ class ParamsDialog {
 // and with the prefix by passing it and fetching the functions dynamically.
 template<typename ReaperObj>
 class FxParam;
+template<typename ReaperObj>
+class FxNamedConfigParam;
 
 template<typename ReaperObj>
 class FxParams: public ParamSource {
 	friend class FxParam<ReaperObj>;
+	friend class FxNamedConfigParam<ReaperObj>;
 
 	private:
 	ReaperObj* obj;
 	int fx;
+	// Named config params can't be enumerated, so we have to build a list of
+	// these based on the effect and the known named parameters it supports. See
+	// initNamedConfigParams().
+	vector<FxNamedConfigParam<ReaperObj>> namedConfigParams;
 	int (*_GetNumParams)(ReaperObj*, int);
+	bool (*_GetFXName)(ReaperObj*, int, char*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
 	double (*_GetParam)(ReaperObj*, int, int, double*, double*);
 	bool (*_GetParameterStepSizes)(ReaperObj*, int, int, double*, double*,
 		double*, bool*);
 	bool (*_SetParam)(ReaperObj*, int, int, double);
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
+	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
+	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
+
+	void initNamedConfigParams();
 
 	public:
 
@@ -575,35 +645,58 @@ class FxParams: public ParamSource {
 			obj(obj), fx(fx) {
 		// Get functions.
 		*(void**)&this->_GetNumParams = plugin_getapi((apiPrefix + "_GetNumParams").c_str());
+		*(void**)&this->_GetFXName = plugin_getapi(
+			(apiPrefix + "_GetFXName").c_str());
 		*(void**)&this->_GetParamName = plugin_getapi((apiPrefix + "_GetParamName").c_str());
 		*(void**)&this->_GetParam = plugin_getapi((apiPrefix + "_GetParam").c_str());
 		*(void**)&this->_GetParameterStepSizes = plugin_getapi((apiPrefix +
 			"_GetParameterStepSizes").c_str());
 		*(void**)&this->_SetParam = plugin_getapi((apiPrefix + "_SetParam").c_str());
 		*(void**)&this->_FormatParamValue = plugin_getapi((apiPrefix + "_FormatParamValue").c_str());
+		*(void**)&this->_GetNamedConfigParm = plugin_getapi(
+			(apiPrefix + "_GetNamedConfigParm").c_str());
+		*(void**)&this->_SetNamedConfigParm = plugin_getapi(
+			(apiPrefix + "_SetNamedConfigParm").c_str());
+		if (fx >= 0) {
+			this->initNamedConfigParams();
+		}
 	}
 
 	string getTitle() {
-		return "FX Parameters";
+		return translate("FX Parameters");
 	}
 
 	int getParamCount() {
-		return this->_GetNumParams(this->obj, this->fx);
+		// Any named config params come first, followed by normal params.
+		return (int)this->namedConfigParams.size() +
+			this->_GetNumParams(this->obj, this->fx);
 	}
 
 	string getParamName(int param) {
-		char name[256];
-		this->_GetParamName(this->obj, this->fx, param, name, sizeof(name));
+		ostringstream ns;
+		auto namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			ns << this->namedConfigParams[param].getDisplayName();
+		} else {
+			char name[256];
+			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
+				sizeof(name));
+			ns << name;
+		}
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ostringstream ns;
-		ns << name << " (" << param + 1 << ")";
+		ns << " (" << param + 1 << ")";
 		return ns.str();
 	}
 
 	unique_ptr<Param> getParam(int fx, int param);
 	unique_ptr<Param> getParam(int param) {
-		return this->getParam(this->fx, param);
+		auto namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			return make_unique<FxNamedConfigParam<ReaperObj>>(
+				this->namedConfigParams[param]);
+		}
+		return this->getParam(this->fx, param - namedCount);
 	}
 };
 
@@ -670,6 +763,117 @@ class FxParam: public Param {
 		this->setValue(atof(text.c_str()));
 	}
 };
+
+// The possible values for an FX named config param. The first string is the
+// display name. The second is the name to pass to the API.
+using FxNamedConfigParamValues = vector<pair<const char*, const char*>>;
+
+template<typename ReaperObj>
+class FxNamedConfigParam: public Param {
+	private:
+	FxParams<ReaperObj>& source;
+	int fx;
+	const string displayName;
+	const string name;
+	const FxNamedConfigParamValues& values;
+
+	public:
+
+	FxNamedConfigParam(FxParams<ReaperObj>& source,
+			const string displayName, const string name,
+			const FxNamedConfigParamValues& values):
+			Param(), source(source), displayName(displayName), name(name),
+			values(values) {
+		this->min = 0;
+		this->max = (double)values.size() - 1;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	double getValue() {
+		char valueStr[50];
+		valueStr[0] = '\0';
+		this->source._GetNamedConfigParm(this->source.obj, this->source.fx,
+			this->name.c_str(), valueStr, sizeof(valueStr));
+		if (!valueStr[0]) {
+			return 0.0;
+		}
+		for (int v = 0; v < (int)this->values.size(); ++v) {
+			if (strcmp(valueStr, this->values[v].second) == 0) {
+				return v;
+			}
+		}
+		return 0.0;
+	}
+
+	string getValueText(double value) {
+		return translate(this->values[(int)value].first);
+	}
+
+	void setValue(double value) {
+		const char* valueStr = this->values[(int)value].second;
+		this->source._SetNamedConfigParm(this->source.obj, this->source.fx,
+			this->name.c_str(), valueStr);
+	}
+
+	const string getDisplayName() {
+		return this->displayName;
+	}
+};
+
+const FxNamedConfigParamValues TOGGLE_FX_NAMED_CONFIG_PARAM_VALUES = {
+	// translate firstString begin
+	{"off", "0"},
+	{"on", "1"},
+	// translate firstString end
+};
+const FxNamedConfigParamValues REAEQ_BAND_TYPE_VALUES = {
+	// translate firstString begin
+	{"low shelf", "0"},
+	{"high shelf", "1"},
+	{"band", "8"},
+	{"low pass", "3"},
+	{"high pass", "4"},
+	{"all pass", "5"},
+	{"notch", "6"},
+	{"band pass", "7"},
+	{"band (alt)", "9"},
+	{"band (alt 2)", "2"},
+	// translate firstString end
+};
+
+template<typename ReaperObj>
+void FxParams<ReaperObj>::initNamedConfigParams() {
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	if (strcmp(fxName, "VST: ReaEQ (Cockos)") == 0) {
+		for (int band = 0; ; ++band) {
+			ostringstream name;
+			name << "BANDENABLED" << band;
+			char type[2];
+			if (!this->_GetNamedConfigParm(this->obj, this->fx, name.str().c_str(),
+					type, sizeof(type))) {
+				// This band doesn't exist.
+				break;
+			}
+			// Translators: A parameter in the FX Parameters dialog which adjusts
+			// whether a ReaEQ band is enabled. {} will be replaced with the band
+			// number; e.g. "band 2 enable".
+			string dispName = format(translate("Band {} enable"), band + 1);
+			this->namedConfigParams.push_back(FxNamedConfigParam(*this, dispName,
+				name.str(), TOGGLE_FX_NAMED_CONFIG_PARAM_VALUES));
+			name.str("");
+			name << "BANDTYPE" << band;
+			// Translators: A parameter in the FX Parameters dialog which adjusts
+			// the type of a ReaEQ band. {} will be replaced with the band number;
+			// e.g. "band 2 type".
+			dispName = format(translate("Band {} type"), band + 1);
+			this->namedConfigParams.push_back(FxNamedConfigParam(*this, dispName,
+				name.str(), REAEQ_BAND_TYPE_VALUES));
+		}
+	}
+}
 
 template<typename ReaperObj>
 unique_ptr<Param> FxParams<ReaperObj>::getParam(int fx, int param) {
@@ -743,27 +947,34 @@ class TrackParams: public ReaperObjParamSource {
 				dispPrefix << trackName << " ";
 			dispPrefix << categoryName << " ";
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "volume", this->track, category, i, "D_VOL",
+				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "pan", this->track, category, i, "D_PAN",
+				dispPrefix.str() + translate("pan"), this->track, category, i, "D_PAN",
 				ReaperObjPanParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + "mute", this->track, category, i, "B_MUTE",
+				dispPrefix.str() + translate("mute"), this->track, category, i, "B_MUTE",
+				ReaperObjToggleParam::make));
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + translate("mono"), this->track, category, i, "B_MONO",
 				ReaperObjToggleParam::make));
 		}
 	}
 
 	public:
 	TrackParams(MediaTrack* track): track(track) {
-		this->params.push_back(make_unique<TrackParamProvider>("Volume", track,
-			"D_VOL", ReaperObjVolParam::make));
-		this->params.push_back(make_unique<TrackParamProvider>("Pan", track,
-			"D_PAN", ReaperObjPanParam::make));
-		this->params.push_back(make_unique<TrackParamProvider>("Mute", track,
-			"B_MUTE", ReaperObjToggleParam::make));
-		this->addSendParams(0, "send", "P_DESTTRACK");
-		this->addSendParams(-1, "receive", "P_SRCTRACK");
+		this->params.push_back(make_unique<TrackParamProvider>(translate("volume"),
+			track, "D_VOL", ReaperObjVolParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>(translate("pan"),
+			track, "D_PAN", ReaperObjPanParam::make));
+		this->params.push_back(make_unique<TrackParamProvider>(translate("mute"),
+			track, "B_MUTE", ReaperObjToggleParam::make));
+		// Translators: Indicates a parameter for a track send in the Track Parameters
+		// dialog.
+		this->addSendParams(0, translate("send"), "P_DESTTRACK");
+		// Translators: Indicates a parameter for a track receive in the Track
+		// Parameters dialog.
+		this->addSendParams(-1, translate("receive"), "P_SRCTRACK");
 
 		int fxParamCount = CountTCPFXParms(nullptr, track);
 		if (fxParamCount > 0) {
@@ -784,7 +995,7 @@ class TrackParams: public ReaperObjParamSource {
 	}
 
 	string getTitle() {
-		return "Track Parameters";
+		return translate("Track Parameters");
 	}
 };
 
@@ -821,30 +1032,50 @@ class TakeParamProvider: public ReaperObjParamProvider {
 class ItemParams: public ReaperObjParamSource {
 	public:
 	ItemParams(MediaItem* item) {
-		this->params.push_back(make_unique<ItemParamProvider>("Item volume", item,
-			"D_VOL", ReaperObjVolParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("item volume"), item, "D_VOL", ReaperObjVolParam::make));
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
 		if (MediaItem_Take* take = GetActiveTake(item)) {
-			this->params.push_back(make_unique<TakeParamProvider>("Take volume", take,
-				"D_VOL", ReaperObjVolParam::make));
-			this->params.push_back(make_unique<TakeParamProvider>("Take pan", take,
-				"D_PAN", ReaperObjPanParam::make));
+			this->params.push_back(make_unique<TakeParamProvider>(
+				translate("take volume"), take, "D_VOL", ReaperObjVolParam::make));
+			this->params.push_back(make_unique<TakeParamProvider>(
+				translate("take pan"), take, "D_PAN", ReaperObjPanParam::make));
 		}
-		this->params.push_back(make_unique<ItemParamProvider>("Mute", item,
-			"B_MUTE", ReaperObjToggleParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>("Fade in length",
-			item, "D_FADEINLEN", ReaperObjLenParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>("Fade out length",
-			item, "D_FADEOUTLEN", ReaperObjLenParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(translate("mute"),
+			item, "B_MUTE", ReaperObjToggleParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("fade in length"), item, "D_FADEINLEN",
+			ReaperObjLenParam::make));
+		this->params.push_back(make_unique<ItemParamProvider>(
+			translate("Fade out length"), item, "D_FADEOUTLEN",
+			ReaperObjLenParam::make));
 	}
 
 	string getTitle() {
-		return "Item Parameters";
+		return translate("Item Parameters");
 	}
 };
 
 void cmdParamsFocus(Command* command) {
 	unique_ptr<ParamSource> source;
+	if (isFxListFocused()) {
+		int trackNum, itemNum, fx;
+		int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+		MediaTrack* track = trackNum == 0 ?
+			GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+		if (type == 1) { // Track
+			source = make_unique<FxParams<MediaTrack>>(track, "TrackFX", fx);
+		} else if (type == 2) { // Item
+			MediaItem* item = GetTrackMediaItem(track, itemNum);
+			int takeNum = HIWORD(fx);
+			fx = LOWORD(fx);
+			MediaItem_Take* take = GetTake(item, takeNum);
+			source = make_unique<FxParams<MediaItem_Take>>(take, "TakeFX", fx);
+		}
+		new ParamsDialog(move(source));
+		return;
+	}
+
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			MediaTrack* track = GetLastTouchedTrack();
@@ -882,14 +1113,20 @@ FxList listFx(MediaTrack* track) {
 	}
 	string suffix;
 	if (track == GetMasterTrack(0)) {
-		suffix = " [monitor]";
+		// Translators: In the menu of effects when opening the FX Parameters
+		// dialog, this is presented after effects which are monitoring FX.
+		suffix = translate("[monitor]");
 	} else {
-		suffix = " [input]";
+		// Translators: In the menu of effects when opening the FX Parameters
+		// dialog, this is presented after effects which are input FX.
+		suffix = translate("[input]");
 	}
 	for (int index = 0; index < recCount; ++index) {
 		const int rawIndex = 0x1000000 + index;
 		TrackFX_GetFXName(track, rawIndex, rawName, sizeof(rawName));
-		string name = rawName + suffix;
+		string name(rawName);
+		name += " ";
+		name += suffix;
 		fxList.push_back({rawIndex, name});
 	}
 	return fxList;
@@ -912,7 +1149,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	const size_t fxCount = fxList.size();
 	int fx = -1;
 	if (fxCount == 0) {
-		outputMessage("No FX");
+		outputMessage(translate("no FX"));
 		return;
 	} else if (fxCount == 1)
 		fx = fxList[0].first;

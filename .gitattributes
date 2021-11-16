@@ -12,3 +12,5 @@ sconstruct text
 *.ini text
 *.yml text
 *.sh eol=lf
+*.py text
+*.po text

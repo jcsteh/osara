@@ -5,13 +5,14 @@
 # License: GNU General Public License version 2.0
 
 import os
+from makePot import makePot
 
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
 env = Environment(tools = ["default", "textfile"],
 	variables=vars,
-	copyright="Copyright (C) 2014-2020 NV Access Limited, James Teh & other contributors",
+	copyright="Copyright (C) 2014-2021 NV Access Limited, James Teh & other contributors",
 )
 
 if env["PLATFORM"] == "win32":
@@ -52,3 +53,8 @@ else: # Mac
 
 	env.Alias("installer", installer)
 	env.Default(installer)
+
+pot = env.Command("locale/osara_${version}.pot",
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc")],
+	makePot)
+env.Alias("pot", pot)

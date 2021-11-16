@@ -13,10 +13,13 @@
 #include <cstdint>
 #include "osara.h"
 #include "paramsUi.h"
+#include "midiEditorCommands.h"
+#include "translation.h"
 
 using namespace std;
 
 bool shouldReportSurfaceChanges = true;
+bool shouldReportMarkersWhilePlaying = false;
 
 // REAPER often notifies us about track states even if they haven't changed.
 // It also notifies us about these states when a track is first created.
@@ -79,7 +82,21 @@ class Surface: public IReaperControlSurface {
 		return "";
 	}
 
+	virtual void Run() override {
+		if (shouldReportMarkersWhilePlaying && GetPlayState() & 1) {
+			double playPos = GetPlayPosition();
+			if (playPos == this->lastPlayPos) {
+				return;
+			}
+			this->lastPlayPos = playPos;
+			this->reportMarker(playPos);
+		}
+	}
+
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+		if (play) {
+			cancelPendingMidiPreviewNotesOff();
+		}
 		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
@@ -103,7 +120,7 @@ class Surface: public IReaperControlSurface {
 		bool different = this->reportTrackIfDifferent(track, s);
 		different |= this->lastParam != PARAM_VOLUME;
 		if (different) {
-			s << "volume ";
+			s << translate("volume") << " ";
 			this->lastParam = PARAM_VOLUME;
 		}
 		s << fixed << setprecision(2);
@@ -119,7 +136,7 @@ class Surface: public IReaperControlSurface {
 		bool different = this->reportTrackIfDifferent(track, s);
 		different |= this->lastParam != PARAM_PAN;
 		if (different) {
-			s << "pan ";
+			s << translate("pan") << " ";
 			this->lastParam = PARAM_PAN;
 		}
 		formatPan(pan, s);
@@ -135,7 +152,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(mute)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (mute ? "muted" : "unmuted");
+			s << (mute ? translate("muted") : translate("unmuted"));
 			outputMessage(s);
 		}
 		cache.update(mute);
@@ -155,7 +172,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(solo)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (solo ? "soloed" : "unsoloed");
+			s << (solo ? translate("soloed") : translate("unsoloed"));
 			outputMessage(s);
 		}
 		cache.update(solo);
@@ -170,7 +187,7 @@ class Surface: public IReaperControlSurface {
 				cache.hasChanged(arm)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
-			s << (arm ? "armed" : "unarmed");
+			s << (arm ? translate("armed") : translate("unarmed"));
 			outputMessage(s);
 		}
 		cache.update(arm);
@@ -258,13 +275,8 @@ class Surface: public IReaperControlSurface {
 		DWORD now = GetTickCount();
 		DWORD prevChangeTime = this->lastParamChangeTime;
 		this->lastParamChangeTime = now;
-		if (!isHandlingCommand &&
-			// Only handle surface changes if the last change is 100ms or more ago.
-			now - prevChangeTime >= 100
-		) {
-			return true;
-		}
-		return false;
+		// Only handle param changes if the last change was 100ms or more ago.
+		return now - prevChangeTime >= 100;
 	}
 	DWORD lastParamChangeTime = 0;
 
@@ -275,7 +287,7 @@ class Surface: public IReaperControlSurface {
 			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
 				nullptr);
 			if (trackNum <= 0) {
-				output << "master";
+				output << translate("master");
 			} else {
 				output << trackNum;
 				char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
@@ -294,6 +306,44 @@ class Surface: public IReaperControlSurface {
 		return TrackCacheState<enableFlag, disableFlag>(value);
 	}
 
+	void reportMarker(double playPos) {
+		int marker, region;
+		double markerPos;
+		GetLastMarkerAndCurRegion(0, playPos, &marker, &region);
+		const char* name;
+		int number;
+		ostringstream s;
+		if (marker >= 0 && marker != this->lastMarker) {
+			EnumProjectMarkers(marker, nullptr, &markerPos, nullptr, &name, &number);
+			// Allow the cursor to be within 100ms, since this method is called
+			// periodically.
+			if (markerPos >= playPos - 0.1) {
+				if (name[0]) {
+					s << format(translate("{} marker"), name) << " ";
+				} else {
+					s << format(translate("marker {}"), number) << " ";
+				}
+			}
+		}
+		this->lastMarker = marker;
+		if (region >= 0 && region != this->lastRegion) {
+			EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
+			if (name[0]) {
+				// Translators: Reported when playback reaches a named region. {} will
+				// be replaced with the region's name; e.g. "intro region".
+				s << format(translate("{} region"), name) << " ";
+			} else {
+				// Translators: Reported when playback reaches an unnamed region. {}
+				// will be replaced with the region's number; e.g. "region 2".
+				s << format(translate("region {}"), number) << " ";
+			}
+		}
+		this->lastRegion = region;
+		if (s.tellp() > 0) {
+			outputMessage(s, /* interrupt */ false);
+		}
+	}
+
 	MediaTrack* lastSelectedTrack = nullptr;
 	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
@@ -302,6 +352,9 @@ class Surface: public IReaperControlSurface {
 	const int PARAM_PAN = -3;
 	int lastParam = PARAM_NONE;
 	map<MediaTrack*, uint8_t> trackCache;
+	double lastPlayPos = 0;
+	int lastMarker = -1;
+	int lastRegion = -1;
 };
 
 IReaperControlSurface* createSurface() {

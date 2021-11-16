@@ -35,6 +35,6 @@ namespace NSA11yWrapper {
   NSDictionary *announcementInfo = @{NSAccessibilityAnnouncementKey : message,
 				     NSAccessibilityPriorityKey : @(NSAccessibilityPriorityHigh)};
 
-  NSAccessibilityPostNotificationWithUserInfo([NSApp mainWindow], NSAccessibilityAnnouncementRequestedNotification, announcementInfo);
+  NSAccessibilityPostNotificationWithUserInfo([NSApp keyWindow], NSAccessibilityAnnouncementRequestedNotification, announcementInfo);
 }
 @end

@@ -1,3 +1,9 @@
 [submodule "include/WDL"]
 	path = include/WDL
 	url = https://github.com/justinfrankel/WDL.git
+[submodule "include/tinygettext"]
+	path = include/tinygettext
+	url = https://github.com/jcsteh/tinygettext
+[submodule "include/fmt"]
+	path = include/fmt
+	url = https://github.com/fmtlib/fmt

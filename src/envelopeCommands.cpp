@@ -6,7 +6,6 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #include <string>
 #include <sstream>
 #include <tuple>
@@ -16,8 +15,10 @@
 #include <algorithm>
 #include <optional>
 #include "osara.h"
+#include "translation.h"
 
 using namespace std;
+using namespace fmt::literals;
 
 bool selectedEnvelopeIsTake = false;
 int currentAutomationItem = -1;
@@ -97,7 +98,6 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		oldItems = CountAutomationItems(envelope);
 	}
 	Main_OnCommand(command, 0);
-	ostringstream s;
 	int removed;
 	// Check items first, since deleting an item might also implicitly remove
 	// points.
@@ -106,15 +106,21 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		// If no items wer removed, fall through to the points check below unless
 		// we're not checking points, in which case report 0 items.
 		if (removed > 0 || !checkPoints) {
-			s << removed << (removed == 1 ? " automation item" : " automation items") << " removed";
-			outputMessage(s);
+			// Translators: Reported when removing automation items. {} will be
+			// replaced with the number of items; e.g. "2 automation items removed".
+			outputMessage(format(
+				translate_plural("{} automation item removed", "{} automation items removed", removed),
+				removed));
 			return;
 		}
 	}
 	if (checkPoints) {
 		removed = oldPoints - countEnvelopePointsIncludingAutoItems(envelope);
-		s << removed << (removed == 1 ? " point" : " points") << " removed";
-		outputMessage(s);
+		// Translators: Reported when removing envelope points. {} will be
+		// replaced with the number of points; e.g. "2 points removed".
+		outputMessage(format(
+			translate_plural("{} point removed", "{} points removed", removed),
+			removed));
 	}
 }
 
@@ -157,6 +163,24 @@ int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 
 optional<int> currentEnvelopePoint{};
 
+const char* getEnvelopeShapeName(int shape) {
+	static const char* names[] = {
+		// Translators: A shape for an envelope point.
+		translate("linear"),
+		// Translators: A shape for an envelope point.
+		translate("square"),
+		// Translators: A shape for an envelope point.
+		translate("slow start/end"),
+		// Translators: A shape for an envelope point.
+		translate("fast start"),
+		// Translators: A shape for an envelope point.
+		translate("fast end"),
+		// Translators: A shape for an envelope point.
+		translate("bezier"),
+	};
+	return names[shape];
+}
+
 void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
 	TrackEnvelope* envelope;
 	double offset;
@@ -175,8 +199,10 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		++point;
 	}
 	double time, value;
+	int shape;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
+		&shape, nullptr, &selected);
 	time += offset;
 	if ((direction == 1 && time < now)
 		// If this point is at the cursor, skip it only if it's the current point.
@@ -190,7 +216,8 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		int newPoint = point + direction;
 		if (0 <= newPoint && newPoint < count) {
 			point = newPoint;
-			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, NULL, NULL, &selected);
+			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
+				&shape, nullptr, &selected);
 			time += offset;
 		}
 	}
@@ -206,20 +233,25 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
-	ostringstream s;
-	s << "point " << point + 1 << " value ";
 	char out[64];
 	Envelope_FormatValue(envelope, value, out, sizeof(out));
-	s << out;
+	ostringstream s;
+	// Translators: Reported when moving to an envelope point. {point} will be
+	// replaced with the number of the point. {value} will be replaced with its
+	// value. {shape} will be replaced with its shape.
+	// For example: "point 1 value 0.00 dB linear".
+	s << format(translate("point {point} value {value} {shape}"),
+		"point"_a=point, "value"_a=out, "shape"_a=getEnvelopeShapeName(shape));
 	bool isSelected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
 	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
-		if (numSel > 1)
-			s << " selected";
+		if (numSel > 1) {
+			s << " " << translate("selected");
+		}
 	} else {
-		s << " unselected ";
+		s << " " << translate("unselected");
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
@@ -271,7 +303,8 @@ void cmdhSelectEnvelope(int direction) {
 		getEnvelope = [track] (int index) { return GetTrackEnvelope(track, index); };
 	}
 	if (count == 0) {
-		outputMessage(selectedEnvelopeIsTake ? "no take envelopes" : "no track envelopes");
+		outputMessage(selectedEnvelopeIsTake ?
+			translate("no take envelopes") : translate("no track envelopes"));
 		return;
 	}
 
@@ -328,7 +361,7 @@ void cmdhSelectEnvelope(int direction) {
 		break; // We found our envelope!
 	}
 	if (!env) {
-		outputMessage("no visible envelopes");
+		outputMessage(translate("no visible envelopes"));
 		return;
 	}
 
@@ -355,12 +388,16 @@ void cmdhSelectEnvelope(int direction) {
 	}
 	char name[50];
 	GetEnvelopeName(env, name, sizeof(name));
-	s << name << " envelope";
+	// Translators: Reported when selecting an envelope. {} will be replaced
+	// with the name of the envelope; e.g. "volume envelope".
+	s << format(translate("{} envelope"), name);
 	if (!m.empty()) {
-		if (m.str(3)[0] == '0')
-			s << " bypassed";
-		if (m.str(5)[0] == '1')
-			s << " armed";
+		if (m.str(3)[0] == '0') {
+			s << " " << translate("bypassed");
+		}
+		if (m.str(5)[0] == '1') {
+			s << " " << translate("armed");
+		}
 	}
 	outputMessage(s);
 }
@@ -474,21 +511,22 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		// Report the automation item.
 		fakeFocus = FOCUS_AUTOMATIONITEM;
 		ostringstream s;
-		s << "Auto ";
 		char name[500];
 		GetSetAutomationItemInfo_String(envelope, i, "P_POOL_NAME", name, false);
 		if (name[0]) {
-			s << name;
+			// Translators: Reported when moving to an automation item. {} will be
+			// replaced with the name or number of the automation item; e.g. "auto 2".
+			s << format(translate("auto {}"), name);
 		} else {
-			s << i + 1;
+			s << format(translate("auto {}"), i + 1);
 		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
 			if (countSelectedAutomationItems(envelope, true) > 1) {
-				s << " selected";
+				s << " " << translate("selected");
 			}
 		} else {
-			s << " unselected";
+			s << " " << translate("unselected");
 		}
 		s << " " << formatCursorPosition();
 		outputMessage(s);
@@ -512,16 +550,21 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	if (!envelope) {
 		return;
 	}
-	ostringstream s;
 	int count;
 	if ((count = countSelectedAutomationItems(envelope))) {
-		s << count << (count == 1 ? " automation item" : " automation items");
+		// Translators: Reported when copying automation items. {} will be replaced
+		// with the number of items; e.g. "2 automation items copied".
+		outputMessage(format(
+			translate_plural("{} automation item copied", "{} automation items copied", count),
+			count));
 	} else {
 		count = countSelectedEnvelopePoints(envelope);
-		s << count << (count == 1 ? " envelope point" : " envelope points");
+		// Translators: Reported when copying envelope points. {} will be replaced
+		// with the number of points; e.g. "2 envelope points copied".
+		outputMessage(format(
+			translate_plural("{} envelope point copied", "{} envelope points copied", count),
+			count));
 	}
-	s << " copied";
-	outputMessage(s);
 }
 
 bool isEnvelopeVisible(TrackEnvelope* envelope) {
@@ -538,18 +581,23 @@ void reportToggleTrackEnvelope(const char* envType) {
 		return;
 	}
 	if (!isTrackSelected(track)) {
-		outputMessage("track not selected");
+		outputMessage(translate("track not selected"));
 		return;
 	}
 	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
 		(void*)envType);
 	bool visible = envelope && isEnvelopeVisible(envelope);
-	ostringstream s;
-	s << (visible ? "showed " : "hid ");
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
-	s << name << " envelope";
-	outputMessage(s);
+	if (visible) {
+		// Translators: Reported when showing an envelope. {} will be replaced with
+		// the name of the envelope; e.g. "showed volume envelope".
+		outputMessage(format(translate("showed {} envelope"), name));
+	} else {
+		// Translators: Reported when hiding an envelope. {} will be replaced with
+		// the name of the envelope; e.g. "hid volume envelope".
+		outputMessage(format(translate("hid {} envelope"), name));
+	}
 }
 
 void postToggleTrackVolumeEnvelope(int command) {
@@ -580,15 +628,9 @@ void cmdToggleTrackEnvelope(Command* command) {
 	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
-	ostringstream s;
 	if (after.size() == before.size()) {
-		outputMessage("no envelopes toggled");
+		outputMessage(translate("no envelopes toggled"));
 		return;
-	}
-	if (after.size() > before.size()) {
-		s << "showed ";
-	} else {
-		s << "hid ";
 	}
 	set<TrackEnvelope*> difference;
 	set_symmetric_difference(before.begin(), before.end(),
@@ -596,8 +638,11 @@ void cmdToggleTrackEnvelope(Command* command) {
 	TrackEnvelope* envelope = *difference.begin();
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
-	s << name << " envelope";
-	outputMessage(s);
+	if (after.size() > before.size()) {
+		outputMessage(format(translate("showed {} envelope"), name));
+	} else {
+		outputMessage(format(translate("hid {} envelope"), name));
+	}
 }
 
 void postSelectMultipleEnvelopePoints(int command) {
@@ -606,7 +651,9 @@ void postSelectMultipleEnvelopePoints(int command) {
 		return;
 	}
 	int count = countSelectedEnvelopePoints(envelope);
-	ostringstream s;
-	s << count << (count == 1 ? " point" : " points") << " selected";
-	outputMessage(s);
+	// Translators: Reported when selecting envelope points. {} will be replaced
+	// with the number of points; e.g. "2 points selected".
+	outputMessage(format(
+		translate_plural("{} point selected", "{} points selected", count),
+		count));
 }

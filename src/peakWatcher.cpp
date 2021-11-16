@@ -2,24 +2,26 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Peak Watcher code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2020 NV Access Limited, James Teh
+ * Copyright 2015-2021 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #include <math.h>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <cassert>
+// osara.h includes windows.h, which must be included before other Windows
+// headers.
+#include "osara.h"
 #ifdef _WIN32
 #include <Commctrl.h>
 #include <Windowsx.h>
 #endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
-#include "osara.h"
 #include "resource.h"
+#include "translation.h"
 
 using namespace std;
 
@@ -46,16 +48,136 @@ int pw_hold = 0;
 int pw_numTracksEnabled = 0;
 UINT_PTR pw_timer = 0;
 
+const char FX_LOUDNESS_METER[] = "loudness_meter";
+
+double getLoudnessMeterParam(MediaTrack* track,
+	int configParam, double configValue, int queryParam
+) {
+	int fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
+		0 /* don't create */);
+	if (fx == -1) {
+		// Add the effect.
+		fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
+			1 /* create if not found */);
+		if (fx == -1) {
+			// Effect doesn't exist!
+			return -150.0;
+		}
+		// Turn off all level types except the one we need.
+		for (int param = 0; param <= 6; ++param) {
+			TrackFX_SetParam(track, fx, param,
+				param == configParam ? configValue : 0.0);
+		}
+		// Turn off reset on playback start.
+		TrackFX_SetParam(track, fx, 10, 0.0);
+		// set output loudness values as automation to all
+		TrackFX_SetParam(track, fx, 14, 1.0);
+	}
+	return TrackFX_GetParam(track, fx, queryParam, nullptr, nullptr);
+}
+
+void deleteLoudnessMeter(MediaTrack* track) {
+	int fx = TrackFX_AddByName(track, FX_LOUDNESS_METER, /* recFX */ false,
+		0 /* don't create */);
+	if (fx != -1) {
+		TrackFX_Delete(track, fx);
+	}
+}
+
+// Level types.
+const struct {
+	const char* name;
+	double (*getLevel)(MediaTrack* track, int channel);
+	bool separateChannels;
+	void (*reset)(MediaTrack* track);
+} PW_LEVEL_TYPES[] = {
+	// translate firstString begin
+	{"peak dB",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			// #119: We use Track_GetPeakHoldDB even when Peak Watcher's hold
+			//  functionality is disabled because we only measure every 30 ms and we
+			// might miss peaks.
+			// Undocumented: Track_GetPeakHoldDB returns hundredths of a dB.
+			double newPeak = Track_GetPeakHoldDB(track, channel, false) * 100.0;
+			// We have the peak now, so reset REAPER's hold.
+			Track_GetPeakHoldDB(track, channel, true);
+			return newPeak;
+		},
+		/* separateChannels */ true,
+		/* reset */ nullptr,
+	},
+	{"integrated LUFS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 6, 1.0, 20);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"momentary LUFS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 3, 1.0, 18);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"short term LUFS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 4, 1.0, 19);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"loudness range LU",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 5, 1.0, 21);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"integrated RMS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 2, 1.0, 17);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"momentary RMS",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 1, 1.0, 16);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	{"true peak dBTP",
+		/* getValue */ [](MediaTrack* track, int channel) {
+			return getLoudnessMeterParam(track, 0, 1.0, 15);
+		},
+		/* separateChannels */ false,
+		/* reset */ deleteLoudnessMeter,
+	},
+	// translate firstString end
+};
+constexpr unsigned int PW_NUM_LEVEL_TYPES = sizeof(PW_LEVEL_TYPES) /
+	sizeof(PW_LEVEL_TYPES[0]);
+unsigned int pw_levelType = 0; // Default to peak dB
+
 void pw_resetTrack(int trackIndex, bool report=false) {
 	auto& pwTrack = pw_tracks[trackIndex];
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
 		pwTrack.channels[c].peak = -150;
 	}
+	auto& levelType = PW_LEVEL_TYPES[pw_levelType];
+	if (pwTrack.track && levelType.reset) {
+		levelType.reset(pwTrack.track);
+	}
 	if (report) {
 		if (!pwTrack.track && !pwTrack.follow) {
-			outputMessage("Peak Watcher track disabled");
+			// Translators: Reported when the user tries to reset a Peak Watcher
+			// track, but that Peak Watcher track is disabled.
+			outputMessage(translate("Peak Watcher track disabled"));
 		} else {
-			outputMessage("reset");
+			// Translators: Reported when the user resets a Peak Watcher track.
+			outputMessage(translate("reset"));
 		}
 	}
 }
@@ -63,6 +185,7 @@ void pw_resetTrack(int trackIndex, bool report=false) {
 void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
 	s << fixed << setprecision(1);
+	auto& levelType = PW_LEVEL_TYPES[pw_levelType];
 	for (int t = 0; t < PW_NUM_TRACKS; ++t) {
 		auto& pwTrack = pw_tracks[t];
 		if (!pwTrack.track && !pwTrack.follow)
@@ -70,22 +193,20 @@ void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		MediaTrack* currentTrack = GetLastTouchedTrack();
 		if (pwTrack.follow && pwTrack.track != currentTrack) {
 			// We're following the current track and it changed.
-			pwTrack.track = currentTrack;
 			pw_resetTrack(t);
+			pwTrack.track = currentTrack;
 			if (!currentTrack)
 				continue; // No current track, so nothing to do.
 		}
 
 		bool trackReported = false;
-		for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
+		// If this level type doesn't care about separate channels, we only need
+		// to process one channel.
+		const int numChannels = levelType.separateChannels ?
+			PW_NUM_CHANNELS : 1;
+		for (int c = 0; c < numChannels; ++c) {
 			auto& pwChan = pwTrack.channels[c];
-			// #119: We use Track_GetPeakHoldDB even when Peak Watcher's hold
-			//  functionality is disabled because we only measure every 30 ms and we
-			// might miss peaks.
-			// Undocumented: Track_GetPeakHoldDB returns hundredths of a dB.
-			double newPeak = Track_GetPeakHoldDB(pwTrack.track, c, false) * 100.0;
-			// We have the peak now, so reset REAPER's hold.
-			Track_GetPeakHoldDB(pwTrack.track, c, true);
+			double newPeak = levelType.getLevel(pwTrack.track, c) ;
 			if (pw_hold == -1 // Hold disabled
 				|| newPeak > pwChan.peak
 				|| (pw_hold != 0 && time > pwChan.time + pw_hold)
@@ -97,14 +218,34 @@ void CALLBACK pw_watcher(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 						// Only report the track name if watching more than one track
 						// and a channel actually changed for this track.
 						int trackNum = (int)(size_t)GetSetMediaTrackInfo(pwTrack.track, "IP_TRACKNUMBER", NULL);
-						if (trackNum <= 0)
-							s << "master ";
-						else
-							s << "track " << trackNum << " ";
+						if (trackNum <= 0) {
+							s << translate("master") << " ";
+						} else {
+							// Translators: used when Peak Watcher notifies about a peak.
+							// {} will be replaced with the track number; e.g. "track 2".
+							s << format(translate("track {}"), trackNum) << " ";
+						}
 					}
-					s << "chan " << c + 1 << ": " << newPeak;
+					if (levelType.separateChannels) {
+						// Translators: used when Peak Watcher notifies about a peak. This is
+						// placed after the track and before the peak value.
+						// {} will be replaced with the channel number; e.g. "chan 2".
+						s << format(translate("chan {}:"), c + 1);
+					} else {
+						// Translators: used when Peak Watcher notifies about a peak for cases
+						// where the channel is irrelevant. This is placed after the track and
+						// before the peak value.
+						s << translate("level");
+					}
+					s << " " << newPeak;
 					outputMessage(s);
 				}
+			}
+		}
+		if (!levelType.separateChannels) {
+			// Copy the value to the other channels for on-demand reporting.
+			for (int c = 1; c < PW_NUM_CHANNELS; ++c) {
+				pwTrack.channels[c].peak = pwTrack.channels[0].peak;
 			}
 		}
 	}
@@ -120,6 +261,13 @@ void pw_stop() {
 }
 
 void pw_onOk(HWND dialog) {
+	// Retrieve the level type.
+	HWND typeSel = GetDlgItem(dialog, ID_PEAK_TYPE);
+	unsigned int newType = ComboBox_GetCurSel(typeSel);
+	bool typeChanged = newType != pw_levelType;
+	// Don't set pw_levelType here because we might need to reset tracks, which
+	// depends on knowing the old type. We'll set it later.
+
 	// Retrieve the notification state for channels.
 	for (int c = 0; c < PW_NUM_CHANNELS; ++c) {
 		pw_notifyChannels[c] = IsDlgButtonChecked(dialog, ID_PEAK_CHAN1 + c) == BST_CHECKED;
@@ -154,15 +302,23 @@ void pw_onOk(HWND dialog) {
 		auto& pwTrack = pw_tracks[t];
 		if (sel == PWT_DISABLED) {
 			// Disabled.
+			pw_resetTrack(t);
 			pwTrack.track = NULL;
 			pwTrack.follow = false;
 			continue;
 		}
 		++pw_numTracksEnabled;
+		auto resetIfTypeChanged = [typeChanged, t] {
+			if (typeChanged) {
+				pw_resetTrack(t);
+			}
+		};
 		if (sel == PWT_FOLLOW) {
 			// Follow current track.
-			if (pwTrack.follow)
+			if (pwTrack.follow) {
+				resetIfTypeChanged();
 				continue; // Already following.
+			}
 			pw_resetTrack(t);
 			pwTrack.follow = true;
 			pwTrack.track = NULL;
@@ -177,8 +333,12 @@ void pw_onOk(HWND dialog) {
 			pw_resetTrack(t);
 			pwTrack.track = track;
 			pwTrack.follow = false;
+		} else {
+			resetIfTypeChanged();
 		}
 	}
+
+	pw_levelType = newType;
 
 	if (pw_numTracksEnabled == 0 && pw_timer) {
 		// Peak watcher disabled completely.
@@ -223,27 +383,38 @@ void cmdPeakWatcher(Command* command) {
 		return;
 	ostringstream s;
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), mainHwnd, pw_dialogProc);
+	translateDialog(dialog);
+
+	HWND typeSel = GetDlgItem(dialog, ID_PEAK_TYPE);
+	for (unsigned int type = 0; type < PW_NUM_LEVEL_TYPES; ++type) {
+		WDL_UTF8_HookComboBox(typeSel);
+		ComboBox_AddString(typeSel, translate(PW_LEVEL_TYPES[type].name));
+	}
+	ComboBox_SetCurSel(typeSel, pw_levelType);
 
 	for (int pwt = 0; pwt < PW_NUM_TRACKS; ++pwt) {
 		HWND trackSel = GetDlgItem(dialog, ID_PEAK_TRACK1 + pwt);
 		WDL_UTF8_HookComboBox(trackSel);
 		auto& pwTrack = pw_tracks[pwt];
 		// Populate the list of what to watch.
-		ComboBox_AddString(trackSel, "None");
+		ComboBox_AddString(trackSel, translate("none"));
 		if (!pwTrack.follow && !pwTrack.track)
 			ComboBox_SetCurSel(trackSel, PWT_DISABLED);
-		ComboBox_AddString(trackSel, "Follow current track");
+		ComboBox_AddString(trackSel, translate("follow current track"));
 		if (pwTrack.follow)
 			ComboBox_SetCurSel(trackSel, PWT_FOLLOW);
-		ComboBox_AddString(trackSel, "Master");
+		ComboBox_AddString(trackSel, translate("master"));
 		MediaTrack* track = GetMasterTrack(0);
 		if (pwTrack.track == track)
 			ComboBox_SetCurSel(trackSel, PWT_MASTER);
 		MediaTrack* currentTrack = GetLastTouchedTrack();
 		for (int t = 0; t < trackCount; ++t) {
 			track = GetTrack(0, t);
-			if (track == currentTrack)
-				s << "current ";
+			if (track == currentTrack) {
+				// Translators: Used in the lists of tracks in the Peak Watcher dialog
+				// to indicate the current track.
+				s << translate("current") << " ";
+			}
 			s << (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
 			char* name;
 			if ((name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr))) {
@@ -294,11 +465,15 @@ void pw_report(int trackIndex, int channel) {
 	assert(channel < PW_NUM_CHANNELS);
 	auto& pwTrack = pw_tracks[trackIndex];
 	if (!pwTrack.track && !pwTrack.follow) {
-		outputMessage("Peak Watcher track disabled");
+		// Translators: Reported when the user tries to report a Peak Watcher
+		// channel, but the Peak Watcher track is disabled.
+		outputMessage(translate("Peak Watcher track disabled"));
 		return;
 	}
 	if (!pw_timer) {
-		outputMessage("Peak Watcher paused");
+		// Translators: Reported when the user tries to report a Peak Watcher
+		// channel, but the Peak Watcher is paused.
+		outputMessage(translate("Peak Watcher paused"));
 		return;
 	}
 	ostringstream s;
@@ -335,13 +510,13 @@ void cmdPausePeakWatcher(Command* command) {
 	if (pw_timer) {
 		// Running.
 		pw_stop();
-		outputMessage("paused Peak Watcher");
+		outputMessage(translate("paused Peak Watcher"));
 	} else if (pw_numTracksEnabled > 0) {
-		// Disabled.
-		pw_start();
-		outputMessage("resumed Peak Watcher");
-	} else {
 		// Paused.
-		outputMessage("Peak Watcher not enabled");
+		pw_start();
+		outputMessage(translate("resumed Peak Watcher"));
+	} else {
+		// Disabled.
+		outputMessage(translate("Peak Watcher not enabled"));
 	}
 }

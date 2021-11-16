@@ -1,7 +1,7 @@
 ; OSARA: Open Source Accessibility for the REAPER Application
 ; NSIS installer script
 ; Author: James Teh <jamie@jantrid.net>
-; Copyright 2016 NV Access Limited
+; Copyright 2016-2021 NV Access Limited, James Teh
 ; License: GNU General Public License version 2.0
 
 !include "MUI2.nsh"
@@ -29,7 +29,6 @@ RequestExecutionLevel user
 Page custom portablePage portablePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE directoryPagePre
 !insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -90,8 +89,10 @@ Section "OSARA plug-in" SecPlugin
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
 	File /oname=OSARA.ReaperKeyMap "..\config\windows\reaper-kb.ini"
+	CreateDirectory "$INSTDIR\osara\locale"
+	SetOutPath "$INSTDIR\osara\locale"
+	File "..\locale\*.po"
 	${Unless} $portable = ${BST_CHECKED}
-		CreateDirectory "$INSTDIR\osara"
 		WriteUninstaller "$INSTDIR\osara\uninstall.exe"
 		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayName" "OSARA"
 		WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OSARA" "DisplayVersion" "${VERSION}"
@@ -101,9 +102,16 @@ Section "OSARA plug-in" SecPlugin
 SectionEnd
 
 Section "Replace existing key map with OSARA key map" SecKeyMap
+	MessageBox MB_YESNO|MB_ICONQUESTION \
+		"Do you want to replace the existing key map with the OSARA key map?$\r$\n\
+		New users are advised to answer Yes, which will completely replace your key map with a clean copy of the OSARA key map including all latest assignments.$\r$\n\
+		Answering No will install OSARA without modifying your key map, which may be preferable for experienced users who have prior alterations that they'd like to preserve." \
+		/SD IDNO IDNO dontReplaceKeyMap
+	; If we reach here, the user chose yes.
 	SetOutPath "$INSTDIR"
 	Rename "reaper-kb.ini" "KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	File "..\config\windows\reaper-kb.ini"
+	dontReplaceKeyMap:
 SectionEnd
 
 Section "Uninstall"

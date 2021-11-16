@@ -1,4 +1,4 @@
-version: "2020.1pre-{build}"
+version: "2021.1pre-{build}"
 
 branches:
  only:
@@ -8,12 +8,14 @@ environment:
  matrix:
   - job_name: Windows
     appveyor_build_worker_image: Visual Studio 2019
-    PY_PYTHON: 3.7-32
+    PY_PYTHON: 3.9-32
   - job_name: Mac
     appveyor_build_worker_image: macos
  global:
   encFileKey:
    secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
+  crowdinAuthToken:
+   secure: 7DTljIEjNzKsCtWTf9iKT8LhRApXcEnPVzIoN1puxBeGhQlp9UcHOT/LQIp4Ddo6jU74HoZn4D9UzdjsEgRgEj34QGDv+gjpsc9HN9PevKho1TYfAZDEAVM0OZl2NaVt
 
 init:
  - ps: |
@@ -24,7 +26,7 @@ init:
        Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
       }
      }
- - cmd: py -m pip install scons
+ - cmd: py -m pip --disable-pip-version-check install --no-warn-script-location scons
  - sh: pip3 install --user scons
 
 clone_depth: 1
@@ -48,14 +50,19 @@ install:
       cd ..
      }
  - git submodule update --init
+ - sh: sudo xcode-select -s /Applications/Xcode-12.3.app
 
 build_script:
- - ps: If ($IsWindows) { $scons = "c:\python37\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.7/bin/scons" }
- - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh"'
+ - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.9/bin/scons" }
+ # We only build the pot on Windows. The choice of which OS is
+ # arbitrary, but there's no point in building it on both.
+ - ps: If ($IsWindows) { $targets = "installer", "pot" }
+ - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets'
 
 artifacts:
  - path: installer/*.exe
  - path: installer/*.dmg
+ - path: locale/*.pot
 
 deploy_script:
  - ps: |
@@ -65,9 +72,18 @@ deploy_script:
        os=$(If ($IsWindows) { "win" } Else { "mac" });
        jobId=$env:APPVEYOR_JOB_ID;
        version=$env:APPVEYOR_BUILD_VERSION;
+       commit=$env:APPVEYOR_REPO_COMMIT;
        installer=$installer
       }
+      if ($IsWindows) { $data["pot"] = Get-ChildItem -Name locale/*.pot }
       ConvertTo-Json -InputObject $data -Compress | ssh osara@duralumin.jantrid.net osaraCiHook
+      if ($IsWindows) {
+       py -m pip --disable-pip-version-check install --no-warn-script-location requests
+       # We must explicitly specify the Python version here because
+       # crowdinSync has a shebang line which causes the wrong version to be
+       # used.
+       py -3.9-32 ci\crowdinSync uploadPot
+      }
      }
 
 notifications:

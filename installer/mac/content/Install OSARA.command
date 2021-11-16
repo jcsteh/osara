@@ -7,6 +7,8 @@ var finder = Application("Finder");
 
 function isPortableReaper ( dir ) {
 	return (
+		finder.exists(Path(dir + "/REAPER.app")) ||
+		finder.exists(Path(dir + "/REAPER-ARM.app")) ||
 		finder.exists(Path(dir + "/REAPER64.app")) ||
 		finder.exists(Path(dir + "REAPER32.app")) )
 }
@@ -37,13 +39,15 @@ function run(argv) {
 
 	var s = app.doShellScript;
 	try{
-		s(`mkdir '${target}/UserPlugins'`);
+		s(`mkdir -p '${target}/UserPlugins'`);
 	} catch (ignore){}// directory probably already exists
 	s(`cat '${source}/reaper_osara.dylib' > '${target}/UserPlugins/reaper_osara.dylib'`);
 	try{
 		s(`mkdir '${target}/KeyMaps'`);
 	} catch(ignore) {} // directory probably already exists
 	s(`cp '${source}/OSARA.ReaperKeyMap' '${target}/KeyMaps/'`);
+	s(`mkdir -p '${target}/osara/locale'`);
+	s(`cp '${source}/locale/'* '${target}/osara/locale/'`);
 	var res = app.displayDialog(
 		"Do you want to replace the existing keymap with the Osara keymap?", {
 		buttons: ["Yes", "No"],

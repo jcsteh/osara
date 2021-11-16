@@ -4,6 +4,8 @@
 # Copyright 2015-2017 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
+import os.path
+
 Import("env")
 
 env.Textfile(target="buildVersion.h", source=[
@@ -11,7 +13,13 @@ env.Textfile(target="buildVersion.h", source=[
 	'const char OSARA_COPYRIGHT[] = "$copyright";',
 ]);
 
-env.Append(CPPPATH=(".", "#include", "#include/WDL"))
+env.Append(CPPPATH=(
+	".",
+	"#include",
+	"#include/WDL",
+	"#include/tinygettext/include",
+	"#include/fmt/include"
+))
 sources = [
 	"reaper_osara.cpp",
 	"paramsUi.cpp",
@@ -20,10 +28,16 @@ sources = [
 	"envelopeCommands.cpp",
 	"controlSurface.cpp",
 	"exports.cpp",
+	"fxChain.cpp",
+	"translation.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX")
+	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX "
+		# #479: fmt/format.h includes UTF-8 characters in comments. However, cl
+		# treats the file as ANSI unless it has a BOM. This causes a warning (and
+		# thus an error) on systems with certain locales. Just disable this warning.
+		"/wd4819")
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
@@ -48,19 +62,18 @@ else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
 	env.Append(CPPPATH=(swellDir,))
 	env["CXX"] = "clang++"
-	coreFlags = "-mmacosx-version-min=10.7 -stdlib=libc++"
+	import subprocess
+	env["xcodeDevDir"] = (
+		subprocess.check_output(("xcode-select", "-p"))
+		.decode().strip())
+	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
+		"-arch x86_64 -arch arm64 "
+		"-isysroot $xcodeDevDir/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 	cxxFlags = coreFlags + " -std=c++17 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
-	# SWELL files.
-	sources.extend(
-		# Disable warnings for SWELL, since we don't have any control over those.
-		env.SharedObject(swellDir.File(f), CXXFLAGS=cxxFlags + " -Wno-everything")
-		for f in (
-			"swell.cpp", "swell-ini.cpp", "swell-dlg.mm", "swell-gdi.mm",
-			"swell-kb.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-menu.mm",
-			"swell-wnd.mm", "swell-modstub.mm",
-	))
+	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
+	sources.append(swellDir.File("swell-modstub.mm"))
 	sources.append("osxa11y.mm")
 	libs = []
 	# OS X frameworks.
@@ -73,6 +86,24 @@ else: # Mac
 	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
 		[["include/WDL/WDL/swell/mac_resgen.php", "$SOURCE"]])
 	env.Depends("reaper_osara.cpp", res)
+
+def addExternalSources(dir, files):
+	dir = env.Dir(dir)
+	# We want the object to be built in our build dir, so we must
+	# use env.SharedObject explicitly.
+	sources.extend(
+		env.SharedObject(os.path.splitext(f)[0], dir.File(f))
+		for f in files)
+
+addExternalSources("#include/tinygettext/src", (
+	"dictionary.cpp",
+	"language.cpp",
+	"log.cpp",
+	"plural_forms.cpp",
+	"po_parser.cpp",
+	"tinygettext.cpp",
+))
+addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],

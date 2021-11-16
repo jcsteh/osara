@@ -2,11 +2,10 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2019 NV Access Limited, James Teh
+ * Copyright 2014-2021 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
-#include <windows.h>
 #ifdef _WIN32
 #include <initguid.h>
 #include <oleacc.h>
@@ -40,8 +39,11 @@
 #include "midiEditorCommands.h"
 #include "envelopeCommands.h"
 #include "buildVersion.h"
+#include "fxChain.h"
+#include "translation.h"
 
 using namespace std;
+using namespace fmt::literals;
 
 HINSTANCE pluginHInstance;
 HWND mainHwnd;
@@ -69,6 +71,7 @@ bool shouldMoveFromPlayCursor = false;
 
 /*** Utilities */
 
+bool muteNextMessage = false;
 #ifdef _WIN32
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
@@ -92,6 +95,9 @@ string narrow(const wstring& text) {
 string lastMessage;
 HWND lastMessageHwnd = NULL;
 void outputMessage(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		return;
+	}
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;
@@ -123,6 +129,9 @@ void outputMessage(const string& message, bool interrupt) {
 #else // _WIN32
 
 void outputMessage(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		return;
+	}
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
@@ -132,23 +141,29 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
-string formatTime(double time, TimeFormat format, bool isLength, bool useCache, bool includeZeros) {
+string formatTime(double time, TimeFormat timeFormat, bool isLength,
+	bool useCache, bool includeZeros, bool includeProjectStartOffset
+) {
 	ostringstream s;
-	if (format == TF_RULER) {
-		if (GetToggleCommandState(40365))
-			format = TF_MINSEC;
-		else if (GetToggleCommandState(40368))
-			format = TF_SEC;
-		else if (GetToggleCommandState(41973))
-			format = TF_FRAME;
-		else if (GetToggleCommandState(40370))
-			format = TF_HMSF;
-		else if (GetToggleCommandState(40369))
-			format = TF_SAMPLE;
-		else
-			format = TF_MEASURE;
+	if (timeFormat == TF_RULER) {
+		if (GetToggleCommandState(40365)) {
+			timeFormat = TF_MINSEC;
+		} else if (GetToggleCommandState(40368)) {
+			timeFormat = TF_SEC;
+		} else if (GetToggleCommandState(41973)) {
+			timeFormat = TF_FRAME;
+		} else if (GetToggleCommandState(40370)) {
+			timeFormat = TF_HMSF;
+		} else if (GetToggleCommandState(40369)) {
+			timeFormat = TF_SAMPLE;
+		} else {
+			timeFormat = TF_MEASURE;
+		}
 	}
-	switch (format) {
+	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
+		time += GetProjectTimeOffset(nullptr, false);
+	}
+	switch (timeFormat) {
 		case TF_MEASURE: {
 			int measure;
 			int measureLength;
@@ -166,21 +181,44 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			if (!isLength) {
 				++measure;
 				++wholeBeat;
+				if (includeProjectStartOffset) {
+					int size = 0;
+					int index = projectconfig_var_getoffs("projmeasoffs", &size);
+					assert(size == sizeof(int));
+					measure += *(int*)projectconfig_var_addr(nullptr, index);
+				}
 			}
 			if (!useCache || measure != oldMeasure) {
 				if (isLength) {
-					if (includeZeros || measure != 0)
-						s << measure << (measure == 1 ? " bar " : " bars ");
-				} else
-					s << "bar " << measure << " ";
+					if (includeZeros || measure != 0) {
+						// Translators: Used when reporting a length of time in measures.
+						// {} will be replaced with the number of measures; e.g.
+						// "2 bars".
+						s << format(
+							translate_plural("{} bar", "{} bars", measure), measure)
+							<< " ";
+					}
+				} else {
+					// Translators: Used when reporting the measure of a time position.
+					// {} will be replaced with the measure number; e.g. "bar 2".
+					s << format(translate("bar {}"), measure) << " ";
+				}
 				oldMeasure = measure;
 			}
 			if (!useCache || wholeBeat != oldBeat) {
 				if (isLength) {
-					if (includeZeros || wholeBeat != 0)
-						s << wholeBeat << (wholeBeat == 1 ? " beat " : " beats ");
-				} else
-					s << "beat " << wholeBeat << " ";
+					if (includeZeros || wholeBeat != 0) {
+						// Translators: Used when reporting a length of time in beats.
+						// {} will be replaced with the number of beats; e.g. "2 beats".
+						s << format(
+							translate_plural("{} beat", "{} beats", wholeBeat),
+							wholeBeat) << " ";
+					}
+				} else {
+					// Translators: Used when reporting the beat of a time position.
+					// {} will be replaced with the beat number; e.g. "beat 2".
+					s << format(translate("beat {}"), wholeBeat) << " ";
+				}
 				oldBeat = wholeBeat;
 			}
 			if (!useCache || beatPercent != oldBeatPercent) {
@@ -195,24 +233,29 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
-				s << minute << " min ";
+				// Translators: Used when reporting a time in minutes. {} will be
+				// replaced with the number of minutes; e.g. "2 min".
+				s << format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
-			s << fixed << setprecision(3);
-			s << time << " sec";
+			// Translators: Used when reporting a time in seconds. {:.3f} will be
+			// replaced with the number of seconds; e.g. "2 sec".
+			s << format(translate("{:#.3f} sec"), time);
 			break;
 		}
 		case TF_SEC: {
 			// Seconds
-			s << fixed << setprecision(3);
-			s << time << " sec";
+			s << format(translate("{:.3f} sec"), time);
 			break;
 		}
 		case TF_FRAME: {
 			// Frames
 			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 			if (!useCache || oldFrame != frame) {
-				s << frame << (frame == 1 ? " frame" : " frames");
+				// Translators: Used when reporting a time in frames. {} will be
+				// replaced with the number of frames; e.g. "2 frames".
+				s << format(
+					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -222,24 +265,30 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 			int hour = (int)(time / 3600);
 			time = fmod(time, 3600);
 			if (!useCache || oldHour != hour) {
-				s << hour << (hour == 1 ? " hour " : " hours ");
+				// Translators: used when reporting a time in hours. {} will be replaced
+				// with the number of hours; e.g. "2 hours".
+				s << format(
+					translate_plural("{} hour", "{} hours", hour), hour) << " ";
 				oldHour = hour;
 			}
 			int minute = (int)(time / 60);
 			time = fmod(time, 60);
 			if (!useCache || oldMinute != minute) {
-				s << minute << " min ";
+				s << format(translate("{} min"), minute) << " ";
 				oldMinute = minute;
 			}
 			int second = (int)time;
 			if (!useCache || oldSecond != second) {
-				s << second << " sec ";
+				// Translators: Used when reporting a time in seconds. {} will be
+				// replaced with the number of seconds; e.g. "2 sec".
+				s << format(translate("{} sec"), second) << " ";
 				oldSecond = second;
 			}
 			time = time - second;
 			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
-				s << frame << (frame == 1 ? " frame" : " frames");
+				s << format(
+					translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -247,14 +296,16 @@ string formatTime(double time, TimeFormat format, bool isLength, bool useCache, 
 		case TF_SAMPLE: {
 			char buf[20];
 			format_timestr_pos(time, buf, sizeof(buf), 4);
-			s << buf << " samples";
+			// Translators: Used when reporting a time in samples. {} will be replaced
+			// with the number of samples; e.g. "2 samples".
+			s << format(translate("{} samples"), buf);
 			break;
 		}
 		default:
 			assert(false);
 	}
 	// #31: Clear cache for other units to avoid confusion if they are used later.
-	resetTimeCache(format);
+	resetTimeCache(timeFormat);
 	return s.str();
 }
 
@@ -276,26 +327,66 @@ void resetTimeCache(TimeFormat excludeFormat) {
 	}
 }
 
+string formatNoteLength(double start, double end) {
+	int measureLength;
+	double startBeats;
+	double endBeats;
+	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
+	TimeMap2_timeToBeats(NULL, end, NULL, NULL, &endBeats, NULL);
+	double lengthBeats = endBeats-startBeats;
+	int bars = int(lengthBeats)/measureLength;
+	int remBeats = int(lengthBeats)%measureLength;
+	int percent = lround((lengthBeats-int(lengthBeats))*100);
+	if(percent>99) {
+		percent = 0;
+		++remBeats;
+	}
+	if(remBeats==measureLength) {
+		remBeats = 0;
+		++bars;
+	}
+	ostringstream s;
+	if(bars>0) {
+		s << format(
+			translate_plural("{} bar", "{} bars", bars), bars) << " ";
+	}
+	if(remBeats>0){
+		s << format(
+			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
+	}
+	if(percent>0) {
+		s << percent << "%";
+	}
+	return s.str();
+}
+
 string formatCursorPosition(TimeFormat format, bool useCache) {
 	return formatTime(GetCursorPosition(), format, false, useCache);
 }
 
 const char* formatFolderState(int state, bool reportTrack=true) {
-	if (state == 0)
-		return reportTrack ? "track" : NULL;
-	else if (state == 1)
-		return "folder";
-	return "end of folder";
+	if (state == 0) {
+		// Translators: A track which isn't a folder.
+		return reportTrack ? translate("track") : nullptr;
+	} else if (state == 1) {
+		// Translators: A track which is a folder.
+		return translate("folder");
+	}
+	// Translators: A track which ends its folder.
+	return translate("end of folder");
 }
 
 const char* getFolderCompacting(MediaTrack* track) {
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
 		case 0:
-			return "open";
+			// Translators: An open track folder.
+			return translate("open");
 		case 1:
-			return "small";
+			// Translators: An open (but small visually) track folder.
+			return translate("small");
 		case 2:
-			return "closed";
+			// Translators: A closed track folder.
+			return translate("closed");
 	}
 	return ""; // Should never happen.
 }
@@ -320,11 +411,9 @@ void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCatego
 typedef bool(*TrackStateCheck)(MediaTrack* track);
 
 bool isTrackMuted(MediaTrack* track) {
-	if (track == GetMasterTrack(0)) {
-		// Method for normal tracks doesn't seem to work for master.
-		return GetMasterMuteSoloFlags() & 1;
-	}
-	return *(bool*)GetSetMediaTrackInfo(track, "B_MUTE", NULL);
+	bool muted = false;
+	GetTrackUIMute(track, &muted);
+	return muted;
 }
 
 bool isTrackSoloed(MediaTrack* track) {
@@ -335,13 +424,10 @@ bool isTrackSoloed(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
 }
 
-const regex RE_TRACK_STATE("\\sMUTESOLO \\d \\d (\\d)");
 bool isTrackDefeatingSolo(MediaTrack* track) {
-	char state[500];
-	GetTrackStateChunk(track, state, sizeof(state), false);
-	cmatch m;
-	regex_search(state, m, RE_TRACK_STATE);
-	return !m.empty() && m.str(1)[0] == '1';
+	auto defeat = (bool*)GetSetMediaTrackInfo(track, "B_SOLO_DEFEAT", nullptr);
+	// This will be null in REAPER < 6.30.
+	return defeat ? *defeat : false;
 }
 
 bool isTrackArmed(MediaTrack* track) {
@@ -368,56 +454,81 @@ bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
 }
 
+bool isFreeItemPositioningEnabled(MediaTrack* track) {
+	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
+}
+
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
 		case -1:
-			return "none";
+			// Translators: An automation mode.
+			return translate("none");
 		case 0:
-			return "trim/read";
+			// Translators: An automation mode.
+			return translate("trim/read");
 		case 1:
-			return "read";
+			// Translators: An automation mode.
+			return translate("read");
 		case 2:
-			return "touch";
+			// Translators: An automation mode.
+			return translate("touch");
 		case 3:
-			return "write";
+			// Translators: An automation mode.
+			return translate("write");
 		case 4:
-			return "latch";
+			// Translators: An automation mode.
+			return translate("latch");
 		case 5:
-			return "latch preview";
+			// Translators: An automation mode.
+			return translate("latch preview");
 		case 6:
-			return "bypass";
+			// Translators: An automation mode.
+			return translate("bypass");
 		default:
-			return "unknown";
+			// Translators: An automation mode OSARA doesn't know about.
+			return translate("unknown");
 	}
 }
 
 const char* recordingModeAsString(int mode) {
 	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
 		case 0:
-			return "input";
+			// Translators: A recording mode.
+			return translate("input");
 		case 1:
-			return "output (stereo)";
+			// Translators: A recording mode.
+			return translate("output (stereo)");
 		case 2:
-			return "disabled";
+			// Translators: A recording mode.
+			return translate("disabled");
 		case 3:
-			return "output (stereo, latency compensated)";
+			// Translators: A recording mode.
+			return translate("output (stereo, latency compensated)");
 		case 4:
-			return "output (midi)";
+			// Translators: A recording mode.
+			return translate("output (midi)");
 		case 5:
-			return "output (mono)";
+			// Translators: A recording mode.
+			return translate("output (mono)");
 		case 6:
-			return "output (mono, latency compensated)";
+			// Translators: A recording mode.
+			return translate("output (mono, latency compensated)");
 		case 7:
-			return "midi overdub";
+			// Translators: A recording mode.
+			return translate("midi overdub");
 		case 8:
-			return "midi replace";
+			// Translators: A recording mode.
+			return translate("midi replace");
 		case 9:
-			return "midi touch-replace";
+			// Translators: A recording mode.
+			return translate("midi touch-replace");
 		case 16:
-			return "midi latch-replace";
+			// Translators: A recording mode.
+			return translate("midi latch-replace");
 		default:
-			return "unknown";
+			// Translators: A recording mode OSARA doesn't know about.
+			return translate("unknown");
 	}
 }
 
@@ -491,6 +602,47 @@ unsigned int getConfigUndoMask() {
 	return *undomask;
 }
 
+struct {
+	const char* displayName;
+	const char* name;
+} TRACK_GROUP_TOGGLES[] = {
+	// translate firstString begin
+	{"volume lead", "VOLUME_LEAD"},
+	{"volume follow", "VOLUME_FOLLOW"},
+	{"VCA lead", "VOLUME_VCA_LEAD"},
+	{"VCA follow", "VOLUME_VCA_FOLLOW"},
+	{"pan lead", "PAN_LEAD"},
+	{"pan follow", "PAN_FOLLOW"},
+	{"width lead", "WIDTH_LEAD"},
+	{"width follow", "WIDTH_FOLLOW"},
+	{"mute lead", "MUTE_LEAD"},
+	{"mute follow", "MUTE_FOLLOW"},
+	{"solo lead", "SOLO_LEAD"},
+	{"solo follow", "SOLO_FOLLOW"},
+	{"record arm lead", "RECARM_LEAD"},
+	{"record arm follow", "RECARM_FOLLOW"},
+	{"polarity lead", "POLARITY_LEAD"},
+	{"polarity follow", "POLARITY_FOLLOW"},
+	{"automation mode lead", "AUTOMODE_LEAD"},
+	{"automation mode follow", "AUTOMODE_FOLLOW"},
+	{"reverse volume", "VOLUME_REVERSE"},
+	{"reverse pan", "PAN_REVERSE"},
+	{"reverse width", "WIDTH_REVERSE"},
+	{"do not lead when following", "NO_LEAD_WHEN_FOLLOW"},
+	{"VCA pre-FX follow", "VOLUME_VCA_FOLLOW_ISPREFX"},
+	// translate firstString end
+};
+
+bool isTrackGrouped(MediaTrack* track) {
+	for (auto& toggle : TRACK_GROUP_TOGGLES) {
+		if (GetSetTrackGroupMembership(track, toggle.name, 0, 0) ||
+				GetSetTrackGroupMembershipHigh(track, toggle.name, 0, 0)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -499,6 +651,7 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
+bool shouldReportTrackNumbers = true;
 bool shouldReportFx = false;
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
@@ -508,51 +661,108 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (!track)
 		return;
 	ostringstream s;
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
-	if (trackNum <= 0)
-		s << "master";
-	else {
-		s << trackNum;
-		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL);
-		if (folderDepth == 1) { // Folder
-			s << " " << getFolderCompacting(track);
+	auto separate = [&s]() {
+		if (s.tellp() > 0) {
+			s << " ";
 		}
-		const char* message = formatFolderState(folderDepth, false);
-		if (message)
-			s << " " << message;
-		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-		if (trackName)
-			s << " " << trackName;
+	};
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	if (trackNum <= 0) {
+		// Translators: Reported when navigating to the master track.
+		s << translate("master");
+	} else if (shouldReportTrackNumbers) {
+		s << trackNum;
 	}
 	if (isTrackSelected(track)) {
 		// One selected track is the norm, so don't report selected in this case.
-		if (CountSelectedTracks(0) > 1)
-			s << " selected";
-	} else
-		s << " unselected";
-	if (isTrackMuted(track))
-		s << " muted";
-	if (isTrackSoloed(track))
-		s << " soloed";
-	if (isTrackDefeatingSolo(track)) {
-		s << " defeating solo";
+		if (CountSelectedTracks(0) > 1) {
+			separate();
+			s << translate("selected");
+		}
+	} else {
+		separate();
+		s << translate("unselected");
 	}
-	if (isTrackArmed(track))
-		s << " armed";
-	if (isTrackPhaseInverted(track))
-		s << " phase inverted";
-	if (isTrackFxBypassed(track))
-		s << " FX bypassed";
+	const bool armed = isTrackArmed(track);
+	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM",
+		nullptr);
+	// This will be null in REAPER < 6.30.
+	const bool autoArm = pAutoArm ? *pAutoArm : false;
+	// If auto armed, don't report this before the track name.
+	if (armed && !autoArm) {
+		separate();
+		s << translate("armed");
+	}
+	if (isTrackMuted(track)) {
+		separate();
+		s << translate("muted");
+	}
+	if (isTrackSoloed(track)) {
+		separate();
+		s << translate("soloed");
+	}
+	if (isTrackDefeatingSolo(track)) {
+		separate();
+		s << translate("defeating solo");
+	}
+	if (isTrackPhaseInverted(track)) {
+		separate();
+		s << translate("phase inverted");
+	}
+	if (isTrackFxBypassed(track)) {
+		separate();
+		s << translate("FX bypassed");
+	}
+	if (trackNum > 0) { // Not master
+		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH",
+			nullptr);
+		if (folderDepth == 1) { // Folder
+			separate();
+			s << getFolderCompacting(track);
+		}
+		const char* message = formatFolderState(folderDepth, false);
+		if (message) {
+			separate();
+			s << message;
+		}
+		separate();
+		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+		if (trackName && trackName[0]) {
+			s << trackName;
+		} else if (!shouldReportTrackNumbers) {
+			// There's no name and track number reporting is disabled. We report the
+			// number in lieu of the name.
+			s << trackNum;
+		}
+		if (armed && autoArm) {
+			separate();
+			s << translate("armed");
+		}
+	}
+	if (isTrackGrouped(track)) {
+		// Translators: Reported when navigating to a track which is grouped.
+		s << " " << translate("grouped");
+	}
 	if (NF_GetSWSTrackNotes && NF_GetSWSTrackNotes(track)[0]) {
-		s << " notes";
+		// Translators: Reported when navigating to a track which has track notes.
+		s << " " << translate("notes");
 	}
 	if (trackNum > 0) { // Not master
 		int itemCount = CountTrackMediaItems(track);
-		s << " " << itemCount << (itemCount == 1 ? " item" : " items");
+		// Translators: Reported when navigating tracks to indicate how many items
+		// the track has. {} will be replaced by the number of items; e.g.
+		// "2 items".
+		s << " " << format(translate_plural("{} item", "{} items", itemCount),
+			itemCount);
+		if (isFreeItemPositioningEnabled(track)) {
+			s << " " << translate("free item positioning");
+		}
 	}
 	int count;
 	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
-		s << "; FX: ";
+		// Translators: Reported when navigating tracks before listing the effects on
+		// the track.
+		s << "; " << translate("FX:") << " ";
 		char name[256];
 		for (int f = 0; f < count; ++f) {
 			if (f > 0)
@@ -576,21 +786,27 @@ void postToggleTrackMute(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackMuted(track) ? "muted" : "unmuted");
+	outputMessage(isTrackMuted(track) ?
+		translate("muted") :
+		translate("unmuted"));
 }
 
 void postToggleTrackSolo(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackSoloed(track) ? "soloed" : "unsoloed");
+	outputMessage(isTrackSoloed(track) ?
+		translate("soloed") :
+		translate("unsoloed"));
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackArmed(track) ? "armed" : "unarmed");
+	outputMessage(isTrackArmed(track) ?
+		translate("armed") :
+		translate("unarmed"));
 }
 
 void postCycleTrackMonitor(int command) {
@@ -599,13 +815,15 @@ void postCycleTrackMonitor(int command) {
 		return;
 	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
 		case 0:
-			outputMessage("record monitor off");
+			outputMessage(translate("record monitor off"));
 			break;
 		case 1:
-			outputMessage("normal");
+			// Translators: Record monitor set to normal.
+			outputMessage(translate("normal"));
 			break;
 		case 2:
-			outputMessage("not when playing");
+			// Translators: Record monitor set to not when playing.
+			outputMessage(translate("not when playing"));
 	}
 }
 
@@ -613,11 +831,15 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackPhaseInverted(track) ? "phase inverted" : "phase normal");
+	outputMessage(isTrackPhaseInverted(track) ?
+		translate("phase inverted") :
+		translate("phase normal"));
 }
 
 void postToggleTrackFxBypass(MediaTrack* track) {
-	outputMessage(isTrackFxBypassed(track) ? "FX bypassed" : "FX active");
+	outputMessage(isTrackFxBypassed(track) ?
+		translate("FX bypassed") :
+		translate("FX active"));
 }
 
 void postToggleTrackFxBypass(int command) {
@@ -648,7 +870,15 @@ void postToggleAllTracksFxBypass(int command) {
 			break;
 		}
 	}
-	outputMessage(bypassed ? "all tracks FX bypassed" : "all tracks FX active");
+	outputMessage(bypassed ?
+		translate("all tracks FX bypassed") :
+		translate("all tracks FX active"));
+}
+
+void postToggleLastFocusedFxDeltaSolo(int command) {
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled delta solo") :
+		translate("disabled delta solo"));
 }
 
 bool shouldReportScrub = true;
@@ -667,6 +897,28 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
+void postItemNormalize(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(0);
+	if (selectedItemsCount == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	if (command == 40254) {
+		// Item properties: Normalize multiple items to common gain
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items normalized to common gain".
+		outputMessage(format(
+			translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
+			selectedItemsCount));
+	} else {
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items normalized".
+		outputMessage(format(
+			translate_plural("{} item normalized", "{} items normalized", selectedItemsCount),
+			selectedItemsCount));
+	}
+}
+
 void postCycleTrackFolderState(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
@@ -678,7 +930,38 @@ void postCycleTrackFolderCollapsed(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
+	if (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", nullptr) != 1) {
+		outputMessage(translate("not a folder"));
+		return;
+	}
 	outputMessage(getFolderCompacting(track));
+}
+
+int findRegionEndingAt(double wantedEndPos) {
+	double start = wantedEndPos;
+	for (; ;) {
+		if (start == 0) {
+			return -1;
+		}
+		// GetLastMarkerAndCurRegion doesn't return a region at its end position,
+		// so subtract a bit.
+		double tempPos = max(start - 0.001, 0);
+		int region;
+		GetLastMarkerAndCurRegion(nullptr, tempPos, nullptr, &region);
+		if (region < 0) {
+			return -1;
+		}
+		double end;
+		EnumProjectMarkers(region, nullptr, &start, &end, nullptr, nullptr);
+		if (end == wantedEndPos) {
+			return region;
+		}
+		// If there are overlapping regions, GetLastMarkerAndCurRegion will return
+		// the region which starts nearest to the given position. There might be a
+		// region which starts earlier but ends earlier. The next iteration will
+		// try the region just prior to this region's start position.
+	}
+	return -1;
 }
 
 void postGoToMarker(int command) {
@@ -686,41 +969,81 @@ void postGoToMarker(int command) {
 	int marker, region;
 	double markerPos;
 	double cursorPos = GetCursorPosition();
-	GetLastMarkerAndCurRegion(0, cursorPos, &marker, &region);
+	GetLastMarkerAndCurRegion(nullptr, cursorPos, &marker, &region);
 	const char* name;
 	int number;
 	if (marker >= 0) {
 		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
 		if (markerPos == cursorPos) {
 			fakeFocus = FOCUS_MARKER;
-			if (name[0])
-				s << name << " marker" << " ";
-			else
-				s << "marker " << number << " ";
+			if (name[0]) {
+				// Translators: Reported when moving to a named project marker. {} will
+				// be replaced with the marker's name; e.g. "intro marker".
+				s << format(translate("{} marker"), name) << " ";
+			} else {
+				// Translators: Reported when moving to an unnamed project marker. {}
+				// will be replaced with the marker's name; e.g. "marker 2".
+				s << format(translate("marker {}"), number) << " ";
+			}
 		}
 	}
-	if (region >= 0) {
-		EnumProjectMarkers(region, NULL, NULL, NULL, &name, &number);
-		fakeFocus = FOCUS_REGION;
-		if (name[0])
-			s << name << " region ";
-		else
-			s << "region " << number << " ";
-	}
 	double start, end;
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, &start, &end, &name, &number);
+		if (start == cursorPos) {
+			fakeFocus = FOCUS_REGION;
+			if (name[0]) {
+				// Translators: Reported when moving to the start of a named region. {}
+				// will be replaced with the region's name; e.g. "intro region start".
+				s << format(translate("{} region start"), name) << " ";
+			} else {
+				// Translators: Reported when moving to the start of an unnamed region.
+				// {} will be replaced with the region's number; e.g.
+				// "region 2 start".
+				s << format(translate("region {} start"), number) << " ";
+			}
+		}
+	}
+	region = findRegionEndingAt(cursorPos);
+	if (region >= 0) {
+		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &number);
+		fakeFocus = FOCUS_REGION;
+		if (name[0]) {
+			// Translators: Reported when moving to the end of a named region. {}
+			// will be replaced with the region's name; e.g. "intro region end".
+			s << format(translate("{} region end"), name) << " ";
+		} else {
+			// Translators: Reported when moving to the end of an unnamed region.
+			// {} will be replaced with the region's number; e.g.
+			// "region 2 end".
+			s << format(translate("region {} end"), number) << " ";
+		}
+	}
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start != end) {
-		if (cursorPos == start)
-			s << "selection start ";
-		if (cursorPos == end)
-			s << "selection end ";
+		if (cursorPos == start) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// start of the time selection.
+			s << translate("selection start") << " ";
+		}
+		if (cursorPos == end) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// end of the time selection.
+			s << translate("selection end") << " ";
+		}
 	}
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	if (start != end) {
-		if (cursorPos == start)
-			s << "loop start ";
-		if (cursorPos == end)
-			s << "loop end ";
+		if (cursorPos == start) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// loop start point.
+			s << translate("loop start") << " ";
+		}
+		if (cursorPos == end) {
+			// Translators: Reported when moving by marker and the cursor lands at the
+			// loop end point.
+			s << translate("loop end") << " ";
+		}
 	}
 	s << formatCursorPosition();
 	if (s.tellp() > 0)
@@ -757,11 +1080,26 @@ void postGoToSpecificMarker(int command) {
 			continue;
 		fakeFocus = reg ? FOCUS_REGION : FOCUS_MARKER;
 		ostringstream s;
-		if (name[0])
-			s << name << (reg ? " region " : " marker ");
-		else
-			s << (reg ? "region " : "marker ") << num << " ";
-		s << formatCursorPosition();
+		if (name[0]) {
+			if (reg) {
+				// Translators: used when reporting a named region. {} will be
+				// replaced with the name of the region; e.g. "intro region"
+				s << format(translate("{} region"), name);
+			} else {
+				// Translators: used when reporting a named marker. {} will be
+				// replaced with the name of the marker; e.g. "v2 marker"
+				s << format(translate("{} marker"), name);
+			}
+		} else{ // unnamed
+			if(reg){
+				// Translators: used to report an unnamed region. {} is replaced with the region number.  
+				s << format(translate("region {}"), num);
+			} else {
+				// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+				s << format(translate("marker {}"), num);
+			}
+		}
+		s << " " << formatCursorPosition();
 		outputMessage(s);
 		return;
 	}
@@ -770,7 +1108,7 @@ void postGoToSpecificMarker(int command) {
 void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
 	if(lastCommand != command) 
-		s << commandMessage;
+		s << commandMessage << " ";
 	s << fixed << setprecision(2);
 	s << VAL2DB(volume);
 	outputMessage(s);
@@ -781,7 +1119,7 @@ void postChangeTrackVolume(int command) {
 	double volume = 0.0;
 	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeVolumeH(volume, command, "Track ");
+	postChangeVolumeH(volume, command, translate("Track"));
 }
 
 void postChangeMasterTrackVolume(int command) {
@@ -789,7 +1127,7 @@ void postChangeMasterTrackVolume(int command) {
 	double volume = 0.0;
 	if ( !GetTrackUIVolPan(track, &volume, NULL) )
 		return;
-	postChangeVolumeH(volume, command, "Master ");
+	postChangeVolumeH(volume, command, translate("Master"));
 }
 
 void postChangeItemVolume(int command) {
@@ -797,7 +1135,7 @@ void postChangeItemVolume(int command) {
 	if(!item)
 		return;
 	double volume = GetMediaItemInfo_Value(item, "D_VOL");
-	postChangeVolumeH(volume, command, "Item ");
+	postChangeVolumeH(volume, command, translate("Item"));
 }
 
 void postChangeTakeVolume(int command) {
@@ -810,24 +1148,28 @@ void postChangeTakeVolume(int command) {
 	}
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
 	volume = fabs(volume);// volume is negative if take polarity is flipped
-	postChangeVolumeH(volume, command, "Take ");
+	postChangeVolumeH(volume, command, translate("Take"));
 }
 
 void postChangeHorizontalZoom(int command) {
-	ostringstream s;
-	s << fixed << setprecision(3);
-	s << GetHZoomLevel() << " pixels/second";
-	outputMessage(s);
+	// Translators: Reported when zooming in or out horizontally. {:g} will be
+	// replaced with the number of pixels per second; e.g. 100 pixels/second.
+	outputMessage(format(translate("{:g} pixels/second"), GetHZoomLevel()));
 }
 
 void formatPan(double pan, ostringstream& output) {
 	pan *=100.0;
 	if (pan == 0) {
-		output << "center";
+		// Translators: Panned to the center.
+		output << translate("center");
 	} else if (pan < 0) {
-		output << -pan << "% left";
+		// Translators: Panned to the left. {:g} will be replaced with the amount;
+		// e.g. "20% left".
+		output << format(translate("{:g}% left"), -pan);
 	} else {
-		output << pan << "% right";
+		// Translators: Panned to the right. {:g} will be replaced with the amount;
+		// e.g. "20% right".
+		output << format(translate("{:g}% right"), pan);
 	}
 }
 
@@ -844,19 +1186,19 @@ void postChangeTrackPan(int command) {
 }
 
 void postCycleRippleMode(int command) {
-	ostringstream s;
-	s << "ripple ";
-	if (GetToggleCommandState(40310))
-		s << "per-track";
-	else if (GetToggleCommandState(40311))
-		s << "all tracks";
-	else
-		s << "off";
-	outputMessage(s);
+	if (GetToggleCommandState(40310)) {
+		outputMessage(translate("ripple per-track"));
+	} else if (GetToggleCommandState(40311)) {
+		outputMessage(translate("ripple all tracks"));
+	} else {
+		outputMessage(translate("ripple off"));
+	}
 }
 
 void reportRepeat(bool repeat) {
-	outputMessage(repeat ? "repeat on" : "repeat off");
+	outputMessage(repeat ?
+		translate("repeat on") :
+		translate("repeat off"));
 }
 
 void postToggleRepeat(int command) {
@@ -869,7 +1211,9 @@ void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
 	int count = TakeFX_GetCount(take);
 	if (count == 0)
 		return;
-	s << "; FX: ";
+	// Translators: Reported when switching takes before listing the effects on
+	// the take.
+	s << "; " << translate("FX:") << " ";
 	char name[256];
 	for (int f = 0; f < count; ++f) {
 		if (f > 0)
@@ -894,26 +1238,32 @@ void postSwitchToTake(int command) {
 }
 
 void postCopy(int command) {
-	ostringstream s;
 	int count;
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
-			if ((count = CountSelectedTracks(0)) > 0)
-				s << count << (count == 1 ? " track" : " tracks") << " copied";
-			break;
+			if ((count = CountSelectedTracks(0)) > 0) {
+				// Translators: Reported when copying tracks. {} will be replaced with
+				// the number of tracks; e.g. "2 tracks copied".
+				outputMessage(format(
+					translate_plural("{} track copied", "{} tracks copied", count),
+					count));
+			}
+			return;
 		case 1: // Item
-			if ((count = CountSelectedMediaItems(0)) > 0)
-				s << count << (count == 1 ? " item" : " items") << " copied";
-			break;
+			if ((count = CountSelectedMediaItems(0)) > 0) {
+				// Translators: Reported when copying items. {} will be replaced with
+				// the number of items; e.g. "2 items copied".
+				outputMessage(format(
+					translate_plural("{} item copied", "{} items copied", count),
+					count));
+			}
+			return;
 		case 2: // Envelope
 			reportCopiedEnvelopePointsOrAutoItems();
-			// A message was already reported, so return here;
-			// don't let the outputMessage below squelch it.
 			return;
 		default:
 			return;
 	}
-	outputMessage(s);
 }
 
 void postMoveToTimeSig(int command) {
@@ -928,9 +1278,16 @@ void postMoveToTimeSig(int command) {
 		return;
 	fakeFocus = FOCUS_TIMESIG;
 	ostringstream s;
-	s << "tempo " << bpm;
-	if (sigNum > 0)
-		s << " time sig " << sigNum << "/" << sigDenom;
+	// Translators: Reported when moving to a tempo change. {} will be replaced
+	// with the tempo in bpm; e.g. "tempo 100".
+	s << format(translate("tempo {}"), bpm);
+	if (sigNum > 0) {
+		// Translators: Reported when moving to a time signature change. {num} will
+		// be replaced with the time signature numerator. {denom} will be replaced
+		// with the time signature denominator. For example: "time sig 6/8".
+		s << " " << format(translate("time sig {num}/{denom}"),
+			"num"_a=sigNum, "denom"_a=sigDenom);
+	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
 }
@@ -982,7 +1339,8 @@ void postGoToStretch(int command) {
 	if (found) {
 		fakeFocus = FOCUS_STRETCH;
 		lastStretchPos = cursor;
-		s << "stretch marker ";
+		// Translators: Reported when moving to a stretch marker.
+		s << translate("stretch marker") << " ";
 	} else
 		lastStretchPos = -1;
 	s << formatCursorPosition();
@@ -1007,25 +1365,30 @@ void postTrackIo(int command) {
 }
 
 void postToggleMetronome(int command) {
-	outputMessage(GetToggleCommandState(command) ? "metronome on" : "metronome off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("metronome on") :
+		translate("metronome off"));
 }
 
 void postToggleMasterTrackVisible(int command) {
-	outputMessage(GetToggleCommandState(command) ? "master track visible" : "master track hidden");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("master track visible") :
+		translate("master track hidden"));
 }
 
 bool shouldReportTransport = true;
 void reportTransportState(int state) {
 	if (!shouldReportTransport)
 		return;
-	if (state & 2)
-		outputMessage("pause");
-	else if (state & 4)
-		outputMessage("record");
-	else if (state & 1)
-		outputMessage("play");
-	else
-		outputMessage("stop");
+	if (state & 2) {
+		outputMessage(translate("pause"));
+	} else if (state & 4) {
+		outputMessage(translate("record"));
+	} else if (state & 1) {
+		outputMessage(translate("play"));
+	} else {
+		outputMessage(translate("stop"));
+	}
 }
 
 void postChangeTransportState(int command) {
@@ -1034,9 +1397,11 @@ void postChangeTransportState(int command) {
 
 void postSelectMultipleItems(int command) {
 	int count = CountSelectedMediaItems(0);
-	ostringstream s;
-	s << count << (count == 1 ? " item" : " items") << " selected";
-	outputMessage(s);
+	// Translators: Reported when items are selected. {} will be replaced with
+	// the number of items; e.g. "2 items selected".
+	outputMessage(format(
+		translate_plural("{} item selected", "{} items selected", count),
+		count));
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
@@ -1047,7 +1412,8 @@ void postRenameTrack(int command) {
 	if (!GetLastTouchedTrack())
 		return;
 	// #82: On Windows, this will end up as the label of the track name text box.
-	outputMessage("Track name");
+	// Translators: Reported when prompting for the name of a track.
+	outputMessage(translate("Track name"));
 }
 
 bool isItemMuted(MediaItem* item) {
@@ -1061,7 +1427,8 @@ void postToggleItemMute(int command) {
 	if(count==0)
 		return;
 	if(count==1)  {
-		outputMessage(isItemMuted(GetSelectedMediaItem(0,0))?"muted":"unmuted");
+		outputMessage(isItemMuted(GetSelectedMediaItem(0,0)) ?
+			translate("muted") : translate("unmuted"));
 		return;
 	}
 	for (int i=0; i<count; ++i) {
@@ -1072,11 +1439,21 @@ void postToggleItemMute(int command) {
 	}
 	ostringstream s;
 	if(muteCount>0){
-		s<<muteCount<<" item"<<((muteCount==1)?"":"s") <<" muted";
-		s<<((unmuteCount>0)?", ":"");
+		// Translators: Reported when multiple items are muted. {} will be replaced
+		// with the number of items; e.g. "2 items muted".
+		s << format(translate_plural("{} item muted", "{} items muted", muteCount),
+			muteCount);
+		if (unmuteCount > 0) {
+			s << ", ";
+		}
 	}
-	if(unmuteCount>0) 
-		s<<unmuteCount<<" item"<<((unmuteCount==1)?"":"s") <<" unmuted";
+	if(unmuteCount>0)  {
+		// Translators: Reported when multiple items are unmuted. {} will be
+		// replaced with the number of items; e.g. "2 items unmuted".
+		s << format(
+			translate_plural("{} item unmuted", "{} items unmuted", unmuteCount),
+			unmuteCount);
+	}
 	outputMessage(s);
 }
 
@@ -1094,60 +1471,79 @@ void postToggleItemSolo(int command) {
 		}
 	}
 	if(selectedCount==1) {
-		outputMessage(soloed?"soloed":"unsoloed");
+		outputMessage(soloed ? translate("soloed") : translate("unsoloed"));
 		return;
 	}
-	ostringstream s;
-	s<<selectedCount<<" items "<<(soloed?"soloed":"unsoloed");
-	outputMessage(s);
+	if (soloed) {
+		// Translators: Reported when multiple items are soloed. {} will be replaced
+		// with the number of items; e.g. "2 items soloed".
+		outputMessage(format(
+			translate_plural("{} item soloed", "{} items soloed", selectedCount),
+			selectedCount));
+	} else {
+		// Translators: Reported when multiple items are unsoloed. {} will be
+		// replaced with the number of items; e.g. "2 items unsoloed".
+		outputMessage(format(
+			translate_plural("{} item unsoloed", "{} items unsoloed", selectedCount),
+			selectedCount));
+	}
 }
 
 void postSetSelectionEnd(int command) {
-	outputMessage("set selection end");
+	outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
 }
 
 void postToggleMasterMono(int command) {
-	outputMessage(GetToggleCommandState(command) ? "master mono" : "master stereo");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("master mono") : translate("master stereo"));
 }
 
 void postToggleAutoCrossfade(int command) {
-	outputMessage(GetToggleCommandState(command) ? "crossfade on" : "crossfade off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("crossfade on") : translate("crossfade off"));
 }
 
 void postToggleLocking(int command) {
-	outputMessage(GetToggleCommandState(command) ? "locking on" : "locking off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("locking on") : translate("locking off"));
 }
 
 void postToggleSoloInFront(int command) {
-	outputMessage(GetToggleCommandState(command) ? "solo in front" : "normal solo");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("solo in front") :
+		// Translators: Solo in front was turned off.
+		translate("normal solo"));
 }
 
 void postAdjustPlayRate(int command) {
 	double rate = Master_GetPlayRate(nullptr);
-	ostringstream s;
-	s << fixed << setprecision(3);
-	s << rate << " play rate";
-	outputMessage(s);
+	// Translators: Reported when the play rate is adjusted. {:g} will be replaced
+	// with the play rate; e.g. "1.5 play rate".
+	outputMessage(format(translate("{:g} play rate"), rate));
 }
 
 void postToggleMonitoringFxBypass(int command) {
-	outputMessage(GetToggleCommandState(command) ? "FX bypassed" : "fx active");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("FX bypassed") : translate("fx active"));
 }
 
 void postCycleRecordMode(int command) {
 	if (GetToggleCommandState(40252)) {
-		outputMessage("normal record");
+		// Translators: Record mode set to normal.
+		outputMessage(translate("normal record"));
 	} else if (GetToggleCommandState(40253)) {
-		outputMessage("selected item auto-punch");
+		outputMessage(translate("selected item auto-punch"));
 	} else if (GetToggleCommandState(40076)) {
-		outputMessage("time selection auto-punch");
+		outputMessage(translate("time selection auto-punch"));
 	}
 }
 
 void postChangeGlobalAutomationOverride(int command) {
 	ostringstream s;
-	s << "Override ";
+	// Translators: When changing the global automation override, reported prior
+	// to the chosen automation mode.
+	s << translate("override") << " ";
 	s << automationModeAsString(GetGlobalAutomationOverride());
 	outputMessage(s);
 }
@@ -1155,111 +1551,106 @@ void postChangeGlobalAutomationOverride(int command) {
 void postReverseTake(int command) {
 	int count = CountSelectedMediaItems(0);
 	if(count==0) {
-		outputMessage("no items selected");
+		outputMessage(translate("no items selected"));
 		return;
 	}
-	ostringstream s;
-	s<<count<<((count==1)?" take ":" takes ")<<"reversed";
-	outputMessage(s);
+	// Translators: Reported when reversing takes. {} will be replaced by the
+	// number of takes; e.g. "2 takes reversed".
+	outputMessage(format(
+		translate_plural("{} take reversed", "{} takes reversed", count),
+		count));
 }
 
 void postTogglePreRoll(int command) {
-	outputMessage(GetToggleCommandState(command) ? "pre roll on":"pre roll off");
+	outputMessage(GetToggleCommandState(command) ?
+		translate("pre roll on") : translate("pre roll off"));
 }
 
 void postToggleCountIn(int command) {
-	outputMessage(GetToggleCommandState(command) ? "count in on":"count in off");
+	outputMessage(GetToggleCommandState(command) ? 
+		translate("count in on") : translate("count in off"));
 }
 
 void postTakeChannelMode(int command) {
 	int count = CountSelectedMediaItems(0);
 	if(count==0) {
-		outputMessage("no items selected");
+		outputMessage(translate("no items selected"));
 		return;
 	}
 	const char* mode;
 	switch(command) {
 		case 40176: {
-			mode = "normal";
+			// Translators: A take channel mode.
+			mode = translate("normal");
 			break;
 		}
 		case 40179: {
-			mode = "mono (left)";
+			// Translators: A take channel mode.
+			mode = translate("mono (left)");
 			break;
 		}
 		case 40178: {
-			mode = "mono (downmix)";
+			// Translators: A take channel mode.
+			mode = translate("mono (downmix)");
 			break;
 		}
 		case 40180: {
-			mode = "mono (right)";
+			// Translators: A take channel mode.
+			mode = translate("mono (right)");
 			break;
 		}
 		default: {
-			mode = "unknown mode";
+			// Translators: A take channel mode OSARA doesn't know about.
+			mode = translate("unknown mode");
 		}
 	}
-	ostringstream s;
-	s<< "set " << count <<((count==1)?" take ":" takes ") << "to " << mode;
-	outputMessage(s);
+	// Translators: Reported when setting the channel mode of takes.
+	// {count} will be replaced with the number of takes affected.
+	// {mode} will be replaced with the mode being set.
+	// For example: "set 2 takes to mono (left)"
+	outputMessage(format(
+		translate_plural("set {count} take to {mode}", "set {count} takes to {mode}", count),
+		"count"_a=count, "mode"_a=mode));
 }
 
 void postChangeTempo(int command) {
 	double tempo = Master_GetTempo();
-	ostringstream s;
-	s << tempo << " BPM";
-	outputMessage(s);
+	// Translators: Reported when changing the tempo. {} will be replaced with
+	// the new tempo; e.g. "50 bpm".
+	outputMessage(format(translate("{} bpm"), tempo));
 }
 
 void postTogglePlaybackPositionFollowsTimebase(int command) {
-	ostringstream s;
-	s << ( GetToggleCommandState(command) ? "Enabled" : "Disabled" );
-	s << " playback position follows project timebase when changing tempo" ;
-	outputMessage(s);
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled playback position follows project timebase when changing tempo") :
+		translate("disabled playback position follows project timebase when changing tempo"));
 }
 
 void postTogglePreservePitchWhenPlayRateChanged(int command) {
-	ostringstream s;
-	s << ( GetToggleCommandState(command) ? "preserving" : "not preserving")
-		<< " pitch when changing play rate";
-	outputMessage(s);
+	outputMessage(GetToggleCommandState(command) ?
+		translate("preserving pitch when changing play rate") :
+		translate("not preserving pitch when changing play rate"));
 }
 
 void postSetItemEnd(int command) {
 	MediaItem* item = getItemWithFocus();
 	if(!item)
 		return;
-	ostringstream s;
 	int selCount = CountSelectedMediaItems(0);
 	if(selCount > 1){
-		s << selCount << " item ends set to source media end";
+		// Translators: Reported when setting the ends of multiple items to the end
+		// of their source media. {} will be replaced with the number of items; e.g.
+		// "2 item ends set to source media end"
+		outputMessage(format(translate("{} item ends set to source media end"),
+			selCount));
 	} else {
 		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
-		s << "Item end set to source media end: ";
-		s << formatTime(endPos, TF_RULER, false, false, true);
+		// Translators: Reported when setting the end of a single item to its source
+		// media end. {} will be replaced with the end time; e.g.
+		// "item end set to source media end: bar 3 beat 1 25%"
+		outputMessage(format(translate("item end set to source media end: {}"),
+			formatTime(endPos, TF_RULER, false, false, true)));
 	}
-	outputMessage(s);
-}
-
-void postChangeItemGroup(int command) {
-	MediaItem* item = getItemWithFocus();
-	if(!item) {
-		return;
-	}
-	int selCount = CountSelectedMediaItems(nullptr);
-	ostringstream s;
-	if (selCount == 1) {
-		s << "item";
-	} else {
-		s << selCount << " items";
-	}
-	int groupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
-	if (groupId) {
-		s << " added to group";
-	} else {
-		s << " removed from group";
-	}
-	outputMessage(s);
 }
 
 void postGoToTakeMarker(int command) {
@@ -1285,7 +1676,9 @@ void postGoToTakeMarker(int command) {
 			char name[100];
 			double markerPos = GetTakeMarker(take, m, name, sizeof(name), nullptr);
 			if (markerPos == cursorRel) {
-				s << name << " take marker ";
+				// Translators: Reported when moving to a take marker. {} will be
+				// replaced with the name of the marker; e.g. "fix take marker".
+				s << format(translate("{} take marker"), name) << " ";
 				fakeFocus = FOCUS_TAKEMARKER;
 			}
 		}
@@ -1299,9 +1692,10 @@ void postGoToTakeMarker(int command) {
 
 void postSelectMultipleTracks(int command) {
 	int count = CountSelectedTracks(nullptr);
-	ostringstream s;
-	s << count << (count == 1 ? " track" : " tracks") << " selected";
-	outputMessage(s);
+	// Translators: Reported when an action selects tracks. {} will be replaced
+	// with the number of tracks; e.g. "2 tracks selected".
+	outputMessage(format(
+		translate_plural("{} track selected", "{} tracks selected", count), count));
 }
 
 void postSelectAll(int command) {
@@ -1325,24 +1719,48 @@ void postToggleTrackSoloDefeat(int command) {
 	if (!track) {
 		return;
 	}
-	outputMessage(isTrackDefeatingSolo(track) ?
-		"defeating solo" : "not defeating solo");
+	// We don't use isTrackDefeatingSolo() because it returns false even if
+	// this is REAPER < 6.30. We want to report nothing if this REAPER is too old
+	// to support this.
+	auto defeat = (bool*)GetSetMediaTrackInfo(track, "B_SOLO_DEFEAT", nullptr);
+	if (!defeat) {
+		return;
+	}
+	outputMessage(*defeat ?
+		translate("defeating solo") : translate("not defeating solo"));
 }
 
 void postChangeTransientDetectionSensitivity(int command) {
 	double sensitivity = *(double*)get_config_var("transientsensitivity",
 		nullptr) * 100;
-	ostringstream s;
-	s << sensitivity << "% sensitivity";
-	outputMessage(s);
+		// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+		// E.g. "13% sensitivity"
+	outputMessage(format(
+		translate("{:g}% sensitivity"), sensitivity));
 }
 
 void postChangeTransientDetectionThreshold(int command) {
 	double threshold = *(double*)get_config_var("transientthreshold",
 		nullptr);
-	ostringstream s;
-	s << threshold << "dB threshold";
-	outputMessage(s);
+	// Translators: Reported when changing the transient detection threshold.
+	// {:g} will be replaced with the threshold; e.g. "{} dB threshold".
+	outputMessage(format(translate("{:g} dB threshold"), threshold));
+}
+
+void postToggleEnvelopePointsMoveWithMediaItems(int command) {
+	outputMessage(GetToggleCommandState(command) ?
+		translate("enabled envelope points move with media items") :
+		translate("disabled envelope points move with media items"));
+}
+
+void postToggleFreeItemPositioning(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr) ?
+		translate("enabled free item positioning") :
+		translate("disabled free item positioning"));
 }
 
 typedef void (*PostCommandExecute)(int);
@@ -1350,6 +1768,12 @@ typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
 } PostCommand;
+
+typedef struct MidiPostCommand : PostCommand {
+	bool supportedInMidiEventList = false;
+	bool changesValueInMidiEventList = false;
+} MidiPostCommand;
+
 // For commands registered by other plug-ins.
 typedef struct {
 	const char* id;
@@ -1358,22 +1782,29 @@ typedef struct {
 
 PostCommand POST_COMMANDS[] = {
 	{40001, postGoToTrack}, // Track: Insert new track
+	{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
 	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
+	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
 	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
 	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
 	{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
+	{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
+	{40108, postItemNormalize}, // Item properties: Normalize items
+	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
+	{41040, postCursorMovement}, // Move edit cursor to start of next measure
+	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{41042, postCursorMovement}, // Go forward one measure
 	{41043, postCursorMovement}, // Go back one measure
 	{41044, postCursorMovement}, // Go forward one beat
@@ -1408,6 +1839,7 @@ PostCommand POST_COMMANDS[] = {
 	{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
 	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
 	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
+	{41190, postChangeHorizontalZoom}, // View: Set horizontal zoom to default project setting
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
@@ -1482,8 +1914,8 @@ PostCommand POST_COMMANDS[] = {
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
 	{40630, postCursorMovement}, // Go to start of time selection
 	{40631, postCursorMovement}, // Go to end of time selection
-	{40032, postChangeItemGroup}, // Item grouping: Group items
-	{40033, postChangeItemGroup}, // Item grouping: Remove items from group
+	{40632, postCursorMovement}, // Go to start of loop
+	{40633, postCursorMovement}, // Go to end of loop
 	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
 	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
 	{40296, postSelectMultipleTracks}, // Track: Select all tracks
@@ -1494,40 +1926,52 @@ PostCommand POST_COMMANDS[] = {
 	{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
 	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
 	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
+	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
+	{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
 	{0},
 };
-PostCommand MIDI_POST_COMMANDS[] = {
-	{40006, postMidiSelectNotes}, // Edit: Select all events
+MidiPostCommand MIDI_POST_COMMANDS[] = {
+	{40006, postMidiSelectEvents, true}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
-	{40177, postMidiChangePitch}, // Edit: Move notes up one semitone
-	{40178, postMidiChangePitch}, // Edit: Move notes down one semitone
-	{40179, postMidiChangePitch}, // Edit: Move notes up one octave
-	{40180, postMidiChangePitch}, // Edit: Move notes down one octave
+	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
+	{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
+	{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
+	{40180, postMidiChangePitch, true, true}, // Edit: Move notes down one octave
+	{40181, postMidiMoveStart}, // Edit: Move notes left one pixel
+	{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
+	{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
+	{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
 	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
 	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
 	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
-	{40435, postMidiSelectNotes}, // Select all notes with the same pitch
+	{40434, postMidiSelectNotes, true}, // Select all notes with the same pitch
 	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
-	{40446, postMidiChangeLength}, // Edit: Lengthen notes one grid unit
-	{40447, postMidiChangeLength}, // Edit: Shorten notes one grid unit
-	{40462, postMidiChangeVelocity}, // Edit: Note velocity +01
-	{40463, postMidiChangeVelocity}, // Edit: Note velocity +10
-	{40464, postMidiChangeVelocity}, // Edit: Note velocity -01
-	{40465, postMidiChangeVelocity}, // Edit: Note velocity -10
-	{40501, postMidiSelectNotes}, // Invert selection
-	{40676, postMidiChangeCCValue}, // Edit: Increase value a little bit for CC events
-	{40677, postMidiChangeCCValue}, // Edit: Decrease value a little bit for CC events
-	{40746, postMidiSelectNotes}, // Edit: Select all notes in time selection
-	{41026, postMidiChangePitch}, // Edit: Move notes up one semitone ignoring scale/key
-	{41027, postMidiChangePitch}, // Edit: Move notes down one semitone ignoring scale/key
-	{0},
+	{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
+	{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
+	{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
+	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
+	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
+	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
+	{40501, postMidiSelectEvents}, // Invert selection
+	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
+	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
+	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
+	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
+	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
+	{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
+	{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
+	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
+	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
 	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
+	{"_XENAKIOS_NUDMASVOL1DBU", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB up
+	{"_XENAKIOS_NUDMASVOL1DBD", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB down
+	{"_XENAKIOS_SETMASTVOLTO0", postChangeMasterTrackVolume}, // Xenakios/SWS: Set master volume to 0 dB
 	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
@@ -1544,6 +1988,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 };
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40625, "set selection start"}, // Time selection: Set start point
 	{40222, "set loop start"}, // Loop points: Set start point
 	{40223, "set loop end"}, // Loop points: Set end point
@@ -1556,9 +2001,11 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
 	{40778, "grid eighth"}, // Grid: Set to 1/8
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{40774, "grid sixty forth"}, // Grid: Set to 1/64
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+	// translate firstString end
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -1570,7 +2017,9 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
+map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
+	// translate firstString begin
 	{40204, "grid whole"}, // Grid: Set to 1
 	{40203, "grid half"}, // Grid: Set to 1/2
 	{40190, "grid thirty second"}, // Grid: Set to 1/32
@@ -1581,6 +2030,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40197, "grid eighth"}, // Grid: Set to 1/8
 	{40193, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 	{40189, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
+	{41020, "grid sixty forth"}, // Grid: Set to 1/64
 	{41081, "length whole"}, // Set length for next inserted note: 1
 	{41079, "length half"}, // Set length for next inserted note: 1/2
 	{41067, "length thirty second"}, // Set length for next inserted note: 1/32
@@ -1591,6 +2041,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41073, "length eighth"}, // Set length for next inserted note: 1/8
 	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
 	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
+	// translate firstString end
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -1638,25 +2089,28 @@ bool showReaperContextMenu(const int menu) {
 	return false;
 }
 
+bool isClassName(HWND hwnd, string className) {
+	char buffer[50];
+	if (GetClassName(hwnd, buffer, sizeof(buffer)) == 0) {
+		return false;
+	}
+	return className.compare(buffer) == 0;
+}
+
 #ifdef _WIN32
 
 HWND getSendContainer(HWND hwnd) {
-	WCHAR className[21] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Button") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Button")) {
+		return nullptr;
+	}
 	hwnd = GetWindow(hwnd, GW_HWNDPREV);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"Static") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "Static")) {
+		return nullptr;
+	}
 	hwnd = GetAncestor(hwnd, GA_PARENT);
-	if (!hwnd)
-		return NULL;
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	if (wcscmp(className, L"REAPERVirtWndDlgHost") != 0)
-		return NULL;
+	if (!isClassName(hwnd, "REAPERVirtWndDlgHost")) {
+		return nullptr;
+	}
 	return hwnd;
 }
 
@@ -1676,7 +2130,8 @@ void sendMenu(HWND sendWindow) {
 	HMENU menu = CreatePopupMenu();
 	MENUITEMINFO itemInfo;
 	itemInfo.cbSize = sizeof(MENUITEMINFO);
-	itemInfo.fMask = MIIM_FTYPE | MIIM_ID | MIIM_STRING;
+	// MIIM_TYPE is deprecated, but win32_utf8 still relies on it.
+	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	itemInfo.fType = MFT_STRING;
 	child.vt = VT_I4;
 	int item = 0;
@@ -1716,66 +2171,6 @@ void sendMenu(HWND sendWindow) {
 	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
 }
 
-bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
-	char name[8];
-	if (GetWindowText(window, name, sizeof(name)) == 0)
-		return false;
-	if (strncmp(name, "FX: ", 4) != 0 && // FX chain window
-		// floating FX window, for different plug-in types
-		strncmp(name, "DX: ", 4) != 0 &&
-		strncmp(name, "VST: ", 5) != 0 &&
-		strncmp(name, "VSTi: ", 6) != 0 &&
-		strncmp(name, "VST3: ", 6) != 0 &&
-		strncmp(name, "VST3i: ", 7) != 0
-	) {
-		return false;
-	}
-	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
-		return false;
-	}
-	// This is a property page containing the plugin window among other things.
-	// set property page name, to avoid CPU/PDC label audition after switching
-	if (GetWindowText(window, name, sizeof(name)) == 0) {
-		SetWindowText(window, " ");
-	}
-	// Descend. Observed as the first or as the last. 
-	// Can not just search, we do not know the class nor name.
-	if (!(window = GetWindow(window, GW_CHILD)))
-		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
-		// Plugin window should be the last.
-		if (!(window = GetWindow(window, GW_HWNDLAST))) {
-			return false;
-		}
-	} // else it is the first
-	// We have found plug-in window or its container
-	HWND plugin = window;
-	// if focus is already inside plug-in window, let F6 work as usual
-	HWND focus = GetFocus();
-	if ((focus == plugin) || (IsChild(plugin, focus))) {
-		return false;
-	}
-	// Try to focus the first child in Z order
-	HWND child;
-	while ((child = GetWindow(window, GW_CHILD))) {
-		window = child;
-	}
-	while (window) {
-		SetFocus(window);
-		if ((window == plugin) || (GetFocus() == window)) {
-			break; // success or the last possible attempt
-		}
-		window = GetParent(window);
-	}
-	return true;
-}
-
 bool isTrackViewWindow(HWND hwnd) {
 	WCHAR className[22] = L"\0";
 	GetClassNameW(hwnd, className, ARRAYSIZE(className));
@@ -1785,51 +2180,21 @@ bool isTrackViewWindow(HWND hwnd) {
 }
 
 bool isListView(HWND hwnd) {
-	WCHAR className[14] = L"\0";
-	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	return wcscmp(className, L"SysListView32") == 0;
+	return isClassName(hwnd, "SysListView32");
 }
 
-// If an FX chain dialog is focused, report active/bypassed for the selected
-// effect.
-// We can't annotate the names of SysListView32 items, since screen readers have
-// special support for those and override MSAA. Instead, we do this when the
-// user is focused in the Notes text box. This is a big ugly hack, but it's
-// far better than nothing.
-bool maybeReportFxChainBypass(bool aboutToToggle=false) {
-	HWND focus = GetFocus();
-	if (GetWindowLongW(focus, GWL_ID) != 1191) {
-		// Not the notes field in the FX Chain dialog.
-		return false;
+bool isMidiEditorEventListView(HWND hwnd) {
+	return isListView(hwnd)
+		&& isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
+}
+
+void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
+	int child = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	if (child == -1) {
+		return;
 	}
-	bool enabled = false;
-	if (fakeFocus == FOCUS_TRACK) {
-		MediaTrack* track = GetLastTouchedTrack();
-		if (!track) {
-			return false;
-		}
-		int fx = TrackFX_GetChainVisible(track);
-		if (fx < 0) {
-			return false;
-		}
-		enabled = TrackFX_GetEnabled(track, fx);
-	} else  {
-		MediaItem* item = GetSelectedMediaItem(0, 0);
-		MediaItem_Take* take = item ? GetActiveTake(item) : nullptr;
-		if (!take) {
-			return false;
-		}
-		int fx = TakeFX_GetChainVisible(take);
-		if (fx < 0) {
-			return false;
-		}
-		enabled = TakeFX_GetEnabled(take, fx);
-	}
-	if (aboutToToggle) {
-		enabled = !enabled;
-	}
-	outputMessage(enabled ? "active" : "bypassed", /* interrupt */ false);
-	return true;
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT,
+		child + 1);
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -1845,9 +2210,7 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
-	char className[8];
-	if (GetClassName(pref, className, sizeof(className))
-			&& strcmp(className, "Button") == 0
+	if (isClassName(pref, "Button")
 			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
 		return nullptr;
 	}
@@ -1900,48 +2263,99 @@ bool maybeAnnotatePreferenceDescription() {
 	return true;
 }
 
+// Overide the tab/shift+tab key in Save dialogs so it can reach REAPER specific
+// controls: Create subdirectory for project, etc.
+// Tab seems to completely skip these controls, even though WS_TABSTOP and
+// WS_EX_CONTROLPARENT are set correctly.
+bool maybeFixTabInSaveDialog(bool previous) {
+	HWND focus = GetFocus();
+	HWND parent = GetParent(focus);
+	if (
+		// Save as type combo box. The REAPER specific controls are after this.
+		!(isClassName(focus, "ComboBox") &&
+			isClassName(parent, "FloatNotifySink")) &&
+		// A REAPER specific control in the Save dialog.
+		!(isClassName(parent, "#32770") &&
+			isClassName(GetParent(parent), "FloatNotifySink")) &&
+		// The "Hide Folders" toolbar in the save dialog. The REAPER specific
+		// controls are before this.
+		!(isClassName(focus, "ToolbarWindow32") &&
+			isClassName(GetWindow(focus, GW_HWNDPREV), "DUIViewWndClassName"))
+	) {
+		return false;
+	}
+	HWND target = GetNextDlgTabItem(GetForegroundWindow(), focus, previous);
+	SetFocus(target);
+	return true;
+}
+
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B') {
+	const bool isKeyDown = !(lParam & 0x80000000);
+	if (!isKeyDown || code != HC_ACTION || (
+		wParam != VK_APPS && wParam != VK_RETURN &&
+				wParam != VK_F6 && wParam != 'B' &&
+				wParam != VK_TAB && wParam != VK_CONTROL)) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
 	HWND focus = GetFocus();
-	if (!focus)
+	if (!focus) {
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	HWND window;
-	if (wParam == VK_APPS && lParam & 0x80000000) {
-		if (isTrackViewWindow(focus)) {
-			// Reaper doesn't handle the applications key for these windows.
-			// Display the appropriate context menu depending on fakeFocus.
-			if (GetKeyState(VK_CONTROL) & 0x8000) {
-				showReaperContextMenu(1);
-			} else if (GetKeyState(VK_MENU) & 0x8000) {
-				showReaperContextMenu(2);
-			} else {
-				showReaperContextMenu(0);
-			}
-			return 1;
-		} else if (window = getSendContainer(focus)) {
-			sendMenu(window);
-			return 1;
+	}
+	if (wParam == VK_APPS && isTrackViewWindow(focus)) {
+		// Reaper doesn't handle the applications key for these windows and it
+		// doesn't work even when bound to an action. (Shift+f10 is handled by
+		// action bindings.)
+		// Display the appropriate context menu depending on fakeFocus.
+		if (GetKeyState(VK_CONTROL) & 0x8000) {
+			showReaperContextMenu(1);
+		} else if (GetKeyState(VK_MENU) & 0x8000) {
+			showReaperContextMenu(2);
+		} else {
+			showReaperContextMenu(0);
 		}
-	} else if ((wParam == VK_APPS || (wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000))
-		&& !(lParam & 0x80000000) // Key down
-		&& isListView(focus)
+		return 1;
+	}
+	if (wParam == VK_CONTROL) {
+		if (cancelPendingMidiPreviewNotesOff()) {
+			previewNotesOff(true);
+		}
+		return 1;
+	}
+	const bool isContextMenu = wParam == VK_APPS ||
+		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000);
+	HWND window;
+	if (isContextMenu && (window = getSendContainer(focus))) {
+		sendMenu(window);
+		return 1;
+	}
+	if (
+		(isContextMenu ||
+			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000)) &&
+		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
 		if (item != -1) {
 			RECT rect;
 			ListView_GetItemRect(focus, item, &rect, LVIR_BOUNDS);
-			POINT point = {rect.left + 10, rect.top + 10};
+			POINT point;
+			if (GetWindowLong(focus, GWL_ID) == 1071) {
+				// In the Project Render Metadata list, we need to click in the centre of
+				// the item.
+				point = {rect.left + (rect.right - rect.left) / 2,
+					rect.top + (rect.bottom - rect.top) / 2};
+			} else {
+				// #478: Clicking in the centre of the Media Explorer list misbehaves for
+				// some users, so use the top left for most lists.
+				point = {rect.left, rect.top};
+			}
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
-			if (wParam == VK_APPS) {
-				// Applications key right clicks.
+			if (wParam == VK_APPS || wParam == VK_F10) {
+				// Applications/f10 key right clicks.
 				mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 				mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
 			} else {
@@ -1953,12 +2367,26 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			return 1;
 		}
-	} else if (wParam == VK_F6 && !(lParam & 0x80000000)) {
-		if (maybeSwitchToFxPluginWindow())
+	} else if (wParam == VK_F6) {
+		if (maybeSwitchToFxPluginWindow()) {
 			return 1;
-	} else if (wParam == 'B' && !(lParam & 0x80000000) &&
-			GetKeyState(VK_CONTROL) & 0x8000) {
+		}
+	} else if (wParam == 'B' && GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
+	} else if (wParam == VK_TAB && !(GetKeyState(VK_MENU) & 0x8000)) {
+		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
+		if (maybeFixTabInSaveDialog(shift)) {
+			return 1;
+		}
+		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
+			return 1;
+		}
+	} else if (wParam == VK_DOWN && GetKeyState(VK_MENU) & 0x8000 &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) && !(GetKeyState(VK_CONTROL) & 0x8000)) {
+		// Alt+downArrow.
+		if (maybeOpenFxPresetDialog()) {
+			return 1;
+		}
 	}
 	return CallNextHookEx(NULL, code, wParam, lParam);
 }
@@ -1978,7 +2406,8 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	bool makeUndoPoint = undoMask&1<<4;
 	int count = CountTracks(0);
 	if (count == 0) {
-		outputMessage("No tracks");
+		// Translators: Reported when there are no tracks to navigate to.
+		outputMessage(translate("no tracks"));
 		return;
 	}
 	int num;
@@ -2112,29 +2541,48 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if ((clearSelection || select) && makeUndoPoint)
 			Undo_EndBlock("Change Item Selection", 0);
 		SetEditCurPos(pos, true, true); // Seek playback.
-
-		// Report the item.
 		fakeFocus = FOCUS_ITEM;
 		selectedEnvelopeIsTake = true;
 		SetCursorContext(1, NULL);
+		if (!shouldReportTimeMovement()) {
+			return;
+		}
+
+		// Report the item.
 		ostringstream s;
 		s << i + 1;
-		MediaItem_Take* take = GetActiveTake(item);
-		if (take)
-			s << " " << GetTakeName(take);
 		if (isItemSelected(item)) {
 			// One selected item is the norm, so don't report selected in this case.
-			if (CountSelectedMediaItems(0) > 1)
-				s << " selected";
-		} else
-			s << " unselected";
-		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL))
-			s << " muted";
-		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1)
-			s << " locked";
+			if (CountSelectedMediaItems(0) > 1) {
+				s << " " << translate("selected");
+			}
+		} else {
+			s << " " << translate("unselected");
+		}
+		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL)) {
+			s << " " << translate("muted");
+		}
+		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1) {
+			// Translators: Used when navigating items to indicate that an item is
+			// locked.
+			s << " " << translate("locked");
+		}
+		int groupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
+		if (groupId) {
+			// Translators: Used when navigating items to indicate that an item is
+			// grouped. {} will be replaced with the group number; e.g. "group 1".
+			s << " " << format(translate("group {}"), groupId);
+		}
+		MediaItem_Take* take = GetActiveTake(item);
+		if (take) {
+			s << " " << GetTakeName(take);
+		}
 		int takeCount = CountTakes(item);
-		if (takeCount > 1)
-			s << " " << takeCount << " takes";
+		if (takeCount > 1) {
+			// Translators: Used when navigating items to indicate the number of
+			// takes. {} will be replaced with the number; e.g. "2 takes".
+			s << " " << format(translate("{} takes"), takeCount);
+		}
 		s << " " << formatCursorPosition();
 		addTakeFxNames(take, s);
 		outputMessage(s);
@@ -2163,9 +2611,9 @@ void cmdUndo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	ostringstream s;
-	s << "Undo " << text;
-	outputMessage(s);
+	// Translators: Reported when undoing an action. {}
+	// will be replaced with the name of the action; e.g. "undo Remove tracks".
+	outputMessage(format(translate("undo {}"), text));
 }
 
 void cmdRedo(Command* command) {
@@ -2173,18 +2621,19 @@ void cmdRedo(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!text)
 		return;
-	ostringstream s;
-	s << "Redo " << text;
-	outputMessage(s);
+	// Translators: Reported when redoing an action. {}
+	// will be replaced with the name of the action; e.g. "redo Remove tracks".
+	outputMessage(format(translate("redo {}"), text));
 }
 
 void cmdSplitItems(Command* command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	int added = CountMediaItems(0) - oldCount;
-	ostringstream s;
-	s << added << (added == 1 ? " item" : " items") << " added";
-	outputMessage(s);
+	// Translators: Reported when items are added. {} will be replaced with the
+	// number of items; e.g. "2 items added".
+	outputMessage(format(
+		translate_plural("{} item added", "{} items added", added), added));
 }
 
 void cmdPaste(Command* command) {
@@ -2198,28 +2647,59 @@ void cmdPaste(Command* command) {
 		oldAutoItems = CountAutomationItems(envelope);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	ostringstream s;
 	int added;
-	if ((added = CountTracks(0) - oldTracks) > 0)
-		s << added << (added == 1 ? " track" : " tracks") << " added";
-	else if ((added = CountMediaItems(0) - oldItems) > 0)
-		s << added << (added == 1 ? " item" : " items") << " added";
-	else if (envelope && (added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints) > 0)
-		s << added << (added == 1 ? " point" : " points") << " added";
-	else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0)
-		s << added << (added == 1 ? " automation item" : " automation items") << " added";
-	else
-		s << "nothing pasted";
-	outputMessage(s);
+	// We want to report both tracks and items if both got added; e.g.
+	// "1 track 2 items added".
+	ostringstream s;
+	if ((added = CountTracks(0) - oldTracks) > 0) {
+		// Translators: Reported when tracks are added. Other things might be added
+		// at the same time (e.g. items), so other messages may surround this.
+		// {} will be replaced with the number of tracks; e.g. "2 tracks".
+		s << format(translate_plural("{} track", "{} tracks", added), added);
+	}
+	if ((added = CountMediaItems(0) - oldItems) > 0) {
+		if (s.tellp() > 0) {
+			s << " ";
+		}
+		// Translators: Reported when items are added. Other things might be added
+		// at the same time (e.g. tracks), so other messages may surround this.
+		// {} will be replaced with the number of items; e.g. "2 items".
+		s << format(translate_plural("{} item", "{} items", added), added);
+	}
+	if (s.tellp() > 0) {
+		// Translators: Reported after the number of tracks and/or items added.
+		s << " " << translate("added");
+		outputMessage(s);
+		return;
+	}
+	if (envelope &&
+			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
+			> 0) {
+		// Translators: Reported when envelope points are added. {} will be replaced
+		// with the number of points; e.g. "2 points added".
+		outputMessage(format(
+			translate_plural("{} point added", "{} points added", added), added));
+	} else if (envelope &&
+			(added = CountAutomationItems(envelope) - oldAutoItems)
+			> 0) {
+		// Translators: Reported when automation items are added. {} will be
+		// replaced with the number of items; e.g. "2 automation items added".
+		outputMessage(format(
+			translate_plural("{} automation item added", "{} automation items added", added), added));
+	} else {
+		outputMessage(translate("nothing pasted"));
+	}
 }
 
 void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountTracks(0);
-	ostringstream s;
-	s << removed << (removed == 1 ? " track" : " tracks") << " removed";
-	outputMessage(s);
+	// Translators: Reported when tracks are removed. {} will be replaced with the
+	// number of tracks; e.g. "2 tracks removed".
+	outputMessage(format(
+		translate_plural("{} track removed", "{} tracks removed", removed),
+		removed));
 }
 
 void cmdRemoveTracks(Command* command) {
@@ -2230,9 +2710,11 @@ void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
-	ostringstream s;
-	s << removed << (removed == 1 ? " item" : " items") << " removed";
-	outputMessage(s);
+	// Translators: Reported when items are removed. {} will be replaced with the
+	// number of items; e.g. "2 items removed".
+	outputMessage(format(
+		translate_plural("{} item removed", "{} items removed", removed),
+		removed));
 }
 
 void cmdRemoveItems(Command* command) {
@@ -2257,8 +2739,9 @@ void cmdRemoveTimeSelection(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
-	if (start != end)
-		outputMessage("Contents of time selection removed");
+	if (start != end) {
+		outputMessage(translate("contents of time selection removed"));
+	}
 }
 
 void cmdMoveItems(Command* command) {
@@ -2281,7 +2764,7 @@ void cmdMoveItems(Command* command) {
 void cmdMoveItemEdge(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
-		outputMessage("No items selected");
+		outputMessage(translate("no items selected"));
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
@@ -2311,8 +2794,11 @@ void cmdMoveItemEdge(Command* command) {
 		s<<formatTime(newStart, TF_RULER, false, true);
 	else if(newEnd!=oldEnd)
 		s<<formatTime(newEnd, TF_RULER, false, true);
-	else
-		s<<"no change";
+	else {
+		// Translators: Reported when moving items to indicate that no movement
+		// occurred.
+		s << translate("no change");
+	}
 	outputMessage(s);
 }
 
@@ -2320,21 +2806,21 @@ void cmdDeleteMarker(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
 	if (CountProjectMarkers(0, NULL, NULL) != count)
-		outputMessage("marker deleted");
+		outputMessage(translate("marker deleted"));
 }
 
 void cmdDeleteRegion(Command* command) {
 	int count = CountProjectMarkers(0, NULL, NULL);
 	Main_OnCommand(40615, 0); // Markers: Delete region near cursor
 	if (CountProjectMarkers(0, NULL, NULL) != count)
-		outputMessage("region deleted");
+		outputMessage(translate("region deleted"));
 }
 
 void cmdDeleteTimeSig(Command* command) {
 	int count = CountTempoTimeSigMarkers(0);
 	Main_OnCommand(40617, 0); // Markers: Delete time signature marker near cursor
 	if (CountTempoTimeSigMarkers(0) != count)
-		outputMessage("time signature deleted");
+		outputMessage(translate("time signature deleted"));
 }
 
 void cmdRemoveStretch(Command* command) {
@@ -2347,7 +2833,7 @@ void cmdRemoveStretch(Command* command) {
 	int count = GetTakeNumStretchMarkers(take);
 	Main_OnCommand(41859, 0); // Item: remove stretch marker at current position
 	if (GetTakeNumStretchMarkers(take) != count)
-		outputMessage("stretch marker deleted");
+		outputMessage(translate("stretch marker deleted"));
 }
 
 void cmdClearTimeLoopSel(Command* command) {
@@ -2362,7 +2848,7 @@ void cmdClearTimeLoopSel(Command* command) {
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	cur += start + end;
 	if (old != cur)
-		outputMessage("Cleared time/loop selection");
+		outputMessage(translate("cleared time/loop selection"));
 }
 
 void cmdUnselAllTracksItemsPoints(Command* command) {
@@ -2372,7 +2858,7 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
 	if (old != cur)
-		outputMessage("Unselected tracks/items/envelope points");
+		outputMessage(translate("unselected tracks/items/envelope points"));
 }
 
 void cmdSwitchProjectTab(Command* command) {
@@ -2387,7 +2873,9 @@ void cmdSwitchProjectTab(Command* command) {
 	if (newName[0]) {
 		outputMessage(newName);
 	} else {
-		outputMessage("[Unsaved]");
+		// Translators: Reported when switching to a project tab containing an
+		// unsaved project.
+		outputMessage(translate("[Unsaved]"));
 	}
 }
 
@@ -2404,6 +2892,14 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 		moveToAutomationItem(-1, false, isSelectionContiguous);
 	} else {
 		moveToItem(-1, false, isSelectionContiguous);
+	}
+}
+
+void cmdPropertiesFocus(Command* command) {
+	if (shouldMoveToAutoItem) {
+		Main_OnCommand(42090, 0); // Envelope: Automation item properties...
+	} else {
+		Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
 	}
 }
 
@@ -2436,12 +2932,21 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 				s << (multiLine ? "\r\n" : ", ");
 			}
 			if (i == -1) {
-				s << "master";
+				s << translate("master");
 			} else {
-				s << i + 1;
-				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+				if (shouldReportTrackNumbers) {
+					s << i + 1;
+				}
+				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 				if (name && name[0]) {
-					s << " " << name;
+					if (shouldReportTrackNumbers) {
+						s << " ";
+					}
+					s << name;
+				} else if (!shouldReportTrackNumbers) {
+					// There's no name and track number reporting is disabled. We report
+					// the number in lieu of the name.
+					s << i + 1;
 				}
 			}
 		}
@@ -2450,7 +2955,9 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 		if (!outputIfNone) {
 			return "";
 		}
-		s << "none";
+		// Translators: Used when reporting all tracks which are muted, soloed, etc.
+		// to indicate that no tracks are muted, soloed, etc.
+		s << translate("none");
 	}
 	return s.str();
 }
@@ -2469,37 +2976,38 @@ void reportTracksWithState(const char* prefix, TrackStateCheck checkState,
 }
 
 void cmdReportMutedTracks(Command* command) {
-	reportTracksWithState("Muted", isTrackMuted, /* includeMaster */ true);
+	reportTracksWithState(translate("Muted"), isTrackMuted, /* includeMaster */ true);
 }
 
 void cmdReportSoloedTracks(Command* command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	s << formatTracksWithState("soloed", isTrackSoloed, /* includeMaster */ true,
+	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true,
 		multiLine);
-	string defeat = formatTracksWithState("defeating solo", isTrackDefeatingSolo,
-		/* includeMaster */ false, multiLine, /* outputIfNone */ false);
+	string defeat = formatTracksWithState(translate("defeating solo"),
+		isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
+		/* outputIfNone */ false);
 	if (!defeat.empty()) {
 		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
 	}
 	if (multiLine) {
-		reviewMessage("Soloed", s.str().c_str());
+		reviewMessage(translate("Soloed"), s.str().c_str());
 	} else {
 		outputMessage(s);
 	}
 }
 
 void cmdReportArmedTracks(Command* command) {
-	reportTracksWithState("Armed", isTrackArmed, /* includeMaster */ false);
+	reportTracksWithState(translate("Armed"), isTrackArmed, /* includeMaster */ false);
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState("Monitored", isTrackMonitored,
+	reportTracksWithState(translate("Monitored"), isTrackMonitored,
 		/* includeMaster */ false);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState("Phase inverted", isTrackPhaseInverted,
+	reportTracksWithState(translate("Phase inverted"), isTrackPhaseInverted,
 		/* includeMaster */ false);
 }
 
@@ -2507,32 +3015,15 @@ void cmdReportSelection(Command* command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
-	int count = 0;
-	int t;
-	MediaTrack* track;
 	switch (fakeFocus) {
-		case FOCUS_TRACK: {
-			if (isTrackSelected(GetMasterTrack(0))) {
-				s << "master";
-				count = 1;
-			}
-			for (t = 0; t < CountTracks(0); ++t) {
-				track = GetTrack(0, t);
-				if (isTrackSelected(track)) {
-					++count;
-					if (count > 1)
-						s << separator;
-					s << t + 1;
-					char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
-					if (name && name[0])
-						s << " " << name;
-				}
-			}
+		case FOCUS_TRACK:
+			s << formatTracksWithState(nullptr, isTrackSelected,
+				/* includeMaster */ true, multiLine, /* outputIfNone */ false);
 			break;
-		}
 		case FOCUS_ITEM: {
-			for (t = 0; t < CountTracks(0); ++t) {
-				track = GetTrack(0, t);
+			int count = 0;
+			for (int t = 0; t < CountTracks(0); ++t) {
+				MediaTrack* track = GetTrack(0, t);
 				for (int i = 0; i < CountTrackMediaItems(track); ++i) {
 					MediaItem* item = GetTrackMediaItem(track, i);
 					if (isItemSelected(item)) {
@@ -2552,10 +3043,19 @@ void cmdReportSelection(Command* command) {
 			double start, end;
 			GetSet_LoopTimeRange(false, false, &start, &end, false);
 			if (start != end) {
-				s << "start " << formatTime(start, TF_RULER, false, false) << separator
-					<< "end " << formatTime(end, TF_RULER, false, false) << separator
-					<< "length " << formatTime(end - start, TF_RULER, true, false);
-				count = 1;
+				s <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the start time; e.g. "start bar 2 beat 1 0%".
+					format(translate("start {}"),
+						formatTime(start, TF_RULER, false, false)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the end time; e.g. "end bar 4 beat 1 0%".
+					format(translate("end {}"),
+						formatTime(end, TF_RULER, false, false)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
+					format(translate("length {}"),
+						formatTime(end - start, TF_RULER, true, false));
 				resetTimeCache();
 			}
 			break;
@@ -2563,8 +3063,8 @@ void cmdReportSelection(Command* command) {
 		default:
 			return;
 	}
-	if (count == 0) {
-		outputMessage("No selection");
+	if (s.tellp() == 0) {
+		outputMessage(translate("no selection"));
 		return;
 	}
 	if (multiLine) {
@@ -2595,13 +3095,11 @@ void cmdhDeleteTakeMarkers(int command) {
 	int oldCount = countTakeMarkersInSelectedTakes();
 	Main_OnCommand(command, 0);
 	int removed = oldCount - countTakeMarkersInSelectedTakes();
-	if (removed == 1) {
-		outputMessage("take marker deleted");
-	} else {
-		ostringstream s;
-		s << removed << " take markers deleted";
-		outputMessage(s);
-	}
+	// Translators: Reported when deleting take markers. {} will be replaced with
+	// the number of markers; e.g. "2 take markers deleted".
+	outputMessage(format(
+		translate_plural("take marker deleted", "{} take markers deleted", removed),
+		removed));
 }
 
 void cmdDeleteTakeMarkers(Command* command) {
@@ -2644,7 +3142,8 @@ void cmdRemoveFocus(Command* command) {
 
 void cmdShortcutHelp(Command* command) {
 	isShortcutHelpEnabled = !isShortcutHelpEnabled;
-	outputMessage(isShortcutHelpEnabled ? "shortcut help on" : "shortcut help off");
+	outputMessage(isShortcutHelpEnabled ?
+		translate("shortcut help on") : translate("shortcut help off"));
 }
 
 void cmdReportCursorPosition(Command* command) {
@@ -2665,14 +3164,26 @@ void cmdReportCursorPosition(Command* command) {
 	} else {
 		tf = TF_RULER;
 	}
-	double pos = GetPlayState() & 1 ? GetPlayPosition() : GetCursorPosition();
-	outputMessage(formatTime(pos, tf, false, false));
+	int state = GetPlayState();
+	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	ostringstream s;
+	s << formatTime(pos, tf, false, false) << " ";
+	if (state & 2) {
+		s << translate("paused");
+	} else if (state & 4) {
+		s << translate("recording");
+	} else if (state & 1) {
+		s << translate("playing");
+	} else {
+		s << translate("stopped");
+	}
+	outputMessage(s);
 }
 
 void cmdToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
-		outputMessage("noncontiguous selection");
+		outputMessage(translate("noncontiguous selection"));
 		return;
 	}
 	bool select;
@@ -2705,7 +3216,7 @@ void cmdToggleSelection(Command* command) {
 		default:
 			return;
 	}
-	outputMessage(select ? "selected" : "unselected");
+	outputMessage(select ? translate("selected") : translate("unselected"));
 }
 
 void cmdMoveStretch(Command* command) {
@@ -2734,8 +3245,9 @@ void cmdMoveStretch(Command* command) {
 		done = true;
 	}
 	Undo_EndBlock("Move stretch marker", UNDO_STATE_ITEMS);
-	if (done)
-		outputMessage("stretch marker moved");
+	if (done) {
+		outputMessage(translate("stretch marker moved"));
+	}
 }
 
 void reportPeak(MediaTrack* track, int channel) {
@@ -2775,7 +3287,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 	for (int i = count - 1; i >= 0; --i)
 		DeleteTempoTimeSigMarker(0, i);
 	Undo_EndBlock("Delete all time signature markers", UNDO_STATE_ALL);
-	outputMessage("Deleted all time signature markers");
+	outputMessage(translate("deleted all time signature markers"));
 }
 
 void moveToTransient(bool previous) {
@@ -2827,30 +3339,39 @@ void cmdShowContextMenu3(Command* command) {
 
 void cmdReportAutomationMode(Command* command) {
 	// This reports the global automation override if set, otherwise the current track automation mode.
-	ostringstream s;
 	MediaTrack* track = GetLastTouchedTrack();
-	if (GetGlobalAutomationOverride() >= 0) {
-		s << "global automation override " << automationModeAsString(GetGlobalAutomationOverride());
+	const int globalMode = GetGlobalAutomationOverride() ;
+	if (globalMode >= 0) {
+		// Translators: Used to report global automation override mode.  {} is
+		// replaced with the mode; e.g. "Global automation override latch
+		// preview"
+		outputMessage(format(
+			translate("global automation override {}"),
+			automationModeAsString(globalMode)));
 	} else {
-		s << "track automation mode " << automationModeAsString(GetTrackAutomationMode(track));
+		// Translators: Used to report track automation override mode.  {} is
+		// replaced with the mode; e.g. "track automation override latch
+		// preview"
+		outputMessage(format(
+			translate("track automation mode {}"),
+			automationModeAsString(GetTrackAutomationMode(track))));
 	}
-	outputMessage(s);
 }
 
 void cmdToggleGlobalAutomationLatchPreview(Command* command) {
 	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
 		SetGlobalAutomationOverride(-1);
-		outputMessage("Global automation override off");
+		outputMessage(translate("global automation override off"));
 	} else { //not in latch preview.
 		SetGlobalAutomationOverride(5);
-		outputMessage("Global automation override latch preview");
+		outputMessage(translate("global automation override latch preview"));
 	}
 }
 
 void cmdCycleTrackAutomation(Command* command) {
 	int count = CountSelectedTracks2(0, true);
 	if (count == 0) {
-		outputMessage("No selected tracks");
+		outputMessage(translate("no selected tracks"));
 		return;
 	}
 	int oldmode = GetTrackAutomationMode(GetLastTouchedTrack());
@@ -2860,17 +3381,17 @@ void cmdCycleTrackAutomation(Command* command) {
 	for (int tracknum = 0; tracknum < count; ++tracknum) {
 		SetTrackAutomationMode(GetSelectedTrack2(0, tracknum, true), newmode);
 	}
-	ostringstream s;
-	s << "automation mode ";
-	s << automationModeAsString(newmode);
-	s << " for selected tracks";
-	outputMessage(s);
+	// Translators: Report the track automation mode. {} is replaced with the
+	// automation mode; e.g. "automation mode trim/read for selected tracks"
+	outputMessage(format(
+		translate("automation mode {} for selected tracks"),
+		automationModeAsString(newmode)));
 }
 
 void cmdCycleMidiRecordingMode(Command* command) {
 	int count = CountSelectedTracks2(0, false);
 	if (count == 0) {
-		outputMessage("No selected tracks");
+		outputMessage(translate("no selected tracks"));
 		return;
 	}
 	int oldmode = (int)GetMediaTrackInfo_Value(GetLastTouchedTrack(), "I_RECMODE");
@@ -2917,12 +3438,14 @@ void cmdNudgeTimeSelection(Command* command) {
 		resetTimeCache();
 	ostringstream s;
 	if(newStart!=oldStart) {
-		if(first)
-			s<<"time selection start ";
+		if(first) {
+			s << translate("time selection start") << " ";
+		}
 		s<<formatTime(newStart, TF_RULER, false, true, false);
 	} else if(newEnd!=oldEnd) {
-		if(first)
-			s<<"time selection end ";
+		if(first) {
+			s << translate("time selection end") << " ";
+		}
 		s<<formatTime(newEnd, TF_RULER, false, true, false);
 	}
 	outputMessage(s);
@@ -2930,10 +3453,13 @@ void cmdNudgeTimeSelection(Command* command) {
 
 void cmdAbout(Command* command) {
 	ostringstream s;
-	s << "OSARA: Open Source Accessibility for the REAPER Application\r\n" <<
-		"Version: " << OSARA_VERSION << "\r\n" <<
+	// Translators: OSARA's full name presented in the About dialog.
+	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
+	// Translators: osara version. {} is replaced with the version; e.g.
+	// "Version: 2021.1pre-588,0531135a"
+		format(translate("Version: {}"), OSARA_VERSION) << "\r\n" <<
 		OSARA_COPYRIGHT;
-	reviewMessage("About OSARA", s.str().c_str());
+	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
 // The Transient Detection Settings dialog deliberately passes most keys to the
@@ -2985,13 +3511,149 @@ void cmdTransientDetectionSettings(Command* command) {
 	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
 }
 
+void cmdInsertMarker(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
+		return; // Not inserted.
+	}
+	int marker;
+	GetLastMarkerAndCurRegion(nullptr, GetCursorPosition(), &marker, nullptr);
+	if (marker < 0) {
+		return;
+	}
+	int number;
+	EnumProjectMarkers(marker, nullptr, nullptr, nullptr, nullptr, &number);
+	// Translators: Reported when inserting a marker. {} will be replaced with the
+	// number of the new marker; e.g. "marker 2 inserted".
+	outputMessage(format(translate("marker {} inserted"), number));
+}
+
+void cmdInsertRegion(Command* command) {
+	if (!shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int oldCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int newCount = CountProjectMarkers(nullptr, nullptr, nullptr);
+	if (newCount == oldCount) {
+		return; // Not inserted.
+	}
+	double selStart;
+	GetSet_LoopTimeRange(false, false, &selStart, nullptr, false);
+	int region;
+	GetLastMarkerAndCurRegion(nullptr, selStart, nullptr, &region);
+	if (region < 0) {
+		return;
+	}
+	// if there are multiple regions starting at the same position, REAPER might
+	// not return the region just added. Find the most recently added.
+	for (int m = region + 1; m < newCount; ++m) {
+		bool isRegion;
+		double start;
+		EnumProjectMarkers(m, &isRegion, &start, nullptr, nullptr, nullptr);
+		if (start > selStart) {
+			break;
+		}
+		assert(start == selStart);
+		if (!isRegion) {
+			continue;
+		}
+		region = m;
+	}
+	int number;
+	EnumProjectMarkers(region, nullptr, nullptr, nullptr, nullptr, &number);
+	// Translators: Reported when inserting a region. {} will be replaced with the
+	// number of the new region; e.g. "region 2 inserted".
+	outputMessage(format(translate("region {} inserted"), number));
+}
+
+void cmdChangeItemGroup(Command* command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	int selCount = CountSelectedMediaItems(nullptr);
+	int oldGroupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int newGroupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
+	if (newGroupId) {
+		// Translators: Reported when adding items to a group. {count} will be
+		// replaced with the number of items. {group} will be replaced with the
+		// group number. For example: "2 items added to group 1".
+		outputMessage(format(
+			translate_plural("item added to group {group}", "{count} items added to group {group}", selCount),
+			"count"_a=selCount, "group"_a=newGroupId));
+	} else if (oldGroupId) {
+		// Translators: Reported when removing items from a group. {count} will be
+		// replaced with the number of items. {group} will be replaced with the group
+		// number. For example: "2 items removed from group 1".
+		outputMessage(format(
+			translate_plural("item removed from group {group}", "{count} items removed from group {group}", selCount),
+			"count"_a=selCount, "group"_a=oldGroupId));
+	}
+}
+
+void cmdReportTrackGroups(Command* command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	map<int, vector<const char*>> groups;
+	for (auto& toggle : TRACK_GROUP_TOGGLES) {
+		int mask = GetSetTrackGroupMembership(track, toggle.name, 0, 0);
+		for (int g = 0; g < 32; ++g) {
+			if (mask & (1 << g)) {
+				groups[g].push_back(toggle.displayName);
+			}
+		}
+	}
+	ostringstream s;
+	for (auto [group, toggles] : groups) {
+		if (s.tellp() > 0) {
+			s << "; ";
+		}
+		ostringstream desc;
+		desc << "TRACK_GROUP_NAME:" << group + 1;
+		char groupName[200];
+		GetSetProjectInfo_String(nullptr, desc.str().c_str(), groupName, false);
+		if (groupName[0]) {
+			s << groupName;
+		} else {
+			s << group + 1;
+		}
+		s << ": ";
+		bool first = true;
+		for (auto* toggle : toggles) {
+			if (first) {
+				first = false;
+			} else {
+				s << ", ";
+			}
+			s << translate(toggle);
+		}
+	}
+	if (s.tellp() == 0) {
+		outputMessage(translate("track not grouped"));
+		return;
+	}
+	outputMessage(s);
+}
+
+void cmdMuteNextMessage(Command* command){
+	muteNextMessage = true;
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
-const int MAIN_SECTION = 0;
-const int MIDI_EVENT_LIST_SECTION = 32061;
-const int MIDI_EDITOR_SECTION = 32060;
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
@@ -3046,16 +3708,30 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
+	{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
+	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
+	{MAIN_SECTION, {{0, 0, 40032}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Group items
+	{MAIN_SECTION, {{0, 0, 40033}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Remove items from group
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one measure
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0,40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0,40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
@@ -3063,9 +3739,11 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
 	// Our own commands.
+	// translate firstString begin
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View properties for current media item/take/automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item/FX (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
@@ -3086,7 +3764,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position and transport state"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Move last focused stretch marker to current edit cursor position"}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report current peak for channel 1 of current track"}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
@@ -3111,6 +3789,8 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -3127,9 +3807,13 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Select all notes with the same pitch starting in time selection"}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
+	{ MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
+	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	// translate firstString end
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
@@ -3140,6 +3824,7 @@ map<pair<int, int>, Command*> commandsMap;
 
 extern bool shouldReportNotes;
 extern bool shouldReportSurfaceChanges;
+extern bool shouldReportMarkersWhilePlaying;
 
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
@@ -3153,6 +3838,10 @@ void loadConfig() {
 		"reportSurfaceChanges")[0] == '1';
 	shouldMoveFromPlayCursor =
 		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
+	shouldReportMarkersWhilePlaying =
+		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
+	shouldReportTrackNumbers =
+		GetExtState(CONFIG_SECTION, "reportTrackNumbers")[0] != '0';
 }
 
 void config_onOk(HWND dialog) {
@@ -3177,6 +3866,14 @@ void config_onOk(HWND dialog) {
 		ID_CONFIG_MOVE_FROM_PLAY_CURSOR) == BST_CHECKED;
 	SetExtState(CONFIG_SECTION, "moveFromPlayCursor",
 		shouldMoveFromPlayCursor ? "1" : "0", true);
+	shouldReportMarkersWhilePlaying = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying",
+		shouldReportMarkersWhilePlaying ? "1" : "0", true);
+	shouldReportTrackNumbers = IsDlgButtonChecked(dialog,
+		ID_CONFIG_REPORT_TRACK_NUMBERS) == BST_CHECKED;
+	SetExtState(CONFIG_SECTION, "reportTrackNumbers",
+		shouldReportTrackNumbers ? "1" : "0", true);
 }
 
 INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
@@ -3200,6 +3897,7 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 
 void cmdConfig(Command* command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
+	translateDialog(dialog);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
@@ -3211,6 +3909,10 @@ void cmdConfig(Command* command) {
 		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
 	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
 		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING,
+		shouldReportMarkersWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRACK_NUMBERS,
+		shouldReportTrackNumbers ? BST_CHECKED : BST_UNCHECKED);
 
 	ShowWindow(dialog, SW_SHOWNORMAL);
 }
@@ -3226,7 +3928,6 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto postIt = postCommandsMap.find(command);
 		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			if (shouldMoveFromPlayCursor) {
 				const auto cursorIt = MOVE_FROM_PLAY_CURSOR_COMMANDS.find(command);
 				if (cursorIt != MOVE_FROM_PLAY_CURSOR_COMMANDS.end()) {
@@ -3244,19 +3945,20 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			}
 			postIt->second(command);
 			lastCommand=command;
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
 		const auto mIt = POST_COMMAND_MESSAGES.find(command);
 		if (mIt != POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			if (hwnd) {
 				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			} else {
 				Main_OnCommand(command, 0);
 			}
-			outputMessage(mIt->second);
+			outputMessage(translate(mIt->second));
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
@@ -3264,20 +3966,39 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto it = midiPostCommandsMap.find(command);
 		if (it != midiPostCommandsMap.end()) {
 			isHandlingCommand = true;
-			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second(command);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
 		const auto mIt = MIDI_POST_COMMAND_MESSAGES.find(command);
 		if (mIt != MIDI_POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			outputMessage(translate(mIt->second));
+			lastCommandTime = GetTickCount();
+			isHandlingCommand = false;
+			return true;
+		}
+	}else if (section==MIDI_EVENT_LIST_SECTION) {
+		const auto it = midiEventListPostCommandsMap.find(command);
+		if (it != midiEventListPostCommandsMap.end()) {
+			isHandlingCommand = true;
 			lastCommandTime = GetTickCount();
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
-			outputMessage(mIt->second);
+			it->second.first(command);
+			#ifdef _WIN32
+			if (it->second.second) { // changesValueInMidiEventList
+				HWND focus = GetFocus();
+				if (focus && isMidiEditorEventListView(focus)) {
+					sendNameChangeEventToMidiEditorEventListItem(focus);
+				}
+			}
+			#endif
 			isHandlingCommand = false;
 			return true;
 		}
@@ -3294,21 +4015,26 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
 	) {
 		isHandlingCommand = true;
-		DWORD now = GetTickCount();
-		if (it->second->gaccel.accel.cmd == lastCommand && now - lastCommandTime < 500)
+		if (it->second->gaccel.accel.cmd == lastCommand &&
+				GetTickCount() - lastCommandTime < 500) {
 			++lastCommandRepeatCount;
-		else
+		} else {
 			lastCommandRepeatCount = 0;
-		lastCommandTime = now;
+		}
 		it->second->execute(it->second);
 		lastCommand = it->second->gaccel.accel.cmd;
+		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
+		if(it->second->execute != cmdMuteNextMessage) {
+			muteNextMessage = false;
+		} 
 		return true;
 	} else if (isShortcutHelpEnabled) {
 		reportActionName(command, section, false);
 		return true;
 	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {
+		muteNextMessage = false;
 		return true;
 	}
 	return false;
@@ -3322,9 +4048,14 @@ bool handleMainCommandFallback(int command, int flag) {
 		isHandlingCommand = true;
 		it->second->execute(it->second);
 		isHandlingCommand = false;
+		if(it->second->execute != cmdMuteNextMessage) {
+			muteNextMessage = false;
+		} 
 		return true;
-	} else if (handlePostCommand(MAIN_SECTION, command))
+	} else if (handlePostCommand(MAIN_SECTION, command)){
+		muteNextMessage = false;
 		return true;
+	}
 	return false;
 }
 
@@ -3365,6 +4096,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// Give these objects a non-generic role so NVDA doesn't fall back to
 			// screen scraping, which causes spurious messages to be reported.
 			annotateAccRole(hwnd, ROLE_SYSTEM_PANE);
+		}
+
+		if (isMidiEditorEventListView(hwnd)) {
+			maybePreviewCurrentNoteInEventList(hwnd);
 		}
 		if (lastMessageHwnd && hwnd != lastMessageHwnd) {
 			// Focus is moving. Clear our tweak to accName for the previous focus.
@@ -3407,9 +4142,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				return;
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+		} else if (childId > CHILDID_SELF) {
+			maybeReportFxChainBypassDelayed();
 		} else {
-			maybeReportFxChainBypass()
-				|| maybeAnnotatePreferenceDescription();
+			maybeAnnotatePreferenceDescription();
 		}
 	}
 }
@@ -3445,6 +4181,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		mainHwnd = rec->hwnd_main;
 		loadConfig();
 		resetTimeCache();
+		initTranslation();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
@@ -3460,8 +4197,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 
-		for (int i = 0; MIDI_POST_COMMANDS[i].cmd; ++i) {
-			midiPostCommandsMap.insert(make_pair(MIDI_POST_COMMANDS[i].cmd, MIDI_POST_COMMANDS[i].execute));
+		for (auto &midiPostCommand: MIDI_POST_COMMANDS) {
+			midiPostCommandsMap.insert(make_pair(midiPostCommand.cmd, midiPostCommand.execute));
+			if (midiPostCommand.supportedInMidiEventList) {
+				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
+			}
 		}
 
 		for (int i = 0; COMMANDS[i].execute; ++i) {
@@ -3469,12 +4209,13 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				// This is our own command.
 				if (COMMANDS[i].section == MAIN_SECTION) {
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
+					COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
 					rec->Register("gaccel", &COMMANDS[i].gaccel);
 				} else {
 					custom_action_register_t action;
 					action.uniqueSectionId = COMMANDS[i].section;
 					action.idStr = COMMANDS[i].id;
-					action.name = COMMANDS[i].gaccel.desc;
+					action.name = translate(COMMANDS[i].gaccel.desc);
 					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
 				}
 			}
@@ -3491,7 +4232,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		registerExports(rec);
 		SetTimer(nullptr, 0, 0, delayedInit);
 #ifdef _WIN32
-		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
+		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
 #endif
 		return 1;
 
