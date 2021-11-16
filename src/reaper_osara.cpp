@@ -2285,17 +2285,19 @@ bool maybeFixTabInSaveDialog(bool previous) {
 // Handle keyboard keys which can't be bound to actions.
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
-	if (code != HC_ACTION && wParam != VK_APPS && wParam != VK_RETURN &&
-			wParam != VK_F6 && wParam != 'B' &&
-			wParam != VK_TAB) {
+	const bool isKeyDown = !(lParam & 0x80000000);
+	if (!isKeyDown || code != HC_ACTION || (
+		wParam != VK_APPS && wParam != VK_RETURN &&
+				wParam != VK_F6 && wParam != 'B' &&
+				wParam != VK_TAB && wParam != VK_CONTROL)) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
 	HWND focus = GetFocus();
-	if (!focus)
+	if (!focus) {
 		return CallNextHookEx(NULL, code, wParam, lParam);
-	const bool isKeyDown = !(lParam & 0x80000000);
-	if (wParam == VK_APPS && isKeyDown && isTrackViewWindow(focus)) {
+	}
+	if (wParam == VK_APPS && isTrackViewWindow(focus)) {
 		// Reaper doesn't handle the applications key for these windows and it
 		// doesn't work even when bound to an action. (Shift+f10 is handled by
 		// action bindings.)
@@ -2309,9 +2311,14 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		}
 		return 1;
 	}
-	const bool isContextMenu = isKeyDown && (
-		wParam == VK_APPS ||
-		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000));
+	if (wParam == VK_CONTROL) {
+		if (cancelPendingMidiPreviewNotesOff()) {
+			previewNotesOff(true);
+		}
+		return 1;
+	}
+	const bool isContextMenu = wParam == VK_APPS ||
+		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000);
 	HWND window;
 	if (isContextMenu && (window = getSendContainer(focus))) {
 		sendMenu(window);
@@ -2319,7 +2326,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	}
 	if (
 		(isContextMenu ||
-			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000 && isKeyDown)) &&
+			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000)) &&
 		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
@@ -2353,14 +2360,13 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			return 1;
 		}
-	} else if (wParam == VK_F6 && isKeyDown) {
-		if (maybeSwitchToFxPluginWindow())
+	} else if (wParam == VK_F6) {
+		if (maybeSwitchToFxPluginWindow()) {
 			return 1;
-	} else if (wParam == 'B' && isKeyDown &&
-			GetKeyState(VK_CONTROL) & 0x8000) {
+		}
+	} else if (wParam == 'B' && GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
-	} else if (wParam == VK_TAB && isKeyDown &&
-			!(GetKeyState(VK_MENU) & 0x8000)) {
+	} else if (wParam == VK_TAB && !(GetKeyState(VK_MENU) & 0x8000)) {
 		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
 		if (maybeFixTabInSaveDialog(shift)) {
 			return 1;
@@ -2368,9 +2374,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
 			return 1;
 		}
-	} else if (wParam == VK_DOWN && isKeyDown &&
-			GetKeyState(VK_MENU) & 0x8000 && !(GetKeyState(VK_SHIFT) & 0x8000) &&
-			!(GetKeyState(VK_CONTROL) & 0x8000)) {
+	} else if (wParam == VK_DOWN && GetKeyState(VK_MENU) & 0x8000 &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) && !(GetKeyState(VK_CONTROL) & 0x8000)) {
 		// Alt+downArrow.
 		if (maybeOpenFxPresetDialog()) {
 			return 1;
@@ -4203,7 +4208,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		registerExports(rec);
 		SetTimer(nullptr, 0, 0, delayedInit);
 #ifdef _WIN32
-		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, NULL, guiThread);
+		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
 #endif
 		return 1;
 

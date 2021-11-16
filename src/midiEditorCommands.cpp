@@ -143,27 +143,30 @@ PreviewSource previewSource;
 preview_register_t previewReg = {0};
 
 // Queue note off events for the notes currently being previewed.
-// This function doesn't begin sending the events.
-void previewNotesOff() {
+// when sendNoteOff is true, this function  also sends the events.
+void previewNotesOff(bool sendNoteOff) {
 	for (auto note = previewingNotes.cbegin(); note != previewingNotes.cend(); ++note) {
 		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_OFF | note->channel),
 			(unsigned char)note->pitch, (unsigned char)note->velocity}};
 		previewSource.events.push_back(event);
 	}
+	if (sendNoteOff) {
+		// Send the events.
+		previewReg.curpos = 0.0;
+		PlayTrackPreview(&previewReg);
+	}
+	previewingNotes.clear();
 }
 
 // Called after the preview length elapses to turn off notes currently being previewed.
 void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
-	if (event != previewDoneTimer)
+	if (event != previewDoneTimer) {
 		return; // Cancelled.
-	previewNotesOff();
-	previewingNotes.clear();
-	// Send the events.
-	previewReg.curpos = 0.0;
-	PlayTrackPreview(&previewReg);
-	previewDoneTimer = 0;
-	KillTimer(nullptr, event);
+	}
+	bool canceled = cancelPendingMidiPreviewNotesOff();
+	assert(canceled);
+	previewNotesOff(true);
 }
 
 // Used to find out the minimum note length.
@@ -185,12 +188,9 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewReg.src = &previewSource;
 		previewReg.m_out_chan = -1; // Use .preview_track.
 	}
-	if (previewDoneTimer) {
-		// Notes are currently being previewed. Interrupt them.
-		// We want to turn off these notes immediately.
-		KillTimer(NULL, previewDoneTimer);
-		previewDoneTimer = 0;
-		previewNotesOff();
+	// Stop the current preview.
+	if (cancelPendingMidiPreviewNotesOff()) {
+		previewNotesOff(false);
 	}
 	// Queue note on events for the new notes.
 	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
@@ -213,11 +213,13 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
 }
 
-void cancelMidiPreviewNotesOff() {
+bool cancelPendingMidiPreviewNotesOff() {
 	if (previewDoneTimer) {
 		KillTimer(nullptr, previewDoneTimer);
 		previewDoneTimer = 0;
+		return true;
 	}
+	return false;
 }
 
 void cmdMidiMoveCursor(Command* command) {

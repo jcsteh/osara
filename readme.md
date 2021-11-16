@@ -598,6 +598,8 @@ When you move to a note, that note will be played and its name will be reported.
 The single note will also be selected so you can manipulate just that note.
 For example, pressing delete will delete only that note.
 
+When a chord or a note within a chord is played, you can cancel the note preview by pressing the control key.
+
 You can select multiple chords or multiple notes in a chord.
 To do this, first move to the first chord or note you want to select.
 Then, use shift plus the arrow keys to add the next or previous chord or note to the selection.
@@ -610,6 +612,7 @@ That is, press shift+space (OSARA: Enable noncontiguous selection/toggle selecti
 ### Note Preview in the MIDI Event List (Windows Only)
 When the MIDI Editor is set to Event List mode, REAPER presents a list with all the events in the current MIDI item.
 When a note gets focus in the list, OSARA will play a preview of the focused note.
+To cancel a note preview, press the control key.
 
 ### Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
