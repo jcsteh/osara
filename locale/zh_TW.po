@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-11-16 11:12\n"
+"PO-Revision-Date: 2021-11-17 01:46\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1988,7 +1988,7 @@ msgid "OSARA: Report groups for current track"
 msgstr "OSARA: 報告當前軌道的組"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr ""
+msgstr "OSARA: 將來自 OSARA 的下一條消息靜音"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"

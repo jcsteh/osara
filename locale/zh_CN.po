@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2021-11-16 11:12\n"
+"PO-Revision-Date: 2021-11-17 02:45\n"
 
 msgid "volume"
 msgstr "音量"
@@ -360,10 +360,10 @@ msgid "Hold 2 Pedal (on/off)"
 msgstr "保持音 2 踏板(开/关)"
 
 msgid "Sound Variation"
-msgstr " 声音变化"
+msgstr "声音变化"
 
 msgid "Timbre/Resonance"
-msgstr " 音色/共鸣"
+msgstr "音色/共鸣"
 
 msgid "Sound Release"
 msgstr "声音释放"
@@ -1988,7 +1988,7 @@ msgid "OSARA: Report groups for current track"
 msgstr "OSARA: 报告当前轨道的分组"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr ""
+msgstr "OSARA:将 OSARA 的下一条消息静音"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"

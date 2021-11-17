@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2021-11-16 11:12\n"
+"PO-Revision-Date: 2021-11-17 02:45\n"
 
 msgid "volume"
 msgstr "volume"
@@ -351,7 +351,7 @@ msgid "Control 2 LSB"
 msgstr "Contrôle 2 LSB"
 
 msgid "Hold Pedal (on/off)"
-msgstr "Maintenir la pédale (actif/inactif)"
+msgstr "Pédale de maintien (actif/inactif)"
 
 msgid "Portamento (on/off)"
 msgstr "Portamento (actif/inactif)"
@@ -360,19 +360,19 @@ msgid "Sostenuto (on/off)"
 msgstr "Sostenuto (actif/inactif)"
 
 msgid "Soft Pedal (on/off)"
-msgstr "Pédale étouffoirs (actif/inactif)"
+msgstr "Pédale d'étouffoirs (actif/inactif)"
 
 msgid "Legato Pedal (on/off)"
-msgstr "Pédale Legato (actif/inactif)"
+msgstr "Pédale de Legato (actif/inactif)"
 
 msgid "Hold 2 Pedal (on/off)"
-msgstr "Maintenir 2 pédales (actif/inactif)"
+msgstr "Pédale de maintien 2 (actif/inactif)"
 
 msgid "Sound Variation"
 msgstr "Variation sonore"
 
 msgid "Timbre/Resonance"
-msgstr "Timbre/Résonance"
+msgstr "Timbre, Intensité harmonique"
 
 msgid "Sound Release"
 msgstr "Relâchement du son"
@@ -381,7 +381,7 @@ msgid "Sound Attack"
 msgstr "Attaque sonore"
 
 msgid "Brightness/Cutoff Freq"
-msgstr "Luminosité/Fréquence de coupure"
+msgstr "Brillance, coupure de fréquence"
 
 msgid "Sound Control 6"
 msgstr "Contrôle du son 6"
@@ -420,7 +420,7 @@ msgid "Chorus Level"
 msgstr "Niveau du Chorus"
 
 msgid "Celeste Level"
-msgstr "Niveau du Celeste"
+msgstr "Niveau du céleste"
 
 msgid "Phaser Level"
 msgstr "Niveau du Phaser"
@@ -471,7 +471,7 @@ msgstr "Poly activé"
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
 msgid "Poly Aftertouch {note}  {value}"
-msgstr "Poly Aftertouch {note}  {value}"
+msgstr "Aftertouch polyphonique {note}  {value}"
 
 #. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 msgid "Control {control}, {value}"
@@ -485,7 +485,7 @@ msgstr "Pression du canal {}"
 
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
-msgstr "Pitch Bend {}"
+msgstr "Hauteur tonale {}"
 
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
@@ -571,8 +571,8 @@ msgstr[1] "{} notes raccourcies d'une unité de grille"
 #. "3 notes set length to grid size"
 msgid "{} note set length to grid size"
 msgid_plural "{} notes length set to grid size"
-msgstr[0] "{} note définie selon la longueur de division de la grille"
-msgstr[1] "{} notes définies selon la longueur de division de la grille"
+msgstr[0] "{} note définie selon la longueur de la division de grille"
+msgstr[1] "{} notes définies selon la longueur de la division de grille"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -587,8 +587,8 @@ msgstr[1] "{} notes en legato"
 #. "3 notes length changed"
 msgid "{} note length changed"
 msgid_plural "{} notes length changed"
-msgstr[0] "{} note dont la longueur est modifiée"
-msgstr[1] "{} notes dont la longueur est modifiées"
+msgstr[0] "{} longueur de note modifiée"
+msgstr[1] "{} longueurs de note modifiées"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -643,8 +643,8 @@ msgstr[1] "{} notes un demi-ton vers le bas en ignorant la gamme"
 #. "3 notes pitch changed"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
-msgstr[0] "{} note dont la hauteur tonale est modifiée"
-msgstr[1] "{} notes dont la hauteur tonale est modifiée"
+msgstr[0] "{} hauteur tonale de note modifiée"
+msgstr[1] "{} hauteur tonale de notes modifiées"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -683,15 +683,15 @@ msgstr[1] "{} notes déplacées vers la droite sur la grille"
 #. "3 notes pixel left"
 msgid "{} note start moved"
 msgid_plural "{} notes start moved"
-msgstr[0] "{} note du début déplacée"
-msgstr[1] "{} notes du début déplacées"
+msgstr[0] "{} début de note déplacé"
+msgstr[1] "{} début de notes déplacé"
 
 #. Used when MIDI CCs change. {} is replaced by the
 #. number of values changed. E.g. "2 values increased"
 msgid "{} value increase"
 msgid_plural "{} values increased"
-msgstr[0] "{} valeur augmentée"
-msgstr[1] "{} valeurs augmentées"
+msgstr[0] "{} valeurs diminuée"
+msgstr[1] "{} valeurs diminuées"
 
 #. Used when MIDI CCs change. {} is replaced by the
 #. number of values changed. E.g. "2 values decreased"
@@ -708,16 +708,16 @@ msgstr[0] "{} valeur modifiée"
 msgstr[1] "{} valeurs modifiées"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "Entrées MIDI activées comme entrée pas à pas"
+msgstr "Entrées MIDI par étape activé"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "Entrées MIDI désactivées comme entrée pas à pas"
+msgstr "Entrées MIDI par étape désactivé"
 
 msgid "Enabled  f1-f12 as step input"
-msgstr "Activé f1 à f12 comme entrée pas à pas"
+msgstr "Activé f1 à f12 comme entrée par étape"
 
 msgid "Disabled  f1-f12 as step input"
-msgstr "Désactivé f1 à f12 comme entrée pas à pas"
+msgstr "Désactivé f1 à f12 comme entrée par étape"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -2047,7 +2047,7 @@ msgid "OSARA: Report groups for current track"
 msgstr "OSARA: Énonce le groupe de la piste actuelle"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr ""
+msgstr "OSARA: Ignorer le prochain message d'OSARA"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
