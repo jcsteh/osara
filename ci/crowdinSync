@@ -48,8 +48,8 @@ def downloadTranslations():
 	shutil.copyfileobj(r.raw, open(TMP_DOWNLOAD_PATH, "wb"))
 
 def syncTranslations():
-	#print("Pulling from GitHub")
-	#subprocess.check_call(("git", "pull"))
+	print("Pulling from GitHub")
+	subprocess.check_call(("git", "pull"))
 	downloadTranslations()
 	print("Extracting translations")
 	with zipfile.ZipFile(TMP_DOWNLOAD_PATH) as zf:
@@ -58,8 +58,8 @@ def syncTranslations():
 	print("Committing new translations")
 	subprocess.check_call(("git", "add", *glob.glob("locale/*.po")))
 	subprocess.check_call(("git", "commit", "-m", "Update translations."))
-	#print("Pushing to GitHub")
-	#subprocess.check_call(("git", "push"))
+	print("Pushing to GitHub")
+	subprocess.check_call(("git", "push"))
 
 def uploadPot():
 	potPath = glob.glob("locale/*.pot")[0]
