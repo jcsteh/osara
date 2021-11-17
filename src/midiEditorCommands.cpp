@@ -1145,7 +1145,7 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 			// the command. E.g. "1 note split into 2"
 			outputMessage(format(
 				translate_plural("{oldCount} note split into {newCount}", "{oldCount} notes split into {newCount}", oldCount),
-				"oldCount"_a=oldCount, "newcount"_a=newCount));
+				"oldCount"_a=oldCount, "newCount"_a=newCount));
 			break;
 		case 40456:
 			// Translators: used when joining notes in the midi editor.
