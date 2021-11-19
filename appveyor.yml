@@ -7,7 +7,7 @@ branches:
 environment:
  matrix:
   - job_name: Windows
-    appveyor_build_worker_image: Visual Studio 2019
+    appveyor_build_worker_image: Visual Studio 2022
     PY_PYTHON: 3.9-32
   - job_name: Mac
     appveyor_build_worker_image: macos
@@ -50,7 +50,7 @@ install:
       cd ..
      }
  - git submodule update --init
- - sh: sudo xcode-select -s /Applications/Xcode-12.3.app
+ - sh: sudo xcode-select -s /Applications/Xcode-13.0.app
 
 build_script:
  - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.9/bin/scons" }
