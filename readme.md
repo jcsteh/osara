@@ -756,8 +756,10 @@ To build OSARA, you will need:
 	* [Download Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
 	* Visual Studio 2022 Community/Professional/Enterprise is also supported.
 	* Whether installing Build Tools or Visual Studio, you must enable the following:
-		- On the Workloads tab, in the Windows group: Desktop development with C++
-		- On the Workloads tab, in the Optional group: C++ ATL for latest v143 build tools (x86 & x64)
+		- In the list on the Workloads tab, in the Windows grouping: Desktop development with C++
+		- Then in the Installation details tree view, under Desktop development with C++ > Optional:
+			* C++ ATL for latest v143 build tools (x86 & x64)
+			* C++ Clang tools for Windows
 - Mac only: Xcode 13:
 	* You can download Xcode 13 from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
 - Python, version 3.7 or later:

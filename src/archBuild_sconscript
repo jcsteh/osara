@@ -33,11 +33,26 @@ sources = [
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CXXFLAGS="/EHsc /std:c++20 /W3 /WX "
-		# #479: fmt/format.h includes UTF-8 characters in comments. However, cl
-		# treats the file as ANSI unless it has a BOM. This causes a warning (and
-		# thus an error) on systems with certain locales. Just disable this warning.
-		"/wd4819")
+	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
+	env["CC"] = "clang-cl"
+	env["LINK"] = "lld-link"
+	env.Append(CCFLAGS=[
+		"/W3",
+		"/WX",
+		# Clang warns about unused functions in WDL
+		"/clang:-Wno-unused-function",
+	])
+	env.Append(CXXFLAGS=[
+		"/clang:-std=c++20",
+		"/EHsc",
+		# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
+		"/clang:-Wno-missing-braces",
+	])
+	env.Append(CFLAGS=[
+		# Ignore warnings in WDL/win32_utf8.c, not our code
+		"/clang:-Wno-deprecated-declarations",
+		"/clang:-Wno-unused-variable"
+	])
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
