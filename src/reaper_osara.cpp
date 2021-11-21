@@ -2294,9 +2294,10 @@ bool maybeFixTabInSaveDialog(bool previous) {
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	const bool isKeyDown = !(lParam & 0x80000000);
 	if (!isKeyDown || code != HC_ACTION || (
-		wParam != VK_APPS && wParam != VK_RETURN &&
+		wParam != VK_APPS && wParam != VK_CONTROL &&
+				wParam != VK_F10 && wParam != VK_RETURN &&
 				wParam != VK_F6 && wParam != 'B' &&
-				wParam != VK_TAB && wParam != VK_CONTROL)) {
+				wParam != VK_TAB && wParam != VK_DOWN)) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
