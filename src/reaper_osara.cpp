@@ -2506,7 +2506,7 @@ void cmdGoToFirstTrack(Command* command){
 void cmdGoToLastTrack(Command* command){
 	int trackNo = CountTracks(nullptr) - 1;
 	if(!trackNo) {
-			return;
+		return;
 	}
 	MediaTrack* track = GetTrack(nullptr, trackNo);
 	if(!track) {
