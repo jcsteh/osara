@@ -2499,6 +2499,9 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 
 void cmdGoToFirstTrack(Command* command){
 	MediaTrack* track = GetTrack(nullptr, 0);
+	if(!track) {
+		return;
+	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
 }
