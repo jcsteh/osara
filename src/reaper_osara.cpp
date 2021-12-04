@@ -4048,7 +4048,15 @@ bool handleMainCommandFallback(int command, int flag) {
 	const auto it = commandsMap.find(make_pair(MAIN_SECTION, command));
 	if (it != commandsMap.end()) {
 		isHandlingCommand = true;
+		if (it->second->gaccel.accel.cmd == lastCommand &&
+				GetTickCount() - lastCommandTime < 500) {
+			++lastCommandRepeatCount;
+		} else {
+			lastCommandRepeatCount = 0;
+		}
 		it->second->execute(it->second);
+		lastCommand = it->second->gaccel.accel.cmd;
+		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
 		if(it->second->execute != cmdMuteNextMessage) {
 			muteNextMessage = false;
