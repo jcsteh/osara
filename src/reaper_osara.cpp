@@ -769,6 +769,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 				s << ", ";
 			TrackFX_GetFXName(track, f, name, sizeof(name));
 			s << name;
+			if (!TrackFX_GetEnabled(track, f)) {
+				s << " " << translate("bypassed");
+			}
 		}
 	}
 	outputMessage(s);
