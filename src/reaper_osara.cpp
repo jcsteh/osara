@@ -587,7 +587,7 @@ INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 
 void reviewMessage(const char* title, const char* message) {
 	HWND dialog = CreateDialog(pluginHInstance,
-		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), mainHwnd,
+		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), GetForegroundWindow(),
 		reviewMessage_dialogProc);
 	SetWindowText(dialog, title);
 	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
@@ -3897,7 +3897,8 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM 
 }
 
 void cmdConfig(Command* command) {
-	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG), mainHwnd, config_dialogProc);
+	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG),
+		GetForegroundWindow(), config_dialogProc);
 	translateDialog(dialog);
 
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
