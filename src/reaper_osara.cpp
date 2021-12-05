@@ -768,7 +768,22 @@ void postGoToTrack(int command, MediaTrack* track) {
 			if (f > 0)
 				s << ", ";
 			TrackFX_GetFXName(track, f, name, sizeof(name));
-			s << name;
+			const regex RE_FX_NAME("^([A-Z]+): (.+?)( \\(.*?\\))?$");
+			cmatch m;
+			regex_search(name, m, RE_FX_NAME);
+			if (m.empty()) {
+				s << name;
+			} else {
+				// Group 1 is the prefix, group 2 is the FX name, group 3 is the
+				// parenthesised suffix.
+				s << m.str(2);
+				if (m.str(1) == "JS") {
+					// For JS, not all effects have a vendor name. Therefore, we always
+					// include the parenthesised suffix to avoid stripping potentially
+					// useful info.
+					s << m.str(3);
+				}
+			}
 			if (!TrackFX_GetEnabled(track, f)) {
 				s << " " << translate("bypassed");
 			}
