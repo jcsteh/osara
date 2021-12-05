@@ -192,6 +192,7 @@
 #define REAPERAPI_WANT_GetSetTrackGroupMembership
 #define REAPERAPI_WANT_GetSetTrackGroupMembershipHigh
 #define REAPERAPI_WANT_GetSetProjectInfo_String
+#define REAPERAPI_WANT_MIDI_GetEvt
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
