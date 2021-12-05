@@ -643,6 +643,25 @@ bool isTrackGrouped(MediaTrack* track) {
 	return false;
 }
 
+void shortenFxName(char* name, ostringstream& s) {
+	const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
+	cmatch m;
+	regex_search(name, m, RE_FX_NAME);
+	if (m.empty()) {
+		s << name;
+	} else {
+		// Group 1 is the prefix, group 2 is the FX name, group 3 is the
+		// parenthesised suffix.
+		s << m.str(2);
+		if (m.str(1) == "JS") {
+			// For JS, not all effects have a vendor name. Therefore, we always
+			// include the parenthesised suffix to avoid stripping potentially
+			// useful info.
+			s << m.str(3);
+		}
+	}
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -768,22 +787,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			if (f > 0)
 				s << ", ";
 			TrackFX_GetFXName(track, f, name, sizeof(name));
-			const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
-			cmatch m;
-			regex_search(name, m, RE_FX_NAME);
-			if (m.empty()) {
-				s << name;
-			} else {
-				// Group 1 is the prefix, group 2 is the FX name, group 3 is the
-				// parenthesised suffix.
-				s << m.str(2);
-				if (m.str(1) == "JS") {
-					// For JS, not all effects have a vendor name. Therefore, we always
-					// include the parenthesised suffix to avoid stripping potentially
-					// useful info.
-					s << m.str(3);
-				}
-			}
+			shortenFxName(name, s);
 			if (!TrackFX_GetEnabled(track, f)) {
 				s << " " << translate("bypassed");
 			}
@@ -1237,7 +1241,7 @@ void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
 		if (f > 0)
 			s << ", ";
 		TakeFX_GetFXName(take, f, name, sizeof(name));
-		s << name;
+		shortenFxName(name, s);
 	}
 }
 
