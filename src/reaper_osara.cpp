@@ -768,7 +768,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			if (f > 0)
 				s << ", ";
 			TrackFX_GetFXName(track, f, name, sizeof(name));
-			const regex RE_FX_NAME("^([A-Z]+): (.+?)( \\(.*?\\))?$");
+			const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
 			cmatch m;
 			regex_search(name, m, RE_FX_NAME);
 			if (m.empty()) {
