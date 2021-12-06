@@ -850,6 +850,13 @@ void postMidiSelectEvents(int command) {
 		if (evtIndex == -1) {
 			break;
 		}
+		unsigned char msg[3] = "\0";
+		int size = sizeof(msg);
+		MIDI_GetEvt(take, evtIndex, /* selectedOut */ nullptr, /* mutedOut */ nullptr,
+			/* ppqposOut */ nullptr, (char*)msg, &size);
+		if (0x80 <= msg[0] && msg[0] <= 0x8F) {
+			continue; // Don't count note off messages.
+		}
 		++count;
 	}
 	if (fakeFocus != FOCUS_NOTE && fakeFocus != FOCUS_CC) {
