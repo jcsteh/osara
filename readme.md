@@ -649,6 +649,8 @@ When you are done, press the OK button to accept any changes or the Cancel butto
 OSARA also includes some other miscellaneous actions.
 
 #### Main
+- OSARA: go to first track: Control+Alt+Home
+- OSARA: go to last track: Control+Alt+End
 - OSARA: Move to next item (leaving other items selected): control+shift+rightArrow
 - OSARA: Move to previous item (leaving other items selected): control+shift+leftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus)
