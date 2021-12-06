@@ -771,8 +771,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// Translators: Reported when navigating tracks to indicate how many items
 		// the track has. {} will be replaced by the number of items; e.g.
 		// "2 items".
-		s << " " << format(translate_plural("{} item", "{} items", itemCount),
-			itemCount);
+		if (itemCount > 0) {
+			s << " " << format(translate_plural("{} item", "{} items", itemCount),
+				itemCount);
+		}
 		if (isFreeItemPositioningEnabled(track)) {
 			s << " " << translate("free item positioning");
 		}
