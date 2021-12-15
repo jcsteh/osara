@@ -3697,6 +3697,57 @@ void cmdMuteNextMessage(Command* command){
 	muteNextMessage = true;
 }
 
+void cmdReportGainReductionFocusedFX(Command* command){
+	auto invalid = []() {
+		outputMessage(translate("No gain reduction value available"));
+	};
+	static int typeCache, trackNumCache, itemNumCache, fxCache;
+	int trackNum, itemNum, fx;
+	bool valid = false;
+	int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+	if (type == 0 && typeCache != 0) { // no fx focused, so use last focused FX
+	type = typeCache;
+	trackNum = trackNumCache;
+	itemNum = itemNumCache;
+	fx = fxCache;
+	}
+	MediaTrack* track = trackNum == 0 ?
+		GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+	if (!track) {
+		invalid();
+		return;
+	}
+	const int buffsize = 10;
+	char buff[buffsize];
+	if (type == 1) { // Track
+		valid = TrackFX_GetNamedConfigParm(track, fx, "GainReduction_dB", buff, buffsize);
+	} else if (type == 2) { // Item
+		MediaItem* item = GetTrackMediaItem(track, itemNum);
+		if (!item) {
+			invalid();
+			return;
+		}
+		int takeNum = HIWORD(fx);
+		fx = LOWORD(fx);
+		MediaItem_Take* take = GetTake(item, takeNum);
+		if (!take) {
+			invalid();
+			return;
+		}
+		valid = TakeFX_GetNamedConfigParm(take, fx, "GainReduction_dB", buff, buffsize);
+	}
+	if (!valid) {
+		invalid();
+		return;
+	}
+	typeCache = type;
+	trackNumCache = trackNum;
+	itemNumCache = itemNum;
+	fxCache = fx;
+	double gr = stod(buff);
+	outputMessage(format("{:.1f}", gr));
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3838,6 +3889,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report current gain reduction for focused effect if supported"}, "OSARA_REPORTGR", cmdReportGainReductionFocusedFX},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},

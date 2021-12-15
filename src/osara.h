@@ -194,6 +194,8 @@
 #define REAPERAPI_WANT_GetSetProjectInfo_String
 #define REAPERAPI_WANT_SetOnlyTrackSelected
 #define REAPERAPI_WANT_MIDI_GetEvt
+#define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
+#define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

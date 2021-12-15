@@ -685,6 +685,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Toggle global automation override between latch preview and off: control+alt+shift+l
 - OSARA: Cycle through midi recording modes of selected tracks: alt+shift+\
 - OSARA: Report groups for current track
+- OSARA: Report current gain reduction for focused effect if supported
+ - If no effect is focused, reports the gain reduction of the last focused effect.
 - OSARA: About
 
 #### Midi editor
