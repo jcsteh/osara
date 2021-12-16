@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2021-11-16 11:12\n"
+"PO-Revision-Date: 2021-12-16 11:34\n"
 
 msgid "volume"
 msgstr "Lautstärke"
@@ -189,8 +189,8 @@ msgstr "{} tab"
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} Note"
+msgstr[1] "{} Noten"
 
 #. The name of a musical note.
 msgid "c"
@@ -247,8 +247,8 @@ msgstr "Nicht zusammenhängende Selektion"
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} Ereignis entfernt"
+msgstr[1] "{} Ereignisse entfernt"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -256,15 +256,15 @@ msgstr[1] ""
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} Note selektiert"
+msgstr[1] "{} Noten selektiert"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} Ereignis selektiert"
+msgstr[1] "{} Ereignisse selektiert"
 
 msgid "Bank Select MSB"
 msgstr ""
@@ -2047,6 +2047,12 @@ msgid "OSARA: Report groups for current track"
 msgstr "Osara: Track Gruppen Ansagen"
 
 msgid "OSARA: Mute next message from OSARA"
+msgstr ""
+
+msgid "OSARA: Go to first track"
+msgstr ""
+
+msgid "OSARA: Go to last track"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

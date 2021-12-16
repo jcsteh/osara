@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-11-17 02:45\n"
+"PO-Revision-Date: 2021-12-16 11:34\n"
 
 msgid "volume"
 msgstr "volume"
@@ -2048,6 +2048,12 @@ msgstr "OSARA: annoncer le groupe de la piste courante"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Rendre le prochain message muet en provenance d'OSARA"
+
+msgid "OSARA: Go to first track"
+msgstr ""
+
+msgid "OSARA: Go to last track"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection discontinue / bascule en sélection dé-sélection de la note / l'accord courant"

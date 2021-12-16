@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2021-12-04 04:45\n"
+"PO-Revision-Date: 2021-12-16 11:34\n"
 
 msgid "volume"
 msgstr "volume"
@@ -1466,16 +1466,16 @@ msgstr[0] "{} prise renversée"
 msgstr[1] "{} prises renversées"
 
 msgid "pre roll on"
-msgstr "pré-décompte activé"
+msgstr "pré-roll en enregistrement activé"
 
 msgid "pre roll off"
-msgstr "pré-décompte désactivé"
+msgstr "pré-roll en enregistrement désactivé"
 
 msgid "count in on"
-msgstr "décompte activé"
+msgstr "décompte avant l'enregistrement activé"
 
 msgid "count in off"
-msgstr "décompte désactivé"
+msgstr "décompte avant l'enregistrement désactivé"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -2048,6 +2048,12 @@ msgstr "OSARA: Énonce le groupe de la piste actuelle"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Ignorer le prochain message d'OSARA"
+
+msgid "OSARA: Go to first track"
+msgstr "OSARA: Aller à la première piste"
+
+msgid "OSARA: Go to last track"
+msgstr "OSARA: Aller à la dernière piste"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
