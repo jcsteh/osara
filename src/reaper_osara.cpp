@@ -2950,13 +2950,6 @@ void cmdPropertiesFocus(Command* command) {
 	}
 }
 
-void cmdIoMaster(Command* command) {
-	// REAPER >= 6.01 has a builtin action for this. We keep this OSARA action
-	// for compatibility, but it should be removed when the key map is next
-	// revised.
-	Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
-}
-
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
