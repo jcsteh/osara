@@ -1380,7 +1380,7 @@ void postTrackFxChain(int command) {
 	}
 }
 
-void cmdIoMaster(Command* command);
+// void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
 		// Make this work for the master track. It doesn't out of the box.
