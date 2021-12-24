@@ -2951,9 +2951,6 @@ void cmdPropertiesFocus(Command* command) {
 }
 
 void cmdIoMaster(Command* command) {
-	// REAPER >= 6.01 has a builtin action for this. We keep this OSARA action
-	// for compatibility, but it should be removed when the key map is next
-	// revised.
 	Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
 }
 
@@ -3801,7 +3798,6 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Pause/resume Peak Watcher"}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View I/O for master track"}, "OSARA_IOMASTER", cmdIoMaster},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
