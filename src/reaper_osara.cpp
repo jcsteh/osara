@@ -1380,7 +1380,7 @@ void postTrackFxChain(int command) {
 	}
 }
 
-// void cmdIoMaster(Command* command);
+void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
 		// Make this work for the master track. It doesn't out of the box.
@@ -2948,6 +2948,10 @@ void cmdPropertiesFocus(Command* command) {
 	} else {
 		Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
 	}
+}
+
+void cmdIoMaster(Command* command) {
+	Main_OnCommand(42235, 0); // Track: View routing and I/O for master track
 }
 
 void cmdReportRippleMode(Command* command) {
