@@ -13,6 +13,7 @@
 #include <cassert>
 #include <variant>
 #include <vector>
+#include <utility>
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
@@ -23,6 +24,7 @@
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
+#include "fxChain.h"
 #include "resource.h"
 #include "translation.h"
 
@@ -92,6 +94,12 @@ void describeTrack(MediaTrack* track, ostringstream& s) {
 void describeTarget(Target& target, ostringstream& s) {
 	if (MediaTrack** track = get_if<MediaTrack*>(&target)) {
 		describeTrack(*track, s);
+	} else if (TrackFx* tfx = get_if<TrackFx>(&target)) {
+		describeTrack(tfx->first, s);
+		s << ", ";
+		char name[256];
+		TrackFX_GetFXName(tfx->first, tfx->second, name, sizeof(name));
+		shortenFxName(name, s);
 	}
 }
 
@@ -211,6 +219,8 @@ bool isTrackLevelTypeSupported(const Target& target) {
 	return holds_alternative<MediaTrack*>(target);
 }
 
+const char FXPARM_GAIN_REDUCTION[] = "GainReduction_dB";
+
 const LevelType LEVEL_TYPES[] = {
 	// translate firstString begin
 	{"peak dB",
@@ -293,6 +303,28 @@ const LevelType LEVEL_TYPES[] = {
 			return getLoudnessMeterParam(watcher, 0, 1.0, 15);
 		},
 		/* reset */ deleteLoudnessMeter,
+	},
+	{"gain reduction dB",
+		/* isSupported */ [](const Target& target) {
+			const TrackFx* tfx = get_if<TrackFx>(&target);
+			if (!tfx) {
+				return false;
+			}
+			char text[1];
+			return TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
+				FXPARM_GAIN_REDUCTION, text, sizeof(text));
+		},
+		/* separateChannels */ false,
+		/* isSmallerSignificant */ true,
+		/* getValue */ [](Watcher& watcher, int channel) {
+			const TrackFx* tfx = get_if<TrackFx>(&watcher.target);
+			assert(tfx);
+			char text[10];
+			TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
+				FXPARM_GAIN_REDUCTION, text, sizeof(text));
+			return stod(text);
+		},
+		/* reset */ nullptr,
 	},
 	// translate firstString end
 };
@@ -428,6 +460,14 @@ bool isWatchingAnything() {
 }
 
 Target getFocusedTarget() {
+	int trackNum, itemNum, fx;
+	int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+	if (type == 1) { // Track
+		MediaTrack* track = trackNum == 0 ?
+			GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+		return TrackFx(track, fx);
+	}
+
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
 			return GetLastTouchedTrack();
