@@ -21,7 +21,6 @@
 #include <cassert>
 #include <math.h>
 #include <optional>
-#include <regex>
 #include <set>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
@@ -645,25 +644,6 @@ bool isTrackGrouped(MediaTrack* track) {
 		}
 	}
 	return false;
-}
-
-void shortenFxName(char* name, ostringstream& s) {
-	const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
-	cmatch m;
-	regex_search(name, m, RE_FX_NAME);
-	if (m.empty()) {
-		s << name;
-	} else {
-		// Group 1 is the prefix, group 2 is the FX name, group 3 is the
-		// parenthesised suffix.
-		s << m.str(2);
-		if (m.str(1) == "JS") {
-			// For JS, not all effects have a vendor name. Therefore, we always
-			// include the parenthesised suffix to avoid stripping potentially
-			// useful info.
-			s << m.str(3);
-		}
-	}
 }
 
 // Format a double d to precision decimal places, stripping trailing zeroes.

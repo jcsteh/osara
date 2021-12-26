@@ -6,7 +6,10 @@
  * License: GNU General Public License version 2.0
  */
 
+#include <sstream>
+
 bool isFxListFocused();
+void shortenFxName(char* name, std::ostringstream& s);
 bool maybeSwitchToFxPluginWindow();
 bool maybeReportFxChainBypass(bool aboutToToggle=false);
 bool maybeReportFxChainBypassDelayed();
