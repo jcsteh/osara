@@ -843,7 +843,7 @@ void postCycleTrackMonitor(int command) {
 			break;
 		case 1:
 			// Translators: Record monitor set to normal.
-			outputMessage(translate("normal"));
+			outputMessage(translate_ctxt("record monitor", "normal"));
 			break;
 		case 2:
 			// Translators: Record monitor set to not when playing.
@@ -1605,7 +1605,7 @@ void postTakeChannelMode(int command) {
 	switch(command) {
 		case 40176: {
 			// Translators: A take channel mode.
-			mode = translate("normal");
+			mode = translate_ctxt("take channel mode", "normal");
 			break;
 		}
 		case 40179: {
