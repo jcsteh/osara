@@ -15,11 +15,18 @@
 
 extern tinygettext::Dictionary translationDict;
 
-#define translate(msg) translationDict.translate(msg)
-#define translate_ctxt(context, msg) \
-	translationDict.translate_ctxt(context, msg)
-#define translate_plural(msg, msgPlural, num) \
-	translationDict.translate_plural(msg, msgPlural, num)
+template<typename S>
+auto translate(S msg) {
+	return translationDict.translate(msg);
+}
+template<typename S>
+auto translate_ctxt(S context, S msg) {
+	return translationDict.translate_ctxt(context, msg);
+}
+template<typename S, typename N>
+auto translate_plural(S msg, S msgPlural, N num) {
+	return translationDict.translate_plural(msg, msgPlural, num);
+}
 
 // Catch exceptions from fmt::format due to errors in translations so we can
 // fail gracefully instead of crashing.
