@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Code related to FX chain windows
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2016-2020 NV Access Limited, James Teh
+ * Copyright 2016-2022 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 

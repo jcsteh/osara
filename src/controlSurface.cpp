@@ -1,7 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Control surface code
- * Copyright 2019-2020 NV Access Limited, James Teh, Leonard de Ruijter
+ * Copyright 2019-2022 NV Access Limited, James Teh, Leonard de Ruijter
  * License: GNU General Public License version 2.0
  */
 

@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Parameters UI code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2017 NV Access Limited
+ * Copyright 2014-2022 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 

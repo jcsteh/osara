@@ -3,7 +3,7 @@
  * Exported API functions code
  * Exports functions to be called by REAPER extensions and scripts.
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2020 James Teh
+ * Copyright 2020-2022 James Teh
  * License: GNU General Public License version 2.0
  */
 
