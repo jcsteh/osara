@@ -49,7 +49,7 @@ install:
       Add-Content -Path $HOME/.ssh/known_hosts -Value $(Get-Content ssh_known_hosts  )
       cd ..
      }
- - git submodule update --init
+ - git submodule update --init --depth 1
  - sh: sudo xcode-select -s /Applications/Xcode-13.app
 
 build_script:
