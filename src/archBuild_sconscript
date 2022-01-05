@@ -33,7 +33,7 @@ sources = [
 ]
 
 if env["PLATFORM"] == "win32":
-	env.Append(CXXFLAGS="/EHsc /std:c++latest /W3 /WX "
+	env.Append(CXXFLAGS="/EHsc /std:c++20 /W3 /WX "
 		# #479: fmt/format.h includes UTF-8 characters in comments. However, cl
 		# treats the file as ANSI unless it has a BOM. This causes a warning (and
 		# thus an error) on systems with certain locales. Just disable this warning.
@@ -69,7 +69,7 @@ else: # Mac
 	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
 		"-arch x86_64 -arch arm64 "
 		"-isysroot $xcodeDevDir/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-	cxxFlags = coreFlags + " -std=c++17 -Werror"
+	cxxFlags = coreFlags + " -std=c++20 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
 	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
