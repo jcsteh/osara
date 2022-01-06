@@ -435,6 +435,7 @@ class ParamsDialog {
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
+#ifdef _WIN32
 			case WM_ACTIVATE:
 				if (!dialog->isDestroying && LOWORD(wParam) == WA_INACTIVE) {
 					// If something steals focus, close the dialog. Otherwise, we won't
@@ -446,6 +447,7 @@ class ParamsDialog {
 					PostMessage(dialogHwnd, WM_CLOSE, 0, 0);
 					return TRUE;
 				}
+#endif
 		}
 		return FALSE;
 	}
