@@ -20,8 +20,12 @@ def request(path, method=requests.get, headers={}, **kwargs):
 	headers["Authorization"] = "Bearer %s" % AUTH_TOKEN
 	r = method("https://api.crowdin.com/api/v2/%s" % path, headers=headers,
 		**kwargs)
-	# Convert errors to exceptions.
-	r.raise_for_status()
+	# Convert errors to exceptions, but print the response before raising.
+	try:
+		r.raise_for_status()
+	except requests.exceptions.HTTPError:
+		print(r.json())
+		raise
 	return r
 
 def projectRequest(path, **kwargs):
