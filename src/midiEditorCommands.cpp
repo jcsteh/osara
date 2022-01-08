@@ -741,6 +741,10 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	}
 	if (shouldReportNotes) {
 		s << formatNoteLength(note.start, note.end);
+		if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40632)
+				) { // View: Show velocity numbers on notes
+			s << ", " << note.velocity << " " << translate("velocity");
+		}
 	}
 	outputMessage(s);
 }
