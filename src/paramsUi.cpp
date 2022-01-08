@@ -838,6 +838,7 @@ const FxNamedConfigParamValues REAEQ_BAND_TYPE_VALUES = {
 	{"all pass", "5"},
 	{"notch", "6"},
 	{"band pass", "7"},
+	{"parallel band pass", "10"},
 	{"band (alt)", "9"},
 	{"band (alt 2)", "2"},
 	// translate firstString end
