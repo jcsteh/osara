@@ -87,7 +87,7 @@ def addCppTranslateFirstString(input):
 			addMessage(data)
 
 RE_CPP_TRANSLATE = re.compile(r'\btranslate\("(?P<msgid>.*?)"\)')
-RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)\)')
+RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)"\)')
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\("(?P<msgid>.*?)",\s*"(?P<plural>.*?)", .*?\)')
 RE_CPP_TRANSLATE_FIRST_STRING_BEGIN = re.compile(r"^\s*// translate firstString begin$")
 def addCpp(input):
