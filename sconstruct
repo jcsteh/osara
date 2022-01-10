@@ -6,6 +6,7 @@
 
 import os
 from makePot import makePot
+import multiprocessing
 
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
@@ -14,6 +15,10 @@ env = Environment(tools = ["default", "textfile"],
 	variables=vars,
 	copyright="Copyright (C) 2014-2022 NV Access Limited, James Teh & other contributors",
 )
+
+# Make sure to run the build on multiple threads so it runs faster
+env.SetOption('num_jobs', multiprocessing.cpu_count())
+print("Building using {} jobs".format(env.GetOption('num_jobs')))
 
 if env["PLATFORM"] == "win32":
 	for arch, suffix in (("x86", "32"), ("x86_64", "64")):
