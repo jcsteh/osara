@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -652,7 +652,7 @@ msgstr[1] "{} notas cambiado el tono"
 msgid "{} note pixel left"
 msgid_plural "{} notes pixel left"
 msgstr[0] "{} nota pixel a la izquierda"
-msgstr[1] ""
+msgstr[1] "{} notas pixel izquierda"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -683,8 +683,8 @@ msgstr[1] "[] notas unidades de rejillas a la derecha"
 #. "3 notes pixel left"
 msgid "{} note start moved"
 msgid_plural "{} notes start moved"
-msgstr[0] "[] nota star desplazada"
-msgstr[1] ""
+msgstr[0] "[] nota de comienzo desplazada"
+msgstr[1] "{} notas de comienzo desplazadas"
 
 #. Used when MIDI CCs change. {} is replaced by the
 #. number of values changed. E.g. "2 values increased"
@@ -755,6 +755,9 @@ msgstr "anular"
 
 msgid "band pass"
 msgstr "paso de banda"
+
+msgid "parallel band pass"
+msgstr "paso de banda paralela"
 
 msgid "band (alt)"
 msgstr "band (alt)"
@@ -1178,9 +1181,9 @@ msgid "record monitor off"
 msgstr "apagado"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
-msgstr "monitor de grabación encendido"
+msgstr "normal"
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
@@ -1476,6 +1479,11 @@ msgstr "activado el conteo"
 
 msgid "count in off"
 msgstr "desactivado el conteo"
+
+#. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr "normal"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -1938,9 +1946,6 @@ msgstr "OSARA: Reiniciar visor de pico de la segunda pista"
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA: pausar/continuar visor de pico"
 
-msgid "OSARA: View I/O for master track"
-msgstr "OSARA: ver entradas/salidas de la pista master"
-
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: muestra el modo de edición adaptativa actual"
 
@@ -2047,7 +2052,7 @@ msgid "OSARA: Report groups for current track"
 msgstr "OSARA: Anunciar grupos para la pista actual"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr ""
+msgstr "OSARA: Silencia el siguiente mensaje de OSARA"
 
 msgid "OSARA: Go to first track"
 msgstr "Pista"

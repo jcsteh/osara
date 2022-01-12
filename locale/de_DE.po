@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "Lautstärke"
@@ -756,6 +756,9 @@ msgstr "Notch"
 msgid "band pass"
 msgstr "Bandpass"
 
+msgid "parallel band pass"
+msgstr ""
+
 msgid "band (alt)"
 msgstr "Band (alt)"
 
@@ -1178,9 +1181,9 @@ msgid "record monitor off"
 msgstr "Aufnahme Monitor deaktiviert"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
-msgstr "normal"
+msgstr ""
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
@@ -1476,6 +1479,11 @@ msgstr "Einzählen aktiviert"
 
 msgid "count in off"
 msgstr "Einzählen deaktiviert"
+
+#. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr ""
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -1937,9 +1945,6 @@ msgstr "Osara: Zurücksetzen des zweiten Peak Watcher Tracks"
 
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "Osara: Peak Watcher anhalten / fortsetzen"
-
-msgid "OSARA: View I/O for master track"
-msgstr "Osara: Zeige I/O des Master Tracks"
 
 msgid "OSARA: Report ripple editing mode"
 msgstr "Osara: Report aktuellen Ripple Editieren Modus"

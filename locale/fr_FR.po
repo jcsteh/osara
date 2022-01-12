@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "volume"
@@ -756,6 +756,9 @@ msgstr "coupe bande"
 msgid "band pass"
 msgstr "passe-bande"
 
+msgid "parallel band pass"
+msgstr "passe bande parallèle"
+
 msgid "band (alt)"
 msgstr "bande (alt)"
 
@@ -1178,7 +1181,7 @@ msgid "record monitor off"
 msgstr "moniteur en enregistrement désactivé"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
 msgstr "normal"
 
@@ -1476,6 +1479,11 @@ msgstr "comptage activé"
 
 msgid "count in off"
 msgstr "comptage désactivé"
+
+#. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr "normal"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -1938,9 +1946,6 @@ msgstr "OSARA: réinitialisé le visualiseur de pic de la seconde piste"
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA : Pause/reprise Peak Watcher"
 
-msgid "OSARA: View I/O for master track"
-msgstr "OSARA: afficher I/O de la piste master"
-
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: annoncer le mode d'édition ripple"
 
@@ -2050,10 +2055,10 @@ msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Rendre le prochain message muet en provenance d'OSARA"
 
 msgid "OSARA: Go to first track"
-msgstr ""
+msgstr "OSARA: Aller à la première piste"
 
 msgid "OSARA: Go to last track"
-msgstr ""
+msgstr "OSARA: Aller à la dernière piste"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection discontinue / bascule en sélection dé-sélection de la note / l'accord courant"

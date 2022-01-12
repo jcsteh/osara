@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "volume"
@@ -708,16 +708,16 @@ msgstr[0] "{} valeur modifiée"
 msgstr[1] "{} valeurs modifiées"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "Entrées MIDI par étape activé"
+msgstr "Entrées MIDI pas à pas activé"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "Entrées MIDI par étape désactivé"
+msgstr "Entrées MIDI pas à pas désactivé"
 
 msgid "Enabled  f1-f12 as step input"
-msgstr "Activé f1 à f12 comme entrée par étape"
+msgstr "Activé f1 à f12 comme entrée pas à pas"
 
 msgid "Disabled  f1-f12 as step input"
-msgstr "Désactivé f1 à f12 comme entrée par étape"
+msgstr "Désactivé f1 à f12 comme entrée pas à pas"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -755,6 +755,9 @@ msgstr "coupe bande"
 
 msgid "band pass"
 msgstr "passe-bande"
+
+msgid "parallel band pass"
+msgstr "passe-bande parallèle"
 
 msgid "band (alt)"
 msgstr "bande (alt)"
@@ -1025,7 +1028,7 @@ msgstr "inconnu"
 
 #. A recording mode.
 msgid "input"
-msgstr "entrée"
+msgstr "entrée, Audio et Midi"
 
 #. A recording mode.
 msgid "output (stereo)"
@@ -1178,7 +1181,7 @@ msgid "record monitor off"
 msgstr "monitoring d'entrée, désactivé"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
 msgstr "monitoring d'entrée, activé"
 
@@ -1435,20 +1438,20 @@ msgstr "solo normal"
 #. Reported when the play rate is adjusted. {:g} will be replaced
 #. with the play rate; e.g. "1.5 play rate".
 msgid "{:g} play rate"
-msgstr "{:g} vitesse de lecture"
+msgstr "vitesse de lecture définie à, {:g}"
 
 msgid "fx active"
 msgstr "fx actif"
 
 #. Record mode set to normal.
 msgid "normal record"
-msgstr "enregistrement normal"
+msgstr "mode d'enregistrement: normal"
 
 msgid "selected item auto-punch"
-msgstr "punch-automatique sur la sélection d'objet"
+msgstr "mode d'enregistrement: auto-punch sur la sélection d'objet"
 
 msgid "time selection auto-punch"
-msgstr "punch-automatique sur la sélection temporelle"
+msgstr "mode d'enregistrement: auto-punch sur la sélection temporelle"
 
 #. When changing the global automation override, reported prior
 #. to the chosen automation mode.
@@ -1478,6 +1481,11 @@ msgid "count in off"
 msgstr "décompte avant l'enregistrement désactivé"
 
 #. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr "normal"
+
+#. A take channel mode.
 msgid "mono (left)"
 msgstr "mono (gauche)"
 
@@ -1499,8 +1507,8 @@ msgstr "mode inconnu"
 #. For example: "set 2 takes to mono (left)"
 msgid "set {count} take to {mode}"
 msgid_plural "set {count} takes to {mode}"
-msgstr[0] "définir {count} prise sur {mode}"
-msgstr[1] "définir {count} prises sur {mode}"
+msgstr[0] "{count} prise définie sur {mode}"
+msgstr[1] "{count} Prises définies sur {mode}"
 
 #. Reported when changing the tempo. {} will be replaced with
 #. the new tempo; e.g. "50 bpm".
@@ -1937,9 +1945,6 @@ msgstr "OSARA: Réinitialise l'observateur de crête pour la seconde piste"
 
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA: met en pause, ou relance l'observateur de crête\""
-
-msgid "OSARA: View I/O for master track"
-msgstr "OSARA: Affiche les entrées et les sorties de la piste master\""
 
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: Énonce le mode d'édition ripple"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "音量"
@@ -723,6 +723,9 @@ msgstr "等級"
 msgid "band pass"
 msgstr "帶通"
 
+msgid "parallel band pass"
+msgstr "平行帶通"
+
 msgid "band (alt)"
 msgstr "頻段 (alt)"
 
@@ -1024,7 +1027,7 @@ msgstr "midi 替換"
 
 #. A recording mode.
 msgid "midi touch-replace"
-msgstr "MIDI觸碰替換"
+msgstr "midi 觸碰-替換"
 
 #. A recording mode.
 msgid "midi latch-replace"
@@ -1140,7 +1143,7 @@ msgid "record monitor off"
 msgstr "錄音監聽關"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
 msgstr "正常"
 
@@ -1391,7 +1394,7 @@ msgid "{:g} play rate"
 msgstr "{:g} 播放率"
 
 msgid "fx active"
-msgstr "FX 活躍"
+msgstr "fx 活躍"
 
 #. Record mode set to normal.
 msgid "normal record"
@@ -1428,6 +1431,11 @@ msgstr "預示開"
 
 msgid "count in off"
 msgstr "預示關"
+
+#. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr "正常"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -1879,9 +1887,6 @@ msgstr "OSARA: 重製峰值查看器第二軌道"
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA: 暫停/恢復峰值查看器"
 
-msgid "OSARA: View I/O for master track"
-msgstr "OSARA: 查看主控軌的 I/O"
-
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: 報告波紋編輯狀態"
 
@@ -2057,7 +2062,7 @@ msgstr "參數(&P)"
 
 msgctxt "Parameters"
 msgid "Value:"
-msgstr "值"
+msgstr "值:"
 
 msgctxt "Parameters"
 msgid "&Filter:"
@@ -2077,11 +2082,11 @@ msgstr "水平類型："
 
 msgctxt "Peak Watcher"
 msgid "First track:"
-msgstr "第一軌道"
+msgstr "第一軌道:"
 
 msgctxt "Peak Watcher"
 msgid "Second track:"
-msgstr "第二軌道"
+msgstr "第二軌道:"
 
 msgctxt "Peak Watcher"
 msgid "Notify automatically for channels:"

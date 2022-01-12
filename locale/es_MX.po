@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2021-12-16 11:34\n"
+"PO-Revision-Date: 2022-01-12 21:51\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -279,7 +279,7 @@ msgid "Foot Pedal MSB"
 msgstr "Pedal MSB"
 
 msgid "Portamento MSB"
-msgstr ""
+msgstr "Portamento MSB"
 
 msgid "Data Entry MSB"
 msgstr "Entrada de Datos MSB"
@@ -288,7 +288,7 @@ msgid "Volume MSB"
 msgstr "Volumen MSB"
 
 msgid "Balance MSB"
-msgstr ""
+msgstr "Balance MSB"
 
 msgid "Pan Position MSB"
 msgstr "Posición Panorámica MSB"
@@ -297,10 +297,10 @@ msgid "Expression MSB"
 msgstr "Expresión MSB"
 
 msgid "Control 1 MSB"
-msgstr ""
+msgstr "Control 1 MSB"
 
 msgid "Control 2 MSB"
-msgstr ""
+msgstr "Control 2 MSB"
 
 msgid "GP Slider 1"
 msgstr "Deslizador GP 1"
@@ -327,7 +327,7 @@ msgid "Foot Pedal LSB"
 msgstr "Pedal LSB"
 
 msgid "Portamento LSB"
-msgstr ""
+msgstr "Portamento LSB"
 
 msgid "Data Entry LSB"
 msgstr "Entrada de Datos LSB"
@@ -336,7 +336,7 @@ msgid "Volume LSB"
 msgstr "Volumen LSB"
 
 msgid "Balance LSB"
-msgstr ""
+msgstr "Balance LSB"
 
 msgid "Pan Position LSB"
 msgstr "Posición Panorámica LSB"
@@ -345,10 +345,10 @@ msgid "Expression LSB"
 msgstr "Expresión LSB"
 
 msgid "Control 1 LSB"
-msgstr ""
+msgstr "Control 1 LSB"
 
 msgid "Control 2 LSB"
-msgstr ""
+msgstr "Control 2 LSB"
 
 msgid "Hold Pedal (on/off)"
 msgstr "Pedal Sostenido (activar/desactivar)"
@@ -432,16 +432,16 @@ msgid "Data Button Dec"
 msgstr "Botón de datos Dec"
 
 msgid "Non-Reg Parm LSB"
-msgstr ""
+msgstr "Sin-Registro Parm LSB"
 
 msgid "Non-Reg Parm MSB"
-msgstr ""
+msgstr "Sin-Registro Parm LSB"
 
 msgid "Reg Parm LSB"
-msgstr ""
+msgstr "Registro Parm LSB"
 
 msgid "Reg Parm MSB"
-msgstr ""
+msgstr "Reg Parm LSB"
 
 msgid "All Sound Off"
 msgstr "Todo el Sonido Desactivado"
@@ -450,7 +450,7 @@ msgid "Reset"
 msgstr "Reiniciar"
 
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
 msgid "All Notes Off"
 msgstr "Todas las Notas Desactivadas"
@@ -475,7 +475,7 @@ msgstr "Modo Polifónico Después de Tocar {note}  {value}"
 
 #. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 msgid "Control {control}, {value}"
-msgstr ""
+msgstr "Control {control}, {value}"
 
 msgid "Program {}"
 msgstr "Programa {}"
@@ -485,7 +485,7 @@ msgstr "Presión del canal {}"
 
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
-msgstr ""
+msgstr "Curvatura de Tono {}"
 
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
@@ -556,7 +556,7 @@ msgstr[1] "{} notas acortadas en modo pixel"
 msgid "{} note lengthened grid unit"
 msgid_plural "{} notes lengthened grid unit"
 msgstr[0] "{} nota alargada en modo cuadrícula"
-msgstr[1] "{} notas alagadas en modo cuadrícula"
+msgstr[1] "{} notas alargadas en modo cuadrícula"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -755,6 +755,9 @@ msgstr "filtro notch"
 
 msgid "band pass"
 msgstr "filtro de paso de banda"
+
+msgid "parallel band pass"
+msgstr "paso de banda paralela"
 
 msgid "band (alt)"
 msgstr "banda (alt)"
@@ -1178,9 +1181,9 @@ msgid "record monitor off"
 msgstr "monitor de grabación apagado"
 
 #. Record monitor set to normal.
-#. A take channel mode.
+msgctxt "record monitor"
 msgid "normal"
-msgstr "monitor de grabación encendido"
+msgstr "normal"
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
@@ -1476,6 +1479,11 @@ msgstr "conteo encendido"
 
 msgid "count in off"
 msgstr "conteo apagado"
+
+#. A take channel mode.
+msgctxt "take channel mode"
+msgid "normal"
+msgstr "normal"
 
 #. A take channel mode.
 msgid "mono (left)"
@@ -1938,9 +1946,6 @@ msgstr "OSARA: reiniciar el Medidor de Picos para la pista secundaria"
 msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA: pausar/reanudar el Medidor de Picos"
 
-msgid "OSARA: View I/O for master track"
-msgstr "OSARA: Ver I/O para pista máster"
-
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: Anunciar el estado del ripple"
 
@@ -2050,10 +2055,10 @@ msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Silenciar el siguiente mensaje de OSARA"
 
 msgid "OSARA: Go to first track"
-msgstr ""
+msgstr "OSARA: Ir a la primera pista"
 
 msgid "OSARA: Go to last track"
-msgstr ""
+msgstr "OSARA: Ir a la última pista"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: habilitar/deshabilitar la selección separada en el acorde/nota actual"
