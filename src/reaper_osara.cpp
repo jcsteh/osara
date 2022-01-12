@@ -4180,7 +4180,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			}
 		}
 		HWND tempWindow;
-		if (tempWindow = getSendContainer(hwnd)) {
+		if ((tempWindow = getSendContainer(hwnd))) {
 			// #24: This is a button for a send in the Track I/O window.
 			// Tweak the name so the user knows what send it's for.
 			// Unfortunately, we can't annotate the accessible for the container.

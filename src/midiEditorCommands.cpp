@@ -1037,7 +1037,7 @@ void midiMoveToItem(int direction) {
 	MediaItem* item = GetMediaItemTake_Item(take);
 	MediaTrack* track = GetMediaItem_Track(item);
 	int count = CountTrackMediaItems(track);
-	int itemNum;
+	int itemNum = 1;
 	for (int i=0; i<count; ++i) {
 		MediaItem* itemTmp = GetTrackMediaItem(track, i);
 		if (itemTmp == item) {
