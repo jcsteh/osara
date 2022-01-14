@@ -473,8 +473,8 @@ You do this using the following actions:
 
 - OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed): J
 - OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed): K
-- OSARA: Report peak at play cursor position for channel 1 of master track: Shift+J
-- OSARA: Report peak at play cursor position for channel 2 of master track: Shift+K
+- OSARA: Report level in peak dB at play cursor for channel 1 of master track: Shift+J
+- OSARA: Report level in peak dB at play cursor for channel 2 of master track: Shift+K
 
 ### Peak Watcher
 In addition to reading current peaks, You can also be notified automatically when the volume exceeds a specified maximum level using Peak Watcher.
