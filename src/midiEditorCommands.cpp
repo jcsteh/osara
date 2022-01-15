@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <map>
 #include <cassert>
+#include <functional>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "translation.h"
@@ -24,14 +25,52 @@ using namespace fmt::literals;
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
 // It is also used for other MIDI messages.
-typedef struct {
+struct MidiControlChange{ 
 	int channel;
 	int index;
 	int message1;
 	int message2;
 	int message3;
 	double position;
-} MidiControlChange;
+	bool selected;
+	bool muted;
+
+	struct ReqParams {
+		bool position = true;
+		bool message1 = false;
+		bool channel = false;
+		bool message2 = false;
+		bool message3 = false;
+		bool selected = false;
+		bool muted = false;
+	};
+
+	// Used to compare a position with the position of a CC.
+	struct CompareByPosition {
+		bool operator() (const MidiControlChange& cc, double pos) const { return cc.position < pos; }
+		bool operator() (double pos, const MidiControlChange& cc) const { return pos < cc.position; }
+	};
+
+	static const MidiControlChange get(MediaItem_Take* take, int index, ReqParams params) {
+		MidiControlChange cc;
+		double position;
+		MIDI_GetCC(take, index,
+			params.selected ? &cc.selected : nullptr,
+			params.muted ? &cc.muted : nullptr,
+			params.position ? &position : nullptr,
+			params.message1 ? &cc.message1 : nullptr,
+			params.channel ? &cc.channel : nullptr,
+			params.message2 ? &cc.message2 : nullptr,
+			params.message3 ? &cc.message3 : nullptr
+		);
+		if (params.position) {
+			position = MIDI_GetProjTimeFromPPQPos(take, position);
+			cc.position = position;
+		}
+		cc.index = index;
+		return cc;
+	}
+} ;
 
 const UINT DEFAULT_PREVIEW_LENGTH = 300; // ms
 
@@ -42,9 +81,51 @@ struct MidiNote {
 	int index;
 	double start;
 	double end;
+	bool selected;
+	bool muted;
 
 	double getLength() const {
-		return max (0, (end - start));
+		return max (0, (this->end - this->start));
+	}
+
+	struct ReqParams {
+		bool start = true;
+		bool end = false;
+		bool channel = false;
+		bool pitch = false;
+		bool velocity = false;
+		bool selected = false;
+		bool muted = false;
+	};
+
+	// Used to compare a position with the start of a note.
+	struct CompareByStart {
+		bool operator() (const MidiNote& note, double pos) const { return note.start < pos; }
+		bool operator() (double pos, const MidiNote& note) const { return pos < note.start; }
+	};
+
+	static const MidiNote get(MediaItem_Take* take, int index, ReqParams params) {
+		MidiNote note;
+		double start, end;
+		MIDI_GetNote(take, index,
+			params.selected ? &note.selected : nullptr,
+			params.muted ? &note.muted : nullptr,
+			params.start ? &start: nullptr,
+			params.end ? &end: nullptr,
+			params.channel ? &note.channel: nullptr,
+			params.pitch ? &note.pitch: nullptr,
+			params.velocity ? &note.velocity : nullptr
+		);
+		if (params.start) {
+			start = MIDI_GetProjTimeFromPPQPos(take, start);
+			note.start = start;
+		}
+		if (params.end) {
+			end = MIDI_GetProjTimeFromPPQPos(take, end);
+			note.end = end;
+		}
+		note.index = index;
+		return note;
 	}
 };
 
@@ -193,10 +274,10 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewNotesOff(false);
 	}
 	// Queue note on events for the new notes.
-	for (auto note = notes.cbegin(); note != notes.cend(); ++note) {
+	for (auto const& note: notes) {
 		MIDI_event_t event = {0, 3, {
-			(unsigned char)(MIDI_NOTE_ON | note->channel),
-			(unsigned char)note->pitch, (unsigned char)note->velocity}};
+			(unsigned char)(MIDI_NOTE_ON | note.channel),
+			(unsigned char)note.pitch, (unsigned char)note.velocity}};
 		previewSource.events.push_back(event);
 	}
 	// Save the notes being previewed so we can turn them off later (previewNotesOff).
@@ -207,7 +288,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	// Calculate the minimum note length.
-	double minLength = min_element(notes.begin(), notes.end(), compareNotesByLength)->getLength();
+	double minLength = min_element(notes.cbegin(), notes.cend(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(nullptr, 0,
 		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
@@ -223,22 +304,21 @@ bool cancelPendingMidiPreviewNotesOff() {
 }
 
 // A random access iterator for MIDI events.
-// The template parameter is arbitrary and is only used to specialise the
-// template for different event types (note, CC, etc.). We do this instead of
-// subclassing because iterators need to return their exact type, not a base
-// class.
-template<auto eventType>
+// The template parameter is used to specialise the
+// template for different event types (note, CC, etc.).
+template<typename EventType>
 class MidiEventIterator {
 	public:
 	using difference_type = int;
-	using value_type = const double;
-	using pointer = void;
-	using reference = void;
+	using value_type = const EventType;
+	using pointer = value_type*;
+	using reference = value_type;
 	using iterator_category = random_access_iterator_tag;
 
-	MidiEventIterator(MediaItem_Take* take): take(take) {
+	MidiEventIterator(MediaItem_Take* take, typename EventType::ReqParams ReqParams = {}, difference_type index=0)
+		: take(take), reqParams(ReqParams), index(index)
+	{
 		this->count = this->getCount();
-		this->index = 0;
 	}
 
 	bool operator==(const MidiEventIterator& other) const {
@@ -257,13 +337,17 @@ class MidiEventIterator {
 		return this->index <= other.index;
 	}
 
-	const double operator[](const int index) const {
-		double pos = this->getEvent(this->index + index);
-		return MIDI_GetProjTimeFromPPQPos(take, pos);
+	value_type operator[](const difference_type index) const{
+		return this->getEvent(this->index + index);
 	}
 
-	const double operator*() const {
+	reference operator*() const {
 		return (*this)[0];
+	}
+
+	pointer operator->() const {
+		this->currentValue = (*this)[0];
+		return &(this->currentValue);
 	}
 
 	MidiEventIterator& operator++() {
@@ -276,17 +360,29 @@ class MidiEventIterator {
 		return *this;
 	}
 
-	MidiEventIterator& operator+=(const int increment) {
+	MidiEventIterator& operator+=(const difference_type increment) {
 		this->index += increment;
 		return *this;
 	}
 
-	MidiEventIterator& operator-=(const int decrement) {
+	MidiEventIterator& operator-=(const difference_type decrement) {
 		this->index -= decrement;
 		return *this;
 	}
 
-	int operator-(const MidiEventIterator& other) {
+	MidiEventIterator operator+(const difference_type increment) {
+		auto tmpIt = *this;
+		tmpIt += increment;
+		return tmpIt;
+	}
+
+	MidiEventIterator operator-(const difference_type decrement) {
+		auto tmpIt = *this;
+		tmpIt -= decrement;
+		return tmpIt;
+	}
+
+	difference_type operator-(const MidiEventIterator& other) {
 		return this->index - other.index;
 	}
 
@@ -294,35 +390,31 @@ class MidiEventIterator {
 		this->index = count;
 	}
 
-	int getIndex() const {
+	difference_type getIndex() const {
 		return this->index;
 	}
 
 	protected:
 	int getCount() const;
-	double getEvent(int index) const;
+	value_type getEvent(difference_type index) const {
+		return EventType::get(this->take, index, this->reqParams);
+	}
 	MediaItem_Take* take;
 
 	private:
 	int count;
-	int index;
+	typename EventType::ReqParams reqParams;
+	difference_type index;
+	mutable EventType currentValue;
 };
 
-using MidiNoteIterator = MidiEventIterator<1>;
+using MidiNoteIterator = MidiEventIterator<MidiNote>;
 
 template<>
 int MidiNoteIterator::getCount() const {
 	int count;
 	MIDI_CountEvts(this->take, &count, nullptr, nullptr);
 	return count;
-}
-
-template<>
-double MidiNoteIterator::getEvent(int index) const {
-	double start;
-	MIDI_GetNote(take, index, nullptr, nullptr, &start, nullptr, nullptr,
-		nullptr, nullptr);
-	return start;
 }
 
 void cmdMidiMoveCursor(Command* command) {
@@ -404,7 +496,6 @@ const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	}
 	return s.str();
 }
-
 // Returns the indexes of the first and last notes in a chord in a given direction.
 pair<int, int> findChord(MediaItem_Take* take, int direction) {
 	double now = GetCursorPosition();
@@ -415,7 +506,7 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 		// No notes.
 		return {-1, -1};
 	}
-	auto range = equal_range(begin, end, now);
+	auto range = equal_range(begin, end, now, MidiNote::CompareByStart{});
 	// Find the first note of the chord.
 	MidiNoteIterator firstNote = end;
 	if (direction == 1 && range.second != end) {
@@ -436,11 +527,11 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 		return {-1, -1};
 	}
 	// Find the last note of the chord.
-	double firstStart = *firstNote;
+	double firstStart = firstNote->start;
 	MidiNoteIterator lastNote = firstNote;
 	MidiNoteIterator note = firstNote;
 	for (note += direction; begin <= note && note < end; note += direction) {
-		if (*note != firstStart) {
+		if (note->start != firstStart) {
 			break;
 		}
 		lastNote = note;
@@ -468,19 +559,21 @@ bool compareNotesByPitch(const MidiNote& note1, const MidiNote& note2) {
 // This updates curNoteInChord.
 MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 	auto chord = findChord(take, 0);
-	if (chord.first == -1)
+	if (chord.first == -1) {
 		return {-1};
+	}
+	MidiNoteIterator begin(take, {
+		true,  // start
+		true,  // end
+		true,  // channel
+		true,  // pitch
+		true  // velocity
+	});
+	auto end = begin + (chord.second + 1);
+	begin += chord.first;
 	// Notes at the same position are ordered arbitrarily.
 	// This is not intuitive, so sort them.
-	vector<MidiNote> notes;
-	for (int note = chord.first; note <= chord.second; ++note) {
-		double start, end;
-		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
-		notes.push_back({chan, pitch, vel, note, start, end});
-	}
+	vector<MidiNote> notes(begin, end);
 	sort(notes.begin(), notes.end(), compareNotesByPitch);
 	const int lastNoteIndex = (int)notes.size() - 1;
 	// Work out which note to move to.
@@ -537,6 +630,15 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 		notes.push_back({chan, pitch, vel, noteIndex, start, end});
 	}
 	return notes;
+}
+
+using MidiControlChangeIterator = MidiEventIterator<MidiControlChange>;
+
+template<>
+int MidiControlChangeIterator::getCount() const {
+	int count;
+	MIDI_CountEvts(this->take, nullptr, &count, nullptr);
+	return count;
 }
 
 // Finds a single CC at the cursor in a given direction and returns its info.
@@ -658,8 +760,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, direction);
-	if (chord.first == -1)
+	if (chord.first == -1) {
 		return;
+	}
 	curNoteInChord = -1;
 	if (clearSelection) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
@@ -667,20 +770,24 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	}
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
-	vector<MidiNote> notes;
-	for (int note = chord.first; note <= chord.second; ++note) {
-		double start, end;
-		int chan, pitch, vel;
-		MIDI_GetNote(take, note, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
+	MidiNoteIterator begin(take, {
+		true,  // start
+		true,  // end
+		true,  // channel
+		true,  // pitch
+		true  // velocity
+	});
+	auto end = begin + (chord.second + 1);
+	begin += chord.first;
+	vector<MidiNote> notes(begin, end);
+	for (auto const& note : notes) {
 		if (!cursorSet && direction != 0) {
-			SetEditCurPos(start, true, false);
+			SetEditCurPos(note.start, true, false);
 			cursorSet = true;
 		}
-		if (select)
-			selectNote(take, note);
-		notes.push_back({chan, pitch, vel, 0, start, end});
+		if (select) {
+			selectNote(take, note.index);
+		}
 	}
 	previewNotes(take, notes);
 	fakeFocus = FOCUS_NOTE;
