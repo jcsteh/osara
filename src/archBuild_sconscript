@@ -98,8 +98,10 @@ else: # Mac
 	env["SHLIBPREFIX"] = ""
 
 	# Generate Mac resources.
+	import shutil
+	php = shutil.which("php")
 	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
-		[["include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
+		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
 	env.Depends("reaper_osara.cpp", res)
 
 def addExternalSources(dir, files):
