@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-01-12 21:51\n"
+"PO-Revision-Date: 2022-01-15 23:24\n"
 
 msgid "volume"
 msgstr "音量"
@@ -236,6 +236,9 @@ msgstr "B"
 
 msgid "noncontiguous selection"
 msgstr "不連續選擇"
+
+msgid "velocity"
+msgstr "力度"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -1923,17 +1926,17 @@ msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦�
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: 移動最後焦點的拉伸標記到編輯光標位置"
 
-msgid "OSARA: Report current peak for channel 1 of current track"
-msgstr "OSARA: 報告當前軌道第一通道的峰值"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
+msgstr "OSARA: 報告當前軌道通道 1 的播放游標處的峰值 dB 電平（而不是在軌道待錄時報告輸入電平）"
 
-msgid "OSARA: Report current peak for channel 2 of current track"
-msgstr "OSARA: 報告當前軌道第二通道的峰值"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
+msgstr "OSARA: 報告當前軌道通道 2 的播放游標處的峰值 dB 電平（而不是在軌道待錄時報告輸入電平）"
 
-msgid "OSARA: Report current peak for channel 1 of master track"
-msgstr "OSARA: 報告主控軌第一通道的當前峰值"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
+msgstr "OSARA: 報告主控軌通道 1 播放光標處的峰值 dB 電平"
 
-msgid "OSARA: Report current peak for channel 2 of master track"
-msgstr "OSARA: 報告主控軌第二通道的當前峰值"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
+msgstr "OSARA: 報告主控軌通道 2 播放光標處的峰值 dB 電平"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: 刪除所有拍號標記"

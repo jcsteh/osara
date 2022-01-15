@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-01-12 21:51\n"
+"PO-Revision-Date: 2022-01-15 23:24\n"
 
 msgid "volume"
 msgstr "volume"
@@ -242,6 +242,9 @@ msgstr "si"
 
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
+
+msgid "velocity"
+msgstr ""
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -1982,17 +1985,17 @@ msgstr "OSARA: Active la sélection non contigu, bascule la sélection de la pis
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: Déplace le dernier marqueur d'étirement focalisé à la position actuelle du curseur d'édition"
 
-msgid "OSARA: Report current peak for channel 1 of current track"
-msgstr "OSARA: Énonce la valeur de la crête actuel pour le canal 1 de la piste actuelle"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 2 of current track"
-msgstr "OSARA: Énonce la valeur de la crête actuel pour le canal 2 de la piste actuelle"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 1 of master track"
-msgstr "OSARA: Énonce la valeur de la crête actuel pour le canal 1 de la piste master"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 2 of master track"
-msgstr "OSARA: Énonce la valeur de la crête actuel pour le canal 2 de la piste master"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
+msgstr ""
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: Supprime tous les marqueurs de signature rythmique"

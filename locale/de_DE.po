@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2022-01-12 21:51\n"
+"PO-Revision-Date: 2022-01-15 23:24\n"
 
 msgid "volume"
 msgstr "Lautstärke"
@@ -242,6 +242,9 @@ msgstr "B"
 
 msgid "noncontiguous selection"
 msgstr "Nicht zusammenhängende Selektion"
+
+msgid "velocity"
+msgstr ""
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -1982,17 +1985,17 @@ msgstr "Osara: Aktivieren der nicht zusammenhängenden Selektion  / Umschalten S
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "Osara: Verschiebe den zuletzt fokussierten Stretch Marker zum Edit Cursor"
 
-msgid "OSARA: Report current peak for channel 1 of current track"
-msgstr "Osara: Report aktuellen Peak auf Kanal eins des aktuellen Tracks"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 2 of current track"
-msgstr "Osara: Report aktuellen Peak auf Kanal zwei des aktuellen Tracks"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 1 of master track"
-msgstr "Osara: Report aktuellen Peak auf Kanal eins des Master Track"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
+msgstr ""
 
-msgid "OSARA: Report current peak for channel 2 of master track"
-msgstr "Osara: Report aktuellen Peak auf Kanal zwei des Master Track"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
+msgstr ""
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "Osara: lösche alle Taktart Marker"
