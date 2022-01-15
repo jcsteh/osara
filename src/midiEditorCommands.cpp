@@ -103,7 +103,7 @@ struct MidiNote {
 		bool operator() (double pos, const MidiNote& note) const { return pos < note.start; }
 	};
 
-	static const MidiNote get(MediaItem_Take* take, int index, MidiNote::ReqParams params) {
+	static const MidiNote get(MediaItem_Take* take, int index, ReqParams params) {
 		MidiNote note;
 		double start, end;
 		MIDI_GetNote(take, index,
@@ -125,8 +125,6 @@ struct MidiNote {
 		}
 		return note;
 	}
-
-
 };
 
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
@@ -305,9 +303,7 @@ bool cancelPendingMidiPreviewNotesOff() {
 
 // A random access iterator for MIDI events.
 // The template parameter is used to specialise the
-// template for different event types (note, CC, etc.). We do this instead of
-// subclassing because iterators need to return their exact type, not a base
-// class.
+// template for different event types (note, CC, etc.).
 template<typename EventType>
 class MidiEventIterator {
 	public:
