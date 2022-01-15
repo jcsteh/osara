@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-01-12 21:51\n"
+"PO-Revision-Date: 2022-01-15 23:24\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -189,8 +189,8 @@ msgstr "{} pestaña"
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
-msgstr[0] "[] notas"
-msgstr[1] "[] notas"
+msgstr[0] "{} notas"
+msgstr[1] "{} notas"
 
 #. The name of a musical note.
 msgid "c"
@@ -242,6 +242,9 @@ msgstr "si"
 
 msgid "noncontiguous selection"
 msgstr "selección no contígua"
+
+msgid "velocity"
+msgstr "velocidad"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -643,8 +646,8 @@ msgstr[1] "{} notas semitono abajo ignorando escala"
 #. "3 notes pitch changed"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
-msgstr[0] "{} nota cambiado el tono"
-msgstr[1] "{} notas cambiado el tono"
+msgstr[0] "{} nota cambiada el tono"
+msgstr[1] "{} notas cambiadas el tono"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -1537,7 +1540,7 @@ msgstr "{} final de ítem colocado al final del audio"
 #. media end. {} will be replaced with the end time; e.g.
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
-msgstr "final de ítem colocado al final del audio"
+msgstr "final de ítem colocado al final del audio: {}"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -1982,17 +1985,17 @@ msgstr "OSARA: activa el modo de selección no contiguo, o cambia la selección 
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: mueve el último marcador enfocado a la posición actual del cursor"
 
-msgid "OSARA: Report current peak for channel 1 of current track"
-msgstr "OSARA: anuncia valor del pico del canal 1 de la pista actual"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
+msgstr "OSARA: anuncia nivel del pico en DB en la posición del cursor del canal 1 de la pista actual (anuncia nivel de entrada sin estar la pista armada)"
 
-msgid "OSARA: Report current peak for channel 2 of current track"
-msgstr "OSARA: anuncia valor del pico del canal 2 de la pista actual"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
+msgstr "OSARA: anuncia nivel del pico en DB en la posición del cursor del canal 2 de la pista actual (anuncia nivel de entrada sin estar la pista armada)"
 
-msgid "OSARA: Report current peak for channel 1 of master track"
-msgstr "OSARA: anuncia valor del pico del canal 1 de la pista master"
+msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
+msgstr "OSARA: anuncia el nivel del pico en DB del canal 1 de la pista master"
 
-msgid "OSARA: Report current peak for channel 2 of master track"
-msgstr "OSARA: anuncia valor del pico del canal 2 de la pista master"
+msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
+msgstr "OSARA: anuncia el nivel del pico en DB del canal 2 de la pista master"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: elimina todos los marcadores de cambio de tiempo"
@@ -2067,13 +2070,13 @@ msgid "OSARA: Move to next chord"
 msgstr "OSARA: mueve al siguiente acorde"
 
 msgid "OSARA: Move to previous chord"
-msgstr "OSARA: mueve al acorde anterior"
+msgstr "OSARA: mueve al acorde o nota anterior"
 
 msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: mueve al siguiente acorde y lo agrega a la selección"
+msgstr "OSARA: mueve al siguiente acorde o nota y lo agrega a la selección"
 
 msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: mueve al acorde anterior y lo agrega a la selección"
+msgstr "OSARA: mueve al acorde anterior o nota y lo agrega a la selección"
 
 msgid "OSARA: Move to next note in chord"
 msgstr "OSARA: mueve a la siguiente nota del acorde"
