@@ -67,6 +67,7 @@ struct MidiControlChange{
 			position = MIDI_GetProjTimeFromPPQPos(take, position);
 			cc.position = position;
 		}
+		cc.index = index;
 		return cc;
 	}
 } ;
@@ -123,6 +124,7 @@ struct MidiNote {
 			end = MIDI_GetProjTimeFromPPQPos(take, end);
 			note.end = end;
 		}
+		note.index = index;
 		return note;
 	}
 };
