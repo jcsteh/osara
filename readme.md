@@ -354,6 +354,7 @@ FX: Toggle delta solo for last focused FX
 - Edit: Decrease pitch cursor one octave: Alt+Shift+DownArrow
 - Edit: Delete events: Delete
 - Edit: Insert note at edit cursor: I
+- Edit: Insert note at edit cursor (no advance edit cursor)
 - Edit: Select all events: Ctrl+A
 - Edit: Select all notes in time selection
 - Invert selection: Ctrl+I

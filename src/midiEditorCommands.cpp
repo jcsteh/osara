@@ -911,12 +911,19 @@ void cmdMidiInsertNote(Command* command) {
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
+	// If we're advancing the cursor position, we should report the new position.
+	const bool reportNewPos = command->gaccel.accel.cmd ==
+		40051; // Edit: Insert note at edit cursor
 	if (shouldReportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
 		s << formatNoteLength(note.start, note.end);
-		s << ", ";
+		if (reportNewPos) {
+			s << ", ";
+		}
 	}
-	s << formatCursorPosition(TF_MEASURE);
+	if (reportNewPos) {
+		s << formatCursorPosition(TF_MEASURE);
+	}
 	outputMessage(s);
 }
 
