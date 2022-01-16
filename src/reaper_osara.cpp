@@ -793,6 +793,11 @@ void postGoToTrack(int command, MediaTrack* track) {
 			if (!TrackFX_GetEnabled(track, f)) {
 				s << " " << translate("bypassed");
 			}
+			int deltaParam = TrackFX_GetParamFromIdent(track, f, ":delta");
+			if (deltaParam != -1 &&
+					TrackFX_GetParam(track, f, deltaParam, nullptr, nullptr)) {
+				s << " " << translate("delta");
+			}
 		}
 	}
 	outputMessage(s);
