@@ -129,6 +129,67 @@ struct MidiNote {
 	}
 };
 
+struct MidiEventListData { 
+	int index;
+	double position;
+	string message;
+	int offVel;
+	double length;
+	bool selected;
+
+	struct ReqParams {
+		bool position = true;
+		bool length = false;
+		bool message = false;
+		bool offVel = false;
+		bool selected = false;
+	};
+
+	// Used to compare a position with the position of a MIDI event list item.
+	struct CompareByPosition {
+		bool operator() (const MidiEventListData& data, double pos) const { return data.position < pos; }
+		bool operator() (double pos, const MidiEventListData& data) const { return pos < data.position; }
+	};
+
+	static const MidiEventListData get(HWND editor, int index, ReqParams params) {
+		MidiEventListData data{index};
+		auto setting = format("list_{}", index);
+		char eventData[255] = "\0";
+		MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData));
+		string key, val;
+		istringstream s(eventData);
+		while(getline(getline(s, key, '='), val, ' ')) {
+			if (key == "pos" && params.position) {
+				auto eventPosQn = stof(val);
+				data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
+			} else if (key == "len" && params.length) {
+				auto lengthQn = stof(val);
+				data.length = TimeMap2_QNToTime(nullptr, lengthQn);
+			} else if (key == "msg" && params.message) {
+				data.message = val;
+			} else if (key == "offvel" && params.offVel) {
+				data.offVel = stoi(val);
+			} else if (key == "sel" && params.selected) {
+				data.selected = val == "1" ? true: false;
+			}
+		}
+		return data;
+	}
+
+	const MidiNote toMidiNote() {
+		int msg = stoi(this->message, nullptr, 16);
+		MidiNote note{
+			(msg >> 16) &0xf,  // channel
+			(msg >> 8) & 0x7f,  // pitch
+			msg & 0x7f, // velocity
+			-1, // index
+			this->position, // start
+			this->position + this->length,  // end
+		};
+		return note;
+	}
+} ;
+
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
@@ -307,9 +368,10 @@ bool cancelPendingMidiPreviewNotesOff() {
 }
 
 // A random access iterator for MIDI events.
-// The template parameter is used to specialise the
+// The EventType template parameter is used to specialise the
 // template for different event types (note, CC, etc.).
-template<typename EventType>
+// The SourceType template parameter is used to define the source of events (MediaItem_Take*, HWND for event list window, etc.)
+template<typename EventType, typename SourceType>
 class MidiEventIterator {
 	public:
 	using difference_type = int;
@@ -318,14 +380,14 @@ class MidiEventIterator {
 	using reference = value_type;
 	using iterator_category = random_access_iterator_tag;
 
-	MidiEventIterator(MediaItem_Take* take, typename EventType::ReqParams ReqParams = {}, difference_type index=0)
-		: take(take), reqParams(ReqParams), index(index)
+	MidiEventIterator(SourceType source, typename EventType::ReqParams ReqParams = {}, difference_type index=0)
+		: source(source), reqParams(ReqParams), index(index)
 	{
 		this->count = this->getCount();
 	}
 
 	bool operator==(const MidiEventIterator& other) const {
-		return this->take == other.take && this->index == other.index;
+		return this->source == other.source && this->index == other.index;
 	}
 
 	bool operator!=(const MidiEventIterator& other) const {
@@ -400,9 +462,9 @@ class MidiEventIterator {
 	protected:
 	int getCount() const;
 	value_type getEvent(difference_type index) const {
-		return EventType::get(this->take, index, this->reqParams);
+		return EventType::get(this->source, index, this->reqParams);
 	}
-	MediaItem_Take* take;
+	SourceType source;
 
 	private:
 	int count;
@@ -411,12 +473,12 @@ class MidiEventIterator {
 	mutable EventType currentValue;
 };
 
-using MidiNoteIterator = MidiEventIterator<MidiNote>;
+using MidiNoteIterator = MidiEventIterator<MidiNote, MediaItem_Take*>;
 
 template<>
 int MidiNoteIterator::getCount() const {
 	int count;
-	MIDI_CountEvts(this->take, &count, nullptr, nullptr);
+	MIDI_CountEvts(this->source, &count, nullptr, nullptr);
 	return count;
 }
 
@@ -635,12 +697,12 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 	return notes;
 }
 
-using MidiControlChangeIterator = MidiEventIterator<MidiControlChange>;
+using MidiControlChangeIterator = MidiEventIterator<MidiControlChange, MediaItem_Take*>;
 
 template<>
 int MidiControlChangeIterator::getCount() const {
 	int count;
-	MIDI_CountEvts(this->take, nullptr, &count, nullptr);
+	MIDI_CountEvts(this->source, nullptr, &count, nullptr);
 	return count;
 }
 
@@ -1291,51 +1353,47 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 }
 
 #ifdef _WIN32
-map<string, string> parseEventData(string const& source) {
-	map<string, string> m;
-	string key, val;
-	istringstream s(source);
-	while(getline(getline(s, key, '='), val, ' ')) {
-		m[key] = val;
-	}
-	return m;
+using MidiEventListDataIterator = MidiEventIterator<MidiEventListData, HWND>;
+
+template<>
+int MidiEventListDataIterator::getCount() const {
+	return MIDIEditor_GetSetting_int(this->source, "list_cnt");
 }
 
 void focusNearestMidiEvent(HWND hwnd) {
 	double cursorPos = GetCursorPosition();
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
-	auto listCount = MIDIEditor_GetSetting_int(editor, "list_cnt");
-	for (int i = 0; i < listCount; ++i) {
-		auto setting = format("list_{}", i);
-		char eventData[255] = "\0";
-		if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
-			continue;
-		}
-		auto eventValueMap = parseEventData(eventData);
-		// Check whether this event has a position
-		auto posIt = eventValueMap.find("pos");
-		if (posIt == eventValueMap.end()) {
-			// no position
-			continue;
-		}
-		auto eventPosQn = stof((*posIt).second);
-		auto eventPos = TimeMap2_QNToTime(nullptr, eventPosQn);
-		if (eventPos >= cursorPos) {
-			// This item is at or just after the cursor.
-			int oldFocus = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
-			int lvBitMask = LVIS_FOCUSED | LVIS_SELECTED;
-			// select and focus this item
-			ListView_SetItemState(hwnd, i,
-				lvBitMask, lvBitMask);
-			ListView_EnsureVisible (hwnd, i, false);
-			if (oldFocus != -1 && oldFocus != i) {
-				// Unselect the previously focused item.
-				ListView_SetItemState(hwnd, oldFocus,
-					0, LVIS_SELECTED);
-			}
-			break;
-		}
+	auto begin = MidiEventListDataIterator(editor);
+	auto end = begin;
+	end.moveToEnd();
+	if (begin == end) {
+		// No events
+		return;
+	}
+	auto range = equal_range(begin, end, cursorPos, MidiEventListData::CompareByPosition{});
+	auto first = range.first;
+	auto last = range.second - 1;
+	if (first == end) {
+		// Cursor is after all events.
+		return;
+	}
+	int curFocus = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	auto firstIndex = first.getIndex();
+	auto lastIndex = last.getIndex();
+	if (curFocus != -1 && firstIndex <= curFocus && curFocus <= lastIndex) {
+		// Current focus is within the range of events at the cursor.
+		return;
+	}
+	int lvBitMask = LVIS_FOCUSED | LVIS_SELECTED;
+	// select and focus the first item
+	ListView_SetItemState(hwnd, firstIndex,
+		lvBitMask, lvBitMask);
+	ListView_EnsureVisible (hwnd, firstIndex, false);
+	if (curFocus != -1) {
+		// Unselect the previously focused item.
+		ListView_SetItemState(hwnd, curFocus,
+			0, LVIS_SELECTED);
 	}
 }
 
@@ -1362,50 +1420,33 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	if (!shouldPreviewNotes && !editCursorShouldFollowEventListFocus) {
 		return;
 	}
-	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	if (childId == CHILDID_SELF) {
-		if (editCursorShouldFollowEventListFocus && focused == -1) {
+		// Focus is set to the list, not to an item within the list.
+		if (editCursorShouldFollowEventListFocus) {
 			focusNearestMidiEvent(hwnd);
 		}
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
-	auto setting = format("list_{}", focused);
-	char eventData[255] = "\0";
-	if (!MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
-		return;
-	}
-	auto eventValueMap = parseEventData(eventData);
-	// Check whether this event has a position.
-	auto posIt = eventValueMap.find("pos");
-	if (posIt == eventValueMap.end()) {
-		// no position
-		return;
-	}
-	auto posQn = stof((*posIt).second);
-	auto pos = TimeMap2_QNToTime(nullptr, posQn);
+	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	auto event = MidiEventListData::get(editor, focused, {
+		true,  // position
+		true,  // length
+		true,  // message
+	});
 	if (editCursorShouldFollowEventListFocus) {
-		SetEditCurPos(pos, true, false);
+		SetEditCurPos(event.position , true, false);
 	}
 	if (!shouldPreviewNotes) {
 		return;
 	}
 	// Check whether this is a note
-	auto lenIt = eventValueMap.find("len");
-	if (lenIt == eventValueMap.end()) {
+	if (event.length == 0) {
 		// No Note
 		return;
 	}
-	MidiNote note;
-	auto lengthQn = stof((*lenIt).second);
-	auto endQn = posQn + lengthQn;
-	note.start = pos;
-	note.end = TimeMap2_QNToTime(nullptr, endQn);
-	auto msg = stoi(eventValueMap.at("msg"), nullptr, 16);
-	note.pitch = (msg >> 8) & 0xff;
-	note.channel = (msg >> 16) &0xf;
-	note.velocity = msg & 0xff;
+	auto note = event.toMidiNote();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	previewNotes(take, {note});
 }
