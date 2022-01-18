@@ -1000,9 +1000,15 @@ void cmdMidiToggleSelCC (Command* command) {
 	int newCount = countSelectedEvents (take);
 	int count = newCount - oldCount;
 	if (count >= 0) {
-		outputMessage(format(translate_plural("{} CC event selected", "{} CC events selected", count), count));
+		// Translators: Used in the MIDI editor when CC events are selected.  {}
+		// is replaced by the number of events selected.
+		outputMessage(format(
+			translate_plural("{} CC event selected", "{} CC events selected", count), count));
 	} else {
-		outputMessage(format(translate_plural("{} CC event unselected", "{} CC events unselected", -count), -count));
+		// Translators: Used in the MIDI editor when CC events are unselected.  {}
+		// is replaced by the number of events unselected.
+		outputMessage(format(
+			translate_plural("{} CC event unselected", "{} CC events unselected", -count), -count));
 	}
 }
 
