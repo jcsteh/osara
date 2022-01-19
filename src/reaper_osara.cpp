@@ -2775,7 +2775,8 @@ void cmdRemoveAreaOfItems(Command* command) {
 			if((start < itemStart && itemStart < end) ||
 				(start < itemEnd && itemEnd < end) ||
 				(itemStart < start && start < itemEnd) ||
-				(itemStart < end && end < itemEnd)) {
+				(itemStart < end && end < itemEnd) ||
+				(start == itemStart && end == itemEnd)) {
 					++count;
 				}
 		}
