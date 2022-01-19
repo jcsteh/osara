@@ -2771,7 +2771,7 @@ void cmdHRemoveAreaOfItems(int command) {
 		for(int i = 0; i < selItems; ++i) {
 			MediaItem* item = GetSelectedMediaItem(nullptr, i);
 			double itemStart = GetMediaItemInfo_Value(item, "D_POSITION");
-			double itemEnd = GetMediaItemInfo_Value(item, "D_LENGTH");
+			double itemEnd = itemStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 			if((start < itemStart && itemStart < end) ||
 				(start < itemEnd && itemEnd < end) ||
 				(itemStart < start && start < itemEnd) ||
