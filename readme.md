@@ -171,6 +171,7 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Set cursor to previous take marker in selected items
 - Item: Delete take marker at cursor
 - Item: Delete all take markers
+- Item: Remove selected area of items: Control+Win+Delete
 
 #### Takes
 - Take: Switch items to next take: T
@@ -299,6 +300,7 @@ FX: Toggle delta solo for last focused FX
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
 - Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Control+Shift+X
+- Item: Cut selected area of items: Control+Win+X
 - Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Control+Shift+C
 - Item: Paste items/tracks: Control+V
