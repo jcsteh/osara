@@ -412,6 +412,7 @@ FX: Toggle delta solo for last focused FX
 - CC: Previous CC lane: Control+Alt+-
 - Options: MIDI inputs as step input mode
 - Options: F1-F12 as step input mode
+- Edit: Toggle selection of all CC events under selected notes
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
