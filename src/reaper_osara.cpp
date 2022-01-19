@@ -2758,7 +2758,7 @@ void cmdRemoveTracks(Command* command) {
 	cmdhRemoveTracks(command->gaccel.accel.cmd);
 }
 
-void cmdHRemoveAreaOfItems(int command) {
+void cmdRemoveAreaOfItems(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
@@ -2785,11 +2785,7 @@ void cmdHRemoveAreaOfItems(int command) {
 		outputMessage(format(
 			translate_plural("selected area of {} item removed", "Selected area of {} items removed", count), count));
 	}
-	Main_OnCommand(command, 0);
-}
-
-void cmdRemoveAreaOfItems(Command* command) {
-	cmdHRemoveAreaOfItems(command->gaccel.accel.cmd);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
 }
 
 void cmdhRemoveItems(int command) {
