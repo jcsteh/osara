@@ -763,13 +763,12 @@ To build OSARA, you will need:
 			* C++ Clang tools for Windows
 - Mac only: Xcode 13:
 	* You can download Xcode 13 from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
-- Python, version 3.7 or later:
-	* This is needed by SCons.
-	* [Download Python](https://www.python.org/downloads/)
-- [SCons](https://www.scons.org/), version 3.0.4 or later:
+	* Run Xcode at least once and make sure that the latest version of the 'command-line tools' is installed
+    * [Homebrew package manager](http://homebrew.sh) is highly recommended for every thing below, install and configure following the instructions on the website
+    * Install Python, Scons and PHP packages (ideally in that order) using the 'brew install' command
+    	* Please note that PHP may already be installed on versions of Mac OS below 12.x (Monterey), so you may want to run 'php' first to double-check
 	* Once Python is installed, you should be able to install SCons by running this at the command line:
 		* Windows: `py -3 -m pip install scons`
-		* Mac: `pip3 install scons`
 - Windows only: [NSIS](https://nsis.sourceforge.io/Download), version 3.03 or later
 
 ### How to Build
