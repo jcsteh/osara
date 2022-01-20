@@ -2782,6 +2782,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 		}
 		switch (command->gaccel.accel.cmd) {
 			case 40060: // Item: Copy selected area of items
+			case 40014: // Item: Copy loop of selected area of audio items
 				// Translators: used for  "Item: Copy selected area of items".
 				// {} is replaced by the number of items effected.
 				outputMessage(format(
