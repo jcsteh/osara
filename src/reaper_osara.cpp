@@ -2758,7 +2758,7 @@ void cmdRemoveTracks(Command* command) {
 	cmdhRemoveTracks(command->gaccel.accel.cmd);
 }
 
-void cmdRemoveAreaOfItems(Command* command) {
+void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
@@ -2777,14 +2777,23 @@ void cmdRemoveAreaOfItems(Command* command) {
 				(itemStart < start && start < itemEnd) ||
 				(itemStart < end && end < itemEnd) ||
 				(start == itemStart && end == itemEnd)) {
-					++count;
-				}
+				++count;
+			}
 		}
-		// Translators: used for  "Item: Cut selected area of items" and "Item:
-		// Remove selected area of items".  {} is replaced by the number of items
-		// effected.
-		outputMessage(format(
-			translate_plural("selected area of {} item removed", "Selected area of {} items removed", count), count));
+		switch (command->gaccel.accel.cmd) {
+			case 40060: // Item: Copy selected area of items
+				// Translators: used for  "Item: Copy selected area of items".
+				// {} is replaced by the number of items effected.
+				outputMessage(format(
+					translate_plural("selected area of {} item copied", "Selected area of {} items copied", count), count));
+				break;
+			default: 
+				// Translators: used for  "Item: Cut selected area of items" and "Item:
+				// Remove selected area of items".  {} is replaced by the number of items
+				// effected.
+				outputMessage(format(
+					translate_plural("selected area of {} item removed", "Selected area of {} items removed", count), count));
+		}
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 }
@@ -3759,8 +3768,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40325}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut points within time selection
 	{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
 	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
-	{MAIN_SECTION, {{0, 0, 40312}, NULL}, NULL, cmdRemoveAreaOfItems}, // Item: Remove selected area of items
-	{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveAreaOfItems}, // Item: Cut selected area of items
+	{MAIN_SECTION, {{0, 0, 40312}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Remove selected area of items
+	{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
+	{MAIN_SECTION, {{0, 0, 40060}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
+	{MAIN_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
 	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
 	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
