@@ -754,24 +754,30 @@ To build OSARA, you will need:
 
 - Several git submodules used by OSARA.
 	See the note about submodules in the previous section.
-- Windows only: Build Tools for Microsoft Visual Studio 2022:
-	* [Download Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+
+#### Windows:
+- Build Tools for Microsoft Visual Studio 2022: [Download Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
 	* Visual Studio 2022 Community/Professional/Enterprise is also supported.
-	* Whether installing Build Tools or Visual Studio, you must enable the following:
-		- In the list on the Workloads tab, in the Windows grouping: Desktop development with C++
-		- Then in the Installation details tree view, under Desktop development with C++ > Optional:
-			* C++ ATL for latest v143 build tools (x86 & x64)
-			* C++ Clang tools for Windows
-- Mac only: Xcode 13:
-	* You can download Xcode 13 from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
+- Whether installing Build Tools or Visual Studio, you must enable the following:
+	- In the list on the Workloads tab, in the Windows grouping: Desktop development with C++
+	- Then in the Installation details tree view, under Desktop development with C++ > Optional:
+		* C++ ATL for latest v143 build tools (x86 & x64)
+		* C++ Clang tools for Windows
 - Python, version 3.7 or later:
 	* This is needed by SCons.
 	* [Download Python](https://www.python.org/downloads/)
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
 	* Once Python is installed, you should be able to install SCons by running this at the command line:
-		* Windows: `py -3 -m pip install scons`
-		* Mac: `pip3 install scons`
+		* `py -3 -m pip install scons`
 - Windows only: [NSIS](https://nsis.sourceforge.io/Download), version 3.03 or later
+
+#### Mac OS:
+- Xcode 13: download from the [Mac App Store](https://apps.apple.com/us/app/xcode/id497799835?ls=1&mt=12).
+	* please run `xcode` at least once to make sure the latest command-line tools are installed on your system
+- Homebrew: download and install using instructions at [Homebrew website](http://brew.sh)
+	* Once installed (verify with `brew doctor` and `brew update` commands)
+- download and install `python`, `scons` and `php` using the `brew install` command, preferably in the order specified here
+	* please note: `php` may already be installed on versions of Mac OS below 12.x, in which case you may not need to download `php` from the Homebrew repository
 
 ### How to Build
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run scons.
