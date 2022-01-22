@@ -13,6 +13,7 @@
 #include <map>
 #include <cassert>
 #include <functional>
+#include <compare>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "translation.h"
@@ -389,12 +390,8 @@ class MidiEventIterator {
 		return !(*this == other);
 	}
 
-	bool operator<(const MidiEventIterator& other) const {
-		return this->index < other.index;
-	}
-
-	bool operator<=(const MidiEventIterator& other) const {
-		return this->index <= other.index;
+	auto operator<=>(const MidiEventIterator& other) const {
+		return this->index <=> other.index;
 	}
 
 	value_type operator[](const difference_type index) const{
@@ -477,40 +474,6 @@ int MidiNoteIterator::getCount() const {
 	return count;
 }
 
-void cmdMidiMoveCursor(Command* command) {
-	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	ostringstream s;
-	s << formatCursorPosition(TF_MEASURE);
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int noteCount;
-	MIDI_CountEvts(take, &noteCount, NULL, NULL);
-	double now = GetCursorPosition();
-	// todo: Optimise; perhaps a binary search?
-	vector<MidiNote> notes;
-	for (int n = 0; n < noteCount; ++n) {
-		double start, end;
-		int chan, pitch, vel;
-		MIDI_GetNote(take, n, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		if (start > now) {
-			break;
-		}
-		if (start == now) {
-			end = MIDI_GetProjTimeFromPPQPos(take, end);
-			notes.push_back({chan, pitch, vel, 0, start, end});
-		}
-	}
-	int count = static_cast<int>(notes.size());
-	if (count > 0) {
-		previewNotes(take, notes);
-		fakeFocus = FOCUS_NOTE;
-		s << " " << format(
-			translate_plural("{} note", "{} notes", count), count);
-	}
-	outputMessage(s);
-}
-
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	static const char* names[] = {
 		// Translators: The name of a musical note.
@@ -556,15 +519,18 @@ const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	}
 	return s.str();
 }
-// Returns the indexes of the first and last notes in a chord in a given direction.
-pair<int, int> findChord(MediaItem_Take* take, int direction) {
+
+// Returns iterators to the first and exclusive last notes in a chord in a given direction.
+pair<MidiNoteIterator, MidiNoteIterator> findChord(MediaItem_Take* take, int direction, MidiNote::ReqParams reqParams={}) {
+	// Ensure we always collect the start of the note since we need it to find chords.
+	reqParams.start = true;
 	double now = GetCursorPosition();
-	MidiNoteIterator begin(take);
+	MidiNoteIterator begin(take, reqParams);
 	MidiNoteIterator end = begin;
 	end.moveToEnd();
 	if (begin == end) {
 		// No notes.
-		return {-1, -1};
+		return {begin, end};
 	}
 	auto range = equal_range(begin, end, now, MidiNote::CompareByStart{});
 	// Find the first note of the chord.
@@ -581,10 +547,10 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 		--firstNote;
 	} else if (range.first != range.second) {
 		// Return chord at the cursor.
-		return {range.first.getIndex(), range.second.getIndex() - 1};
+		return range;
 	} else {
 		// Nothing in the requested direction or at the cursor.
-		return {-1, -1};
+		return {end, end};
 	}
 	// Find the last note of the chord.
 	double firstStart = firstNote->start;
@@ -596,8 +562,8 @@ pair<int, int> findChord(MediaItem_Take* take, int direction) {
 		}
 		lastNote = note;
 	}
-	return {min(firstNote.getIndex(), lastNote.getIndex()),
-		max(lastNote.getIndex(), firstNote.getIndex())};
+	return {min(firstNote, lastNote),
+		max(lastNote, firstNote) + 1};
 }
 
 // Keeps track of the note to which the user last moved in a chord.
@@ -618,22 +584,19 @@ bool compareNotesByPitch(const MidiNote& note1, const MidiNote& note2) {
 // Finds a single note in the chord at the cursor in a given direction and returns its info.
 // This updates curNoteInChord.
 MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
-	auto chord = findChord(take, 0);
-	if (chord.first == -1) {
-		return {-1};
-	}
-	MidiNoteIterator begin(take, {
+	auto chord = findChord(take, 0, {
 		true,  // start
 		true,  // end
 		true,  // channel
 		true,  // pitch
 		true  // velocity
 	});
-	auto end = begin + (chord.second + 1);
-	begin += chord.first;
+	if (chord.first == chord.second) {
+		return {-1};
+	}
 	// Notes at the same position are ordered arbitrarily.
 	// This is not intuitive, so sort them.
-	vector<MidiNote> notes(begin, end);
+	vector<MidiNote> notes(chord.first, chord.second);
 	sort(notes.begin(), notes.end(), compareNotesByPitch);
 	const int lastNoteIndex = (int)notes.size() - 1;
 	// Work out which note to move to.
@@ -649,6 +612,30 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 		curNoteInChord = direction == 1 ? 0 : (int)lastNoteIndex;
 	}
 	return notes[curNoteInChord];
+}
+
+void cmdMidiMoveCursor(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	ostringstream s;
+	s << formatCursorPosition(TF_MEASURE);
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	auto chord = findChord(take, 0, {
+		true,  // start
+		true,  // end
+		true,  // channel
+		true,  // pitch
+		true  // velocity
+	});
+	vector<MidiNote> notes(chord.first, chord.second);
+	int count = static_cast<int>(notes.size());
+	if (count > 0) {
+		previewNotes(take, notes);
+		fakeFocus = FOCUS_NOTE;
+		s << " " << format(
+			translate_plural("{} note", "{} notes", count), count);
+	}
+	outputMessage(s);
 }
 
 void selectNote(MediaItem_Take* take, const int note, bool select=true) {
@@ -682,12 +669,13 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 		if (noteIndex == -1) {
 			break;
 		}
-		double start, end;
-		int chan, pitch, vel;
-		MIDI_GetNote(take, noteIndex, NULL, NULL, &start, &end, &chan, &pitch, &vel);
-		start = MIDI_GetProjTimeFromPPQPos(take, start);
-		end = MIDI_GetProjTimeFromPPQPos(take, end);
-		notes.push_back({chan, pitch, vel, noteIndex, start, end});
+		notes.push_back(MidiNote::get(take, noteIndex, {
+			true,  // start
+			true,  // end
+			true,  // channel
+			true,  // pitch
+			true  // velocity
+		}));
 	}
 	return notes;
 }
@@ -791,13 +779,20 @@ void cmdMidiToggleSelection(Command* command) {
 				selectNote(take, note.index, select);
 			} else {
 				// Chord.
-				auto chord = findChord(take, 0);
-				if (chord.first == -1) {
+				auto chord = findChord(take, 0, {
+					true,  // start
+					false,  // end
+					false,  // channel
+					false,  // pitch
+					false,  // velocity
+					true  // selected
+				});
+				if (chord.first == chord.second) {
 					return;
 				}
-				select = !isNoteSelected(take, chord.first);
-				for (int note = chord.first; note <= chord.second; ++note) {
-					selectNote(take, note, select);
+				select = !(chord.first->selected);
+				for (auto note = chord.first; note < chord.second; ++note) {
+					selectNote(take, note.getIndex(), select);
 				}
 			}
 			break;
@@ -819,8 +814,14 @@ void cmdMidiToggleSelection(Command* command) {
 void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	auto chord = findChord(take, direction);
-	if (chord.first == -1) {
+	auto chord = findChord(take, direction, {
+		true,  // start
+		true,  // end
+		true,  // channel
+		true,  // pitch
+		true  // velocity
+	});
+	if (chord.first == chord.second) {
 		return;
 	}
 	curNoteInChord = -1;
@@ -830,16 +831,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	}
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
-	MidiNoteIterator begin(take, {
-		true,  // start
-		true,  // end
-		true,  // channel
-		true,  // pitch
-		true  // velocity
-	});
-	auto end = begin + (chord.second + 1);
-	begin += chord.first;
-	vector<MidiNote> notes(begin, end);
+	vector<MidiNote> notes(chord.first, chord.second);
 	for (auto const& note : notes) {
 		if (!cursorSet && direction != 0) {
 			SetEditCurPos(note.start, true, false);
@@ -853,11 +845,11 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
-	if (!select && !isNoteSelected(take, chord.first)) {
+	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
 	if (shouldReportNotes) {
-		int count = chord.second - chord.first + 1;
+		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
 		s << format(
@@ -1486,12 +1478,12 @@ void postMidiChangeVelocity(int command) {
 	} else {
 		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
-		if (chord.first == -1) {
+		if (chord.first == chord.second) {
 			generalize = true;
 		} else {
 			generalize = !(all_of(
 				selectedNotes.begin(), selectedNotes.end(),
-				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+				[chord](MidiNote n) { return chord.first.getIndex() <= n.index && n.index < chord.second.getIndex(); }
 			));
 		}
 	}
@@ -1547,12 +1539,12 @@ void postMidiChangeLength(int command) {
 	} else {
 		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
-		if (chord.first == -1) {
+		if (chord.first == chord.second) {
 			generalize = true;
 		} else {
 			generalize = !(all_of(
 				selectedNotes.begin(), selectedNotes.end(),
-				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+				[chord](MidiNote n) { return chord.first.getIndex() <= n.index && n.index < chord.second.getIndex(); }
 			));
 		}
 	}
@@ -1644,12 +1636,12 @@ void postMidiChangePitch(int command) {
 	} else {
 		// Get indexes for the current chord.
 		auto chord = findChord(take, 0);
-		if (chord.first == -1) {
+		if (chord.first == chord.second) {
 			generalize = true;
 		} else {
 			generalize = !(all_of(
 				selectedNotes.begin(), selectedNotes.end(),
-				[chord](MidiNote n) { return chord.first <= n.index && n.index <= chord.second; }
+				[chord](MidiNote n) { return chord.first.getIndex() <= n.index && n.index <= chord.second.getIndex(); }
 			));
 		}
 	}
