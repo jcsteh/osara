@@ -138,11 +138,6 @@ struct MidiEventListData {
 	bool selected;
 
 	struct ReqParams {
-		bool position = true;
-		bool length = false;
-		bool message = false;
-		bool offVel = false;
-		bool selected = false;
 	};
 
 	// Used to compare a position with the position of a MIDI event list item.
@@ -151,7 +146,7 @@ struct MidiEventListData {
 		bool operator() (double pos, const MidiEventListData& data) const { return pos < data.position; }
 	};
 
-	static const MidiEventListData get(HWND editor, int index, ReqParams params) {
+	static const MidiEventListData get(HWND editor, int index, ReqParams params={}) {
 		MidiEventListData data{index};
 		auto setting = format("list_{}", index);
 		char eventData[255] = "\0";
@@ -159,17 +154,17 @@ struct MidiEventListData {
 		string key, val;
 		istringstream s(eventData);
 		while(getline(getline(s, key, '='), val, ' ')) {
-			if (key == "pos" && params.position) {
+			if (key == "pos") {
 				auto eventPosQn = stof(val);
 				data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
-			} else if (key == "len" && params.length) {
+			} else if (key == "len") {
 				auto lengthQn = stof(val);
 				data.length = TimeMap2_QNToTime(nullptr, lengthQn);
-			} else if (key == "msg" && params.message) {
+			} else if (key == "msg") {
 				data.message = val;
-			} else if (key == "offvel" && params.offVel) {
+			} else if (key == "offvel") {
 				data.offVel = stoi(val);
-			} else if (key == "sel" && params.selected) {
+			} else if (key == "sel") {
 				data.selected = val == "1" ? true: false;
 			}
 		}
@@ -1403,14 +1398,14 @@ void focusNearestMidiEvent(HWND hwnd) {
 		// Cursor is after all events.
 		return;
 	}
-	int curFocus = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
+	const int curFocus = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	auto firstIndex = first.getIndex();
 	auto lastIndex = last.getIndex();
 	if (curFocus != -1 && firstIndex <= curFocus && curFocus <= lastIndex) {
 		// Current focus is within the range of events at the cursor.
 		return;
 	}
-	int lvBitMask = LVIS_FOCUSED | LVIS_SELECTED;
+	const int lvBitMask = LVIS_FOCUSED | LVIS_SELECTED;
 	// select and focus the first item
 	ListView_SetItemState(hwnd, firstIndex,
 		lvBitMask, lvBitMask);
@@ -1455,11 +1450,7 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
-	auto event = MidiEventListData::get(editor, focused, {
-		true,  // position
-		true,  // length
-		true,  // message
-	});
+	auto event = MidiEventListData::get(editor, focused);
 	if (editCursorShouldFollowEventListFocus) {
 		SetEditCurPos(event.position , true, false);
 	}
