@@ -3971,6 +3971,8 @@ void cmdConfig(Command* command) {
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
 #ifdef _WIN32
 	CheckDlgButton(dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS, editCursorShouldFollowEventListFocus ? BST_CHECKED : BST_UNCHECKED);
+#else
+	ShowWindow( GetDlgItem( dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS), SW_HIDE);
 #endif
 	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
 		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
