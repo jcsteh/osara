@@ -2762,14 +2762,10 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
-	if(start == end) {
-		outputMessage(translate("No time selection"));
-	} else if(!selItems) {
-		outputMessage(translate("No items selected"));
-	} else {
+	auto countEffected = [start, end](MediaItem* (*getFunc)(ReaProject*, int), int totalCount) {
 		int count = 0;
-		for(int i = 0; i < selItems; ++i) {
-			MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		for(int i = 0; i < totalCount; ++i) {
+			MediaItem* item = getFunc(nullptr, i);
 			double itemStart = GetMediaItemInfo_Value(item, "D_POSITION");
 			double itemEnd = itemStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 			if((start < itemStart && itemStart < end) ||
@@ -2780,20 +2776,38 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				++count;
 			}
 		}
+		return count;
+	};
+	if(start == end) {
+		outputMessage(translate("No time selection"));
+	} else {
 		switch (command->gaccel.accel.cmd) {
 			case 40060: // Item: Copy selected area of items
-			case 40014: // Item: Copy loop of selected area of audio items
+			case 40014: { // Item: Copy loop of selected area of audio items
+				if(selItems == 0) {
+					outputMessage(translate("No items selected"));
+					break;
+				}
+				int count = countEffected(GetSelectedMediaItem, selItems);
 				// Translators: used for  "Item: Copy selected area of items".
 				// {} is replaced by the number of items effected.
 				outputMessage(format(
 					translate_plural("selected area of {} item copied", "Selected area of {} items copied", count), count));
 				break;
-			default: 
+			}
+			default: {
+				int count = 0;
+				if(selItems == 0) { // these commands treat no item selection as if all items are selected
+					count = countEffected(GetMediaItem, CountMediaItems(nullptr));
+				} else {
+					count = countEffected(GetSelectedMediaItem, selItems);
+				}
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
 				// effected.
 				outputMessage(format(
 					translate_plural("selected area of {} item removed", "Selected area of {} items removed", count), count));
+			}
 		}
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
