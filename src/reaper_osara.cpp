@@ -2762,7 +2762,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
-	auto countEffected = [start, end](MediaItem* (*getFunc)(ReaProject*, int), int totalCount) {
+	auto countAffected = [start, end](auto getFunc, int totalCount) {
 		int count = 0;
 		for(int i = 0; i < totalCount; ++i) {
 			MediaItem* item = getFunc(nullptr, i);
@@ -2772,41 +2772,42 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				(start < itemEnd && itemEnd < end) ||
 				(itemStart < start && start < itemEnd) ||
 				(itemStart < end && end < itemEnd) ||
-				(start == itemStart && end == itemEnd)) {
+				(start == itemStart && end == itemEnd)
+			) {
 				++count;
 			}
 		}
 		return count;
 	};
 	if(start == end) {
-		outputMessage(translate("No time selection"));
+		outputMessage(translate("no time selection"));
 	} else {
 		switch (command->gaccel.accel.cmd) {
 			case 40060: // Item: Copy selected area of items
 			case 40014: { // Item: Copy loop of selected area of audio items
 				if(selItems == 0) {
-					outputMessage(translate("No items selected"));
+					outputMessage(translate("no items selected"));
 					break;
 				}
-				int count = countEffected(GetSelectedMediaItem, selItems);
+				int count = countAffected(GetSelectedMediaItem, selItems);
 				// Translators: used for  "Item: Copy selected area of items".
-				// {} is replaced by the number of items effected.
+				// {} is replaced by the number of items affected.
 				outputMessage(format(
-					translate_plural("selected area of {} item copied", "Selected area of {} items copied", count), count));
+					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
 				break;
 			}
 			default: {
 				int count = 0;
 				if(selItems == 0) { // these commands treat no item selection as if all items are selected
-					count = countEffected(GetMediaItem, CountMediaItems(nullptr));
+					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
 				} else {
-					count = countEffected(GetSelectedMediaItem, selItems);
+					count = countAffected(GetSelectedMediaItem, selItems);
 				}
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
-				// effected.
+				// affected.
 				outputMessage(format(
-					translate_plural("selected area of {} item removed", "Selected area of {} items removed", count), count));
+					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count));
 			}
 		}
 	}
