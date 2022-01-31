@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-01-15 23:24\n"
+"PO-Revision-Date: 2022-01-31 03:54\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -266,6 +266,20 @@ msgstr[1] ""
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used in the MIDI editor when CC events are selected.  {}
+#. is replaced by the number of events selected.
+msgid "{} CC event selected"
+msgid_plural "{} CC events selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used in the MIDI editor when CC events are unselected.  {}
+#. is replaced by the number of events unselected.
+msgid "{} CC event unselected"
+msgid_plural "{} CC events unselected"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1180,6 +1194,9 @@ msgstr "posição livre do ítem"
 msgid "FX:"
 msgstr "FX"
 
+msgid "delta"
+msgstr ""
+
 msgid "record monitor off"
 msgstr "Retorno de gravação desligado"
 
@@ -1732,6 +1749,21 @@ msgid_plural "{} tracks removed"
 msgstr[0] "{} pista removida"
 msgstr[1] "{} pistas removidas"
 
+#. used for  "Item: Copy selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item copied"
+msgid_plural "selected area of {} items copied"
+msgstr[0] ""
+msgstr[1] ""
+
+#. used for  "Item: Cut selected area of items" and "Item:
+#. Remove selected area of items".  {} is replaced by the number of items
+#. affected.
+msgid "selected area of {} item removed"
+msgid_plural "selected area of {} items removed"
+msgstr[0] ""
+msgstr[1] ""
+
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
@@ -2233,6 +2265,10 @@ msgstr "Anunciar notas midi no editor midi"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "Anunciar mudanças feitas via superfícies de controle"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OK"
