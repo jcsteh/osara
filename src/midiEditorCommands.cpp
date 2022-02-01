@@ -54,15 +54,20 @@ struct MidiControlChange {
 	static bool compareForSortAtPosition(const MidiControlChange& cc1, const MidiControlChange& cc2) {
 		if (cc1.message1 < cc2.message1) {
 			return true;
-		} if (cc1.message1 > cc2.message1) {
+		}
+		if (cc1.message1 > cc2.message1) {
 			return false;
-		} if (cc1.channel < cc2.channel) {
+		}
+		if (cc1.channel < cc2.channel) {
 			return true;
-		} if (cc1.channel > cc2.channel) {
+		}
+		if (cc1.channel > cc2.channel) {
 			return false;
-		} if (cc1.message2 < cc2.message2) {
+		}
+		if (cc1.message2 < cc2.message2) {
 			return true;
-		} if (cc1.message2 > cc2.message2) {
+		}
+		if (cc1.message2 > cc2.message2) {
 			return false;
 		}
 		return cc1.message3 < cc2.message3;
@@ -632,7 +637,7 @@ int curNoteInChord = -1;
 // The second entry of the pair is the number of the CC at the position; e.g. 0 is the first CC.
 // It is not a REAPER CC index.
 // -1 means no position/CC.
-pair<double, int> currentCCAtPos = {-1, -1};
+pair<double, int> currentCC = {-1, -1};
 
 // Finds a single note in the chord at the cursor in a given direction and returns its info.
 // This updates curNoteInChord.
@@ -721,7 +726,7 @@ int MidiControlChangeIterator::getCount() const {
 }
 
 // Finds a single CC at the cursor in a given direction and returns its info.
-// This updates currentCCAtPos.
+// This updates currentCC.
 MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	MidiControlChangeIterator begin(take, {
 		true,  // position
@@ -734,26 +739,33 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	end.moveToEnd();
 	if (begin == end) {
 		// No CCs.
-		currentCCAtPos = {-1, -1};
+		currentCC = {-1, -1};
 		return {-1};
 	}
 	double now = GetCursorPosition();
-	double position = currentCCAtPos.first;
-	int currentCC = currentCCAtPos.second;
+	// Find all CCs at the current position.
 	auto range = equal_range(begin, end, now, MidiControlChange::CompareByPosition{});
 	int count = range.second - range.first;
-	if (currentCC != -1 && position == now && count >0) {
-		auto newCC = currentCC + direction;
+	double position = currentCC.first;
+	int curCC= currentCC.second;
+	if (curCC!= -1 && position == now && count >0) {
+		// In this case, we have a cached CC at the current position
+		// and the range of CCs at the current position contains at least one CC.
+		// We can simmply move to the adjacent CC in the range,
+		// unless curCC is at the edge of the range.
+		// In that case, we skip this block entirely and behave as if there was nothing cached.
+		auto newCC = curCC+ direction;
 		if (direction == -1 ? newCC >= 0 : newCC < count) {
-			// Create a vector of CCs in order to sort them.
+			// #434: CC events are ordered arbitrarily and, unlike notes, order can change when interacting with them.
+			// Create a vector of CCs in order to sort them in a stable way.
 			vector<MidiControlChange> ccs(range.first, range.second);
 			stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
-			currentCCAtPos.second = newCC;
+			currentCC.second = newCC;
 			return ccs.at(newCC);
 		}
 	} else if (direction == 1) {
-		// Direction is forward, but we have no idea what CC to focus.
-		// Therefore, focus the first CC at or after the cursor by setting direction to 0.
+		// Direction is forward, but we want to ensure that focus lands on the first CC at or after the cursor.
+		// Sticking to direction == 1 would mean we'd focus a CC after the cursor, even if there was a CC at the cursor.
 		direction = 0;
 	}
 	MidiControlChangeIterator firstCC = end;
@@ -789,14 +801,20 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 	int index = 0;
 	MidiControlChange ret;
 	if (firstCC == lastCC) {
+		// There is only one CC at this position.
 		ret = *firstCC;
 	} else {
+		// #434: CC events are ordered arbitrarily.
+		// To sort them in a stable way, create a vector containing all the CCs at the position we're navigating to.
+		// Note that the constructor of vector expects an exclusive end, but our range is inclusive.
 		vector<MidiControlChange> ccs(movement != -1 ? firstCC : lastCC, movement != -1 ? lastCC + 1 : firstCC + 1);
 		stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
+		// Focus the first or last note in the vector, depending on direction being forward or backward, respectively.
 		index = movement != -1 ? 0 : (static_cast<int>(ccs.size()) -1);
 		ret = ccs.at(index);
 	}
-	currentCCAtPos = {ret.position, index};
+	// Save the new CC for future invocations of findCC.
+	currentCC = {ret.position, index};
 	return ret;
 }
 
@@ -860,12 +878,12 @@ void cmdMidiToggleSelection(Command* command) {
 			break;
 		}
 		case FOCUS_CC: {
-			if (currentCCAtPos.first == -1 || currentCCAtPos.second == -1) {
+			if (currentCC.first == -1 || currentCC.second == -1) {
 				return;
 			}
-			int currentCC = findCC(take, 0).index;
-			select = !isCCSelected(take, currentCC);
-			selectCC(take, currentCC, select);
+			int curCC= findCC(take, 0).index;
+			select = !isCCSelected(take, curCC);
+			selectCC(take, curCC, select);
 			break;
 		}
 		default:
