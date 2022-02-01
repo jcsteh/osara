@@ -1372,7 +1372,6 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 	}
 }
 
-#ifdef _WIN32
 using MidiEventListDataIterator = MidiEventIterator<MidiEventListData, HWND>;
 
 template<>
@@ -1425,6 +1424,7 @@ void cmdFocusNearestMidiEvent(Command* command) {
 	focusNearestMidiEvent(hwnd);
 }
 
+#ifdef _WIN32
 void cmdMidiFilterWindow(Command *command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
