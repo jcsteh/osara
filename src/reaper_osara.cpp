@@ -3966,7 +3966,7 @@ void loadConfig() {
 #endif
 	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
 		"reportSurfaceChanges")[0] == '1';
-	shouldMoveFromPlayCursor=
+	shouldMoveFromPlayCursor =
 		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
 	shouldReportMarkersWhilePlaying =
 		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
