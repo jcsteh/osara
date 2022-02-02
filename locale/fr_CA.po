@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-01-15 23:24\n"
+"PO-Revision-Date: 2022-01-31 03:54\n"
 
 msgid "volume"
 msgstr "volume"
@@ -59,7 +59,7 @@ msgstr "marqueur {}"
 #. used when reporting a named region. {} will be
 #. replaced with the name of the region; e.g. "intro region"
 msgid "{} region"
-msgstr "{} région"
+msgstr "région {}"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
@@ -244,7 +244,7 @@ msgid "noncontiguous selection"
 msgstr "sélection non contigu"
 
 msgid "velocity"
-msgstr ""
+msgstr "vélocité"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -268,6 +268,20 @@ msgid "{} event selected"
 msgid_plural "{} events selected"
 msgstr[0] "{} événement sélectionné"
 msgstr[1] "{} événements sélectionné"
+
+#. Used in the MIDI editor when CC events are selected.  {}
+#. is replaced by the number of events selected.
+msgid "{} CC event selected"
+msgid_plural "{} CC events selected"
+msgstr[0] "{} événement CC sélectionné"
+msgstr[1] "{} événements CC sélectionnés"
+
+#. Used in the MIDI editor when CC events are unselected.  {}
+#. is replaced by the number of events unselected.
+msgid "{} CC event unselected"
+msgid_plural "{} CC events unselected"
+msgstr[0] "{} événement CC non-sélectionné"
+msgstr[1] "{} événements CC non-sélectionnés"
 
 msgid "Bank Select MSB"
 msgstr "Banque MSB sélectionnée"
@@ -1180,6 +1194,9 @@ msgstr "positionnement libre des objets"
 msgid "FX:"
 msgstr "FX:"
 
+msgid "delta"
+msgstr "delta"
+
 msgid "record monitor off"
 msgstr "monitoring d'entrée, désactivé"
 
@@ -1233,24 +1250,24 @@ msgstr "ceci n'est pas un dossier"
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
 msgid "{} region start"
-msgstr "{} début de la région"
+msgstr "début de la région {}"
 
 #. Reported when moving to the start of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 start".
 msgid "region {} start"
-msgstr "début de la {} région"
+msgstr "début de la région {}"
 
 #. Reported when moving to the end of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region end".
 msgid "{} region end"
-msgstr "{} fin de la région"
+msgstr "fin de la région {}"
 
 #. Reported when moving to the end of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 end".
 msgid "region {} end"
-msgstr "fin de la {} région"
+msgstr "fin de la région {}"
 
 #. Reported when moving by marker and the cursor lands at the
 #. start of the time selection.
@@ -1732,6 +1749,21 @@ msgid_plural "{} tracks removed"
 msgstr[0] "{} piste supprimée"
 msgstr[1] "{} pistes supprimées"
 
+#. used for  "Item: Copy selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item copied"
+msgid_plural "selected area of {} items copied"
+msgstr[0] "{} zone d'Objet sélectionnée copié"
+msgstr[1] "{} zones d'Objets sélectionnées copiées"
+
+#. used for  "Item: Cut selected area of items" and "Item:
+#. Remove selected area of items".  {} is replaced by the number of items
+#. affected.
+msgid "selected area of {} item removed"
+msgid_plural "selected area of {} items removed"
+msgstr[0] "{} zone d'Objet supprimé"
+msgstr[1] "{} zones d'Objets supprimés"
+
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
@@ -1986,16 +2018,16 @@ msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: Déplace le dernier marqueur d'étirement focalisé à la position actuelle du curseur d'édition"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr ""
+msgstr "OSARA: Énonce le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 1 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr ""
+msgstr "OSARA: Énonce le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 2 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr ""
+msgstr "OSARA: Énonce le niveau en dB crête au niveau du curseur de lecture pour le canal 1 de la piste master"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr ""
+msgstr "OSARA: Énonce le niveau en dB crête au niveau du curseur de lecture pour le canal 2 de la piste master"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: Supprime tous les marqueurs de signature rythmique"
@@ -2233,6 +2265,10 @@ msgstr "Énoncer le nom des notes dans l'éditeur MIDI"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "Énoncer les changement effectués par &une surface de control"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr "Le curseur d'édition suit le focus dans la liste d'&événements MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "OK"

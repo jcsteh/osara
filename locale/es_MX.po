@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-01-15 23:24\n"
+"PO-Revision-Date: 2022-01-31 03:54\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -268,6 +268,20 @@ msgid "{} event selected"
 msgid_plural "{} events selected"
 msgstr[0] "{} evento seleccionado"
 msgstr[1] "{} eventos seleccionados"
+
+#. Used in the MIDI editor when CC events are selected.  {}
+#. is replaced by the number of events selected.
+msgid "{} CC event selected"
+msgid_plural "{} CC events selected"
+msgstr[0] "{} Evento CC seleccionado"
+msgstr[1] "{} Eventos CC seleccionados"
+
+#. Used in the MIDI editor when CC events are unselected.  {}
+#. is replaced by the number of events unselected.
+msgid "{} CC event unselected"
+msgid_plural "{} CC events unselected"
+msgstr[0] "{} Evento CC no seleccionado"
+msgstr[1] "{} Eventos CC no seleccionados"
 
 msgid "Bank Select MSB"
 msgstr "Seleccione Banco MSB"
@@ -543,7 +557,7 @@ msgstr "velócity cambiado"
 msgid "{} note lengthened pixel"
 msgid_plural "{} notes lengthened pixel"
 msgstr[0] "{} nota alargada en modo pixel"
-msgstr[1] "{} notas alargadas em modo pixel"
+msgstr[1] "{} notas alargadas en modo pixel"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. "3
@@ -1180,6 +1194,9 @@ msgstr "con colocación libre de ítems"
 msgid "FX:"
 msgstr "FX:"
 
+msgid "delta"
+msgstr "delta"
+
 msgid "record monitor off"
 msgstr "monitor de grabación apagado"
 
@@ -1732,6 +1749,21 @@ msgid_plural "{} tracks removed"
 msgstr[0] "{} pista eliminada"
 msgstr[1] "{} pistas eliminadas"
 
+#. used for  "Item: Copy selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item copied"
+msgid_plural "selected area of {} items copied"
+msgstr[0] "{} ítem copiado en el área de selección de tiempo"
+msgstr[1] "{} ítems copiados en el área de selección de tiempo"
+
+#. used for  "Item: Cut selected area of items" and "Item:
+#. Remove selected area of items".  {} is replaced by the number of items
+#. affected.
+msgid "selected area of {} item removed"
+msgid_plural "selected area of {} items removed"
+msgstr[0] "{} ítem eliminado en el área de selección de tiempo"
+msgstr[1] "{} ítems eliminados en el área de selección de tiempo"
+
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
@@ -2216,7 +2248,7 @@ msgstr "Anunciar mar&cadores durante la reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
-msgstr "Anunciar &estado de transporte (reproducción, grabación, etc.)"
+msgstr "Anunciar estado de &transporte (reproducción, grabación, etc.)"
 
 msgctxt "OSARA Configuration"
 msgid "Report t&rack numbers"
@@ -2233,6 +2265,10 @@ msgstr "Anunciar MIDI &notas en el editor MIDI"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "Anunciar los cambios realizados a través de superficies de &control"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr "El cursor de edición sigue el foco en la lista de &eventos MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
