@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-01-15 23:24\n"
+"PO-Revision-Date: 2022-01-31 03:54\n"
 
 msgid "volume"
 msgstr "音量"
@@ -259,6 +259,18 @@ msgstr[0] "{} 音符選中"
 msgid "{} event selected"
 msgid_plural "{} events selected"
 msgstr[0] "{} 事件選中"
+
+#. Used in the MIDI editor when CC events are selected.  {}
+#. is replaced by the number of events selected.
+msgid "{} CC event selected"
+msgid_plural "{} CC events selected"
+msgstr[0] "{} CC 事件選中"
+
+#. Used in the MIDI editor when CC events are unselected.  {}
+#. is replaced by the number of events unselected.
+msgid "{} CC event unselected"
+msgid_plural "{} CC events unselected"
+msgstr[0] "{} CC 事件取消選中"
 
 msgid "Bank Select MSB"
 msgstr "音色庫選擇 MSB"
@@ -1142,6 +1154,9 @@ msgstr "自由對象定位"
 msgid "FX:"
 msgstr "FX"
 
+msgid "delta"
+msgstr "預測是"
+
 msgid "record monitor off"
 msgstr "錄音監聽關"
 
@@ -1677,6 +1692,19 @@ msgid "{} track removed"
 msgid_plural "{} tracks removed"
 msgstr[0] "{} 軌道移除"
 
+#. used for  "Item: Copy selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item copied"
+msgid_plural "selected area of {} items copied"
+msgstr[0] "{} 對象中的選中區域已復制"
+
+#. used for  "Item: Cut selected area of items" and "Item:
+#. Remove selected area of items".  {} is replaced by the number of items
+#. affected.
+msgid "selected area of {} item removed"
+msgid_plural "selected area of {} items removed"
+msgstr[0] "{} 對象中的選中區域已移除"
+
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
@@ -2174,6 +2202,10 @@ msgstr "在MIDI編輯器報告MIDI音符(&N)"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "報告通過＆控制界面進行的更改(&C)"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr "在 midi 事件列表編輯游標跟隨焦點移動"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
