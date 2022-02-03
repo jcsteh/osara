@@ -514,6 +514,7 @@ class MidiEventIterator {
 	int getCount() const {
 		return EventType::getCount(this->source);
 	}
+
 	value_type getEvent(difference_type index) const {
 		return EventType::get(this->source, index, this->reqParams);
 	}
