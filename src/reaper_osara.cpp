@@ -3755,6 +3755,13 @@ void cmdMuteNextMessage(Command* command){
 	muteNextMessage = true;
 }
 
+void cmdToggleLoopSegScrub(Command* command) {
+	if(shouldMoveFromPlayCursor && (GetPlayState() & 1) ) {
+		SetEditCurPos(GetPlayPosition(), false, false);
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3824,6 +3831,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MAIN_SECTION, {{0, 0, 40032}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Group items
 	{MAIN_SECTION, {{0, 0, 40033}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Remove items from group
+	{MAIN_SECTION, {{0, 0, 41187}, NULL}, NULL, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
