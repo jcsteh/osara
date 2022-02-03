@@ -438,7 +438,7 @@ class MidiEventIterator {
 		reqParams(ReqParams),
 		index(index)
 	{
-		this->count = this->getCount();
+		this->count = EventType::getCount(this->source);
 	}
 
 	bool operator==(const MidiEventIterator& other) const {
@@ -511,10 +511,6 @@ class MidiEventIterator {
 	}
 
 	protected:
-	int getCount() const {
-		return EventType::getCount(this->source);
-	}
-
 	value_type getEvent(difference_type index) const {
 		return EventType::get(this->source, index, this->reqParams);
 	}
