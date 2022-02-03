@@ -13,6 +13,7 @@
 #include <map>
 #include <cassert>
 #include <functional>
+#include <float.h>
 #include <compare>
 #include "midiEditorCommands.h"
 #include "osara.h"
@@ -27,12 +28,12 @@ using namespace fmt::literals;
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
 // It is also used for other MIDI messages.
 struct MidiControlChange {
-	int channel;
-	int index;
-	int message1;
-	int message2;
-	int message3;
-	double position;
+	int channel = -1;
+	int index = -1;
+	int message1 = -1;
+	int message2 = -1;
+	int message3 = -1;
+	double position = -1.0;
 	bool selected;
 	bool muted;
 
@@ -77,7 +78,7 @@ struct MidiControlChange {
 	static const MidiControlChange get(MediaItem_Take* take, int index, ReqParams params) {
 		MidiControlChange cc;
 		double position;
-		MIDI_GetCC(take, index,
+		if (MIDI_GetCC(take, index,
 			params.selected ? &cc.selected : nullptr,
 			params.muted ? &cc.muted : nullptr,
 			params.position ? &position : nullptr,
@@ -85,25 +86,36 @@ struct MidiControlChange {
 			params.channel ? &cc.channel : nullptr,
 			params.message2 ? &cc.message2 : nullptr,
 			params.message3 ? &cc.message3 : nullptr
-		);
-		if (params.position) {
-			position = MIDI_GetProjTimeFromPPQPos(take, position);
-			cc.position = position;
+		)) {
+			if (params.position) {
+				position = MIDI_GetProjTimeFromPPQPos(take, position);
+				cc.position = position;
+			}
+			cc.index = index;
+		} else {
+			cc.position = DBL_MAX;
 		}
-		cc.index = index;
 		return cc;
+	}
+
+	static const int getCount(MediaItem_Take* take) {
+		int count = 0;
+		while (MIDI_GetCC(take, count, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)) {
+			++count;
+		}
+		return count;
 	}
 } ;
 
 const UINT DEFAULT_PREVIEW_LENGTH = 300; // ms
 
 struct MidiNote {
-	int channel;
-	int pitch;
-	int velocity;
-	int index;
-	double start;
-	double end;
+	int channel = -1;
+	int pitch = -1;
+	int velocity = -1;
+	int index = -1;
+	double start = -1.0;
+	double end = -1.0;
 	bool selected;
 	bool muted;
 
@@ -135,7 +147,7 @@ struct MidiNote {
 	static const MidiNote get(MediaItem_Take* take, int index, ReqParams params) {
 		MidiNote note;
 		double start, end;
-		MIDI_GetNote(take, index,
+		if (MIDI_GetNote(take, index,
 			params.selected ? &note.selected : nullptr,
 			params.muted ? &note.muted : nullptr,
 			params.start ? &start: nullptr,
@@ -143,26 +155,37 @@ struct MidiNote {
 			params.channel ? &note.channel: nullptr,
 			params.pitch ? &note.pitch: nullptr,
 			params.velocity ? &note.velocity : nullptr
-		);
-		if (params.start) {
-			start = MIDI_GetProjTimeFromPPQPos(take, start);
-			note.start = start;
+		)) {
+			if (params.start) {
+				start = MIDI_GetProjTimeFromPPQPos(take, start);
+				note.start = start;
+			}
+			if (params.end) {
+				end = MIDI_GetProjTimeFromPPQPos(take, end);
+				note.end = end;
+			}
+			note.index = index;
+		} else {
+			note.start = note.end = DBL_MAX;
 		}
-		if (params.end) {
-			end = MIDI_GetProjTimeFromPPQPos(take, end);
-			note.end = end;
-		}
-		note.index = index;
 		return note;
+	}
+
+	static const int getCount(MediaItem_Take* take) {
+		int count = 0;
+		while (MIDI_GetNote(take, count, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr)) {
+			++count;
+		}
+		return count;
 	}
 };
 
 struct MidiEventListData { 
-	int index;
-	double position;
+	int index = -1;
+	double position = -1.0;
 	string message;
-	int offVel;
-	double length;
+	int offVel = -1;
+	double length = -1.0;
 	bool selected;
 
 	struct ReqParams {
@@ -178,25 +201,32 @@ struct MidiEventListData {
 		MidiEventListData data{index};
 		auto setting = format("list_{}", index);
 		char eventData[255] = "\0";
-		MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData));
-		string key, val;
-		istringstream s(eventData);
-		while(getline(getline(s, key, '='), val, ' ')) {
-			if (key == "pos") {
-				auto eventPosQn = stof(val);
-				data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
-			} else if (key == "len") {
-				auto lengthQn = stof(val);
-				data.length = TimeMap2_QNToTime(nullptr, lengthQn);
-			} else if (key == "msg") {
-				data.message = val;
-			} else if (key == "offvel") {
-				data.offVel = stoi(val);
-			} else if (key == "sel") {
-				data.selected = val == "1" ? true: false;
+		if (MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
+			string key, val;
+			istringstream s(eventData);
+			while(getline(getline(s, key, '='), val, ' ')) {
+				if (key == "pos") {
+					auto eventPosQn = stof(val);
+					data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
+				} else if (key == "len") {
+					auto lengthQn = stof(val);
+					data.length = TimeMap2_QNToTime(nullptr, lengthQn);
+				} else if (key == "msg") {
+					data.message = val;
+				} else if (key == "offvel") {
+					data.offVel = stoi(val);
+				} else if (key == "sel") {
+					data.selected = val == "1" ? true: false;
+				}
 			}
+		} else {
+			data.position = DBL_MAX;
 		}
 		return data;
+	}
+
+	static const int getCount(HWND midiEditor) {
+		return MIDIEditor_GetSetting_int(midiEditor, "list_cnt");
 	}
 
 	const MidiNote toMidiNote() {
@@ -404,9 +434,11 @@ class MidiEventIterator {
 	using iterator_category = random_access_iterator_tag;
 
 	MidiEventIterator(SourceType source, typename EventType::ReqParams ReqParams = {}, difference_type index=0)
-		: source(source), reqParams(ReqParams), index(index)
+		: source(source),
+		reqParams(ReqParams),
+		index(index)
 	{
-		this->count = this->getCount();
+		this->count = EventType::getCount(this->source);
 	}
 
 	bool operator==(const MidiEventIterator& other) const {
@@ -479,7 +511,6 @@ class MidiEventIterator {
 	}
 
 	protected:
-	int getCount() const;
 	value_type getEvent(difference_type index) const {
 		return EventType::get(this->source, index, this->reqParams);
 	}
@@ -493,13 +524,6 @@ class MidiEventIterator {
 };
 
 using MidiNoteIterator = MidiEventIterator<MidiNote, MediaItem_Take*>;
-
-template<>
-int MidiNoteIterator::getCount() const {
-	int count;
-	MIDI_CountEvts(this->source, &count, nullptr, nullptr);
-	return count;
-}
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 	static const char* names[] = {
@@ -705,13 +729,6 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 }
 
 using MidiControlChangeIterator = MidiEventIterator<MidiControlChange, MediaItem_Take*>;
-
-template<>
-int MidiControlChangeIterator::getCount() const {
-	int count;
-	MIDI_CountEvts(this->source, nullptr, &count, nullptr);
-	return count;
-}
 
 // Finds a single CC at the cursor in a given direction and returns its info.
 // This updates currentCC.
@@ -1442,11 +1459,6 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 
 #ifdef _WIN32
 using MidiEventListDataIterator = MidiEventIterator<MidiEventListData, HWND>;
-
-template<>
-int MidiEventListDataIterator::getCount() const {
-	return MIDIEditor_GetSetting_int(this->source, "list_cnt");
-}
 
 void focusNearestMidiEvent(HWND hwnd) {
 	double cursorPos = GetCursorPosition();
