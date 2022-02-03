@@ -3814,6 +3814,7 @@ void cmdReportRegionMarkerItems(Command* command) {
 			s << format(translate("marker {}"), number);
 		}
 	}
+	separate();
 	s << formatItemsWithState([pos](MediaItem* item) -> bool{
 		MediaTrack* track = GetMediaItem_Track(item);
 		return (isTrackSelected(track) && isPosInItem(pos, item));
