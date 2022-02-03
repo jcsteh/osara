@@ -186,7 +186,7 @@ struct MidiEventListData {
 	string message;
 	int offVel = -1;
 	double length = -1.0;
-	bool selected = -1;
+	bool selected;
 
 	struct ReqParams {
 	};
