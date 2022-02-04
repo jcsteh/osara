@@ -3820,8 +3820,8 @@ void cmdReportRegionMarkerItems(Command* command) {
 		return (isTrackSelected(track) && isPosInItem(pos, item));
 	}, multiLine);
 	if(multiLine) {
-		// Translators: The title of the review message for the action "OSARA: report regions, most recent marker and items at current position".
-		reviewMessage(translate("regions, most recent marker and items at current position"), s.str().c_str());
+		// Translators: The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+		reviewMessage(translate("At Current Position"), s.str().c_str());
 	} else{
 		outputMessage(s);
 	}
@@ -3977,7 +3977,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report regions, most recent marker and items at current position"}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report regions, last project marker and items on selected tracks at current position"}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
