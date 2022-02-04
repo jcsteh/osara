@@ -33,7 +33,8 @@ for line in orig:
 from operator import methodcaller
 acts.sort(key = lambda m: (m.group(3), m.group(5)))
 scrs.sort(key = lambda m: (m.group(3), m.group(5)))
-keys.sort(key = lambda m: (m.group(5), m.group(4)))
+#sort keys by section, action id, modifiers and key.
+keys.sort(key = lambda m: (m.group(5), m.group(4), m.group(2),m.group(3)))
 for match in (acts+scrs+keys):
 	if match:
 		out = ' '.join(match.groups())
