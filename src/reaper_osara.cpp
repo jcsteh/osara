@@ -408,8 +408,6 @@ void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCatego
 	outputMessage(s);
 }
 
-typedef bool(*TrackStateCheck)(MediaTrack* track);
-
 bool isTrackMuted(MediaTrack* track) {
 	bool muted = false;
 	GetTrackUIMute(track, &muted);
@@ -452,6 +450,12 @@ bool isTrackSelected(MediaTrack* track) {
 
 bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
+}
+
+bool isPosInItem(double pos, MediaItem* item) {
+	double start = GetMediaItemInfo_Value(item, "D_POSITION");
+	double end = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
+	return (start <= pos && pos <= end);
 }
 
 bool isFreeItemPositioningEnabled(MediaTrack* track) {
@@ -3018,8 +3022,8 @@ void cmdIoMaster(Command* command) {
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
-
-string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
+template <typename Func>
+string formatTracksWithState(const char* prefix, Func checkState,
 	bool includeMaster, bool multiLine, bool outputIfNone = true
 ) {
 	ostringstream s;
@@ -3067,7 +3071,8 @@ string formatTracksWithState(const char* prefix, TrackStateCheck checkState,
 	return s.str();
 }
 
-void reportTracksWithState(const char* prefix, TrackStateCheck checkState,
+template <typename Func>
+void reportTracksWithState(const char* prefix, Func checkState,
 	bool includeMaster
 ) {
 	bool multiLine = lastCommandRepeatCount == 1;
@@ -3116,6 +3121,30 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 		/* includeMaster */ false);
 }
 
+template <typename Func>
+string formatItemsWithState(Func stateCheck, bool multiLine) {
+	const char* separator = multiLine ? "\r\n" : ", ";
+	ostringstream s;
+	int count = 0;
+	for (int t = 0; t < CountTracks(nullptr); ++t) {
+		MediaTrack* track = GetTrack(nullptr, t);
+		for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+			MediaItem* item = GetTrackMediaItem(track, i);
+			if (stateCheck(item)) {
+				++count;
+				if (count > 1) {
+					s << separator;
+				}
+				s << t + 1 << "." << i + 1;
+				MediaItem_Take* take = GetActiveTake(item);
+				if (take)
+					s << " " << GetTakeName(take);
+			}
+		}
+	}
+	return s.str();
+}
+
 void cmdReportSelection(Command* command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	const char* separator = multiLine ? "\r\n" : ", ";
@@ -3126,22 +3155,7 @@ void cmdReportSelection(Command* command) {
 				/* includeMaster */ true, multiLine, /* outputIfNone */ false);
 			break;
 		case FOCUS_ITEM: {
-			int count = 0;
-			for (int t = 0; t < CountTracks(0); ++t) {
-				MediaTrack* track = GetTrack(0, t);
-				for (int i = 0; i < CountTrackMediaItems(track); ++i) {
-					MediaItem* item = GetTrackMediaItem(track, i);
-					if (isItemSelected(item)) {
-						++count;
-						if (count > 1)
-							s << separator;
-						s << t + 1 << "." << i + 1;
-						MediaItem_Take* take = GetActiveTake(item);
-						if (take)
-							s << " " << GetTakeName(take);
-					}
-				}
-			}
+			s << formatItemsWithState(isItemSelected, multiLine);
 			break;
 		}
 		case FOCUS_RULER: {
@@ -3762,6 +3776,57 @@ void cmdToggleLoopSegScrub(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 }
 
+void cmdReportRegionMarkerItems(Command* command) {
+	const bool multiLine = lastCommandRepeatCount == 1;
+	ostringstream s;
+	auto separate = [&s, multiLine]() {
+		if(s.tellp()) {
+			s << (multiLine ? "\r\n" : ", ");
+		}
+	};
+	double pos = GetPlayState()? GetPlayPosition():GetCursorPosition();
+	double start,end;
+	bool isrgn;
+	int number;
+	const char* name{nullptr};
+	int idx = 0;
+	while(EnumProjectMarkers(idx++, &isrgn, &start, &end, &name, &number)>0) {
+		if(!(isrgn && start <= pos && pos <= end)) {
+			continue;
+		} 
+		separate();
+		if(name[0]) {
+			s << name ;
+		} else {
+			// Translators: used to report an unnamed region. {} is replaced with the region number.  
+			s << format(translate("region {}"), number);
+		}
+	}
+	int markerIdx;
+	GetLastMarkerAndCurRegion(nullptr, pos, &markerIdx, nullptr);
+	if(markerIdx >=0) {
+		EnumProjectMarkers(markerIdx, nullptr, nullptr, nullptr, &name, &number);
+		separate();
+		if (name[0]) {
+			s << name;
+		} else {
+			// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+			s << format(translate("marker {}"), number);
+		}
+	}
+	separate();
+	s << formatItemsWithState([pos](MediaItem* item) -> bool{
+		MediaTrack* track = GetMediaItem_Track(item);
+		return (isTrackSelected(track) && isPosInItem(pos, item));
+	}, multiLine);
+	if(multiLine) {
+		// Translators: The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+		reviewMessage(translate("At Current Position"), s.str().c_str());
+	} else{
+		outputMessage(s);
+	}
+}
+
 // See the Configuration section of the code below.
 void cmdConfig(Command* command);
 
@@ -3912,6 +3977,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report regions, last project marker and items on selected tracks at current position"}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
