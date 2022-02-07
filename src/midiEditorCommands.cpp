@@ -1538,7 +1538,7 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 		return;
 	}
 	// Check whether this is a note
-	if (event.length == 0) {
+	if (event.length == -1) {
 		// No Note
 		return;
 	}
