@@ -1796,6 +1796,40 @@ void postToggleFreeItemPositioning(int command) {
 		translate("disabled free item positioning"));
 }
 
+void postChangeItemRate(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+	// Translators: Used when changing item rate. {:g} is replaced by the new rate. E.G. "1.0 item rate"
+	outputMessage(format(translate("{:g} item rate"), rate));
+}
+
+void postChangeItemPitch(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
+	// Translators: Used when changing item PITCH. {:+g} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
+	outputMessage(format(translate("{:+g} semitones"), pitch));
+}
+
+void postToggleTakePreservePitch(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(take, "B_PPITCH", nullptr);
+	outputMessage(isPreserving ?
+		translate("take preserve pitch enabled"):
+		translate("take preserve pitch disabled"));
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1961,6 +1995,26 @@ PostCommand POST_COMMANDS[] = {
 	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
 	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
 	{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
+	{40520, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents)
+	{40800, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch'
+	{40518, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone)
+	{40798, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch'
+	{40519, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents)
+	{40799, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch'
+	{40517, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone)
+	{40797, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch'
+	{42374, postChangeItemRate}, // Item properties: Set item rate from user-supplied source media tempo/bpm...
+	{40652, postChangeItemRate}, // Item properties: Set item rate to 1.0
+	{40207, postChangeItemPitch}, // Item properties: Pitch item down one cent
+	{40206, postChangeItemPitch}, // Item properties: Pitch item up one cent
+	{40205, postChangeItemPitch}, // Item properties: Pitch item down one semitone
+	{40204, postChangeItemPitch}, // Item properties: Pitch item up one semitone
+	{40516, postChangeItemPitch}, // Item properties: Pitch item down one octave
+	{40515, postChangeItemPitch}, // Item properties: Pitch item up one octave
+	{40653, postChangeItemPitch}, // Item properties: Reset item pitch
+	{40566, postToggleTakePreservePitch}, // Item properties: Toggle take preserve pitch
+	{40796, postToggleTakePreservePitch}, //Item properties: Clear take preserve pitch
+	{40795, postToggleTakePreservePitch}, // Item properties: Set take preserve pitch
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
