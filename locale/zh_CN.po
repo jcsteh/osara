@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-01-31 03:54\n"
+"PO-Revision-Date: 2022-02-08 10:30\n"
 
 msgid "volume"
 msgstr "音量"
@@ -51,6 +51,7 @@ msgstr "{} 标记"
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 #. used to report an unnamed marker. {} is replaced with the marker number.  
+#. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
 msgstr "标记 {}"
 
@@ -63,6 +64,7 @@ msgstr "{} 区间"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
+#. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
 msgstr "区间 {}"
@@ -180,12 +182,6 @@ msgstr "活动"
 msgid "{} tab"
 msgstr "{} 选项卡"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
-msgid "{} note"
-msgid_plural "{} notes"
-msgstr[0] "音符"
-
 #. The name of a musical note.
 msgid "c"
 msgstr "c"
@@ -233,6 +229,12 @@ msgstr "A 升记号"
 #. The name of a musical note.
 msgid "b"
 msgstr "B"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} note"
+msgid_plural "{} notes"
+msgstr[0] "音符"
 
 msgid "noncontiguous selection"
 msgstr "不连续选择"
@@ -1876,6 +1878,10 @@ msgstr[0] "{count} 个对象已从组 {group} 中移除"
 msgid "track not grouped"
 msgstr "轨道未分组"
 
+#. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+msgid "At Current Position"
+msgstr "光标位置"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
 
@@ -2025,6 +2031,9 @@ msgstr "OSARA: 报告当前轨道的分组"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA:将 OSARA 的下一条消息静音"
+
+msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
+msgstr "OSARA: 报告光标位置所在的区间,最后的工程标记和选定轨的对象"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: 转到第一条轨道"

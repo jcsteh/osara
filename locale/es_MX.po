@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-01-31 03:54\n"
+"PO-Revision-Date: 2022-02-08 10:30\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -51,6 +51,7 @@ msgstr "{} marcador"
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 #. used to report an unnamed marker. {} is replaced with the marker number.  
+#. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
 msgstr "marcador {}"
 
@@ -63,6 +64,7 @@ msgstr "{} región"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
+#. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
 msgstr "región {}"
@@ -185,13 +187,6 @@ msgstr "{} activo"
 msgid "{} tab"
 msgstr "{} pestaña"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
-msgid "{} note"
-msgid_plural "{} notes"
-msgstr[0] "{} nota"
-msgstr[1] "{} notas"
-
 #. The name of a musical note.
 msgid "c"
 msgstr "do"
@@ -239,6 +234,13 @@ msgstr "la sostenido"
 #. The name of a musical note.
 msgid "b"
 msgstr "si"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} note"
+msgid_plural "{} notes"
+msgstr[0] "{} nota"
+msgstr[1] "{} notas"
 
 msgid "noncontiguous selection"
 msgstr "selección separada"
@@ -1939,6 +1941,10 @@ msgstr[1] "{count} ítems removidos del grupo {group}"
 msgid "track not grouped"
 msgstr "pista no agrupada"
 
+#. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+msgid "At Current Position"
+msgstr "En la posición actual"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: mover al siguiente ítem (dejando otros ítems seleccionados)"
 
@@ -2088,6 +2094,9 @@ msgstr "OSARA: Anuncia los grupos para la pista actual"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Silenciar el siguiente mensaje de OSARA"
+
+msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
+msgstr "OSARA: Anunciar regiones, último marcador de proyecto e ítems de las pistas seleccionadas en la posición actual"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: Ir a la primera pista"

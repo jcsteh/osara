@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-01-31 03:54\n"
+"PO-Revision-Date: 2022-02-08 10:30\n"
 
 msgid "volume"
 msgstr "volume"
@@ -51,6 +51,7 @@ msgstr "{} Marqueur"
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 #. used to report an unnamed marker. {} is replaced with the marker number.  
+#. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
 msgstr "marqueur {}"
 
@@ -63,6 +64,7 @@ msgstr "{} région"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
+#. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
 msgstr "région {}"
@@ -185,13 +187,6 @@ msgstr "actif"
 msgid "{} tab"
 msgstr "{} onglet"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
-msgid "{} note"
-msgid_plural "{} notes"
-msgstr[0] "{} note décalée d'une unité de grille vers la droite"
-msgstr[1] "{} notes"
-
 #. The name of a musical note.
 msgid "c"
 msgstr "do"
@@ -239,6 +234,13 @@ msgstr "la dièse"
 #. The name of a musical note.
 msgid "b"
 msgstr "si"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} note"
+msgid_plural "{} notes"
+msgstr[0] "{} note décalée d'une unité de grille vers la droite"
+msgstr[1] "{} notes"
 
 msgid "noncontiguous selection"
 msgstr "sélection discontinue"
@@ -1761,7 +1763,7 @@ msgstr[1] "{} zones d'objets sélectionnées copié"
 #. affected.
 msgid "selected area of {} item removed"
 msgid_plural "selected area of {} items removed"
-msgstr[0] ""
+msgstr[0] "{} zone d'objet sélectionné supprimée"
 msgstr[1] "{} zone d'objet sélectionnée supprimée"
 
 #. Reported when items are removed. {} will be replaced with the
@@ -1939,6 +1941,10 @@ msgstr[1] "{count} objets supprimés du groupe {group}"
 msgid "track not grouped"
 msgstr "piste non groupée"
 
+#. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+msgid "At Current Position"
+msgstr "A la position actuelle"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: déplacement au prochain objet sans dé-sélectionner les autres objets"
 
@@ -2088,6 +2094,9 @@ msgstr "OSARA: annoncer le groupe de la piste courante"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Rendre le prochain message muet en provenance d'OSARA"
+
+msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
+msgstr "OSARA : annoncer la position des régions, du dernier marqeur de projet et des objets de la piste à la position actuelle"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: Aller à la première piste"
