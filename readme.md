@@ -205,7 +205,6 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item properties: Clear take preserve pitch
 - Item properties: Set take preserve pitch
 
-
 #### FX
 FX: Toggle delta solo for last focused FX
 

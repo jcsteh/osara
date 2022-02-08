@@ -666,6 +666,12 @@ void shortenFxName(char* name, ostringstream& s) {
 	}
 }
 
+string formatDouble(double d, int precision, bool plus=false) {
+	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
+	size_t pos = s.find_last_not_of("-+0.");
+	return (pos == string::npos) ? "0" : s.substr(0, pos+1);
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -1551,9 +1557,9 @@ void postToggleSoloInFront(int command) {
 
 void postAdjustPlayRate(int command) {
 	double rate = Master_GetPlayRate(nullptr);
-	// Translators: Reported when the play rate is adjusted. {:g} will be replaced
+	// Translators: Reported when the play rate is adjusted. {} will be replaced
 	// with the play rate; e.g. "1.5 play rate".
-	outputMessage(format(translate("{:g} play rate"), rate));
+	outputMessage(format(translate("{} play rate"), formatDouble(rate, 6)));
 }
 
 void postToggleMonitoringFxBypass(int command) {
@@ -1802,9 +1808,15 @@ void postChangeItemRate(int command) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
 	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+	// if(abs(rate) < 0.0001) { // round to 0 to avoid outputting scientific notation
+	// 	rate = 0.0;
+	// }
 	// Translators: Used when changing item rate. {:g} is replaced by the new rate. E.G. "1.0 item rate"
-	outputMessage(format(translate("{:g} item rate"), rate));
+	outputMessage(format(translate("{} item rate"), formatDouble(rate, 6)));
 }
 
 void postChangeItemPitch(int command) {
@@ -1813,9 +1825,15 @@ void postChangeItemPitch(int command) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
 	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
+	// if(abs(pitch) < 0.0001) { // round to 0 to avoid outputting scientific notation
+	// 	pitch = 0.0;
+	// }
 	// Translators: Used when changing item PITCH. {:+g} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
-	outputMessage(format(translate("{:+g} semitones"), pitch));
+	outputMessage(format(translate("{} semitones"), formatDouble(pitch, 6, true)));
 }
 
 void postToggleTakePreservePitch(int command) {
@@ -1824,10 +1842,13 @@ void postToggleTakePreservePitch(int command) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
 	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(take, "B_PPITCH", nullptr);
 	outputMessage(isPreserving ?
-		translate("take preserve pitch enabled"):
-		translate("take preserve pitch disabled"));
+		translate("enabled preserve pitch when changing item rate"):
+		translate("disabled preserve pitch when changing item rate"));
 }
 
 typedef void (*PostCommandExecute)(int);
