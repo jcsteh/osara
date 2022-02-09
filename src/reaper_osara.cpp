@@ -1812,10 +1812,7 @@ void postChangeItemRate(int command) {
 		return;
 	}
 	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
-	// if(abs(rate) < 0.0001) { // round to 0 to avoid outputting scientific notation
-	// 	rate = 0.0;
-	// }
-	// Translators: Used when changing item rate. {:g} is replaced by the new rate. E.G. "1.0 item rate"
+	// Translators: Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
 	outputMessage(format(translate("{} item rate"), formatDouble(rate, 6)));
 }
 
@@ -1829,10 +1826,7 @@ void postChangeItemPitch(int command) {
 		return;
 	}
 	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
-	// if(abs(pitch) < 0.0001) { // round to 0 to avoid outputting scientific notation
-	// 	pitch = 0.0;
-	// }
-	// Translators: Used when changing item PITCH. {:+g} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
+	// Translators: Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
 	outputMessage(format(translate("{} semitones"), formatDouble(pitch, 6, true)));
 }
 
