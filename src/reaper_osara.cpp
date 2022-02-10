@@ -666,6 +666,14 @@ void shortenFxName(char* name, ostringstream& s) {
 	}
 }
 
+// Format a double d to precision decimal places, stripping trailing zeroes.
+// If plus is true, a "+" prefix will be included for a positive number.
+string formatDouble(double d, int precision, bool plus=false) {
+	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
+	size_t pos = s.find_last_not_of("-+0.");
+	return (pos == string::npos) ? "0" : s.substr(0, pos+1);
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -1551,9 +1559,9 @@ void postToggleSoloInFront(int command) {
 
 void postAdjustPlayRate(int command) {
 	double rate = Master_GetPlayRate(nullptr);
-	// Translators: Reported when the play rate is adjusted. {:g} will be replaced
+	// Translators: Reported when the play rate is adjusted. {} will be replaced
 	// with the play rate; e.g. "1.5 play rate".
-	outputMessage(format(translate("{:g} play rate"), rate));
+	outputMessage(format(translate("{} play rate"), formatDouble(rate, 6)));
 }
 
 void postToggleMonitoringFxBypass(int command) {
@@ -1796,6 +1804,49 @@ void postToggleFreeItemPositioning(int command) {
 		translate("disabled free item positioning"));
 }
 
+void postChangeItemRate(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
+	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+	// Translators: Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
+	outputMessage(format(translate("{} item rate"), formatDouble(rate, 6)));
+}
+
+void postChangeItemPitch(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
+	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
+	// Translators: Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
+	outputMessage(format(translate("{} semitones"), formatDouble(pitch, 6, true)));
+}
+
+void postToggleTakePreservePitch(int command) {
+	MediaItem* item = getItemWithFocus();
+	if(!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	if(!take) {
+		return;
+	}
+	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(take, "B_PPITCH", nullptr);
+	outputMessage(isPreserving ?
+		translate("enabled preserve pitch when changing item rate"):
+		translate("disabled preserve pitch when changing item rate"));
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -1961,6 +2012,26 @@ PostCommand POST_COMMANDS[] = {
 	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
 	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
 	{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
+	{40520, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents)
+	{40800, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch'
+	{40518, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone)
+	{40798, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch'
+	{40519, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents)
+	{40799, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch'
+	{40517, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone)
+	{40797, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch'
+	{42374, postChangeItemRate}, // Item properties: Set item rate from user-supplied source media tempo/bpm...
+	{40652, postChangeItemRate}, // Item properties: Set item rate to 1.0
+	{40207, postChangeItemPitch}, // Item properties: Pitch item down one cent
+	{40206, postChangeItemPitch}, // Item properties: Pitch item up one cent
+	{40205, postChangeItemPitch}, // Item properties: Pitch item down one semitone
+	{40204, postChangeItemPitch}, // Item properties: Pitch item up one semitone
+	{40516, postChangeItemPitch}, // Item properties: Pitch item down one octave
+	{40515, postChangeItemPitch}, // Item properties: Pitch item up one octave
+	{40653, postChangeItemPitch}, // Item properties: Reset item pitch
+	{40566, postToggleTakePreservePitch}, // Item properties: Toggle take preserve pitch
+	{40796, postToggleTakePreservePitch}, //Item properties: Clear take preserve pitch
+	{40795, postToggleTakePreservePitch}, // Item properties: Set take preserve pitch
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {

@@ -184,6 +184,26 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Take: Nudge active takes volume -1dB
 - Xenakios/SWS: Nudge active take volume up: Control+UpArrow
 - Xenakios/SWS: Nudge active take volume down: Control+DownArrow
+- Item properties: Decrease item rate by ~0.6% (10 cents): Shift+1
+- Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch': Shift+3
+- Item properties: Decrease item rate by ~6% (one semitone)
+- Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch': Shift+5
+- Item properties: Increase item rate by ~0.6% (10 cents): Shift+2
+- Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch': shift+4
+- Item properties: Increase item rate by ~6% (one semitone)
+- Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch': shift+6
+- Item properties: Set item rate from user-supplied source media tempo/bpm...
+- Item properties: Set item rate to 1.0: Control+Alt+Backspace
+- Item properties: Pitch item down one cent: Shift+7
+- Item properties: Pitch item up one cent: Shift+8
+- Item properties: Pitch item down one semitone: shift+9
+- Item properties: Pitch item up one semitone: Shift+0
+- Item properties: Pitch item down one octave
+- Item properties: Pitch item up one octave
+- Item properties: Reset item pitch: Control+Backspace
+- Item properties: Toggle take preserve pitch
+- Item properties: Clear take preserve pitch
+- Item properties: Set take preserve pitch
 
 #### FX
 FX: Toggle delta solo for last focused FX
