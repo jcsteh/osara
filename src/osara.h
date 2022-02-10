@@ -241,7 +241,9 @@ extern enum FakeFocus fakeFocus;
 
 extern bool isSelectionContiguous;
 extern bool shouldMoveToAutoItem;
+extern int lastCommand;
 
+bool shouldReportTimeMovement() ;
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
 

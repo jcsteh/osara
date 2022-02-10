@@ -2927,23 +2927,6 @@ void cmdRemoveTimeSelection(Command* command) {
 	}
 }
 
-void cmdMoveItems(Command* command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	double oldPos, oldLen;
-	if (item) {
-		oldPos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-		oldLen = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", NULL);
-	}
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	if (!item)
-		return;
-	// Only report if something actually happened.
-	double newPos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-	double newLen = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", NULL);
-	if (newPos != oldPos || newLen != oldLen)
-		reportActionName(command->gaccel.accel.cmd);
-}
-
 void cmdMoveItemEdge(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
@@ -2983,6 +2966,14 @@ void cmdMoveItemEdge(Command* command) {
 		s << translate("no change");
 	}
 	outputMessage(s);
+}
+
+void cmdMoveItemsOrEnvPoint(Command* command) {
+	if(GetCursorContext2(true) == 2 ) {// Envelope
+	cmdMoveSelEnvelopePoints(command);
+	} else {
+		cmdMoveItemEdge(command);
+	}
 }
 
 void cmdDeleteMarker(Command* command) {
@@ -3928,8 +3919,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
 	{MAIN_SECTION, {{0, 0, 40060}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
 	{MAIN_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
-	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points right
-	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItems}, // Item edit: Move items/envelope points left
+	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
+	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
+	{MAIN_SECTION, {{0, 0, 40793}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
+	{MAIN_SECTION, {{0, 0, 40794}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
 	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
 	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
 	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
