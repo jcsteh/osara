@@ -666,6 +666,8 @@ void shortenFxName(char* name, ostringstream& s) {
 	}
 }
 
+// Format a double d to precision decimal places, stripping trailing zeroes.
+// If plus is true, a "+" prefix will be included for a positive number.
 string formatDouble(double d, int precision, bool plus=false) {
 	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
 	size_t pos = s.find_last_not_of("-+0.");
