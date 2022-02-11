@@ -261,6 +261,7 @@ std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=fa
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
+const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
 

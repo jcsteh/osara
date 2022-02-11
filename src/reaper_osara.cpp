@@ -391,10 +391,10 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCategory=true) {
+const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true) {
 	const char* name = kbd_getTextFromCmd(command, section);
-	const char* start;
 	if (skipCategory) {
+		const char* start;
 		// Skip the category before the colon (if any).
 		for (start = name; *start; ++start) {
 			if (*start == ':') {
@@ -403,9 +403,7 @@ void reportActionName(int command, KbdSectionInfo* section=NULL, bool skipCatego
 			}
 		}
 	}
-	ostringstream s;
-	s << name;
-	outputMessage(s);
+	return name;
 }
 
 bool isTrackMuted(MediaTrack* track) {
@@ -2936,16 +2934,7 @@ void cmdMoveItemEdge(Command* command) {
 	}
 	ostringstream s;
 	if(lastCommand != command->gaccel.accel.cmd) { 
-		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
-		const char* start;
-		// Skip the category before the colon (if any).
-		for (start = name; *start; ++start) {
-			if (*start == ':') {
-				name = start + 2;
-				break;
-			}
-		}
-		s<<name << " ";
+		s<< getActionName(command->gaccel.accel.cmd) << " ";
 		resetTimeCache();
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
@@ -4297,7 +4286,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		} 
 		return true;
 	} else if (isShortcutHelpEnabled) {
-		reportActionName(command, section, false);
+		outputMessage(getActionName(command, section, false));
 		return true;
 	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {

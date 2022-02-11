@@ -660,7 +660,7 @@ void postSelectMultipleEnvelopePoints(int command) {
 
 void cmdMoveSelEnvelopePoints(Command* command) {
 	TrackEnvelope* envelope;
-	double offset{0.0};
+	double offset;
 	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
 	if(!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -675,16 +675,7 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	newPos += offset;
 	ostringstream s;
 	if(lastCommand != command->gaccel.accel.cmd) { 
-		const char* name = kbd_getTextFromCmd(command->gaccel.accel.cmd, nullptr);
-		const char* start;
-		// Skip the category before the colon (if any).
-		for (start = name; *start; ++start) {
-			if (*start == ':') {
-				name = start + 2;
-				break;
-			}
-		}
-		s<<name << " ";
+		s << getActionName(command->gaccel.accel.cmd) << " ";
 		resetTimeCache();
 	}
 	if(oldPos == newPos) {
