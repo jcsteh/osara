@@ -3481,9 +3481,6 @@ void cmdDeleteAllTimeSigs(Command* command) {
 }
 
 void moveToTransient(bool previous) {
-	int selCmd = NamedCommandLookup("_XENAKIOS_SELITEMSUNDEDCURSELTX");
-	if (selCmd)
-		Main_OnCommand(selCmd, 0); // Xenakios/SWS: Select items under edit cursor on selected tracks
 	bool wasPlaying = GetPlayState() & 1;
 	if (wasPlaying) {
 		// Moving to transients can be slow, so pause/stop playback so it doesn't drift
