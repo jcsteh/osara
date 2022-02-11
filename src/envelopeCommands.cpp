@@ -504,7 +504,7 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 			selectAutomationItem(envelope, i);
 		}
 		if (clearSelection || select) {
-			Undo_EndBlock("Change Automation Item Selection", 0);
+			Undo_EndBlock(translate("Change Automation Item Selection"), 0);
 		}
 		SetEditCurPos(pos, true, true); // Seek playback.
 

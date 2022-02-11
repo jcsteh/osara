@@ -2580,7 +2580,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		if ((clearSelection || select) && makeUndoPoint)
-			Undo_EndBlock("Change Track Selection", 0);
+			Undo_EndBlock(translate("Change Track Selection"), 0);
 	}
 	postGoToTrack(0);
 }
@@ -2666,7 +2666,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (select)
 			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
 		if ((clearSelection || select) && makeUndoPoint)
-			Undo_EndBlock("Change Item Selection", 0);
+			Undo_EndBlock(translate("Change Item Selection"), 0);
 		SetEditCurPos(pos, true, true); // Seek playback.
 		fakeFocus = FOCUS_ITEM;
 		selectedEnvelopeIsTake = true;
@@ -3434,7 +3434,7 @@ void cmdMoveStretch(Command* command) {
 		SetTakeStretchMarker(take, index, destPos, NULL);
 		done = true;
 	}
-	Undo_EndBlock("Move stretch marker", UNDO_STATE_ITEMS);
+	Undo_EndBlock(translate("Move stretch marker"), UNDO_STATE_ITEMS);
 	if (done) {
 		outputMessage(translate("stretch marker moved"));
 	}
@@ -3476,7 +3476,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 		return;
 	for (int i = count - 1; i >= 0; --i)
 		DeleteTempoTimeSigMarker(0, i);
-	Undo_EndBlock("Delete all time signature markers", UNDO_STATE_ALL);
+	Undo_EndBlock(translate("Delete all time signature markers"), UNDO_STATE_ALL);
 	outputMessage(translate("deleted all time signature markers"));
 }
 
