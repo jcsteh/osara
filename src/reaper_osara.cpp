@@ -391,7 +391,7 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true) {
+const char* getActionName(int command, KbdSectionInfo* section, bool skipCategory) {
 	const char* name = kbd_getTextFromCmd(command, section);
 	if (skipCategory) {
 		const char* start;
