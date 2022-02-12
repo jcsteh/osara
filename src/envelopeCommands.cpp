@@ -657,3 +657,31 @@ void postSelectMultipleEnvelopePoints(int command) {
 		translate_plural("{} point selected", "{} points selected", count),
 		count));
 }
+
+void cmdMoveSelEnvelopePoints(Command* command) {
+	TrackEnvelope* envelope;
+	double offset;
+	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
+	if(!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		return;
+	}
+	double oldPos {0.0};
+	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &oldPos, nullptr, nullptr, nullptr, nullptr);
+	oldPos += offset;
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double newPos{0.0};
+	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr);
+	newPos += offset;
+	ostringstream s;
+	if(lastCommand != command->gaccel.accel.cmd) { 
+		s << getActionName(command->gaccel.accel.cmd) << " ";
+		resetTimeCache();
+	}
+	if(oldPos == newPos) {
+		s << translate("no change");
+	} else {
+		s << formatTime(newPos, TF_RULER, false, true);
+	}
+	outputMessage(s);
+}

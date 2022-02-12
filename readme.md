@@ -141,6 +141,8 @@ Most of these are actions built into REAPER, but a few are very useful actions f
 - Item: Remove items
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
+- Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6
+- Item edit: Move items/envelope points left by grid size: Alt+Shift+, or Control+Alt+NumPad4
 - Item edit: Grow left edge of items: Control+, or Control+NumPad4
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
