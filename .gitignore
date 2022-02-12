@@ -11,3 +11,4 @@ build
 *.rc_mac_*
 __pycache__
 locale/*.pot
+*.bak
