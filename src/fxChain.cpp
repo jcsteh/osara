@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <memory>
+#include <regex>
 #include <WDL/win32_utf8.h>
 #include "resource.h"
 #include "translation.h"
@@ -27,6 +28,25 @@ using namespace std;
 bool isFxListFocused() {
 	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
 		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
+}
+
+void shortenFxName(char* name, ostringstream& s) {
+	const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
+	cmatch m;
+	regex_search(name, m, RE_FX_NAME);
+	if (m.empty()) {
+		s << name;
+	} else {
+		// Group 1 is the prefix, group 2 is the FX name, group 3 is the
+		// parenthesised suffix.
+		s << m.str(2);
+		if (m.str(1) == "JS") {
+			// For JS, not all effects have a vendor name. Therefore, we always
+			// include the parenthesised suffix to avoid stripping potentially
+			// useful info.
+			s << m.str(3);
+		}
+	}
 }
 
 #ifdef _WIN32

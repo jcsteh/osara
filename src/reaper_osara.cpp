@@ -21,7 +21,6 @@
 #include <cassert>
 #include <math.h>
 #include <optional>
-#include <regex>
 #include <set>
 #ifdef _WIN32
 // We only need this on Windows and it apparently causes compilation issues on Mac.
@@ -643,25 +642,6 @@ bool isTrackGrouped(MediaTrack* track) {
 		}
 	}
 	return false;
-}
-
-void shortenFxName(char* name, ostringstream& s) {
-	const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
-	cmatch m;
-	regex_search(name, m, RE_FX_NAME);
-	if (m.empty()) {
-		s << name;
-	} else {
-		// Group 1 is the prefix, group 2 is the FX name, group 3 is the
-		// parenthesised suffix.
-		s << m.str(2);
-		if (m.str(1) == "JS") {
-			// For JS, not all effects have a vendor name. Therefore, we always
-			// include the parenthesised suffix to avoid stripping potentially
-			// useful info.
-			s << m.str(3);
-		}
-	}
 }
 
 // Format a double d to precision decimal places, stripping trailing zeroes.
@@ -3983,13 +3963,13 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item/FX (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View Peak Watcher"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of first track"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherT1C1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of first track"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherT1C2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 1 of second track"}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherT2C1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for channel 2 of second track"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherT2C2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for first track"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherT1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher for second track"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherT2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for first watcher first channel"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherW1C1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for first watcher second channel"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherW1C2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for second watcher first channel"}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherW2C1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for second watcher second channel"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherW2C2},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher first watcher"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherW1},
+	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher second watcher"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherW2},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Pause/resume Peak Watcher"}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
 	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},

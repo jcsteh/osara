@@ -9,10 +9,10 @@
 #include "osara.h"
 
 void cmdPeakWatcher(Command* command);
-void cmdReportPeakWatcherT1C1(Command* command);
-void cmdReportPeakWatcherT1C2(Command* command);
-void cmdReportPeakWatcherT2C1(Command* command);
-void cmdReportPeakWatcherT2C2(Command* command);
-void cmdResetPeakWatcherT1(Command* command);
-void cmdResetPeakWatcherT2(Command* command);
+void cmdReportPeakWatcherW1C1(Command* command);
+void cmdReportPeakWatcherW1C2(Command* command);
+void cmdReportPeakWatcherW2C1(Command* command);
+void cmdReportPeakWatcherW2C2(Command* command);
+void cmdResetPeakWatcherW1(Command* command);
+void cmdResetPeakWatcherW2(Command* command);
 void cmdPausePeakWatcher(Command* command);
