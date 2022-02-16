@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-02-08 10:30\n"
+"PO-Revision-Date: 2022-02-16 10:31\n"
 
 msgid "volume"
 msgstr "音量"
@@ -135,6 +135,9 @@ msgstr "{} 包絡"
 msgid "bypassed"
 msgstr "旁通"
 
+msgid "Change Automation Item Selection"
+msgstr "更改選取的自動化對象"
+
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
@@ -173,6 +176,11 @@ msgstr "無包絡切換"
 msgid "{} point selected"
 msgid_plural "{} points selected"
 msgstr[0] "{} 點選中"
+
+#. Reported when moving items to indicate that no movement
+#. occurred.
+msgid "no change"
+msgstr "無更改"
 
 msgid "active"
 msgstr "活躍"
@@ -475,6 +483,9 @@ msgstr "單通道開"
 msgid "Poly On"
 msgstr "多通道開"
 
+msgid "Change CC Selection"
+msgstr "更改選取的 CC"
+
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
@@ -495,6 +506,12 @@ msgstr "通道壓力 {}"
 msgid "Pitch Bend {}"
 msgstr "彎音 {}"
 
+msgid "OSARA: Move to next midi item on track"
+msgstr "OSARA: 移至軌道上的下一個Midi對象"
+
+msgid "OSARA: Move to previous midi item on track"
+msgstr "OSARA: 移至軌道上的上一個Midi對象"
+
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
 #. be replaced with its name. For example: "item 2 chorus".
@@ -506,6 +523,9 @@ msgstr "無時間選區"
 
 msgid "no notes selected"
 msgstr "無音符選中"
+
+msgid "OSARA: Select all notes with the same pitch within time selection"
+msgstr "OSARA: 在時間選區內選擇所有具有相同音高的音符"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -811,6 +831,22 @@ msgstr "[輸入]"
 msgid "no FX"
 msgstr "無 FX"
 
+#. A track which isn't a folder.
+msgid "track"
+msgstr "軌道"
+
+msgid "1st watcher"
+msgstr "第1峰值查看器"
+
+msgid "2nd watcher"
+msgstr "第2峰值查看器"
+
+msgid "1st chan"
+msgstr "第1通道"
+
+msgid "2nd chan"
+msgstr "第2通道"
+
 msgid "peak dB"
 msgstr "峰值 dB"
 
@@ -835,53 +871,42 @@ msgstr "瞬時 RMS"
 msgid "true peak dBTP"
 msgstr "真實峰值 dBTP"
 
-#. Reported when the user tries to reset a Peak Watcher
-#. track, but that Peak Watcher track is disabled.
-#. Reported when the user tries to report a Peak Watcher
-#. channel, but the Peak Watcher track is disabled.
-msgid "Peak Watcher track disabled"
-msgstr "峰值查看氣的軌道禁用"
+msgid "gain reduction dB"
+msgstr "增益降低分貝"
 
-#. Reported when the user resets a Peak Watcher track.
+msgid "not configured"
+msgstr "未配置"
+
+msgid "following last touched track"
+msgstr "追蹤最後觸碰的軌道"
+
+#. Reported when the user tries to reset a Peak Watcher
+#. value, but that watcher is disabled.
+#. Reported when the user tries to report a Peak Watcher
+#. channel, but the Peak Watcher value is disabled.
+msgid "watcher disabled"
+msgstr "峰值查看器禁用"
+
+#. Reported when the user resets a Peak Watcher value.
 msgid "reset"
 msgstr "重設"
 
-#. used when Peak Watcher notifies about a peak.
-#. {} will be replaced with the track number; e.g. "track 2".
-msgid "track {}"
-msgstr "軌道 {}"
-
-#. used when Peak Watcher notifies about a peak. This is
-#. placed after the track and before the peak value.
-#. {} will be replaced with the channel number; e.g. "chan 2".
-msgid "chan {}:"
-msgstr "通道 {}:"
-
-#. used when Peak Watcher notifies about a peak for cases
-#. where the channel is irrelevant. This is placed after the track and
-#. before the peak value.
-msgid "level"
-msgstr "水平"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "沒有"
-
-msgid "follow current track"
-msgstr "追蹤當前軌道"
-
-#. Used in the lists of tracks in the Peak Watcher dialog
-#. to indicate the current track.
-msgid "current"
-msgstr "當前"
+msgctxt "Peak Watcher"
+msgid "Peak Watcher"
+msgstr "峰值查看器"
 
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher is paused.
 msgid "Peak Watcher paused"
 msgstr "峰值查看器暫停"
 
+msgid "Peak Watcher does not support the current focus"
+msgstr "峰值查看器不支持當前焦點"
+
+#. Used when asking which Peak Watcher value to configure.
+#. {} will be replaced with the value number; e.g. "Value &2".
+#. After this, information about the existing configuration for the value
+#. will be appended.
 msgid "paused Peak Watcher"
 msgstr "暫停峰值查看器"
 
@@ -949,10 +974,6 @@ msgstr "{} 秒"
 msgid "{} samples"
 msgstr "{} 採樣"
 
-#. A track which isn't a folder.
-msgid "track"
-msgstr "軌道"
-
 #. A track which is a folder.
 msgid "folder"
 msgstr "資料夾"
@@ -972,6 +993,12 @@ msgstr "小"
 #. A closed track folder.
 msgid "closed"
 msgstr "關閉"
+
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "沒有"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1408,10 +1435,10 @@ msgstr "獨奏在前"
 msgid "normal solo"
 msgstr "正常獨奏"
 
-#. Reported when the play rate is adjusted. {:g} will be replaced
+#. Reported when the play rate is adjusted. {} will be replaced
 #. with the play rate; e.g. "1.5 play rate".
-msgid "{:g} play rate"
-msgstr "{:g} 播放率"
+msgid "{} play rate"
+msgstr "{} 播放率"
 
 msgid "fx active"
 msgstr "fx 活躍"
@@ -1546,6 +1573,20 @@ msgstr "啟用自由對象定位"
 msgid "disabled free item positioning"
 msgstr "禁用自由對象定位"
 
+#. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
+msgid "{} item rate"
+msgstr "{} 對象速率"
+
+#. Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
+msgid "{} semitones"
+msgstr "{} 半音"
+
+msgid "enabled preserve pitch when changing item rate"
+msgstr "更改對象速率時啟用保留音高"
+
+msgid "disabled preserve pitch when changing item rate"
+msgstr "更改對象速率時禁用保留音高"
+
 msgid "set selection start"
 msgstr "設置選區開始"
 
@@ -1630,6 +1671,12 @@ msgstr "32分3聯音音符長"
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "無軌道"
+
+msgid "Change Track Selection"
+msgstr "更改選取的軌道"
+
+msgid "Change Item Selection"
+msgstr "更改選取的對象"
 
 #. Used when navigating items to indicate that an item is
 #. locked.
@@ -1716,11 +1763,6 @@ msgstr[0] "{} 對象移除"
 msgid "contents of time selection removed"
 msgstr "時間選區的內容已移除"
 
-#. Reported when moving items to indicate that no movement
-#. occurred.
-msgid "no change"
-msgstr "無更改"
-
 msgid "marker deleted"
 msgstr "標記刪除"
 
@@ -1801,8 +1843,14 @@ msgstr "播放中"
 msgid "stopped"
 msgstr "已停止"
 
+msgid "Move stretch marker"
+msgstr "移除拉伸標記"
+
 msgid "stretch marker moved"
 msgstr "拉伸標記移動"
+
+msgid "Delete all time signature markers"
+msgstr "刪除所有拍號標記"
 
 msgid "deleted all time signature markers"
 msgstr "刪除所有拍號標記"
@@ -1900,29 +1948,29 @@ msgstr "OSARA: 查看當前軌道或片段的FX 參數（取決於焦點）"
 msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: 查看主控軌的FX 參數"
 
-msgid "OSARA: View Peak Watcher"
-msgstr "OSARA: 查看峰值查看器"
+msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
+msgstr "OSARA: 配置當前軌道/ 軌道 FX 的峰值查看器（取決於焦點）"
 
-msgid "OSARA: Report Peak Watcher value for channel 1 of first track"
-msgstr "OSARA: 報告峰值查看器第一軌道第一通道的峰質"
+msgid "OSARA: Report Peak Watcher value for first watcher first channel"
+msgstr "OSARA: 報告第1峰值查看器第1通道的峰質"
 
-msgid "OSARA: Report Peak Watcher value for channel 2 of first track"
-msgstr "OSARA: 報告峰值查看器第一軌道第二通道的峰質"
+msgid "OSARA: Report Peak Watcher value for first watcher second channel"
+msgstr "OSARA: 報告第1峰值查看器第2通道的峰質"
 
-msgid "OSARA: Report Peak Watcher value for channel 1 of second track"
-msgstr "OSARA: 報告峰值查看器第二軌道第一通道的峰質"
+msgid "OSARA: Report Peak Watcher value for second watcher first channel"
+msgstr "OSARA: 報告第2峰值查看器第1通道的峰質"
 
-msgid "OSARA: Report Peak Watcher value for channel 2 of second track"
-msgstr "OSARA: 報告峰值查看器第二軌道第二通道的峰質"
+msgid "OSARA: Report Peak Watcher value for second watcher second channel"
+msgstr "OSARA: 報告第2峰值查看器第2通道的峰質"
 
-msgid "OSARA: Reset Peak Watcher for first track"
-msgstr "OSARA: 重製峰值查看器第一軌道"
+msgid "OSARA: Reset Peak Watcher first watcher"
+msgstr "OSARA: 重製峰值查看器第1峰值查看器"
 
-msgid "OSARA: Reset Peak Watcher for second track"
-msgstr "OSARA: 重製峰值查看器第二軌道"
+msgid "OSARA: Reset Peak Watcher second watcher"
+msgstr "OSARA: 重製峰值查看器第2峰值查看器"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: 暫停/恢復峰值查看器"
+msgstr "OSARA: 暫停/ 恢復峰值查看器"
 
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: 報告波紋編輯狀態"
@@ -2080,12 +2128,6 @@ msgstr "OSARA: 移至下一個CC並添加到選區"
 msgid "OSARA: Move to previous CC and add to selection"
 msgstr "OSARA: 移至上一個CC並添加到選區"
 
-msgid "OSARA: Move to previous midi item on track"
-msgstr "OSARA: 移至軌道上的上一個Midi對象"
-
-msgid "OSARA: Move to next midi item on track"
-msgstr "OSARA: 移至軌道上的下一個Midi對象"
-
 msgid "OSARA: Select all notes with the same pitch starting in time selection"
 msgstr "OSARA: 從時間選區開始選擇具有相同音高的所有音符"
 
@@ -2113,20 +2155,12 @@ msgid "&Close"
 msgstr "關閉(&C)"
 
 msgctxt "Peak Watcher"
-msgid "Peak Watcher"
-msgstr "峰值查看氣"
+msgid "&Follow when last touched track changes"
+msgstr "追蹤上次觸碰的軌道更改(&F)"
 
 msgctxt "Peak Watcher"
 msgid "Level type:"
 msgstr "水平類型："
-
-msgctxt "Peak Watcher"
-msgid "First track:"
-msgstr "第一軌道:"
-
-msgctxt "Peak Watcher"
-msgid "Second track:"
-msgstr "第二軌道:"
 
 msgctxt "Peak Watcher"
 msgid "Notify automatically for channels:"
@@ -2134,19 +2168,19 @@ msgstr "自動通知通道:"
 
 msgctxt "Peak Watcher"
 msgid "&1"
-msgstr "1"
+msgstr "1(&1)"
 
 msgctxt "Peak Watcher"
 msgid "&2"
-msgstr "2"
+msgstr "2(&2)"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"
-msgstr "當水平達到："
+msgstr "當水平達到：(&l)"
 
 msgctxt "Peak Watcher"
-msgid "Hold highest level:"
-msgstr "保持最高水平："
+msgid "Hold level:"
+msgstr "保持水平："
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
@@ -2165,12 +2199,16 @@ msgid "&Reset"
 msgstr "重設(&R)"
 
 msgctxt "Peak Watcher"
-msgid "&OK"
-msgstr "確定(&O)"
+msgid "OK"
+msgstr "確定"
 
 msgctxt "Peak Watcher"
-msgid "&Cancel"
-msgstr "取消(&C)"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "Peak Watcher"
+msgid "D&isable"
+msgstr "禁用(&i)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
@@ -2198,7 +2236,7 @@ msgstr "報告走代狀態播放、錄音等(&T)"
 
 msgctxt "OSARA Configuration"
 msgid "Report t&rack numbers"
-msgstr "朗讀軌道號(&R)"
+msgstr "朗讀軌道號(&r)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"

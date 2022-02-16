@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-02-08 10:30\n"
+"PO-Revision-Date: 2022-02-16 10:31\n"
 
 msgid "volume"
 msgstr "volume"
@@ -137,6 +137,9 @@ msgstr "{} enveloppe"
 msgid "bypassed"
 msgstr "désactivé"
 
+msgid "Change Automation Item Selection"
+msgstr "Changement de sélection d'objet automatisé"
+
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
@@ -178,6 +181,11 @@ msgid "{} point selected"
 msgid_plural "{} points selected"
 msgstr[0] "{} point sélectionné"
 msgstr[1] "{} points sélectionnés"
+
+#. Reported when moving items to indicate that no movement
+#. occurred.
+msgid "no change"
+msgstr "aucun changement"
 
 msgid "active"
 msgstr "actif"
@@ -486,6 +494,9 @@ msgstr "Mono activé"
 msgid "Poly On"
 msgstr "Poly activé"
 
+msgid "Change CC Selection"
+msgstr "Changement de sélection CC"
+
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
@@ -506,6 +517,12 @@ msgstr "Pression de canal"
 msgid "Pitch Bend {}"
 msgstr "Hauteur tonale"
 
+msgid "OSARA: Move to next midi item on track"
+msgstr "OSARA: saute à l'objet MIDI suivant sur la piste"
+
+msgid "OSARA: Move to previous midi item on track"
+msgstr "OSARA: saute à l'objet MIDI précédent sur la piste"
+
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
 #. be replaced with its name. For example: "item 2 chorus".
@@ -517,6 +534,9 @@ msgstr "aucune sélection temporelle"
 
 msgid "no notes selected"
 msgstr "pas de note sélectionnée"
+
+msgid "OSARA: Select all notes with the same pitch within time selection"
+msgstr "OSARA: sélectionner toutes les hauteurs de notes identiques sans tenir compte de la sélection temporelle"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -846,6 +866,22 @@ msgstr "Entrée"
 msgid "no FX"
 msgstr "pas d'effet"
 
+#. A track which isn't a folder.
+msgid "track"
+msgstr "piste"
+
+msgid "1st watcher"
+msgstr "1er observateur"
+
+msgid "2nd watcher"
+msgstr "2e observateur"
+
+msgid "1st chan"
+msgstr "1er canal"
+
+msgid "2nd chan"
+msgstr "2e canal"
+
 msgid "peak dB"
 msgstr "pic en dB"
 
@@ -870,61 +906,50 @@ msgstr "RMS momentané"
 msgid "true peak dBTP"
 msgstr "pic réelle dBTP"
 
-#. Reported when the user tries to reset a Peak Watcher
-#. track, but that Peak Watcher track is disabled.
-#. Reported when the user tries to report a Peak Watcher
-#. channel, but the Peak Watcher track is disabled.
-msgid "Peak Watcher track disabled"
-msgstr "Peak watcher sur piste désactivé"
+msgid "gain reduction dB"
+msgstr "réduction du gain en dB"
 
-#. Reported when the user resets a Peak Watcher track.
+msgid "not configured"
+msgstr "non configuré"
+
+msgid "following last touched track"
+msgstr "suivant la dernière piste en focus"
+
+#. Reported when the user tries to reset a Peak Watcher
+#. value, but that watcher is disabled.
+#. Reported when the user tries to report a Peak Watcher
+#. channel, but the Peak Watcher value is disabled.
+msgid "watcher disabled"
+msgstr "observateur désactivé"
+
+#. Reported when the user resets a Peak Watcher value.
 msgid "reset"
 msgstr "réinitialisé"
 
-#. used when Peak Watcher notifies about a peak.
-#. {} will be replaced with the track number; e.g. "track 2".
-msgid "track {}"
-msgstr "piste {}"
-
-#. used when Peak Watcher notifies about a peak. This is
-#. placed after the track and before the peak value.
-#. {} will be replaced with the channel number; e.g. "chan 2".
-msgid "chan {}:"
-msgstr "canal {}:"
-
-#. used when Peak Watcher notifies about a peak for cases
-#. where the channel is irrelevant. This is placed after the track and
-#. before the peak value.
-msgid "level"
-msgstr "niveau"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "aucun"
-
-msgid "follow current track"
-msgstr "suivre la piste courante"
-
-#. Used in the lists of tracks in the Peak Watcher dialog
-#. to indicate the current track.
-msgid "current"
-msgstr "courante"
+msgctxt "Peak Watcher"
+msgid "Peak Watcher"
+msgstr "Observateur de pic"
 
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher is paused.
 msgid "Peak Watcher paused"
-msgstr "Peak watcher en pause"
+msgstr "Observateur de pic en pause"
 
+msgid "Peak Watcher does not support the current focus"
+msgstr "Pas de support de l'observateur de pic pour le focus actuel"
+
+#. Used when asking which Peak Watcher value to configure.
+#. {} will be replaced with the value number; e.g. "Value &2".
+#. After this, information about the existing configuration for the value
+#. will be appended.
 msgid "paused Peak Watcher"
-msgstr "peak watcher en pause"
+msgstr "observateur de pic en pause"
 
 msgid "resumed Peak Watcher"
-msgstr "peak watcher relancé"
+msgstr "observateur de pic relancé"
 
 msgid "Peak Watcher not enabled"
-msgstr "Peak watcher inactif"
+msgstr "Observateur de pic inactif"
 
 #. Used when reporting a length of time in measures.
 #. {} will be replaced with the number of measures; e.g.
@@ -988,10 +1013,6 @@ msgstr "{} sec"
 msgid "{} samples"
 msgstr "{} échantillon"
 
-#. A track which isn't a folder.
-msgid "track"
-msgstr "piste"
-
 #. A track which is a folder.
 msgid "folder"
 msgstr "dossier"
@@ -1011,6 +1032,12 @@ msgstr "rétréci"
 #. A closed track folder.
 msgid "closed"
 msgstr "replié"
+
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1457,10 +1484,10 @@ msgstr "solo en avant plan"
 msgid "normal solo"
 msgstr "solo normal"
 
-#. Reported when the play rate is adjusted. {:g} will be replaced
+#. Reported when the play rate is adjusted. {} will be replaced
 #. with the play rate; e.g. "1.5 play rate".
-msgid "{:g} play rate"
-msgstr "{:g} vitesse de lecture"
+msgid "{} play rate"
+msgstr "vitesse de lecture à {}"
 
 msgid "fx active"
 msgstr "fx activé"
@@ -1598,6 +1625,20 @@ msgstr "positionnement libre des objets activé"
 msgid "disabled free item positioning"
 msgstr "positionnement libre des objets désactivé"
 
+#. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
+msgid "{} item rate"
+msgstr "vitesse de l'objet à {}"
+
+#. Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
+msgid "{} semitones"
+msgstr "{} demi-ton"
+
+msgid "enabled preserve pitch when changing item rate"
+msgstr "activé préserver la hauteur tonale lors du changement de vitesse de l'objet"
+
+msgid "disabled preserve pitch when changing item rate"
+msgstr "désactivé préserver la hauteur tonale lors du changement de vitesse de l'objet"
+
 msgid "set selection start"
 msgstr "début de sélection réglée"
 
@@ -1682,6 +1723,12 @@ msgstr "longueur triple croche (Triolet)"
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "aucune piste"
+
+msgid "Change Track Selection"
+msgstr "Changement de sélection de piste"
+
+msgid "Change Item Selection"
+msgstr "Changement d'objet sélectionné"
 
 #. Used when navigating items to indicate that an item is
 #. locked.
@@ -1776,11 +1823,6 @@ msgstr[1] "{} objets supprimés"
 msgid "contents of time selection removed"
 msgstr "contenu de la sélection temporelle supprimé"
 
-#. Reported when moving items to indicate that no movement
-#. occurred.
-msgid "no change"
-msgstr "aucun changement"
-
 msgid "marker deleted"
 msgstr "marqueur supprimé"
 
@@ -1862,8 +1904,14 @@ msgstr "en lecture"
 msgid "stopped"
 msgstr "a l'arrêt"
 
+msgid "Move stretch marker"
+msgstr "Déplacement du marqueur élastique"
+
 msgid "stretch marker moved"
 msgstr "marqueur élastique déplacé"
+
+msgid "Delete all time signature markers"
+msgstr "Suppression de tous les marqueurs de signature temporel"
 
 msgid "deleted all time signature markers"
 msgstr "suppression de tous les marqueurs de signature rythmique"
@@ -1963,29 +2011,29 @@ msgstr "OSARA : Voir les paramètres FX pour la piste/prise actuelle (en fonctio
 msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: voir FX pour la piste master"
 
-msgid "OSARA: View Peak Watcher"
-msgstr "OSARA : voir le peak watcher"
+msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
+msgstr "OSARA : Configurer l'observateur de pic pour la piste actuelle/l'effet de piste (en fonction du focus)"
 
-msgid "OSARA: Report Peak Watcher value for channel 1 of first track"
-msgstr "OSARA: annoncé valeur du visualiseur de pic pour le canal 1 de la première piste"
+msgid "OSARA: Report Peak Watcher value for first watcher first channel"
+msgstr "OSARA: Annoncer la valeur du visualiseur de pique pour le premier visualiseur premier canal"
 
-msgid "OSARA: Report Peak Watcher value for channel 2 of first track"
-msgstr "OSARA: annoncé valeur du visualiseur de pic pour le canal 2 de la première piste"
+msgid "OSARA: Report Peak Watcher value for first watcher second channel"
+msgstr "OSARA : Annoncer la valeur de l'observateur de pic pour le premier observateur second canal"
 
-msgid "OSARA: Report Peak Watcher value for channel 1 of second track"
-msgstr "OSARA: annoncé valeur peak watcher pour le canal 1 de la seconde piste"
+msgid "OSARA: Report Peak Watcher value for second watcher first channel"
+msgstr "OSARA : Annoncer la valeur de l'observateur de pic pour le second observateur premier canal"
 
-msgid "OSARA: Report Peak Watcher value for channel 2 of second track"
-msgstr "OSARA: annoncé valeur du visualiseur de pic pour le canal 2 de la seconde piste"
+msgid "OSARA: Report Peak Watcher value for second watcher second channel"
+msgstr "OSARA : Annoncer la valeur de l'observateur de pic pour le second observateur second canal"
 
-msgid "OSARA: Reset Peak Watcher for first track"
-msgstr "OSARA: réinitialisé le visualiseur de pic de la première piste"
+msgid "OSARA: Reset Peak Watcher first watcher"
+msgstr "OSARA : Réinitialiser l'observateur de pic premier observateur"
 
-msgid "OSARA: Reset Peak Watcher for second track"
-msgstr "OSARA: réinitialisé le visualiseur de pic de la seconde piste"
+msgid "OSARA: Reset Peak Watcher second watcher"
+msgstr "OSARA : Réinitialiser l'observateur de pic second observateur"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA : Pause/reprise Peak Watcher"
+msgstr "OSARA : Pause/reprise Observateur de pic"
 
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: annoncer le mode d'édition ripple"
@@ -2024,16 +2072,16 @@ msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: déplace le dernier marqueur élastique en focus au curseur d'édition"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: annoncer le niveau pique en dB au curseur de lecture pour le canal 1 de la piste courante (annonce le niveau d'entrée quand la piste est armée)"
+msgstr "OSARA : Annoncer le niveau pique en dB au curseur de lecture pour le canal 1 de la piste courante (annonce le niveau d'entrée quand la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: annoncer le niveau pique en dB au curseur de lecture pour le canal 2 de la piste courante (annonce le niveau d'entrée quand la piste est armée)"
+msgstr "OSARA : Annoncer le niveau pique en dB au curseur de lecture pour le canal 2 de la piste courante (annonce le niveau d'entrée quand la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: annoncer le niveau pique en dB au curseur de lecture pour le canal 1 de la piste master"
+msgstr "OSARA : Annoncer le niveau pique en dB au curseur de lecture pour le canal 1 de la piste master"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: annoncer le niveau pique en dB au curseur de lecture pour le canal 2 de la piste master"
+msgstr "OSARA : Annoncer le niveau pique en dB au curseur de lecture pour le canal 2 de la piste master"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: supprime tous les marqueurs de signature temporelle"
@@ -2143,12 +2191,6 @@ msgstr "OSARA : saute au prochain CC en l'ajoutant à la sélection"
 msgid "OSARA: Move to previous CC and add to selection"
 msgstr "OSARA : saute au précédent CC en l'ajoutant à la sélection"
 
-msgid "OSARA: Move to previous midi item on track"
-msgstr "OSARA: saute à l'objet MIDI précédent sur la piste"
-
-msgid "OSARA: Move to next midi item on track"
-msgstr "OSARA: saute à l'objet MIDI suivant sur la piste"
-
 msgid "OSARA: Select all notes with the same pitch starting in time selection"
 msgstr "OSARA: sélectionne toutes les notes de même hauteur tonale dans la sélection temporelle"
 
@@ -2176,20 +2218,12 @@ msgid "&Close"
 msgstr "&Fermer"
 
 msgctxt "Peak Watcher"
-msgid "Peak Watcher"
-msgstr "Visualiseur de pique"
+msgid "&Follow when last touched track changes"
+msgstr "&Suivre lorsque la dernière piste est modifiée"
 
 msgctxt "Peak Watcher"
 msgid "Level type:"
-msgstr "Visualiseur de pic:"
-
-msgctxt "Peak Watcher"
-msgid "First track:"
-msgstr "Première piste:"
-
-msgctxt "Peak Watcher"
-msgid "Second track:"
-msgstr "Deuxième piste:"
+msgstr "Type de niveau:"
 
 msgctxt "Peak Watcher"
 msgid "Notify automatically for channels:"
@@ -2205,11 +2239,11 @@ msgstr "&2"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"
-msgstr "Visualiseur de pic:"
+msgstr "Quand le &niveau atteint :"
 
 msgctxt "Peak Watcher"
-msgid "Hold highest level:"
-msgstr "Visualiseur de pic:"
+msgid "Hold level:"
+msgstr "Maintenir le niveau:"
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
@@ -2228,12 +2262,16 @@ msgid "&Reset"
 msgstr "&Réinitialisé"
 
 msgctxt "Peak Watcher"
-msgid "&OK"
-msgstr "&Ok"
+msgid "OK"
+msgstr "Ok"
 
 msgctxt "Peak Watcher"
-msgid "&Cancel"
-msgstr "&Annuler"
+msgid "Cancel"
+msgstr "Annuler"
+
+msgctxt "Peak Watcher"
+msgid "D&isable"
+msgstr "Désactivé"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
