@@ -320,8 +320,10 @@ const LevelType LEVEL_TYPES[] = {
 			const TrackFx* tfx = get_if<TrackFx>(&watcher.target);
 			assert(tfx);
 			char text[10];
-			TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
-				FXPARM_GAIN_REDUCTION, text, sizeof(text));
+			if (!TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
+					FXPARM_GAIN_REDUCTION, text, sizeof(text))) {
+				return NO_LEVEL;
+			}
 			return stod(text);
 		},
 		/* reset */ nullptr,
