@@ -319,6 +319,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Time selection: Shift right (by time selection length): Shift+]
 - Go to start of time selection: Home
 - Go to end of time selection: End
+- Time selection: Swap left edge of time selection to next transient in items: Control+Shift+[
+- Time selection: Extend time selection to next transient in items: Control+Shift+]
 
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
