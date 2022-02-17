@@ -32,6 +32,10 @@ init:
 clone_depth: 1
 
 install:
+ # There's no point in building if we're going to fail the build because of
+ # unsorted key maps, so we do this as early as we can.
+ - cmd: py tools/sortKeymap.py -t config/windows/reaper-kb.ini
+ - cmd: py tools/sortKeymap.py -t config/mac/reaper-kb.ini
  - ps: |
      If (!$env:APPVEYOR_PULL_REQUEST_NUMBER) {
       cd ci
