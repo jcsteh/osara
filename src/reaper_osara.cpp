@@ -2087,6 +2087,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+	{42467, "all delta solos reset"}, // FX: Clear delta solo for all project FX
 	// translate firstString end
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
@@ -3918,6 +3919,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
 	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
+	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
+	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
@@ -3931,6 +3934,8 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40440}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to start of selected events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40639}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to end of selected events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid

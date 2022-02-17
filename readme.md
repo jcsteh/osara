@@ -209,6 +209,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### FX
 - FX: Toggle delta solo for last focused FX: Shift+F6
+- FX: Clear delta solo for all project FX: Alt+Shift+F6
 - FX: Show/hide track envelope for last touched FX parameter: Control+Alt+L
 
 #### Markers and Regions
@@ -318,6 +319,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Time selection: Shift right (by time selection length): Shift+]
 - Go to start of time selection: Home
 - Go to end of time selection: End
+- Time selection: Swap left edge of time selection to next transient in items: Control+Shift+[
+- Time selection: Extend time selection to next transient in items: Control+Shift+]
 
 #### Clipboard
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
@@ -441,6 +444,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Options: MIDI inputs as step input mode
 - Options: F1-F12 as step input mode
 - Edit: Toggle selection of all CC events under selected notes: C
+- Navigate: Move edit cursor to start of selected events: Control+Shift+Home
+- Navigate: Move edit cursor to end of selected events: Control+Shift+End
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
