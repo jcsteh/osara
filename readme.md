@@ -209,6 +209,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### FX
 - FX: Toggle delta solo for last focused FX: Shift+F6
+- FX: Clear delta solo for all project FX: Alt+Shift+F6
 - FX: Show/hide track envelope for last touched FX parameter: Control+Alt+L
 
 #### Markers and Regions
