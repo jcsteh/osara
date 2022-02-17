@@ -1825,6 +1825,15 @@ void postToggleTakePreservePitch(int command) {
 		translate("disabled preserve pitch when changing item rate"));
 }
 
+void postMExplorerChangeVolume(int cmd, HWND hwnd) {
+	HWND w = GetDlgItem(hwnd, 1047);
+	char text[50];
+	if(!GetWindowText(w, text, ARRAYSIZE(text))) {
+		return;
+	}
+	outputMessage(text);
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -2068,6 +2077,13 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{NULL},
 };
+
+using MExplorerPostExecute = void (*)(int, HWND);
+map<int, MExplorerPostExecute> MExplorerPostCommands{
+	{42178, postMExplorerChangeVolume }, // Preview: decrease volume by 1 dB
+	{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
+};
+
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
 	// translate firstString begin
@@ -4235,6 +4251,16 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 				}
 			}
 			#endif
+			isHandlingCommand = false;
+			return true;
+		}
+	} else if(section == MEDIA_EXPLORER_SECTION) {
+		const auto it = MExplorerPostCommands.find(command);
+		if(it != MExplorerPostCommands.end()){
+			isHandlingCommand = true;
+			SendMessage(hwnd, WM_COMMAND, command, 0);
+			it->second(command, hwnd);
+			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
 		}
