@@ -2087,6 +2087,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
+	{42467, "all delta solos reset"}, // FX: Clear delta solo for all project FX
 	// translate firstString end
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
