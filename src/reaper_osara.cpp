@@ -1827,8 +1827,9 @@ void postToggleTakePreservePitch(int command) {
 
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 1047);
-	char text[50];
-	if(!GetWindowText(w, text, ARRAYSIZE(text))) {
+	const int sz = 10;
+	char text[sz];
+	if(!GetWindowText(w, text ,sz)) {
 		return;
 	}
 	outputMessage(text);
