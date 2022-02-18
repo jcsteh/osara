@@ -441,6 +441,10 @@ FX: Toggle delta solo for last focused FX
 - Options: F1-F12 as step input mode
 - Edit: Toggle selection of all CC events under selected notes
 
+#### Media Explorer
+- Preview: decrease volume by 1 dB
+- Preview: increase volume by 1 dB
+
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track input, track area, track routing, item, ruler, envelope point and automation item context menus.
