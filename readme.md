@@ -447,6 +447,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Navigate: Move edit cursor to start of selected events: Control+Shift+Home
 - Navigate: Move edit cursor to end of selected events: Control+Shift+End
 
+#### Media Explorer
+- Preview: decrease volume by 1 dB
+- Preview: increase volume by 1 dB
+
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
 OSARA enables keyboard access for the track input, track area, track routing, item, ruler, envelope point and automation item context menus.
