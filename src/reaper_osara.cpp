@@ -2080,7 +2080,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 };
 
 using MExplorerPostExecute = void (*)(int, HWND);
-map<int, MExplorerPostExecute> MExplorerPostCommands{
+map<int, MExplorerPostExecute> mExplorerPostCommands{
 	{42178, postMExplorerChangeVolume }, // Preview: decrease volume by 1 dB
 	{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
 };
@@ -4256,8 +4256,8 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 			return true;
 		}
 	} else if(section == MEDIA_EXPLORER_SECTION) {
-		const auto it = MExplorerPostCommands.find(command);
-		if(it != MExplorerPostCommands.end()){
+		const auto it = mExplorerPostCommands.find(command);
+		if(it != mExplorerPostCommands.end()){
 			isHandlingCommand = true;
 			SendMessage(hwnd, WM_COMMAND, command, 0);
 			it->second(command, hwnd);
