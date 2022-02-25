@@ -2399,7 +2399,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 				wParam != VK_F6 && wParam != 'B' &&
 				wParam != VK_TAB && wParam != VK_DOWN)) {
 		// Return early if we're not interested in the key.
-		return CallNextHookEx(NULL, code, wParam, lParam);
+		return CallNextHookEx(nullptr, code, wParam, lParam);
 	}
 	HWND focus = GetFocus();
 	if (!focus) {
@@ -2442,7 +2442,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	}
 	if (
 		(isContextMenu ||
-			(wParam == VK_RETURN && GetKeyState(VK_CONTROL) & 0x8000)) &&
+			(wParam == VK_RETURN && control)) &&
 		isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
@@ -2463,7 +2463,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			}
 			ClientToScreen(focus, &point);
 			SetCursorPos(point.x, point.y);
-			if (wParam == VK_APPS || wParam == VK_F10) {
+			if (isContextMenu) {
 				// Applications/f10 key right clicks.
 				mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 				mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
@@ -2480,25 +2480,24 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (maybeSwitchToFxPluginWindow()) {
 			return 1;
 		}
-	} else if (wParam == 'B' && GetKeyState(VK_CONTROL) & 0x8000) {
+	} else if (wParam == 'B' && control) {
 		maybeReportFxChainBypass(true);
-	} else if (wParam == VK_TAB && !(GetKeyState(VK_MENU) & 0x8000)) {
+	} else if (wParam == VK_TAB && !alt) {
 		if (maybeFixTabInSaveDialog(shift)) {
 			return 1;
 		}
-		if (GetKeyState(VK_CONTROL) & 0x8000 && maybeSwitchFxTab(shift)) {
+		if (control && maybeSwitchFxTab(shift)) {
 			return 1;
 		}
-	} else if (wParam == VK_DOWN && GetKeyState(VK_MENU) & 0x8000 &&
-			!(GetKeyState(VK_SHIFT) & 0x8000) && !(GetKeyState(VK_CONTROL) & 0x8000)) {
+	} else if (wParam == VK_DOWN && alt && !shift && !control) {
 		// Alt+downArrow.
 		if (maybeOpenFxPresetDialog()) {
 			return 1;
 		}
 	}
-	return CallNextHookEx(NULL, code, wParam, lParam);
+	return CallNextHookEx(nullptr, code, wParam, lParam);
 }
-HHOOK keyboardHook = NULL;
+HHOOK keyboardHook = nullptr;
 
 #endif // _WIN32
 
