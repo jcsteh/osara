@@ -2405,16 +2405,26 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (!focus) {
 		return CallNextHookEx(NULL, code, wParam, lParam);
 	}
-	if (wParam == VK_APPS && isTrackViewWindow(focus)) {
+	const bool shift = GetKeyState(VK_SHIFT) & 0x8000;
+	const bool alt = GetKeyState(VK_MENU) & 0x8000;
+	const bool control = GetKeyState(VK_CONTROL) & 0x8000;
+	const bool isContextMenu = wParam == VK_APPS ||
+		// Alt+shift+f10 should not display a context menu, as that would override
+		// a command in the key map. Control+alt+shift+f10 should, though.
+		(wParam == VK_F10 && shift && (!alt || control));
+	if (isContextMenu && isTrackViewWindow(focus)) {
 		// Reaper doesn't handle the applications key for these windows and it
-		// doesn't work even when bound to an action. (Shift+f10 is handled by
-		// action bindings.)
+		// doesn't work even when bound to an action. Shift+f10 does work when bound
+		// to an action, but then it interferes with FX plugin UIs.
 		// Display the appropriate context menu depending on fakeFocus.
-		if (GetKeyState(VK_CONTROL) & 0x8000) {
-			showReaperContextMenu(1);
-		} else if (GetKeyState(VK_MENU) & 0x8000) {
+		if (alt && (wParam != VK_F10 || control)) {
+			// Alt+applications or control+alt+shift+f10.
 			showReaperContextMenu(2);
+		} else if (control) {
+			// Control+applications or control+shift+f10.
+			showReaperContextMenu(1);
 		} else {
+			// Applications or shift+f10.
 			showReaperContextMenu(0);
 		}
 		return 1;
@@ -2425,8 +2435,6 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		}
 		return 1;
 	}
-	const bool isContextMenu = wParam == VK_APPS ||
-		(wParam == VK_F10 && GetKeyState(VK_SHIFT) & 0x8000);
 	HWND window;
 	if (isContextMenu && (window = getSendContainer(focus))) {
 		sendMenu(window);
@@ -2475,7 +2483,6 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if (wParam == 'B' && GetKeyState(VK_CONTROL) & 0x8000) {
 		maybeReportFxChainBypass(true);
 	} else if (wParam == VK_TAB && !(GetKeyState(VK_MENU) & 0x8000)) {
-		bool shift = GetKeyState(VK_SHIFT) & 0x8000;
 		if (maybeFixTabInSaveDialog(shift)) {
 			return 1;
 		}
