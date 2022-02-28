@@ -7,7 +7,7 @@ branches:
 environment:
  matrix:
   - job_name: Windows
-    appveyor_build_worker_image: Visual Studio 2022
+    appveyor_build_worker_image: Previous Visual Studio 2022
     PY_PYTHON: 3.9-32
   - job_name: Mac
     appveyor_build_worker_image: macos-bigsur
@@ -54,10 +54,10 @@ install:
       cd ..
      }
  - git submodule update --init --depth 1
- - sh: sudo xcode-select -s /Applications/Xcode-13.app
+ - sh: sudo xcode-select -s /Applications/Xcode-13.2.1.app
 
 build_script:
- - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.9/bin/scons" }
+ - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.8/bin/scons" }
  # We only build the pot on Windows. The choice of which OS is
  # arbitrary, but there's no point in building it on both.
  - ps: If ($IsWindows) { $targets = "installer", "pot" }

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-02-16 10:31\n"
+"PO-Revision-Date: 2022-02-23 22:56\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -2015,16 +2015,16 @@ msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on fo
 msgstr "OSARA: Configura el visor de pico para la pista/Fx de pista actual, (según contexto)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
-msgstr "OSARA: Anuncia el valor del Visor de pico para el primer canal del primer visor"
+msgstr "OSARA: Anuncia el valor del primer canal del primer visor de pico"
 
 msgid "OSARA: Report Peak Watcher value for first watcher second channel"
-msgstr "OSARA: Anuncia el valor del Visor de pico para el segundo canal del primer visor"
+msgstr "OSARA: Anuncia el valor del segundo canal del primer visor de pico"
 
 msgid "OSARA: Report Peak Watcher value for second watcher first channel"
 msgstr "OSARA: Anuncia valor del primer canal del segundo visor de pico"
 
 msgid "OSARA: Report Peak Watcher value for second watcher second channel"
-msgstr "OSARA: Anuncia el valor del segundo canal del primer visor de pico"
+msgstr "OSARA: Anuncia el valor del segundo canal del segundo visor de pico"
 
 msgid "OSARA: Reset Peak Watcher first watcher"
 msgstr "OSARA: Reinicia Primer Visor de pico"

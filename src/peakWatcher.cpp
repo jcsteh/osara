@@ -349,7 +349,7 @@ void Watcher::description(ostringstream& s) {
 	} else {
 		describeTarget(target, s);
 	}
-	s << " " << this->levelTypeInfo().name;
+	s << " " << translate(this->levelTypeInfo().name);
 }
 
 void resetWatcher(int watcherIndex, bool report=false) {
