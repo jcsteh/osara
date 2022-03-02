@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-02-23 22:56\n"
+"PO-Revision-Date: 2022-03-02 09:23\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1634,6 +1634,9 @@ msgstr "全部轨道已取消独奏"
 
 msgid "all tracks unarmed"
 msgstr "全部轨道已取消准备"
+
+msgid "all delta solos reset"
+msgstr "重制全部 delta 独奏"
 
 msgid "grid thirty second triplet"
 msgstr "32分3连音网格"

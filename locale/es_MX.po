@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-02-16 10:31\n"
+"PO-Revision-Date: 2022-03-02 09:23\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1686,6 +1686,9 @@ msgstr "solo en todas las pistas desactivado"
 
 msgid "all tracks unarmed"
 msgstr "desarmar todas las pistas"
+
+msgid "all delta solos reset"
+msgstr "resetear todos los solos delta"
 
 msgid "grid thirty second triplet"
 msgstr "cuadrícula en fusas (tresillo)"

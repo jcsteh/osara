@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-02-16 10:31\n"
+"PO-Revision-Date: 2022-03-02 09:23\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -1686,6 +1686,9 @@ msgstr "Todas as pistas com solo desativado"
 
 msgid "all tracks unarmed"
 msgstr "Todas as pistas desarmadas"
+
+msgid "all delta solos reset"
+msgstr ""
 
 msgid "grid thirty second triplet"
 msgstr "grade:  ajustar para 1/32 (triplo)"
