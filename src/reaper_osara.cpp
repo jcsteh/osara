@@ -4026,7 +4026,7 @@ void cmdReportRegionMarkerItems(Command* command) {
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
-	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
+	{MAIN_SECTION, {{0, 'Y', 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
 	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
 	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
@@ -4437,9 +4437,10 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		if (cmd)
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
+	auto sec = SectionFromUniqueID(1);
+	reviewMessage("j", format("{} {} {}", sec->action_list_cnt, sec->def_keys_cnt, (void*)sec).c_str());
 	KillTimer(NULL, event);
 }
-
 #ifdef _WIN32
 
 void annotateAccRole(HWND hwnd, long role) {
@@ -4609,7 +4610,15 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
+<<<<<<< HEAD
 		registerSettingCommands();
+=======
+		for (auto i: {0, 100, 32060, 32061, 32062, 32063}) {
+			auto sec = SectionFromUniqueID(i);
+			sec->def_keys_cnt = 0;
+			sec->def_keys = nullptr;
+		}
+>>>>>>> 7535d21 (Work in progress)
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
 		rec->Register("hookcommand2", (void*)handleCommand);
