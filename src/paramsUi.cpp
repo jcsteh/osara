@@ -456,6 +456,11 @@ class ParamsDialog {
 		if (msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) {
 			return 0; // Not interested.
 		}
+		int ret = kbd_translateAccelerator(dialog->dialog, msg, SectionFromUniqueID(102)); 
+		if(ret !=0  &&
+		(!isClassName(GetFocus(), "Edit"))) {
+			return -666;
+		}
 		if (msg->hwnd == dialog->slider) {
 			// We handle key presses for the slider ourselves.
 			double newVal = dialog->val;
