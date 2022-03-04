@@ -505,8 +505,18 @@ The Filter field allows you to narrow the list to only contain parameters which 
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
 Clearing the text in the Filter field shows the entire list.
 
-When you are done working with parameters, press the Close button.
-Alternatively, you can press enter or escape.
+When you are done working with parameters, press the Close button, enter or escape.
+Note that  if you press Escape to exit the dialog, the changes you've made will not be reverted.
+
+#### Controlling Transport and Selection in the Parameters dialog
+It is often useful to be able to audition parameter adjustments you're making in context.
+OSARA  makes it possible to adjust the context you're hearing without leaving the Parameters dialog.
+The following functionality is supported, albeit with some non-standard behaviour which is noted in parentheses:
+- Play/Stop (note: you must use Control+Space while inside the Parameters dialog)
+- Setting start and end of time slection and loop points
+- Function keys F1 through F12
+- The Control, Alt and Shift modifiers, or any combination thereof
+- Navigation of project markers, stretch markers and tempo time signature changes (note that the previous/next keys for marker navigation do not work when focus is in edit fields, so you can still type those characters in the Filter)
 
 ### Reading Current Peaks
 OSARA allows you to read the current audio peak for channels 1 and 2 of either the current or master tracks.

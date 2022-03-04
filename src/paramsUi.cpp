@@ -499,9 +499,21 @@ class ParamsDialog {
 			// Anything with both alt and shift.
 			(GetAsyncKeyState(VK_MENU) & 0x8000 &&
 				GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
+			// Anything with both alt and control.
+			(GetAsyncKeyState(VK_MENU) & 0x8000 &&
+				GetAsyncKeyState(VK_CONTROL) & 0x8000) ||
+			// Anything with the alt key, but only if not in a text box.
+			(!isClassName(GetFocus(), "Edit") &&
+				GetAsyncKeyState(VK_MENU) & 0x8000) ||
 			// Anything with the control key, but only if not in a text box.
 			(!isClassName(GetFocus(), "Edit") &&
-				GetAsyncKeyState(VK_CONTROL) & 0x8000)
+				GetAsyncKeyState(VK_CONTROL) & 0x8000) ||
+			// Pass the semicolon key for marker navigation, but only if not in a text box.
+			(!isClassName(GetFocus(), "Edit") &&
+				GetAsyncKeyState(VK_OEM_1) & 0x8000) ||
+			// Pass the apostrophe key for marker navigation, but only if not in a text box.
+			(!isClassName(GetFocus(), "Edit") &&
+				GetAsyncKeyState(VK_OEM_7) & 0x8000)
 		) {
 			return -666; // Force to main window.
 		}
