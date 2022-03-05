@@ -505,6 +505,8 @@ The Filter field allows you to narrow the list to only contain parameters which 
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
 Clearing the text in the Filter field shows the entire list.
 
+As an alternative to using the Parameter combo box, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
+
 When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
 

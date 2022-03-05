@@ -302,11 +302,13 @@ class ParamsDialog {
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
+	int paramNum;
 	unique_ptr<Param> param;
 	double val;
 	string valText;
 	HWND prevFocus;
 	bool isDestroying = false;
+	bool suppressValueChangeReport = false;
 
 	void updateValueText() {
 		if (this->valText.empty()) {
@@ -321,11 +323,15 @@ class ParamsDialog {
 		// Set the slider's accessible value to this text.
 		accPropServices->SetHwndPropStr(this->slider, OBJID_CLIENT, CHILDID_SELF,
 			PROPID_ACC_VALUE, widen(this->valText).c_str());
-		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, this->slider,
-			OBJID_CLIENT, CHILDID_SELF);
+		if (!this->suppressValueChangeReport) {
+			NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, this->slider,
+				OBJID_CLIENT, CHILDID_SELF);
+		}
 #else // _WIN32
 		// We can't set the slider's accessible value on Mac.
-		outputMessage(this->valText);
+		if (!this->suppressValueChangeReport) {
+			outputMessage(this->valText);
+		}
 #endif // _WIN32
 	}
 
@@ -338,8 +344,8 @@ class ParamsDialog {
 	}
 
 	void onParamChange() {
-		int paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
-		this->param = this->source->getParam(paramNum);
+		this->paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
+		this->param = this->source->getParam(this->paramNum);
 		this->val = this->param->getValue();
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		this->updateValue();
@@ -488,6 +494,35 @@ class ParamsDialog {
 				dialog->onSliderChange(newVal);
 				return 1; // Eat the keystroke.
 			}
+		}
+#ifdef _WIN32
+		const bool control = GetAsyncKeyState(VK_CONTROL) & 0x8000;
+#else
+		// On Mac, SWELL maps the control key to VK_LWIN.
+		const bool control = GetAsyncKeyState(VK_LWIN) & 0x8000;
+#endif
+		if (msg->wParam == VK_TAB && control) {
+			// Control+tab switches to the next parameter, control+shift+tab to the
+			// previous.
+			int newParam = ComboBox_GetCurSel(dialog->paramCombo) +
+				(GetAsyncKeyState(VK_SHIFT) & 0x8000 ? -1 : 1);
+			if (newParam < 0) {
+				newParam = dialog->visibleParams.size() - 1;
+			} else if (newParam == dialog->visibleParams.size()) {
+				newParam = 0;
+			}
+			// newParam could be -1 if there are no visible parameters.
+			if (newParam >= 0) {
+				ComboBox_SetCurSel(dialog->paramCombo, newParam);
+				dialog->suppressValueChangeReport = true;
+				dialog->onParamChange();
+				dialog->suppressValueChangeReport = false;
+				ostringstream s;
+				s << dialog->source->getParamName(dialog->paramNum) << ", " <<
+					dialog->valText;
+				outputMessage(s);
+			}
+			return 1; // Eat the keystroke.
 		}
 		if (msg->wParam == VK_SPACE) {
 			// Let REAPER handle the space key so control+space works.
