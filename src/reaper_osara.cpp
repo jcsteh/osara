@@ -2498,6 +2498,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	} else if(control && 
 		(wParam == VK_DOWN || wParam == VK_UP || wParam == VK_SPACE)
 		&& isListView(focus)
+		// exclude the second list in the Edit custom action dialog because Ctrl+up/down reorder items.
+		&& GetWindowLong(focus, GWL_ID) != 1322
 	) {
 		SendMessage(focus, WM_KEYDOWN, wParam, lParam);
 		return 1;
