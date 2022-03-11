@@ -2501,7 +2501,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (maybeOpenFxPresetDialog()) {
 			return 1;
 		}
-	} else if(control && 
+	} else if(control && !shift &&
 		(wParam == VK_DOWN || wParam == VK_UP || wParam == VK_SPACE)
 		&& isListView(focus)
 		// exclude the second list in the Edit custom action dialog because Ctrl+up/down reorder items.
