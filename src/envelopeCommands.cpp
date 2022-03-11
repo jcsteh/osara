@@ -23,45 +23,64 @@ using namespace fmt::literals;
 bool selectedEnvelopeIsTake = false;
 int currentAutomationItem = -1;
 
-// Returns the selected envelope and the offset for all envelope point times.
-// Track envelope points are relative to the start of the project,
-// but take envelope points are relative to the start of the item.
-pair<TrackEnvelope*, double> getSelectedEnvelopeAndOffset() {
-	TrackEnvelope* envelope = GetSelectedEnvelope(0);
-	if (!envelope)
-		return {NULL, 0.0};
-	if (!selectedEnvelopeIsTake)
-		return {envelope, 0.0};
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
-		return {envelope, 0.0};
-	double offset = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-	return {envelope, offset};
-}
-
-int getEnvelopePointAtCursor() {
-	TrackEnvelope* envelope;
-	double offset;
-	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
-	if (!envelope)
+int getEnvelopePointByProjectTime(double time) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
 		return -1;
+	}
+	double offset = 0.0;
+	double rate = 1.0;
+	if (selectedEnvelopeIsTake) {
+		MediaItem* item = GetSelectedMediaItem(0, 0);
+		if (!item) {
+			return -1;
+		}
+		offset = GetMediaItemInfo_Value(item, "D_POSITION");
+		MediaItem_Take* take = GetActiveTake(item);
+		if(!take) {
+			return -1;
+		}
+		rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+	}
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
 	return GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
-		GetCursorPosition() + 0.0001 - offset);
+		(time + 0.0001 - offset) * rate);
+}
+
+int getEnvelopePointAtCursor() {
+	return getEnvelopePointByProjectTime(GetCursorPosition());
+}
+
+double envelopeTimeToProjectTime(double time) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return time;
+	}
+	double offset = 0.0;
+	double rate = 1.0;
+	if (selectedEnvelopeIsTake) {
+		MediaItem* item = GetSelectedMediaItem(0, 0);
+		if (!item) {
+			return time;
+		}
+		offset = GetMediaItemInfo_Value(item, "D_POSITION");
+		MediaItem_Take* take = GetActiveTake(item);
+		if(!take) {
+			return time + offset;
+		}
+		rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+	}
+	return time / rate + offset;
 }
 
 void postMoveEnvelopePoint(int command) {
-	TrackEnvelope* envelope;
-	double offset;
-	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
-	if (!envelope)
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
 		return;
+	}
 	fakeFocus = FOCUS_ENVELOPE;
-	// GetEnvelopePointByTime often returns the point before instead of right at the position.
-	// Increment the cursor position a bit to work around this.
-	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
-		GetCursorPosition() + 0.0001 - offset);
+	int point = getEnvelopePointAtCursor();
 	if (point < 0)
 		return;
 	double value;
@@ -182,17 +201,16 @@ const char* getEnvelopeShapeName(int shape) {
 }
 
 void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
-	TrackEnvelope* envelope;
-	double offset;
-	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
-	if (!envelope)
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
 		return;
+	}
 	int count = CountEnvelopePointsEx(envelope, currentAutomationItem);
-	if (count == 0)
+	if (count == 0) {
 		return;
+	}
 	double now = GetCursorPosition();
-	// Get the point at or before the cursr.
-	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem, now - offset);
+	int point = getEnvelopePointAtCursor();
 	if (point < 0) {
 		if (direction != 1)
 			return;
@@ -203,7 +221,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	bool selected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
 		&shape, nullptr, &selected);
-	time += offset;
+	time = envelopeTimeToProjectTime(time);
 	if ((direction == 1 && time < now)
 		// If this point is at the cursor, skip it only if it's the current point.
 		// This allows you to easily get to a point at the cursor
@@ -218,7 +236,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 			point = newPoint;
 			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
 				&shape, nullptr, &selected);
-			time += offset;
+			time = envelopeTimeToProjectTime(time);
 		}
 	}
 	if (direction != 0 && direction == 1 ? time < now : time > now)
@@ -659,20 +677,16 @@ void postSelectMultipleEnvelopePoints(int command) {
 }
 
 void cmdMoveSelEnvelopePoints(Command* command) {
-	TrackEnvelope* envelope;
-	double offset;
-	tie(envelope, offset) = getSelectedEnvelopeAndOffset();
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if(!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
 	double oldPos {0.0};
 	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &oldPos, nullptr, nullptr, nullptr, nullptr);
-	oldPos += offset;
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	double newPos{0.0};
 	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr);
-	newPos += offset;
 	ostringstream s;
 	if(lastCommand != command->gaccel.accel.cmd) { 
 		s << getActionName(command->gaccel.accel.cmd) << " ";
@@ -681,7 +695,7 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	if(oldPos == newPos) {
 		s << translate("no change");
 	} else {
-		s << formatTime(newPos, TF_RULER, false, true);
+		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, true);
 	}
 	outputMessage(s);
 }
