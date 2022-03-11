@@ -1247,8 +1247,14 @@ void postSwitchToTake(int command) {
 	if (!item)
 		return;
 	MediaItem_Take* take = GetActiveTake(item);
-	if (!take)
+	if (!take) {
+		if (CountTakes(item) == 0) {
+			outputMessage(translate("no takes"));
+		} else {
+			outputMessage(translate("empty take lane"));
+		}
 		return;
+	}
 	ostringstream s;
 	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
 		<< GetTakeName(take);
