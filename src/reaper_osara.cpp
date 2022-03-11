@@ -2157,6 +2157,22 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	// translate firstString end
 };
 
+struct ToggleCommandMessage {
+	const char* onMsg;
+	const char* offMsg;
+};
+
+// Messages for toggle actions. Specify null messages to report nothing. If a
+// toggle action isn't included here or in another of OSARA's action maps,
+// OSARA will fall back to reporting the toggle state and the action name.
+map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
+	// translate first2Strings begin
+	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
+	// Specify nullptr for onMsg and offMsg to report nothing.
+	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
+	// translate first2Strings end
+};
+
 /*** Code related to context menus and other UI that isn't just actions.
  * This includes code to access REAPER context menus, but also code to display
  * our own in some cases where REAPER doesn't provide one.
@@ -4302,6 +4318,58 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 	return false;
 }
 
+bool handleToggleCommand(KbdSectionInfo* section, int command, HWND hwnd) {
+	const auto entry = TOGGLE_COMMAND_MESSAGES.find({section->uniqueID, command});
+	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg) {
+		return false; // Ignore.
+	}
+	int oldState = GetToggleCommandState2(section, command);
+	if (oldState == -1) {
+		return false; // Not a toggle action.
+	}
+	HWND oldFocus = GetFocus();
+	isHandlingCommand = true;
+	switch (section->uniqueID) {
+		case MAIN_SECTION:
+			Main_OnCommand(command, 0);
+			break;
+		case MIDI_EDITOR_SECTION:
+		case MIDI_EVENT_LIST_SECTION: {
+			HWND editor = MIDIEditor_GetActive();
+			MIDIEditor_OnCommand(editor, command);
+			break;
+		}
+		case MEDIA_EXPLORER_SECTION:
+			SendMessage(hwnd, WM_COMMAND, command, 0);
+			break;
+		default:
+			isHandlingCommand = false;
+			return false; // We can't send commands for this section.
+	}
+	isHandlingCommand = false;
+	HWND newFocus = GetFocus();
+	int newState = GetToggleCommandState2(section, command);
+	if (oldFocus != newFocus) {
+		// Don't report if the focus changes. The focus changing is better
+		// feedback and we don't want to interrupt that.
+		return true;
+	}
+	if (oldState == newState) {
+		return true; // No change, report nothing.
+	}
+	if (entry != TOGGLE_COMMAND_MESSAGES.end()) {
+		outputMessage(translate(newState ? entry->second.onMsg :
+			entry->second.offMsg));
+		return true;
+	}
+	// Generic feedback.
+	ostringstream s;
+	s << (newState ? translate("enabled") : translate("disabled")) <<
+		" " << getActionName(command, section, /* skipCategory */ false);
+	outputMessage(s);
+	return true;
+}
+
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
@@ -4325,12 +4393,17 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 			muteNextMessage = false;
 		} 
 		return true;
-	} else if (isShortcutHelpEnabled) {
+	}
+	if (isShortcutHelpEnabled) {
 		outputMessage(getActionName(command, section, false));
 		return true;
-	} else if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
+	}
+	if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {
 		muteNextMessage = false;
+		return true;
+	}
+	if (handleToggleCommand(section, command, hwnd)) {
 		return true;
 	}
 	return false;
