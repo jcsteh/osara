@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-03-02 09:23\n"
+"PO-Revision-Date: 2022-03-12 08:31\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1363,6 +1363,12 @@ msgstr "repetir encendido"
 
 msgid "repeat off"
 msgstr "repetir apagado"
+
+msgid "no takes"
+msgstr "sin tomas"
+
+msgid "empty take lane"
+msgstr "carril de toma vacío"
 
 #. Reported when copying tracks. {} will be replaced with
 #. the number of tracks; e.g. "2 tracks copied".

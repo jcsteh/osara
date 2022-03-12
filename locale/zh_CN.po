@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-03-02 09:23\n"
+"PO-Revision-Date: 2022-03-12 08:31\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1321,6 +1321,12 @@ msgstr "重复开"
 
 msgid "repeat off"
 msgstr "重复关"
+
+msgid "no takes"
+msgstr "无片段"
+
+msgid "empty take lane"
+msgstr "空白片段 lane"
 
 #. Reported when copying tracks. {} will be replaced with
 #. the number of tracks; e.g. "2 tracks copied".

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-03-02 09:23\n"
+"PO-Revision-Date: 2022-03-12 08:31\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -127,7 +127,7 @@ msgid "no track envelopes"
 msgstr "sin envolventes de pista"
 
 msgid "no visible envelopes"
-msgstr "sin envolventes de pista"
+msgstr "sin envolventes visibles"
 
 #. Reported when selecting an envelope. {} will be replaced
 #. with the name of the envelope; e.g. "volume envelope".
@@ -1364,6 +1364,12 @@ msgstr "repetir activado"
 msgid "repeat off"
 msgstr "repetir apagado"
 
+msgid "no takes"
+msgstr ""
+
+msgid "empty take lane"
+msgstr ""
+
 #. Reported when copying tracks. {} will be replaced with
 #. the number of tracks; e.g. "2 tracks copied".
 msgid "{} track copied"
@@ -2147,7 +2153,7 @@ msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Silencia el siguiente mensaje de OSARA"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: Anuncia regiones, marcador último proyecto y ítems en la pista seleccionada en la posición actual"
+msgstr "OSARA: Anuncia última región, marcador e ítems en la pista seleccionada en la posición actual"
 
 msgid "OSARA: Go to first track"
 msgstr "Pista"
