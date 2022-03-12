@@ -390,6 +390,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
 - Edit: Select all events: Control+A
 - Edit: Select all notes in time selection
+- Edit: Select all notes starting in time selection: Control+Shift+A
 - Invert selection: Control+I
 - Select all notes with the same pitch: Shift+A
 - Grid: Set to 1: 1, Control+Shift+1

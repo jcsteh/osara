@@ -1087,14 +1087,7 @@ void cmdMidiDeleteEvents(Command* command) {
 void postMidiSelectNotes(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int noteIndex=-1;
-	int count=0;
-	for(;;){
-		noteIndex = MIDI_EnumSelNotes(take, noteIndex);
-		if (noteIndex == -1)
-			break;
-		++count;
-	}
+	int count=countSelectedNotes(take);
 	fakeFocus = FOCUS_NOTE;
 	// Translators: used when notes are selected in the MIDI editor.
 	// {} is replaced by the number of notes. E.g. "4 notes selected"
