@@ -4423,37 +4423,22 @@ bool handleMainCommandFallback(int command, int flag) {
 IReaperControlSurface* surface = nullptr;
 
 void initKeyMap() {
-	ostringstream s;
 	for(auto& [secId, keys, namedKeys] : osaraKeySections) {
-		s << "section" << secId << ", " << keys.size() << " " << namedKeys.size() << endl;
 		auto sec = SectionFromUniqueID(secId);
 		if(!sec) {
 			break;
 		}
-		// KbdSectionInfo* newSec = new KbdSectionInfo(*sec);
 		keys.reserve(keys.size() + namedKeys.size());
 		for(auto& key : namedKeys) {
 			int cmd = NamedCommandLookup(key.cmd);
 			if(cmd <= 0){
-				s << key.cmd << endl;
 				continue;
 			}
 			keys.push_back({key.key, cmd, key.flags});
 		}
-		// newSec->def_keys = keys.data();
-		// newSec->def_keys_cnt = keys.size();
-		// newSec->accels = nullptr;
-		// newSec->action_list = sec->action_list;
-		// newSec->action_list_cnt = sec->action_list_cnt;
-		// newSec->name = sec->name;
-		// newSec->onAction = sec->onAction;
-		// newSec->uniqueID = sec->uniqueID;
 		sec->def_keys = keys.data();
 		sec->def_keys_cnt = keys.size();
-		// newSec->uniqueID = sec->uniqueID + 100000;
-		// plugin_register("accel_section", newSec);
 	}
-	reviewMessage( "fkj", s.str().c_str());
 }
 
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
