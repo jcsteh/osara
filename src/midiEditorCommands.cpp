@@ -1945,3 +1945,11 @@ void postToggleFunctionKeysAsStepInput(int command) {
 		outputMessage(translate("Disabled  f1-f12 as step input"));
 	}
 }
+
+void postMidiToggleSnap(int command) {
+	if(GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command)) {
+		outputMessage(translate("enabled snap to grid"));
+	} else {
+		outputMessage(translate("disabled snap to grid"));
+	}
+}
