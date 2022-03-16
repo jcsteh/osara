@@ -43,8 +43,8 @@ struct NamedKeyBindingInfo {
 };
 
 """
-
-a,b = buildKeyList('../config/windows/reaper-kb.ini')
+import sys
+a,b = buildKeyList(sys.argv[1])
 sections = ''
 for section in a:
 	s += f'vector<KbdKeyBindingInfo> osaraKeySection{section}{{\n'
