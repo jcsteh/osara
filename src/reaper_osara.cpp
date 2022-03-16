@@ -41,8 +41,8 @@
 #include "buildVersion.h"
 #include "fxChain.h"
 #include "translation.h"
-
 using namespace std;
+#include "osara_keymap.h"
 using namespace fmt::literals;
 
 HINSTANCE pluginHInstance;
@@ -4422,6 +4422,40 @@ bool handleMainCommandFallback(int command, int flag) {
 
 IReaperControlSurface* surface = nullptr;
 
+void initKeyMap() {
+	ostringstream s;
+	for(auto& [secId, keys, namedKeys] : osaraKeySections) {
+		s << "section" << secId << ", " << keys.size() << " " << namedKeys.size() << endl;
+		auto sec = SectionFromUniqueID(secId);
+		if(!sec) {
+			break;
+		}
+		// KbdSectionInfo* newSec = new KbdSectionInfo(*sec);
+		keys.reserve(keys.size() + namedKeys.size());
+		for(auto& key : namedKeys) {
+			int cmd = NamedCommandLookup(key.cmd);
+			if(cmd <= 0){
+				s << key.cmd << endl;
+				continue;
+			}
+			keys.push_back({key.key, cmd, key.flags});
+		}
+		// newSec->def_keys = keys.data();
+		// newSec->def_keys_cnt = keys.size();
+		// newSec->accels = nullptr;
+		// newSec->action_list = sec->action_list;
+		// newSec->action_list_cnt = sec->action_list_cnt;
+		// newSec->name = sec->name;
+		// newSec->onAction = sec->onAction;
+		// newSec->uniqueID = sec->uniqueID;
+		sec->def_keys = keys.data();
+		sec->def_keys_cnt = keys.size();
+		// newSec->uniqueID = sec->uniqueID + 100000;
+		// plugin_register("accel_section", newSec);
+	}
+	reviewMessage( "fkj", s.str().c_str());
+}
+
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
 void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
@@ -4437,8 +4471,6 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		if (cmd)
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
-	auto sec = SectionFromUniqueID(1);
-	reviewMessage("j", format("{} {} {}", sec->action_list_cnt, sec->def_keys_cnt, (void*)sec).c_str());
 	KillTimer(NULL, event);
 }
 #ifdef _WIN32
@@ -4610,15 +4642,12 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
-<<<<<<< HEAD
 		registerSettingCommands();
-=======
-		for (auto i: {0, 100, 32060, 32061, 32062, 32063}) {
+		for (const int i: {0, 100, 102, 103, 32060, 32061, 32062, 32063}) {
 			auto sec = SectionFromUniqueID(i);
 			sec->def_keys_cnt = 0;
 			sec->def_keys = nullptr;
 		}
->>>>>>> 7535d21 (Work in progress)
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
 		rec->Register("hookcommand2", (void*)handleCommand);
@@ -4632,6 +4661,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
 #endif
+initKeyMap();
 		return 1;
 
 	} else {
