@@ -73,29 +73,36 @@ def addMessage(data):
 		comments.extend(lastTranslatorsComment)
 		lastTranslatorsComment = []
 
-RE_CPP_TRANSLATE_FIRST_STRING_END = re.compile(r"^\s*// translate firstString end$")
-RE_CPP_TRANSLATE_FIRST_STRING = re.compile(r'^\s*[^/].*?"(?P<msgid>.*?)"')
-def addCppTranslateFirstString(input):
+RE_CPP_TRANSLATE_FIRST_N_STRINGS_END = re.compile(r"^\s*// translate first\d?Strings? end$")
+RE_CPP_COMMENT = re.compile(r'^\s*/')
+RE_CPP_STRING = re.compile(r'"(?P<msgid>.*?)"')
+def addCppTranslateFirstNStrings(input, maxStrings):
 	for line in input:
 		if handleTranslatorsComment(line):
 			continue
-		if RE_CPP_TRANSLATE_FIRST_STRING_END.match(line):
+		if RE_CPP_TRANSLATE_FIRST_N_STRINGS_END.match(line):
 			break
-		m = RE_CPP_TRANSLATE_FIRST_STRING.match(line)
-		if m:
+		if RE_CPP_COMMENT.match(line):
+			continue
+		for num, m in enumerate(RE_CPP_STRING.finditer(line)):
+			if num == maxStrings:
+				break
 			data = m.groupdict()
 			addMessage(data)
 
 RE_CPP_TRANSLATE = re.compile(r'\btranslate\("(?P<msgid>.*?)"\)')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)"\)')
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\("(?P<msgid>.*?)",\s*"(?P<plural>.*?)", .*?\)')
-RE_CPP_TRANSLATE_FIRST_STRING_BEGIN = re.compile(r"^\s*// translate firstString begin$")
+RE_CPP_TRANSLATE_FIRST_N_STRINGS_BEGIN = re.compile(r"^\s*// translate first(?P<maxStrings>\d)?Strings? begin$")
 def addCpp(input):
 	for line in input:
 		if handleTranslatorsComment(line):
 			continue
-		if RE_CPP_TRANSLATE_FIRST_STRING_BEGIN.match(line):
-			addCppTranslateFirstString(input)
+		m = RE_CPP_TRANSLATE_FIRST_N_STRINGS_BEGIN.match(line)
+		if m:
+			maxStrings = m.group("maxStrings")
+			maxStrings = int(maxStrings) if maxStrings else 1
+			addCppTranslateFirstNStrings(input, maxStrings)
 			continue
 		matches = itertools.chain(RE_CPP_TRANSLATE.finditer(line),
 			RE_CPP_TRANSLATE_CTXT.finditer(line),
