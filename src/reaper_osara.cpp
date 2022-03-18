@@ -2107,7 +2107,9 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
 	{40778, "grid eighth"}, // Grid: Set to 1/8
 	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
+	{41212, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
 	{40774, "grid sixty forth"}, // Grid: Set to 1/64
+	{41047, "grid one hundred twenty eighth"}, // Grid: Set to 1/128
 	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
 	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
 	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
@@ -2138,6 +2140,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40193, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
 	{40189, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
 	{41020, "grid sixty forth"}, // Grid: Set to 1/64
+	{41019, "grid one hundred twenty eighth"}, // Grid: Set to 1/128
 	{41081, "length whole"}, // Set length for next inserted note: 1
 	{41079, "length half"}, // Set length for next inserted note: 1/2
 	{41067, "length thirty second"}, // Set length for next inserted note: 1/32
@@ -2148,6 +2151,8 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41073, "length eighth"}, // Set length for next inserted note: 1/8
 	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
 	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
+	{41064, "length sixty forth"}, // Set length for next inserted note: 1/64
+	{41062, "length one hundred twenty eighth"}, // Set length for next inserted note: 1/128
 	// translate firstString end
 };
 

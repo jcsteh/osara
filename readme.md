@@ -88,7 +88,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - SWS: Select nearest previous folder: Alt+PageUp
 - Track: Remove tracks
 - Track: Select all tracks
-- Track properties: Toggle free item positioning
+- Track properties: Toggle free item positioning: Alt+Shift+F2
 
 #### Adjusting Track Parameters
 - Track: Toggle mute for selected tracks
@@ -351,6 +351,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Grid: Set to 1/12 (1/8 triplet): Control+Shift+9
 - Grid: Set to 1/48 (1/32 triplet): Control+Shift+0
 - Grid: Set to 1/64
+- Grid: Set to 1/128
 
 #### Project Tabs
 - Close current project tab: Control+F4
@@ -404,6 +405,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Grid: Set to 1/12 (1/8 triplet): 9, Control+Shift+9
 - Grid: Set to 1/48 (1/32 triplet): 0
 - Grid: Set to 1/64
+- Grid: Set to 1/128
 - Set length for next inserted note: 1: Control+1
 - Set length for next inserted note: 1/2: Control+2
 - Set length for next inserted note: 1/32: Control+3
@@ -414,6 +416,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Set length for next inserted note: 1/8: Control+8
 - Set length for next inserted note: 1/8T: Control+9
 - Set length for next inserted note: 1/32T: Control+0
+- Set length for next inserted note: 1/64
+- Set length for next inserted note: 1/128
 - Activate next MIDI track: Ctrl+DownArrow
 - Activate previous MIDI track: Ctrl+UpArrow
 - Edit: Move notes up one semitone: NumPad8 or N
