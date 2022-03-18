@@ -417,6 +417,7 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 				chan.peak = newPeak;
 				chan.time = time;
 				if (chan.notify &&
+						newPeak != NO_LEVEL &&
 						levelType.isLevelSignificant(newPeak, watcher.notifyLevel)) {
 					if (s.tellp() > 0) {
 						s << ", ";
