@@ -451,6 +451,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Edit: Toggle selection of all CC events under selected notes: C
 - Navigate: Move edit cursor to start of selected events: Control+Shift+Home
 - Navigate: Move edit cursor to end of selected events: Control+Shift+End
+- View: Toggle snap to grid: Alt+S
 
 #### Media Explorer
 - Preview: decrease volume by 1 dB

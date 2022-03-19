@@ -2064,6 +2064,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
 	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
 	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
+	{1014, postMidiToggleSnap}, // View: Toggle snap to grid
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
