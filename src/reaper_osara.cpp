@@ -4393,8 +4393,28 @@ void annotateAccRole(HWND hwnd, long role) {
 		var);
 }
 
+HWND prevForegroundHwnd = nullptr;
+HWND prevPrevForegroundHwnd = nullptr;
+
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
+		HWND foreground = GetForegroundWindow();
+		if (foreground != prevForegroundHwnd) {
+			// The foreground window has changed.
+			if (IsWindowVisible(prevPrevForegroundHwnd) &&
+					!IsWindowVisible(prevForegroundHwnd)) {
+				// The previous foreground window has closed. For example, this happens
+				// when you open the FX chain for a track with no FX and dismiss the Add
+				// FX dialog. It also happens in the Menu Editor when you add an
+				// action and then dismiss the Actions dialog. REAPER returns focus to the
+				// track view in this case. We redirect focus to the foreground window
+				// before the last (the FX chain in the former example), which is more
+				// useful to the user.
+				SetForegroundWindow(prevPrevForegroundHwnd);
+			}
+			prevPrevForegroundHwnd = prevForegroundHwnd;
+			prevForegroundHwnd = foreground;
+		}
 		bool focusIsTrackView = isTrackViewWindow(hwnd);
 		if (focusIsTrackView) {
 			// Give these objects a non-generic role so NVDA doesn't fall back to
