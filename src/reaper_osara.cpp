@@ -4426,7 +4426,7 @@ void initKeyMap() {
 	for(auto& [secId, keys, namedKeys] : osaraKeySections) {
 		auto sec = SectionFromUniqueID(secId);
 		if(!sec) {
-			break;
+			continue;
 		}
 		keys.reserve(keys.size() + namedKeys.size());
 		for(auto& key : namedKeys) {
@@ -4436,8 +4436,8 @@ void initKeyMap() {
 			}
 			keys.push_back({key.key, cmd, key.flags});
 		}
-		sec->def_keys = keys.data();
 		sec->def_keys_cnt = keys.size();
+		sec->def_keys = keys.data();
 	}
 }
 
@@ -4628,11 +4628,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
 		registerSettingCommands();
-		for (const int i: {0, 100, 102, 103, 32060, 32061, 32062, 32063}) {
-			auto sec = SectionFromUniqueID(i);
-			sec->def_keys_cnt = 0;
-			sec->def_keys = nullptr;
-		}
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
 		rec->Register("hookcommand2", (void*)handleCommand);

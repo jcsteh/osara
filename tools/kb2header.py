@@ -1,4 +1,4 @@
-import sortKeymap
+from . import sortKeymap
 
 def buildKeyList(fn):
 	lines = open(fn, encoding='utf-8').readlines()
@@ -35,41 +35,44 @@ def formatArray(scList, isCustom):
 			s += f'{{{sc[0]}, {sc[1]}, {sc[2]}}}'
 	return s
 
-s = """
-struct NamedKeyBindingInfo {
-	int key;
-	const char* cmd;
-	int flags;
-};
+def buildKeymapHeader(target, source, env=None):
+	target = target[0].path
+	source = source[0].path
+	s = """
+	struct NamedKeyBindingInfo {
+		int key;
+		const char* cmd;
+		int flags;
+	};
 
-"""
-import sys
-a,b = buildKeyList(sys.argv[1])
-sections = ''
-for section in a:
-	s += f'vector<KbdKeyBindingInfo> osaraKeySection{section}{{\n'
-	s += formatArray(a[section], False)
-	s+= '\n};\n'
-	if sections:
-		sections += ',\n'
-	sections += f'\t{{{section}, osaraKeySection{section}, osaraNamedKeySection{section}}}'
-for section in b:
-	s += f'vector<NamedKeyBindingInfo> osaraNamedKeySection{section}{{\n'
-	s += formatArray(b[section], True)
-	s+= '\n};\n'
+	"""
+	import sys
+	a,b = buildKeyList(source)
+	sections = ''
+	for section in a:
+		s += f'vector<KbdKeyBindingInfo> osaraKeySection{section}{{\n'
+		s += formatArray(a[section], False)
+		s+= '\n};\n'
+		if sections:
+			sections += ',\n'
+		sections += f'\t{{{section}, osaraKeySection{section}, osaraNamedKeySection{section}}}'
+	for section in b:
+		s += f'vector<NamedKeyBindingInfo> osaraNamedKeySection{section}{{\n'
+		s += formatArray(b[section], True)
+		s+= '\n};\n'
 
-s += """
-struct OsaraKeySection {
-	int section;
-	vector<KbdKeyBindingInfo>& keys;
-	vector<NamedKeyBindingInfo>& namedKeys;
-};
-vector<OsaraKeySection> osaraKeySections {
-"""
-s += sections;
-s += """
-};
-"""
-	
+	s += """
+	struct OsaraKeySection {
+		int section;
+		vector<KbdKeyBindingInfo>& keys;
+		vector<NamedKeyBindingInfo>& namedKeys;
+	};
+	vector<OsaraKeySection> osaraKeySections {
+	"""
+	s += sections;
+	s += """
+	};
+	"""
+		
 
-print(s)
+	open(target, 'x', encoding='utf-8').write(s)
