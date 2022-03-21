@@ -637,7 +637,9 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 		true,  // end
 		true,  // channel
 		true,  // pitch
-		true  // velocity
+		true,  // velocity
+		true,  // selected
+		true  // muted
 	});
 	if (chord.first == chord.second) {
 		return {-1};
@@ -673,7 +675,9 @@ void cmdMidiMoveCursor(Command* command) {
 		true,  // end
 		true,  // channel
 		true,  // pitch
-		true  // velocity
+		true,  // velocity
+		false,  // selected
+		true  // muted
 	});
 	vector<MidiNote> notes(chord.first, chord.second);
 	int count = static_cast<int>(notes.size());
@@ -682,6 +686,13 @@ void cmdMidiMoveCursor(Command* command) {
 		fakeFocus = FOCUS_NOTE;
 		s << " " << format(
 			translate_plural("{} note", "{} notes", count), count);
+		int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+		if (mutedCount > 0) {
+			// Translators: used when reporting the number of muted notes in a chord.
+			// {} will be replaced by the number of muted notes. E.g. "3 muted"
+			s << format(
+				translate("{} muted"), mutedCount);
+		}
 	}
 	outputMessage(s);
 }
@@ -722,7 +733,9 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 			true,  // end
 			true,  // channel
 			true,  // pitch
-			true  // velocity
+			true,  // velocity
+			false,  // selected
+			true  // muted
 		}));
 	}
 	return notes;
@@ -738,7 +751,9 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 		true,  // message1
 		true,  // channel
 		true,  // message2
-		true  // message3,
+		true,  // message3,
+		true,  // selected
+		true  // muted
 	});
 	MidiControlChangeIterator end = begin;
 	end.moveToEnd();
@@ -867,7 +882,7 @@ void cmdMidiToggleSelection(Command* command) {
 				if (note.channel == -1) {
 					return;
 				}
-				select = !isNoteSelected(take, note.index);
+				select = !note.selected;
 				selectNote(take, note.index, select);
 			} else {
 				// Chord.
@@ -893,9 +908,9 @@ void cmdMidiToggleSelection(Command* command) {
 			if (currentCC.first == -1 || currentCC.second == -1) {
 				return;
 			}
-			int curCC= findCC(take, 0).index;
-			select = !isCCSelected(take, curCC);
-			selectCC(take, curCC, select);
+			auto curCC= findCC(take, 0);
+			select = !curCC.selected;
+			selectCC(take, curCC.index, select);
 			break;
 		}
 		default:
@@ -912,7 +927,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		true,  // end
 		true,  // channel
 		true,  // pitch
-		true  // velocity
+		true,  // velocity
+		false,  // selected
+		true  // muted
 	});
 	if (chord.first == chord.second) {
 		return;
@@ -947,6 +964,13 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		// {} will be replaced by the number of notes. E.g. "3 notes"
 		s << format(
 			translate_plural("{} note", "{} notes", count), count);
+		int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+		if (mutedCount > 0) {
+			// Translators: used when reporting the number of muted notes in a chord.
+			// {} will be replaced by the number of muted notes. E.g. "3 muted"
+			s << format(
+				translate("{} muted"), mutedCount);
+		}
 	}
 	outputMessage(s);
 }
@@ -971,8 +995,9 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	MidiNote note = findNoteInChord(take, direction);
-	if (note.channel == -1)
+	if (note.channel == -1) {
 		return;
+	}
 	if (clearSelection) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 		isSelectionContiguous = true;
@@ -984,6 +1009,9 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (shouldReportNotes) {
+		if (note.muted) {
+			s << translate("muted") << " ";
+		}
 		s << getMidiNoteName(take, note.pitch, note.channel);
 	}
 	if (!select && !isNoteSelected(take, note.index)) {
@@ -1262,6 +1290,9 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	s << formatCursorPosition(TF_MEASURE) << " ";
+	if (cc.muted) {
+		s << translate("muted") << " ";
+	}
 	if (cc.message1 == 0xA0) {
 		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
 		// name and {value} will be replaced with the aftertouch value; e.g.
