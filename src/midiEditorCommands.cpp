@@ -392,20 +392,23 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	}
 	// Queue note on events for the new notes.
 	for (auto const& note: notes) {
+		if (note.muted) {
+			continue;
+		}
 		MIDI_event_t event = {0, 3, {
 			(unsigned char)(MIDI_NOTE_ON | note.channel),
 			(unsigned char)note.pitch, (unsigned char)note.velocity}};
 		previewSource.events.push_back(event);
+		// Save the note being previewed so we can turn it off later (previewNotesOff).
+		previewingNotes.push_back(note);
 	}
-	// Save the notes being previewed so we can turn them off later (previewNotesOff).
-	previewingNotes = notes;
 	// Send the events.
 	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
 	previewReg.preview_track = track;
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	// Calculate the minimum note length.
-	double minLength = min_element(notes.cbegin(), notes.cend(), compareNotesByLength)->getLength();
+	double minLength = min_element(previewingNotes.cbegin(), previewingNotes.cend(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
 	previewDoneTimer = SetTimer(nullptr, 0,
 		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
