@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-03-12 08:31\n"
+"PO-Revision-Date: 2022-03-23 10:02\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -249,6 +249,13 @@ msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] ""
 msgstr[1] ""
+
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+msgid "{} muted"
+msgstr ""
 
 msgid "noncontiguous selection"
 msgstr "Seleção não contígua"
@@ -756,6 +763,12 @@ msgid "Enabled  f1-f12 as step input"
 msgstr ""
 
 msgid "Disabled  f1-f12 as step input"
+msgstr ""
+
+msgid "enabled snap to grid"
+msgstr ""
+
+msgid "disabled snap to grid"
 msgstr ""
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
@@ -1681,8 +1694,14 @@ msgstr "grade:  ajustar para 1/8"
 msgid "grid eighth triplet"
 msgstr "grade:  ajustar para 1/8 (triplo)"
 
+msgid "grid thirty second triplet"
+msgstr "grade:  ajustar para 1/32 (triplo)"
+
 msgid "grid sixty forth"
 msgstr "grade:  ajustar para 1/64"
+
+msgid "grid one hundred twenty eighth"
+msgstr ""
 
 msgid "all tracks unmuted"
 msgstr "Todas as pistas não silenciadas"
@@ -1695,9 +1714,6 @@ msgstr "Todas as pistas desarmadas"
 
 msgid "all delta solos reset"
 msgstr ""
-
-msgid "grid thirty second triplet"
-msgstr "grade:  ajustar para 1/32 (triplo)"
 
 msgid "length whole"
 msgstr "duração 1"
@@ -1728,6 +1744,12 @@ msgstr "duração 1/8 (triplo)"
 
 msgid "length thirty second triplet"
 msgstr "grade:  ajustar para 1/32"
+
+msgid "length sixty forth"
+msgstr ""
+
+msgid "length one hundred twenty eighth"
+msgstr ""
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

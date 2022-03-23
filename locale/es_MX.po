@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-03-12 08:31\n"
+"PO-Revision-Date: 2022-03-23 09:09\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -250,6 +250,13 @@ msgid_plural "{} notes"
 msgstr[0] "{} nota"
 msgstr[1] "{} notas"
 
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+msgid "{} muted"
+msgstr ""
+
 msgid "noncontiguous selection"
 msgstr "selección separada"
 
@@ -450,7 +457,7 @@ msgid "Celeste Level"
 msgstr "Nivel de Celeste"
 
 msgid "Phaser Level"
-msgstr "Nivel de fase"
+msgstr "Nivel de Phaser"
 
 msgid "Data Button Inc"
 msgstr "Botón de datos Inc"
@@ -634,48 +641,48 @@ msgstr[1] "longitud de {} notas cambiada"
 #. "3 notes semitone up"
 msgid "{} note semitone up"
 msgid_plural "{} notes semitone up"
-msgstr[0] "semitono de {} nota arriba"
-msgstr[1] "semitono de {} notas arriba"
+msgstr[0] "subiendo semitono de {} nota"
+msgstr[1] "subiendo semitono de {} notas"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone down"
 msgid "{} note semitone down"
 msgid_plural "{} notes semitone down"
-msgstr[0] "semitono de {} nota abajo"
-msgstr[1] "semitono de {} notas abajo"
+msgstr[0] "bajando semitono de {} nota"
+msgstr[1] "bajando semitono de {} notas"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes octave up"
 msgid "{} note octave up"
 msgid_plural "{} notes octave up"
-msgstr[0] "octava de {} nota arriba"
-msgstr[1] "octava de {} notas arriba"
+msgstr[0] "subiendo octava de {} nota"
+msgstr[1] "subiendo octava de {} notas"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes octave down"
 msgid "{} note octave down"
 msgid_plural "{} notes octave down"
-msgstr[0] "octava de {} nota abajo"
-msgstr[1] "octava de {} notas abajo"
+msgstr[0] "bajando octava de {} nota"
+msgstr[1] "bajando octava de {} notas"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone up ignoring scale"
 msgid "{} note semitone up ignoring scale"
 msgid_plural "{} notes semitone up ignoring scale"
-msgstr[0] "semitono de {} nota arriba ignorando la escala"
-msgstr[1] "semitono de {} notas arriba ignorando la escala"
+msgstr[0] "subiendo semitono de {} nota ignorando la escala"
+msgstr[1] "subiendo semitono de {} notas ignorando la escala"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone down ignoring scale"
 msgid "{} note semitone down ignoring scale"
 msgid_plural "{} notes semitone down ignoring scale"
-msgstr[0] "semitono de {} nota abajo ignorando la escala"
-msgstr[1] "semitono de {} notas abajo ignorando la escala"
+msgstr[0] "bajando semitono de {} nota ignorando la escala"
+msgstr[1] "bajando semitono de {} notas ignorando la escala"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -757,6 +764,12 @@ msgstr "Habilitar f1-f12 como entrada escalonada"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "Deshabilitar f1-f12 como entrada escalonada"
+
+msgid "enabled snap to grid"
+msgstr "ajuste a la cuadrícula activado"
+
+msgid "disabled snap to grid"
+msgstr "ajuste a la cuadrícula desactivado"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -1466,10 +1479,10 @@ msgid "set selection end"
 msgstr "fin de selección establecido"
 
 msgid "master mono"
-msgstr "máster mono"
+msgstr "máster en mono"
 
 msgid "master stereo"
-msgstr "máster estéreo"
+msgstr "máster en estéreo"
 
 msgid "crossfade on"
 msgstr "crossfade encendido"
@@ -1681,8 +1694,14 @@ msgstr "cuadrícula en corcheas"
 msgid "grid eighth triplet"
 msgstr "cuadrícula en corcheas (tresillo)"
 
+msgid "grid thirty second triplet"
+msgstr "cuadrícula en fusas (tresillo)"
+
 msgid "grid sixty forth"
 msgstr "cuadrícula en semifusas"
+
+msgid "grid one hundred twenty eighth"
+msgstr "cuadrícula en garrapateas"
 
 msgid "all tracks unmuted"
 msgstr "todas las pistas han sido desmuteadas"
@@ -1694,10 +1713,7 @@ msgid "all tracks unarmed"
 msgstr "desarmar todas las pistas"
 
 msgid "all delta solos reset"
-msgstr "resetear todos los solos delta"
-
-msgid "grid thirty second triplet"
-msgstr "cuadrícula en fusas (tresillo)"
+msgstr "todos los solos en delta reseteados"
 
 msgid "length whole"
 msgstr "longitud en redondas"
@@ -1728,6 +1744,12 @@ msgstr "longitud en corcheas (tresillo)"
 
 msgid "length thirty second triplet"
 msgstr "longitud en fusas (tresillo)"
+
+msgid "length sixty forth"
+msgstr "longitud en semifusas"
+
+msgid "length one hundred twenty eighth"
+msgstr "longitud en garrapateas"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

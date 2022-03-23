@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-03-12 08:31\n"
+"PO-Revision-Date: 2022-03-23 10:02\n"
 
 msgid "volume"
 msgstr "音量"
@@ -243,6 +243,13 @@ msgstr "B"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} 音符"
+
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+msgid "{} muted"
+msgstr "{} 已禁音"
 
 msgid "noncontiguous selection"
 msgstr "不连续选择"
@@ -722,6 +729,12 @@ msgstr "启用 F1-F12 进行步进录制"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "禁用 F1-F12 进行步进录制"
+
+msgid "enabled snap to grid"
+msgstr "已启用网格吸附"
+
+msgid "disabled snap to grid"
+msgstr "已禁用网格吸附"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -1629,8 +1642,14 @@ msgstr "8分网格"
 msgid "grid eighth triplet"
 msgstr "8分3连音网格"
 
+msgid "grid thirty second triplet"
+msgstr "32分3连音网格"
+
 msgid "grid sixty forth"
 msgstr "64分网格"
+
+msgid "grid one hundred twenty eighth"
+msgstr "128分网格"
 
 msgid "all tracks unmuted"
 msgstr "全部轨道已取消静音"
@@ -1643,9 +1662,6 @@ msgstr "全部轨道已取消准备"
 
 msgid "all delta solos reset"
 msgstr "重制全部 delta 独奏"
-
-msgid "grid thirty second triplet"
-msgstr "32分3连音网格"
 
 msgid "length whole"
 msgstr "全音长度"
@@ -1676,6 +1692,12 @@ msgstr "8分3连音长度"
 
 msgid "length thirty second triplet"
 msgstr "32分3连音长度"
+
+msgid "length sixty forth"
+msgstr "64分长度"
+
+msgid "length one hundred twenty eighth"
+msgstr "128分长度"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

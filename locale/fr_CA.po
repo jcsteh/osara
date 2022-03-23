@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-03-12 08:31\n"
+"PO-Revision-Date: 2022-03-23 10:02\n"
 
 msgid "volume"
 msgstr "volume"
@@ -249,6 +249,13 @@ msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} note"
 msgstr[1] "{} notes"
+
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+msgid "{} muted"
+msgstr ""
 
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
@@ -757,6 +764,12 @@ msgstr "Activé f1 à f12 comme entrée pas à pas"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "Désactivé f1 à f12 comme entrée pas à pas"
+
+msgid "enabled snap to grid"
+msgstr ""
+
+msgid "disabled snap to grid"
+msgstr ""
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -1681,8 +1694,14 @@ msgstr "grille à la croche"
 msgid "grid eighth triplet"
 msgstr "grille à la croche, triolet"
 
+msgid "grid thirty second triplet"
+msgstr "grille triple croche, triolet"
+
 msgid "grid sixty forth"
 msgstr "grille quadruple croche, 1/64"
+
+msgid "grid one hundred twenty eighth"
+msgstr "grille cent vingt huitième"
 
 msgid "all tracks unmuted"
 msgstr "sourdine de toutes les pistes désactivé"
@@ -1695,9 +1714,6 @@ msgstr "désarmement de toutes les pistes"
 
 msgid "all delta solos reset"
 msgstr "tous les delta solos réinitialisés"
-
-msgid "grid thirty second triplet"
-msgstr "grille triple croche, triolet"
 
 msgid "length whole"
 msgstr "longueur de ronde"
@@ -1728,6 +1744,12 @@ msgstr "longueur de croche, triolet"
 
 msgid "length thirty second triplet"
 msgstr "longueur de triple croche, triolet"
+
+msgid "length sixty forth"
+msgstr "longueur soixante-quatrième"
+
+msgid "length one hundred twenty eighth"
+msgstr "longueur cent vingt huitième"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

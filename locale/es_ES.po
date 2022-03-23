@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-03-12 08:31\n"
+"PO-Revision-Date: 2022-03-23 10:02\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -249,6 +249,13 @@ msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} nota"
 msgstr[1] "{} notas"
+
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+#. used when reporting the number of muted notes in a chord.
+#. {} will be replaced by the number of muted notes. E.g. "3 muted"
+msgid "{} muted"
+msgstr "{} silenciadas"
 
 msgid "noncontiguous selection"
 msgstr "selección no contígua"
@@ -757,6 +764,12 @@ msgstr "Activado f1-f12 para entrada por pasos"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "Desactivado f1-f12 como entrada por pasos"
+
+msgid "enabled snap to grid"
+msgstr "activada snap a la rejilla"
+
+msgid "disabled snap to grid"
+msgstr "desactivada snap a la rejilla"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -1365,10 +1378,10 @@ msgid "repeat off"
 msgstr "repetir apagado"
 
 msgid "no takes"
-msgstr ""
+msgstr "sin tomas"
 
 msgid "empty take lane"
-msgstr ""
+msgstr "carril de toma vacío"
 
 #. Reported when copying tracks. {} will be replaced with
 #. the number of tracks; e.g. "2 tracks copied".
@@ -1681,8 +1694,14 @@ msgstr "rejilla: ajustar a 1/8"
 msgid "grid eighth triplet"
 msgstr "rejilla: ajustar a 1/8, triplete"
 
+msgid "grid thirty second triplet"
+msgstr "rejilla: ajustar a 1/32, triplete"
+
 msgid "grid sixty forth"
 msgstr "rejilla: ajustar a 1/64"
+
+msgid "grid one hundred twenty eighth"
+msgstr "rejilla en ciento veinti ocho"
 
 msgid "all tracks unmuted"
 msgstr "ninguna pista silenciada"
@@ -1695,9 +1714,6 @@ msgstr "desarmadas todas las pistas"
 
 msgid "all delta solos reset"
 msgstr "reiniciado todo delta solos,"
-
-msgid "grid thirty second triplet"
-msgstr "rejilla: ajustar a 1/32, triplete"
 
 msgid "length whole"
 msgstr "duración 1"
@@ -1728,6 +1744,12 @@ msgstr "duración 1/8, triplete"
 
 msgid "length thirty second triplet"
 msgstr "duración 1/32, triplete"
+
+msgid "length sixty forth"
+msgstr "duraci'on sesenta y cuatro"
+
+msgid "length one hundred twenty eighth"
+msgstr "duraci'on ciento veinti ocho"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
