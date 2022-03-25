@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-03-23 10:02\n"
+"PO-Revision-Date: 2022-03-25 10:44\n"
 
 msgid "volume"
 msgstr "音量"
@@ -249,7 +249,8 @@ msgstr[0] "{} 音符"
 #. used when reporting the number of muted notes in a chord.
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
-msgstr "{} 已禁音"
+msgid_plural "{} muted"
+msgstr[0] "{} 已静音"
 
 msgid "noncontiguous selection"
 msgstr "不连续选择"

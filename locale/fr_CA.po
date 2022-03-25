@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-03-23 10:02\n"
+"PO-Revision-Date: 2022-03-25 10:44\n"
 
 msgid "volume"
 msgstr "volume"
@@ -255,7 +255,9 @@ msgstr[1] "{} notes"
 #. used when reporting the number of muted notes in a chord.
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
-msgstr ""
+msgid_plural "{} muted"
+msgstr[0] "{} en sourdine"
+msgstr[1] "{} en sourdine"
 
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
@@ -705,8 +707,8 @@ msgstr[1] "{} notes déplacées d'un pixel vers la gauche"
 #. "3 notes pixel right"
 msgid "{} note pixel right"
 msgid_plural "{} notes pixel right"
-msgstr[0] "{} note déplacée d'un pixel à droite"
-msgstr[1] "{} note déplacée d'un pixel à droite"
+msgstr[0] "{} note déplacée d'un pixel vers la droite"
+msgstr[1] "{} notes déplacées d'un pixel vers la droite"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -714,14 +716,14 @@ msgstr[1] "{} note déplacée d'un pixel à droite"
 msgid "{} note grid unit left"
 msgid_plural "{} notes grid unit left"
 msgstr[0] "{} note déplacée d'une unité de grille vers la gauche"
-msgstr[1] "{} notes déplacées d'une unité de grille vers la gauche"
+msgstr[1] "{} notes déplacées vers la gauche sur la grille"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes grid unit right"
 msgid "{} note grid unit right"
 msgid_plural "{} notes grid unit right"
-msgstr[0] "{} notes déplacées vers la gauche sur la grille"
+msgstr[0] "{} note déplacées vers la droite sur la grille"
 msgstr[1] "{} notes déplacées vers la droite sur la grille"
 
 #. Used when moving notes in the MIDI
@@ -766,10 +768,10 @@ msgid "Disabled  f1-f12 as step input"
 msgstr "Désactivé f1 à f12 comme entrée pas à pas"
 
 msgid "enabled snap to grid"
-msgstr ""
+msgstr "magnétisme à la grille activé"
 
 msgid "disabled snap to grid"
-msgstr ""
+msgstr "magnétisme à la grille désactivé"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -1668,40 +1670,40 @@ msgid "set loop end"
 msgstr "fin de la boucle définie"
 
 msgid "grid whole"
-msgstr "grille à la ronde"
+msgstr "grille sur ronde, une mesure"
 
 msgid "grid half"
-msgstr "grille à la blanche"
+msgstr "grille sur blanche, 1/2"
 
 msgid "grid thirty second"
-msgstr "grille triple croche"
+msgstr "grille sur triple croche, 1/32"
 
 msgid "grid quarter"
-msgstr "grille à la noire"
+msgstr "grille sur noire, 1/4"
 
 msgid "grid quarter triplet"
-msgstr "grille à la noire, triolet"
+msgstr "grille sur triolet de noire, 1/6"
 
 msgid "grid sixteenth"
-msgstr "grille double croche"
+msgstr "grille sur double croche, 1/16"
 
 msgid "grid sixteenth triplet"
-msgstr "grille double croche, triolet"
+msgstr "grille sur triolet de double croche, 1/24"
 
 msgid "grid eighth"
-msgstr "grille à la croche"
+msgstr "grille sur croche, 1/8"
 
 msgid "grid eighth triplet"
-msgstr "grille à la croche, triolet"
+msgstr "grille sur triolet de croche, 1/12"
 
 msgid "grid thirty second triplet"
-msgstr "grille triple croche, triolet"
+msgstr "grille sur triolet de triple croche, 1/48"
 
 msgid "grid sixty forth"
-msgstr "grille quadruple croche, 1/64"
+msgstr "grille sur quadruple croche, 1/64"
 
 msgid "grid one hundred twenty eighth"
-msgstr "grille cent vingt huitième"
+msgstr "grille sur quintuple croche, 1/128"
 
 msgid "all tracks unmuted"
 msgstr "sourdine de toutes les pistes désactivé"
@@ -1716,40 +1718,40 @@ msgid "all delta solos reset"
 msgstr "tous les delta solos réinitialisés"
 
 msgid "length whole"
-msgstr "longueur de ronde"
+msgstr "longueur, ronde, une mesure"
 
 msgid "length half"
-msgstr "longueur de blanche"
+msgstr "longueur, blanche, 1/2"
 
 msgid "length thirty second"
-msgstr "longueur de triple croche"
+msgstr "longueur, triple croche, 1/32"
 
 msgid "length quarter"
-msgstr "longueur de noire"
+msgstr "longueur, noire, 1/4"
 
 msgid "length quarter triplet"
-msgstr "longueur de noir, triolet"
+msgstr "longueur, triolet de noire, 1/6"
 
 msgid "length sixteenth"
-msgstr "longueur de double croche"
+msgstr "longueur, double croche, 1/16"
 
 msgid "length sixteenth triplet"
-msgstr "longueur de double croche, triolet"
+msgstr "longueur, triolet de double croche, 1/24"
 
 msgid "length eighth"
-msgstr "longueur de croche"
+msgstr "longueur, croche, 1/8"
 
 msgid "length eighth triplet"
-msgstr "longueur de croche, triolet"
+msgstr "longueur, triolet de croche, 1/12"
 
 msgid "length thirty second triplet"
-msgstr "longueur de triple croche, triolet"
+msgstr "longueur, triolet de triple croche, 1/48"
 
 msgid "length sixty forth"
-msgstr "longueur soixante-quatrième"
+msgstr "longueur, quadruple croche, 1/64"
 
 msgid "length one hundred twenty eighth"
-msgstr "longueur cent vingt huitième"
+msgstr "longueur, quintuple croche, 1/128"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
