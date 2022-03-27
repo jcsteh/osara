@@ -1969,6 +1969,9 @@ PostCommand POST_COMMANDS[] = {
 	{41051, postReverseTake}, // Item properties: Toggle take reverse
 	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
 	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
+	{40408, postToggleTrackVolumeEnvelope}, // Track: Toggle track pre-FX volume envelope visible
+	{40409, postToggleTrackPanEnvelope}, // Track: Toggle track pre-FX pan envelope visible
+	{40867, postToggleTrackPanEnvelope}, // Track: Toggle track mute envelope visible
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
 	{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
 	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
