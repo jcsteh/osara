@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-03-25 10:44\n"
+"PO-Revision-Date: 2022-03-27 22:32\n"
 
 msgid "volume"
 msgstr "volume"
@@ -756,10 +756,10 @@ msgstr[0] "{} valeur modifiée"
 msgstr[1] "{} valeurs modifiées"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "Entrées MIDI pas à pas activé"
+msgstr "Entrées MIDI pas à pas, activé"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "Entrées MIDI pas à pas désactivé"
+msgstr "Entrées MIDI pas à pas, désactivé"
 
 msgid "Enabled  f1-f12 as step input"
 msgstr "Activé f1 à f12 comme entrée pas à pas"
@@ -768,10 +768,10 @@ msgid "Disabled  f1-f12 as step input"
 msgstr "Désactivé f1 à f12 comme entrée pas à pas"
 
 msgid "enabled snap to grid"
-msgstr "magnétisme à la grille activé"
+msgstr "magnétisme à la grille, activé"
 
 msgid "disabled snap to grid"
-msgstr "magnétisme à la grille désactivé"
+msgstr "magnétisme à la grille, désactivé"
 
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
@@ -935,7 +935,7 @@ msgstr "suivre la dernière piste touchée"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher value is disabled.
 msgid "watcher disabled"
-msgstr "observateur désactivé"
+msgstr "l'observateur de crête n'est pas activé"
 
 #. Reported when the user resets a Peak Watcher value.
 msgid "reset"
@@ -1266,10 +1266,10 @@ msgid "all tracks FX active"
 msgstr "fX de toutes les pistes, activées"
 
 msgid "enabled delta solo"
-msgstr "delta solo activé"
+msgstr "delta solo, activé"
 
 msgid "disabled delta solo"
-msgstr "delta solo désactivé"
+msgstr "delta solo, désactivé"
 
 msgid "no selected items"
 msgstr "aucun Objets n'est sélectionné"
@@ -1586,10 +1586,10 @@ msgid "{} bpm"
 msgstr "{} Bpm"
 
 msgid "enabled playback position follows project timebase when changing tempo"
-msgstr "la position de lecture activée suit la base temporelle du projet lors du changement de tempo"
+msgstr "la position de lecture suit la base temporelle du projet lors du changement de tempo, activée"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr "la position de lecture désactivée suit la base temporelle du projet lors du changement de tempo"
+msgstr "la position de lecture suit la base temporelle lors du changement de tempo, désactivé"
 
 msgid "preserving pitch when changing play rate"
 msgstr "préserver la hauteur tonale quand la vitesse de lecture change"
@@ -1635,16 +1635,16 @@ msgid "{:g} dB threshold"
 msgstr "{:g} dB, seuil"
 
 msgid "enabled envelope points move with media items"
-msgstr "activer le déplacement des points d'enveloppe avec les objets média"
+msgstr "les points d'enveloppe se déplacent avec les objets média, activé"
 
 msgid "disabled envelope points move with media items"
-msgstr "désactiver le déplacement des points d'enveloppe avec les objets média"
+msgstr "les points d'enveloppe se déplacent avec les objets média, désactivé"
 
 msgid "enabled free item positioning"
-msgstr "activer le positionnement libre des objets"
+msgstr "positionnement libre des objets, activés"
 
 msgid "disabled free item positioning"
-msgstr "désactiver le positionnement libre des objets"
+msgstr "positionnement libre des objets, désactivé"
 
 #. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
 msgid "{} item rate"
@@ -1655,10 +1655,10 @@ msgid "{} semitones"
 msgstr "{} demi ton"
 
 msgid "enabled preserve pitch when changing item rate"
-msgstr "préserver la hauteur tonale lors du changement de vitesse de l'Objet"
+msgstr "préserver la hauteur tonale lors du changement de vitesse de l'Objet, activé"
 
 msgid "disabled preserve pitch when changing item rate"
-msgstr "ne pas préserver la hauteur tonale lors du changement de vitesse de l'Objet"
+msgstr "préserver la hauteur tonale lors du changement de vitesse de l'Objet, désactivé"
 
 msgid "set selection start"
 msgstr "début de la sélection, définie"
@@ -1752,6 +1752,12 @@ msgstr "longueur, quadruple croche, 1/64"
 
 msgid "length one hundred twenty eighth"
 msgstr "longueur, quintuple croche, 1/128"
+
+msgid "full screen"
+msgstr "pleine écran"
+
+msgid "normal screen"
+msgstr "écran réduite"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2229,6 +2235,9 @@ msgstr "OSARA: Sélectionne toutes les notes de même hauteur tonale dans la sé
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: Sélectionne l'événement le plus proche du curseur d'édition"
+
+msgid "enabled"
+msgstr "activé"
 
 msgctxt "Parameters"
 msgid "Parameters"

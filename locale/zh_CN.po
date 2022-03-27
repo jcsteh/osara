@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-03-25 10:44\n"
+"PO-Revision-Date: 2022-03-27 22:32\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1700,6 +1700,12 @@ msgstr "64分长度"
 msgid "length one hundred twenty eighth"
 msgstr "128分长度"
 
+msgid "full screen"
+msgstr "全屏幕"
+
+msgid "normal screen"
+msgstr "标准屏幕"
+
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "无轨道"
@@ -2165,6 +2171,9 @@ msgstr "OSARA: 从时间选区开始选择具有相同音高的全部音符"
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: 光标最近的焦点事件"
+
+msgid "enabled"
+msgstr "已启用"
 
 msgctxt "Parameters"
 msgid "Parameters"

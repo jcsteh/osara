@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2022-03-25 10:44\n"
+"PO-Revision-Date: 2022-03-27 22:32\n"
 
 msgid "volume"
 msgstr "Lautstärke"
@@ -1753,6 +1753,12 @@ msgstr ""
 msgid "length one hundred twenty eighth"
 msgstr ""
 
+msgid "full screen"
+msgstr ""
+
+msgid "normal screen"
+msgstr ""
+
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "Keine Tracks"
@@ -2229,6 +2235,9 @@ msgstr "Osara: Selektiere alle Noten der gleichen Tonhöhe, beginnend in der Zei
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "Osara: Selektiere den am nächsten beim Edit Cursor liegenden Event"
+
+msgid "enabled"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "Parameters"

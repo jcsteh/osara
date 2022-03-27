@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-03-25 10:44\n"
+"PO-Revision-Date: 2022-03-27 22:32\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1753,6 +1753,12 @@ msgstr "longitud en semifusas"
 msgid "length one hundred twenty eighth"
 msgstr "longitud en garrapateas"
 
+msgid "full screen"
+msgstr "modo a pantalla completa"
+
+msgid "normal screen"
+msgstr "modo a pantalla normal"
+
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "sin pistas"
@@ -2229,6 +2235,9 @@ msgstr "OSARA: seleccionar todas las notas del mismo tono en la selección de ti
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "Osara: Enfocar el evento más cercano al cursor de edición"
+
+msgid "enabled"
+msgstr "habilitado"
 
 msgctxt "Parameters"
 msgid "Parameters"
