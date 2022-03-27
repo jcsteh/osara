@@ -4347,13 +4347,12 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, HWND hwnd) {
 			return false; // We can't send commands for this section.
 	}
 	isHandlingCommand = false;
-	HWND newFocus = GetFocus();
-	int newState = GetToggleCommandState2(section, command);
-	if (oldFocus != newFocus) {
+	if (oldFocus != GetFocus()) {
 		// Don't report if the focus changes. The focus changing is better
 		// feedback and we don't want to interrupt that.
 		return true;
 	}
+	int newState = GetToggleCommandState2(section, command);
 	if (oldState == newState) {
 		return true; // No change, report nothing.
 	}
