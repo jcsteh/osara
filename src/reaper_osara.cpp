@@ -2172,7 +2172,17 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// translate first2Strings begin
 	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
 	// Specify nullptr for onMsg and offMsg to report nothing.
+	// Main section toggles
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
+	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
+	// Media Explorer toggles
+	{{32063, 1011}, {"enabled auto play", "disabled auto play"}}, // Autoplay: Toggle on/off
+	{{32063, 1068}, {"repeat on", "repeat off"}}, // Preview: Toggle repeat on/off
+	{{32063, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
+	{{32063, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
+	{{32063, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
+	{{32063, 40021}, {"half time", "normal time"}}, // Tempo match: /2
+	{{32063, 40022}, {"double time", "normal time"}}, // Tempo match: x2
 	// translate first2Strings end
 };
 
