@@ -454,8 +454,16 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - View: Toggle snap to grid: Alt+S
 
 #### Media Explorer
-- Preview: decrease volume by 1 dB
-- Preview: increase volume by 1 dB
+- Preview: increase volume by 1 dB: Alt+Shift+UpArrow
+- Preview: decrease volume by 1 dB: Alt+Shift+DownArrow
+- Autoplay: Toggle on/off: Alt+A
+- Start on bar: Toggle on/off: Alt+S
+- Preview: Toggle repeat on/off: Control+R
+- Options: Preserve pitch when tempo-matching or changing play rate: Alt+P
+- Preview: reset pitch: Control+Backspace
+- Tempo match: Toggle on/off: Alt+T
+- Tempo match: /2: Alt+/
+- Tempo match: x2: Alt+2
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
