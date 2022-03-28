@@ -2178,6 +2178,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// Media Explorer toggles
 	{{32063, 1011}, {"enabled auto play", "disabled auto play"}}, // Autoplay: Toggle on/off
 	{{32063, 1068}, {"repeat on", "repeat off"}}, // Preview: Toggle repeat on/off
+	{{32063, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
 	{{32063, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
 	{{32063, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
 	{{32063, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
