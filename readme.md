@@ -264,7 +264,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Global automation override: Bypass all automation
 - Global automation override: No override (set automation modes per track)
 - Track: Toggle track volume envelope visible: Control+Alt+V
+- Track: Toggle track pre-FX volume envelope visible: Control+Alt+Shift+V
 - Track: Toggle track pan envelope visible: Control+Alt+P
+- Track: Toggle track pre-FX pan envelope visible: Control+Alt+Shift+P
+- Track: Toggle track mute envelope visible: Control+Alt+F5
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-
