@@ -2169,7 +2169,19 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// translate first2Strings begin
 	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
 	// Specify nullptr for onMsg and offMsg to report nothing.
+	// Main section toggles
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
+	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
+	// Media Explorer toggles
+	{{32063, 1011}, {"enabled auto play", "disabled auto play"}}, // Autoplay: Toggle on/off
+	{{32063, 1068}, {"repeat on", "repeat off"}}, // Preview: Toggle repeat on/off
+	{{32063, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
+	{{32063, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
+	{{32063, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
+	{{32063, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
+	{{32063, 40021}, {"half time", "normal time"}}, // Tempo match: /2
+	{{32063, 40022}, {"double time", "normal time"}}, // Tempo match: x2
+	{{32063, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
 	// translate first2Strings end
 };
 
@@ -3983,6 +3995,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
+	{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
+	{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...

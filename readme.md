@@ -264,7 +264,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Global automation override: Bypass all automation
 - Global automation override: No override (set automation modes per track)
 - Track: Toggle track volume envelope visible: Control+Alt+V
+- Track: Toggle track pre-FX volume envelope visible: Control+Alt+Shift+V
 - Track: Toggle track pan envelope visible: Control+Alt+P
+- Track: Toggle track pre-FX pan envelope visible: Control+Alt+Shift+P
+- Track: Toggle track mute envelope visible: Control+Alt+F5
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-
@@ -454,8 +457,18 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - View: Toggle snap to grid: Alt+S
 
 #### Media Explorer
-- Preview: decrease volume by 1 dB
-- Preview: increase volume by 1 dB
+- Preview: increase volume by 1 dB: Alt+Shift+UpArrow
+- Preview: decrease volume by 1 dB: Alt+Shift+DownArrow
+- Autoplay: Toggle on/off: Alt+A
+- Start on bar: Toggle on/off: Alt+S
+- Preview: Toggle repeat on/off: Control+R
+- Options: Preserve pitch when tempo-matching or changing play rate: Alt+P
+- Preview: reset pitch: Control+Backspace
+- Tempo match: Toggle on/off: Alt+T
+- Tempo match: /2: Alt+/
+- Tempo match: x2: Alt+2
+- Dock Media Explorer in Docker: Shift+D
+(Note: although the action name doesn't make it clear, this is a toggle. For best screen reader accessibility, you should run this action once to remove Media Explorer from the Docker)
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
@@ -744,7 +757,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report groups for current track
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
-- OSARA: About
+- OSARA: About: Control+F1
+- Toggle fullscreen: F11
 
 #### Midi editor
 - OSARA: Move to next midi item on track: Control+RightArrow
