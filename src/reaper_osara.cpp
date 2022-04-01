@@ -2181,6 +2181,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{32063, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
 	{{32063, 40021}, {"half time", "normal time"}}, // Tempo match: /2
 	{{32063, 40022}, {"double time", "normal time"}}, // Tempo match: x2
+	{{32063, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
 	// translate first2Strings end
 };
 

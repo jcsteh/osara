@@ -467,6 +467,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Tempo match: Toggle on/off: Alt+T
 - Tempo match: /2: Alt+/
 - Tempo match: x2: Alt+2
+- Dock Media Explorer in Docker: Shift+D
+(Note: although the action name doesn't make it clear, this is a toggle. For best screen reader accessibility, you should run this action once to remove Media Explorer from the Docker)
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
