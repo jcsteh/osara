@@ -9,8 +9,8 @@ environment:
   - job_name: Windows
     appveyor_build_worker_image: Visual Studio 2022
     PY_PYTHON: 3.9-32
-  - job_name: Mac
-    appveyor_build_worker_image: macos-bigsur
+  # - job_name: Mac
+    # appveyor_build_worker_image: macos-bigsur
  global:
   encFileKey:
    secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
@@ -61,8 +61,7 @@ build_script:
  # We only build the pot on Windows. The choice of which OS is
  # arbitrary, but there's no point in building it on both.
  - ps: If ($IsWindows) { $targets = "installer", "pot" }
- - ps: $ErrorActionPreference = "Continue"
- - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets 2>&1 | % ToString'
+ - ps: '$ErrorActionPreference = "SilentlyContinue"; & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets 2>&1 | % ToString'
 
 artifacts:
  - path: installer/*.exe
