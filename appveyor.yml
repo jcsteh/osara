@@ -61,6 +61,7 @@ build_script:
  # We only build the pot on Windows. The choice of which OS is
  # arbitrary, but there's no point in building it on both.
  - ps: If ($IsWindows) { $targets = "installer", "pot" }
+ - ps: $ErrorActionPreference = "Continue"
  - ps: '& $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets'
 
 artifacts:
