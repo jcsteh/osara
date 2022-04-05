@@ -65,7 +65,8 @@ build_script:
      & {
        $ErrorActionPreference = "SilentlyContinue"
        & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets
-       if(!$?) {
+       $ErrorActionPreference = "Stop"
+       if($LastExitCode) {
          throw "Scons exited with code $LastExitCode"
        }
      }
