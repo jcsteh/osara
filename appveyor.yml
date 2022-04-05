@@ -63,7 +63,7 @@ build_script:
  - ps: If ($IsWindows) { $targets = "installer", "pot" }
  - ps: Set-AppveyorBuildVariable "scons" $scons
  - ps: Set-AppveyorBuildVariable "targets" $targets
- - cmd: %scons% version=%APPVEYOR_BUILD_VERSION% publisher="James Teh" %targets%
+ - cmd: '%scons% version=%APPVEYOR_BUILD_VERSION% publisher="James Teh" %targets%''
 
 artifacts:
  - path: installer/*.exe
