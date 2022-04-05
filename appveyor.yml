@@ -9,8 +9,8 @@ environment:
   - job_name: Windows
     appveyor_build_worker_image: Visual Studio 2022
     PY_PYTHON: 3.9-32
-  # - job_name: Mac
-    # appveyor_build_worker_image: macos-bigsur
+  - job_name: Mac
+    appveyor_build_worker_image: macos-bigsur
  global:
   encFileKey:
    secure: hN4Qfteiu6qqPajSvT+vrPfVoazOY+MFAlwUt/kZSnM=
@@ -63,7 +63,7 @@ build_script:
  - ps: If ($IsWindows) { $targets = "installer", "pot" }
  - ps: Set-AppveyorBuildVariable "scons" $scons
  - ps: Set-AppveyorBuildVariable "targets" $targets
- - cmd: '%scons% version=%APPVEYOR_BUILD_VERSION% publisher="James Teh" %targets%'
+ - sh: '$scons version=$APPVEYOR_BUILD_VERSION publisher="James Teh" $targets'
 
 artifacts:
  - path: installer/*.exe
