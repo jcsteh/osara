@@ -4651,4 +4651,3 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #include <swell-menugen.h>
 #include "reaper_osara.rc_mac_menu"
 #endif
-fail build
