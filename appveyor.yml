@@ -57,11 +57,18 @@ install:
  - sh: sudo xcode-select -s /Applications/Xcode-13.2.1.app
 
 build_script:
- - ps: If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.8/bin/scons" }
- # We only build the pot on Windows. The choice of which OS is
- # arbitrary, but there's no point in building it on both.
- - ps: If ($IsWindows) { $targets = "installer", "pot" }
- - ps: '& {$ErrorActionPreference = "SilentlyContinue"; & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets}'
+ - ps: |
+     If ($IsWindows) { $scons = "c:\python39\scripts\scons.exe" } Else { $scons = "/Users/appveyor/Library/Python/3.8/bin/scons" }
+     # We only build the pot on Windows. The choice of which OS is
+     # arbitrary, but there's no point in building it on both.
+     If ($IsWindows) { $targets = "installer", "pot" }
+     & {
+       $ErrorActionPreference = "SilentlyContinue"
+       & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets
+       if(!$?) {
+         throw "Scons exited with code $LastExitCode"
+       }
+     }
 
 artifacts:
  - path: installer/*.exe
