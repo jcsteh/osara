@@ -62,13 +62,12 @@ build_script:
      # We only build the pot on Windows. The choice of which OS is
      # arbitrary, but there's no point in building it on both.
      If ($IsWindows) { $targets = "installer", "pot" }
-     & {
-       $ErrorActionPreference = "SilentlyContinue"
-       & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets
-       $ErrorActionPreference = "Stop"
-       if($LastExitCode) {
-         throw "Scons exited with code $LastExitCode"
-       }
+     # workaround for Warnings written to stderr that cause the appveyor build to fail
+     $ErrorActionPreference = "SilentlyContinue"
+     & $scons version=$env:APPVEYOR_BUILD_VERSION publisher="James Teh" $targets
+     $ErrorActionPreference = "Stop"
+     if($LastExitCode) {
+       throw "Scons exited with code $LastExitCode"
      }
 
 artifacts:
