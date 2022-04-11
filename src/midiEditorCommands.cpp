@@ -972,7 +972,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			// Translators: used when reporting the number of muted notes in a chord.
 			// {} will be replaced by the number of muted notes. E.g. "3 muted"
 			s << format(
-				translate("{} muted"), mutedCount);
+				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
 		}
 	}
 	outputMessage(s);
