@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "Volume"
@@ -1757,6 +1757,54 @@ msgid "full screen"
 msgstr ""
 
 msgid "normal screen"
+msgstr ""
+
+msgid "showed Media Explorer"
+msgstr ""
+
+msgid "hid Media Explorer"
+msgstr ""
+
+msgid "enabled auto play"
+msgstr ""
+
+msgid "disabled auto play"
+msgstr ""
+
+msgid "starting on bar"
+msgstr ""
+
+msgid "not starting on bar"
+msgstr ""
+
+msgid "preserving pitch"
+msgstr ""
+
+msgid "not preserving pitch"
+msgstr ""
+
+msgid "reset pitch"
+msgstr ""
+
+msgid "tempo matching"
+msgstr ""
+
+msgid "not tempo  matching"
+msgstr ""
+
+msgid "half time"
+msgstr ""
+
+msgid "normal time"
+msgstr ""
+
+msgid "double time"
+msgstr ""
+
+msgid "docked Media Explorer"
+msgstr ""
+
+msgid "removed Media Explorer from dock"
 msgstr ""
 
 #. Reported when there are no tracks to navigate to.

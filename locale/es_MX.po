@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -527,7 +527,7 @@ msgid "Pitch Bend {}"
 msgstr "Curvatura de Tono {}"
 
 msgid "OSARA: Move to next midi item on track"
-msgstr "OSARA: mover al siguiente ítem en la pista"
+msgstr "OSARA: mover al siguiente ítem midi en la pista"
 
 msgid "OSARA: Move to previous midi item on track"
 msgstr "OSARA: mover al ítem midi anterior en la pista"
@@ -928,7 +928,7 @@ msgid "not configured"
 msgstr "no configurado"
 
 msgid "following last touched track"
-msgstr "siguiendo la pista enfocada en"
+msgstr "siguiendo la última pista enfocada en"
 
 #. Reported when the user tries to reset a Peak Watcher
 #. value, but that watcher is disabled.
@@ -1101,7 +1101,7 @@ msgstr "deshabilitado"
 
 #. A recording mode.
 msgid "output (stereo, latency compensated)"
-msgstr "salida (estéreo, compensar latencia)"
+msgstr "salida (estéreo, latencia compensada)"
 
 #. A recording mode.
 msgid "output (midi)"
@@ -1113,7 +1113,7 @@ msgstr "salida (mono)"
 
 #. A recording mode.
 msgid "output (mono, latency compensated)"
-msgstr "salida (mono, compensar latencia)"
+msgstr "salida (mono, latencia compensada)"
 
 #. A recording mode.
 msgid "midi overdub"
@@ -1712,7 +1712,7 @@ msgid "all tracks unsoloed"
 msgstr "solo en todas las pistas desactivado"
 
 msgid "all tracks unarmed"
-msgstr "desarmar todas las pistas"
+msgstr "todas las pistas desarmadas"
 
 msgid "all delta solos reset"
 msgstr "todos los solos en delta reseteados"
@@ -1758,6 +1758,54 @@ msgstr "modo a pantalla completa"
 
 msgid "normal screen"
 msgstr "modo a pantalla normal"
+
+msgid "showed Media Explorer"
+msgstr "explorador de medios mostrado"
+
+msgid "hid Media Explorer"
+msgstr "explorador de medios oculto"
+
+msgid "enabled auto play"
+msgstr "auto reproducción habilitada"
+
+msgid "disabled auto play"
+msgstr "auto reproducción deshabilitada"
+
+msgid "starting on bar"
+msgstr "iniciando en el compás"
+
+msgid "not starting on bar"
+msgstr "sin iniciar en el compás"
+
+msgid "preserving pitch"
+msgstr "preservando tono"
+
+msgid "not preserving pitch"
+msgstr "sin preservación de tono"
+
+msgid "reset pitch"
+msgstr "restablecer tono"
+
+msgid "tempo matching"
+msgstr "coincidencia de tempo"
+
+msgid "not tempo  matching"
+msgstr "sin coincidencia de tempo"
+
+msgid "half time"
+msgstr "medio tiempo"
+
+msgid "normal time"
+msgstr "tiempo normal"
+
+msgid "double time"
+msgstr "tiempo doble"
+
+msgid "docked Media Explorer"
+msgstr "explorador de medios acomplado"
+
+msgid "removed Media Explorer from dock"
+msgstr "explorador de medios removido del dock"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -1950,10 +1998,10 @@ msgid "stretch marker moved"
 msgstr "marcador elástico movido"
 
 msgid "Delete all time signature markers"
-msgstr "Eliminar cambios de tempo"
+msgstr "Eliminar todos los cambios de tempo"
 
 msgid "deleted all time signature markers"
-msgstr "cambios de tempo eliminados"
+msgstr "todos los cambios de tempo fueron eliminados"
 
 #. Used to report global automation override mode.  {} is
 #. replaced with the mode; e.g. "Global automation override latch
@@ -1994,7 +2042,7 @@ msgstr "OSARA: extensión de Accesibilidad de código abierto para la aplicació
 #. osara version. {} is replaced with the version; e.g.
 #. "Version: 2021.1pre-588,0531135a"
 msgid "Version: {}"
-msgstr "Versión: {} (Traducida por Producción Musical Accesible)"
+msgstr "Versión: {} (traducción por producción musical accesible)"
 
 msgid "About OSARA"
 msgstr "Acerca de OSARA"

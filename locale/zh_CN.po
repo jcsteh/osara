@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1706,6 +1706,54 @@ msgstr "全屏幕"
 msgid "normal screen"
 msgstr "标准屏幕"
 
+msgid "showed Media Explorer"
+msgstr "显示媒体资源管理器"
+
+msgid "hid Media Explorer"
+msgstr "影藏媒体资源管理器"
+
+msgid "enabled auto play"
+msgstr "已启用自动播放"
+
+msgid "disabled auto play"
+msgstr "已禁用自动播放"
+
+msgid "starting on bar"
+msgstr "从小节线开始"
+
+msgid "not starting on bar"
+msgstr "不从小节线开始"
+
+msgid "preserving pitch"
+msgstr "保留音高"
+
+msgid "not preserving pitch"
+msgstr "不保留音高"
+
+msgid "reset pitch"
+msgstr "重制音高"
+
+msgid "tempo matching"
+msgstr "匹配速度"
+
+msgid "not tempo  matching"
+msgstr "不匹配速度"
+
+msgid "half time"
+msgstr "一半时间"
+
+msgid "normal time"
+msgstr "标准时间"
+
+msgid "double time"
+msgstr "两倍时间"
+
+msgid "docked Media Explorer"
+msgstr "已停靠媒体资源管理器"
+
+msgid "removed Media Explorer from dock"
+msgstr "已从泊坞窗移除媒体资源管理器"
+
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
 msgstr "无轨道"
@@ -1897,13 +1945,13 @@ msgstr "全部拍号标记已删除"
 #. replaced with the mode; e.g. "Global automation override latch
 #. preview"
 msgid "global automation override {}"
-msgstr "全局自动化覆盖"
+msgstr "{} 全局自动化覆盖"
 
 #. Used to report track automation override mode.  {} is
 #. replaced with the mode; e.g. "track automation override latch
 #. preview"
 msgid "track automation mode {}"
-msgstr "轨道自动化模式"
+msgstr "{} 轨道自动化模式"
 
 msgid "global automation override off"
 msgstr "关闭全局自动化覆盖"
@@ -1917,7 +1965,7 @@ msgstr "无选定轨"
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
 msgid "automation mode {} for selected tracks"
-msgstr "选定轨道的自动化模式"
+msgstr "自动化模式 {} 选定的轨道"
 
 msgid "time selection start"
 msgstr "时间选区开始"
@@ -1952,14 +2000,14 @@ msgstr "区间 {} 已插入"
 #. group number. For example: "2 items added to group 1".
 msgid "item added to group {group}"
 msgid_plural "{count} items added to group {group}"
-msgstr[0] "{count} 个对象已添加到组 {group}"
+msgstr[0] "对象已添加到组 {group}"
 
 #. Reported when removing items from a group. {count} will be
 #. replaced with the number of items. {group} will be replaced with the group
 #. number. For example: "2 items removed from group 1".
 msgid "item removed from group {group}"
 msgid_plural "{count} items removed from group {group}"
-msgstr[0] "{count} 个对象已从组 {group} 中移除"
+msgstr[0] "对象已从组移除 {group}"
 
 msgid "track not grouped"
 msgstr "轨道未分组"

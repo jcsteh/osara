@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "音量"
@@ -345,7 +345,7 @@ msgid "Mod Wheel LSB"
 msgstr "調製輪 LSB"
 
 msgid "Breath LSB"
-msgstr "呼吸"
+msgstr "呼吸 LSB"
 
 msgid "Foot Pedal LSB"
 msgstr "腳踏板 LSB"
@@ -450,10 +450,10 @@ msgid "Phaser Level"
 msgstr "移相器深度"
 
 msgid "Data Button Inc"
-msgstr "資料按鈕增加"
+msgstr "數據按鈕增加"
 
 msgid "Data Button Dec"
-msgstr "資料按鈕減少"
+msgstr "數據按鈕減少"
 
 msgid "Non-Reg Parm LSB"
 msgstr "非注冊參數LSB"
@@ -1095,55 +1095,55 @@ msgid "volume lead"
 msgstr "音量引導"
 
 msgid "volume follow"
-msgstr "音量跟蹤"
+msgstr "音量跟隨"
 
 msgid "VCA lead"
 msgstr "VCA 引導"
 
 msgid "VCA follow"
-msgstr "VCA 跟蹤"
+msgstr "VCA 跟隨"
 
 msgid "pan lead"
 msgstr "聲像引導"
 
 msgid "pan follow"
-msgstr "聲像跟蹤"
+msgstr "聲像跟隨"
 
 msgid "width lead"
 msgstr "寬度引導"
 
 msgid "width follow"
-msgstr "寬度跟蹤"
+msgstr "寬度跟隨"
 
 msgid "mute lead"
 msgstr "靜音引導"
 
 msgid "mute follow"
-msgstr "靜音跟蹤"
+msgstr "靜音跟隨"
 
 msgid "solo lead"
 msgstr "獨奏引導"
 
 msgid "solo follow"
-msgstr "獨奏跟蹤"
+msgstr "獨奏跟隨"
 
 msgid "record arm lead"
 msgstr "錄音預備引導"
 
 msgid "record arm follow"
-msgstr "錄音預備跟蹤"
+msgstr "錄音預備跟隨"
 
 msgid "polarity lead"
 msgstr "極性引導"
 
 msgid "polarity follow"
-msgstr "極性跟蹤"
+msgstr "極性跟隨"
 
 msgid "automation mode lead"
 msgstr "自動化模式引導"
 
 msgid "automation mode follow"
-msgstr "自動化模式跟蹤"
+msgstr "自動化模式跟隨"
 
 msgid "reverse volume"
 msgstr "撤銷音量"
@@ -1155,10 +1155,10 @@ msgid "reverse width"
 msgstr "撤銷寬度"
 
 msgid "do not lead when following"
-msgstr "跟蹤時不引導"
+msgstr "跟隨時不引導"
 
 msgid "VCA pre-FX follow"
-msgstr "VCA pre-FX 跟蹤"
+msgstr "VCA pre-FX 跟隨"
 
 msgid "defeating solo"
 msgstr "獨奏失效"
@@ -1705,6 +1705,54 @@ msgstr "全螢幕"
 
 msgid "normal screen"
 msgstr "正常畫面"
+
+msgid "showed Media Explorer"
+msgstr "顯示媒體資源瀏覽器"
+
+msgid "hid Media Explorer"
+msgstr "隱藏媒體資源瀏覽器"
+
+msgid "enabled auto play"
+msgstr "啟用自動播放"
+
+msgid "disabled auto play"
+msgstr "禁用自動播放"
+
+msgid "starting on bar"
+msgstr "從小節開始"
+
+msgid "not starting on bar"
+msgstr "不從小節開始"
+
+msgid "preserving pitch"
+msgstr "保持音高"
+
+msgid "not preserving pitch"
+msgstr "不保持音高"
+
+msgid "reset pitch"
+msgstr "重設音高"
+
+msgid "tempo matching"
+msgstr "速度匹配"
+
+msgid "not tempo  matching"
+msgstr "布疋配速度"
+
+msgid "half time"
+msgstr "半速"
+
+msgid "normal time"
+msgstr "正常速度"
+
+msgid "double time"
+msgstr "雙速"
+
+msgid "docked Media Explorer"
+msgstr "停靠媒體資源瀏覽器"
+
+msgid "removed Media Explorer from dock"
+msgstr "從停靠區中移除媒體資源瀏覽器"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

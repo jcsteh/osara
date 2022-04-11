@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "volume"
@@ -256,7 +256,7 @@ msgstr[1] "{} notes"
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
 msgid_plural "{} muted"
-msgstr[0] ""
+msgstr[0] "{} muette"
 msgstr[1] ""
 
 msgid "noncontiguous selection"
@@ -1754,10 +1754,58 @@ msgid "length one hundred twenty eighth"
 msgstr "longueur à 1/128"
 
 msgid "full screen"
-msgstr ""
+msgstr "plein écran"
 
 msgid "normal screen"
-msgstr ""
+msgstr "écran normal"
+
+msgid "showed Media Explorer"
+msgstr "explorateur de média affiché"
+
+msgid "hid Media Explorer"
+msgstr "explorateur de média masqué"
+
+msgid "enabled auto play"
+msgstr "lecture automatique activée"
+
+msgid "disabled auto play"
+msgstr "lecture automatique désactivée"
+
+msgid "starting on bar"
+msgstr "démarrer sur la mesure"
+
+msgid "not starting on bar"
+msgstr "ne pas démarrer sur la mesure"
+
+msgid "preserving pitch"
+msgstr "préserver la hauteur tonale"
+
+msgid "not preserving pitch"
+msgstr "ne pas préserver la hauteur tonale"
+
+msgid "reset pitch"
+msgstr "réinitialiser la hauteur tonale"
+
+msgid "tempo matching"
+msgstr "correspondance de tempo"
+
+msgid "not tempo  matching"
+msgstr "pas de correspondance de tempo"
+
+msgid "half time"
+msgstr "division de la vitesse par deux"
+
+msgid "normal time"
+msgstr "vitesse normale"
+
+msgid "double time"
+msgstr "doublement de la vitesse par deux"
+
+msgid "docked Media Explorer"
+msgstr "explorateurr de média ancré"
+
+msgid "removed Media Explorer from dock"
+msgstr "explorateurr de média détaché"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2237,7 +2285,7 @@ msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: sélectionne l'événement le plus proche du curseur d'édition"
 
 msgid "enabled"
-msgstr ""
+msgstr "activé"
 
 msgctxt "Parameters"
 msgid "Parameters"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1758,6 +1758,54 @@ msgstr "pantalla completa"
 
 msgid "normal screen"
 msgstr "tamaño de pantalla normal"
+
+msgid "showed Media Explorer"
+msgstr "explorador media mostrado"
+
+msgid "hid Media Explorer"
+msgstr "explorador media oculto"
+
+msgid "enabled auto play"
+msgstr "activada reproducción automática"
+
+msgid "disabled auto play"
+msgstr ""
+
+msgid "starting on bar"
+msgstr "comenzando en compás"
+
+msgid "not starting on bar"
+msgstr "sin comienzo en compás"
+
+msgid "preserving pitch"
+msgstr "mantener el tono"
+
+msgid "not preserving pitch"
+msgstr "no mantener el tono"
+
+msgid "reset pitch"
+msgstr "reinicio del tono"
+
+msgid "tempo matching"
+msgstr "igualar el tempo"
+
+msgid "not tempo  matching"
+msgstr "sin igualar el tempo"
+
+msgid "half time"
+msgstr "velocidad a la mitad"
+
+msgid "normal time"
+msgstr "velocidad normal"
+
+msgid "double time"
+msgstr "velocidad doble"
+
+msgid "docked Media Explorer"
+msgstr "explorador media en el dock"
+
+msgid "removed Media Explorer from dock"
+msgstr "eliminado explorador media del dock"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-03-27 22:32\n"
+"PO-Revision-Date: 2022-04-11 04:18\n"
 
 msgid "volume"
 msgstr "volume"
@@ -1758,6 +1758,54 @@ msgstr "pleine écran"
 
 msgid "normal screen"
 msgstr "écran réduite"
+
+msgid "showed Media Explorer"
+msgstr "afficher l'explorateur de média"
+
+msgid "hid Media Explorer"
+msgstr "masquer l'explorateur de média"
+
+msgid "enabled auto play"
+msgstr "lecture automatique, activé"
+
+msgid "disabled auto play"
+msgstr "lecture automatique, désactivé"
+
+msgid "starting on bar"
+msgstr "démarrer sur la mesure, activé"
+
+msgid "not starting on bar"
+msgstr "démarrer sur la mesure, désactivé"
+
+msgid "preserving pitch"
+msgstr "préserver la hauteur tonale, activé"
+
+msgid "not preserving pitch"
+msgstr "préserver la hauteur tonale, désactivé"
+
+msgid "reset pitch"
+msgstr "hauteur tonale réinitialisé"
+
+msgid "tempo matching"
+msgstr "harmonisation du tempo, activé"
+
+msgid "not tempo  matching"
+msgstr "harmonisation du tempo, désactivé"
+
+msgid "half time"
+msgstr "harmoniser le tempo, vitesse /2"
+
+msgid "normal time"
+msgstr "harmoniser le tempo, vitesse normal"
+
+msgid "double time"
+msgstr "harmoniser le tempo, vitesse X2"
+
+msgid "docked Media Explorer"
+msgstr "explorateur de média ancré dans le docker"
+
+msgid "removed Media Explorer from dock"
+msgstr "explorateur de média désancré du docker"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
