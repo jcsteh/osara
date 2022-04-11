@@ -48,7 +48,7 @@ unique_ptr<UiaCore> uiaCore;
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
 class UiaProvider : public IRawElementProviderSimple {
 	public:
-	UiaProvider(_In_ HWND hwnd): controlHWnd(hwnd) {}
+	UiaProvider(_In_ HWND hwnd): refCount(0), controlHWnd(hwnd) {}
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() {
@@ -131,7 +131,7 @@ CComPtr<IRawElementProviderSimple> uiaProvider;
 LRESULT CALLBACK uiaWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
-			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)) {
+			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId) && uiaProvider) {
 				return UiaReturnRawElementProvider(hwnd, wParam, lParam, uiaProvider);
 			}
 			return 0;
@@ -184,6 +184,8 @@ bool initializeUia() {
 		return false;
 	}
 	ShowWindow(uiaWnd, SW_SHOWNA);
+	// Constructor  initializes refcount to 0, assignment to a CComPtr
+	// takes it to 1.
 	uiaProvider = new UiaProvider(uiaWnd);
 	return true;
 }
