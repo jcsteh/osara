@@ -873,3 +873,4 @@ The resulting installer can be found in the installer directory.
 - Alexey Zhelezov
 - Leonard de Ruijter
 - Robbie Murray
+- Glen Gordon
