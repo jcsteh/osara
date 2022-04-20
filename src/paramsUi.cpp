@@ -1198,8 +1198,13 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.wID = fxList[f].first + 1;
-			itemInfo.dwTypeData = (char*)fxList[f].second.c_str();
-			itemInfo.cch = (UINT)fxList[f].second.length();
+			ostringstream s;
+			s << f + 1 << " ";
+			shortenFxName(fxList[f].second.c_str(), s);
+			// Make sure this stays around until the InsertMenuItem call.
+			const string str = s.str();
+			itemInfo.dwTypeData = (char*)str.c_str();
+			itemInfo.cch = (UINT)s.tellp();
 			InsertMenuItem(effects, (UINT)f, true, &itemInfo);
 		}
 		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;

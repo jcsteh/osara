@@ -9,7 +9,7 @@
 #include <sstream>
 
 bool isFxListFocused();
-void shortenFxName(char* name, std::ostringstream& s);
+void shortenFxName(const char* name, std::ostringstream& s);
 bool maybeSwitchToFxPluginWindow();
 bool maybeReportFxChainBypass(bool aboutToToggle=false);
 bool maybeReportFxChainBypassDelayed();

@@ -30,7 +30,7 @@ bool isFxListFocused() {
 		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
 }
 
-void shortenFxName(char* name, ostringstream& s) {
+void shortenFxName(const char* name, ostringstream& s) {
 	const regex RE_FX_NAME("^(\\w+): (.+?)( \\(.*?\\))?$");
 	cmatch m;
 	regex_search(name, m, RE_FX_NAME);
