@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-04-11 04:18\n"
+"PO-Revision-Date: 2022-04-20 12:56\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1769,7 +1769,7 @@ msgid "enabled auto play"
 msgstr "activada reproducción automática"
 
 msgid "disabled auto play"
-msgstr ""
+msgstr "desactivada reproducción automática"
 
 msgid "starting on bar"
 msgstr "comenzando en compás"
