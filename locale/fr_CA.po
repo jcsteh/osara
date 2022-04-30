@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-04-11 04:18\n"
+"PO-Revision-Date: 2022-04-30 11:19\n"
 
 msgid "volume"
 msgstr "volume"
@@ -143,7 +143,7 @@ msgstr "Changer la sélection d'Objets d'automatisation"
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
-msgstr "automatique {}"
+msgstr "automatisation {}"
 
 #. Reported when copying automation items. {} will be replaced
 #. with the number of items; e.g. "2 automation items copied".
@@ -2016,10 +2016,10 @@ msgid "track automation mode {}"
 msgstr "mode d'automatisation de piste {}"
 
 msgid "global automation override off"
-msgstr "passer outre l'automatisation global désactivée"
+msgstr "passer outre l'automatisation global, désactivée"
 
 msgid "global automation override latch preview"
-msgstr "aperçu du surpasser, passer outre l'automatisation globale"
+msgstr "passer outre l'automatisation globale, surpasser aperçu"
 
 msgid "no selected tracks"
 msgstr "aucune piste sélectionné"
