@@ -299,6 +299,7 @@ class ParamsDialog {
 	HWND paramCombo;
 	HWND slider;
 	HWND valueEdit;
+	HWND valueLabel;
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
@@ -333,6 +334,7 @@ class ParamsDialog {
 			outputMessage(this->valText);
 		}
 #endif // _WIN32
+		SetWindowText(this->valueLabel, this->valText.c_str());
 	}
 
 	void updateValue() {
@@ -631,6 +633,7 @@ class ParamsDialog {
 		this->accelReg.user = (void*)this;
 		plugin_register("accelerator", &this->accelReg);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
+		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
