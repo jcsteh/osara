@@ -4481,6 +4481,7 @@ void annotateAccRole(HWND hwnd, long role) {
 }
 
 HWND prevForegroundHwnd = nullptr;
+DWORD prevForegroundTime = 0;
 HWND prevPrevForegroundHwnd = nullptr;
 
 void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
@@ -4488,7 +4489,12 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		HWND foreground = GetForegroundWindow();
 		if (foreground != prevForegroundHwnd) {
 			// The foreground window has changed.
-			if (IsWindowVisible(prevPrevForegroundHwnd) &&
+			if (
+					// #747: When opening the Render to file name dialog, REAPER very briefly
+					// opens and then closes the full Render to File dialog first. Use a
+					// short timeout to prevent this code from running in that case.
+					time - prevForegroundTime > 50 &&
+					IsWindowVisible(prevPrevForegroundHwnd) &&
 					!IsWindowVisible(prevForegroundHwnd)) {
 				// The previous foreground window has closed. For example, this happens
 				// when you open the FX chain for a track with no FX and dismiss the Add
@@ -4501,6 +4507,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			}
 			prevPrevForegroundHwnd = prevForegroundHwnd;
 			prevForegroundHwnd = foreground;
+			prevForegroundTime = time;
 		}
 		bool focusIsTrackView = isTrackViewWindow(hwnd);
 		if (focusIsTrackView) {
