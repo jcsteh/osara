@@ -390,6 +390,8 @@ class ParamsDialog {
 		char rawText[30];
 		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0)
 			return;
+		if (this->param->getValueForEditing().compare(rawText) == 0)
+			return;
 		this->param->setValueFromEdited(rawText);
 		this->val = this->param->getValue();
 		this->updateValue();
