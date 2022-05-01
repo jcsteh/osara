@@ -20,6 +20,9 @@ BoolSetting(reportScrub,
 BoolSetting(reportTimeMovementWhilePlaying,
 	"Report time movement during playback/recording",
 	true)
+BoolSetting(reportFullTimeMovement,
+	"Report f&ull time for time movement commands",
+	false)
 BoolSetting(moveFromPlayCursor,
 	"&Move relative to the play cursor for time movement commands during playback",
 	false)

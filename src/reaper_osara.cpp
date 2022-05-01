@@ -141,8 +141,10 @@ void outputMessage(ostringstream& message, bool interrupt) {
 }
 
 string formatTime(double time, TimeFormat timeFormat, bool isLength,
-	bool useCache, bool includeZeros, bool includeProjectStartOffset
+	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset
 ) {
+	const bool useCache = cache == FT_USE_CACHE ||
+		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
 	ostringstream s;
 	if (timeFormat == TF_RULER) {
 		if (GetToggleCommandState(40365)) {
@@ -359,8 +361,8 @@ string formatNoteLength(double start, double end) {
 	return s.str();
 }
 
-string formatCursorPosition(TimeFormat format, bool useCache) {
-	return formatTime(GetCursorPosition(), format, false, useCache);
+string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
+	return formatTime(GetCursorPosition(), format, false, cache);
 }
 
 const char* formatFolderState(int state, bool reportTrack=true) {
@@ -1677,7 +1679,7 @@ void postSetItemEnd(int command) {
 		// media end. {} will be replaced with the end time; e.g.
 		// "item end set to source media end: bar 3 beat 1 25%"
 		outputMessage(format(translate("item end set to source media end: {}"),
-			formatTime(endPos, TF_RULER, false, false, true)));
+			formatTime(endPos, TF_RULER, false, FT_NO_CACHE, true)));
 	}
 }
 
@@ -2993,9 +2995,10 @@ void cmdMoveItemEdge(Command* command) {
 		return;
 	}
 	ostringstream s;
+	auto cache = FT_USE_CACHE;
 	if(lastCommand != command->gaccel.accel.cmd) { 
 		s<< getActionName(command->gaccel.accel.cmd) << " ";
-		resetTimeCache();
+		cache = FT_NO_CACHE;
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
@@ -3006,9 +3009,9 @@ void cmdMoveItemEdge(Command* command) {
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	if(newStart!=oldStart)
-		s<<formatTime(newStart, TF_RULER, false, true);
+		s<<formatTime(newStart, TF_RULER, false, cache);
 	else if(newEnd!=oldEnd)
-		s<<formatTime(newEnd, TF_RULER, false, true);
+		s<<formatTime(newEnd, TF_RULER, false, cache);
 	else {
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
@@ -3362,15 +3365,15 @@ void cmdReportSelection(Command* command) {
 					// Translators: Used when reporting the time selection. {} will be
 					// replaced with the start time; e.g. "start bar 2 beat 1 0%".
 					format(translate("start {}"),
-						formatTime(start, TF_RULER, false, false)) << separator <<
+						formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
 					// Translators: Used when reporting the time selection. {} will be
 					// replaced with the end time; e.g. "end bar 4 beat 1 0%".
 					format(translate("end {}"),
-						formatTime(end, TF_RULER, false, false)) << separator <<
+						formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
 					// Translators: Used when reporting the time selection. {} will be
 					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
 					format(translate("length {}"),
-						formatTime(end - start, TF_RULER, true, false));
+						formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
 				resetTimeCache();
 			}
 			break;
@@ -3482,7 +3485,7 @@ void cmdReportCursorPosition(Command* command) {
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
-	s << formatTime(pos, tf, false, false) << " ";
+	s << formatTime(pos, tf, false, FT_NO_CACHE) << " ";
 	if (state & 2) {
 		s << translate("paused");
 	} else if (state & 4) {
@@ -3746,19 +3749,18 @@ void cmdNudgeTimeSelection(Command* command) {
 	if (!shouldReportTimeMovement()) {
 		return;
 	}
-	if(first) 
-		resetTimeCache();
+	auto cache = first ? FT_NO_CACHE : FT_USE_CACHE;
 	ostringstream s;
 	if(newStart!=oldStart) {
 		if(first) {
 			s << translate("time selection start") << " ";
 		}
-		s<<formatTime(newStart, TF_RULER, false, true, false);
+		s<<formatTime(newStart, TF_RULER, false, cache, false);
 	} else if(newEnd!=oldEnd) {
 		if(first) {
 			s << translate("time selection end") << " ";
 		}
-		s<<formatTime(newEnd, TF_RULER, false, true, false);
+		s<<formatTime(newEnd, TF_RULER, false, cache, false);
 	}
 	outputMessage(s);
 }

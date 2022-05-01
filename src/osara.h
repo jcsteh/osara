@@ -256,10 +256,18 @@ typedef enum {
 	TF_SAMPLE
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
-std::string formatTime(double time, TimeFormat format=TF_RULER, bool isLength=false, bool useCache=true, bool includeZeros=true, bool includeProjectStartOffset=true);
+enum FormatTimeCacheRequest {
+	FT_NO_CACHE, // Don't use the cache.
+	FT_USE_CACHE, // Use the cache.
+	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
+};
+std::string formatTime(double time, TimeFormat format=TF_RULER,
+	bool isLength=false, FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
+	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatNoteLength(double start, double end);
-std::string formatCursorPosition(TimeFormat format=TF_RULER, bool useCache=true);
+std::string formatCursorPosition(TimeFormat format=TF_RULER,
+	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
