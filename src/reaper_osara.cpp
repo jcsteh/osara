@@ -654,7 +654,7 @@ string formatDouble(double d, int precision, bool plus=false) {
 		pos -= 1;
 	}
 	auto stripped = s.substr(0, pos + 1);
-	if(stripped == "+0") {
+	if(stripped == "+0" || stripped == "-0") {
 		return "0";
 	}
 	return stripped;
