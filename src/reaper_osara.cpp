@@ -648,8 +648,16 @@ bool isTrackGrouped(MediaTrack* track) {
 // If plus is true, a "+" prefix will be included for a positive number.
 string formatDouble(double d, int precision, bool plus=false) {
 	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
-	size_t pos = s.find_last_not_of("-+0.");
-	return (pos == string::npos) ? "0" : s.substr(0, pos+1);
+	size_t pos = s.find_last_not_of("0");
+	if(s[pos] == '.') {
+		// also strip the trailing decimal point
+		pos -= 1;
+	}
+	auto stripped = s.substr(0, pos + 1);
+	if(stripped == "+0" || stripped == "-0") {
+		return "0";
+	}
+	return stripped;
 }
 
 // Functions exported from SWS
