@@ -621,15 +621,34 @@ class ParamsDialog {
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
-		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
 		// We need to do exotic stuff with this slider that we can't support on Mac:
 		// 1. Custom step values (TBM_SETLINESIZE, TBM_SETPAGESIZE).
 		// 2. Down arrow moving left instead of right (TBS_DOWNISLEFT).
 		// We also snap to changes in value text, which is even tricky on Windows.
-		// Therefore, we just use the slider as a placeholder and handle key
-		// presses ourselves.
-		// We also use this key handler to pass some keys through to the main
-		// window.
+		// Finally, we need to expose value text, not just a numeric value, but UIA
+		// ignores annotation of PROPID_ACC_VALUE and
+		// UIA_IsValuePatternAvailablePropertyId on real sliders.
+		// Therefore, we just use a placeholder and handle key presses ourselves.
+#ifdef _WIN32
+		// On Windows, we use a Static text control and annotate the role and value
+		// to get around the annotation issues with real sliders.
+		HWND realSlider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+		ShowWindow(realSlider, SW_HIDE);
+		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_FAKE_SLIDER);
+		VARIANT role;
+		role.vt = VT_I4;
+		role.lVal = ROLE_SYSTEM_SLIDER;
+		accPropServices->SetHwndProp(this->slider, OBJID_CLIENT, CHILDID_SELF,
+			PROPID_ACC_ROLE, role);
+#else
+		// On Mac, we use a real slider because we can't annotate roles and we want
+		// it to be reported as a slider.
+		HWND fakeSlider = GetDlgItem(this->dialog, ID_PARAM_VAL_FAKE_SLIDER);
+		ShowWindow(fakeSlider, SW_HIDE);
+		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+#endif
+		// As well as the slider keyboard handling, we also use this key handler to
+		// pass some keys through to the main window.
 		this->accelReg.translateAccel = &this->translateAccel;
 		this->accelReg.isLocal = true;
 		this->accelReg.user = (void*)this;
