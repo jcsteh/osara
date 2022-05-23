@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-04-11 04:18\n"
+"PO-Revision-Date: 2022-05-23 12:48\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1198,7 +1198,7 @@ msgid "FX:"
 msgstr "FX"
 
 msgid "delta"
-msgstr "預測是"
+msgstr "效果差異"
 
 msgid "record monitor off"
 msgstr "錄音監聽關"
@@ -1225,10 +1225,10 @@ msgid "all tracks FX active"
 msgstr "所有軌道 FX 活躍"
 
 msgid "enabled delta solo"
-msgstr "啟用預測是獨奏"
+msgstr "啟用效果差異獨奏"
 
 msgid "disabled delta solo"
-msgstr "禁用預測是獨奏"
+msgstr "禁用效果獨奏"
 
 msgid "no selected items"
 msgstr "無項目選中"
@@ -1662,7 +1662,7 @@ msgid "all tracks unarmed"
 msgstr "所有軌道取消待錄"
 
 msgid "all delta solos reset"
-msgstr "重設全部預測是獨奏"
+msgstr "重設全部效果差異獨奏"
 
 msgid "length whole"
 msgstr "全音符長"
