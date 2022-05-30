@@ -363,6 +363,10 @@ string formatCursorPosition(TimeFormat format, bool useCache) {
 	return formatTime(GetCursorPosition(), format, false, useCache);
 }
 
+string formatCursorPosition(TimeFormat format, bool useCache, bool includeZeros) {
+	return formatTime(GetCursorPosition(), format, false, useCache, includeZeros);
+}
+
 const char* formatFolderState(int state, bool reportTrack=true) {
 	if (state == 0) {
 		// Translators: A track which isn't a folder.
@@ -913,7 +917,11 @@ bool shouldReportScrub = true;
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	if (shouldReportTimeMovement()) {
-		outputMessage(formatCursorPosition().c_str());
+		if (command==41043 || command== 41042 ) {
+			outputMessage(formatCursorPosition(TF_RULER, false, false).c_str());
+		} else {
+			outputMessage(formatCursorPosition().c_str());
+		}
 	}
 }
 
