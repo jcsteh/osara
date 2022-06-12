@@ -4246,7 +4246,7 @@ void cmdConfig(Command* command) {
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int section, int command, int val=0, int valHw=0,
+bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 	int relMode=0, HWND hwnd=nullptr
 ) {
 	if (section==MAIN_SECTION) {
@@ -4261,13 +4261,9 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 					}
 				}
 			}
-			if (hwnd) {
-				// #244: If the command was triggered via MIDI, pass the MIDI data when
-				// executing the command so that toggles, etc. work as expected.
-				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
-			} else {
-				Main_OnCommand(command, 0);
-			}
+			// #244: If the command was triggered via MIDI, pass the MIDI data when
+			// executing the command so that toggles, etc. work as expected.
+			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			postIt->second(command);
 			lastCommand=command;
 			lastCommandTime = GetTickCount();
@@ -4277,11 +4273,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 		const auto mIt = POST_COMMAND_MESSAGES.find(command);
 		if (mIt != POST_COMMAND_MESSAGES.end()) {
 			isHandlingCommand = true;
-			if (hwnd) {
-				KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
-			} else {
-				Main_OnCommand(command, 0);
-			}
+			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			outputMessage(translate(mIt->second));
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
@@ -4341,7 +4333,7 @@ bool handlePostCommand(int section, int command, int val=0, int valHw=0,
 	return false;
 }
 
-bool handleToggleCommand(KbdSectionInfo* section, int command, HWND hwnd) {
+bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	const auto entry = TOGGLE_COMMAND_MESSAGES.find({section->uniqueID, command});
 	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg) {
 		return false; // Ignore.
@@ -4354,7 +4346,7 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, HWND hwnd) {
 	isHandlingCommand = true;
 	switch (section->uniqueID) {
 		case MAIN_SECTION:
-			Main_OnCommand(command, 0);
+			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			break;
 		case MIDI_EDITOR_SECTION:
 		case MIDI_EVENT_LIST_SECTION: {
@@ -4425,7 +4417,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		muteNextMessage = false;
 		return true;
 	}
-	if (handleToggleCommand(section, command, hwnd)) {
+	if (handleToggleCommand(section, command, val, valHw, relMode, hwnd)) {
 		return true;
 	}
 	return false;
