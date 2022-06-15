@@ -109,6 +109,7 @@ Section "Replace existing key map with OSARA key map" SecKeyMap
 		/SD IDNO IDNO dontReplaceKeyMap
 	; If we reach here, the user chose yes.
 	SetOutPath "$INSTDIR"
+	delete "$INSTDIR\KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	Rename "reaper-kb.ini" "KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	File "..\config\windows\reaper-kb.ini"
 	dontReplaceKeyMap:
