@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-05-23 12:48\n"
+"PO-Revision-Date: 2022-07-16 20:58\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1707,10 +1707,10 @@ msgid "normal screen"
 msgstr "正常畫面"
 
 msgid "showed Media Explorer"
-msgstr "顯示媒體資源瀏覽器"
+msgstr "顯示媒體總管"
 
 msgid "hid Media Explorer"
-msgstr "隱藏媒體資源瀏覽器"
+msgstr "隱藏媒體總管"
 
 msgid "enabled auto play"
 msgstr "啟用自動播放"
@@ -1749,10 +1749,10 @@ msgid "double time"
 msgstr "雙速"
 
 msgid "docked Media Explorer"
-msgstr "停靠媒體資源瀏覽器"
+msgstr "停靠媒體總管"
 
 msgid "removed Media Explorer from dock"
-msgstr "從停靠區中移除媒體資源瀏覽器"
+msgstr "從停靠區中移除媒體總管"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

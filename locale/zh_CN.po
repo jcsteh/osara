@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-04-11 04:18\n"
+"PO-Revision-Date: 2022-07-16 20:58\n"
 
 msgid "volume"
 msgstr "音量"
@@ -20,10 +20,10 @@ msgid "pan"
 msgstr "声像"
 
 msgid "muted"
-msgstr "已静音"
+msgstr "静音"
 
 msgid "unmuted"
-msgstr "已取消静音"
+msgstr "取消静音"
 
 msgid "soloed"
 msgstr "独奏"
