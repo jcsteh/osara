@@ -839,6 +839,7 @@ To build OSARA, you will need:
 	* Then in the Installation details tree view, under Desktop development with C++ > Optional:
 		- C++ ATL for latest v143 build tools (x86 & x64)
 		- C++ Clang tools for Windows
+		- Windows 11 SDK (10.0.22000.0)
 
 - [Python](https://www.python.org/downloads/), version 3.7 or later:
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
