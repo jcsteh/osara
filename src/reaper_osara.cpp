@@ -3135,31 +3135,80 @@ void cmdIoMaster(Command* command) {
 void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
+
+string formatTrackRange(int start, const char* startName,
+	int end, const char* endName, const char* separator
+) {
+	ostringstream s;
+	s << start;
+	if (startName && startName[0]) {
+		s << " " << startName;
+	}
+	const string startText = s.str();
+	const int diff = end - start;
+	if (diff == 0) {
+		// Single track. Just report that track.
+		return startText;
+	}
+	s.str("");
+	s << end;
+	if (endName && endName[0]) {
+		s << " " << endName;
+	}
+	const string endText = s.str();
+	if (diff == 1) {
+		// Two consecutive tracks, so report them separately.
+		s.str("");
+		s << startText << separator << endText;
+		return s.str();
+	}
+	// Translators: Used when reporting a range of tracks. {start} will be
+	// replaced with the first track. {end} will be replaced with the last track
+	// in the range. For example: "1 drums through 5 piano"
+	return format(translate("{start} through {end}"),
+		"start"_a=startText, "end"_a=endText);
+}
+
 template <typename Func>
 string formatTracksWithState(const char* prefix, Func checkState,
 	bool includeMaster, bool multiLine, bool outputIfNone = true
 ) {
+	const char* separator = multiLine ? "\r\n" : ", ";
+	int rangeStart = 0;
+	char* startingTrackName;
+	char* prevTrackName;
+	bool inActiveRange = false;
 	ostringstream s;
+
 	if (prefix) {
 		s << prefix << ":" <<
-			(multiLine ? "\r\n" : " ");
+			(multiLine ? separator : " ");
 	}
+
 	int count = 0;
-	for (int i = includeMaster ? -1 : 0; i < CountTracks(0); ++i) {
-		MediaTrack* track = (i == -1) ?
-			GetMasterTrack(nullptr) : GetTrack(nullptr, i);
-		if (checkState(track)) {
+	if(includeMaster) {
+		MediaTrack* master = GetMasterTrack(nullptr);
+		if (checkState(master)) {
 			++count;
-			if (count > 1) {
-				s << (multiLine ? "\r\n" : ", ");
-			}
-			if (i == -1) {
-				s << translate("master");
-			} else {
-				if (shouldReportTrackNumbers) {
-					s << i + 1;
+			s << translate("master") << separator;
+		}
+	}
+
+	int trackCount = CountTracks(0);
+	for (int i = 0; i < trackCount; ++i) {
+		const int trackNumber = i + 1;
+		MediaTrack* track = GetTrack(nullptr, i);
+		char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+		if (multiLine) {
+			// We don't summarise ranges in this case. We output each track.
+			if (checkState(track)) {
+				++count;
+				if (count > 1) {
+					s << separator;
 				}
-				char* name = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+				if (shouldReportTrackNumbers) {
+					s << trackNumber;
+				}
 				if (name && name[0]) {
 					if (shouldReportTrackNumbers) {
 						s << " ";
@@ -3171,8 +3220,44 @@ string formatTracksWithState(const char* prefix, Func checkState,
 					s << i + 1;
 				}
 			}
+			continue;
+		}
+
+		if (checkState(track)) {
+			prevTrackName = name;
+			if (trackNumber == trackCount) {
+				// No more tracks. Output the last range.
+				++count;
+				if (count > 1) {
+					s << separator;
+				}
+				s << formatTrackRange(inActiveRange ? rangeStart : trackCount,
+					inActiveRange ? startingTrackName : name, trackCount, name, separator);
+				break;
+			}
+			if (inActiveRange) {
+				// Not interested in tracks within a range, only those at each end.
+				continue;
+			}
+			inActiveRange = true;
+			rangeStart = trackNumber;
+			startingTrackName = name;
+		} else {
+			if (inActiveRange) {
+				// This track doesn't match. Output the previous range.
+				++count;
+				if (count > 1) {
+					s << separator;
+				}
+				s << formatTrackRange(rangeStart, startingTrackName, i, prevTrackName,
+					separator);
+				startingTrackName = nullptr;
+				rangeStart = 0;
+				inActiveRange = false;
+			}
 		}
 	}
+
 	if (count == 0) {
 		if (!outputIfNone) {
 			return "";

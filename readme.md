@@ -875,3 +875,4 @@ The resulting installer can be found in the installer directory.
 - Leonard de Ruijter
 - Robbie Murray
 - Glen Gordon
+- James Scholes
