@@ -72,7 +72,6 @@ def uploadPot():
 	print("Uploading pot to Crowdin temporary storage")
 	r = request("storages", method=requests.post,
 		headers={"Crowdin-API-FileName": "osara.po"}, data=pot)
-	r.raise_for_status()
 	storageId = r.json()["data"]["id"]
 	print("Updating pot file on Crowdin")
 	r = projectRequest("files/%d" % POT_FILE_ID, method=requests.put,
