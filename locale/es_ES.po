@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-05-23 12:48\n"
+"PO-Revision-Date: 2022-08-19 11:57\n"
 
 msgid "volume"
 msgstr "volumen"
@@ -1932,6 +1932,12 @@ msgstr "deseleccionado pistas, 'items o puntos de envolvente"
 #. unsaved project.
 msgid "[Unsaved]"
 msgstr "sin guardar"
+
+#. Used when reporting a range of tracks. {start} will be
+#. replaced with the first track. {end} will be replaced with the last track
+#. in the range. For example: "1 drums through 5 piano"
+msgid "{start} through {end}"
+msgstr "{start} hasta {end}"
 
 msgid "Muted"
 msgstr "Silenciado"

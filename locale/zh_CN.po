@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-07-16 20:58\n"
+"PO-Revision-Date: 2022-08-19 11:57\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1872,6 +1872,12 @@ msgstr "取消选定的轨道/对象/包络点"
 msgid "[Unsaved]"
 msgstr "[未保存的]"
 
+#. Used when reporting a range of tracks. {start} will be
+#. replaced with the first track. {end} will be replaced with the last track
+#. in the range. For example: "1 drums through 5 piano"
+msgid "{start} through {end}"
+msgstr "{start} 到 {end}"
+
 msgid "Muted"
 msgstr "已静音"
 
@@ -2257,11 +2263,11 @@ msgstr "通道自动通知:"
 
 msgctxt "Peak Watcher"
 msgid "&1"
-msgstr "峰值观察器 1"
+msgstr "&1 通道"
 
 msgctxt "Peak Watcher"
 msgid "&2"
-msgstr "峰值观察器 2"
+msgstr "&2 通道"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"

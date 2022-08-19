@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-04-30 11:19\n"
+"PO-Revision-Date: 2022-08-19 11:57\n"
 
 msgid "volume"
 msgstr "volume"
@@ -1932,6 +1932,12 @@ msgstr "piste, Objet, enveloppe, désélectionné"
 #. unsaved project.
 msgid "[Unsaved]"
 msgstr "[Pas sauvegardé]"
+
+#. Used when reporting a range of tracks. {start} will be
+#. replaced with the first track. {end} will be replaced with the last track
+#. in the range. For example: "1 drums through 5 piano"
+msgid "{start} through {end}"
+msgstr "jusqu'à"
 
 msgid "Muted"
 msgstr "En sourdine"

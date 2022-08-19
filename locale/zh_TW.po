@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-07-16 20:58\n"
+"PO-Revision-Date: 2022-08-19 11:57\n"
 
 msgid "volume"
 msgstr "音量"
@@ -1871,6 +1871,12 @@ msgstr "取消選中軌道/對象/包絡點"
 #. unsaved project.
 msgid "[Unsaved]"
 msgstr "[未儲存]"
+
+#. Used when reporting a range of tracks. {start} will be
+#. replaced with the first track. {end} will be replaced with the last track
+#. in the range. For example: "1 drums through 5 piano"
+msgid "{start} through {end}"
+msgstr "{} 到 {}"
 
 msgid "Muted"
 msgstr "靜音"
