@@ -48,6 +48,8 @@ T& varGet(V& var) {
 }
 
 class Watcher;
+bool isWatchingAnything();
+void stop();
 
 // Peak Watcher can watch various types of levels; e.g. peak dB, momentary LUFS.
 struct LevelType {
@@ -137,7 +139,7 @@ class Watcher {
 
 	bool isValid() {
 		if (MediaTrack** track = get_if<MediaTrack*>(&this->target)) {
-			return !!*track;
+			return *track && ValidatePtr((void*)*track, "MediaTrack*");
 		}
 		return true;
 	}
@@ -150,6 +152,17 @@ class Watcher {
 		if (!this->isDisabled() && levelType.reset) {
 			levelType.reset(*this);
 		}
+	}
+
+	// Returns false if all watchers are disabled.
+	bool disable() {
+		this->reset();
+		this->target = NoTarget();
+		if (!isWatchingAnything()) {
+			stop();
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -400,6 +413,13 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 					continue; // No current target, so nothing to do.
 				}
 			}
+		} else if (!watcher.isValid()) {
+			// We're not following and our target is gone. Disable this watcher.
+			if (!watcher.disable()) {
+				// All watchers are disabled, so stop processing altogether.
+				return;
+			}
+			continue; // No target, so skip this watcher.
 		}
 
 		// If this level type doesn't care about separate channels, we only need
