@@ -1840,7 +1840,10 @@ void postToggleTakePreservePitch(int command) {
 }
 
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
-	HWND w = GetDlgItem(hwnd, 1047);
+	HWND w = GetDlgItem(hwnd, 997);
+	if(!w) {// support Reaper versions before 6.65
+		w = GetDlgItem(hwnd, 1047);
+	}
 	const int sz = 10;
 	char text[sz];
 	if(!GetWindowText(w, text ,sz)) {
