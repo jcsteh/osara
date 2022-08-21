@@ -22,3 +22,5 @@ const char CONFIG_SECTION[] = "osara";
 
 void loadConfig();
 void cmdConfig(Command* command);
+void registerSettingCommands();
+bool handleSettingCommand(int command);
