@@ -4381,6 +4381,10 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		muteNextMessage = false;
 		return true;
 	}
+	if (section->uniqueID == MAIN_SECTION && handleSettingCommand(command)) {
+		muteNextMessage = false;
+		return true;
+	}
 	if (handleToggleCommand(section, command, val, valHw, relMode, hwnd)) {
 		return true;
 	}
@@ -4603,6 +4607,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 		}
+		registerSettingCommands();
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
 		rec->Register("hookcommand2", (void*)handleCommand);
