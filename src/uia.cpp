@@ -12,6 +12,7 @@
 #include <memory>
 #include <utility>
 #include "osara.h"
+#include "config.h"
 
 using namespace std;
 

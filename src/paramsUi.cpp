@@ -24,6 +24,7 @@
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
 #include <reaper/reaper_plugin.h>
+#include "config.h"
 #include "fxChain.h"
 #include "resource.h"
 #include "translation.h"

@@ -199,8 +199,6 @@
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
-const char CONFIG_SECTION[] = "osara";
-
 const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
 const int MEDIA_EXPLORER_SECTION = 32063;

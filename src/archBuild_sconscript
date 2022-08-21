@@ -5,6 +5,7 @@
 # License: GNU General Public License version 2.0
 
 import os.path
+from makeConfigRc import makeConfigRc
 
 Import("env")
 
@@ -12,6 +13,10 @@ env.Textfile(target="buildVersion.h", source=[
 	'const char OSARA_VERSION[] = "$version";',
 	'const char OSARA_COPYRIGHT[] = "$copyright";',
 ]);
+
+configRc = env.Command("config.rc",
+	["resource.h", "settings.h"],
+	makeConfigRc)
 
 env.Append(CPPPATH=(
 	".",
@@ -22,6 +27,7 @@ env.Append(CPPPATH=(
 ))
 sources = [
 	"reaper_osara.cpp",
+	"config.cpp",
 	"paramsUi.cpp",
 	"peakWatcher.cpp",
 	"midiEditorCommands.cpp",
@@ -61,6 +67,7 @@ if env["PLATFORM"] == "win32":
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
 		env.RES("reaper_osara.rc"),
+		env.RES("config.rc"),
 	))
 	libs = [
 		"user32",
@@ -102,7 +109,10 @@ else: # Mac
 	php = shutil.which("php")
 	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
 		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
-	env.Depends("reaper_osara.cpp", res)
+	dialogRes = env.Command(["config.rc_mac_dlg", "config.rc_mac_menu"],
+		"config.rc",
+		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
+	env.Depends("reaper_osara.cpp", [res, dialogRes])
 
 def addExternalSources(dir, files):
 	dir = env.Dir(dir)

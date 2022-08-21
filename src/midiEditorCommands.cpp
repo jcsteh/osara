@@ -17,6 +17,7 @@
 #include <compare>
 #include "midiEditorCommands.h"
 #include "osara.h"
+#include "config.h"
 #include "translation.h"
 #ifdef _WIN32
 #include <Commctrl.h>
@@ -247,10 +248,6 @@ vector<MidiNote> previewingNotes; // Notes currently being previewed.
 UINT_PTR previewDoneTimer = 0;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
-bool shouldReportNotes = true;
-#ifdef _WIN32
-bool editCursorShouldFollowEventListFocus = false;
-#endif
 
 // A minimal PCM_source to send MIDI events for preview.
 class PreviewSource : public PCM_source {
@@ -961,7 +958,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
@@ -1011,7 +1008,7 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		if (note.muted) {
 			s << translate("muted") << " ";
 		}
@@ -1019,10 +1016,10 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	}
 	if (!select && !isNoteSelected(take, note.index)) {
 		s << " " << translate("unselected") << " ";
-	} else if (shouldReportNotes) {
+	} else if (settings::reportNotes) {
 		s << ", ";
 	}
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		s << formatNoteLength(note.start, note.end);
 		if (GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40632)
 				) { // View: Show velocity numbers on notes
@@ -1055,7 +1052,7 @@ void postMidiMovePitchCursor(int command) {
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
 	previewNotes(take, {{chan, pitch, vel}});
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		outputMessage(getMidiNoteName(take, pitch, chan));
 	}
 }
@@ -1090,7 +1087,7 @@ void cmdMidiInsertNote(Command* command) {
 	// If we're advancing the cursor position, we should report the new position.
 	const bool reportNewPos = command->gaccel.accel.cmd ==
 		40051; // Edit: Insert note at edit cursor
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
 		s << formatNoteLength(note.start, note.end);
 		if (reportNewPos) {
@@ -1544,12 +1541,12 @@ void cmdMidiFilterWindow(Command *command) {
 
 void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	bool shouldPreviewNotes = GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041);  // Options: Preview notes when inserting or editing
-	if (!shouldPreviewNotes && !editCursorShouldFollowEventListFocus) {
+	if (!shouldPreviewNotes && !settings::editCursorFollowsEventListFocus) {
 		return;
 	}
 	if (childId == CHILDID_SELF) {
 		// Focus is set to the list, not to an item within the list.
-		if (editCursorShouldFollowEventListFocus) {
+		if (settings::editCursorFollowsEventListFocus) {
 			focusNearestMidiEvent(hwnd);
 		}
 		return;
@@ -1558,7 +1555,7 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	assert(editor == GetParent(hwnd));
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	auto event = MidiEventListData::get(editor, focused);
-	if (editCursorShouldFollowEventListFocus) {
+	if (settings::editCursorFollowsEventListFocus) {
 		SetEditCurPos(event.position , true, false);
 	}
 	if (!shouldPreviewNotes) {
@@ -1577,7 +1574,7 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 #endif // _WIN32
 
 void postMidiChangeVelocity(int command) {
-	if (!shouldReportNotes) {
+	if (!settings::reportNotes) {
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
@@ -1666,7 +1663,7 @@ void postMidiChangeLength(int command) {
 	if (!generalize) {
 		previewNotes(take, selectedNotes);
 	}
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		ostringstream s;
 		if (generalize) {
 			int count = static_cast<int>(selectedNotes.size());
@@ -1735,7 +1732,7 @@ void postMidiChangeLength(int command) {
 }
 
 void postMidiChangePitch(int command) {
-	if (!shouldReportNotes) {
+	if (!settings::reportNotes) {
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
@@ -1843,7 +1840,7 @@ void postMidiMoveStart(int command) {
 	if (!generalize) {
 		previewNotes(take, selectedNotes);
 	}
-	if (shouldReportNotes) {
+	if (settings::reportNotes) {
 		ostringstream s;
 		if (generalize) {
 			switch (command) {

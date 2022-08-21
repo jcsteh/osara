@@ -12,14 +12,12 @@
 #include <WDL/db2val.h>
 #include <cstdint>
 #include "osara.h"
+#include "config.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
 
 using namespace std;
-
-bool shouldReportSurfaceChanges = true;
-bool shouldReportMarkersWhilePlaying = false;
 
 // REAPER often notifies us about track states even if they haven't changed.
 // It also notifies us about these states when a track is first created.
@@ -83,7 +81,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void Run() override {
-		if (shouldReportMarkersWhilePlaying && GetPlayState() & 1) {
+		if (settings::reportMarkersWhilePlaying && GetPlayState() & 1) {
 			double playPos = GetPlayPosition();
 			if (playPos == this->lastPlayPos) {
 				return;
@@ -97,7 +95,7 @@ class Surface: public IReaperControlSurface {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
-		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
+		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		// Calculate integer based transport state
@@ -106,7 +104,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetRepeatState(bool repeat) override {
-		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
+		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		reportRepeat(repeat);
@@ -144,7 +142,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
-		if (!shouldReportSurfaceChanges) {
+		if (!settings::reportSurfaceChanges) {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_MUTED, TC_UNMUTED>(track);
@@ -159,7 +157,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
-		if (!shouldReportSurfaceChanges) {
+		if (!settings::reportSurfaceChanges) {
 			return;
 		}
 		if (track == GetMasterTrack(nullptr) && !(GetMasterMuteSoloFlags() & 2)) {
@@ -179,7 +177,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
-		if (!shouldReportSurfaceChanges) {
+		if (!settings::reportSurfaceChanges) {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_ARMED, TC_UNARMED>(track);
@@ -197,7 +195,7 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
-		if (!selected || !shouldReportSurfaceChanges ||
+		if (!selected || !settings::reportSurfaceChanges ||
 			// REAPER calls this a *lot*, even if the track was already selected; e.g.
 			// for mute, arm, solo, etc. Ignore this if we were already told about
 			// this track being selected.
@@ -269,7 +267,7 @@ class Surface: public IReaperControlSurface {
 	// Used for parameters we don't cache such as volume, pan and FX parameters.
 	// We cache states such as mute, solo and arm, so they don't use this.
 	bool shouldHandleParamChange() {
-		if (!shouldReportSurfaceChanges || this->wasCausedByCommand()) {
+		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
 			return false;
 		}
 		DWORD now = GetTickCount();

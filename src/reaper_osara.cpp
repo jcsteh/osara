@@ -32,6 +32,7 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
+#include "config.h"
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -66,7 +67,6 @@ int lastCommand = 0;
 DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
 MediaItem* currentItem = nullptr;
-bool shouldMoveFromPlayCursor = false;
 
 /*** Utilities */
 
@@ -560,9 +560,8 @@ MediaItem* getItemWithFocus() {
 	return nullptr;
 }
 
-bool shouldReportTimeMovementWhilePlaying = true;
 bool shouldReportTimeMovement() {
-	if (shouldReportTimeMovementWhilePlaying) {
+	if (settings::reportTimeMovementWhilePlaying) {
 		return true;
 	}
 	// Don't report if playing.
@@ -668,8 +667,7 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
-bool shouldReportTrackNumbers = true;
-bool shouldReportFx = false;
+
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
@@ -687,7 +685,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (trackNum <= 0) {
 		// Translators: Reported when navigating to the master track.
 		s << translate("master");
-	} else if (shouldReportTrackNumbers) {
+	} else if (settings::reportTrackNumbers) {
 		s << trackNum;
 	}
 	if (isTrackSelected(track)) {
@@ -746,7 +744,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 		if (trackName && trackName[0]) {
 			s << trackName;
-		} else if (!shouldReportTrackNumbers) {
+		} else if (!settings::reportTrackNumbers) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
@@ -778,7 +776,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		}
 	}
 	int count;
-	if (shouldReportFx && (count = TrackFX_GetCount(track)) > 0) {
+	if (settings::reportFx && (count = TrackFX_GetCount(track)) > 0) {
 		// Translators: Reported when navigating tracks before listing the effects on
 		// the track.
 		s << "; " << translate("FX:") << " ";
@@ -908,8 +906,6 @@ void postToggleLastFocusedFxDeltaSolo(int command) {
 		translate("disabled delta solo"));
 }
 
-bool shouldReportScrub = true;
-
 void postCursorMovement(int command) {
 	fakeFocus = FOCUS_RULER;
 	if (shouldReportTimeMovement()) {
@@ -918,7 +914,7 @@ void postCursorMovement(int command) {
 }
 
 void postCursorMovementScrub(int command) {
-	if (shouldReportScrub)
+	if (settings::reportScrub)
 		postCursorMovement(command);
 	else
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
@@ -1233,7 +1229,7 @@ void postToggleRepeat(int command) {
 }
 
 void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
-	if (!shouldReportFx)
+	if (!settings::reportFx)
 		return;
 	int count = TakeFX_GetCount(take);
 	if (count == 0)
@@ -1409,9 +1405,8 @@ void postToggleMasterTrackVisible(int command) {
 		translate("master track hidden"));
 }
 
-bool shouldReportTransport = true;
 void reportTransportState(int state) {
-	if (!shouldReportTransport)
+	if (!settings::reportTransport)
 		return;
 	if (state & 2) {
 		outputMessage(translate("pause"));
@@ -3206,15 +3201,15 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				if (shouldReportTrackNumbers) {
+				if (settings::reportTrackNumbers) {
 					s << trackNumber;
 				}
 				if (name && name[0]) {
-					if (shouldReportTrackNumbers) {
+					if (settings::reportTrackNumbers) {
 						s << " ";
 					}
 					s << name;
-				} else if (!shouldReportTrackNumbers) {
+				} else if (!settings::reportTrackNumbers) {
 					// There's no name and track number reporting is disabled. We report
 					// the number in lieu of the name.
 					s << i + 1;
@@ -3965,7 +3960,7 @@ void cmdMuteNextMessage(Command* command){
 }
 
 void cmdToggleLoopSegScrub(Command* command) {
-	if(shouldMoveFromPlayCursor && (GetPlayState() & 1) ) {
+	if(settings::moveFromPlayCursor && (GetPlayState() & 1) ) {
 		SetEditCurPos(GetPlayPosition(), false, false);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -4021,9 +4016,6 @@ void cmdReportRegionMarkerItems(Command* command) {
 		outputMessage(s);
 	}
 }
-
-// See the Configuration section of the code below.
-void cmdConfig(Command* command);
 
 #define DEFACCEL {0, 0, 0}
 
@@ -4211,122 +4203,6 @@ Command COMMANDS[] = {
 };
 map<pair<int, int>, Command*> commandsMap;
 
-/*** Configuration
- * For new settings, appropriate code needs to be added to loadConfig, config_onOk and cmdConfig.
- ***/
-
-extern bool shouldReportNotes;
-#ifdef _WIN32
-extern bool editCursorShouldFollowEventListFocus;
-#endif
-extern bool shouldReportSurfaceChanges;
-extern bool shouldReportMarkersWhilePlaying;
-
-void loadConfig() {
-	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
-	shouldReportScrub = GetExtState(CONFIG_SECTION, "reportScrub")[0] != '0';
-	shouldReportTimeMovementWhilePlaying =
-		GetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying")[0] != '0';
-	shouldReportFx = GetExtState(CONFIG_SECTION, "reportFx")[0] == '1';
-	shouldReportTransport = GetExtState(CONFIG_SECTION, "reportTransport")[0] != '0';
-	shouldReportNotes = GetExtState(CONFIG_SECTION, "reportNotes")[0] != '0';
-#ifdef _WIN32
-	editCursorShouldFollowEventListFocus = GetExtState(CONFIG_SECTION,
-		"editCursorFollowsEventListFocus")[0] == '1';
-#endif
-	shouldReportSurfaceChanges = GetExtState(CONFIG_SECTION,
-		"reportSurfaceChanges")[0] == '1';
-	shouldMoveFromPlayCursor =
-		GetExtState(CONFIG_SECTION, "moveFromPlayCursor")[0] == '1';
-	shouldReportMarkersWhilePlaying =
-		GetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying")[0] == '1';
-	shouldReportTrackNumbers =
-		GetExtState(CONFIG_SECTION, "reportTrackNumbers")[0] != '0';
-}
-
-void config_onOk(HWND dialog) {
-	shouldReportScrub = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_SCRUB) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportScrub", shouldReportScrub ? "1" : "0", true);
-	shouldReportTimeMovementWhilePlaying =
-		IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING)
-		== BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportTimeMovementWhilePlaying",
-		shouldReportTimeMovementWhilePlaying ? "1" : "0", true);
-	shouldReportFx = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_FX) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportFx", shouldReportFx ? "1" : "0", true);
-	shouldReportTransport = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_TRANSPORT) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportTransport", shouldReportTransport ? "1" : "0", true);
-	shouldReportNotes = IsDlgButtonChecked(dialog, ID_CONFIG_REPORT_NOTES) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportNotes", shouldReportNotes ? "1" : "0", true);
-#ifdef _WIN32
-	editCursorShouldFollowEventListFocus = IsDlgButtonChecked(dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "editCursorFollowsEventListFocus", editCursorShouldFollowEventListFocus ? "1" : "0", true);
-#endif
-	shouldReportSurfaceChanges = IsDlgButtonChecked(dialog,
-		ID_CONFIG_REPORT_SURFACE_CHANGES) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportSurfaceChanges",
-		shouldReportSurfaceChanges ? "1" : "0", true);
-	shouldMoveFromPlayCursor = IsDlgButtonChecked(dialog,
-		ID_CONFIG_MOVE_FROM_PLAY_CURSOR) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "moveFromPlayCursor",
-		shouldMoveFromPlayCursor ? "1" : "0", true);
-	shouldReportMarkersWhilePlaying = IsDlgButtonChecked(dialog,
-		ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportMarkersWhilePlaying",
-		shouldReportMarkersWhilePlaying ? "1" : "0", true);
-	shouldReportTrackNumbers = IsDlgButtonChecked(dialog,
-		ID_CONFIG_REPORT_TRACK_NUMBERS) == BST_CHECKED;
-	SetExtState(CONFIG_SECTION, "reportTrackNumbers",
-		shouldReportTrackNumbers ? "1" : "0", true);
-}
-
-INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
-	switch (msg) {
-		case WM_COMMAND:
-			if (LOWORD(wParam) == IDOK) {
-				config_onOk(dialog);
-				DestroyWindow(dialog);
-				return TRUE;
-			} else if (LOWORD(wParam) == IDCANCEL) {
-				DestroyWindow(dialog);
-				return TRUE;
-			}
-			break;
-		case WM_CLOSE:
-			DestroyWindow(dialog);
-			return TRUE;
-	}
-	return FALSE;
-}
-
-void cmdConfig(Command* command) {
-	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG),
-		GetForegroundWindow(), config_dialogProc);
-	translateDialog(dialog);
-
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_SCRUB, shouldReportScrub ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_TIME_MOVEMENT_WHILE_PLAYING,
-		shouldReportTimeMovementWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_FX, shouldReportFx ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRANSPORT, shouldReportTransport ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_NOTES, shouldReportNotes ? BST_CHECKED : BST_UNCHECKED);
-#ifdef _WIN32
-	CheckDlgButton(dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS, editCursorShouldFollowEventListFocus ? BST_CHECKED : BST_UNCHECKED);
-#else
-	ShowWindow( GetDlgItem( dialog, ID_CONFIG_EDIT_CURSOR_FOLLOWS_EVENT_LIST_FOCUS), SW_HIDE);
-#endif
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_SURFACE_CHANGES,
-		shouldReportSurfaceChanges ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_MOVE_FROM_PLAY_CURSOR,
-		shouldMoveFromPlayCursor ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_MARKERS_WHILE_PLAYING,
-		shouldReportMarkersWhilePlaying ? BST_CHECKED : BST_UNCHECKED);
-	CheckDlgButton(dialog, ID_CONFIG_REPORT_TRACK_NUMBERS,
-		shouldReportTrackNumbers ? BST_CHECKED : BST_UNCHECKED);
-
-	ShowWindow(dialog, SW_SHOWNORMAL);
-}
-
 /*** Initialisation, termination and inner workings. */
 
 bool isHandlingCommand = false;
@@ -4338,7 +4214,7 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 		const auto postIt = postCommandsMap.find(command);
 		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
-			if (shouldMoveFromPlayCursor) {
+			if (settings::moveFromPlayCursor) {
 				const auto cursorIt = MOVE_FROM_PLAY_CURSOR_COMMANDS.find(command);
 				if (cursorIt != MOVE_FROM_PLAY_CURSOR_COMMANDS.end()) {
 					if (GetPlayState() & 1) { // Playing
@@ -4760,6 +4636,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 // Mac resources
 #include <swell-dlggen.h>
 #include "reaper_osara.rc_mac_dlg"
+#include "config.rc_mac_dlg"
 #include <swell-menugen.h>
 #include "reaper_osara.rc_mac_menu"
+#include "config.rc_mac_menu"
 #endif
