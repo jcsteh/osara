@@ -716,6 +716,9 @@ The dialog contains the following options:
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
+There is also an action to toggle each setting; e.g. OSARA: Toggle Report position when scrubbing.
+These do not have keyboard shortcuts by default, but you can add shortcuts in the Actions dialog.
+
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 

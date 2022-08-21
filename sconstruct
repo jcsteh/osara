@@ -30,6 +30,7 @@ if env["PLATFORM"] == "win32":
 		archEnv.SConscript("src/archBuild_sconscript",
 			exports={"env": archEnv},
 			variant_dir="build/%s" % arch, duplicate=False)
+	configRc = "build/x86_64/config.rc"
 
 	try:
 		import winreg
@@ -55,11 +56,12 @@ else: # Mac
 		variant_dir="build", duplicate=False)
 	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
 		[["$SOURCE", "$version"]])
+	configRc = "build/x86_64/config.rc"
 
 	env.Alias("installer", installer)
 	env.Default(installer)
 
 pot = env.Command("locale/osara_${version}.pot",
-	[env.Glob("src/*.cpp"), env.Glob("src/*.rc")],
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
 	makePot)
 env.Alias("pot", pot)
