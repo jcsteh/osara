@@ -11,7 +11,17 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-08-19 11:57\n"
+"PO-Revision-Date: 2022-08-24 01:54\n"
+
+msgid "enabled"
+msgstr "activé"
+
+#. A recording mode.
+msgid "disabled"
+msgstr "désactivé"
+
+msgid "OSARA: Toggle"
+msgstr ""
 
 msgid "volume"
 msgstr "volume"
@@ -1094,10 +1104,6 @@ msgstr "entrée"
 #. A recording mode.
 msgid "output (stereo)"
 msgstr "sortie (stéréo)"
-
-#. A recording mode.
-msgid "disabled"
-msgstr "désactivé"
 
 #. A recording mode.
 msgid "output (stereo, latency compensated)"
@@ -2290,9 +2296,6 @@ msgstr "OSARA: sélectionne toutes les notes de même hauteur tonale dans la sé
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: sélectionne l'événement le plus proche du curseur d'édition"
 
-msgid "enabled"
-msgstr "activé"
-
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "Paramètres"
@@ -2369,58 +2372,6 @@ msgctxt "Peak Watcher"
 msgid "D&isable"
 msgstr "Désactivé"
 
-msgctxt "OSARA Configuration"
-msgid "OSARA Configuration"
-msgstr "Configuration OSARA"
-
-msgctxt "OSARA Configuration"
-msgid "Report position when &scrubbing"
-msgstr "Annoncer la position du &scrubb"
-
-msgctxt "OSARA Configuration"
-msgid "Report &time movement during playback/recording"
-msgstr "Annoncer le temps / mouvement durant la lecture / l'enregistrement"
-
-msgctxt "OSARA Configuration"
-msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "Mouvement relatif jusqu'au curseur de lecture pour la commande de temps durant la lecture"
-
-msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Annoncer les marqueurs durant la lecture"
-
-msgctxt "OSARA Configuration"
-msgid "Report &transport state (play, record, etc.)"
-msgstr "Annoncer l'état du transport (lecture, enregistrement, etc)"
-
-msgctxt "OSARA Configuration"
-msgid "Report t&rack numbers"
-msgstr "Annoncer le numéro de la piste"
-
-msgctxt "OSARA Configuration"
-msgid "Report &FX when moving to tracks/takes"
-msgstr "Annoncer FX sur pistes / prises"
-
-msgctxt "OSARA Configuration"
-msgid "Report MIDI &notes in MIDI editor"
-msgstr "Annoncer le nom des notes dans l'éditeur MIDI"
-
-msgctxt "OSARA Configuration"
-msgid "Report changes made via &control surfaces"
-msgstr "Annoncer les changement effectués par &une surface de control"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "Le curseur d'édition suit le focus dans l'éditeur MIDI et la liste d'événement"
-
-msgctxt "OSARA Configuration"
-msgid "OK"
-msgstr "OK"
-
-msgctxt "OSARA Configuration"
-msgid "Cancel"
-msgstr "Anuler"
-
 msgctxt "Message"
 msgid "Message"
 msgstr "Message"
@@ -2444,4 +2395,56 @@ msgstr "&OK"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "&Annuler"
+
+msgctxt "OSARA Configuration"
+msgid "OSARA Configuration"
+msgstr "Configuration OSARA"
+
+msgctxt "OSARA Configuration"
+msgid "Report position when &scrubbing"
+msgstr "Annoncer la position du &scrubb"
+
+msgctxt "OSARA Configuration"
+msgid "Report time movement during playback/recording"
+msgstr ""
+
+msgctxt "OSARA Configuration"
+msgid "&Move relative to the play cursor for time movement commands during playback"
+msgstr "Mouvement relatif jusqu'au curseur de lecture pour la commande de temps durant la lecture"
+
+msgctxt "OSARA Configuration"
+msgid "Report mar&kers during playback"
+msgstr "Annoncer les marqueurs durant la lecture"
+
+msgctxt "OSARA Configuration"
+msgid "Report &transport state (play, record, etc.)"
+msgstr "Annoncer l'état du transport (lecture, enregistrement, etc)"
+
+msgctxt "OSARA Configuration"
+msgid "&Report track numbers"
+msgstr ""
+
+msgctxt "OSARA Configuration"
+msgid "Report &FX when moving to tracks/takes"
+msgstr "Annoncer FX sur pistes / prises"
+
+msgctxt "OSARA Configuration"
+msgid "Report MIDI &notes in MIDI editor"
+msgstr "Annoncer le nom des notes dans l'éditeur MIDI"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr "Le curseur d'édition suit le focus dans l'éditeur MIDI et la liste d'événement"
+
+msgctxt "OSARA Configuration"
+msgid "Report changes made via &control surfaces"
+msgstr "Annoncer les changement effectués par &une surface de control"
+
+msgctxt "OSARA Configuration"
+msgid "OK"
+msgstr "OK"
+
+msgctxt "OSARA Configuration"
+msgid "Cancel"
+msgstr "Anuler"
 

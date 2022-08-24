@@ -11,7 +11,17 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-08-19 11:57\n"
+"PO-Revision-Date: 2022-08-24 01:54\n"
+
+msgid "enabled"
+msgstr ""
+
+#. A recording mode.
+msgid "disabled"
+msgstr "Desabilitado"
+
+msgid "OSARA: Toggle"
+msgstr ""
 
 msgid "volume"
 msgstr "Volume"
@@ -1094,10 +1104,6 @@ msgstr "Entrada"
 #. A recording mode.
 msgid "output (stereo)"
 msgstr "Saída (estéreo)"
-
-#. A recording mode.
-msgid "disabled"
-msgstr "Desabilitado"
 
 #. A recording mode.
 msgid "output (stereo, latency compensated)"
@@ -2290,9 +2296,6 @@ msgstr "OSARA: Selecione todas as notas com a mesma tomalidade começando na sel
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: focaliza o evento mais próximo ao cursor de edição"
 
-msgid "enabled"
-msgstr ""
-
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "Parâmetros"
@@ -2369,58 +2372,6 @@ msgctxt "Peak Watcher"
 msgid "D&isable"
 msgstr ""
 
-msgctxt "OSARA Configuration"
-msgid "OSARA Configuration"
-msgstr "Configuração do OSARA"
-
-msgctxt "OSARA Configuration"
-msgid "Report position when &scrubbing"
-msgstr "Reportar posição durante o scrubbing"
-
-msgctxt "OSARA Configuration"
-msgid "Report &time movement during playback/recording"
-msgstr "Anuncia mudanças de posição ao mover-se durante reprodução / gravação"
-
-msgctxt "OSARA Configuration"
-msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "Movimento relativo ao cursor de reprodução enquanto este está ativo"
-
-msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Anunciar marcadores durante a reprodução"
-
-msgctxt "OSARA Configuration"
-msgid "Report &transport state (play, record, etc.)"
-msgstr "Anuncia estado de reprodução / gravação"
-
-msgctxt "OSARA Configuration"
-msgid "Report t&rack numbers"
-msgstr "Anunciar número das pistas"
-
-msgctxt "OSARA Configuration"
-msgid "Report &FX when moving to tracks/takes"
-msgstr "Reportar FX ao mover para pistas / trechos"
-
-msgctxt "OSARA Configuration"
-msgid "Report MIDI &notes in MIDI editor"
-msgstr "Anunciar notas midi no editor midi"
-
-msgctxt "OSARA Configuration"
-msgid "Report changes made via &control surfaces"
-msgstr "Anunciar mudanças feitas via superfícies de controle"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr ""
-
-msgctxt "OSARA Configuration"
-msgid "OK"
-msgstr "Ok"
-
-msgctxt "OSARA Configuration"
-msgid "Cancel"
-msgstr "Cancelar"
-
 msgctxt "Message"
 msgid "Message"
 msgstr "Mensagem"
@@ -2443,5 +2394,57 @@ msgstr "Ok"
 
 msgctxt "FX Preset"
 msgid "&Cancel"
+msgstr "Cancelar"
+
+msgctxt "OSARA Configuration"
+msgid "OSARA Configuration"
+msgstr "Configuração do OSARA"
+
+msgctxt "OSARA Configuration"
+msgid "Report position when &scrubbing"
+msgstr "Reportar posição durante o scrubbing"
+
+msgctxt "OSARA Configuration"
+msgid "Report time movement during playback/recording"
+msgstr ""
+
+msgctxt "OSARA Configuration"
+msgid "&Move relative to the play cursor for time movement commands during playback"
+msgstr "Movimento relativo ao cursor de reprodução enquanto este está ativo"
+
+msgctxt "OSARA Configuration"
+msgid "Report mar&kers during playback"
+msgstr "Anunciar marcadores durante a reprodução"
+
+msgctxt "OSARA Configuration"
+msgid "Report &transport state (play, record, etc.)"
+msgstr "Anuncia estado de reprodução / gravação"
+
+msgctxt "OSARA Configuration"
+msgid "&Report track numbers"
+msgstr ""
+
+msgctxt "OSARA Configuration"
+msgid "Report &FX when moving to tracks/takes"
+msgstr "Reportar FX ao mover para pistas / trechos"
+
+msgctxt "OSARA Configuration"
+msgid "Report MIDI &notes in MIDI editor"
+msgstr "Anunciar notas midi no editor midi"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr ""
+
+msgctxt "OSARA Configuration"
+msgid "Report changes made via &control surfaces"
+msgstr "Anunciar mudanças feitas via superfícies de controle"
+
+msgctxt "OSARA Configuration"
+msgid "OK"
+msgstr "Ok"
+
+msgctxt "OSARA Configuration"
+msgid "Cancel"
 msgstr "Cancelar"
 

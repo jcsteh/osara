@@ -11,7 +11,17 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-08-19 11:57\n"
+"PO-Revision-Date: 2022-08-24 01:54\n"
+
+msgid "enabled"
+msgstr "已啟用"
+
+#. A recording mode.
+msgid "disabled"
+msgstr "已禁用"
+
+msgid "OSARA: Toggle"
+msgstr "OSARA: 切換"
 
 msgid "volume"
 msgstr "音量"
@@ -1054,10 +1064,6 @@ msgstr "輸入"
 #. A recording mode.
 msgid "output (stereo)"
 msgstr "輸出 （立體聲）"
-
-#. A recording mode.
-msgid "disabled"
-msgstr "禁用"
 
 #. A recording mode.
 msgid "output (stereo, latency compensated)"
@@ -2226,9 +2232,6 @@ msgstr "OSARA: 從時間選區開始選擇具有相同音高的所有音符"
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: 焦點到編輯游標最近的事件"
 
-msgid "enabled"
-msgstr "啟用"
-
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "參數"
@@ -2305,58 +2308,6 @@ msgctxt "Peak Watcher"
 msgid "D&isable"
 msgstr "禁用(&i)"
 
-msgctxt "OSARA Configuration"
-msgid "OSARA Configuration"
-msgstr "OSARA 配置設定"
-
-msgctxt "OSARA Configuration"
-msgid "Report position when &scrubbing"
-msgstr "擦帶時報告位置(&S)"
-
-msgctxt "OSARA Configuration"
-msgid "Report &time movement during playback/recording"
-msgstr "在播放/ 錄音期間報告時間移動(&T)"
-
-msgctxt "OSARA Configuration"
-msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
-
-msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "在播放過程中報告標記(&K)"
-
-msgctxt "OSARA Configuration"
-msgid "Report &transport state (play, record, etc.)"
-msgstr "報告走代狀態播放、錄音等(&T)"
-
-msgctxt "OSARA Configuration"
-msgid "Report t&rack numbers"
-msgstr "朗讀軌道號(&r)"
-
-msgctxt "OSARA Configuration"
-msgid "Report &FX when moving to tracks/takes"
-msgstr "移至軌道/片段時報告FX(&F)"
-
-msgctxt "OSARA Configuration"
-msgid "Report MIDI &notes in MIDI editor"
-msgstr "在MIDI編輯器報告MIDI音符(&N)"
-
-msgctxt "OSARA Configuration"
-msgid "Report changes made via &control surfaces"
-msgstr "報告通過＆控制界面進行的更改(&C)"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "在 midi 事件列表編輯游標跟隨焦點移動"
-
-msgctxt "OSARA Configuration"
-msgid "OK"
-msgstr "確定"
-
-msgctxt "OSARA Configuration"
-msgid "Cancel"
-msgstr "取消"
-
 msgctxt "Message"
 msgid "Message"
 msgstr "訊息"
@@ -2380,4 +2331,56 @@ msgstr "確定(&O)"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "取消)&C)"
+
+msgctxt "OSARA Configuration"
+msgid "OSARA Configuration"
+msgstr "OSARA 配置設定"
+
+msgctxt "OSARA Configuration"
+msgid "Report position when &scrubbing"
+msgstr "擦帶時報告位置(&S)"
+
+msgctxt "OSARA Configuration"
+msgid "Report time movement during playback/recording"
+msgstr "報告播放/錄製期間的時間移動"
+
+msgctxt "OSARA Configuration"
+msgid "&Move relative to the play cursor for time movement commands during playback"
+msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
+
+msgctxt "OSARA Configuration"
+msgid "Report mar&kers during playback"
+msgstr "在播放過程中報告標記(&K)"
+
+msgctxt "OSARA Configuration"
+msgid "Report &transport state (play, record, etc.)"
+msgstr "報告走代狀態播放、錄音等(&T)"
+
+msgctxt "OSARA Configuration"
+msgid "&Report track numbers"
+msgstr "報告軌道號(&r)"
+
+msgctxt "OSARA Configuration"
+msgid "Report &FX when moving to tracks/takes"
+msgstr "移至軌道/片段時報告FX(&F)"
+
+msgctxt "OSARA Configuration"
+msgid "Report MIDI &notes in MIDI editor"
+msgstr "在MIDI編輯器報告MIDI音符(&N)"
+
+msgctxt "OSARA Configuration"
+msgid "Edit cursor follows focus in MIDI &event list"
+msgstr "在 midi 事件列表編輯游標跟隨焦點移動(&E)"
+
+msgctxt "OSARA Configuration"
+msgid "Report changes made via &control surfaces"
+msgstr "報告通過＆控制界面進行的更改(&C)"
+
+msgctxt "OSARA Configuration"
+msgid "OK"
+msgstr "確定"
+
+msgctxt "OSARA Configuration"
+msgid "Cancel"
+msgstr "取消"
 
