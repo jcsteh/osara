@@ -533,19 +533,31 @@ class ParamsDialog {
 			// Let REAPER handle the space key so control+space works.
 			return 0; // Not interested.
 		}
-		if (
-			// A function key.
-			(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
-			// Anything with both alt and shift.
-			(GetAsyncKeyState(VK_MENU) & 0x8000 &&
-				GetAsyncKeyState(VK_SHIFT) & 0x8000) ||
-			// Anything with the control key, but only if not in a text box.
-			(!isClassName(GetFocus(), "Edit") &&
-				GetAsyncKeyState(VK_CONTROL) & 0x8000)
-		) {
-			return -666; // Force to main window.
+		if (msg->hwnd == dialog->paramCombo ||
+				isClassName(GetFocus(), "Edit")) {
+			// In text boxes and combo boxes, we only allow specific keys through to
+			// the main section.
+			if (
+				// A function key.
+				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
+				// Anything with both alt and shift.
+				(GetAsyncKeyState(VK_MENU) & 0x8000 &&
+					GetAsyncKeyState(VK_SHIFT) & 0x8000)
+			) {
+				return -666; // Force to main window.
+			}
+			// Anything else must go to our window so the user can interact with the
+			// control.
+			return -1; // Pass to our window.
 		}
-		return -1; // Pass to our window.
+		switch (msg->wParam) {
+			case VK_TAB:
+			case VK_RETURN:
+			case VK_ESCAPE:
+				// These keys are required to interact with the dialog.
+				return -1; // Pass to our window.
+		}
+		return -666; // Force to main window.
 	}
 
 	~ParamsDialog() {
