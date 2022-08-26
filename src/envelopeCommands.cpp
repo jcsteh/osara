@@ -688,14 +688,14 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	double newPos{0.0};
 	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr);
 	ostringstream s;
+	auto cache = FT_USE_CACHE;
 	if(lastCommand != command->gaccel.accel.cmd) { 
 		s << getActionName(command->gaccel.accel.cmd) << " ";
-		resetTimeCache();
 	}
 	if(oldPos == newPos) {
 		s << translate("no change");
 	} else {
-		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, true);
+		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
 	}
 	outputMessage(s);
 }
