@@ -3348,39 +3348,56 @@ void cmdReportSelection(Command* command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
-	switch (fakeFocus) {
-		case FOCUS_TRACK:
-			s << formatTracksWithState(nullptr, isTrackSelected,
-				/* includeMaster */ true, multiLine, /* outputIfNone */ false);
-			break;
-		case FOCUS_ITEM: {
-			s << formatItemsWithState(isItemSelected, multiLine);
-			break;
+	// If we're showing a reviewable message, report all selection contexts.
+	// Otherwise, only show the selection associated with the focus.
+	if (fakeFocus == FOCUS_RULER || multiLine) {
+		if (multiLine) {
+			s << translate("Time selection:") << separator;
 		}
-		case FOCUS_RULER: {
-			double start, end;
-			GetSet_LoopTimeRange(false, false, &start, &end, false);
-			if (start != end) {
-				s <<
-					// Translators: Used when reporting the time selection. {} will be
-					// replaced with the start time; e.g. "start bar 2 beat 1 0%".
-					format(translate("start {}"),
-						formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
-					// Translators: Used when reporting the time selection. {} will be
-					// replaced with the end time; e.g. "end bar 4 beat 1 0%".
-					format(translate("end {}"),
-						formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
-					// Translators: Used when reporting the time selection. {} will be
-					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
-					format(translate("length {}"),
-						formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
-				resetTimeCache();
-			}
-			break;
+		double start, end;
+		GetSet_LoopTimeRange(false, false, &start, &end, false);
+		if (start != end) {
+			s <<
+				// Translators: Used when reporting the time selection. {} will be
+				// replaced with the start time; e.g. "start bar 2 beat 1 0%".
+				format(translate("start {}"),
+					formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
+				// Translators: Used when reporting the time selection. {} will be
+				// replaced with the end time; e.g. "end bar 4 beat 1 0%".
+				format(translate("end {}"),
+					formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
+				// Translators: Used when reporting the time selection. {} will be
+				// replaced with the length; e.g. "length 2 bars 0 beats 0%".
+				format(translate("length {}"),
+					formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
+			resetTimeCache();
+		} else if (multiLine) {
+			s << translate("none");
 		}
-		default:
-			return;
 	}
+
+	if (fakeFocus ==  FOCUS_TRACK || multiLine) {
+		if (multiLine) {
+			if (s.tellp() > 0) {
+				s << separator << separator;
+			}
+			s << translate("Selected tracks:") << separator;
+		}
+		s << formatTracksWithState(nullptr, isTrackSelected,
+			/* includeMaster */ true, multiLine, /* outputIfNone */ multiLine);
+	}
+
+	if (fakeFocus ==  FOCUS_ITEM || multiLine) {
+		if (multiLine) {
+			if (s.tellp() > 0) {
+				s << separator << separator;
+			}
+			s << translate("Selected items:") << separator;
+		}
+		string items = formatItemsWithState(isItemSelected, multiLine);
+		s << (items.empty() ? translate("none") : items);
+	}
+
 	if (s.tellp() == 0) {
 		outputMessage(translate("no selection"));
 		return;
