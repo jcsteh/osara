@@ -203,15 +203,17 @@ struct MidiEventListData {
 		auto setting = format("list_{}", index);
 		char eventData[255] = "\0";
 		if (MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
+			MediaItem_Take* take = MIDIEditor_GetTake (editor);
 			string key, val;
 			istringstream s(eventData);
+			double eventPosPpq = -1.0;
+			double lengthPpq = -1.0;
 			while(getline(getline(s, key, '='), val, ' ')) {
 				if (key == "pos") {
-					auto eventPosQn = stof(val);
-					data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
+					eventPosPpq = stof(val) * 960.0; // fixme: only works with the default ppq of 960.
+					data.position = MIDI_GetProjTimeFromPPQPos(take, eventPosPpq);
 				} else if (key == "len") {
-					auto lengthQn = stof(val);
-					data.length = TimeMap2_QNToTime(nullptr, lengthQn);
+					lengthPpq = stof(val) * 960.0;
 				} else if (key == "msg") {
 					data.message = val;
 				} else if (key == "offvel") {
@@ -219,6 +221,10 @@ struct MidiEventListData {
 				} else if (key == "sel") {
 					data.selected = val == "1" ? true: false;
 				}
+			}
+			if (lengthPpq>=0.0) {
+				double endPos = MIDI_GetProjTimeFromPPQPos (take, lengthPpq + eventPosPpq);
+				data.length = endPos - data.position;
 			}
 		} else {
 			data.position = DBL_MAX;
