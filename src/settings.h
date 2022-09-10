@@ -41,11 +41,6 @@ BoolSetting(reportFx,
 BoolSetting(reportNotes,
 	"Report MIDI &notes in MIDI editor",
 	true)
-#ifdef _WIN32
-BoolSetting(editCursorFollowsEventListFocus,
-	"Edit cursor follows focus in MIDI &event list",
-	false)
-#endif
 BoolSetting(reportSurfaceChanges,
 	"Report changes made via &control surfaces",
 	false)

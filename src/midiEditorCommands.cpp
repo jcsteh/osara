@@ -1541,26 +1541,13 @@ void cmdMidiFilterWindow(Command *command) {
 
 void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	bool shouldPreviewNotes = GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041);  // Options: Preview notes when inserting or editing
-	if (!shouldPreviewNotes && !settings::editCursorFollowsEventListFocus) {
-		return;
-	}
-	if (childId == CHILDID_SELF) {
-		// Focus is set to the list, not to an item within the list.
-		if (settings::editCursorFollowsEventListFocus) {
-			focusNearestMidiEvent(hwnd);
-		}
+	if (!shouldPreviewNotes) {
 		return;
 	}
 	HWND editor = MIDIEditor_GetActive();
 	assert(editor == GetParent(hwnd));
 	auto focused = ListView_GetNextItem(hwnd, -1, LVNI_FOCUSED);
 	auto event = MidiEventListData::get(editor, focused);
-	if (settings::editCursorFollowsEventListFocus) {
-		SetEditCurPos(event.position , true, false);
-	}
-	if (!shouldPreviewNotes) {
-		return;
-	}
 	// Check whether this is a note
 	if (event.length == -1) {
 		// No Note
