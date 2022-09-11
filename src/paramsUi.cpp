@@ -738,7 +738,7 @@ class FxParams: public ParamSource {
 		}
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ns << " (" << param + 1 << ")";
+		ns << " (" << param << ")";
 		return ns.str();
 	}
 
