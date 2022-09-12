@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-08-24 01:54\n"
+"PO-Revision-Date: 2022-09-12 06:36\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2409,6 +2409,10 @@ msgid "Report time movement during playback/recording"
 msgstr ""
 
 msgctxt "OSARA Configuration"
+msgid "Report f&ull time for time movement commands"
+msgstr ""
+
+msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
 msgstr "Mouvement relatif jusqu'au curseur de lecture pour la commande de temps durant la lecture"
 
@@ -2431,10 +2435,6 @@ msgstr "Annoncer FX sur pistes / prises"
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
 msgstr "Annoncer le nom des notes dans l'éditeur MIDI"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "Le curseur d'édition suit le focus dans l'éditeur MIDI et la liste d'événement"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"

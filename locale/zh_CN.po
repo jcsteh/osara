@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-08-24 01:54\n"
+"PO-Revision-Date: 2022-09-12 06:36\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -2345,6 +2345,10 @@ msgid "Report time movement during playback/recording"
 msgstr "报告播放/录制期间的时间移动(&T)"
 
 msgctxt "OSARA Configuration"
+msgid "Report f&ull time for time movement commands"
+msgstr "报告时间移动命令的完整时间(&U)"
+
+msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
 msgstr "播放时,移动编辑光标跟随播放指针移动(&M)"
 
@@ -2367,10 +2371,6 @@ msgstr "移到轨道/片段时报告FX(&F)"
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
 msgstr "在MIDI编辑器中报告MIDI音符(&N)"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "编辑光标跟随MIDI事件列表中的焦点(E&)"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"

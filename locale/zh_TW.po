@@ -11,14 +11,14 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-08-24 01:54\n"
+"PO-Revision-Date: 2022-09-12 06:36\n"
 
 msgid "enabled"
-msgstr "已啟用"
+msgstr "啟用"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "已禁用"
+msgstr "禁用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切換"
@@ -938,7 +938,7 @@ msgid "resumed Peak Watcher"
 msgstr "恢復峰值察看器"
 
 msgid "Peak Watcher not enabled"
-msgstr "峰值查看器不可用"
+msgstr "峰值查看器未啟用"
 
 #. Used when reporting a length of time in measures.
 #. {} will be replaced with the number of measures; e.g.
@@ -2345,6 +2345,10 @@ msgid "Report time movement during playback/recording"
 msgstr "報告播放/錄製期間的時間移動"
 
 msgctxt "OSARA Configuration"
+msgid "Report f&ull time for time movement commands"
+msgstr "報告時間移動命令的完整時間(&u)"
+
+msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
 msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
 
@@ -2367,10 +2371,6 @@ msgstr "移至軌道/片段時報告FX(&F)"
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
 msgstr "在MIDI編輯器報告MIDI音符(&N)"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "在 midi 事件列表編輯游標跟隨焦點移動(&E)"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"

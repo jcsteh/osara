@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-08-24 01:54\n"
+"PO-Revision-Date: 2022-09-12 06:36\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -21,7 +21,7 @@ msgid "disabled"
 msgstr "désactivé"
 
 msgid "OSARA: Toggle"
-msgstr ""
+msgstr "OSARA: Basculer"
 
 msgid "volume"
 msgstr "volume"
@@ -1066,7 +1066,7 @@ msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
-msgstr "élagage, lecture"
+msgstr "élagager, lecture"
 
 #. An automation mode.
 msgid "read"
@@ -2406,11 +2406,15 @@ msgstr "Énoncer la position du &scrub"
 
 msgctxt "OSARA Configuration"
 msgid "Report time movement during playback/recording"
-msgstr ""
+msgstr "Énoncer le déplacement temporel pendant la lecture/l'enregistrement"
+
+msgctxt "OSARA Configuration"
+msgid "Report f&ull time for time movement commands"
+msgstr "Énoncer en tout temps les commandes de d&éplacement temporel"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "&Déplacement relatif au curseur de lecture pour les commandes de mouvement temporel pendant la lecture"
+msgstr "&Déplacement relatif au curseur de lecture pour les commandes de déplacement temporel pendant la lecture"
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers during playback"
@@ -2422,7 +2426,7 @@ msgstr "Énoncer l'état du &transport (lecture, enregistrement, etc)"
 
 msgctxt "OSARA Configuration"
 msgid "&Report track numbers"
-msgstr ""
+msgstr "&Énoncer les numéros de piste"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
@@ -2431,10 +2435,6 @@ msgstr "Énoncer &l'FX lors de la sélection des pistes et des prises"
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
 msgstr "Énoncer le nom des notes dans l'éditeur MIDI"
-
-msgctxt "OSARA Configuration"
-msgid "Edit cursor follows focus in MIDI &event list"
-msgstr "Le curseur d'édition suit le focus dans la liste d'&événements MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
