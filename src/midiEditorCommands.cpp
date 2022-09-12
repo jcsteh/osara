@@ -1540,6 +1540,15 @@ void cmdMidiFilterWindow(Command *command) {
 }
 
 void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
+	if (childId == CHILDID_SELF) {
+		// Focus is set to the list, not to an item within the list.
+		// By default, REAPER doesn't focus any event in the event list when coming from outside.
+		// Since the edit cursor follows the focused event in the event list, this is impractical,
+		// as changing focus with the arrow keys means that the current edit cursor position will be lost.
+		// Therefore, focus the nearest event in this case.
+		focusNearestMidiEvent(hwnd);
+		return;
+	}
 	bool shouldPreviewNotes = GetToggleCommandState2(SectionFromUniqueID(MIDI_EVENT_LIST_SECTION), 40041);  // Options: Preview notes when inserting or editing
 	if (!shouldPreviewNotes) {
 		return;
