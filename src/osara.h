@@ -197,7 +197,6 @@
 #define REAPERAPI_WANT_MIDI_GetEvt
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
-#define REAPERAPI_WANT_LocalizeString
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
