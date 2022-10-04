@@ -53,17 +53,9 @@ void shortenFxName(const char* name, ostringstream& s) {
 
 bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetForegroundWindow();
-	char name[8];
-	if (GetWindowText(window, name, sizeof(name)) == 0)
-		return false;
-	if (strncmp(name, "FX: ", 4) != 0 && // FX chain window
-		// floating FX window, for different plug-in types
-		strncmp(name, "DX: ", 4) != 0 &&
-		strncmp(name, "VST: ", 5) != 0 &&
-		strncmp(name, "VSTi: ", 6) != 0 &&
-		strncmp(name, "VST3: ", 6) != 0 &&
-		strncmp(name, "VST3i: ", 7) != 0
-	) {
+	const unsigned int fxFocus = GetFocusedFX2(nullptr, nullptr, nullptr);
+	const bool isFxWindow = (fxFocus) && !(fxFocus & 4);
+	if (!isFxWindow) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
@@ -72,6 +64,7 @@ bool maybeSwitchToFxPluginWindow() {
 	}
 	// This is a property page containing the plugin window among other things.
 	// set property page name, to avoid CPU/PDC label audition after switching
+	char name[8];
 	if (GetWindowText(window, name, sizeof(name)) == 0) {
 		SetWindowText(window, " ");
 	}

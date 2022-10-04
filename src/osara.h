@@ -183,6 +183,7 @@
 #define REAPERAPI_WANT_GetToggleCommandState2
 #define REAPERAPI_WANT_SectionFromUniqueID
 #define REAPERAPI_WANT_GetFocusedFX
+#define REAPERAPI_WANT_GetFocusedFX2
 #define REAPERAPI_WANT_GetTake
 #define REAPERAPI_WANT_GetTrackUIMute
 #define REAPERAPI_WANT_GetResourcePath
@@ -196,6 +197,7 @@
 #define REAPERAPI_WANT_MIDI_GetEvt
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
+#define REAPERAPI_WANT_LocalizeString
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
