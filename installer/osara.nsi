@@ -81,11 +81,11 @@ FunctionEnd
 Section "OSARA plug-in" SecPlugin
 	SectionIn RO
 	SetOutPath "$INSTDIR\UserPlugins"
-	File "..\build\x86\reaper_z_osara32.dll"
+	File "..\build\x86\reaper_osara32.dll"
 	; Installing the 64 bit dll on a 32 bit system causes an error when REAPER starts up.
 	; However, it's fine on a 64 bit system even with 32 bit REAPER.
 	${If} ${RunningX64}
-		File "..\build\x86_64\reaper_z_osara64.dll"
+		File "..\build\x86_64\reaper_osara64.dll"
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
 	File /oname=OSARA.ReaperKeyMap "..\config\windows\reaper-kb.ini"
@@ -116,8 +116,8 @@ Section "Replace existing key map with OSARA key map" SecKeyMap
 SectionEnd
 
 Section "Uninstall"
-	Delete "$INSTDIR\..\UserPlugins\reaper_z_osara32.dll"
-	Delete "$INSTDIR\..\UserPlugins\reaper_z_osara64.dll"
+	Delete "$INSTDIR\..\UserPlugins\reaper_osara32.dll"
+	Delete "$INSTDIR\..\UserPlugins\reaper_osara64.dll"
 	Delete "$INSTDIR\..\KeyMaps\OSARA.ReaperKeyMap"
 	Delete "$INSTDIR\uninstall.exe"
 	RMDir "$INSTDIR"

@@ -115,7 +115,6 @@ else: # Mac
 		"config.rc",
 		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
 	env.Depends("reaper_osara.cpp", [res, dialogRes])
-	env.Depends("reaper_osara.cpp", res)
 	keymapFile = '#config/mac/reaper-kb.ini'
 
 def addExternalSources(dir, files):
@@ -139,7 +138,6 @@ addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 env.Command('osara_keymap.h', keymapFile, buildKeymapHeader)
 
 env.SharedLibrary(
-	#Hack: Load osara after sws to allow the keyboard shortcuts to be initialized 
-	target="reaper_z_osara%s" % env["libSuffix"],
+	target="reaper_osara%s" % env["libSuffix"],
 	source=sources, LIBS=libs,
 )
