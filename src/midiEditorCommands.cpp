@@ -15,6 +15,7 @@
 #include <functional>
 #include <float.h>
 #include <compare>
+#include<regex>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "config.h"
@@ -25,6 +26,29 @@
 
 using namespace std;
 using namespace fmt::literals;
+
+// returns the pulses per quarter note of the first midi source in the item.
+int getItemPPQ(MediaItem* item) {
+	const int defaultPPQ = 960;
+	static MediaItem* cachedItem;
+	static int cachedPPQ;
+	if(item == cachedItem) {
+		return cachedPPQ;
+	}
+	char buff[4096] = "";
+	if(!GetItemStateChunk(item, buff, sizeof(buff), false)) {
+		return defaultPPQ;
+	}
+	static const regex re("^\\s*HASDATA [0-9]+ ([0-9]+) ");
+	cmatch match;
+	if(!regex_search(buff, match, re)) {
+		return defaultPPQ;
+	}
+	int ppq = stoi(match.str(1));
+	cachedPPQ = ppq;
+	cachedItem = item;
+	return ppq;
+}
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
 // It is also used for other MIDI messages.
@@ -203,15 +227,19 @@ struct MidiEventListData {
 		auto setting = format("list_{}", index);
 		char eventData[255] = "\0";
 		if (MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
+			MediaItem_Take* take = MIDIEditor_GetTake (editor);
+			MediaItem* item = GetMediaItemTake_Item(take);
+			int ppq = getItemPPQ(item);
 			string key, val;
 			istringstream s(eventData);
+			double eventPosPpq = -1.0;
+			double lengthPpq = -1.0;
 			while(getline(getline(s, key, '='), val, ' ')) {
 				if (key == "pos") {
-					auto eventPosQn = stof(val);
-					data.position = TimeMap2_QNToTime(nullptr, eventPosQn);
+					eventPosPpq = stof(val) * ppq;
+					data.position = MIDI_GetProjTimeFromPPQPos(take, eventPosPpq);
 				} else if (key == "len") {
-					auto lengthQn = stof(val);
-					data.length = TimeMap2_QNToTime(nullptr, lengthQn);
+					lengthPpq = stof(val) * ppq;
 				} else if (key == "msg") {
 					data.message = val;
 				} else if (key == "offvel") {
@@ -219,6 +247,10 @@ struct MidiEventListData {
 				} else if (key == "sel") {
 					data.selected = val == "1" ? true: false;
 				}
+			}
+			if (lengthPpq>=0.0) {
+				double endPos = MIDI_GetProjTimeFromPPQPos (take, lengthPpq + eventPosPpq);
+				data.length = endPos - data.position;
 			}
 		} else {
 			data.position = DBL_MAX;
