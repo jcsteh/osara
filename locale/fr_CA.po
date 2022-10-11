@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-09-12 06:36\n"
+"PO-Revision-Date: 2022-10-11 10:17\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1066,7 +1066,7 @@ msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
-msgstr "élagager, lecture"
+msgstr "élagage, lecture"
 
 #. An automation mode.
 msgid "read"
