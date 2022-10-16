@@ -249,3 +249,8 @@ bool sendUiaNotification(const string& message, bool interrupt) {
 		SysAllocString(L"REAPER_OSARA")
 	) == S_OK);
 }
+
+void resetUia() {
+	ShowWindow(uiaWnd, SW_HIDE);
+	ShowWindow(uiaWnd, SW_SHOWNA);
+}

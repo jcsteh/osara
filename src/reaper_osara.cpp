@@ -4476,6 +4476,10 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		HWND foreground = GetForegroundWindow();
 		if (foreground != prevForegroundHwnd) {
 			// The foreground window has changed.
+			// hack: A bug in earlier versions of JUCE breaks OSARA UIA events when
+			// the JUCE UI is dismissed. Hiding and showing our UIA HWND seems to fix
+			// this.
+			resetUia();
 			if (
 					// #747: When opening the Render to file name dialog, REAPER very briefly
 					// opens and then closes the full Render to File dialog first. Use a

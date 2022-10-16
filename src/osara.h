@@ -288,6 +288,7 @@ bool initializeUia();
 bool terminateUia();
 bool shouldUseUiaNotifications();
 bool sendUiaNotification(const std::string& message, bool interrupt = true);
+void resetUia();
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
