@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-09-12 06:36\n"
+"PO-Revision-Date: 2022-10-16 22:38\n"
 
 msgid "enabled"
 msgstr "啟用"
@@ -1899,6 +1899,9 @@ msgstr "監聽"
 msgid "Phase inverted"
 msgstr "翻轉像位"
 
+msgid "Time selection:"
+msgstr "時間選區"
+
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
 msgid "start {}"
@@ -1913,6 +1916,12 @@ msgstr "結束 {}"
 #. replaced with the length; e.g. "length 2 bars 0 beats 0%".
 msgid "length {}"
 msgstr "長度 {}"
+
+msgid "Selected tracks:"
+msgstr "選中軌道"
+
+msgid "Selected items:"
+msgstr "選中對象"
 
 msgid "no selection"
 msgstr "未選取"

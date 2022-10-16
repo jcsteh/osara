@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2022-09-12 06:36\n"
+"PO-Revision-Date: 2022-10-16 22:38\n"
 
 msgid "enabled"
 msgstr ""
@@ -1960,6 +1960,9 @@ msgstr ""
 msgid "Phase inverted"
 msgstr ""
 
+msgid "Time selection:"
+msgstr ""
+
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
 msgid "start {}"
@@ -1974,6 +1977,12 @@ msgstr "Final {}"
 #. replaced with the length; e.g. "length 2 bars 0 beats 0%".
 msgid "length {}"
 msgstr "Comprimento {}"
+
+msgid "Selected tracks:"
+msgstr ""
+
+msgid "Selected items:"
+msgstr ""
 
 msgid "no selection"
 msgstr "Sem seleção"
