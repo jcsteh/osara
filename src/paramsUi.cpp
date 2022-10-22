@@ -551,10 +551,14 @@ class ParamsDialog {
 			return -1; // Pass to our window.
 		}
 		switch (msg->wParam) {
+			// These keys are required to interact with the dialog.
 			case VK_TAB:
 			case VK_RETURN:
 			case VK_ESCAPE:
-				// These keys are required to interact with the dialog.
+			// UP and down arrows switch tracks, which changes focus, which dismisses
+			// the dialog. This is an easy mistake to make, so prevent it.
+			case VK_UP:
+			case VK_DOWN:
 				return -1; // Pass to our window.
 		}
 		return -666; // Force to main window.
