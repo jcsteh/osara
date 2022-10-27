@@ -256,10 +256,12 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetTrackListChange() override {
+#ifdef _WIN32
 		// hack: A bug in earlier versions of JUCE breaks OSARA UIA events when
 		// a JUCE plugin is removed, which can happen when a track is removed. Hiding
 		// and showing our UIA HWND seems to fix this.
 		resetUia();
+#endif // _WIN32
 	}
 
 	private:
