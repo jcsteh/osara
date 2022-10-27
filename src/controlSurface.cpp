@@ -111,7 +111,9 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
-		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
+		auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
+			(void*)"<VOLENV");
+		if (!this->shouldHandleParamChange(envelope)) {
 			return;
 		}
 		ostringstream s;
@@ -127,7 +129,9 @@ class Surface: public IReaperControlSurface {
 	}
 
 	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
-		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
+		auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
+			(void*)"<PANENV");
+		if (!this->shouldHandleParamChange(envelope)) {
 			return;
 		}
 		ostringstream s;
@@ -216,17 +220,19 @@ class Surface: public IReaperControlSurface {
 
 	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
 		if (call == CSURF_EXT_SETFXPARAM) {
-			if (!this->shouldHandleParamChange()) {
-				return 0; // Unsupported.
-			}
 			auto track = (MediaTrack*)parm1;
 			int fx = *(int*)parm2 >> 16;
-			// Don't report parameter changes where they might already be reported by
-			// the UI.
-			if (isParamsDialogOpen || TrackFX_GetChainVisible(track) == fx) {
+			int param = *(int*)parm2 & 0xFFFF;
+			TrackEnvelope* envelope = GetFXEnvelope(track, fx, param,
+				/* create */ false);
+			if (!this->shouldHandleParamChange(envelope)) {
 				return 0; // Unsupported.
 			}
-			int param = *(int*)parm2 & 0xFFFF;
+			// Don't report parameter changes where they might already be reported by
+			// the UI.
+			if (TrackFX_GetChainVisible(track) == fx) {
+				return 0; // Unsupported.
+			}
 			double normVal = *(double*)parm3;
 			ostringstream s;
 			char chunk[256];
@@ -275,15 +281,27 @@ class Surface: public IReaperControlSurface {
 
 	// Used for parameters we don't cache such as volume, pan and FX parameters.
 	// We cache states such as mute, solo and arm, so they don't use this.
-	bool shouldHandleParamChange() {
-		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
+	bool shouldHandleParamChange(TrackEnvelope* envelope) {
+		if (!settings::reportSurfaceChanges || isParamsDialogOpen ||
+				this->wasCausedByCommand()) {
 			return false;
 		}
 		DWORD now = GetTickCount();
 		DWORD prevChangeTime = this->lastParamChangeTime;
 		this->lastParamChangeTime = now;
-		// Only handle param changes if the last change was 100ms or more ago.
-		return now - prevChangeTime >= 100;
+		// Don't handle param changes if the last change was less than 100ms ago.
+		if (now - prevChangeTime < 100) {
+			return false;
+		}
+		// Don't report automation that is being played back. Also, don't report
+		// parameter changes caused by an automation mode change.
+		constexpr int AUTO_PLAYING = 1;
+		constexpr int AUTO_MODE_CHANGED = 4;
+		if (envelope &&
+				GetEnvelopeUIState(envelope) & (AUTO_PLAYING | AUTO_MODE_CHANGED)) {
+			return false;
+		}
+		return true;
 	}
 	DWORD lastParamChangeTime = 0;
 

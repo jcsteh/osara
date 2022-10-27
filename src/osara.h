@@ -198,6 +198,8 @@
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetItemStateChunk
+#define REAPERAPI_WANT_GetEnvelopeUIState
+#define REAPERAPI_WANT_GetFXEnvelope
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
