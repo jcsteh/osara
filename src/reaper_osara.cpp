@@ -1134,8 +1134,7 @@ void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
 	if(lastCommand != command) 
 		s << commandMessage << " ";
-	s << fixed << setprecision(2);
-	s << VAL2DB(volume);
+	s << formatDouble(VAL2DB(volume), 2, true);
 	outputMessage(s);
 }
 
@@ -1177,9 +1176,10 @@ void postChangeTakeVolume(int command) {
 }
 
 void postChangeHorizontalZoom(int command) {
-	// Translators: Reported when zooming in or out horizontally. {:g} will be
+	double hZoom = GetHZoomLevel();
+	// Translators: Reported when zooming in or out horizontally. {} will be
 	// replaced with the number of pixels per second; e.g. 100 pixels/second.
-	outputMessage(format(translate("{:g} pixels/second"), GetHZoomLevel()));
+	outputMessage(format(translate("{} pixels/second"), formatDouble(hZoom, 1)));
 }
 
 void formatPan(double pan, ostringstream& output) {
