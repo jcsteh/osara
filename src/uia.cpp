@@ -195,7 +195,7 @@ bool terminateUia() {
 	if (uiaProvider) {
 		// Null out uiaProvider so it can't be returned by WM_GETOBJECT during
 		// disconnection.
-		CComPtr<IRawElementProviderSimple> tmpProv = move(uiaProvider);
+		CComPtr<IRawElementProviderSimple> tmpProv = std::move(uiaProvider);
 		uiaProvider = nullptr;
 		uiaCore->DisconnectProvider(tmpProv);
 	}
