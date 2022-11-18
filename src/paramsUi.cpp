@@ -625,7 +625,7 @@ class ParamsDialog {
 
 	public:
 
-	ParamsDialog(unique_ptr<ParamSource> source): source(move(source)) {
+	ParamsDialog(unique_ptr<ParamSource> source): source(std::move(source)) {
 		this->paramCount = this->source->getParamCount();
 		if (this->paramCount == 0) {
 			delete this;
@@ -1130,7 +1130,7 @@ void cmdParamsFocus(Command* command) {
 			MediaItem_Take* take = GetTake(item, takeNum);
 			source = make_unique<FxParams<MediaItem_Take>>(take, "TakeFX", fx);
 		}
-		new ParamsDialog(move(source));
+		new ParamsDialog(std::move(source));
 		return;
 	}
 
@@ -1152,7 +1152,7 @@ void cmdParamsFocus(Command* command) {
 		default:
 			return;
 	}
-	new ParamsDialog(move(source));
+	new ParamsDialog(std::move(source));
 }
 
 typedef vector<pair<int, string>> FxList;
@@ -1236,7 +1236,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	}
 
 	auto source = make_unique<FxParams<ReaperObj>>(obj, apiPrefix, fx);
-	new ParamsDialog(move(source));
+	new ParamsDialog(std::move(source));
 }
 
 void cmdFxParamsFocus(Command* command) {
