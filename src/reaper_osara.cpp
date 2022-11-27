@@ -1227,7 +1227,7 @@ void reportRepeat(bool repeat) {
 }
 
 void postToggleRepeat(int command) {
-	reportRepeat(GetToggleCommandState(command));
+	reportRepeat(GetToggleCommandState(1068)); // Transport: Toggle repeat
 }
 
 void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
@@ -2073,6 +2073,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
 	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
 	{1014, postMidiToggleSnap}, // View: Toggle snap to grid
+	{1139, postToggleRepeat}, // Transport: Toggle repeat
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
