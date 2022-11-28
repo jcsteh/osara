@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-10-16 22:38\n"
+"PO-Revision-Date: 2022-11-28 15:52\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1052,7 +1052,7 @@ msgstr "ouvert"
 
 #. An open (but small visually) track folder.
 msgid "small"
-msgstr "rétréci"
+msgstr "réduit"
 
 #. A closed track folder.
 msgid "closed"
@@ -1066,11 +1066,11 @@ msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
-msgstr "élagage, lecture"
+msgstr "élaguer, lire"
 
 #. An automation mode.
 msgid "read"
-msgstr "lecture"
+msgstr "lire"
 
 #. An automation mode.
 msgid "touch"
@@ -1078,7 +1078,7 @@ msgstr "touché"
 
 #. An automation mode.
 msgid "write"
-msgstr "écriture"
+msgstr "écrire"
 
 #. An automation mode.
 msgid "latch"
@@ -1086,7 +1086,7 @@ msgstr "surpasser"
 
 #. An automation mode.
 msgid "latch preview"
-msgstr "aperçu du surpassé"
+msgstr "surpassé, aperçu"
 
 #. An automation mode.
 msgid "bypass"
@@ -1351,10 +1351,10 @@ msgstr "Objet"
 msgid "Take"
 msgstr "Prise"
 
-#. Reported when zooming in or out horizontally. {:g} will be
+#. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{:g} pixels/second"
-msgstr "{:g} pixels, seconde"
+msgid "{} pixels/second"
+msgstr "{} pixels/seconde"
 
 #. Panned to the center.
 msgid "center"
@@ -1961,7 +1961,7 @@ msgid "Phase inverted"
 msgstr "Phase inversée"
 
 msgid "Time selection:"
-msgstr ""
+msgstr "Sélection temporelle:"
 
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
@@ -1979,10 +1979,10 @@ msgid "length {}"
 msgstr "longueur {}"
 
 msgid "Selected tracks:"
-msgstr ""
+msgstr "Pistes Sélectionnées:"
 
 msgid "Selected items:"
-msgstr ""
+msgstr "Objets Sélectionnés:"
 
 msgid "no selection"
 msgstr "aucune sélection"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-10-16 22:38\n"
+"PO-Revision-Date: 2022-11-28 15:52\n"
 
 msgid "enabled"
 msgstr "啟用"
@@ -1308,10 +1308,10 @@ msgstr "對象"
 msgid "Take"
 msgstr "片段"
 
-#. Reported when zooming in or out horizontally. {:g} will be
+#. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{:g} pixels/second"
-msgstr "{:g} 像素/秒"
+msgid "{} pixels/second"
+msgstr ""
 
 #. Panned to the center.
 msgid "center"

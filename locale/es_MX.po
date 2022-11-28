@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-10-16 22:38\n"
+"PO-Revision-Date: 2022-11-28 15:52\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -917,10 +917,10 @@ msgid "momentary LUFS"
 msgstr "lUFS momentáneo"
 
 msgid "short term LUFS"
-msgstr "lUFS corto"
+msgstr "lUFS de término corto"
 
 msgid "loudness range LU"
-msgstr "rango de resonancia LU"
+msgstr "rango de volumen LU"
 
 msgid "integrated RMS"
 msgstr "rms integrado"
@@ -1351,10 +1351,10 @@ msgstr "Ítem"
 msgid "Take"
 msgstr "Toma"
 
-#. Reported when zooming in or out horizontally. {:g} will be
+#. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{:g} pixels/second"
-msgstr "{:g} pixeles/segundo"
+msgid "{} pixels/second"
+msgstr "{} píxeles/segundo"
 
 #. Panned to the center.
 msgid "center"

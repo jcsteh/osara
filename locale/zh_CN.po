@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-10-16 22:38\n"
+"PO-Revision-Date: 2022-11-28 15:52\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -618,7 +618,7 @@ msgstr[0] "将 {} 音符长度设置为网格大小"
 #. "3 notes made legato"
 msgid "{} note made legato"
 msgid_plural "{} notes made legato"
-msgstr[0] "{} 音符联奏"
+msgstr[0] "{} 音符连奏"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -1308,10 +1308,10 @@ msgstr "{} 对象"
 msgid "Take"
 msgstr "片段"
 
-#. Reported when zooming in or out horizontally. {:g} will be
+#. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{:g} pixels/second"
-msgstr "{:g} 像素/秒"
+msgid "{} pixels/second"
+msgstr "{} 像素/秒"
 
 #. Panned to the center.
 msgid "center"
@@ -1580,7 +1580,7 @@ msgstr "取消独奏失效"
 #. report transient sensitivity. {:g} is replaced with the sensitivity percentage;
 #. E.g. "13% sensitivity"
 msgid "{:g}% sensitivity"
-msgstr "{:g}% 林敏度"
+msgstr "{:g}% 灵敏度"
 
 #. Reported when changing the transient detection threshold.
 #. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
@@ -1921,7 +1921,7 @@ msgid "Selected tracks:"
 msgstr "选定的轨道:"
 
 msgid "Selected items:"
-msgstr "选定的对象"
+msgstr "选定的对象:"
 
 msgid "no selection"
 msgstr "无选择"
@@ -1996,12 +1996,12 @@ msgstr "时间选区结束"
 
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
-msgstr "OSARA:reaper应用程序的开源可访问性"
+msgstr "OSARA: reaper应用程序的开源可访问性"
 
 #. osara version. {} is replaced with the version; e.g.
 #. "Version: 2021.1pre-588,0531135a"
 msgid "Version: {}"
-msgstr "版本"
+msgstr "版本: {}"
 
 msgid "About OSARA"
 msgstr "关于 OSARA"
@@ -2047,7 +2047,7 @@ msgid "OSARA: View properties for current media item/take/automation item (depen
 msgstr "OSARA: 查看当前媒体对象/片段/自动化对象的属性(取决于焦点)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
-msgstr "OSARA: 查看当前轨道/对象/FX的参数(取决于焦点)"
+msgstr "OSARA: 查看当前轨/对象/FX的参数(取决于焦点)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: 查看当前轨道/片段的FX参数(取决于焦点)"
@@ -2056,7 +2056,7 @@ msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: 查看主控的FX参数"
 
 msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
-msgstr "OSARA: 为当前轨道/轨道 FX 配置峰值监视器(取决于焦点)"
+msgstr "OSARA: 为当前轨/轨道 FX 配置峰值监视器(取决于焦点)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
 msgstr "OSARA: 报告第1监视器第1通道的峰值"
@@ -2116,16 +2116,16 @@ msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: 将最后一个聚焦的拉伸标记移动到当前编辑光标位置"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: 报告当前轨道通道 1 的播放光标处的峰值 dB 电平(而不是在轨道准备好时报告输入电平)"
+msgstr "OSARA: 报告当前轨通道 1 的播放光标处的峰值 dB 电平(而不是在轨道准备好时报告输入电平)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: 报告当前轨道通道 2 的播放光标处的峰值 dB 电平(而不是在轨道准备好时报告输入电平)"
+msgstr "OSARA: 报告当前轨通道 2 的播放光标处的峰值 dB 电平(而不是在轨道准备好时报告输入电平)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA :报告主音轨通道 1 播放光标处的峰值 dB 电平"
+msgstr "OSARA: 报告主控轨通道 1 播放光标处的峰值 dB 电平"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: 报告主音轨通道 2 播放光标处的峰值 dB 电平"
+msgstr "OSARA: 报告主控轨通道 2 播放光标处的峰值 dB 电平"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: 删除全部拍号标记"
@@ -2182,10 +2182,10 @@ msgid "OSARA: About"
 msgstr "OSARA: 关于"
 
 msgid "OSARA: Report groups for current track"
-msgstr "OSARA: 报告当前轨道的分组"
+msgstr "OSARA: 报告当前轨的分组"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr "OSARA:将 OSARA 的下一条消息静音"
+msgstr "OSARA: 将 OSARA 的下一条消息静音"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
 msgstr "OSARA: 报告光标位置所在的区间,最后的工程标记和选定轨的对象"
@@ -2299,7 +2299,7 @@ msgstr "直到重置(&U)"
 
 msgctxt "Peak Watcher"
 msgid "for (&ms):"
-msgstr "保持(毫秒)(:&M)"
+msgstr "保持(毫秒):(&M)"
 
 msgctxt "Peak Watcher"
 msgid "&Reset"

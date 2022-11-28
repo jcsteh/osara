@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2022-10-16 22:38\n"
+"PO-Revision-Date: 2022-11-28 15:52\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1351,10 +1351,10 @@ msgstr "Objet"
 msgid "Take"
 msgstr "Prise"
 
-#. Reported when zooming in or out horizontally. {:g} will be
+#. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{:g} pixels/second"
-msgstr "{:g} pixels/seconde"
+msgid "{} pixels/second"
+msgstr ""
 
 #. Panned to the center.
 msgid "center"
