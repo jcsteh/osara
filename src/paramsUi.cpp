@@ -506,11 +506,12 @@ class ParamsDialog {
 		// On Mac, SWELL maps the control key to VK_LWIN.
 		const bool control = GetAsyncKeyState(VK_LWIN) & 0x8000;
 #endif
+		const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
 		if (msg->wParam == VK_TAB && control) {
 			// Control+tab switches to the next parameter, control+shift+tab to the
 			// previous.
 			int newParam = ComboBox_GetCurSel(dialog->paramCombo) +
-				(GetAsyncKeyState(VK_SHIFT) & 0x8000 ? -1 : 1);
+				(shift ? -1 : 1);
 			if (newParam < 0) {
 				newParam = dialog->visibleParams.size() - 1;
 			} else if (newParam == dialog->visibleParams.size()) {
@@ -534,7 +535,6 @@ class ParamsDialog {
 			return 0; // Not interested.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
-		const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
 		if (msg->hwnd == dialog->paramCombo ||
 				isClassName(GetFocus(), "Edit")) {
 			// In text boxes and combo boxes, we only allow specific keys through to
