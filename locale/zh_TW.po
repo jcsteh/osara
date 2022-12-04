@@ -11,14 +11,14 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-11-28 15:52\n"
+"PO-Revision-Date: 2022-12-04 23:41\n"
 
 msgid "enabled"
-msgstr "啟用"
+msgstr "已啟用"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "禁用"
+msgstr "已禁用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切換"
@@ -1311,7 +1311,7 @@ msgstr "片段"
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
 msgid "{} pixels/second"
-msgstr ""
+msgstr "{} 像素/秒"
 
 #. Panned to the center.
 msgid "center"
