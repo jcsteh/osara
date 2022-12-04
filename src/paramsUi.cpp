@@ -533,6 +533,8 @@ class ParamsDialog {
 			// Let REAPER handle the space key so control+space works.
 			return 0; // Not interested.
 		}
+		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
+		const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
 		if (msg->hwnd == dialog->paramCombo ||
 				isClassName(GetFocus(), "Edit")) {
 			// In text boxes and combo boxes, we only allow specific keys through to
@@ -541,13 +543,17 @@ class ParamsDialog {
 				// A function key.
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
-				(GetAsyncKeyState(VK_MENU) & 0x8000 &&
-					GetAsyncKeyState(VK_SHIFT) & 0x8000)
+				(alt && shift)
 			) {
 				return -666; // Force to main window.
 			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
+			return -1; // Pass to our window.
+		}
+		if (alt && 'A' <= msg->wParam && msg->wParam <= 'Z') {
+			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
+			// the Parameter combo box.
 			return -1; // Pass to our window.
 		}
 		switch (msg->wParam) {
