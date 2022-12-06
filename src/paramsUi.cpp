@@ -565,6 +565,8 @@ class ParamsDialog {
 			// the dialog. This is an easy mistake to make, so prevent it.
 			case VK_UP:
 			case VK_DOWN:
+			// Prevent deletion of last-touched track or item while params dialog has focus, another easy mistake to make.
+			case VK_DELETE:
 				return -1; // Pass to our window.
 		}
 		return -666; // Force to main window.
