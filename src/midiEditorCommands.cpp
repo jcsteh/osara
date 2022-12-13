@@ -700,7 +700,7 @@ void cmdMidiMoveCursor(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	ostringstream s;
-	s << formatCursorPosition(TF_MEASURE);
+	s << formatCursorPosition(TF_MIDI);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto chord = findChord(take, 0, {
 		true,  // start
@@ -987,7 +987,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (settings::reportScrub) {
-		s << formatCursorPosition(TF_MEASURE) << " ";
+		s << formatCursorPosition(TF_MIDI) << " ";
 	}
 	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
@@ -1129,7 +1129,7 @@ void cmdMidiInsertNote(Command* command) {
 		}
 	}
 	if (reportNewPos) {
-		s << formatCursorPosition(TF_MEASURE);
+		s << formatCursorPosition(TF_MIDI);
 	}
 	outputMessage(s);
 }
@@ -1323,7 +1323,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	SetEditCurPos(cc.position, true, false);
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
-	s << formatCursorPosition(TF_MEASURE) << " ";
+	s << formatCursorPosition(TF_MIDI) << " ";
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
@@ -1913,7 +1913,7 @@ void postMidiMoveStart(int command) {
 		} else{ 
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
 				if (note == selectedNotes.cbegin()) {
-					s << formatTime(note->start, TF_MEASURE) << " ";
+					s << formatTime(note->start, TF_MIDI) << " ";
 				}
 				s << getMidiNoteName(take, note->pitch, note->channel);
 				if (note != selectedNotes.cend() - 1) {

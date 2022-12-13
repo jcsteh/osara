@@ -55,7 +55,7 @@ IAccPropServices* accPropServices = NULL;
 // We cache the last reported time so we can report just the components which have changed.
 int oldMeasure;
 int oldBeat;
-int oldBeatPercent;
+int oldbeatFraction;
 int oldMinute;
 int oldFrame;
 int oldSecond;
@@ -146,6 +146,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 	const bool useCache = cache == FT_USE_CACHE ||
 		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
 	ostringstream s;
+	HWND midiEditor = MIDIEditor_GetActive();
 	if (timeFormat == TF_RULER) {
 		if (GetToggleCommandState(40365)) {
 			timeFormat = TF_MINSEC;
@@ -160,19 +161,28 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 		} else {
 			timeFormat = TF_MEASURE;
 		}
+	} else if (timeFormat == TF_MIDI) {
+		assert(midiEditor);
+		KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
+		if (GetToggleCommandState2(section, 40737)) {
+			timeFormat = TF_MEASURETICK;
+		} else {
+			timeFormat = TF_MEASURE;
+		}
 	}
 	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
 		time += GetProjectTimeOffset(nullptr, false);
 	}
 	switch (timeFormat) {
-		case TF_MEASURE: {
+		case TF_MEASURE:
+		case TF_MEASURETICK: {
 			int measure;
 			int measureLength;
 			double beat = TimeMap2_timeToBeats(NULL, time, &measure, &measureLength, NULL, NULL);
 			int wholeBeat = (int)beat;
-			int beatPercent = lround((beat - wholeBeat) * 100)  ;
-			if(beatPercent==100) {
-				beatPercent = 0;
+			int beatFraction = lround((beat - wholeBeat) * 100)  ;
+			if(beatFraction==100) {
+				beatFraction = 0;
 				++wholeBeat;
 			}
 			if(wholeBeat==measureLength) {
@@ -188,6 +198,12 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 					assert(size == sizeof(int));
 					measure += *(int*)projectconfig_var_addr(nullptr, index);
 				}
+			}
+			if (timeFormat == TF_MEASURETICK) {
+				assert(midiEditor);
+				MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
+				MediaItem* item = GetMediaItemTake_Item(take);
+				beatFraction = beatFraction * getItemPPQ(item) / 100;
 			}
 			if (!useCache || measure != oldMeasure) {
 				if (isLength) {
@@ -222,10 +238,19 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 				}
 				oldBeat = wholeBeat;
 			}
-			if (!useCache || beatPercent != oldBeatPercent) {
-				if (includeZeros || beatPercent != 0)
-					s << beatPercent << "%";
-				oldBeatPercent = beatPercent;
+			if (!useCache || beatFraction != oldbeatFraction) {
+				if (includeZeros || beatFraction != 0) {
+					if (timeFormat == TF_MEASURE) {
+						s << beatFraction << "%";
+					} else {
+						// Translators: used when reporting a time in ticks. {} will be replaced
+						// with the number of ticks; e.g. "2 ticks".
+						s << format(
+							translate_plural("{} tick", "{} ticks", beatFraction),
+							beatFraction);
+					}
+				}
+				oldbeatFraction = beatFraction;
 			}
 			break;
 		}
@@ -311,12 +336,12 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 }
 
 void resetTimeCache(TimeFormat excludeFormat) {
-	if (excludeFormat != TF_MEASURE) {
+	if (excludeFormat != TF_MEASURE && excludeFormat != TF_MEASURETICK) {
 		oldMeasure = 0;
 		oldBeat = 0;
-		// Ensure percent gets reported even if it is 0.
+		// Ensure percent/ticks get reported even if 0.
 		// Otherwise, we would initially report nothing for a length of 0.
-		oldBeatPercent = -1;
+		oldbeatFraction = -1;
 	}
 	if (excludeFormat != TF_MINSEC && excludeFormat != TF_HMSF)
 		oldMinute = 0;
@@ -337,14 +362,21 @@ string formatNoteLength(double start, double end) {
 	double lengthBeats = endBeats-startBeats;
 	int bars = int(lengthBeats)/measureLength;
 	int remBeats = int(lengthBeats)%measureLength;
-	int percent = lround((lengthBeats-int(lengthBeats))*100);
-	if(percent>99) {
-		percent = 0;
+	int fraction = lround((lengthBeats-int(lengthBeats))*100);
+	if(fraction>99) {
+		fraction = 0;
 		++remBeats;
 	}
 	if(remBeats==measureLength) {
 		remBeats = 0;
 		++bars;
+	}
+	const bool useTicks = GetToggleCommandState2(
+		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
+	if (useTicks) {
+		MediaItem_Take* take = MIDIEditor_GetTake (MIDIEditor_GetActive());
+		MediaItem* item = GetMediaItemTake_Item(take);
+		fraction = fraction * getItemPPQ(item) / 100;
 	}
 	ostringstream s;
 	if(bars>0) {
@@ -355,8 +387,13 @@ string formatNoteLength(double start, double end) {
 		s << format(
 			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
 	}
-	if(percent>0) {
-		s << percent << "%";
+	if(fraction>0) {
+		if (useTicks) {
+			s << format(
+				translate_plural("{} tick", "{} ticks", fraction), fraction);
+		} else {
+			s << fraction << "%";
+		}
 	}
 	return s.str();
 }
