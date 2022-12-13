@@ -148,7 +148,14 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 	ostringstream s;
 	HWND midiEditor = MIDIEditor_GetActive();
 	if (timeFormat == TF_RULER) {
-		if (GetToggleCommandState(40365)) {
+		if (midiEditor && GetForegroundWindow() == midiEditor) {
+			KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
+			if (GetToggleCommandState2(section, 40737)) {
+				timeFormat = TF_MEASURETICK;
+			} else {
+				timeFormat = TF_MEASURE;
+			}
+		} else if (GetToggleCommandState(40365)) {
 			timeFormat = TF_MINSEC;
 		} else if (GetToggleCommandState(40368)) {
 			timeFormat = TF_SEC;
@@ -158,14 +165,6 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			timeFormat = TF_HMSF;
 		} else if (GetToggleCommandState(40369)) {
 			timeFormat = TF_SAMPLE;
-		} else {
-			timeFormat = TF_MEASURE;
-		}
-	} else if (timeFormat == TF_MIDI) {
-		assert(midiEditor);
-		KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
-		if (GetToggleCommandState2(section, 40737)) {
-			timeFormat = TF_MEASURETICK;
 		} else {
 			timeFormat = TF_MEASURE;
 		}

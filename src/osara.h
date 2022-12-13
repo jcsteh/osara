@@ -256,8 +256,7 @@ typedef enum {
 	TF_FRAME,
 	TF_HMSF,
 	TF_SAMPLE,
-	TF_MEASURETICK,
-	TF_MIDI
+	TF_MEASURETICK
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
 enum FormatTimeCacheRequest {
