@@ -700,6 +700,7 @@ You can open this dialog by pressing Control+F12 or Control+Alt+Shift+P (OSARA: 
 The dialog contains the following options:
 
 - Report position when scrubbing: When disabled, OSARA will not report the cursor position when using the scrubbing actions (View: Move cursor left/right one pixel).
+ The cursor position also won't be reported when moving to chords in the MIDI editor (OSARA: Move to previous/next chord).
 - Report time movement during playback/recording: When disabled, OSARA will not report actions during playback/recording which move the cursor or adjust positions or lengths.
  This includes item navigation.
  Although not strictly time movement, this also includes inserting markers or regions.

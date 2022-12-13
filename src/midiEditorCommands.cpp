@@ -986,7 +986,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	previewNotes(take, notes);
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	s << formatCursorPosition(TF_MEASURE) << " ";
+	if (settings::reportScrub) {
+		s << formatCursorPosition(TF_MEASURE) << " ";
+	}
 	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
