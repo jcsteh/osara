@@ -992,7 +992,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (settings::reportNotes) {
+	if (settings::reportNotes && settings::reportScrub) {
 		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
