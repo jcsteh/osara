@@ -23,6 +23,8 @@ void previewNotesOff(bool sendNoteOff=true);
 // Returns true when previewDoneTimer was set at the time of calling the function, false otherwise.
 bool cancelPendingMidiPreviewNotesOff();
 
+int getItemPPQ(MediaItem* item);
+
 void cmdMidiMoveCursor(Command* command);
 void cmdMidiToggleSelection(Command* command);
 void cmdMidiMoveToNextChord(Command* command);
