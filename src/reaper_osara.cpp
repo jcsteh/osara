@@ -148,7 +148,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 	ostringstream s;
 	HWND midiEditor = MIDIEditor_GetActive();
 	if (timeFormat == TF_RULER) {
-		if (midiEditor && GetForegroundWindow() == midiEditor) {
+		if (midiEditor && GetParent(GetFocus()) == midiEditor) {
 			KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
 			if (GetToggleCommandState2(section, 40737)) {
 				timeFormat = TF_MEASURETICK;
