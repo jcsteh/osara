@@ -169,7 +169,8 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			timeFormat = TF_MEASURE;
 		}
 	}
-	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_SAMPLE) {
+	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE &&
+			timeFormat != TF_MEASURETICK && timeFormat != TF_SAMPLE) {
 		time += GetProjectTimeOffset(nullptr, false);
 	}
 	switch (timeFormat) {
