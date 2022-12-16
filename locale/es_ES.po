@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2022-11-28 15:52\n"
+"PO-Revision-Date: 2022-12-16 12:07\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1000,6 +1000,13 @@ msgstr[1] "{} tiempos"
 #. {} will be replaced with the beat number; e.g. "beat 2".
 msgid "beat {}"
 msgstr "tiempo {}"
+
+#. used when reporting a time in ticks. {} will be replaced
+#. with the number of ticks; e.g. "2 ticks".
+msgid "{} tick"
+msgid_plural "{} ticks"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Used when reporting a time in minutes. {} will be
 #. replaced with the number of minutes; e.g. "2 min".
