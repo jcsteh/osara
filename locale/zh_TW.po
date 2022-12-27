@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2022-12-16 12:07\n"
+"PO-Revision-Date: 2022-12-27 12:03\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -967,7 +967,7 @@ msgstr "{} 拍"
 #. with the number of ticks; e.g. "2 ticks".
 msgid "{} tick"
 msgid_plural "{} ticks"
-msgstr[0] "{} 打鉤"
+msgstr[0] "{} 滴答"
 
 #. Used when reporting a time in minutes. {} will be
 #. replaced with the number of minutes; e.g. "2 min".
