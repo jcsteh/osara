@@ -2520,8 +2520,8 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	if (wParam == VK_CONTROL) {
 		if (cancelPendingMidiPreviewNotesOff()) {
 			previewNotesOff(true);
+			return 1;
 		}
-		return 1;
 	}
 	HWND window;
 	if (isContextMenu && (window = getSendContainer(focus))) {
