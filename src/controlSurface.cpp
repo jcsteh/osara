@@ -369,7 +369,7 @@ class Surface: public IReaperControlSurface {
 		}
 		lastIndex = index;
 		MediaTrack* track = GetLastTouchedTrack();
-		if (!track) {
+		if (!track || !isTrackArmed(track)) {
 			return;
 		}
 		int channel = status - MIDI_NOTE_ON_C0;

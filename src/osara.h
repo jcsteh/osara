@@ -275,6 +275,7 @@ std::string formatCursorPosition(TimeFormat format=TF_RULER,
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
+bool isTrackArmed(MediaTrack* track);
 
 #ifdef _WIN32
 #include <string>
