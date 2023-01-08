@@ -715,6 +715,8 @@ The dialog contains the following options:
  When disabled, track numbers will not be reported except for unnamed tracks.
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
+- Report named MIDI notes for current track on input: When enabled, if a MIDI note is received via a MIDI input and the current track is armed, OSARA will report the note's name if it has been explicitly named.
+ This is useful for instruments with unfamiliar key switches.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.

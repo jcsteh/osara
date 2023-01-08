@@ -89,7 +89,9 @@ class Surface: public IReaperControlSurface {
 			this->lastPlayPos = playPos;
 			this->reportMarker(playPos);
 		}
-		this->reportInputMidiNote();
+		if (settings::reportInputNotes) {
+			this->reportInputMidiNote();
+		}
 	}
 
 	virtual void SetPlayState(bool play, bool pause, bool rec) override {

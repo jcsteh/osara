@@ -41,6 +41,9 @@ BoolSetting(reportFx,
 BoolSetting(reportNotes,
 	"Report MIDI &notes in MIDI editor",
 	true)
+BoolSetting(reportInputNotes,
+	"Report named MIDI notes for current track on &input",
+	false)
 BoolSetting(reportSurfaceChanges,
 	"Report changes made via &control surfaces",
 	false)
