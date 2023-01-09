@@ -38,6 +38,9 @@ BoolSetting(reportTrackNumbers,
 BoolSetting(reportFx,
 	"Report &FX when moving to tracks/takes",
 	false)
+BoolSetting(reportPositionMIDI,
+	"Report &position when navigating chords in MIDI editor",
+	true)
 BoolSetting(reportNotes,
 	"Report MIDI &notes in MIDI editor",
 	true)
