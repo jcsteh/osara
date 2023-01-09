@@ -986,13 +986,13 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	previewNotes(take, notes);
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	if (settings::reportScrub) {
+	if (settings::reportTimeMIDI) {
 		s << formatCursorPosition() << " ";
 	}
 	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (settings::reportNotes && settings::reportScrub) {
+	if (settings::reportNotes && settings::reportTimeMIDI) {
 		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
