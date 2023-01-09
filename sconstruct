@@ -13,7 +13,7 @@ vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
 env = Environment(tools = ["default", "textfile"],
 	variables=vars,
-	copyright="Copyright (C) 2014-2022 NV Access Limited, James Teh & other contributors",
+	copyright="Copyright (C) 2014-2023 NV Access Limited, James Teh & other contributors",
 )
 
 # Make sure to run the build on multiple threads so it runs faster
