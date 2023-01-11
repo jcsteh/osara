@@ -11,17 +11,17 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2022-12-27 12:03\n"
+"PO-Revision-Date: 2023-01-11 11:57\n"
 
 msgid "enabled"
 msgstr "启用"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "已禁用"
+msgstr "禁用"
 
 msgid "OSARA: Toggle"
-msgstr "OSARA: 切换快捷键帮助"
+msgstr "OSARA: 切换"
 
 msgid "volume"
 msgstr "音量"
@@ -2381,7 +2381,11 @@ msgstr "报告轨道编号(&R)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr "移到轨道/片段时报告FX(&F)"
+msgstr "移到轨道/片段时报告 &FX"
+
+msgctxt "OSARA Configuration"
+msgid "Report &position when navigating chords in MIDI editor"
+msgstr "在MIDI编辑器中报告浏览和弦的位置(&P)"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2022-12-16 12:07\n"
+"PO-Revision-Date: 2023-01-11 11:57\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1005,8 +1005,8 @@ msgstr "battement {}"
 #. with the number of ticks; e.g. "2 ticks".
 msgid "{} tick"
 msgid_plural "{} ticks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} tick"
+msgstr[1] "{} ticks"
 
 #. Used when reporting a time in minutes. {} will be
 #. replaced with the number of minutes; e.g. "2 min".
@@ -2447,6 +2447,10 @@ msgstr "&Énoncer les numéros de piste"
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
 msgstr "Énoncer &l'FX lors de la sélection des pistes et des prises"
+
+msgctxt "OSARA Configuration"
+msgid "Report &position when navigating chords in MIDI editor"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
