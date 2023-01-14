@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Peak Watcher code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -715,6 +715,148 @@ void report(int watcherIndex, int channel) {
 	s << fixed << setprecision(1);
 	s << watcher.channels[channel].peak;
 	outputMessage(s);
+}
+
+MediaTrack* getTrackFromGuid(const GUID* guid) {
+	MediaTrack* track = GetMasterTrack(nullptr);
+	if (memcmp(guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
+		return track;
+	}
+	int trackCount = CountTracks(nullptr);
+	for (int i = 0; i < trackCount; ++i) {
+		track = GetTrack(nullptr, i);
+		if (memcmp(guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
+			return track;
+		}
+	}
+	return nullptr;
+}
+
+/*
+ * Example config block:
+<OSARA_PEAKWATCHER
+  WATCHER TRACK {someGuid} TYPE 0 FOLLOW 1 LEVEL 0.0 HOLD 0 NOTIFY 0 0
+  WATCHER TRACKFX {someGuid} 5 TYPE 0 FOLLOW 0 LEVEL -5.0 HOLD -1 NOTIFY 1 1
+>
+ */
+
+const char CONFIG_HEADER[] = "<OSARA_PEAKWATCHER";
+const char CONFIG_FOOTER[] = ">";
+
+bool processExtensionLine(const char* line, ProjectStateContext* ctx,
+	bool isUndo, struct project_config_extension_t* reg
+) {
+	if (isUndo || strcmp(line, CONFIG_HEADER) != 0) {
+		return false;
+	}
+	stop();
+	for (int w = 0; ; ++w) {
+		char data[500];
+		ctx->GetLine(data, sizeof(data));
+		if (strcmp(data, CONFIG_FOOTER) == 0) {
+			break;
+		}
+		if (w >= NUM_WATCHERS) {
+			continue;
+		}
+		istringstream input(data);
+		string word;
+		input >> word;
+		if (word != "WATCHER") {
+			continue;
+		}
+		Watcher& watcher = watchers[w];
+		watcher.reset();
+		input >> word;
+		if (word == "NONE") {
+			watcher.target = NoTarget();
+		} else if (word == "TRACK") {
+			input >> word;
+			GUID guid;
+			stringToGuid(word.c_str(), &guid);
+			if (MediaTrack* track = getTrackFromGuid(&guid)) {
+				watcher.target = track;
+			}
+		} else if (word == "TRACKFX") {
+			input >> word;
+			int fx;
+			input >> fx;
+			GUID guid;
+			stringToGuid(word.c_str(), &guid);
+			if (MediaTrack* track = getTrackFromGuid(&guid)) {
+				watcher.target = TrackFx(track, fx);
+			}
+		}
+		input >> word;
+		if (word == "TYPE") {
+			input >> watcher.levelType;
+		}
+		input >> word;
+		if (word == "FOLLOW") {
+			input >> word;
+			watcher.follow = word == "1";
+		}
+		input >> word;
+		if (word == "LEVEL") {
+			input >> watcher.notifyLevel;
+		}
+		input >> word;
+		if (word == "HOLD") {
+			input >> watcher.hold;
+		}
+		input >> word;
+		if (word == "NOTIFY") {
+			for (auto& channel : watcher.channels) {
+				input >> word;
+				channel.notify = word == "1";
+			}
+		}
+	}
+	if (isWatchingAnything()) {
+		start();
+	}
+	return true;
+}
+
+void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
+	struct project_config_extension_t* reg
+) {
+	if (isUndo) {
+		return;
+	}
+	ctx->AddLine(CONFIG_HEADER);
+	for (Watcher& watcher : watchers) {
+		ostringstream out;
+		out << "WATCHER";
+		if (holds_alternative<NoTarget>(watcher.target)) {
+			out << " NONE";
+		} else if (MediaTrack** track = get_if<MediaTrack*>(&watcher.target)) {
+			char guid[64];
+			guidToString(GetTrackGUID(*track), guid);
+			out << " TRACK " << guid;
+		} else if (TrackFx* tfx = get_if<TrackFx>(&watcher.target)) {
+			char guid[64];
+			guidToString(GetTrackGUID(tfx->first), guid);
+			out << " TRACKFX " << guid << " " << tfx->second;
+		}
+		out << " TYPE " << watcher.levelType;
+		out << " FOLLOW " << (int)watcher.follow;
+		out << " LEVEL " << watcher.notifyLevel;
+		out << " HOLD " << watcher.hold;
+		out << " NOTIFY";
+		for (auto& channel : watcher.channels) {
+			out << " " << (int)channel.notify;
+		}
+		ctx->AddLine("%s", out.str().c_str());
+	}
+	ctx->AddLine(CONFIG_FOOTER);
+}
+
+void initialize() {
+	static project_config_extension_t projConf{0};
+	projConf.ProcessExtensionLine = processExtensionLine;
+	projConf.SaveExtensionConfig = saveExtensionConfig;
+	plugin_register("projectconfig", (void*)&projConf);
 }
 
 } // namespace peakWatcher
