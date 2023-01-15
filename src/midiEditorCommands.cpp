@@ -971,6 +971,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 		isSelectionContiguous = true;
 	}
+	const double oldCursor = GetCursorPosition();
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
 	vector<MidiNote> notes(chord.first, chord.second);
@@ -983,16 +984,22 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			selectNote(take, note.index);
 		}
 	}
-	previewNotes(take, notes);
+	const bool cursorMoved = oldCursor != GetCursorPosition();
+	if (cursorMoved) {
+		previewNotes(take, notes);
+	}
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
 	if (settings::reportPositionMIDI) {
-		s << formatCursorPosition() << " ";
+		s << formatCursorPosition();
+		if (s.tellp() > 0) {
+			s << " ";
+		}
 	}
-	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
+	if (cursorMoved && !select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (settings::reportNotes && settings::reportPositionMIDI) {
+	if (cursorMoved && settings::reportNotes && settings::reportPositionMIDI) {
 		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
@@ -1006,7 +1013,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
 		}
 	}
-	outputMessage(s);
+	if (s.tellp() > 0) {
+		outputMessage(s);
+	}
 }
 
 void cmdMidiMoveToNextChord(Command* command) {
