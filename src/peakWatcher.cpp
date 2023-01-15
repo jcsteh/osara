@@ -717,19 +717,30 @@ void report(int watcherIndex, int channel) {
 	outputMessage(s);
 }
 
-MediaTrack* getTrackFromGuid(const GUID* guid) {
-	MediaTrack* track = GetMasterTrack(nullptr);
-	if (memcmp(guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
-		return track;
+MediaTrack* getTrackFromGuidStr(ReaProject* project, const string& guidStr) {
+	if (guidStr == "MASTER") {
+		return GetMasterTrack(project);
 	}
-	int trackCount = CountTracks(nullptr);
+	GUID guid;
+	stringToGuid(guidStr.c_str(), &guid);
+	int trackCount = CountTracks(project);
 	for (int i = 0; i < trackCount; ++i) {
-		track = GetTrack(nullptr, i);
-		if (memcmp(guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
+		MediaTrack* track = GetTrack(project, i);
+		if (memcmp(&guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
 			return track;
 		}
 	}
 	return nullptr;
+}
+
+string getTrackGuidStr(ReaProject* project, MediaTrack* track) {
+	if (track == GetMasterTrack(project)) {
+		// The master track doesn't have a persistent GUID.
+		return "MASTER";
+	}
+	char guid[64];
+	guidToString(GetTrackGUID(track), guid);
+	return guid;
 }
 
 /*
@@ -750,6 +761,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 		return false;
 	}
 	stop();
+	ReaProject* project = GetCurrentProjectInLoadSave();
 	for (int w = 0; ; ++w) {
 		char data[500];
 		ctx->GetLine(data, sizeof(data));
@@ -772,18 +784,14 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 			watcher.target = NoTarget();
 		} else if (word == "TRACK") {
 			input >> word;
-			GUID guid;
-			stringToGuid(word.c_str(), &guid);
-			if (MediaTrack* track = getTrackFromGuid(&guid)) {
+			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
 				watcher.target = track;
 			}
 		} else if (word == "TRACKFX") {
 			input >> word;
 			int fx;
 			input >> fx;
-			GUID guid;
-			stringToGuid(word.c_str(), &guid);
-			if (MediaTrack* track = getTrackFromGuid(&guid)) {
+			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
 				watcher.target = TrackFx(track, fx);
 			}
 		}
@@ -825,19 +833,17 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 		return;
 	}
 	ctx->AddLine(CONFIG_HEADER);
+	ReaProject* project = GetCurrentProjectInLoadSave();
 	for (Watcher& watcher : watchers) {
 		ostringstream out;
 		out << "WATCHER";
 		if (holds_alternative<NoTarget>(watcher.target)) {
 			out << " NONE";
 		} else if (MediaTrack** track = get_if<MediaTrack*>(&watcher.target)) {
-			char guid[64];
-			guidToString(GetTrackGUID(*track), guid);
-			out << " TRACK " << guid;
+			out << " TRACK " << getTrackGuidStr(project, *track);
 		} else if (TrackFx* tfx = get_if<TrackFx>(&watcher.target)) {
-			char guid[64];
-			guidToString(GetTrackGUID(tfx->first), guid);
-			out << " TRACKFX " << guid << " " << tfx->second;
+			out << " TRACKFX " << getTrackGuidStr(project, tfx->first) <<
+				" " << tfx->second;
 		}
 		out << " TYPE " << watcher.levelType;
 		out << " FOLLOW " << (int)watcher.follow;
