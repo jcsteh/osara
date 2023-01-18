@@ -13,6 +13,8 @@
 #include <cassert>
 #include <variant>
 #include <vector>
+#include<map>
+#include<array>
 #include <utility>
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
@@ -50,6 +52,7 @@ T& varGet(V& var) {
 class Watcher;
 bool isWatchingAnything();
 void stop();
+bool isPaused{false};
 
 // Peak Watcher can watch various types of levels; e.g. peak dB, momentary LUFS.
 struct LevelType {
@@ -76,6 +79,10 @@ struct LevelType {
 		return a > b;
 	}
 };
+
+ReaProject* currentProject(){
+	return EnumProjects(-1,nullptr, 0);
+}
 
 void describeTrack(MediaTrack* track, ostringstream& s) {
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
@@ -167,7 +174,7 @@ class Watcher {
 };
 
 const int NUM_WATCHERS = 2;
-Watcher watchers[NUM_WATCHERS];
+map<const ReaProject*, array<Watcher, NUM_WATCHERS> > watchers;
 
 const char* WATCHER_NAMES[NUM_WATCHERS] = {
 	// translate firstString begin
@@ -366,7 +373,7 @@ void Watcher::description(ostringstream& s) {
 }
 
 void resetWatcher(int watcherIndex, bool report=false) {
-	Watcher& watcher = watchers[watcherIndex];
+	Watcher& watcher = watchers[currentProject()][watcherIndex];
 	watcher.reset();
 	if (report) {
 		if (watcher.isDisabled()) {
@@ -382,7 +389,7 @@ void resetWatcher(int watcherIndex, bool report=false) {
 
 bool isWatchingMultipleValues() {
 	int count = 0;
-	for (Watcher& watcher : watchers) {
+	for (Watcher& watcher : watchers[currentProject()]) {
 		if (!watcher.isDisabled()) {
 			++count;
 		}
@@ -397,8 +404,9 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
 	s << fixed << setprecision(1);
 	const bool multiple = isWatchingMultipleValues();
+	const ReaProject* proj = currentProject();
 	for (int w = 0; w < NUM_WATCHERS; ++w) {
-		Watcher& watcher = watchers[w];
+		Watcher& watcher = watchers[proj][w];
 		if (watcher.isDisabled()) {
 			continue;
 		}
@@ -474,7 +482,7 @@ void stop() {
 }
 
 bool isWatchingAnything() {
-	for (Watcher& watcher : watchers) {
+	for (Watcher& watcher : watchers[currentProject()]) {
 		if (!watcher.isDisabled()) {
 			return true;
 		}
@@ -698,7 +706,7 @@ class Dialog {
 void report(int watcherIndex, int channel) {
 	assert(watcherIndex < NUM_WATCHERS);
 	assert(channel < NUM_CHANNELS);
-	Watcher& watcher = watchers[watcherIndex];
+	Watcher& watcher = watchers[currentProject()][watcherIndex];
 	if (watcher.isDisabled()) {
 		// Translators: Reported when the user tries to report a Peak Watcher
 		// channel, but the Peak Watcher value is disabled.
@@ -777,7 +785,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 		if (word != "WATCHER") {
 			continue;
 		}
-		Watcher& watcher = watchers[w];
+		Watcher& watcher = watchers[project][w];
 		watcher.reset();
 		input >> word;
 		if (word == "NONE") {
@@ -834,7 +842,7 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 	}
 	ctx->AddLine(CONFIG_HEADER);
 	ReaProject* project = GetCurrentProjectInLoadSave();
-	for (Watcher& watcher : watchers) {
+	for (Watcher& watcher : watchers[currentProject()]) {
 		ostringstream out;
 		out << "WATCHER";
 		if (holds_alternative<NoTarget>(watcher.target)) {
@@ -887,6 +895,7 @@ void cmdPeakWatcher(Command* command) {
 	// MIIM_TYPE is deprecated, but win32_utf8 still relies on it.
 	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	itemInfo.fType = MFT_STRING;
+	const ReaProject* project = peakWatcher::currentProject();
 	for (int w = 0; w < peakWatcher::NUM_WATCHERS; ++w) {
 		itemInfo.wID = w + 1;
 		ostringstream s;
@@ -895,7 +904,7 @@ void cmdPeakWatcher(Command* command) {
 		// After this, information about the existing configuration for the value
 		// will be appended.
 		s << translate(peakWatcher::WATCHER_NAMES[w]) << ", ";
-		peakWatcher::watchers[w].description(s);
+		peakWatcher::watchers[project][w].description(s);
 		// Make sure this stays around until the InsertMenuItem call.
 		string str = s.str();
 		itemInfo.dwTypeData = (char*)str.c_str();
@@ -908,7 +917,7 @@ void cmdPeakWatcher(Command* command) {
 	if (w == -1) {
 		return;
 	}
-	peakWatcher::Watcher& watcher = peakWatcher::watchers[w];
+	peakWatcher::Watcher& watcher = peakWatcher::watchers[project][w];
 
 	new peakWatcher::Dialog(target, watcher, types);
 }
@@ -941,13 +950,23 @@ void cmdPausePeakWatcher(Command* command) {
 	if (peakWatcher::timer) {
 		// Running.
 		peakWatcher::stop();
+		peakWatcher::isPaused=true;
 		outputMessage(translate("paused Peak Watcher"));
 	} else if (peakWatcher::isWatchingAnything()) {
 		// Paused.
 		peakWatcher::start();
+		peakWatcher::isPaused=true;
 		outputMessage(translate("resumed Peak Watcher"));
 	} else {
 		// Disabled.
 		outputMessage(translate("Peak Watcher not enabled"));
+	}
+}
+
+void peakWatcherOnSwitchProjectTab(){
+	if(!peakWatcher::timer && peakWatcher::isWatchingAnything() && !peakWatcher::isPaused){
+		peakWatcher::start();
+	} else {
+		peakWatcher::stop();
 	}
 }
