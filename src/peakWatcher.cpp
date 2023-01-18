@@ -473,12 +473,17 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 }
 
 void start() {
+	if (timer) {
+		return;
+	}
 	timer = SetTimer(nullptr, 0, 30, tick);
 }
 
 void stop() {
-	KillTimer(nullptr, timer);
-	timer = 0;
+	if (timer){
+		KillTimer(nullptr, timer);
+		timer = 0;
+	}
 }
 
 bool isWatchingAnything() {
@@ -842,7 +847,7 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 	}
 	ctx->AddLine(CONFIG_HEADER);
 	ReaProject* project = GetCurrentProjectInLoadSave();
-	for (Watcher& watcher : watchers[currentProject()]) {
+	for (Watcher& watcher : watchers[project]) {
 		ostringstream out;
 		out << "WATCHER";
 		if (holds_alternative<NoTarget>(watcher.target)) {
@@ -866,10 +871,28 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 	ctx->AddLine(CONFIG_FOOTER);
 }
 
+void BeginLoadProjectState (bool isUndo, struct project_config_extension_t* reg){
+	//clean up configuration data for dead projects
+	vector<ReaProject*> openProjects;
+	for (int i = 0;; i++){
+		ReaProject* project = EnumProjects(i, nullptr, 0);
+		if (!project) {
+			break;
+		}
+		openProjects.push_back(project);
+	}
+	for (auto& [project, _]: watchers){
+		if (find(openProjects.begin(), openProjects.end(), project) == openProjects.end()){
+			watchers.erase(project);
+		}
+	}
+}
+
 void initialize() {
 	static project_config_extension_t projConf{0};
 	projConf.ProcessExtensionLine = processExtensionLine;
 	projConf.SaveExtensionConfig = saveExtensionConfig;
+	projConf.BeginLoadProjectState = BeginLoadProjectState ;
 	plugin_register("projectconfig", (void*)&projConf);
 }
 
@@ -964,7 +987,7 @@ void cmdPausePeakWatcher(Command* command) {
 }
 
 void peakWatcherOnSwitchProjectTab(){
-	if(!peakWatcher::timer && peakWatcher::isWatchingAnything() && !peakWatcher::isPaused){
+	if(peakWatcher::isWatchingAnything() && !peakWatcher::isPaused){
 		peakWatcher::start();
 	} else {
 		peakWatcher::stop();
