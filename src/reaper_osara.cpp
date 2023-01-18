@@ -2721,6 +2721,18 @@ void cmdGoToLastTrack(Command* command){
 	postGoToTrack(trackNo);
 }
 
+void cmdGoToMaster(Command* command){
+	MediaTrack* track = GetMasterTrack(0);
+	if(!track) {
+		return;
+	}
+	if (!(GetMasterTrackVisibility() & 1)) {
+		return;
+	}
+	SetOnlyTrackSelected(0);
+	moveToTrack(0);
+}
+
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask&1;
@@ -4236,6 +4248,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report regions, last project marker and items on selected tracks at current position"}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to master track if visible"}, "OSARA_GOTOMASTER", cmdGoToMaster},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
