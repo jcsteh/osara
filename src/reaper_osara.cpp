@@ -2731,6 +2731,8 @@ void cmdGoToMaster(Command* command){
 	}
 	SetOnlyTrackSelected(0);
 	moveToTrack(0);
+	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	SetMixerScroll(track); // MCP
 }
 
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
