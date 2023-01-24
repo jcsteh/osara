@@ -404,9 +404,9 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
 	s << fixed << setprecision(1);
 	const bool multiple = isWatchingMultipleValues();
-	const ReaProject* proj = currentProject();
+	auto& projWatchers = watchers[currentProject()];
 	for (int w = 0; w < NUM_WATCHERS; ++w) {
-		Watcher& watcher = watchers[proj][w];
+		Watcher& watcher = projWatchers[w];
 		if (watcher.isDisabled()) {
 			continue;
 		}
@@ -775,6 +775,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 	}
 	stop();
 	ReaProject* project = GetCurrentProjectInLoadSave();
+	auto& projWatchers = watchers[project];
 	for (int w = 0; ; ++w) {
 		char data[500];
 		ctx->GetLine(data, sizeof(data));
@@ -790,7 +791,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 		if (word != "WATCHER") {
 			continue;
 		}
-		Watcher& watcher = watchers[project][w];
+		Watcher& watcher = projWatchers[w];
 		watcher.reset();
 		input >> word;
 		if (word == "NONE") {
@@ -833,7 +834,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 			}
 		}
 	}
-	if (isWatchingAnything()) {
+	if (project == currentProject() && isWatchingAnything()) {
 		start();
 	}
 	return true;
@@ -873,17 +874,11 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 
 void BeginLoadProjectState (bool isUndo, struct project_config_extension_t* reg){
 	//clean up configuration data for dead projects
-	vector<ReaProject*> openProjects;
-	for (int i = 0;; i++){
-		ReaProject* project = EnumProjects(i, nullptr, 0);
-		if (!project) {
-			break;
-		}
-		openProjects.push_back(project);
-	}
-	for (auto& [project, _]: watchers){
-		if (find(openProjects.begin(), openProjects.end(), project) == openProjects.end()){
-			watchers.erase(project);
+	for (auto it = watchers.begin(); it != watchers.end();){
+		if (!ValidatePtr((void*)it->first, "ReaProject*")) {
+			it = watchers.erase(it);
+		} else {
+			++it;
 		}
 	}
 }
@@ -894,6 +889,14 @@ void initialize() {
 	projConf.SaveExtensionConfig = saveExtensionConfig;
 	projConf.BeginLoadProjectState = BeginLoadProjectState ;
 	plugin_register("projectconfig", (void*)&projConf);
+}
+
+void onSwitchTab(){
+	if(isWatchingAnything() && !isPaused){
+		start();
+	} else {
+		stop();
+	}
 }
 
 } // namespace peakWatcher
@@ -919,6 +922,7 @@ void cmdPeakWatcher(Command* command) {
 	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	itemInfo.fType = MFT_STRING;
 	const ReaProject* project = peakWatcher::currentProject();
+	auto& projWatchers = peakWatcher::watchers[project];
 	for (int w = 0; w < peakWatcher::NUM_WATCHERS; ++w) {
 		itemInfo.wID = w + 1;
 		ostringstream s;
@@ -927,7 +931,7 @@ void cmdPeakWatcher(Command* command) {
 		// After this, information about the existing configuration for the value
 		// will be appended.
 		s << translate(peakWatcher::WATCHER_NAMES[w]) << ", ";
-		peakWatcher::watchers[project][w].description(s);
+		projWatchers[w].description(s);
 		// Make sure this stays around until the InsertMenuItem call.
 		string str = s.str();
 		itemInfo.dwTypeData = (char*)str.c_str();
@@ -940,7 +944,7 @@ void cmdPeakWatcher(Command* command) {
 	if (w == -1) {
 		return;
 	}
-	peakWatcher::Watcher& watcher = peakWatcher::watchers[project][w];
+	peakWatcher::Watcher& watcher = projWatchers[w];
 
 	new peakWatcher::Dialog(target, watcher, types);
 }
@@ -978,18 +982,10 @@ void cmdPausePeakWatcher(Command* command) {
 	} else if (peakWatcher::isWatchingAnything()) {
 		// Paused.
 		peakWatcher::start();
-		peakWatcher::isPaused=true;
+		peakWatcher::isPaused=false;
 		outputMessage(translate("resumed Peak Watcher"));
 	} else {
 		// Disabled.
 		outputMessage(translate("Peak Watcher not enabled"));
-	}
-}
-
-void peakWatcherOnSwitchProjectTab(){
-	if(peakWatcher::isWatchingAnything() && !peakWatcher::isPaused){
-		peakWatcher::start();
-	} else {
-		peakWatcher::stop();
 	}
 }
