@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Utility to build translation (pot) template
 # Author: James Teh <jamie@jantrid.net>
-# Copyright 2021 James Teh
+# Copyright 2021-2023 James Teh
 # License: GNU General Public License version 2.0
 
 import re
