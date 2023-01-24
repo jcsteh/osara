@@ -875,7 +875,7 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 void BeginLoadProjectState (bool isUndo, struct project_config_extension_t* reg){
 	//clean up configuration data for dead projects
 	erase_if(watchers, [](const auto& item) {
-auto const& [project, _] = item;
+auto const& project = item.first;
 return ! ValidatePtr((void*)project, "ReaProject*");
 	});
 }
