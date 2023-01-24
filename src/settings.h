@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Setting definitions
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2022 James Teh
+ * Copyright 2022-2023 James Teh
  * License: GNU General Public License version 2.0
  */
 

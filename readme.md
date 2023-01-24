@@ -883,3 +883,4 @@ The resulting installer can be found in the installer directory.
 - Robbie Murray
 - Glen Gordon
 - James Scholes
+- Christian Fillion

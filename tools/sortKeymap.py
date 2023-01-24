@@ -1,6 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Keymap sorting utility
-# Copyright 2022 Robbie Murray
+# Copyright 2022-2023 Robbie Murray
 # License: GNU General Public License version 2.0
 
 import sys
