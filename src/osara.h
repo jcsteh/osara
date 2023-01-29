@@ -282,6 +282,7 @@ const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool ski
 
 bool isTrackSelected(MediaTrack* track);
 std::string formatDouble(double d, int precision, bool plus=false);
+MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
 #include <string>

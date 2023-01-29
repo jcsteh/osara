@@ -644,6 +644,24 @@ void cmdToggleTrackEnvelope(Command* command) {
 	cmdhToggleTrackEnvelope(command->gaccel.accel.cmd);
 }
 
+void cmdhToggleTakeEnvelope(int command) {
+	MediaItem* item = getItemWithFocus();
+	if (!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take) {
+		return;
+	}
+	cmdhToggleEnvelope(command, take, CountTakeEnvelopes, GetTakeEnvelope,
+		translate("showed take {} envelope"),
+		translate("hid take {} envelope"));
+}
+
+void cmdToggleTakeEnvelope(Command* command) {
+	cmdhToggleTakeEnvelope(command->gaccel.accel.cmd);
+}
+
 void postSelectMultipleEnvelopePoints(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
