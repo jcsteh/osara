@@ -32,3 +32,4 @@ void cmdToggleTrackEnvelope(Command* command);
 void cmdToggleTakeEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
+void cmdToggleVolumeEnvelope(Command* command);

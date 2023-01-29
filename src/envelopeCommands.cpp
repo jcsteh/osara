@@ -699,3 +699,11 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	}
 	outputMessage(s);
 }
+
+void cmdToggleVolumeEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40693); // Take: Toggle take volume envelope
+	} else {
+		cmdhToggleTrackEnvelope(40406); // Track: Toggle track volume envelope visible
+	}
+}
