@@ -29,5 +29,6 @@ bool toggleCurrentAutomationItemSelection();
 std::optional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void cmdToggleTrackEnvelope(Command* command);
+void cmdToggleTakeEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
