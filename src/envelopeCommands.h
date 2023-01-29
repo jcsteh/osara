@@ -33,3 +33,7 @@ void cmdToggleTakeEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
 void cmdCycleEnvelopePointShape(Command* command);
+void cmdToggleVolumeEnvelope(Command* command);
+void cmdTogglePanEnvelope(Command* command);
+void cmdToggleMuteEnvelope(Command* command);
+void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command);

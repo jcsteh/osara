@@ -730,3 +730,35 @@ void cmdCycleEnvelopePointShape(Command* command) {
 	}
 	outputMessage(getEnvelopeShapeName(shape));
 }
+
+void cmdToggleVolumeEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40693); // Take: Toggle take volume envelope
+	} else {
+		cmdhToggleTrackEnvelope(40406); // Track: Toggle track volume envelope visible
+	}
+}
+
+void cmdTogglePanEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40694); // Take: Toggle take pan envelope
+	} else {
+		cmdhToggleTrackEnvelope(40407); // Track: Toggle track pan envelope visible
+	}
+}
+
+void cmdToggleMuteEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40695); // Take: Toggle take mute envelope
+	} else {
+		cmdhToggleTrackEnvelope(40867); // Track: Toggle track mute envelope visible
+	}
+}
+
+void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(41612); // Take: Toggle take pitch envelope
+	} else {
+		cmdhToggleTrackEnvelope(40409); // Track: Toggle track pre-FX pan envelope visible
+	}
+}
