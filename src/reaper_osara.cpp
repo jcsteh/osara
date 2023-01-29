@@ -4629,6 +4629,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		loadConfig();
 		resetTimeCache();
 		initTranslation();
+		peakWatcher::initialize();
 
 #ifdef _WIN32
 		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {

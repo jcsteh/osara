@@ -584,6 +584,9 @@ You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher.
 While paused, Peak Watcher won't notify you of any level changes.
 You can later use the same action again to resume automatic reporting.
 
+Peak Watcher settings are saved with the project.
+To configure default settings to use for new projects, you can save them in a project template and configure this template to be used as the template for new projects in the Project section of REAPER Preferences.
+
 ### Shortcut Help
 It is possible to have REAPER list all shortcuts and to search for individual shortcuts in the Action List.
 However, it is sometimes convenient to be able to simply press a shortcut and immediately learn what action it will perform.

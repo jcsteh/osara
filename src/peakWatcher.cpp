@@ -717,6 +717,154 @@ void report(int watcherIndex, int channel) {
 	outputMessage(s);
 }
 
+MediaTrack* getTrackFromGuidStr(ReaProject* project, const string& guidStr) {
+	if (guidStr == "MASTER") {
+		return GetMasterTrack(project);
+	}
+	GUID guid;
+	stringToGuid(guidStr.c_str(), &guid);
+	int trackCount = CountTracks(project);
+	for (int i = 0; i < trackCount; ++i) {
+		MediaTrack* track = GetTrack(project, i);
+		if (memcmp(&guid, GetTrackGUID(track), sizeof(GUID)) == 0) {
+			return track;
+		}
+	}
+	return nullptr;
+}
+
+string getTrackGuidStr(ReaProject* project, MediaTrack* track) {
+	if (track == GetMasterTrack(project)) {
+		// The master track doesn't have a persistent GUID.
+		return "MASTER";
+	}
+	char guid[64];
+	guidToString(GetTrackGUID(track), guid);
+	return guid;
+}
+
+/*
+ * Example config block:
+<OSARA_PEAKWATCHER
+  WATCHER TRACK {someGuid} TYPE 0 FOLLOW 1 LEVEL 0.0 HOLD 0 NOTIFY 0 0
+  WATCHER TRACKFX {someGuid} 5 TYPE 0 FOLLOW 0 LEVEL -5.0 HOLD -1 NOTIFY 1 1
+>
+ */
+
+const char CONFIG_HEADER[] = "<OSARA_PEAKWATCHER";
+const char CONFIG_FOOTER[] = ">";
+
+bool processExtensionLine(const char* line, ProjectStateContext* ctx,
+	bool isUndo, struct project_config_extension_t* reg
+) {
+	if (isUndo || strcmp(line, CONFIG_HEADER) != 0) {
+		return false;
+	}
+	stop();
+	ReaProject* project = GetCurrentProjectInLoadSave();
+	for (int w = 0; ; ++w) {
+		char data[500];
+		ctx->GetLine(data, sizeof(data));
+		if (strcmp(data, CONFIG_FOOTER) == 0) {
+			break;
+		}
+		if (w >= NUM_WATCHERS) {
+			continue;
+		}
+		istringstream input(data);
+		string word;
+		input >> word;
+		if (word != "WATCHER") {
+			continue;
+		}
+		Watcher& watcher = watchers[w];
+		watcher.reset();
+		input >> word;
+		if (word == "NONE") {
+			watcher.target = NoTarget();
+		} else if (word == "TRACK") {
+			input >> word;
+			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
+				watcher.target = track;
+			}
+		} else if (word == "TRACKFX") {
+			input >> word;
+			int fx;
+			input >> fx;
+			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
+				watcher.target = TrackFx(track, fx);
+			}
+		}
+		input >> word;
+		if (word == "TYPE") {
+			input >> watcher.levelType;
+		}
+		input >> word;
+		if (word == "FOLLOW") {
+			input >> word;
+			watcher.follow = word == "1";
+		}
+		input >> word;
+		if (word == "LEVEL") {
+			input >> watcher.notifyLevel;
+		}
+		input >> word;
+		if (word == "HOLD") {
+			input >> watcher.hold;
+		}
+		input >> word;
+		if (word == "NOTIFY") {
+			for (auto& channel : watcher.channels) {
+				input >> word;
+				channel.notify = word == "1";
+			}
+		}
+	}
+	if (isWatchingAnything()) {
+		start();
+	}
+	return true;
+}
+
+void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
+	struct project_config_extension_t* reg
+) {
+	if (isUndo) {
+		return;
+	}
+	ctx->AddLine(CONFIG_HEADER);
+	ReaProject* project = GetCurrentProjectInLoadSave();
+	for (Watcher& watcher : watchers) {
+		ostringstream out;
+		out << "WATCHER";
+		if (holds_alternative<NoTarget>(watcher.target)) {
+			out << " NONE";
+		} else if (MediaTrack** track = get_if<MediaTrack*>(&watcher.target)) {
+			out << " TRACK " << getTrackGuidStr(project, *track);
+		} else if (TrackFx* tfx = get_if<TrackFx>(&watcher.target)) {
+			out << " TRACKFX " << getTrackGuidStr(project, tfx->first) <<
+				" " << tfx->second;
+		}
+		out << " TYPE " << watcher.levelType;
+		out << " FOLLOW " << (int)watcher.follow;
+		out << " LEVEL " << watcher.notifyLevel;
+		out << " HOLD " << watcher.hold;
+		out << " NOTIFY";
+		for (auto& channel : watcher.channels) {
+			out << " " << (int)channel.notify;
+		}
+		ctx->AddLine("%s", out.str().c_str());
+	}
+	ctx->AddLine(CONFIG_FOOTER);
+}
+
+void initialize() {
+	static project_config_extension_t projConf{0};
+	projConf.ProcessExtensionLine = processExtensionLine;
+	projConf.SaveExtensionConfig = saveExtensionConfig;
+	plugin_register("projectconfig", (void*)&projConf);
+}
+
 } // namespace peakWatcher
 
 void cmdPeakWatcher(Command* command) {

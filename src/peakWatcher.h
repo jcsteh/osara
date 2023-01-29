@@ -8,6 +8,10 @@
 
 #include "osara.h"
 
+namespace peakWatcher {
+void initialize();
+}
+
 void cmdPeakWatcher(Command* command);
 void cmdReportPeakWatcherW1C1(Command* command);
 void cmdReportPeakWatcherW1C2(Command* command);

@@ -198,6 +198,10 @@
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetItemStateChunk
+#define REAPERAPI_WANT_GetTrackGUID
+#define REAPERAPI_WANT_guidToString
+#define REAPERAPI_WANT_stringToGuid
+#define REAPERAPI_WANT_GetCurrentProjectInLoadSave
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
