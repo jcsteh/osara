@@ -28,8 +28,6 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 bool toggleCurrentAutomationItemSelection();
 std::optional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
-void postToggleTrackVolumeEnvelope(int command);
-void postToggleTrackPanEnvelope(int command);
 void cmdToggleTrackEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
