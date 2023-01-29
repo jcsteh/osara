@@ -592,11 +592,13 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
+set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
+	auto countFunc, auto getFunc
+) {
 	set<TrackEnvelope*> envelopes;
-	int count = CountTrackEnvelopes(track);
+	int count = countFunc(obj);
 	for (int i = 0; i < count; ++i) {
-		TrackEnvelope* env = GetTrackEnvelope(track, i);
+		TrackEnvelope* env = getFunc(obj, i);
 		if (isEnvelopeVisible(env)) {
 			envelopes.emplace(env);
 		}
@@ -604,14 +606,13 @@ set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
 	return envelopes;
 }
 
-void cmdToggleTrackEnvelope(Command* command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track) {
-		return;
-	}
-	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
+void cmdhToggleEnvelope(int command, auto obj,
+	auto countFunc, auto getFunc,
+	const char* showedMsg, const char* hidMsg
+) {
+	set<TrackEnvelope*> before = getVisibleEnvelopes(obj, countFunc, getFunc);
+	Main_OnCommand(command, 0);
+	set<TrackEnvelope*> after = getVisibleEnvelopes(obj, countFunc, getFunc);
 	if (after.size() == before.size()) {
 		outputMessage(translate("no envelopes toggled"));
 		return;
@@ -623,10 +624,24 @@ void cmdToggleTrackEnvelope(Command* command) {
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
 	if (after.size() > before.size()) {
-		outputMessage(format(translate("showed {} envelope"), name));
+		outputMessage(format(showedMsg, name));
 	} else {
-		outputMessage(format(translate("hid {} envelope"), name));
+		outputMessage(format(hidMsg, name));
 	}
+}
+
+void cmdhToggleTrackEnvelope(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	cmdhToggleEnvelope(command, track, CountTrackEnvelopes, GetTrackEnvelope,
+		translate("showed track {} envelope"),
+		translate("hid track {} envelope"));
+}
+
+void cmdToggleTrackEnvelope(Command* command) {
+	cmdhToggleTrackEnvelope(command->gaccel.accel.cmd);
 }
 
 void postSelectMultipleEnvelopePoints(int command) {
