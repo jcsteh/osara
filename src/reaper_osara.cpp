@@ -3141,6 +3141,8 @@ void cmdSwitchProjectTab(Command* command) {
 		// unsaved project.
 		outputMessage(translate("[Unsaved]"));
 	}
+	// The peak watcher needs to know when the project tab changes
+	peakWatcher::onSwitchTab();
 }
 
 void cmdMoveToNextItemKeepSel(Command* command) {
