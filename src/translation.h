@@ -15,6 +15,9 @@
 
 extern tinygettext::Dictionary translationDict;
 
+void initTranslation();
+void translateDialog(HWND dialog);
+
 template<typename S>
 auto translate(S msg) {
 	return translationDict.translate(msg);
