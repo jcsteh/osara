@@ -592,39 +592,6 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-void reportToggleTrackEnvelope(const char* envType) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track) {
-		return;
-	}
-	if (!isTrackSelected(track)) {
-		outputMessage(translate("track not selected"));
-		return;
-	}
-	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
-		(void*)envType);
-	bool visible = envelope && isEnvelopeVisible(envelope);
-	char name[50];
-	GetEnvelopeName(envelope, name, sizeof(name));
-	if (visible) {
-		// Translators: Reported when showing an envelope. {} will be replaced with
-		// the name of the envelope; e.g. "showed volume envelope".
-		outputMessage(format(translate("showed {} envelope"), name));
-	} else {
-		// Translators: Reported when hiding an envelope. {} will be replaced with
-		// the name of the envelope; e.g. "hid volume envelope".
-		outputMessage(format(translate("hid {} envelope"), name));
-	}
-}
-
-void postToggleTrackVolumeEnvelope(int command) {
-	reportToggleTrackEnvelope("<VOLENV2");
-}
-
-void postToggleTrackPanEnvelope(int command) {
-	reportToggleTrackEnvelope("<PANENV2");
-}
-
 set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
 	set<TrackEnvelope*> envelopes;
 	int count = CountTrackEnvelopes(track);

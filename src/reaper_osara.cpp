@@ -2012,8 +2012,6 @@ PostCommand POST_COMMANDS[] = {
 	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
 	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
 	{41051, postReverseTake}, // Item properties: Toggle take reverse
-	{40406, postToggleTrackVolumeEnvelope}, // Track: Toggle track volume envelope visible
-	{40407, postToggleTrackPanEnvelope}, // Track: Toggle track pan envelope visible
 	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
 	{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
 	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
@@ -4144,6 +4142,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 40406}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
+	{MAIN_SECTION, {{0, 0, 40407}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
 	{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
 	{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
 	{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
