@@ -408,6 +408,9 @@ const string formatFolderState(MediaTrack* track) {
 	if (state == 0) {
 		// Translators: A track which isn't a folder.
 		s << translate("track");
+	} else if (state == 1 && GetMediaTrackInfo_Value(track, "P_PARTRACK")) {
+		// Translators: A track which is a nested folder.
+		s << translate("nested folder");
 	} else if (state == 1) {
 		// Translators: A track which is a folder.
 		s << translate("folder");
