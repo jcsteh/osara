@@ -730,9 +730,14 @@ void report(int watcherIndex, int channel) {
 	outputMessage(s);
 }
 
+const char TRACK_GUID_MASTER[] = "MASTER";
+const char TRACK_GUID_INVALID[] = "INVALID";
 MediaTrack* getTrackFromGuidStr(ReaProject* project, const string& guidStr) {
-	if (guidStr == "MASTER") {
+	if (guidStr == TRACK_GUID_MASTER) {
 		return GetMasterTrack(project);
+	}
+	if (guidStr == TRACK_GUID_INVALID) {
+		return nullptr;
 	}
 	GUID guid;
 	stringToGuid(guidStr.c_str(), &guid);
@@ -749,10 +754,13 @@ MediaTrack* getTrackFromGuidStr(ReaProject* project, const string& guidStr) {
 string getTrackGuidStr(ReaProject* project, MediaTrack* track) {
 	if (track == GetMasterTrack(project)) {
 		// The master track doesn't have a persistent GUID.
-		return "MASTER";
+		return TRACK_GUID_MASTER;
 	}
 	char guid[64];
 	guidToString(GetTrackGUID(track), guid);
+	if (!guid[0]) {
+		return TRACK_GUID_INVALID;
+	}
 	return guid;
 }
 
@@ -798,9 +806,7 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 			watcher.target = NoTarget();
 		} else if (word == "TRACK") {
 			input >> word;
-			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
-				watcher.target = track;
-			}
+			watcher.target = getTrackFromGuidStr(project, word);
 		} else if (word == "TRACKFX") {
 			input >> word;
 			int fx;
