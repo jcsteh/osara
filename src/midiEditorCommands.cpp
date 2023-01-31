@@ -50,6 +50,29 @@ int getItemPPQ(MediaItem* item) {
 	return ppq;
 }
 
+// return the midi editor zoom ratio of the item 
+double getMidiZoomRatio(MediaItem* item) {
+	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
+	const size_t startBuffSize = 16384;
+	const size_t maxBuffSize = 1<<24; // 16 Mib
+	for (size_t buffSize = startBuffSize; buffSize <= maxBuffSize; buffSize *= 2) {
+		string buffer(buffSize, '\0');
+		if (!GetItemStateChunk(item, &buffer.front(), buffSize, false)) {
+			return -1;
+		}
+		smatch match;
+		if (!regex_search(buffer, match, re)) {
+			if (buffer[buffSize-2] != '\0') { //chunk bigger than buffer
+				continue;
+			} else {
+				return -1;
+			}
+		}
+		return stod(match.str(1));
+	}
+	return -1;
+}
+
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
 // It is also used for other MIDI messages.
 struct MidiControlChange {
@@ -2022,4 +2045,22 @@ void postMidiToggleSnap(int command) {
 	} else {
 		outputMessage(translate("disabled snap to grid"));
 	}
+}
+
+void postMidiChangeZoom(int command) {
+	MediaItem_Take* take = MIDIEditor_GetTake(MIDIEditor_GetActive());
+	if(!take) {
+		return;
+	}
+	MediaItem* item = GetMediaItemTake_Item(take);
+	if(!item) {
+		return;
+	}
+	double zoom = getMidiZoomRatio(item);
+	if (zoom <0) {
+		return;
+	}
+	// Translators: Reported when zooming in or out horizontally. {} will be
+	// replaced with the number of pixels per second; e.g. 100 pixels/second.
+	outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 }

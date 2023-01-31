@@ -684,7 +684,7 @@ bool isTrackGrouped(MediaTrack* track) {
 
 // Format a double d to precision decimal places, stripping trailing zeroes.
 // If plus is true, a "+" prefix will be included for a positive number.
-string formatDouble(double d, int precision, bool plus=false) {
+string formatDouble(double d, int precision, bool plus) {
 	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
 	size_t pos = s.find_last_not_of("0");
 	if(s[pos] == '.') {
@@ -2111,6 +2111,8 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
 	{1014, postMidiToggleSnap}, // View: Toggle snap to grid
 	{1139, postToggleRepeat}, // Transport: Toggle repeat
+	{1011, postMidiChangeZoom}, // View: Zoom out horizontally
+	{1012, postMidiChangeZoom}, // View: Zoom in horizontally
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up

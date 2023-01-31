@@ -65,3 +65,4 @@ void postMidiSwitchCCLane(int command);
 void postToggleMidiInputsAsStepInput(int command);
 void postToggleFunctionKeysAsStepInput(int command);
 void postMidiToggleSnap(int command);
+void postMidiChangeZoom(int command);
