@@ -171,7 +171,7 @@ void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
 int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	int numSel = 0;
 	forEachSelectedEnvelopePoint(envelope,
-		[max2, &numSel] (int item, int point) {
+		[max2, &numSel](int item, int point) {
 			++numSel;
 			return !(max2 && numSel == 2);
 		}
@@ -697,4 +697,36 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
 	}
 	outputMessage(s);
+}
+
+void cmdCycleEnvelopePointShape(Command* command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int shape = -1;
+	forEachSelectedEnvelopePoint(envelope,
+		[envelope, &shape](int item, int point) {
+			if (shape == -1) {
+				// Get the shape of the first selected point. (The shape variable will
+				// only be -1 for the first point we encounter.)
+				GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
+					nullptr);
+				// Adjust the shape. This will be set for all selected points.
+				++shape;
+				if (shape > 4) {
+					// 4 is fast end. Don't support setting bezier (5) here, as that requires
+					// a tension value.
+					shape = 0; // Linear
+				}
+			}
+			SetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
+				nullptr, nullptr);
+			return true;
+		}
+	);
+	if (shape == -1) {
+		return; // No selected points.
+	}
+	outputMessage(getEnvelopeShapeName(shape));
 }

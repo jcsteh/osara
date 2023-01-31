@@ -33,3 +33,4 @@ void postToggleTrackPanEnvelope(int command);
 void cmdToggleTrackEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
+void cmdCycleEnvelopePointShape(Command* command);
