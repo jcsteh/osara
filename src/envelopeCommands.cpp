@@ -147,36 +147,35 @@ void cmdDeleteEnvelopePoints(Command* command) {
 	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, true, false);
 }
 
+// For each selected envelope point, Call func(autoItemIndex, pointIndex) .
+// func should return true to continue iterating, false to stop.
+void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
+	// Iterate the points in the envelope itself and each automation item. -1
+	// means the envelope itself.
+	int itemCount = CountAutomationItems(envelope);
+	for (int item = -1; item < itemCount; ++item) {
+		int pointCount = CountEnvelopePointsEx(envelope, item);
+		for (int point = 0; point < pointCount; ++point) {
+			bool selected;
+			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, nullptr, nullptr,
+				&selected);
+			if (selected && !func(item, point)) {
+				return;
+			}
+		}
+	}
+}
+
 // If max2 is true, this only counts to 2;
 // i.e. 2 or more selected envelope points returns 2.
 int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	int numSel = 0;
-	bool selected;
-	// First, count the points in the envelope itself.
-	int pointCount = CountEnvelopePoints(envelope);
-	for (int point = 0; point < pointCount; ++point) {
-		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-		if (selected) {
+	forEachSelectedEnvelopePoint(envelope,
+		[max2, &numSel] (int item, int point) {
 			++numSel;
+			return !(max2 && numSel == 2);
 		}
-		if (max2 && numSel == 2) {
-			return 2; // Don't care above this.
-		}
-	}
-	// Now add the count of the points in each automation item.
-	int itemCount = CountAutomationItems(envelope);
-	for (int item = 0; item < itemCount; ++item) {
-		pointCount = CountEnvelopePointsEx(envelope, item);
-		for (int point = 0; point < pointCount; ++point) {
-			GetEnvelopePointEx(envelope, item, point, NULL, NULL, NULL, NULL, &selected);
-			if (selected) {
-				++numSel;
-			}
-			if (max2 && numSel == 2) {
-				return 2; // Don't care above this.
-			}
-		}
-	}
+	);
 	return numSel;
 }
 
