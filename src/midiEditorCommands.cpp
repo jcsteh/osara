@@ -52,8 +52,7 @@ int getItemPPQ(MediaItem* item) {
 }
 
 struct FreeReaperPtr {
-	void operator()(void* p)
-	{
+	void operator()(void* p) {
 		FreeHeapPtr(p);
 	}
 };
