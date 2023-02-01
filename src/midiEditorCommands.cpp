@@ -16,6 +16,7 @@
 #include <float.h>
 #include <compare>
 #include<regex>
+#include<string_view>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "config.h"
@@ -51,17 +52,24 @@ int getItemPPQ(MediaItem* item) {
 }
 
 // return the midi editor zoom ratio of the item 
-double getMidiZoomRatio(MediaItem* item) {
+double getMidiZoomRatio(MediaItem_Take* take) {
 	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
 	const size_t startBuffSize = 16384;
 	const size_t maxBuffSize = 1<<24; // 16 Mib
+	char guid[40]; 
+	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
+	MediaItem* item = GetMediaItemTake_Item(take);
 	for (size_t buffSize = startBuffSize; buffSize <= maxBuffSize; buffSize *= 2) {
 		string buffer(buffSize, '\0');
 		if (!GetItemStateChunk(item, &buffer.front(), buffSize, false)) {
 			return -1;
 		}
+		size_t takePos = buffer.find(guid);
+		if (takePos == string::npos) {
+			continue;
+		}
 		smatch match;
-		if (!regex_search(buffer, match, re)) {
+		if (!regex_search(buffer.cbegin() + takePos, buffer.cend(), match, re)) {
 			if (buffer[buffSize-2] != '\0') { //chunk bigger than buffer
 				continue;
 			} else {
@@ -2052,11 +2060,7 @@ void postMidiChangeZoom(int command) {
 	if(!take) {
 		return;
 	}
-	MediaItem* item = GetMediaItemTake_Item(take);
-	if(!item) {
-		return;
-	}
-	double zoom = getMidiZoomRatio(item);
+	double zoom = getMidiZoomRatio(take);
 	if (zoom <0) {
 		return;
 	}
