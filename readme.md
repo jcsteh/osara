@@ -758,7 +758,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous envelope point: Alt+J
 - OSARA: Move to next envelope point (leaving other points selected): Alt+Shift+K
 - OSARA: Move to previous envelope point (leaving other points selected): Alt+Shift+J
-- OSARA: Cycle shape of selected envelope points
+- OSARA: Cycle shape of selected envelope points: Control+Alt+J
 - OSARA: Move to next transient: Tab
 - OSARA: Move to previous transient: Shift+Tab
 - OSARA: Cycle automation mode of selected tracks: Control+Shift+\
