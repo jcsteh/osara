@@ -455,6 +455,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Navigate: Move edit cursor to start of selected events: Control+Shift+Home
 - Navigate: Move edit cursor to end of selected events: Control+Shift+End
 - View: Toggle snap to grid: Alt+S
+- View: Zoom in horizontally: NumPad+, Shift+=
+- View: Zoom out horizontally: NumPad-, Shift+-
 
 #### Media Explorer
 - Preview: increase volume by 1 dB: Alt+Shift+UpArrow
