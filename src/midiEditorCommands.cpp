@@ -16,6 +16,7 @@
 #include <float.h>
 #include <compare>
 #include<regex>
+#include<string_view>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "config.h"
@@ -50,27 +51,32 @@ int getItemPPQ(MediaItem* item) {
 	return ppq;
 }
 
-// return the midi editor zoom ratio of the item 
-double getMidiZoomRatio(MediaItem* item) {
-	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
-	const size_t startBuffSize = 16384;
-	const size_t maxBuffSize = 1<<24; // 16 Mib
-	for (size_t buffSize = startBuffSize; buffSize <= maxBuffSize; buffSize *= 2) {
-		string buffer(buffSize, '\0');
-		if (!GetItemStateChunk(item, &buffer.front(), buffSize, false)) {
-			return -1;
-		}
-		smatch match;
-		if (!regex_search(buffer, match, re)) {
-			if (buffer[buffSize-2] != '\0') { //chunk bigger than buffer
-				continue;
-			} else {
-				return -1;
-			}
-		}
-		return stod(match.str(1));
+struct FreeReaperPtr {
+	void operator()(void* p) {
+		FreeHeapPtr(p);
 	}
-	return -1;
+};
+
+// return the midi editor zoom ratio of the take
+double getMidiZoomRatio(MediaItem_Take* take) {
+	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
+	char guid[40]; 
+	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	unique_ptr<char, FreeReaperPtr> state(GetSetObjectState(item, ""));
+	if(!state) {
+		return -1;
+	}
+	auto stateSV = string_view(state.get());
+	size_t takePos = stateSV.find(guid);
+	if (takePos == string::npos) {
+		return -1;
+	}
+	match_results<string_view::const_iterator> match;
+	if (!regex_search(stateSV.cbegin() + takePos, stateSV.cend(), match, re)) {
+		return -1;
+	}
+	return stod(match.str(1));
 }
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
@@ -2052,11 +2058,7 @@ void postMidiChangeZoom(int command) {
 	if(!take) {
 		return;
 	}
-	MediaItem* item = GetMediaItemTake_Item(take);
-	if(!item) {
-		return;
-	}
-	double zoom = getMidiZoomRatio(item);
+	double zoom = getMidiZoomRatio(take);
 	if (zoom <0) {
 		return;
 	}

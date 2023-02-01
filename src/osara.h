@@ -202,6 +202,9 @@
 #define REAPERAPI_WANT_guidToString
 #define REAPERAPI_WANT_stringToGuid
 #define REAPERAPI_WANT_GetCurrentProjectInLoadSave
+#define REAPERAPI_WANT_GetSetMediaItemTakeInfo_String
+#define REAPERAPI_WANT_GetSetObjectState
+#define REAPERAPI_WANT_FreeHeapPtr
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
