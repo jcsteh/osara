@@ -51,34 +51,38 @@ int getItemPPQ(MediaItem* item) {
 	return ppq;
 }
 
+// class to clean up Reaper objects by calling FreeHeapPtr  when they go out of scope.
+template<class t>
+class ReaperHeapPtr {
+	t* ptr;
+	public:
+	ReaperHeapPtr(t* ptr) : ptr(ptr) {}
+	~ReaperHeapPtr() {
+		FreeHeapPtr(ptr);
+	}
+};
+
 // return the midi editor zoom ratio of the item 
 double getMidiZoomRatio(MediaItem_Take* take) {
 	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
-	const size_t startBuffSize = 16384;
-	const size_t maxBuffSize = 1<<24; // 16 Mib
 	char guid[40]; 
 	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
 	MediaItem* item = GetMediaItemTake_Item(take);
-	for (size_t buffSize = startBuffSize; buffSize <= maxBuffSize; buffSize *= 2) {
-		string buffer(buffSize, '\0');
-		if (!GetItemStateChunk(item, &buffer.front(), buffSize, false)) {
-			return -1;
-		}
-		size_t takePos = buffer.find(guid);
-		if (takePos == string::npos) {
-			continue;
-		}
-		smatch match;
-		if (!regex_search(buffer.cbegin() + takePos, buffer.cend(), match, re)) {
-			if (buffer[buffSize-2] != '\0') { //chunk bigger than buffer
-				continue;
-			} else {
-				return -1;
-			}
-		}
-		return stod(match.str(1));
+	char* state = GetSetObjectState(item, "");
+	if(!state) {
+		return -1;
 	}
-	return -1;
+	ReaperHeapPtr<char> statePtr(state); // clean up state when we're done with it.
+	auto stateSV = string_view(state);
+	size_t takePos = stateSV.find(guid);
+	if (takePos == string::npos) {
+		return -1;
+	}
+	match_results<string_view::const_iterator> match;
+	if (!regex_search(stateSV.cbegin() + takePos, stateSV.cend(), match, re)) {
+		return -1;
+	}
+	return stod(match.str(1));
 }
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
