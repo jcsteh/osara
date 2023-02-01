@@ -51,29 +51,24 @@ int getItemPPQ(MediaItem* item) {
 	return ppq;
 }
 
-// class to clean up Reaper objects by calling FreeHeapPtr  when they go out of scope.
-template<class t>
-class ReaperHeapPtr {
-	t* ptr;
-	public:
-	ReaperHeapPtr(t* ptr) : ptr(ptr) {}
-	~ReaperHeapPtr() {
-		FreeHeapPtr(ptr);
+struct FreeReaperPtr {
+	void operator()(void* p)
+	{
+		FreeHeapPtr(p);
 	}
 };
 
-// return the midi editor zoom ratio of the item 
+// return the midi editor zoom ratio of the take
 double getMidiZoomRatio(MediaItem_Take* take) {
 	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
 	char guid[40]; 
 	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
 	MediaItem* item = GetMediaItemTake_Item(take);
-	char* state = GetSetObjectState(item, "");
+	unique_ptr<char, FreeReaperPtr> state(GetSetObjectState(item, ""));
 	if(!state) {
 		return -1;
 	}
-	ReaperHeapPtr<char> statePtr(state); // clean up state when we're done with it.
-	auto stateSV = string_view(state);
+	auto stateSV = string_view(state.get());
 	size_t takePos = stateSV.find(guid);
 	if (takePos == string::npos) {
 		return -1;
