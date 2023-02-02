@@ -707,3 +707,11 @@ void cmdToggleVolumeEnvelope(Command* command) {
 		cmdhToggleTrackEnvelope(40406); // Track: Toggle track volume envelope visible
 	}
 }
+
+void cmdTogglePanEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40694); // Take: Toggle take pan envelope
+	} else {
+		cmdhToggleTrackEnvelope(40407); // Track: Toggle track pan envelope visible
+	}
+}

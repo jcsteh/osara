@@ -4146,6 +4146,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
 	{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
 	{MAIN_SECTION, {{0, 0, 40693}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
+	{MAIN_SECTION, {{0, 0, 40694}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
+	{MAIN_SECTION, {{0, 0, 41612}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
+	{MAIN_SECTION, {{0, 0, 40695}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
 	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
@@ -4240,6 +4243,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take volume envelope (depending on focus)"}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take pan envelope (depending on focus)"}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
