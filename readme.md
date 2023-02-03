@@ -16,7 +16,7 @@ Features:
 - Reports information about items when you navigate to them
 - Reports the edit cursor position when you move by measure, beat, pixel, grid unit, note or to the start or end of the project
 - Provides access to various context menus for tracks, items and the time ruler
-- Reports track envelope selection
+- Reports track and take envelope selection
 - Reports markers when you navigate to them, and optionally reports during project playback
 - Facility to adjust automatable FX parameters
 - Ability to watch and report track peak meters, and gain reduction from supported FX
@@ -25,7 +25,7 @@ Features:
 
 ## Requirements
 OSARA requires REAPER 6.44 or later.
-The latest stable release of the [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended and OSARA supports several useful actions from this extension.
+The latest stable release of the [SWS/S&M EXTENSION](http://www.sws-extension.org/) is highly recommended, as OSARA supports several useful actions from this extension.
 
 OSARA is tested with NVDA and VoiceOver screen readers during development.
 However, on Windows, OSARA uses Microsoft Active Accessibility (MSAA) and UI Automation (UIA) to communicate information, so it should work with any screen reader which supports this correctly.
@@ -39,8 +39,8 @@ Once you have downloaded the installer, simply run it and follow the instruction
 Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
 The installer installs the extension into your user configuration, not the program directory.
 
-If you wish to completely replace your existing key map with the OSARA key map (which is recommended), answer yes when prompted.
-If the installer does replace the key map, a backup of your existing key map will be made in Reaper's KeyMaps folder.
+If you wish to completely replace your existing key map with the OSARA key map (recommended to make sure you have the most recent mappings), answer yes when prompted.
+If the installer does replace the key map, a safety backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
 Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
@@ -58,8 +58,8 @@ Please follow these instructions to install it:
 
 ### Key Map
 Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
-This is particularly useful if you wish to merge the key map with your existing key map, rather than replacing it.
-Note that any keyboard commands described in this document assume you are using the OSARA key map.
+This is particularly useful if you wish to merge new additions with your existing key map, rather than replacing it.
+Note that all keyboard commands described in this document assume you are using the OSARA key map.
 
 For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
@@ -81,20 +81,15 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Track: Go to previous track: UpArrow
 - Track: Go to next track (leaving other tracks selected): Shift+DownArrow
 - Track: Go to previous track (leaving other tracks selected): Shift+UpArrow
-- Track: Insert new track
 - Track: Cycle track folder state: Shift+Enter
 - Track: Cycle track folder collapsed state: Enter
 - SWS: Select nearest next folder: Alt+PageDown
 - SWS: Select nearest previous folder: Alt+PageUp
-- Track: Remove tracks
-- Track: Select all tracks
 - Track properties: Toggle free item positioning: Alt+Shift+F2
 
 #### Adjusting Track Parameters
-- Track: Toggle mute for selected tracks
 - Track: Mute/unmute tracks: F5
 - Track: Solo/unsolo tracks: F6
-- Track: Toggle record arm for selected tracks
 - Toggle record arming for current (last touched) track: F7
 - Track: Cycle track record monitor: F8
 - Track: Invert track phase: F9
@@ -107,9 +102,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - (SWS extension) Xenakios/SWS: Nudge volume of selected tracks down: Alt+Shift+DownArrow
 - Track: Nudge master track volume up: Shift+F12
 - Track: Nudge master track volume down: Shift+F11
-- Xenakios/SWS: Nudge master volume 1 dB up
-- Xenakios/SWS: Nudge master volume 1 dB down
-- Xenakios/SWS: Set master volume to 0 dB
 - Track: Nudge track pan left: Alt+LeftArrow
 - Track: Nudge track pan right: Alt+RightArrow
 - Master track: Toggle stereo/mono (L+R): shift+F9
@@ -138,7 +130,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Select and move to next item: Control+RightArrow
 - Item: Split items at edit or play cursor: S
 - Item: Split items at time selection: Shift+S
-- Item: Remove items
+
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
 - Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6
@@ -149,7 +141,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
 - Item: go to next stretch marker: Control+'
 - Item: go to previous stretch marker: Control+;
-- Item: remove stretch marker at current position
 - Item navigation: Move cursor left to edge of item: Control+Shift+,
 - Item navigation: Move cursor right to edge of item: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
@@ -164,15 +155,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
 - Item: Open associated project in new tab: Alt+Shift+O
-- Item: Nudge items volume +1dB
-- Item: Nudge items volume -1dB
 - Xenakios/SWS: Nudge item volume down: Control+Shift+DownArrow
 - Xenakios/SWS: Nudge item volume up: Control+Shift+UpArrow
 - Item: Set item end to source media end: Control+L
-- Item: Set cursor to next take marker in selected items
-- Item: Set cursor to previous take marker in selected items
-- Item: Delete take marker at cursor
-- Item: Delete all take markers
 - Item: Remove selected area of items: Control+Win+Delete
 
 #### Takes
@@ -182,30 +167,20 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item properties: Set take channel mode to mono (downmix): Control+F8
 - Item properties: Set take channel mode to mono (left): Control+F9
 - Item properties: Set take channel mode to mono (right): Control+F10
-- Take: Nudge active takes volume +1dB
-- Take: Nudge active takes volume -1dB
 - Xenakios/SWS: Nudge active take volume up: Control+UpArrow
 - Xenakios/SWS: Nudge active take volume down: Control+DownArrow
 - Item properties: Decrease item rate by ~0.6% (10 cents): Shift+1
 - Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch': Shift+3
-- Item properties: Decrease item rate by ~6% (one semitone)
 - Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch': Shift+5
 - Item properties: Increase item rate by ~0.6% (10 cents): Shift+2
 - Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch': shift+4
-- Item properties: Increase item rate by ~6% (one semitone)
 - Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch': shift+6
-- Item properties: Set item rate from user-supplied source media tempo/bpm...
 - Item properties: Set item rate to 1.0: Control+Alt+Backspace
 - Item properties: Pitch item down one cent: Shift+7
 - Item properties: Pitch item up one cent: Shift+8
 - Item properties: Pitch item down one semitone: shift+9
 - Item properties: Pitch item up one semitone: Shift+0
-- Item properties: Pitch item down one octave
-- Item properties: Pitch item up one octave
 - Item properties: Reset item pitch: Control+Backspace
-- Item properties: Toggle take preserve pitch
-- Item properties: Clear take preserve pitch
-- Item properties: Set take preserve pitch
 
 #### FX
 - FX: Toggle delta solo for last focused FX: Shift+F6
@@ -215,8 +190,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
-- Markers: Delete marker near cursor
-- Markers: Delete region near cursor
 - Markers: Go to marker 01: 1
 - Markers: Go to marker 02: 2
 - Markers: Go to marker 03: 3
@@ -243,7 +216,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 #### Time Signature/Tempo Markers
 - Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
-- Markers: Delete time signature marker near cursor
 
 #### Automation
 - Item edit: Move items/envelope points up one track/a bit: NumPad8
@@ -253,26 +225,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
-- Envelope: Insert new point at current position (do not remove nearby points)
-- Envelope: Select all points
-- Global automation override: All automation in latch mode
-- Global automation override: All automation in latch preview mode
-- Global automation override: All automation in read mode
-- Global automation override: All automation in touch mode
-- Global automation override: All automation in trim/read mode
-- Global automation override: All automation in write mode
-- Global automation override: Bypass all automation
-- Global automation override: No override (set automation modes per track)
-- Track: Toggle track volume envelope visible: Control+Alt+V
-- Track: Toggle track pre-FX volume envelope visible: Control+Alt+Shift+V
-- Track: Toggle track pan envelope visible: Control+Alt+P
-- Track: Toggle track pre-FX pan envelope visible: Control+Alt+Shift+P
-- Track: Toggle track mute envelope visible: Control+Alt+F5
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-
 - View: Zoom in horizontal: = or NumPad+
-- View: Set horizontal zoom to default project setting
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
@@ -287,7 +243,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Transient detection sensitivity: Decrease: Alt+Shift+PageDown
 - Transient detection threshold: Increase: Control+Shift+PageUp
 - Transient detection threshold: Decrease: Control+Shift+PageDown
-- Options: Envelope points move with media items
 
 #### Undo
 - Edit: Undo: Control+Z
@@ -299,8 +254,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Transport: Decrease playrate by ~6% (one semitone): Control+Shift+-
 - Transport: Increase playrate by ~0.6% (10 cents): Shift+=
 - Transport: Decrease playrate by ~0.6% (10 cents): Shift+-
-- Transport: Set playrate to 1.0
-- Transport: Toggle preserve pitch in audio items when changing master playrate
+- Transport: Set playrate to 1.0: Control+Shift+Backspace
 
 #### Selection
 - Time selection: Set start point: [
@@ -309,7 +263,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Loop points: Set end point: Alt+Shift+]
 - Go to start of loop: Alt+Shift+Home
 - Go to end of loop: Alt+Shift+End
-- Time selection: Remove contents of time selection (moving later items)
 - Time selection: Remove time selection and loop point selection: Escape
 - Unselect all tracks/items/envelope points: Shift+Escape
 - Time selection: Nudge left edge left: Control+[
@@ -329,14 +282,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
 - Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Control+Shift+X
 - Item: Copy selected area of items: Control+Win+C
-- Item: Copy loop of selected area of audio items
-- Edit: Cut items
 - Item: Cut selected area of items: Control+Win+X
 - Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Control+Shift+C
-- Track: Cut tracks
 - Item: Paste items/tracks: Control+V
-- Envelope: Cut points within time selection
 - Select all items/tracks/envelope points (depending on focus): Control+A
 
 #### View
@@ -353,27 +302,16 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Grid: Set to 1/8: Control+Shift+8
 - Grid: Set to 1/12 (1/8 triplet): Control+Shift+9
 - Grid: Set to 1/48 (1/32 triplet): Control+Shift+0
-- Grid: Set to 1/64
-- Grid: Set to 1/128
 
 #### Project Tabs
 - Close current project tab: Control+F4
 - New project tab: Alt+Shift+N
-- New project tab (ignore default template)
 - Next project tab: Control+Tab
 - Previous project tab: Control+Shift+Tab
 
 #### Tempo
 - Tempo: Decrease current project tempo 01 BPM: Alt+-
 - Tempo: Increase current project tempo 01 BPM: alt+=
-- Tempo: Decrease current project tempo 0.1 BPM
-- Tempo: Decrease current project tempo 10 BPM
-- Tempo: Decrease current project tempo 10 percent
-- Tempo: Decrease current project tempo 50 percent (half)
-- Tempo: Increase current project tempo 0.1 BPM
-- Tempo: Increase current project tempo 10 BPM
-- Tempo: Increase current project tempo 10 percent
-- Tempo: Increase current project tempo 100 percent (double)
 - SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo": Alt+Backspace
 
 #### MIDI Editor
@@ -393,7 +331,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Edit: Insert note at edit cursor: I or NumPad5
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
 - Edit: Select all events: Control+A
-- Edit: Select all notes in time selection
 - Edit: Select all notes starting in time selection: Control+Shift+A
 - Invert selection: Control+I
 - Select all notes with the same pitch: Shift+A
@@ -449,8 +386,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Edit: Decrease value a little bit for CC events: -
 - CC: Next CC lane: Control+Alt+=
 - CC: Previous CC lane: Control+Alt+-
-- Options: MIDI inputs as step input mode
-- Options: F1-F12 as step input mode
 - Edit: Toggle selection of all CC events under selected notes: C
 - Navigate: Move edit cursor to start of selected events: Control+Shift+Home
 - Navigate: Move edit cursor to end of selected events: Control+Shift+End
@@ -513,7 +448,7 @@ To access it:
  If there are input or monitoring FX instantiated on the track, these will also be included in the menu with an appropriate suffix.
 
 You can also access the FX parameter list from the FX chain dialog.
-To do this, select the effect in the list and then press Alt+P (OSARA: View parameters for current track/item/FX (depending on focus)).
+To do this, select the effect in the FX chain list box and then press Alt+P (OSARA: View parameters for current track/item/FX (depending on focus)).
 
 Note that some effects expose easily readable values, while others expose only percentages.
  When effects do expose easily readable values, these will be reported when focus is on the slider. The editable text is an internal number and probably won't correspond to the readable value on the slider.
@@ -612,7 +547,7 @@ You can do this as follows:
 5. When you reach a track/item you want to select, press Shift+Space (OSARA: Enable noncontiguous selection/toggle selection of current track/item).
  You can also use this if you want to unselect a previously selected track/item.
 
-Selection will revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
+Selection will automatically revert to contiguous selection the next time you move to a track/item without leaving other tracks/items selected.
 
 If you want to select noncontiguous items on several different tracks, the procedure is exactly the same.
 However, it's important to remember that you must move between tracks without affecting the selection; i.e. using Shift+DownArrow and Shift+UpArrow.
@@ -726,12 +661,12 @@ The dialog contains the following options:
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
 There is also an action to toggle each setting; e.g. OSARA: Toggle Report position when scrubbing.
-These do not have keyboard shortcuts by default, but you can add shortcuts in the Actions dialog.
+These do not have keyboard shortcuts mapped by default, but you can add shortcuts in the Actions dialog (hit F4 to go there).
 
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 
-#### Main
+#### Main section of actions list
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
@@ -754,6 +689,10 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report edit/play cursor position and transport state: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Delete all time signature markers: Alt+Win+Delete
+- OSARA: Toggle track/take volume envelope visibility (depending on focus): Control+Alt+V
+- OSARA: Toggle track/take pan envelope visibility (depending on focus): Control+Alt+P
+- OSARA: Toggle track/take mute envelope visibility (depending on focus): Control+Alt+F5
+- OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus): Control+Alt+Shift+P
 - OSARA: Select next track/take envelope (depending on focus): Alt+L
 - OSARA: Select previous track/take envelope (depending on focus): Alt+Shift+L
 - OSARA: Move to next envelope point: Alt+K
@@ -773,7 +712,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: About: Control+F1
 - Toggle fullscreen: F11
 
-#### Midi editor
+#### Midi Editor section of actions list
 - OSARA: Move to next midi item on track: Control+RightArrow
 - OSARA: Move to previous midi item on track: Control+LeftArrow
 - OSARA: Move to next CC: Control+=
@@ -782,8 +721,98 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to previous CC and add to selection: Control+Shift+-
 - OSARA: Select all notes with the same pitch starting in time selection: Alt+Shift+A
 
-#### MIDI Event List Editor
+#### MIDI Event List Editor section of actions list
 - OSARA: Focus event nearest edit cursor: Control+F
+
+### Actions that report, but are not directly mapped to keyboard shortcuts
+OSARA will report any native REAPER or SWS toggle action that exposes its state with a generic reporting style.
+The actions listed in this section are ones where some effort has been made for reports to be more dynamic, or productivity has been refined in some way.
+While these actions aren't directly on the key map, typically they're used as part of providing context sensitive workflows, custom or cycle actions instead.
+This list is worth referencing when making your own key map additions, assigning actions to control surfaces where reporting is desirable or assembling custom actions, as everything included here should report productively.
+
+#### Unmapped in Main section
+- Envelope: Cut points within time selection
+- Envelope: Insert new point at current position (do not remove nearby points)
+- Envelope: Select all points
+- Global automation override: All automation in latch mode
+- Global automation override: All automation in latch preview mode
+- Global automation override: All automation in read mode
+- Global automation override: All automation in touch mode
+- Global automation override: All automation in trim/read mode
+- Global automation override: All automation in write mode
+- Global automation override: Bypass all automation
+- Global automation override: No override (set automation modes per track)
+- Grid: Set to 1/64
+- Grid: Set to 1/128
+- Item: Remove items
+- Item: Copy loop of selected area of audio items
+- Edit: Cut items
+- Item properties: Pitch item down one octave
+- Item properties: Pitch item up one octave
+- Item properties: Toggle take preserve pitch
+- Item properties: Clear take preserve pitch
+- Item properties: Set take preserve pitch
+- Item properties: Decrease item rate by ~6% (one semitone)
+- Item properties: Increase item rate by ~6% (one semitone)
+- Item properties: Set item rate from user-supplied source media tempo/bpm...
+- Take: Nudge active takes volume +1dB
+- Take: Nudge active takes volume -1dB
+- Item: Nudge items volume +1dB
+- Item: Nudge items volume -1dB
+- Item: remove stretch marker at current position
+- Item: Set cursor to next take marker in selected items
+- Item: Set cursor to previous take marker in selected items
+- Item: Delete take marker at cursor
+- Item: Delete all take markers
+- Markers: Delete time signature marker near cursor
+- Markers: Delete marker near cursor
+- Markers: Delete region near cursor
+- New project tab (ignore default template)
+- Options: Envelope points move with media items
+- Tempo: Decrease current project tempo 0.1 BPM
+- Tempo: Decrease current project tempo 10 BPM
+- Tempo: Decrease current project tempo 10 percent
+- Tempo: Decrease current project tempo 50 percent (half)
+- Tempo: Increase current project tempo 0.1 BPM
+- Tempo: Increase current project tempo 10 BPM
+- Tempo: Increase current project tempo 10 percent
+- Tempo: Increase current project tempo 100 percent (double)
+- Time selection: Remove contents of time selection (moving later items)
+- Track: Insert new track
+- Track: Select all tracks
+- Track: Toggle mute for selected tracks
+- Track: Toggle record arm for selected tracks
+- Track: Remove tracks
+- Track: Cut tracks
+- Xenakios/SWS: Nudge master volume 1 dB up
+- Xenakios/SWS: Nudge master volume 1 dB down
+- Xenakios/SWS: Set master volume to 0 dB
+-- Track: Toggle track volume envelope visible
+- Track: Toggle track pre-FX volume envelope visible
+- Track: Toggle track pan envelope visible
+- Track: Toggle track pre-FX pan envelope visible
+- Track: Toggle track mute envelope visible
+- Transport: Toggle preserve pitch in audio items when changing master playrate
+- View: Set horizontal zoom to default project setting
+
+#### Unmapped in MIDI Editor section
+- Edit: Select all notes in time selection
+- Options: MIDI inputs as step input mode
+- Options: F1-F12 as step input mode
+
+#### Unmapped OSARA actions
+- OSARA: Pause/resume Peak Watcher
+- OSARA: Toggle Move relative to the play cursor for time movement commands during playback
+- OSARA: Toggle Report FX when moving to tracks/takes
+- OSARA: Toggle Report MIDI notes in MIDI editor
+- OSARA: Toggle Report changes made via control surfaces
+- OSARA: Toggle Report full time for time movement commands
+- OSARA: Toggle Report markers during playback
+- OSARA: Toggle Report position when navigating chords in MIDI editor
+- OSARA: Toggle Report position when scrubbing
+- OSARA: Toggle Report time movement during playback/recording
+- OSARA: Toggle Report track numbers
+- OSARA: Toggle Report transport state (play, record, etc.)
 
 ### Muting OSARA Messages in Custom/Cycle Actions
 The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action.
