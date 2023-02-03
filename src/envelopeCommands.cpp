@@ -723,3 +723,11 @@ void cmdToggleMuteEnvelope(Command* command) {
 		cmdhToggleTrackEnvelope(40867); // Track: Toggle track mute envelope visible
 	}
 }
+
+void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(41612); // Take: Toggle take pitch envelope
+	} else {
+		cmdhToggleTrackEnvelope(40409); // Track: Toggle track pre-FX pan envelope visible
+	}
+}

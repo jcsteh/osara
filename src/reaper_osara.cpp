@@ -4245,6 +4245,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take volume envelope visibility (depending on focus)"}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take pan envelope visibility (depending on focus)"}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take mute envelope visibility (depending on focus)"}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
