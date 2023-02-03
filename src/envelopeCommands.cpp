@@ -637,8 +637,8 @@ void cmdhToggleTrackEnvelope(int command) {
 		return;
 	}
 	cmdhToggleEnvelope(command, track, CountTrackEnvelopes, GetTrackEnvelope,
-		translate("showed {} track envelope"),
-		translate("hid {} track envelope"));
+		translate("showed track {} envelope"),
+		translate("hid track {} envelope"));
 }
 
 void cmdToggleTrackEnvelope(Command* command) {
@@ -655,7 +655,7 @@ void cmdhToggleTakeEnvelope(int command) {
 		return;
 	}
 	cmdhToggleEnvelope(command, take, CountTakeEnvelopes, GetTakeEnvelope,
-		translate("showed {} take envelope"),
+		translate("showed take {} envelope"),
 		translate("hid {} take envelope"));
 }
 
