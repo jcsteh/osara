@@ -34,3 +34,4 @@ void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
 void cmdToggleVolumeEnvelope(Command* command);
 void cmdTogglePanEnvelope(Command* command);
+void cmdToggleMuteEnvelope(Command* command);
