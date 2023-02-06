@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2023-01-11 11:57\n"
+"PO-Revision-Date: 2023-02-06 01:16\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -169,21 +169,20 @@ msgid_plural "{} envelope points copied"
 msgstr[0] "{} Automatisierungspunkt kopiert"
 msgstr[1] "{} Automatisierungspunkte kopiert"
 
-msgid "track not selected"
-msgstr "Track ist nicht ausgewählt"
-
-#. Reported when showing an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "showed volume envelope".
-msgid "showed {} envelope"
-msgstr "{} Automationskurve angezeigt"
-
-#. Reported when hiding an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "hid volume envelope".
-msgid "hid {} envelope"
-msgstr "{} Automationskurve ausgeblendet"
-
 msgid "no envelopes toggled"
 msgstr "Keine Automationskurven aktiviert und angezeigt"
+
+msgid "showed track {} envelope"
+msgstr ""
+
+msgid "hid track {} envelope"
+msgstr ""
+
+msgid "showed take {} envelope"
+msgstr ""
+
+msgid "hid take {} envelope"
+msgstr ""
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -783,6 +782,13 @@ msgstr "Einrasten im Grid aktiviert"
 msgid "disabled snap to grid"
 msgstr "Einrasten am Grid deaktiviert"
 
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+msgid "{} pixels/second"
+msgstr ""
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -1357,11 +1363,6 @@ msgstr "Item"
 
 msgid "Take"
 msgstr "Take"
-
-#. Reported when zooming in or out horizontally. {} will be
-#. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{} pixels/second"
-msgstr ""
 
 #. Panned to the center.
 msgid "center"
@@ -2266,6 +2267,21 @@ msgstr "OSARA: Gehe zum ersten Track"
 
 msgid "OSARA: Go to last track"
 msgstr "OSARA: gehe zum letzten Track"
+
+msgid "OSARA: Cycle shape of selected envelope points"
+msgstr ""
+
+msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
+msgstr ""
+
+msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
+msgstr ""
+
+msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
+msgstr ""
+
+msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "Osara: Aktivieren nicht zusammenhängender Selektion / Umschalten der Selektion von Noten und Akkorden"

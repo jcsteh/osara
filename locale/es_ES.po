@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-01-11 11:57\n"
+"PO-Revision-Date: 2023-02-06 01:16\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -169,21 +169,20 @@ msgid_plural "{} envelope points copied"
 msgstr[0] "{} punto de envolvente copiado"
 msgstr[1] "{} puntos de envolventes copiados"
 
-msgid "track not selected"
-msgstr "pista no seleccionada"
-
-#. Reported when showing an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "showed volume envelope".
-msgid "showed {} envelope"
-msgstr "envolvente de {} mostrado"
-
-#. Reported when hiding an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "hid volume envelope".
-msgid "hid {} envelope"
-msgstr "envolvente de {} oculto"
-
 msgid "no envelopes toggled"
 msgstr "ninguna envolvente cambiada"
+
+msgid "showed track {} envelope"
+msgstr "envolvente de pista {} mostrado"
+
+msgid "hid track {} envelope"
+msgstr "envolvente de pista {} oculto"
+
+msgid "showed take {} envelope"
+msgstr "toma de pista {} mostrado"
+
+msgid "hid take {} envelope"
+msgstr "envolvente de pista {} oculto"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -783,6 +782,13 @@ msgstr "activada snap a la rejilla"
 msgid "disabled snap to grid"
 msgstr "desactivada snap a la rejilla"
 
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+msgid "{} pixels/second"
+msgstr "{} píxeles por segundo"
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -1357,11 +1363,6 @@ msgstr "Ítem"
 
 msgid "Take"
 msgstr "Toma"
-
-#. Reported when zooming in or out horizontally. {} will be
-#. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{} pixels/second"
-msgstr "{} píxeles por segundo"
 
 #. Panned to the center.
 msgid "center"
@@ -2266,6 +2267,21 @@ msgstr "Pista"
 
 msgid "OSARA: Go to last track"
 msgstr "Pista"
+
+msgid "OSARA: Cycle shape of selected envelope points"
+msgstr "OSARA: forma cíclica de los puntos de envolventes seleccionados"
+
+msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
+msgstr "OSARA: conmuta visibilidad de envolvente de volumen de pista, toma (dependiendo del foco)"
+
+msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
+msgstr "OSARA: conmuta visibilidad de panorama de pista, toma (dependiendo del foco)"
+
+msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
+msgstr ""
+
+msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
