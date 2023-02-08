@@ -124,7 +124,7 @@ void registerSettingCommands() {
 		gaccel_register_t gaccel; \
 		gaccel.accel = {0}; \
 		gaccel.accel.cmd = cmd; \
-		tc.settingDisp = translate(displayName); \
+		tc.settingDisp = translate_ctxt("OSARA Configuration", displayName); \
 		/* Strip the '&' character indicating the access key. */ \
 		tc.settingDisp.erase(remove(tc.settingDisp.begin(), tc.settingDisp.end(), \
 			'&'), tc.settingDisp.end()); \
