@@ -11,14 +11,14 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-02-06 01:16\n"
+"PO-Revision-Date: 2023-02-08 19:26\n"
 
 msgid "enabled"
 msgstr "启用"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "禁用"
+msgstr "已禁用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切换"
@@ -169,16 +169,16 @@ msgid "no envelopes toggled"
 msgstr "无包络切换"
 
 msgid "showed track {} envelope"
-msgstr ""
+msgstr "显示轨道 {} 包络"
 
 msgid "hid track {} envelope"
-msgstr ""
+msgstr "影藏轨道 {} 包络"
 
 msgid "showed take {} envelope"
-msgstr ""
+msgstr "显示片段 {} 包络"
 
 msgid "hid take {} envelope"
-msgstr ""
+msgstr "影藏片段 {} 包络"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -2204,19 +2204,19 @@ msgid "OSARA: Go to last track"
 msgstr "OSARA: 转到最后一条轨道"
 
 msgid "OSARA: Cycle shape of selected envelope points"
-msgstr "OSARA: 选定包络点的循环形状"
+msgstr "OSARA:循环切换 选定包络点的形状"
 
 msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: 切换轨道/片段音量包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: 切换轨道/片段声像包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: 切换轨道/片段禁音包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: 切换轨道钱FX声像货片段音高包络可见 (取决于焦点)"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"

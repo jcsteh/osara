@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-02-06 01:17\n"
+"PO-Revision-Date: 2023-02-08 19:26\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2275,13 +2275,13 @@ msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
 msgstr "OSARA: Basculer l'affichage de l'enveloppe de volume de piste/prise (selon le focus)"
 
 msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: Basculer l'affichage de l'enveloppe de panoramique de piste/prise (selon le focus)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: Basculer l'affichage de l'enveloppe de sourdine de piste/prise (selon le focus)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
-msgstr ""
+msgstr "OSARA: Basculer l'affichage de l'enveloppe de panoramique Pré-FX de piste ou de auteur tonale de prise (selon le focus)"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
@@ -2450,7 +2450,7 @@ msgstr "&Déplacement relatif au curseur de lecture pour les commandes de dépla
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers during playback"
-msgstr "Énoncer les ma&rqueurs pendant la lecture"
+msgstr "Énoncer l&es marqueurs pendant la lecture"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
@@ -2466,7 +2466,7 @@ msgstr "Énoncer &l'FX lors de la sélection des pistes et des prises"
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating chords in MIDI editor"
-msgstr "Rapport& de position lors de la sélection des accords dans l'éditeur MIDI"
+msgstr "Énnoncer& la position lors de la sélection des accords dans l'éditeur MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
@@ -2474,7 +2474,7 @@ msgstr "Énoncer le nom des notes dans l'éditeur MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr "Énoncer les changement effectués par &une surface de control"
+msgstr "Énoncer les changement effectués par &une surface de contrôle"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
