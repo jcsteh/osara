@@ -641,7 +641,7 @@ class Dialog {
 			MAKEINTRESOURCE(ID_PEAK_WATCHER_DLG), GetForegroundWindow(),
 			Dialog::dialogProc);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
-		translateDialog(this->dialog);
+// 		translateDialog(this->dialog);
 		s << translate_ctxt("Peak Watcher", "Peak Watcher") << ": ";
 		describeTarget(target, s);
 		SetWindowText(this->dialog, s.str().c_str());
