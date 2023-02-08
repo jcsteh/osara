@@ -3854,8 +3854,6 @@ int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		case VK_LEFT:
 		case VK_UP:
 		case VK_DOWN:
-		case VK_PRIOR:
-		case VK_NEXT:
 		case VK_HOME:
 		case VK_END:
 		case VK_SPACE:
