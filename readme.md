@@ -793,6 +793,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle track pre-FX pan envelope visible
 - Track: Toggle track mute envelope visible
 - Transport: Toggle preserve pitch in audio items when changing master playrate
+- Transport: Play/stop (move edit cursor on stop)
 - View: Set horizontal zoom to default project setting
 
 #### Unmapped in MIDI Editor section
