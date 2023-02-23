@@ -2220,8 +2220,8 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
 	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
 	// Media Explorer toggles
-	{{32063, 1011}, {"enabled auto play", "disabled auto play"}}, // Autoplay: Toggle on/off
-	{{32063, 1068}, {"repeat on", "repeat off"}}, // Preview: Toggle repeat on/off
+	{{32063, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
+	{{32063, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off
 	{{32063, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
 	{{32063, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
 	{{32063, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
