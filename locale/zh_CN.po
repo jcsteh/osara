@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-02-08 19:26\n"
+"PO-Revision-Date: 2023-02-25 01:20\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1725,11 +1725,17 @@ msgstr "显示媒体资源管理器"
 msgid "hid Media Explorer"
 msgstr "影藏媒体资源管理器"
 
-msgid "enabled auto play"
-msgstr "已启用自动播放"
+msgid "auto playing"
+msgstr ""
 
-msgid "disabled auto play"
-msgstr "已禁用自动播放"
+msgid "not auto playing"
+msgstr ""
+
+msgid "repeating previews"
+msgstr ""
+
+msgid "not repeating previews"
+msgstr ""
 
 msgid "starting on bar"
 msgstr "从小节线开始"

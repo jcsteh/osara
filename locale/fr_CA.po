@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-02-08 19:26\n"
+"PO-Revision-Date: 2023-02-25 01:20\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1779,11 +1779,17 @@ msgstr "afficher l'explorateur de média"
 msgid "hid Media Explorer"
 msgstr "masquer l'explorateur de média"
 
-msgid "enabled auto play"
-msgstr "lecture automatique, activé"
+msgid "auto playing"
+msgstr ""
 
-msgid "disabled auto play"
-msgstr "lecture automatique, désactivé"
+msgid "not auto playing"
+msgstr ""
+
+msgid "repeating previews"
+msgstr ""
+
+msgid "not repeating previews"
+msgstr ""
 
 msgid "starting on bar"
 msgstr "démarrer sur la mesure, activé"

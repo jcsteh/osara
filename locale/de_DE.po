@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2023-02-06 01:16\n"
+"PO-Revision-Date: 2023-02-25 01:20\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -1779,11 +1779,17 @@ msgstr "Angezeigter Media Explorer"
 msgid "hid Media Explorer"
 msgstr "Wähle Media Explorer"
 
-msgid "enabled auto play"
-msgstr "Auto Play aktiviert"
+msgid "auto playing"
+msgstr ""
 
-msgid "disabled auto play"
-msgstr "Auto Play deaktiviert"
+msgid "not auto playing"
+msgstr ""
+
+msgid "repeating previews"
+msgstr ""
+
+msgid "not repeating previews"
+msgstr ""
 
 msgid "starting on bar"
 msgstr "Starte bei Takt"
