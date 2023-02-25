@@ -1873,6 +1873,33 @@ void postToggleTakePreservePitch(int command) {
 		translate("disabled preserve pitch when changing item rate"));
 }
 
+void postChangeVerticalZoom(int command) {
+	int size = 0;
+	int index = projectconfig_var_getoffs("vzoom2", &size);
+	assert(size == sizeof(int));
+	int zoom = *(int*)projectconfig_var_addr(nullptr, index);
+	switch (zoom) {
+		case 0:
+			outputMessage(translate("minimum vertical zoom"));
+			return;
+		case 2:
+			outputMessage(translate("small vertical zoom"));
+			return;
+		case 6:
+			outputMessage(translate("medium vertical zoom"));
+			return;
+		case 16:
+			outputMessage(translate("large vertical zoom"));
+			return;
+		case 40:
+			outputMessage(translate("maximum vertical zoom"));
+			return;
+	}
+	// Translators: Used when reporting the vertical zoom level as a number.
+	// {} will be replaced with the number; e.g. "35 vertical zoom".
+	outputMessage(translate(format("{} vertical zoom", zoom)));
+}
+
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
 	if(!w) {// support Reaper versions before 6.65
@@ -2070,6 +2097,10 @@ PostCommand POST_COMMANDS[] = {
 	{40566, postToggleTakePreservePitch}, // Item properties: Toggle take preserve pitch
 	{40796, postToggleTakePreservePitch}, //Item properties: Clear take preserve pitch
 	{40795, postToggleTakePreservePitch}, // Item properties: Set take preserve pitch
+	{40110, postChangeVerticalZoom}, // View: Toggle track zoom to minimum height
+	{40111, postChangeVerticalZoom}, // View: Zoom in vertical
+	{40112, postChangeVerticalZoom}, // View: Zoom out vertical
+	{40113, postChangeVerticalZoom}, // View: Toggle track zoom to maximum height
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {

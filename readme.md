@@ -229,6 +229,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-
 - View: Zoom in horizontal: = or NumPad+
+- View: Zoom out vertical
+- View: Zoom in vertical
+- View: Toggle track zoom to minimum height
+- View: Toggle track zoom to maximum height
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
