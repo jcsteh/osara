@@ -2220,15 +2220,15 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
 	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
 	// Media Explorer toggles
-	{{32063, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
-	{{32063, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off
-	{{32063, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
-	{{32063, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
-	{{32063, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
-	{{32063, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
-	{{32063, 40021}, {"half time", "normal time"}}, // Tempo match: /2
-	{{32063, 40022}, {"double time", "normal time"}}, // Tempo match: x2
-	{{32063, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
+	{{MEDIA_EXPLORER_SECTION, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off
+	{{MEDIA_EXPLORER_SECTION, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
+	{{MEDIA_EXPLORER_SECTION, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
+	{{MEDIA_EXPLORER_SECTION, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 40021}, {"half time", "normal time"}}, // Tempo match: /2
+	{{MEDIA_EXPLORER_SECTION, 40022}, {"double time", "normal time"}}, // Tempo match: x2
+	{{MEDIA_EXPLORER_SECTION, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
 	// translate first2Strings end
 };
 
