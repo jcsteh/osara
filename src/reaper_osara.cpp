@@ -4266,12 +4266,12 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Select all notes with the same pitch starting in time selection"}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
-	{ MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_ME_MUTENEXTMESSAGE", cmdMuteNextMessage},
 #ifdef _WIN32
 	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
-	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	// translate firstString end
 	{0, {}, NULL, NULL},
 };
