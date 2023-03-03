@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-02-25 01:20\n"
+"PO-Revision-Date: 2023-03-03 11:15\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1726,16 +1726,16 @@ msgid "hid Media Explorer"
 msgstr "隱藏媒體總管"
 
 msgid "auto playing"
-msgstr ""
+msgstr "自動播放"
 
 msgid "not auto playing"
-msgstr ""
+msgstr "不自動播放"
 
 msgid "repeating previews"
-msgstr ""
+msgstr "重複預覽"
 
 msgid "not repeating previews"
-msgstr ""
+msgstr "不重複預覽"
 
 msgid "starting on bar"
 msgstr "從小節開始"
