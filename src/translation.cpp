@@ -27,6 +27,7 @@ map<string, string> REAPER_LANG_TO_CODE = {
 	{"REAPER_SWS_french", "fr_FR"},
 	{"Reaper5965_fr_sws_wip", "fr_FR"},
 	{"REAPER_SWS_FRC", "fr_CA"},
+	{"Russian", "ru_RU"},
 };
 
 tinygettext::Dictionary translationDict;
