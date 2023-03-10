@@ -4519,6 +4519,40 @@ void annotateAccRole(HWND hwnd, long role) {
 		var);
 }
 
+// Several windows in REAPER report as dialogs/property pages, but they aren't really.
+// This includes the main window.
+// Annotate these to prevent screen readers from potentially reading a spurious caption.
+void annotateSpuriousDialog(HWND hwnd) {
+	annotateAccRole(hwnd,
+		hwnd == mainHwnd || hwnd == GetForegroundWindow() ? ROLE_SYSTEM_CLIENT :
+		ROLE_SYSTEM_GROUPING);
+	// If the previous hwnd is static text, oleacc will use this as the name.
+	// This is never correct for these windows, so override it.
+	if (GetWindowTextLength(hwnd) == 0) {
+		accPropServices->SetHwndPropStr(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L"");
+	}
+}
+
+void annotateSpuriousDialogs(HWND hwnd) {
+	annotateSpuriousDialog(hwnd);
+	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
+		child = FindWindowExW(hwnd, child, L"#32770", NULL)
+	)
+		annotateSpuriousDialogs(child);
+}
+
+UINT_PTR annotateFxDialogTimer = 0;
+void CALLBACK annotateFxDialog(HWND hwnd, UINT msg, UINT_PTR event,
+	DWORD time
+) {
+	KillTimer(nullptr, annotateFxDialogTimer);
+	annotateFxDialogTimer = 0;
+	if (!GetFocusedFX(nullptr, nullptr, nullptr)) {
+		return;
+	}
+	annotateSpuriousDialogs(GetForegroundWindow());
+}
+
 HWND prevForegroundHwnd = nullptr;
 DWORD prevForegroundTime = 0;
 HWND prevPrevForegroundHwnd = nullptr;
@@ -4608,25 +4642,23 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		} else {
 			maybeAnnotatePreferenceDescription();
 		}
+	} else if (event == EVENT_OBJECT_SHOW) {
+		if (isClassName(hwnd, "#32770")) {
+			if (GetFocusedFX(nullptr, nullptr, nullptr)) {
+				annotateFxDialog(0, 0, 0, 0);
+			} else {
+				// This might be an FX dialog, but REAPER won't answer that query
+				// immediately, so delay it a bit.
+				if (annotateFxDialogTimer) {
+					KillTimer(nullptr, annotateFxDialogTimer);
+				}
+				annotateFxDialogTimer = SetTimer(nullptr, 0, 200,
+					annotateFxDialog);
+			}
+		}
 	}
 }
 HWINEVENTHOOK winEventHook = NULL;
-
-// Several windows in REAPER report as dialogs/property pages, but they aren't really.
-// This includes the main window.
-// Annotate these to prevent screen readers from potentially reading a spurious caption.
-void annotateSpuriousDialogs(HWND hwnd) {
-	annotateAccRole(hwnd,
-		hwnd == mainHwnd ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING);
-	// If the previous hwnd is static text, oleacc will use this as the name.
-	// This is never correct for these windows, so override it.
-	if (GetWindowTextLength(hwnd) == 0)
-		accPropServices->SetHwndPropStr(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L"");
-	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
-		child = FindWindowExW(hwnd, child, L"#32770", NULL)
-	)
-		annotateSpuriousDialogs(child);
-}
 
 #endif // _WIN32
 
@@ -4650,7 +4682,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0;
 		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
-		winEventHook = SetWinEventHook(EVENT_OBJECT_FOCUS, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
+		winEventHook = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS,
+			hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
 #else
 		NSA11yWrapper::init();
