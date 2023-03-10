@@ -1122,14 +1122,14 @@ class ItemParams: public ReaperObjParamSource {
 
 void cmdParamsFocus(Command* command) {
 	unique_ptr<ParamSource> source;
-	if (isFxListFocused()) {
-		int trackNum, itemNum, fx;
-		int type = GetFocusedFX(&trackNum, &itemNum, &fx);
+	int trackNum, itemNum, fx;
+	int fxType = GetFocusedFX2(&trackNum, &itemNum, &fx);
+	if (fxType && !(fxType & 4)) {
 		MediaTrack* track = trackNum == 0 ?
 			GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
-		if (type == 1) { // Track
+		if (fxType == 1) { // Track
 			source = make_unique<FxParams<MediaTrack>>(track, "TrackFX", fx);
-		} else if (type == 2) { // Item
+		} else if (fxType == 2) { // Item
 			MediaItem* item = GetTrackMediaItem(track, itemNum);
 			int takeNum = HIWORD(fx);
 			fx = LOWORD(fx);
