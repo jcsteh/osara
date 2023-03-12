@@ -4456,7 +4456,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		muteNextMessage = false;
 		return true;
 	}
-	if (section->uniqueID == MAIN_SECTION && handleSettingCommand(command)) {
+	if (handleSettingCommand(command)) {
 		muteNextMessage = false;
 		return true;
 	}

@@ -13,7 +13,7 @@
 namespace settings {
 // Declare the variable for each setting. For example, to access the reportScrub
 // setting from C++ code, you would use settings::reportScrub.
-#define BoolSetting(name, displayName, default) extern bool name;
+#define BoolSetting(name, sectionId, displayName, default) extern bool name;
 #include "settings.h"
 #undef BoolSetting
 }
