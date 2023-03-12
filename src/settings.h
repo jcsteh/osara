@@ -27,7 +27,7 @@ BoolSetting(moveFromPlayCursor,
 	"&Move relative to the play cursor for time movement commands during playback",
 	false)
 BoolSetting(reportMarkersWhilePlaying,
-	"Report mar&kers during playback",
+	"Report mar&kers and regions during playback",
 	false)
 BoolSetting(reportTransport,
 	"Report &transport state (play, record, etc.)",

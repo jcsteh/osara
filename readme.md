@@ -649,7 +649,7 @@ The dialog contains the following options:
  When this is disabled, OSARA will only report the part of the time that changed.
  Using the same example, OSARA would report only "beat 2".
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
-- Report markers during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
+- Report markers and regions during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
 - Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
 - Report track numbers: When enabled, OSARA will report track numbers as well as track names.
  When disabled, track numbers will not be reported except for unnamed tracks.
