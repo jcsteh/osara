@@ -2171,6 +2171,10 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	41043, // Go back one measure
 	41044, // Go forward one beat
 	41045, // Go back one beat
+	41041, // Move edit cursor to start of current measure
+	41040, // Move edit cursor to start of next measure
+	40646, // View: Move cursor left to grid division
+40647, // View: Move cursor right to grid division
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
