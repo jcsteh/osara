@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-03-03 11:15\n"
+"PO-Revision-Date: 2023-03-13 02:03\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2390,8 +2390,8 @@ msgid "&Move relative to the play cursor for time movement commands during playb
 msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "在播放過程中報告標記(&K)"
+msgid "Report mar&kers and regions during playback"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"

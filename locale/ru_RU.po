@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-03-03 11:12\n"
+"PO-Revision-Date: 2023-03-13 02:03\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2585,7 +2585,7 @@ msgid "&Move relative to the play cursor for time movement commands during playb
 msgstr ""
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
+msgid "Report mar&kers and regions during playback"
 msgstr ""
 
 msgctxt "OSARA Configuration"

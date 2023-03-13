@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-02-25 01:20\n"
+"PO-Revision-Date: 2023-03-13 02:03\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -2440,23 +2440,23 @@ msgstr "Configurando OSARA"
 
 msgctxt "OSARA Configuration"
 msgid "Report position when &scrubbing"
-msgstr "Anuncia la posición cuando &mueve el cursor"
+msgstr "Anunciar posición cuando &mueve el cursor"
 
 msgctxt "OSARA Configuration"
 msgid "Report time movement during playback/recording"
-msgstr "Anuncia el movimiento del tiempo durante la reproducción/grabación"
+msgstr "Anunciar movimiento del tiempo durante la reproducción/grabación"
 
 msgctxt "OSARA Configuration"
 msgid "Report f&ull time for time movement commands"
-msgstr "Anuncia el tiempo para todos los comandos de movimiento de tiempo"
+msgstr "Anunciar tiempo para todos los comandos de movimiento de tiempo"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
 msgstr "&Mueve en relación con el cursor de reproducción para los comandos de movimiento de tiempo durante la reproducción"
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Anuncia mar&cadores durante la reproducción"
+msgid "Report mar&kers and regions during playback"
+msgstr "Anuncia mar&cadores y regiones durante la reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
@@ -2464,7 +2464,7 @@ msgstr "Anuncia estado de &transporte (reproducción, grabación, etc.)"
 
 msgctxt "OSARA Configuration"
 msgid "&Report track numbers"
-msgstr "&Anuncia el número de pistas"
+msgstr "&Anunciar número de pistas"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
@@ -2476,11 +2476,11 @@ msgstr "Anuncia &posición al navegar por acordes en el editor MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr "Anuncia &notas MIDI en el editor MIDI"
+msgstr "Anunciar &notas en el editor MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr "Anuncia los cambios realizados a través de superficies de &control"
+msgstr "Anunciar cambios realizados a través de superficies de &control"
 
 msgctxt "OSARA Configuration"
 msgid "OK"

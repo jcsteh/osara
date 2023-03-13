@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-02-25 01:20\n"
+"PO-Revision-Date: 2023-03-13 02:03\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1780,16 +1780,16 @@ msgid "hid Media Explorer"
 msgstr "masquer l'explorateur de média"
 
 msgid "auto playing"
-msgstr ""
+msgstr "lecture automatique"
 
 msgid "not auto playing"
-msgstr ""
+msgstr "pas de lecture automatique"
 
 msgid "repeating previews"
-msgstr ""
+msgstr "répétition des aperçus"
 
 msgid "not repeating previews"
-msgstr ""
+msgstr "ne pas répéter les aperçus"
 
 msgid "starting on bar"
 msgstr "démarrer sur la mesure, activé"
@@ -2455,8 +2455,8 @@ msgid "&Move relative to the play cursor for time movement commands during playb
 msgstr "&Déplacement relatif au curseur de lecture pour les commandes de déplacement temporel pendant la lecture"
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Énoncer l&es marqueurs pendant la lecture"
+msgid "Report mar&kers and regions during playback"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"

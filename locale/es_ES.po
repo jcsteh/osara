@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-02-25 01:20\n"
+"PO-Revision-Date: 2023-03-13 02:03\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -2455,8 +2455,8 @@ msgid "&Move relative to the play cursor for time movement commands during playb
 msgstr "&movimiento relativo al cursor de reproducción mientras ésta está activa"
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Anuncia ma&rcadores durante reproducción"
+msgid "Report mar&kers and regions during playback"
+msgstr "Anunciar región y marc&ador En reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
