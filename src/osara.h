@@ -205,6 +205,8 @@
 #define REAPERAPI_WANT_GetSetMediaItemTakeInfo_String
 #define REAPERAPI_WANT_GetSetObjectState
 #define REAPERAPI_WANT_FreeHeapPtr
+#define REAPERAPI_WANT_TimeMap2_timeToQN
+#define REAPERAPI_WANT_MIDI_GetGrid
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
