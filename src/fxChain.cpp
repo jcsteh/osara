@@ -62,12 +62,6 @@ bool maybeSwitchToFxPluginWindow() {
 	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
 		return false;
 	}
-	// This is a property page containing the plugin window among other things.
-	// set property page name, to avoid CPU/PDC label audition after switching
-	char name[8];
-	if (GetWindowText(window, name, sizeof(name)) == 0) {
-		SetWindowText(window, " ");
-	}
 	// Descend. Observed as the first or as the last. 
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
