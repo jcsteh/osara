@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include "config.h"
+#include "midiEditorCommands.h"
 #include "resource.h"
 #include "translation.h"
 
@@ -18,7 +19,7 @@ using namespace std;
 
 namespace settings {
 // Define the variable for each setting.
-#define BoolSetting(name, displayName, default) bool name = default;
+#define BoolSetting(name, sectionId, displayName, default) bool name = default;
 #include "settings.h"
 #undef BoolSetting
 }
@@ -26,7 +27,7 @@ namespace settings {
 void loadConfig() {
 	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
 	char v = '\0';
-#define BoolSetting(name, displayName, default) \
+#define BoolSetting(name, sectionId, displayName, default) \
 	v = GetExtState(CONFIG_SECTION, #name)[0]; \
 	settings::name = default ? v != '0' : v == '1';
 #include "settings.h"
@@ -35,7 +36,7 @@ void loadConfig() {
 
 void config_onOk(HWND dialog) {
 	int id = ID_CONFIG_DLG;
-#define BoolSetting(name, displayName, default) \
+#define BoolSetting(name, sectionId, displayName, default) \
 	settings::name = IsDlgButtonChecked(dialog, ++id) == BST_CHECKED; \
 	SetExtState(CONFIG_SECTION, #name, settings::name ? "1" : "0", true);
 #include "settings.h"
@@ -68,7 +69,7 @@ void cmdConfig(Command* command) {
 		GetForegroundWindow(), config_dialogProc);
 	translateDialog(dialog);
 	int id = ID_CONFIG_DLG;
-#define BoolSetting(name, displayName, default) \
+#define BoolSetting(name, sectionId, displayName, default) \
 	CheckDlgButton(dialog, ++id, \
 		settings::name ? BST_CHECKED : BST_UNCHECKED);
 #include "settings.h"
@@ -114,16 +115,12 @@ int handleToggleState(int command) {
 }
 
 void registerSettingCommands() {
-#define BoolSetting(name, displayName, default) \
+#define BoolSetting(cmdName, sectionId, displayName, default) \
 	{ \
+		ToggleCommand tc; \
 		ostringstream s; \
-		s << "OSARA_CONFIG_" << #name; \
-		int cmd = plugin_register("command_id", (void*)s.str().c_str()); \
-		auto [iter, ignore] = toggleCommands.insert({cmd, {}}); \
-		ToggleCommand& tc = iter->second; \
-		gaccel_register_t gaccel; \
-		gaccel.accel = {0}; \
-		gaccel.accel.cmd = cmd; \
+		s << "OSARA_CONFIG_" << #cmdName; \
+		string idStr = s.str(); \
 		tc.settingDisp = translate_ctxt("OSARA Configuration", displayName); \
 		/* Strip the '&' character indicating the access key. */ \
 		tc.settingDisp.erase(remove(tc.settingDisp.begin(), tc.settingDisp.end(), \
@@ -131,10 +128,24 @@ void registerSettingCommands() {
 		s.str(""); \
 		s << translate("OSARA: Toggle") << " " << tc.settingDisp; \
 		tc.desc = s.str(); \
-		gaccel.desc = tc.desc.c_str(); \
-		plugin_register("gaccel", &gaccel); \
-		tc.setting = &settings::name; \
-		tc.settingName = #name; \
+		int cmd; \
+		if (sectionId == MAIN_SECTION) { \
+			cmd = plugin_register("command_id", (void*)idStr.c_str()); \
+			gaccel_register_t gaccel; \
+			gaccel.accel = {0}; \
+			gaccel.accel.cmd = cmd; \
+			gaccel.desc = tc.desc.c_str(); \
+			plugin_register("gaccel", &gaccel); \
+		}  else { \
+			custom_action_register_t action; \
+			action.uniqueSectionId = sectionId; \
+			action.idStr = idStr.c_str(); \
+			action.name = tc.desc.c_str(); \
+			cmd = plugin_register("custom_action", &action); \
+		} \
+		tc.setting = &settings::cmdName; \
+		tc.settingName = #cmdName; \
+		toggleCommands.insert({cmd, std::move(tc)}); \
 	}
 #include "settings.h"
 #undef BoolSetting
