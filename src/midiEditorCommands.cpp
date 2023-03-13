@@ -1123,7 +1123,15 @@ void postMidiMovePitchCursor(int command) {
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes(take, {{chan, pitch, vel}});
+	double start = GetCursorPosition();
+	double startQn = TimeMap2_timeToQN(nullptr, start);
+	double lenQn;
+	double gridQn = MIDI_GetGrid(take, nullptr, &lenQn);
+	if (lenQn == 0) {
+		lenQn = gridQn;
+	}
+	double end = TimeMap2_QNToTime(nullptr, startQn + lenQn);
+	previewNotes(take, {{chan, pitch, vel, -1, start, end}});
 	if (settings::reportNotes) {
 		outputMessage(getMidiNoteName(take, pitch, chan));
 	}
