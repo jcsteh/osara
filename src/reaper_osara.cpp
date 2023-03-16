@@ -454,19 +454,6 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-int getTrackDepth(MediaTrack* track){
-	int count = CountTracks(nullptr);
-	int depth = 0;
-	for (int i = 0; i<count; i++){
-		MediaTrack* track_ = GetTrack(nullptr, i);
-		if (track_ == track) {
-			break;
-		}
-		depth += (int)GetMediaTrackInfo_Value(track_, "I_FOLDERDEPTH");
-	}
-	return depth;
-}
-
 const char* getActionName(int command, KbdSectionInfo* section, bool skipCategory) {
 	const char* name = kbd_getTextFromCmd(command, section);
 	if (skipCategory) {
