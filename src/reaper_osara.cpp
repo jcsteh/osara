@@ -402,16 +402,38 @@ string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 	return formatTime(GetCursorPosition(), format, false, cache);
 }
 
-const char* formatFolderState(int state, bool reportTrack=true) {
+string formatFolderState(MediaTrack* track) {
+	ostringstream s;
+	int state = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
 	if (state == 0) {
 		// Translators: A track which isn't a folder.
-		return reportTrack ? translate("track") : nullptr;
+		s << translate("track");
+	} else if (state == 1 && GetMediaTrackInfo_Value(track, "P_PARTRACK")) {
+		// Translators: A track which is a nested folder.
+		s << translate("nested folder");
 	} else if (state == 1) {
 		// Translators: A track which is a folder.
-		return translate("folder");
+		s << translate("folder");
+	} else {
+		// Translators: A track which ends its folder.
+		s << translate("end of folder");
+		// find the folder being ended by this track
+		MediaTrack* folderTrack = track;
+		for(int i = state; i<0; ++i) {
+			folderTrack = GetParentTrack(folderTrack); 
+		}
+		if(!folderTrack) { // shouldn't happen
+			return "";
+		}
+		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
+		if (settings::reportTrackNumbers || !folderTrackName[0]) {
+			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", NULL);
+		}
+		if (folderTrackName[0]) {
+			s << " " << folderTrackName;
+		}
 	}
-	// Translators: A track which ends its folder.
-	return translate("end of folder");
+	return s.str();
 }
 
 const char* getFolderCompacting(MediaTrack* track) {
@@ -768,16 +790,12 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << translate("FX bypassed");
 	}
 	if (trackNum > 0) { // Not master
-		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH",
-			nullptr);
+		int folderDepth = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
 		if (folderDepth == 1) { // Folder
 			separate();
 			s << getFolderCompacting(track);
-		}
-		const char* message = formatFolderState(folderDepth, false);
-		if (message) {
 			separate();
-			s << message;
+			s << formatFolderState(track);
 		}
 		separate();
 		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
@@ -787,6 +805,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (folderDepth <0){ //end of folder
+			separate();
+			s << formatFolderState(track);
 		}
 		if (armed && autoArm) {
 			separate();
@@ -985,7 +1007,7 @@ void postCycleTrackFolderState(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(formatFolderState(*(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH", NULL)));
+	outputMessage(formatFolderState(track));
 }
 
 void postCycleTrackFolderCollapsed(int command) {
