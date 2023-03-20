@@ -419,7 +419,7 @@ string formatFolderState(MediaTrack* track) {
 		s << translate("end of folder");
 		// find the folder being ended by this track
 		MediaTrack* folderTrack = track;
-		for(int i = 0; i<(-state); ++i) {
+		for(int i = state; i<0; ++i) {
 			folderTrack = GetParentTrack(folderTrack); 
 		}
 		if(!folderTrack) { // shouldn't happen
