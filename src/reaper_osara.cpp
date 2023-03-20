@@ -402,7 +402,7 @@ string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 	return formatTime(GetCursorPosition(), format, false, cache);
 }
 
-const string formatFolderState(MediaTrack* track) {
+string formatFolderState(MediaTrack* track) {
 	ostringstream s;
 	int state = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
 	if (state == 0) {
@@ -417,20 +417,17 @@ const string formatFolderState(MediaTrack* track) {
 	} else {
 		// Translators: A track which ends its folder.
 		s << translate("end of folder");
-		int trackNum = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER");
 		// find the folder being ended by this track
-		MediaTrack* folderTrack;
-		int folderTrackNum{0};
-		for(folderTrackNum = trackNum -1; folderTrackNum>0; folderTrackNum--){
-			folderTrack= GetTrack(nullptr, folderTrackNum-1); // getTrack is 0 based
-			state += (int)GetMediaTrackInfo_Value(folderTrack, "I_FOLDERDEPTH");
-			if(state == 0){
-				break;
-			}
+		MediaTrack* folderTrack = track;
+		for(int i = 0; i<(-state); ++i) {
+			folderTrack = GetParentTrack(folderTrack); 
+		}
+		if(!folderTrack) { // shouldn't happen
+			return "";
 		}
 		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
 		if (settings::reportTrackNumbers || !folderTrackName[0]) {
-			s << " " << folderTrackNum;
+			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", NULL);
 		}
 		if (folderTrackName[0]) {
 			s << " " << folderTrackName;
@@ -793,14 +790,12 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << translate("FX bypassed");
 	}
 	if (trackNum > 0) { // Not master
-		int folderDepth = *(int*)GetSetMediaTrackInfo(track, "I_FOLDERDEPTH",
-			nullptr);
-		const string folderState = formatFolderState(track);
+		int folderDepth = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
 		if (folderDepth == 1) { // Folder
 			separate();
 			s << getFolderCompacting(track);
 			separate();
-			s << folderState;
+			s << formatFolderState(track);
 		}
 		separate();
 		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
@@ -813,7 +808,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		}
 		if (folderDepth <0){ //end of folder
 			separate();
-			s << folderState;
+			s << formatFolderState(track);
 		}
 		if (armed && autoArm) {
 			separate();
