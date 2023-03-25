@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <memory>
+#include <regex>
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
@@ -448,6 +449,9 @@ class ParamsDialog {
 				} else if (LOWORD(wParam) == ID_PARAM_VAL_EDIT && HIWORD(wParam) ==EN_KILLFOCUS) {
 					dialog->onValueEdited();
 					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_UNNAMED) {
+					dialog->updateParamList();
+					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
 					dialog->isDestroying = true;
@@ -597,7 +601,15 @@ class ParamsDialog {
 		}
 	}
 
+	const regex RE_UNNAMED_PARAM{"(?:|-|[P#]\\d{3}) \\(\\d+\\)"};
 	bool shouldIncludeParam(string name) {
+		if (!IsDlgButtonChecked(this->dialog, ID_PARAM_UNNAMED)) {
+			smatch m;
+			regex_match(name, m, RE_UNNAMED_PARAM);
+			if (!m.empty()) {
+				return false;
+			}
+		}
 		if (filter.empty())
 			return true;
 		// Convert param name to lower case for match.
@@ -675,6 +687,7 @@ class ParamsDialog {
 		plugin_register("accelerator", &this->accelReg);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
+		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
