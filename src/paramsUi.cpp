@@ -170,10 +170,18 @@ class ReaperObjVolParam: public ReaperObjParam {
 		this->step = 0.002;
 		this->largeStep = 0.1;
 		this->isEditable = true;
+		if (this->getValue() < 0) {
+			// Take volume raw values are negative when the polarity is flipped.
+			this->flipSign = true;
+		}
 	}
 
 	double getValue() {
-		return *(double*)this->provider.getSetValue(nullptr);
+		double result = *(double*)this->provider.getSetValue(nullptr);
+		if (this->flipSign) {
+			result = -result;
+		}
+		return result;
 	}
 
 	string getValueText(double value) {
@@ -187,7 +195,12 @@ class ReaperObjVolParam: public ReaperObjParam {
 	}
 
 	void setValue(double value) {
-		this->provider.getSetValue((void*)&value);
+		if (this->flipSign) {
+			double flipped = -value;
+			this->provider.getSetValue((void*)&flipped);
+		} else {
+			this->provider.getSetValue((void*)&value);
+		}
 	}
 
 	void setValueFromEdited(const string& text) {
@@ -202,6 +215,9 @@ class ReaperObjVolParam: public ReaperObjParam {
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
 		return make_unique<ReaperObjVolParam>(provider);
 	}
+
+	private:
+	bool flipSign = false;
 };
 
 class ReaperObjPanParam: public ReaperObjParam {
