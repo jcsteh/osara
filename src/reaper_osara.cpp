@@ -3792,7 +3792,7 @@ void cmdCycleTrackAutomation(Command* command) {
 	// Translators: Report the track automation mode. {} is replaced with the
 	// automation mode; e.g. "automation mode trim/read for selected tracks"
 	outputMessage(format(
-		translate("automation mode {} for selected tracks"),
+		translate("{} automation mode for selected tracks"),
 		automationModeAsString(newmode)));
 }
 
