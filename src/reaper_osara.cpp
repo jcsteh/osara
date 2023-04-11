@@ -1630,12 +1630,12 @@ void postReverseTake(int command) {
 
 void postTogglePreRoll(int command) {
 	outputMessage(GetToggleCommandState(command) ?
-		translate("pre roll on") : translate("pre roll off"));
+		translate("enabled pre roll before recording") : translate("disabled pre roll before recording"));
 }
 
 void postToggleCountIn(int command) {
 	outputMessage(GetToggleCommandState(command) ? 
-		translate("count in on") : translate("count in off"));
+		translate("enabled count in before recording") : translate("disabled count in before recording"));
 }
 
 void postTakeChannelMode(int command) {
