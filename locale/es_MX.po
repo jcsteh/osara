@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-03-13 02:03\n"
+"PO-Revision-Date: 2023-04-29 03:00\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1051,6 +1051,10 @@ msgstr "{} segundos"
 msgid "{} samples"
 msgstr "{} muestras"
 
+#. A track which is a nested folder.
+msgid "nested folder"
+msgstr "subcarpeta"
+
 #. A track which is a folder.
 msgid "folder"
 msgstr "carpeta"
@@ -1552,17 +1556,17 @@ msgid_plural "{} takes reversed"
 msgstr[0] "{} toma en reversa"
 msgstr[1] "{} tomas en reversa"
 
-msgid "pre roll on"
-msgstr "pre roll encendido"
+msgid "enabled pre roll before recording"
+msgstr "habilitar pre-roll antes de grabar"
 
-msgid "pre roll off"
-msgstr "pre roll apagado"
+msgid "disabled pre roll before recording"
+msgstr "deshabilitar pre-roll antes de grabar"
 
-msgid "count in on"
-msgstr "conteo encendido"
+msgid "enabled count in before recording"
+msgstr "habilitar cuenta antes de grabar"
 
-msgid "count in off"
-msgstr "conteo apagado"
+msgid "disabled count in before recording"
+msgstr "deshabilitar cuenta antes de grabar"
 
 #. A take channel mode.
 msgctxt "take channel mode"
@@ -1674,6 +1678,23 @@ msgstr "habilitar preservar el tono del ítem al cambiar la velocidad"
 msgid "disabled preserve pitch when changing item rate"
 msgstr "deshabilitar preservar el tono del ítem al cambiar la velocidad"
 
+msgid "minimum vertical zoom"
+msgstr "zoom vertical mínimo"
+
+msgid "small vertical zoom"
+msgstr "zoom vertical pequeño"
+
+msgid "medium vertical zoom"
+msgstr "zoom vertical medio"
+
+msgid "large vertical zoom"
+msgstr "zoom vertical grande"
+
+msgid "maximum vertical zoom"
+msgstr "zoom vertical máximo"
+
+#. Used when reporting the vertical zoom level as a number.
+#. {} will be replaced with the number; e.g. "35 vertical zoom".
 msgid "set selection start"
 msgstr "inicio de selección establecido"
 
@@ -2061,8 +2082,8 @@ msgstr "no hay pistas seleccionadas"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
-msgid "automation mode {} for selected tracks"
-msgstr "modo de automatización {} para las pistas seleccionadas"
+msgid "{} automation mode for selected tracks"
+msgstr "modo de automatización de {} para pistas seleccionadas"
 
 msgid "time selection start"
 msgstr "selección de tiempo iniciada"
@@ -2452,15 +2473,15 @@ msgstr "Anunciar tiempo para todos los comandos de movimiento de tiempo"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "&Mueve en relación con el cursor de reproducción para los comandos de movimiento de tiempo durante la reproducción"
+msgstr "&Mover en relación con el cursor de reproducción para los comandos de movimiento de tiempo durante la reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers and regions during playback"
-msgstr "Anuncia mar&cadores y regiones durante la reproducción"
+msgstr "Anunciar mar&cadores y regiones durante la reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
-msgstr "Anuncia estado de &transporte (reproducción, grabación, etc.)"
+msgstr "Anunciar estado de &transporte (reproducción, grabación, etc.)"
 
 msgctxt "OSARA Configuration"
 msgid "&Report track numbers"
@@ -2468,11 +2489,11 @@ msgstr "&Anunciar número de pistas"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr "Anuncia &FX al pasar a pistas / tomas"
+msgstr "Anunciar &FX al pasar a pistas / tomas"
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating chords in MIDI editor"
-msgstr "Anuncia &posición al navegar por acordes en el editor MIDI"
+msgstr "Anunciar &posición al navegar por acordes en el editor MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"

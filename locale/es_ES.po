@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-03-13 02:03\n"
+"PO-Revision-Date: 2023-04-29 03:00\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1051,6 +1051,10 @@ msgstr "{} segundo"
 msgid "{} samples"
 msgstr "{} muestras"
 
+#. A track which is a nested folder.
+msgid "nested folder"
+msgstr "carpeta anidada"
+
 #. A track which is a folder.
 msgid "folder"
 msgstr "carpeta"
@@ -1552,17 +1556,17 @@ msgid_plural "{} takes reversed"
 msgstr[0] "{} toma invertida"
 msgstr[1] "{} tomas invertidas"
 
-msgid "pre roll on"
-msgstr "activada la pre-escucha"
+msgid "enabled pre roll before recording"
+msgstr "activado pre rol antes de grabación"
 
-msgid "pre roll off"
-msgstr "desactivada la pre-escucha"
+msgid "disabled pre roll before recording"
+msgstr "desactivado pre roll antes de grabación"
 
-msgid "count in on"
-msgstr "activado el conteo"
+msgid "enabled count in before recording"
+msgstr "activado conteo antes de grabación"
 
-msgid "count in off"
-msgstr "desactivado el conteo"
+msgid "disabled count in before recording"
+msgstr "desactivado conteo antes de grabación"
 
 #. A take channel mode.
 msgctxt "take channel mode"
@@ -1674,6 +1678,23 @@ msgstr "activado mantener tono al cambiar velocidad del ítem"
 msgid "disabled preserve pitch when changing item rate"
 msgstr "desactivado mantener tono al cambiar velocidad del ítem"
 
+msgid "minimum vertical zoom"
+msgstr "zoom vertical mínimo"
+
+msgid "small vertical zoom"
+msgstr "zoom vertical pequeño"
+
+msgid "medium vertical zoom"
+msgstr "zoom vertical medio"
+
+msgid "large vertical zoom"
+msgstr "zoom vertical grande"
+
+msgid "maximum vertical zoom"
+msgstr "zoom vertical máximo"
+
+#. Used when reporting the vertical zoom level as a number.
+#. {} will be replaced with the number; e.g. "35 vertical zoom".
 msgid "set selection start"
 msgstr "comienzo de selección fijado"
 
@@ -2061,8 +2082,8 @@ msgstr "no hay pistas seleccionadas"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
-msgid "automation mode {} for selected tracks"
-msgstr "modo de automatización {} para pistas seleccionadas"
+msgid "{} automation mode for selected tracks"
+msgstr "{} modo de automatizaci'on para las pistas seleccionadas"
 
 msgid "time selection start"
 msgstr "comienzo de selección de tiempo"

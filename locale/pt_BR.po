@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2023-03-13 02:03\n"
+"PO-Revision-Date: 2023-04-29 03:00\n"
 
 msgid "enabled"
 msgstr ""
@@ -1051,6 +1051,10 @@ msgstr "{} seg"
 msgid "{} samples"
 msgstr "{} amostras"
 
+#. A track which is a nested folder.
+msgid "nested folder"
+msgstr ""
+
 #. A track which is a folder.
 msgid "folder"
 msgstr "pasta"
@@ -1552,17 +1556,17 @@ msgid_plural "{} takes reversed"
 msgstr[0] "{} trecho invertido"
 msgstr[1] "{} trechos invertidos"
 
-msgid "pre roll on"
-msgstr "pré-escuta ativada"
+msgid "enabled pre roll before recording"
+msgstr ""
 
-msgid "pre roll off"
-msgstr "pré-escuta desativada"
+msgid "disabled pre roll before recording"
+msgstr ""
 
-msgid "count in on"
-msgstr "Contagem ligada"
+msgid "enabled count in before recording"
+msgstr ""
 
-msgid "count in off"
-msgstr "contagem desligada"
+msgid "disabled count in before recording"
+msgstr ""
 
 #. A take channel mode.
 msgctxt "take channel mode"
@@ -1674,6 +1678,23 @@ msgstr ""
 msgid "disabled preserve pitch when changing item rate"
 msgstr ""
 
+msgid "minimum vertical zoom"
+msgstr ""
+
+msgid "small vertical zoom"
+msgstr ""
+
+msgid "medium vertical zoom"
+msgstr ""
+
+msgid "large vertical zoom"
+msgstr ""
+
+msgid "maximum vertical zoom"
+msgstr ""
+
+#. Used when reporting the vertical zoom level as a number.
+#. {} will be replaced with the number; e.g. "35 vertical zoom".
 msgid "set selection start"
 msgstr "Definir início da seleção"
 
@@ -2061,7 +2082,7 @@ msgstr "Sem pistas selecionadas"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
-msgid "automation mode {} for selected tracks"
+msgid "{} automation mode for selected tracks"
 msgstr ""
 
 msgid "time selection start"
