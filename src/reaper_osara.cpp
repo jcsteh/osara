@@ -2264,6 +2264,18 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MEDIA_EXPLORER_SECTION, 40021}, {"half time", "normal time"}}, // Tempo match: /2
 	{{MEDIA_EXPLORER_SECTION, 40022}, {"double time", "normal time"}}, // Tempo match: x2
 	{{MEDIA_EXPLORER_SECTION, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
+	// MIDI Editor toggles
+	{{MIDI_EDITOR_SECTION, 40042}, {"Piano roll view", ""}}, // Mode: Piano Roll
+	{{MIDI_EDITOR_SECTION, 40043}, {"Named notes view", ""}}, // Mode: Named Notes (Drum Map)
+	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", ""}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", ""}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40954}, {"Notation view", ""}}, // Mode: Notation
+	{{MIDI_EDITOR_SECTION, 40449}, {"Rectangle notes", ""}}, // View: Show events as rectangles (normal mode)
+	{{MIDI_EDITOR_SECTION, 40448}, {"Triangle notes", ""}}, // View: Show events as triangles (drum mode)
+	{{MIDI_EDITOR_SECTION, 40450}, {"Diamond notes", ""}}, // View: Show events as diamonds (drum mode)
+	{{MIDI_EDITOR_SECTION, 40632}, {"Showed velocity numbers on notes", "Hid velocity numbers on notes"}}, // View: Show velocity numbers on notes
+	{{MIDI_EDITOR_SECTION, 40045}, {"Showed note names", "Hid note names"}}, // View: Show note names
+	{{MIDI_EDITOR_SECTION, 41295}, {"Inserted notes matching grid", ""}}, // Set length for next inserted note: grid
 	// translate first2Strings end
 };
 
