@@ -4492,6 +4492,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		return true;
 	}
 	if (handleToggleCommand(section, command, val, valHw, relMode, hwnd)) {
+		muteNextMessage = false;
 		return true;
 	}
 	return false;
