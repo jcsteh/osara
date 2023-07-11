@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-04-29 03:00\n"
+"PO-Revision-Date: 2023-07-11 10:55\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1551,10 +1551,10 @@ msgid "{} bpm"
 msgstr "{} bpm"
 
 msgid "enabled playback position follows project timebase when changing tempo"
-msgstr "改變速率時啟用播放位置遵循工程時基"
+msgstr "改變速率時啟用播放位置依循工程時基"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr "改變速率時禁用播放位置遵循工程時基"
+msgstr "改變速率時禁用播放位置依循工程時基"
 
 msgid "preserving pitch when changing play rate"
 msgstr "改變播放速率時保持音高"
@@ -1793,6 +1793,46 @@ msgstr "停靠媒體總管"
 
 msgid "removed Media Explorer from dock"
 msgstr "從停靠區中移除媒體總管"
+
+msgid "Piano roll view"
+msgstr "鋼琴捲簾檢視"
+
+msgid ""
+msgstr ""
+""
+
+msgid "Named notes view"
+msgstr "音符名稱檢視"
+
+msgid "Event list view"
+msgstr "事件列表檢視"
+
+msgid "Notation view"
+msgstr "樂譜檢視"
+
+msgid "Rectangle notes"
+msgstr "音符矩形"
+
+msgid "Triangle notes"
+msgstr "音符三角形"
+
+msgid "Diamond notes"
+msgstr "音符菱形"
+
+msgid "Showed velocity numbers on notes"
+msgstr "在音符上顯示力度數字"
+
+msgid "Hid velocity numbers on notes"
+msgstr "在音符上隱藏力度數字"
+
+msgid "Showed note names"
+msgstr "顯示音符名稱"
+
+msgid "Hid note names"
+msgstr "隱藏音符名稱"
+
+msgid "Inserted notes matching grid"
+msgstr "依循網格插入音符"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2072,10 +2112,10 @@ msgid "At Current Position"
 msgstr "在當前位置"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
-msgstr "OSARA: 移到下一個對象(離開的對象被選中"
+msgstr "OSARA: 移到下一個對象（離開的對象保留被選中）"
 
 msgid "OSARA: Move to previous item (leaving other items selected)"
-msgstr "OSARA: 移到上一個對象（離開的對象被選中）"
+msgstr "OSARA: 移到上一個對象（離開的對象保留被選中）"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: 查看當前媒體對象/片段/自動化對象的屬性（取決於焦點）"
@@ -2141,13 +2181,13 @@ msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切換熱鍵幫助"
 
 msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: 報告當前編輯/ 播放光標位置及走帶狀態"
+msgstr "OSARA: 報告當前編輯/ 播放游標位置及走帶狀態"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦點）"
 
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
-msgstr "OSARA: 移動最後焦點的拉伸標記到編輯光標位置"
+msgstr "OSARA: 移動最後焦點的拉伸標記到編輯游標位置"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
 msgstr "OSARA: 報告當前軌道通道 1 的播放游標處的峰值 dB 電平（而不是在軌道待錄時報告輸入電平）"
@@ -2156,19 +2196,19 @@ msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current tr
 msgstr "OSARA: 報告當前軌道通道 2 的播放游標處的峰值 dB 電平（而不是在軌道待錄時報告輸入電平）"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: 報告主控軌通道 1 播放光標處的峰值 dB 電平"
+msgstr "OSARA: 報告主控軌通道 1 播放游標處的峰值 dB 電平"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: 報告主控軌通道 2 播放光標處的峰值 dB 電平"
+msgstr "OSARA: 報告主控軌通道 2 播放游標處的峰值 dB 電平"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: 刪除所有拍號標記"
 
 msgid "OSARA: Select next track/take envelope (depending on focus)"
-msgstr "OSARA: 選則下一個軌道或片段的包絡（取決於交扁）"
+msgstr "OSARA: 選則軌道或片段的下一個包絡（取決於交扁） "
 
 msgid "OSARA: Select previous track/take envelope (depending on focus)"
-msgstr "OSARA: 選則上一個軌道或片段的包絡（取決於交扁）"
+msgstr "OSARA: 選則軌道或片段的上一個包絡（取決於交扁）"
 
 msgid "OSARA: Move to next envelope point"
 msgstr "OSARA: 移至下一個包絡點"
@@ -2177,10 +2217,10 @@ msgid "OSARA: Move to previous envelope point"
 msgstr "OSARA: 移至上一個包絡點"
 
 msgid "OSARA: Move to next envelope point (leaving other points selected)"
-msgstr "OSARA: 移至下一個包絡點（離開點被選中）"
+msgstr "OSARA: 移至下一個包絡點（離開點保留被選中）"
 
 msgid "OSARA: Move to previous envelope point (leaving other points selected)"
-msgstr "OSARA: 移至上一個包絡點（離開點被選中）"
+msgstr "OSARA: 移至上一個包絡點（離開點保留被選中）"
 
 msgid "OSARA: Move to next transient"
 msgstr "OSARA: 移至下一個瞬態"
@@ -2408,7 +2448,7 @@ msgstr "報告時間移動命令的完整時間(&u)"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "在播放期間跟著播放光標移動相關時間位置(&M)"
+msgstr "在播放期間跟著播放游標移動相關時間位置(&M)"
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers and regions during playback"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-04-29 03:00\n"
+"PO-Revision-Date: 2023-07-11 10:55\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -315,7 +315,7 @@ msgid "Bank Select MSB"
 msgstr "Banque MSB sélectionnée"
 
 msgid "Mod Wheel MSB"
-msgstr "Roue de modulation"
+msgstr "Molette de modulation"
 
 msgid "Breath MSB"
 msgstr "Souffle MSB"
@@ -1847,6 +1847,46 @@ msgstr "explorateur de média ancré dans le docker"
 
 msgid "removed Media Explorer from dock"
 msgstr "explorateur de média désancré du docker"
+
+msgid "Piano roll view"
+msgstr ""
+
+msgid ""
+msgstr ""
+""
+
+msgid "Named notes view"
+msgstr ""
+
+msgid "Event list view"
+msgstr ""
+
+msgid "Notation view"
+msgstr ""
+
+msgid "Rectangle notes"
+msgstr ""
+
+msgid "Triangle notes"
+msgstr ""
+
+msgid "Diamond notes"
+msgstr ""
+
+msgid "Showed velocity numbers on notes"
+msgstr ""
+
+msgid "Hid velocity numbers on notes"
+msgstr ""
+
+msgid "Showed note names"
+msgstr ""
+
+msgid "Hid note names"
+msgstr ""
+
+msgid "Inserted notes matching grid"
+msgstr ""
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
