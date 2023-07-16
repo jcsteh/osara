@@ -2272,7 +2272,7 @@ struct ToggleCommandMessage {
 map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// translate first2Strings begin
 	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
-	// Specify nullptr for onMsg and offMsg to report nothing.
+	// Specify nullptr to report nothing for a particular message.
 	// Main section toggles
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
 	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
@@ -2287,17 +2287,17 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MEDIA_EXPLORER_SECTION, 40022}, {"double time", "normal time"}}, // Tempo match: x2
 	{{MEDIA_EXPLORER_SECTION, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
 	// MIDI Editor toggles
-	{{MIDI_EDITOR_SECTION, 40042}, {"Piano roll view", ""}}, // Mode: Piano Roll
-	{{MIDI_EDITOR_SECTION, 40043}, {"Named notes view", ""}}, // Mode: Named Notes (Drum Map)
-	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", ""}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", ""}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40954}, {"Notation view", ""}}, // Mode: Notation
-	{{MIDI_EDITOR_SECTION, 40449}, {"Rectangle notes", ""}}, // View: Show events as rectangles (normal mode)
-	{{MIDI_EDITOR_SECTION, 40448}, {"Triangle notes", ""}}, // View: Show events as triangles (drum mode)
-	{{MIDI_EDITOR_SECTION, 40450}, {"Diamond notes", ""}}, // View: Show events as diamonds (drum mode)
+	{{MIDI_EDITOR_SECTION, 40042}, {"Piano roll view", nullptr}}, // Mode: Piano Roll
+	{{MIDI_EDITOR_SECTION, 40043}, {"Named notes view", nullptr}}, // Mode: Named Notes (Drum Map)
+	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", nullptr}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", nullptr}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40954}, {"Notation view", nullptr}}, // Mode: Notation
+	{{MIDI_EDITOR_SECTION, 40449}, {"Rectangle notes", nullptr}}, // View: Show events as rectangles (normal mode)
+	{{MIDI_EDITOR_SECTION, 40448}, {"Triangle notes", nullptr}}, // View: Show events as triangles (drum mode)
+	{{MIDI_EDITOR_SECTION, 40450}, {"Diamond notes", nullptr}}, // View: Show events as diamonds (drum mode)
 	{{MIDI_EDITOR_SECTION, 40632}, {"Showed velocity numbers on notes", "Hid velocity numbers on notes"}}, // View: Show velocity numbers on notes
 	{{MIDI_EDITOR_SECTION, 40045}, {"Showed note names", "Hid note names"}}, // View: Show note names
-	{{MIDI_EDITOR_SECTION, 41295}, {"Inserted notes matching grid", ""}}, // Set length for next inserted note: grid
+	{{MIDI_EDITOR_SECTION, 41295}, {"Inserted notes matching grid", nullptr}}, // Set length for next inserted note: grid
 	// translate first2Strings end
 };
 
@@ -4439,7 +4439,8 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 
 bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	const auto entry = TOGGLE_COMMAND_MESSAGES.find({section->uniqueID, command});
-	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg) {
+	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg &&
+			!entry->second.offMsg) {
 		return false; // Ignore.
 	}
 	int oldState = GetToggleCommandState2(section, command);
@@ -4476,8 +4477,10 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 		return true; // No change, report nothing.
 	}
 	if (entry != TOGGLE_COMMAND_MESSAGES.end()) {
-		outputMessage(translate(newState ? entry->second.onMsg :
-			entry->second.offMsg));
+		const char* message = newState ? entry->second.onMsg : entry->second.offMsg;
+		if (message) {
+			outputMessage(translate(message));
+		}
 		return true;
 	}
 	// Generic feedback.

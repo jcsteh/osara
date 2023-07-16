@@ -66,6 +66,8 @@ def handleTranslatorsComment(line):
 
 def addMessage(data):
 	global messages, lastTranslatorsComment
+	if not data["msgid"]:
+		raise RuntimeError("Empty msgid")
 	key = (data.get("context"), data["msgid"])
 	data = messages.setdefault(key, data)
 	if lastTranslatorsComment:
