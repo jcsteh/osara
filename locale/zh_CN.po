@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-07-11 10:55\n"
+"PO-Revision-Date: 2023-07-16 23:27\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1796,10 +1796,6 @@ msgstr "已从泊坞窗移除媒体资源管理器"
 
 msgid "Piano roll view"
 msgstr ""
-
-msgid ""
-msgstr ""
-""
 
 msgid "Named notes view"
 msgstr ""

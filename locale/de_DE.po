@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2023-07-11 10:55\n"
+"PO-Revision-Date: 2023-07-16 23:27\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -1850,10 +1850,6 @@ msgstr "Media Explorer vom Dock entfernt"
 
 msgid "Piano roll view"
 msgstr ""
-
-msgid ""
-msgstr ""
-""
 
 msgid "Named notes view"
 msgstr ""

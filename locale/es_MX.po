@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-07-11 10:55\n"
+"PO-Revision-Date: 2023-07-16 23:27\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1849,44 +1849,40 @@ msgid "removed Media Explorer from dock"
 msgstr "explorador de medios removido del dock"
 
 msgid "Piano roll view"
-msgstr ""
-
-msgid ""
-msgstr ""
-""
+msgstr "Vista a Piano roll"
 
 msgid "Named notes view"
-msgstr ""
+msgstr "Vista a notas con nombre"
 
 msgid "Event list view"
-msgstr ""
+msgstr "Vista a lista de eventos"
 
 msgid "Notation view"
-msgstr ""
+msgstr "Vista a partitura"
 
 msgid "Rectangle notes"
-msgstr ""
+msgstr "Notas rectangulares"
 
 msgid "Triangle notes"
-msgstr ""
+msgstr "Notas triangulares"
 
 msgid "Diamond notes"
-msgstr ""
+msgstr "Notas de Diamante"
 
 msgid "Showed velocity numbers on notes"
-msgstr ""
+msgstr "Mostrando el número de velócity en notas"
 
 msgid "Hid velocity numbers on notes"
-msgstr ""
+msgstr "Ocultando el número de velócity en notas"
 
 msgid "Showed note names"
-msgstr ""
+msgstr "Mostrando nombres de notas"
 
 msgid "Hid note names"
-msgstr ""
+msgstr "Ocultando nombres de notas"
 
 msgid "Inserted notes matching grid"
-msgstr ""
+msgstr "Notas insertadas en la rejilla según coincida"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

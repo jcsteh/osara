@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2023-07-11 10:55\n"
+"PO-Revision-Date: 2023-07-16 23:27\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -1850,10 +1850,6 @@ msgstr ""
 
 msgid "Piano roll view"
 msgstr ""
-
-msgid ""
-msgstr ""
-""
 
 msgid "Named notes view"
 msgstr ""

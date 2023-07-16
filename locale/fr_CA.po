@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-07-11 10:55\n"
+"PO-Revision-Date: 2023-07-16 23:27\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1850,10 +1850,6 @@ msgstr "explorateur de média désancré du docker"
 
 msgid "Piano roll view"
 msgstr ""
-
-msgid ""
-msgstr ""
-""
 
 msgid "Named notes view"
 msgstr ""
