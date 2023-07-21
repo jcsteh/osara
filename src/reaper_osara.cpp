@@ -2276,6 +2276,18 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// Main section toggles
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
 	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
+	{{MAIN_SECTION, 41973}, {"absolute frames", nullptr}}, // View: Time unit for ruler: Absolute frames
+	{{MAIN_SECTION, 40370}, {"hours:minutes:seconds:frames", nullptr}}, // View: Time unit for ruler: Hours:Minutes:Seconds:Frames
+	{{MAIN_SECTION, 40367}, {"measures.beats", nullptr}}, // View: Time unit for ruler: Measures.Beats
+	{{MAIN_SECTION, 40365}, {"minutes:seconds", nullptr}}, // View: Time unit for ruler: Minutes:Seconds
+	{{MAIN_SECTION, 40369}, {"samples", nullptr}}, // View: Time unit for ruler: Samples
+	{{MAIN_SECTION, 40368}, {"seconds", nullptr}}, // View: Time unit for ruler: Seconds
+	{{MAIN_SECTION, 42365}, {"absolute frames secondary", nullptr}}, // View: Secondary time unit for ruler: Absolute frames
+	{{MAIN_SECTION, 42364}, {"hours:minutes:seconds:frames secondary", nullptr}}, // View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
+	{{MAIN_SECTION, 42361}, {"minutes:seconds secondary", nullptr}}, // View: Secondary time unit for ruler: Minutes:Seconds
+	{{MAIN_SECTION, 42360}, {"no secondary time unit", nullptr}}, // View: Secondary time unit for ruler: None
+	{{MAIN_SECTION, 42363}, {"samples secondary", nullptr}}, // View: Secondary time unit for ruler: Samples
+	{{MAIN_SECTION, 42362}, {"seconds secondary", nullptr}}, // View: Secondary time unit for ruler: Seconds
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off

@@ -799,6 +799,19 @@ This list is worth referencing when making your own key map additions, assigning
 - Transport: Toggle preserve pitch in audio items when changing master playrate
 - Transport: Play/stop (move edit cursor on stop)
 - View: Set horizontal zoom to default project setting
+- View: Time unit for ruler: Absolute frames
+- View: Time unit for ruler: Hours:Minutes:Seconds:Frames
+- View: Time unit for ruler: Measures.Beats
+- View: Time unit for ruler: Measures.Beats / minutes:Seconds
+- View: Time unit for ruler: Minutes:Seconds
+- View: Time unit for ruler: Samples
+- View: Time unit for ruler: Seconds
+- View: Secondary time unit for ruler: Absolute frames
+- View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
+- View: Secondary time unit for ruler: Minutes:Seconds
+- View: Secondary time unit for ruler: None
+- View: Secondary time unit for ruler: Samples
+- View: Secondary time unit for ruler: Seconds
 
 #### Unmapped in MIDI Editor section
 - Edit: Select all notes in time selection
