@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2023-07-16 23:27\n"
+"PO-Revision-Date: 2023-08-05 00:08\n"
 
 msgid "enabled"
 msgstr ""
@@ -1798,6 +1798,42 @@ msgid "showed Media Explorer"
 msgstr ""
 
 msgid "hid Media Explorer"
+msgstr ""
+
+msgid "absolute frames"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames"
+msgstr ""
+
+msgid "measures.beats"
+msgstr ""
+
+msgid "minutes:seconds"
+msgstr ""
+
+msgid "samples"
+msgstr ""
+
+msgid "seconds"
+msgstr ""
+
+msgid "absolute frames secondary"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr ""
+
+msgid "minutes:seconds secondary"
+msgstr ""
+
+msgid "no secondary time unit"
+msgstr ""
+
+msgid "samples secondary"
+msgstr ""
+
+msgid "seconds secondary"
 msgstr ""
 
 msgid "auto playing"

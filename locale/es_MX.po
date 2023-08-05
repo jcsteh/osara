@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-07-16 23:27\n"
+"PO-Revision-Date: 2023-08-05 00:08\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1031,8 +1031,8 @@ msgstr "{:.3f} milisegundos"
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
 msgid_plural "{} frames"
-msgstr[0] "{} cuadro"
-msgstr[1] "{} cuadros"
+msgstr[0] "{} frame"
+msgstr[1] "{} frames"
 
 #. used when reporting a time in hours. {} will be replaced
 #. with the number of hours; e.g. "2 hours".
@@ -1049,7 +1049,7 @@ msgstr "{} segundos"
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
-msgstr "{} muestras"
+msgstr "samples"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1799,6 +1799,42 @@ msgstr "mostrando explorador de medios"
 
 msgid "hid Media Explorer"
 msgstr "ocultando explorador de medios"
+
+msgid "absolute frames"
+msgstr "frames absolutos"
+
+msgid "hours:minutes:seconds:frames"
+msgstr "horas:minutos:segundos:frames"
+
+msgid "measures.beats"
+msgstr "medidas.pulsos"
+
+msgid "minutes:seconds"
+msgstr "minutos:segundos"
+
+msgid "samples"
+msgstr "samples"
+
+msgid "seconds"
+msgstr "segundos"
+
+msgid "absolute frames secondary"
+msgstr "frames absolutos secundarios"
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr "horas:minutos:segundos:frames secundarios"
+
+msgid "minutes:seconds secondary"
+msgstr "minutos:segundos secundarios"
+
+msgid "no secondary time unit"
+msgstr "sin unidad de tiempo secundaria"
+
+msgid "samples secondary"
+msgstr "samples secundarios"
+
+msgid "seconds secondary"
+msgstr "segundos secundarios"
 
 msgid "auto playing"
 msgstr "reproducción automática"

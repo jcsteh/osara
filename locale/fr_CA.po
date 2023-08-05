@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-07-16 23:27\n"
+"PO-Revision-Date: 2023-08-05 00:08\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1799,6 +1799,42 @@ msgstr "afficher l'explorateur de média"
 
 msgid "hid Media Explorer"
 msgstr "masquer l'explorateur de média"
+
+msgid "absolute frames"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames"
+msgstr ""
+
+msgid "measures.beats"
+msgstr ""
+
+msgid "minutes:seconds"
+msgstr ""
+
+msgid "samples"
+msgstr ""
+
+msgid "seconds"
+msgstr ""
+
+msgid "absolute frames secondary"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr ""
+
+msgid "minutes:seconds secondary"
+msgstr ""
+
+msgid "no secondary time unit"
+msgstr ""
+
+msgid "samples secondary"
+msgstr ""
+
+msgid "seconds secondary"
+msgstr ""
 
 msgid "auto playing"
 msgstr "lecture automatique"

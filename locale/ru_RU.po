@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-07-16 23:27\n"
+"PO-Revision-Date: 2023-08-05 00:08\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -27,19 +27,19 @@ msgid "volume"
 msgstr "громкость"
 
 msgid "pan"
-msgstr ""
+msgstr "Панорамирование"
 
 msgid "muted"
-msgstr ""
+msgstr "звук отключён"
 
 msgid "unmuted"
-msgstr ""
+msgstr "звук включён"
 
 msgid "soloed"
-msgstr ""
+msgstr "соло"
 
 msgid "unsoloed"
-msgstr ""
+msgstr "соло отключено"
 
 msgid "armed"
 msgstr ""
@@ -56,34 +56,34 @@ msgstr ""
 #. used when reporting a named marker. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker"
 msgid "{} marker"
-msgstr ""
+msgstr "{} метка"
 
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
-msgstr ""
+msgstr "метка {}"
 
 #. Reported when playback reaches a named region. {} will
 #. be replaced with the region's name; e.g. "intro region".
 #. used when reporting a named region. {} will be
 #. replaced with the name of the region; e.g. "intro region"
 msgid "{} region"
-msgstr ""
+msgstr "{} регион"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
 #. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
-msgstr ""
+msgstr "регион {}"
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
 msgid "{} automation item removed"
 msgid_plural "{} automation items removed"
-msgstr[0] ""
+msgstr[0] "{} удален элемент автоматизации"
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
@@ -92,14 +92,14 @@ msgstr[3] ""
 #. replaced with the number of points; e.g. "2 points removed".
 msgid "{} point removed"
 msgid_plural "{} points removed"
-msgstr[0] ""
+msgstr[0] "Точка удалена\t"
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
 #. A shape for an envelope point.
 msgid "linear"
-msgstr ""
+msgstr "линейный"
 
 #. A shape for an envelope point.
 msgid "square"
@@ -129,10 +129,10 @@ msgid "point {point} value {value} {shape}"
 msgstr ""
 
 msgid "selected"
-msgstr ""
+msgstr "выделено"
 
 msgid "unselected"
-msgstr ""
+msgstr "не выделено"
 
 msgid "no take envelopes"
 msgstr ""
@@ -157,13 +157,13 @@ msgstr ""
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
-msgstr ""
+msgstr "авто {}"
 
 #. Reported when copying automation items. {} will be replaced
 #. with the number of items; e.g. "2 automation items copied".
 msgid "{} automation item copied"
 msgid_plural "{} automation items copied"
-msgstr[0] ""
+msgstr[0] "объекты автоматизации скопированы"
 msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
@@ -1908,6 +1908,42 @@ msgstr ""
 msgid "hid Media Explorer"
 msgstr ""
 
+msgid "absolute frames"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames"
+msgstr ""
+
+msgid "measures.beats"
+msgstr ""
+
+msgid "minutes:seconds"
+msgstr ""
+
+msgid "samples"
+msgstr ""
+
+msgid "seconds"
+msgstr ""
+
+msgid "absolute frames secondary"
+msgstr ""
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr ""
+
+msgid "minutes:seconds secondary"
+msgstr ""
+
+msgid "no secondary time unit"
+msgstr ""
+
+msgid "samples secondary"
+msgstr ""
+
+msgid "seconds secondary"
+msgstr ""
+
 msgid "auto playing"
 msgstr ""
 
@@ -2659,21 +2695,21 @@ msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating chords in MIDI editor"
-msgstr ""
+msgstr "Сообщать &position при навигации по аккордам в MIDI-редакторе"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr ""
+msgstr "Озвучивать MIDI и ноты в MIDI-редакторе"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr ""
+msgstr "Сообщать об изменениях, внесенных с помощью кнопок и панелейй управления"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
-msgstr ""
+msgstr "ОК"
 
 msgctxt "OSARA Configuration"
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 

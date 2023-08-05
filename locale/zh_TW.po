@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-07-16 23:27\n"
+"PO-Revision-Date: 2023-08-05 00:08\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1008,7 +1008,7 @@ msgstr "{} 秒"
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
-msgstr "{} 採樣"
+msgstr "{} 採樣點"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1745,6 +1745,42 @@ msgstr "顯示媒體總管"
 
 msgid "hid Media Explorer"
 msgstr "隱藏媒體總管"
+
+msgid "absolute frames"
+msgstr "絕對幀"
+
+msgid "hours:minutes:seconds:frames"
+msgstr "時:分鐘:秒:幀"
+
+msgid "measures.beats"
+msgstr "小節.節拍"
+
+msgid "minutes:seconds"
+msgstr "分:秒"
+
+msgid "samples"
+msgstr "採樣點"
+
+msgid "seconds"
+msgstr "秒"
+
+msgid "absolute frames secondary"
+msgstr "絕對幀 次要"
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr "時:分:秒:幀 次要"
+
+msgid "minutes:seconds secondary"
+msgstr "分:秒 次要"
+
+msgid "no secondary time unit"
+msgstr "無次要時間單位"
+
+msgid "samples secondary"
+msgstr "採樣點 次要"
+
+msgid "seconds secondary"
+msgstr "秒 次要"
 
 msgid "auto playing"
 msgstr "自動播放"
