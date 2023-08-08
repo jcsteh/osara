@@ -3495,6 +3495,8 @@ void cmdReportSelection(Command* command) {
 			resetTimeCache();
 		} else if (multiLine) {
 			s << translate("none");
+		} else {
+			s << translate("no time selection");
 		}
 	}
 
@@ -3507,6 +3509,9 @@ void cmdReportSelection(Command* command) {
 		}
 		s << formatTracksWithState(nullptr, isTrackSelected,
 			/* includeMaster */ true, multiLine, /* outputIfNone */ multiLine);
+		if (!multiLine && s.tellp() == 0) {
+			s << translate("no selected tracks");
+		}
 	}
 
 	if (fakeFocus ==  FOCUS_ITEM || multiLine) {
@@ -3517,7 +3522,11 @@ void cmdReportSelection(Command* command) {
 			s << translate("Selected items:") << separator;
 		}
 		string items = formatItemsWithState(isItemSelected, multiLine);
-		s << (items.empty() ? translate("none") : items);
+		if (items.empty()) {
+			s << (multiLine ? translate("none") : translate("no selected items"));
+		} else {
+			s << items;
+		}
 	}
 
 	if (s.tellp() == 0) {
