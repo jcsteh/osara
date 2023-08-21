@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-08-05 00:08\n"
+"PO-Revision-Date: 2023-08-21 19:02\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1747,40 +1747,40 @@ msgid "hid Media Explorer"
 msgstr "影藏媒体资源管理器"
 
 msgid "absolute frames"
-msgstr ""
+msgstr "绝对帧"
 
 msgid "hours:minutes:seconds:frames"
-msgstr ""
+msgstr "时:分:秒:帧"
 
 msgid "measures.beats"
-msgstr ""
+msgstr "小节.拍"
 
 msgid "minutes:seconds"
-msgstr ""
+msgstr "分:秒"
 
 msgid "samples"
-msgstr ""
+msgstr "采样"
 
 msgid "seconds"
-msgstr ""
+msgstr "秒"
 
 msgid "absolute frames secondary"
-msgstr ""
+msgstr "绝对帧,辅助"
 
 msgid "hours:minutes:seconds:frames secondary"
-msgstr ""
+msgstr "时:分:秒:帧,辅助"
 
 msgid "minutes:seconds secondary"
-msgstr ""
+msgstr "分:秒,辅助"
 
 msgid "no secondary time unit"
-msgstr ""
+msgstr "无辅助时间单位"
 
 msgid "samples secondary"
-msgstr ""
+msgstr "采样,辅助"
 
 msgid "seconds secondary"
-msgstr ""
+msgstr "秒,辅助"
 
 msgid "auto playing"
 msgstr "自动播放开"
@@ -1831,40 +1831,40 @@ msgid "removed Media Explorer from dock"
 msgstr "已从泊坞窗移除媒体资源管理器"
 
 msgid "Piano roll view"
-msgstr ""
+msgstr "钢琴卷帘视图"
 
 msgid "Named notes view"
-msgstr ""
+msgstr "命名音符试图"
 
 msgid "Event list view"
-msgstr ""
+msgstr "事件列表视图"
 
 msgid "Notation view"
-msgstr ""
+msgstr "乐谱视图"
 
 msgid "Rectangle notes"
-msgstr ""
+msgstr "矩形音符,标准模式"
 
 msgid "Triangle notes"
-msgstr ""
+msgstr "三角形音符,鼓模式"
 
 msgid "Diamond notes"
-msgstr ""
+msgstr "菱形音符,鼓模式"
 
 msgid "Showed velocity numbers on notes"
-msgstr ""
+msgstr "显示音符上的力度数字"
 
 msgid "Hid velocity numbers on notes"
-msgstr ""
+msgstr "隐藏音符上的力度数字"
 
 msgid "Showed note names"
-msgstr ""
+msgstr "显示音符名称"
 
 msgid "Hid note names"
-msgstr ""
+msgstr "影藏音符名称"
 
 msgid "Inserted notes matching grid"
-msgstr ""
+msgstr "插入音符匹配网格"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2026,6 +2026,9 @@ msgstr "长度 {}"
 msgid "Selected tracks:"
 msgstr "选定的轨道:"
 
+msgid "no selected tracks"
+msgstr "无选定轨"
+
 msgid "Selected items:"
 msgstr "选定的对象:"
 
@@ -2085,9 +2088,6 @@ msgstr "关闭全局自动化覆盖"
 
 msgid "global automation override latch preview"
 msgstr "全局自动化覆盖锁存器预览"
-
-msgid "no selected tracks"
-msgstr "无选定轨"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
@@ -2377,6 +2377,10 @@ msgstr "值:"
 msgctxt "Parameters"
 msgid "&Filter:"
 msgstr "过滤(&F):"
+
+msgctxt "Parameters"
+msgid "Include &unnamed parameters"
+msgstr "包含未命名参数(&U)"
 
 msgctxt "Parameters"
 msgid "&Close"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-08-05 00:08\n"
+"PO-Revision-Date: 2023-08-21 19:02\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -2088,6 +2088,9 @@ msgstr "longitud {}"
 msgid "Selected tracks:"
 msgstr "Pistas seleccionadas:"
 
+msgid "no selected tracks"
+msgstr "no hay pistas seleccionadas"
+
 msgid "Selected items:"
 msgstr "Ítems seleccionados:"
 
@@ -2148,9 +2151,6 @@ msgstr "anulación global de automatización apagada"
 
 msgid "global automation override latch preview"
 msgstr "anulación global de automatización en modo escucha previa"
-
-msgid "no selected tracks"
-msgstr "no hay pistas seleccionadas"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
@@ -2441,7 +2441,11 @@ msgstr "Valor:"
 
 msgctxt "Parameters"
 msgid "&Filter:"
-msgstr "Filtro:"
+msgstr "&Filtro:"
+
+msgctxt "Parameters"
+msgid "Include &unnamed parameters"
+msgstr "Incluir &parámetros sin nombre"
 
 msgctxt "Parameters"
 msgid "&Close"

@@ -11,14 +11,14 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-08-05 00:08\n"
+"PO-Revision-Date: 2023-08-21 19:02\n"
 
 msgid "enabled"
 msgstr "已啟用"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "已禁用"
+msgstr "已停用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切換"
@@ -732,19 +732,19 @@ msgid "Enabled MIDI inputs as step input"
 msgstr "啟用 MIDI 輸入作為步進輸入"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "禁用 MIDI 輸入作為步進輸入"
+msgstr "停用 MIDI 輸入作為步進輸入"
 
 msgid "Enabled  f1-f12 as step input"
 msgstr "啟用 f1-f12 作為步進輸入"
 
 msgid "Disabled  f1-f12 as step input"
-msgstr "禁用 f1-f12 作為步進輸入"
+msgstr "停用 f1-f12 作為步進輸入"
 
 msgid "enabled snap to grid"
 msgstr "啟用吸附網格"
 
 msgid "disabled snap to grid"
-msgstr "禁用吸附網格"
+msgstr "停用吸附網格"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -915,7 +915,7 @@ msgstr "追蹤最後觸碰的軌道"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher value is disabled.
 msgid "watcher disabled"
-msgstr "峰值查看器禁用"
+msgstr "峰值查看器停用"
 
 #. Reported when the user resets a Peak Watcher value.
 msgid "reset"
@@ -1250,7 +1250,7 @@ msgid "enabled delta solo"
 msgstr "啟用效果差異獨奏"
 
 msgid "disabled delta solo"
-msgstr "禁用效果獨奏"
+msgstr "停用效果獨奏"
 
 msgid "no selected items"
 msgstr "無項目選中"
@@ -1508,13 +1508,13 @@ msgid "enabled pre roll before recording"
 msgstr "錄製前啟用預卷"
 
 msgid "disabled pre roll before recording"
-msgstr "錄製前禁用預卷"
+msgstr "錄製前停用預卷"
 
 msgid "enabled count in before recording"
 msgstr "錄製前啟用預示"
 
 msgid "disabled count in before recording"
-msgstr "錄製前禁用預示"
+msgstr "錄製前停用預示"
 
 #. A take channel mode.
 msgctxt "take channel mode"
@@ -1554,7 +1554,7 @@ msgid "enabled playback position follows project timebase when changing tempo"
 msgstr "改變速率時啟用播放位置依循工程時基"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr "改變速率時禁用播放位置依循工程時基"
+msgstr "改變速率時停用播放位置依循工程時基"
 
 msgid "preserving pitch when changing play rate"
 msgstr "改變播放速率時保持音高"
@@ -1602,13 +1602,13 @@ msgid "enabled envelope points move with media items"
 msgstr "啟用包絡點隨媒體對象一起移動"
 
 msgid "disabled envelope points move with media items"
-msgstr "禁用包絡點隨媒體對象一起移動"
+msgstr "停用包絡點隨媒體對象一起移動"
 
 msgid "enabled free item positioning"
 msgstr "啟用自由擺放對象"
 
 msgid "disabled free item positioning"
-msgstr "禁用自由擺放對象"
+msgstr "停用自由擺放對象"
 
 #. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
 msgid "{} item rate"
@@ -1622,7 +1622,7 @@ msgid "enabled preserve pitch when changing item rate"
 msgstr "更改對象速率時啟用保留音高"
 
 msgid "disabled preserve pitch when changing item rate"
-msgstr "更改對象速率時禁用保留音高"
+msgstr "更改對象速率時停用保留音高"
 
 msgid "minimum vertical zoom"
 msgstr "最小垂直縮放"
@@ -2026,6 +2026,9 @@ msgstr "長度 {}"
 msgid "Selected tracks:"
 msgstr "選中軌道"
 
+msgid "no selected tracks"
+msgstr "未選中軌道"
+
 msgid "Selected items:"
 msgstr "選中對象"
 
@@ -2085,9 +2088,6 @@ msgstr "全局自動化覆蓋關"
 
 msgid "global automation override latch preview"
 msgstr "全局自動化覆蓋鎖存預覽"
-
-msgid "no selected tracks"
-msgstr "未選中軌道"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
@@ -2379,6 +2379,10 @@ msgid "&Filter:"
 msgstr "過濾器：(&F)"
 
 msgctxt "Parameters"
+msgid "Include &unnamed parameters"
+msgstr "包含未命名參數(&U)"
+
+msgctxt "Parameters"
 msgid "&Close"
 msgstr "關閉(&C)"
 
@@ -2412,7 +2416,7 @@ msgstr "保持水平："
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
-msgstr "禁用(&D)"
+msgstr "停用(&D)"
 
 msgctxt "Peak Watcher"
 msgid "&until reset"
@@ -2436,7 +2440,7 @@ msgstr "取消"
 
 msgctxt "Peak Watcher"
 msgid "D&isable"
-msgstr "禁用(&i)"
+msgstr "停用(&i)"
 
 msgctxt "Message"
 msgid "Message"
@@ -2460,7 +2464,7 @@ msgstr "確定(&O)"
 
 msgctxt "FX Preset"
 msgid "&Cancel"
-msgstr "取消)&C)"
+msgstr "取消(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
