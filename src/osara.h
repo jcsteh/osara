@@ -208,6 +208,7 @@
 #define REAPERAPI_WANT_TimeMap2_timeToQN
 #define REAPERAPI_WANT_MIDI_GetGrid
 #define REAPERAPI_WANT_GetParentTrack
+#define REAPERAPI_WANT_LocalizeString
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

@@ -1613,7 +1613,8 @@ void cmdMidiFilterWindow(Command *command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	// TODO: we could also check the command state was "off", to skip searching otherwise
-	HWND filter = FindWindow(WC_DIALOG, "Filter Events");
+	HWND filter = FindWindowW(L"#32770",
+		widen(LocalizeString("Filter Events", "midi_DLG_128", 0)).c_str());
 	if (filter && (filter != GetFocus())) {
 		SetFocus(filter); // focus the window
 	}
