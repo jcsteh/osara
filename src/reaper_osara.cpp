@@ -2276,6 +2276,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// Main section toggles
 	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
 	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
+	{{MAIN_SECTION, 14}, {"master muted", "master unmuted"}}, // Track: Toggle mute for master track
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off
