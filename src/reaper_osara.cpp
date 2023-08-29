@@ -2288,6 +2288,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 42360}, {"no secondary time unit", nullptr}}, // View: Secondary time unit for ruler: None
 	{{MAIN_SECTION, 42363}, {"samples secondary", nullptr}}, // View: Secondary time unit for ruler: Samples
 	{{MAIN_SECTION, 42362}, {"seconds secondary", nullptr}}, // View: Secondary time unit for ruler: Seconds
+	{{MAIN_SECTION, 14}, {"master muted", "master unmuted"}}, // Track: Toggle mute for master track
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off

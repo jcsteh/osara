@@ -89,6 +89,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### Adjusting Track Parameters
 - Track: Mute/unmute tracks: F5
+- Track: Toggle mute for master track: Shift+F5
 - Track: Solo/unsolo tracks: F6
 - Toggle record arming for current (last touched) track: F7
 - Track: Cycle track record monitor: F8
