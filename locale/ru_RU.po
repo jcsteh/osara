@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-08-21 19:02\n"
+"PO-Revision-Date: 2023-09-02 06:27\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -49,7 +49,7 @@ msgstr ""
 
 #. Reported when navigating to the master track.
 msgid "master"
-msgstr ""
+msgstr "мастер"
 
 #. Reported when moving to a named project marker. {} will
 #. be replaced with the marker's name; e.g. "intro marker".
@@ -216,59 +216,59 @@ msgstr ""
 
 #. The name of a musical note.
 msgid "c"
-msgstr ""
+msgstr "до"
 
 #. The name of a musical note.
 msgid "c sharp"
-msgstr ""
+msgstr "до диез"
 
 #. The name of a musical note.
 msgid "d"
-msgstr ""
+msgstr "ре"
 
 #. The name of a musical note.
 msgid "d sharp"
-msgstr ""
+msgstr "ре диез"
 
 #. The name of a musical note.
 msgid "e"
-msgstr ""
+msgstr "ми"
 
 #. The name of a musical note.
 msgid "f"
-msgstr ""
+msgstr "фа"
 
 #. The name of a musical note.
 msgid "f sharp"
-msgstr ""
+msgstr "фа диез"
 
 #. The name of a musical note.
 msgid "g"
-msgstr ""
+msgstr "соль"
 
 #. The name of a musical note.
 msgid "g sharp"
-msgstr ""
+msgstr "соль диез"
 
 #. The name of a musical note.
 msgid "a"
-msgstr ""
+msgstr "ля"
 
 #. The name of a musical note.
 msgid "a sharp"
-msgstr ""
+msgstr "ля диез"
 
 #. The name of a musical note.
 msgid "b"
-msgstr ""
+msgstr "си"
 
 #. used when reporting the number of notes in a chord.
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "нота"
+msgstr[1] "ноты"
+msgstr[2] "нота"
 msgstr[3] ""
 
 #. used when reporting the number of muted notes in a chord.
@@ -286,14 +286,14 @@ msgid "noncontiguous selection"
 msgstr ""
 
 msgid "velocity"
-msgstr ""
+msgstr "скорость"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "событие удалено"
+msgstr[1] "события удалены"
 msgstr[2] ""
 msgstr[3] ""
 
@@ -384,7 +384,7 @@ msgid "GP Slider 4"
 msgstr ""
 
 msgid "Bank Select LSB"
-msgstr ""
+msgstr "Выберите банк LSB"
 
 msgid "Mod Wheel LSB"
 msgstr ""
@@ -617,7 +617,7 @@ msgid "velocity -10"
 msgstr ""
 
 msgid "velocity changed"
-msgstr ""
+msgstr "скорость изменена"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. "3
@@ -1155,13 +1155,13 @@ msgstr ""
 
 #. A closed track folder.
 msgid "closed"
-msgstr ""
+msgstr "закрыто"
 
 #. An automation mode.
 #. Used when reporting all tracks which are muted, soloed, etc.
 #. to indicate that no tracks are muted, soloed, etc.
 msgid "none"
-msgstr ""
+msgstr "нет"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1445,13 +1445,13 @@ msgid "loop end"
 msgstr ""
 
 msgid "Track"
-msgstr ""
+msgstr "трек"
 
 msgid "Master"
-msgstr ""
+msgstr "масьтер"
 
 msgid "Item"
-msgstr ""
+msgstr "объект"
 
 msgid "Take"
 msgstr ""
@@ -1778,7 +1778,7 @@ msgstr ""
 
 #. Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
 msgid "{} semitones"
-msgstr ""
+msgstr "{} полутона"
 
 msgid "enabled preserve pitch when changing item rate"
 msgstr ""
@@ -1943,6 +1943,12 @@ msgstr ""
 
 msgid "seconds secondary"
 msgstr ""
+
+msgid "master muted"
+msgstr "мастер приглушен"
+
+msgid "master unmuted"
+msgstr "мастер не приглушен"
 
 msgid "auto playing"
 msgstr ""
@@ -2111,9 +2117,9 @@ msgstr ""
 #. number of tracks; e.g. "2 tracks removed".
 msgid "{} track removed"
 msgid_plural "{} tracks removed"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "трек удалён"
+msgstr[1] "треки удалены"
+msgstr[2] "трек удалён"
 msgstr[3] ""
 
 #. used for  "Item: Copy selected area of items".
@@ -2480,7 +2486,7 @@ msgid "OSARA: Cycle automation mode of selected tracks"
 msgstr ""
 
 msgid "OSARA: About"
-msgstr ""
+msgstr "О плагине"
 
 msgid "OSARA: Report groups for current track"
 msgstr ""
@@ -2559,27 +2565,27 @@ msgstr ""
 
 msgctxt "Parameters"
 msgid "Parameters"
-msgstr ""
+msgstr "Параметры"
 
 msgctxt "Parameters"
 msgid "&Parameter:"
-msgstr ""
+msgstr "&Параметр:"
 
 msgctxt "Parameters"
 msgid "Value:"
-msgstr ""
+msgstr "Значение:"
 
 msgctxt "Parameters"
 msgid "&Filter:"
-msgstr ""
+msgstr "&Фильтр:"
 
 msgctxt "Parameters"
 msgid "Include &unnamed parameters"
-msgstr ""
+msgstr "Включать &неименованные параметры"
 
 msgctxt "Parameters"
 msgid "&Close"
-msgstr ""
+msgstr "Закрыть"
 
 msgctxt "Peak Watcher"
 msgid "&Follow when last touched track changes"
@@ -2687,15 +2693,15 @@ msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
-msgstr ""
+msgstr "Отчет о состоянии &передачи (воспроизведение, запись и т.д.)"
 
 msgctxt "OSARA Configuration"
 msgid "&Report track numbers"
-msgstr ""
+msgstr "&сообщать о номерах треков"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr ""
+msgstr "Сообщать &FX при переходе к трекам/дублям"
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating chords in MIDI editor"
