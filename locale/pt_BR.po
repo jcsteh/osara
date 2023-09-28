@@ -11,17 +11,17 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2023-09-02 06:27\n"
+"PO-Revision-Date: 2023-09-28 05:18\n"
 
 msgid "enabled"
-msgstr ""
+msgstr "habilitado"
 
 #. A recording mode.
 msgid "disabled"
 msgstr "Desabilitado"
 
 msgid "OSARA: Toggle"
-msgstr ""
+msgstr "OSARA: Alternar"
 
 msgid "volume"
 msgstr "Volume"
@@ -115,7 +115,7 @@ msgstr "final rápido"
 
 #. A shape for an envelope point.
 msgid "bezier"
-msgstr ""
+msgstr "Bézier"
 
 #. Reported when moving to an envelope point. {point} will be
 #. replaced with the number of the point. {value} will be replaced with its
@@ -148,7 +148,7 @@ msgid "bypassed"
 msgstr "ignorado"
 
 msgid "Change Automation Item Selection"
-msgstr ""
+msgstr "Alterar seleção de itens de automação"
 
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
@@ -173,16 +173,16 @@ msgid "no envelopes toggled"
 msgstr "nenhum envelope alternado"
 
 msgid "showed track {} envelope"
-msgstr ""
+msgstr "Mostrando o envelope {} da pista"
 
 msgid "hid track {} envelope"
-msgstr ""
+msgstr "Ocultando o envelope {} da pista"
 
 msgid "showed take {} envelope"
-msgstr ""
+msgstr "Mostrando o envelope de tomada (take)"
 
 msgid "hid take {} envelope"
-msgstr ""
+msgstr "Ocultando o envelope de tomada (take)"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -256,8 +256,8 @@ msgstr "Si"
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} nota"
+msgstr[1] "{} notas"
 
 #. used when reporting the number of muted notes in a chord.
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -265,21 +265,21 @@ msgstr[1] ""
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
 msgid_plural "{} muted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} nota silenciada"
+msgstr[1] "{} notas silenciadas"
 
 msgid "noncontiguous selection"
 msgstr "Seleção não contígua"
 
 msgid "velocity"
-msgstr ""
+msgstr "intensidade"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento removido"
+msgstr[1] "{} eventos removidos"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -287,35 +287,35 @@ msgstr[1] ""
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} nota selecionada"
+msgstr[1] "{} notas selecionadas"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento selecionado"
+msgstr[1] "{} eventos selecionados"
 
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento CC selecionado"
+msgstr[1] "{} eventos CC selecionados"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
 msgid "{} CC event unselected"
 msgid_plural "{} CC events unselected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento cc deselecionado"
+msgstr[1] "{} eventos cc desselecionados"
 
 msgid "Bank Select MSB"
-msgstr ""
+msgstr "Seleção do Banco MSB"
 
 msgid "Mod Wheel MSB"
-msgstr ""
+msgstr "modo de modulação MSB"
 
 msgid "Breath MSB"
 msgstr ""
@@ -327,43 +327,43 @@ msgid "Portamento MSB"
 msgstr ""
 
 msgid "Data Entry MSB"
-msgstr ""
+msgstr "MSB de entrada de dados"
 
 msgid "Volume MSB"
 msgstr ""
 
 msgid "Balance MSB"
-msgstr ""
+msgstr "MSB balamço"
 
 msgid "Pan Position MSB"
-msgstr ""
+msgstr "posição do pan MSB"
 
 msgid "Expression MSB"
-msgstr ""
+msgstr "Expressão MSB"
 
 msgid "Control 1 MSB"
-msgstr ""
+msgstr "Controle1 MSB"
 
 msgid "Control 2 MSB"
-msgstr ""
+msgstr "Controle 2 MSB"
 
 msgid "GP Slider 1"
-msgstr ""
+msgstr "Slider GP 1"
 
 msgid "GP Slider 2"
-msgstr ""
+msgstr "Slider GP 2"
 
 msgid "GP Slider 3"
-msgstr ""
+msgstr "Slider GP 3"
 
 msgid "GP Slider 4"
-msgstr ""
+msgstr "Slider GP 4"
 
 msgid "Bank Select LSB"
-msgstr ""
+msgstr "Seleção do banco LSB"
 
 msgid "Mod Wheel LSB"
-msgstr ""
+msgstr "Modo de modulação LSB"
 
 msgid "Breath LSB"
 msgstr ""
@@ -375,76 +375,76 @@ msgid "Portamento LSB"
 msgstr ""
 
 msgid "Data Entry LSB"
-msgstr ""
+msgstr "LSB de entrada de dados"
 
 msgid "Volume LSB"
-msgstr ""
+msgstr "LSB de volume"
 
 msgid "Balance LSB"
-msgstr ""
+msgstr "LSB de balanço"
 
 msgid "Pan Position LSB"
-msgstr ""
+msgstr "Posição do pan LSB"
 
 msgid "Expression LSB"
-msgstr ""
+msgstr "LSB de expressão"
 
 msgid "Control 1 LSB"
-msgstr ""
+msgstr "Controle 1LSB"
 
 msgid "Control 2 LSB"
-msgstr ""
+msgstr "Controle 2LSB"
 
 msgid "Hold Pedal (on/off)"
-msgstr ""
+msgstr "Pedal de pressionamento (ligado/desligado)"
 
 msgid "Portamento (on/off)"
-msgstr ""
+msgstr "Portamento (ligado/desligado)"
 
 msgid "Sostenuto (on/off)"
-msgstr ""
+msgstr "Sostenuto (ligado/desligado)"
 
 msgid "Soft Pedal (on/off)"
-msgstr ""
+msgstr "Pedal Soft (ligado/desligado)"
 
 msgid "Legato Pedal (on/off)"
-msgstr ""
+msgstr "Pedal legato (ligado/desligado)"
 
 msgid "Hold 2 Pedal (on/off)"
-msgstr ""
+msgstr "Pedal de pressionamento 2 (ligado/desligado)"
 
 msgid "Sound Variation"
-msgstr ""
+msgstr "Variação de som"
 
 msgid "Timbre/Resonance"
-msgstr ""
+msgstr "Ressonância do timbre"
 
 msgid "Sound Release"
-msgstr ""
+msgstr "Liberação do som"
 
 msgid "Sound Attack"
-msgstr ""
+msgstr "Ataque do som"
 
 msgid "Brightness/Cutoff Freq"
-msgstr ""
+msgstr "Brilho/frequência de corte"
 
 msgid "Sound Control 6"
-msgstr ""
+msgstr "controle de som6"
 
 msgid "Sound Control 7"
-msgstr ""
+msgstr "controle de som7"
 
 msgid "Sound Controll 8"
-msgstr ""
+msgstr "controle de som8"
 
 msgid "Sound Control 9"
-msgstr ""
+msgstr "controle de som9"
 
 msgid "Sound Control 10"
-msgstr ""
+msgstr "controle de som10"
 
 msgid "GP Button 1 (on/off)"
-msgstr ""
+msgstr " "
 
 msgid "GP Button 2 (on/off)"
 msgstr ""
@@ -2463,7 +2463,7 @@ msgstr ""
 
 msgctxt "Peak Watcher"
 msgid "Level type:"
-msgstr "tipo de nível:"
+msgstr "tipo de Pico"
 
 msgctxt "Peak Watcher"
 msgid "Notify automatically for channels:"

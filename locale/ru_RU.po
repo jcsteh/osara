@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-09-02 06:27\n"
+"PO-Revision-Date: 2023-09-28 05:18\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -1909,7 +1909,7 @@ msgid "hid Media Explorer"
 msgstr ""
 
 msgid "absolute frames"
-msgstr ""
+msgstr "абсолютные рамки"
 
 msgid "hours:minutes:seconds:frames"
 msgstr ""
