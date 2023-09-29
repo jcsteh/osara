@@ -95,7 +95,7 @@ class Surface: public IReaperControlSurface {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
-		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
+		if (this->wasCausedByCommand()) {
 			return;
 		}
 		// Calculate integer based transport state
