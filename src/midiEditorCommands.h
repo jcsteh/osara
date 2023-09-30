@@ -54,6 +54,7 @@ void cmdMidiNoteSplitOrJoin(Command* command);
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);
 void maybeHandleEventListItemFocus(HWND hwnd, long childId);
+void toggleListViewItemSelection(HWND list);
 #endif
 
 void postMidiChangeVelocity(int command);
