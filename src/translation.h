@@ -31,6 +31,12 @@ auto translate_plural(S msg, S msgPlural, N num) {
 	return translationDict.translate_plural(msg, msgPlural, num);
 }
 
+// This function is used to mark a string as translatable without actually
+// translating it. This is useful for strings in compile time data structures.
+constexpr auto _t(auto msg) {
+	return msg;
+}
+
 // Catch exceptions from fmt::format due to errors in translations so we can
 // fail gracefully instead of crashing.
 template<typename FormatStr, typename... Args>
