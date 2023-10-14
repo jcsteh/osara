@@ -915,25 +915,21 @@ class FxNamedConfigParam: public Param {
 };
 
 const FxNamedConfigParamValues TOGGLE_FX_NAMED_CONFIG_PARAM_VALUES = {
-	// translate firstString begin
-	{"off", "0"},
-	{"on", "1"},
-	// translate firstString end
+	{_t("off"), "0"},
+	{_t("on"), "1"},
 };
 const FxNamedConfigParamValues REAEQ_BAND_TYPE_VALUES = {
-	// translate firstString begin
-	{"low shelf", "0"},
-	{"high shelf", "1"},
-	{"band", "8"},
-	{"low pass", "3"},
-	{"high pass", "4"},
-	{"all pass", "5"},
-	{"notch", "6"},
-	{"band pass", "7"},
-	{"parallel band pass", "10"},
-	{"band (alt)", "9"},
-	{"band (alt 2)", "2"},
-	// translate firstString end
+	{_t("low shelf"), "0"},
+	{_t("high shelf"), "1"},
+	{_t("band"), "8"},
+	{_t("low pass"), "3"},
+	{_t("high pass"), "4"},
+	{_t("all pass"), "5"},
+	{_t("notch"), "6"},
+	{_t("band pass"), "7"},
+	{_t("parallel band pass"), "10"},
+	{_t("band (alt)"), "9"},
+	{_t("band (alt 2)"), "2"},
 };
 
 template<typename ReaperObj>

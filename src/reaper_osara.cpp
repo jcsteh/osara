@@ -667,31 +667,29 @@ struct {
 	const char* displayName;
 	const char* name;
 } TRACK_GROUP_TOGGLES[] = {
-	// translate firstString begin
-	{"volume lead", "VOLUME_LEAD"},
-	{"volume follow", "VOLUME_FOLLOW"},
-	{"VCA lead", "VOLUME_VCA_LEAD"},
-	{"VCA follow", "VOLUME_VCA_FOLLOW"},
-	{"pan lead", "PAN_LEAD"},
-	{"pan follow", "PAN_FOLLOW"},
-	{"width lead", "WIDTH_LEAD"},
-	{"width follow", "WIDTH_FOLLOW"},
-	{"mute lead", "MUTE_LEAD"},
-	{"mute follow", "MUTE_FOLLOW"},
-	{"solo lead", "SOLO_LEAD"},
-	{"solo follow", "SOLO_FOLLOW"},
-	{"record arm lead", "RECARM_LEAD"},
-	{"record arm follow", "RECARM_FOLLOW"},
-	{"polarity lead", "POLARITY_LEAD"},
-	{"polarity follow", "POLARITY_FOLLOW"},
-	{"automation mode lead", "AUTOMODE_LEAD"},
-	{"automation mode follow", "AUTOMODE_FOLLOW"},
-	{"reverse volume", "VOLUME_REVERSE"},
-	{"reverse pan", "PAN_REVERSE"},
-	{"reverse width", "WIDTH_REVERSE"},
-	{"do not lead when following", "NO_LEAD_WHEN_FOLLOW"},
-	{"VCA pre-FX follow", "VOLUME_VCA_FOLLOW_ISPREFX"},
-	// translate firstString end
+	{_t("volume lead"), "VOLUME_LEAD"},
+	{_t("volume follow"), "VOLUME_FOLLOW"},
+	{_t("VCA lead"), "VOLUME_VCA_LEAD"},
+	{_t("VCA follow"), "VOLUME_VCA_FOLLOW"},
+	{_t("pan lead"), "PAN_LEAD"},
+	{_t("pan follow"), "PAN_FOLLOW"},
+	{_t("width lead"), "WIDTH_LEAD"},
+	{_t("width follow"), "WIDTH_FOLLOW"},
+	{_t("mute lead"), "MUTE_LEAD"},
+	{_t("mute follow"), "MUTE_FOLLOW"},
+	{_t("solo lead"), "SOLO_LEAD"},
+	{_t("solo follow"), "SOLO_FOLLOW"},
+	{_t("record arm lead"), "RECARM_LEAD"},
+	{_t("record arm follow"), "RECARM_FOLLOW"},
+	{_t("polarity lead"), "POLARITY_LEAD"},
+	{_t("polarity follow"), "POLARITY_FOLLOW"},
+	{_t("automation mode lead"), "AUTOMODE_LEAD"},
+	{_t("automation mode follow"), "AUTOMODE_FOLLOW"},
+	{_t("reverse volume"), "VOLUME_REVERSE"},
+	{_t("reverse pan"), "PAN_REVERSE"},
+	{_t("reverse width"), "WIDTH_REVERSE"},
+	{_t("do not lead when following"), "NO_LEAD_WHEN_FOLLOW"},
+	{_t("VCA pre-FX follow"), "VOLUME_VCA_FOLLOW_ISPREFX"},
 };
 
 bool isTrackGrouped(MediaTrack* track) {
@@ -2195,27 +2193,25 @@ map<int, MExplorerPostExecute> mExplorerPostCommands{
 
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
-	// translate firstString begin
-	{40625, "set selection start"}, // Time selection: Set start point
-	{40222, "set loop start"}, // Loop points: Set start point
-	{40223, "set loop end"}, // Loop points: Set end point
-	{40781, "grid whole"}, // Grid: Set to 1
-	{40780, "grid half"}, // Grid: Set to 1/2
-	{40775, "grid thirty second"}, // Grid: Set to 1/32
-	{40779, "grid quarter"}, // Grid: Set to 1/4
-	{41214, "grid quarter triplet"}, // Grid: Set to 1/6 (1/4 triplet)
-	{40776, "grid sixteenth"}, // Grid: Set to 1/16
-	{41213, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
-	{40778, "grid eighth"}, // Grid: Set to 1/8
-	{40777, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
-	{41212, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
-	{40774, "grid sixty forth"}, // Grid: Set to 1/64
-	{41047, "grid one hundred twenty eighth"}, // Grid: Set to 1/128
-	{40339, "all tracks unmuted"}, // Track: Unmute all tracks
-	{40340, "all tracks unsoloed"}, // Track: Unsolo all tracks
-	{40491, "all tracks unarmed"}, // Track: Unarm all tracks for recording
-	{42467, "all delta solos reset"}, // FX: Clear delta solo for all project FX
-	// translate firstString end
+	{40625, _t("set selection start")}, // Time selection: Set start point
+	{40222, _t("set loop start")}, // Loop points: Set start point
+	{40223, _t("set loop end")}, // Loop points: Set end point
+	{40781, _t("grid whole")}, // Grid: Set to 1
+	{40780, _t("grid half")}, // Grid: Set to 1/2
+	{40775, _t("grid thirty second")}, // Grid: Set to 1/32
+	{40779, _t("grid quarter")}, // Grid: Set to 1/4
+	{41214, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
+	{40776, _t("grid sixteenth")}, // Grid: Set to 1/16
+	{41213, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
+	{40778, _t("grid eighth")}, // Grid: Set to 1/8
+	{40777, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
+	{41212, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
+	{40774, _t("grid sixty forth")}, // Grid: Set to 1/64
+	{41047, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
+	{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
+	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
+	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
+	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -2233,32 +2229,30 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
-	// translate firstString begin
-	{40204, "grid whole"}, // Grid: Set to 1
-	{40203, "grid half"}, // Grid: Set to 1/2
-	{40190, "grid thirty second"}, // Grid: Set to 1/32
-	{40201, "grid quarter"}, // Grid: Set to 1/4
-	{40199, "grid quarter triplet"}, // Grid: Set to 1/6 (1/4 triplet)
-	{40192, "grid sixteenth"}, // Grid: Set to 1/16
-	{40191, "grid sixteenth triplet"}, // Grid: Set to 1/24 (1/16 triplet)
-	{40197, "grid eighth"}, // Grid: Set to 1/8
-	{40193, "grid eighth triplet"}, // Grid: Set to 1/12 (1/8 triplet)
-	{40189, "grid thirty second triplet"}, // Grid: Set to 1/48 (1/32 triplet)
-	{41020, "grid sixty forth"}, // Grid: Set to 1/64
-	{41019, "grid one hundred twenty eighth"}, // Grid: Set to 1/128
-	{41081, "length whole"}, // Set length for next inserted note: 1
-	{41079, "length half"}, // Set length for next inserted note: 1/2
-	{41067, "length thirty second"}, // Set length for next inserted note: 1/32
-	{41076, "length quarter"}, // Set length for next inserted note: 1/4
-	{41075, "length quarter triplet"}, // Set length for next inserted note: 1/4T
-	{41070, "length sixteenth"}, // Set length for next inserted note: 1/16
-	{41069, "length sixteenth triplet"}, // Set length for next inserted note: 1/16T
-	{41073, "length eighth"}, // Set length for next inserted note: 1/8
-	{41072, "length eighth triplet"}, // Set length for next inserted note: 1/8T
-	{41066, "length thirty second triplet"}, // Set length for next inserted note: 1/32T
-	{41064, "length sixty forth"}, // Set length for next inserted note: 1/64
-	{41062, "length one hundred twenty eighth"}, // Set length for next inserted note: 1/128
-	// translate firstString end
+	{40204, _t("grid whole")}, // Grid: Set to 1
+	{40203, _t("grid half")}, // Grid: Set to 1/2
+	{40190, _t("grid thirty second")}, // Grid: Set to 1/32
+	{40201, _t("grid quarter")}, // Grid: Set to 1/4
+	{40199, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
+	{40192, _t("grid sixteenth")}, // Grid: Set to 1/16
+	{40191, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
+	{40197, _t("grid eighth")}, // Grid: Set to 1/8
+	{40193, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
+	{40189, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
+	{41020, _t("grid sixty forth")}, // Grid: Set to 1/64
+	{41019, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
+	{41081, _t("length whole")}, // Set length for next inserted note: 1
+	{41079, _t("length half")}, // Set length for next inserted note: 1/2
+	{41067, _t("length thirty second")}, // Set length for next inserted note: 1/32
+	{41076, _t("length quarter")}, // Set length for next inserted note: 1/4
+	{41075, _t("length quarter triplet")}, // Set length for next inserted note: 1/4T
+	{41070, _t("length sixteenth")}, // Set length for next inserted note: 1/16
+	{41069, _t("length sixteenth triplet")}, // Set length for next inserted note: 1/16T
+	{41073, _t("length eighth")}, // Set length for next inserted note: 1/8
+	{41072, _t("length eighth triplet")}, // Set length for next inserted note: 1/8T
+	{41066, _t("length thirty second triplet")}, // Set length for next inserted note: 1/32T
+	{41064, _t("length sixty forth")}, // Set length for next inserted note: 1/64
+	{41062, _t("length one hundred twenty eighth")}, // Set length for next inserted note: 1/128
 };
 
 struct ToggleCommandMessage {
@@ -2270,48 +2264,46 @@ struct ToggleCommandMessage {
 // toggle action isn't included here or in another of OSARA's action maps,
 // OSARA will fall back to reporting the toggle state and the action name.
 map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
-	// translate first2Strings begin
 	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
 	// Specify nullptr to report nothing for a particular message.
 	// Main section toggles
-	{{MAIN_SECTION, 40346}, {"full screen", "normal screen"}}, // Toggle fullscreen
-	{{MAIN_SECTION, 50124}, {"showed Media Explorer", "hid Media Explorer"}}, // Media explorer: Show/hide media explorer
-	{{MAIN_SECTION, 41973}, {"absolute frames", nullptr}}, // View: Time unit for ruler: Absolute frames
-	{{MAIN_SECTION, 40370}, {"hours:minutes:seconds:frames", nullptr}}, // View: Time unit for ruler: Hours:Minutes:Seconds:Frames
-	{{MAIN_SECTION, 40367}, {"measures.beats", nullptr}}, // View: Time unit for ruler: Measures.Beats
-	{{MAIN_SECTION, 40365}, {"minutes:seconds", nullptr}}, // View: Time unit for ruler: Minutes:Seconds
-	{{MAIN_SECTION, 40369}, {"samples", nullptr}}, // View: Time unit for ruler: Samples
-	{{MAIN_SECTION, 40368}, {"seconds", nullptr}}, // View: Time unit for ruler: Seconds
-	{{MAIN_SECTION, 42365}, {"absolute frames secondary", nullptr}}, // View: Secondary time unit for ruler: Absolute frames
-	{{MAIN_SECTION, 42364}, {"hours:minutes:seconds:frames secondary", nullptr}}, // View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
-	{{MAIN_SECTION, 42361}, {"minutes:seconds secondary", nullptr}}, // View: Secondary time unit for ruler: Minutes:Seconds
-	{{MAIN_SECTION, 42360}, {"no secondary time unit", nullptr}}, // View: Secondary time unit for ruler: None
-	{{MAIN_SECTION, 42363}, {"samples secondary", nullptr}}, // View: Secondary time unit for ruler: Samples
-	{{MAIN_SECTION, 42362}, {"seconds secondary", nullptr}}, // View: Secondary time unit for ruler: Seconds
-	{{MAIN_SECTION, 14}, {"master muted", "master unmuted"}}, // Track: Toggle mute for master track
+	{{MAIN_SECTION, 40346}, {_t("full screen"), _t("normal screen")}}, // Toggle fullscreen
+	{{MAIN_SECTION, 50124}, {_t("showed Media Explorer"), _t("hid Media Explorer")}}, // Media explorer: Show/hide media explorer
+	{{MAIN_SECTION, 41973}, {_t("absolute frames"), nullptr}}, // View: Time unit for ruler: Absolute frames
+	{{MAIN_SECTION, 40370}, {_t("hours:minutes:seconds:frames"), nullptr}}, // View: Time unit for ruler: Hours:Minutes:Seconds:Frames
+	{{MAIN_SECTION, 40367}, {_t("measures.beats"), nullptr}}, // View: Time unit for ruler: Measures.Beats
+	{{MAIN_SECTION, 40365}, {_t("minutes:seconds"), nullptr}}, // View: Time unit for ruler: Minutes:Seconds
+	{{MAIN_SECTION, 40369}, {_t("samples"), nullptr}}, // View: Time unit for ruler: Samples
+	{{MAIN_SECTION, 40368}, {_t("seconds"), nullptr}}, // View: Time unit for ruler: Seconds
+	{{MAIN_SECTION, 42365}, {_t("absolute frames secondary"), nullptr}}, // View: Secondary time unit for ruler: Absolute frames
+	{{MAIN_SECTION, 42364}, {_t("hours:minutes:seconds:frames secondary"), nullptr}}, // View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
+	{{MAIN_SECTION, 42361}, {_t("minutes:seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Minutes:Seconds
+	{{MAIN_SECTION, 42360}, {_t("no secondary time unit"), nullptr}}, // View: Secondary time unit for ruler: None
+	{{MAIN_SECTION, 42363}, {_t("samples secondary"), nullptr}}, // View: Secondary time unit for ruler: Samples
+	{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
+	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
 	// Media Explorer toggles
-	{{MEDIA_EXPLORER_SECTION, 1011}, {"auto playing", "not auto playing"}}, // Autoplay: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 1068}, {"repeating previews", "not repeating previews"}}, // Preview: Toggle repeat on/off
-	{{MEDIA_EXPLORER_SECTION, 1012}, {"starting on bar", "not starting on bar"}}, // Start on bar: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 40068}, {"preserving pitch", "not preserving pitch"}}, // Options: Preserve pitch when tempo-matching or changing play rate
-	{{MEDIA_EXPLORER_SECTION, 42239}, {"reset pitch", nullptr}}, // Preview: reset pitch
-	{{MEDIA_EXPLORER_SECTION, 40023}, {"tempo matching", "not tempo  matching"}}, // Tempo match: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 40021}, {"half time", "normal time"}}, // Tempo match: /2
-	{{MEDIA_EXPLORER_SECTION, 40022}, {"double time", "normal time"}}, // Tempo match: x2
-	{{MEDIA_EXPLORER_SECTION, 40008}, {"docked Media Explorer", "removed Media Explorer from dock"}}, // Dock Media Explorer in Docker
+	{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}}, // Preview: Toggle repeat on/off
+	{{MEDIA_EXPLORER_SECTION, 1012}, {_t("starting on bar"), _t("not starting on bar")}}, // Start on bar: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 40068}, {_t("preserving pitch"), _t("not preserving pitch")}}, // Options: Preserve pitch when tempo-matching or changing play rate
+	{{MEDIA_EXPLORER_SECTION, 42239}, {_t("reset pitch"), nullptr}}, // Preview: reset pitch
+	{{MEDIA_EXPLORER_SECTION, 40023}, {_t("tempo matching"), _t("not tempo  matching")}}, // Tempo match: Toggle on/off
+	{{MEDIA_EXPLORER_SECTION, 40021}, {_t("half time"), _t("normal time")}}, // Tempo match: /2
+	{{MEDIA_EXPLORER_SECTION, 40022}, {_t("double time"), _t("normal time")}}, // Tempo match: x2
+	{{MEDIA_EXPLORER_SECTION, 40008}, {_t("docked Media Explorer"), _t("removed Media Explorer from dock")}}, // Dock Media Explorer in Docker
 	// MIDI Editor toggles
-	{{MIDI_EDITOR_SECTION, 40042}, {"Piano roll view", nullptr}}, // Mode: Piano Roll
-	{{MIDI_EDITOR_SECTION, 40043}, {"Named notes view", nullptr}}, // Mode: Named Notes (Drum Map)
-	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40056}, {"Event list view", nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40954}, {"Notation view", nullptr}}, // Mode: Notation
-	{{MIDI_EDITOR_SECTION, 40449}, {"Rectangle notes", nullptr}}, // View: Show events as rectangles (normal mode)
-	{{MIDI_EDITOR_SECTION, 40448}, {"Triangle notes", nullptr}}, // View: Show events as triangles (drum mode)
-	{{MIDI_EDITOR_SECTION, 40450}, {"Diamond notes", nullptr}}, // View: Show events as diamonds (drum mode)
-	{{MIDI_EDITOR_SECTION, 40632}, {"Showed velocity numbers on notes", "Hid velocity numbers on notes"}}, // View: Show velocity numbers on notes
-	{{MIDI_EDITOR_SECTION, 40045}, {"Showed note names", "Hid note names"}}, // View: Show note names
-	{{MIDI_EDITOR_SECTION, 41295}, {"Inserted notes matching grid", nullptr}}, // Set length for next inserted note: grid
-	// translate first2Strings end
+	{{MIDI_EDITOR_SECTION, 40042}, {_t("Piano roll view"), nullptr}}, // Mode: Piano Roll
+	{{MIDI_EDITOR_SECTION, 40043}, {_t("Named notes view"), nullptr}}, // Mode: Named Notes (Drum Map)
+	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40954}, {_t("Notation view"), nullptr}}, // Mode: Notation
+	{{MIDI_EDITOR_SECTION, 40449}, {_t("Rectangle notes"), nullptr}}, // View: Show events as rectangles (normal mode)
+	{{MIDI_EDITOR_SECTION, 40448}, {_t("Triangle notes"), nullptr}}, // View: Show events as triangles (drum mode)
+	{{MIDI_EDITOR_SECTION, 40450}, {_t("Diamond notes"), nullptr}}, // View: Show events as diamonds (drum mode)
+	{{MIDI_EDITOR_SECTION, 40632}, {_t("Showed velocity numbers on notes"), _t("Hid velocity numbers on notes")}}, // View: Show velocity numbers on notes
+	{{MIDI_EDITOR_SECTION, 40045}, {_t("Showed note names"), _t("Hid note names")}}, // View: Show note names
+	{{MIDI_EDITOR_SECTION, 41295}, {_t("Inserted notes matching grid"), nullptr}}, // Set length for next inserted note: grid
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -4283,88 +4275,86 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
 	// Our own commands.
-	// translate firstString begin
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next item (leaving other items selected)"}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous item (leaving other items selected)"}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View properties for current media item/take/automation item (depending on focus)"}, "OSARA_PROPERTIES", cmdPropertiesFocus},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View parameters for current track/item/FX (depending on focus)"}, "OSARA_PARAMS", cmdParamsFocus},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for current track/take (depending on focus)"}, "OSARA_FXPARAMS", cmdFxParamsFocus},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: View FX parameters for master track"}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for first watcher first channel"}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherW1C1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for first watcher second channel"}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherW1C2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for second watcher first channel"}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherW2C1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report Peak Watcher value for second watcher second channel"}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherW2C2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher first watcher"}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherW1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Reset Peak Watcher second watcher"}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherW2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Pause/resume Peak Watcher"}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report ripple editing mode"}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report muted tracks"}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report soloed tracks"}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report record armed tracks"}, "OSARA_REPORTARMED", cmdReportArmedTracks},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with record monitor on"}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report tracks with phase inverted"}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report track/item/time selection (depending on focus)"}, "OSARA_REPORTSEL", cmdReportSelection},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"}, "OSARA_REMOVE", cmdRemoveFocus},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Toggle shortcut help"}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report edit/play cursor position and transport state"}, "OSARA_CURSORPOS", cmdReportCursorPosition},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"}, "OSARA_TOGGLESEL", cmdToggleSelection},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move last focused stretch marker to current edit cursor position"}, "OSARA_MOVESTRETCH", cmdMoveStretch},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"}, "OSARA_REPORTPEAKCURRENTC2", cmdReportPeakCurrentC2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report level in peak dB at play cursor for channel 1 of master track"}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report level in peak dB at play cursor for channel 2 of master track"}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Delete all time signature markers"}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Select next track/take envelope (depending on focus)"}, "OSARA_SELECTNEXTENV", cmdSelectNextEnvelope},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Select previous track/take envelope (depending on focus)"}, "OSARA_SELECTPREVENV", cmdSelectPreviousEnvelope},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point"}, "OSARA_NEXTENVPOINT", cmdMoveToNextEnvelopePoint},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point"}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next envelope point (leaving other points selected)"}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous envelope point (leaving other points selected)"}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to next transient"}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Move to previous transient"}, "OSARA_PREVTRANSIENT", cmdMoveToPreviousTransient},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Show first context menu (depending on focus)"}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Show second context menu (depending on focus)"}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Show third context menu (depending on focus)"}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Cycle through midi recording modes of selected tracks"}, "OSARA_CYCLEMIDIRECORDINGMODE", cmdCycleMidiRecordingMode},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Configuration"}, "OSARA_CONFIG", cmdConfig},
-	{MAIN_SECTION, {DEFACCEL, "OSARA: Report global / Track Automation Mode"}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle global automation override between latch preview and off"}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle automation mode of selected tracks"}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: About"}, "OSARA_ABOUT", cmdAbout},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report groups for current track"}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Report regions, last project marker and items on selected tracks at current position"}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to first track"}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Go to last track"}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Cycle shape of selected envelope points"}, "OSARA_CYCLEENVELOPEPOINTSHAPE", cmdCycleEnvelopePointShape},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take volume envelope visibility (depending on focus)"}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take pan envelope visibility (depending on focus)"}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track/take mute envelope visibility (depending on focus)"}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord"}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord"}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next chord and add to selection"}, "OSARA_NEXTCHORDKEEPSEL", cmdMidiMoveToNextChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous chord and add to selection"}, "OSARA_PREVCHORDKEEPSEL", cmdMidiMoveToPreviousChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord"}, "OSARA_NEXTNOTE", cmdMidiMoveToNextNoteInChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord"}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next note in chord and add to selection"}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous note in chord and add to selection"}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToPreviousNoteInChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC"}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC"}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next CC and add to selection"}, "OSARA_NEXTCCKEEPSEL", cmdMidiMoveToNextCCKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous CC and add to selection"}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to previous midi item on track"}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Move to next midi item on track"}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Select all notes with the same pitch starting in time selection"}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
-	{ MIDI_EDITOR_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_ME_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next item (leaving other items selected)")}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous item (leaving other items selected)")}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View properties for current media item/take/automation item (depending on focus)")}, "OSARA_PROPERTIES", cmdPropertiesFocus},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View parameters for current track/item/FX (depending on focus)")}, "OSARA_PARAMS", cmdParamsFocus},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for current track/take (depending on focus)")}, "OSARA_FXPARAMS", cmdFxParamsFocus},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for master track")}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure Peak Watcher for current track/track FX (depending on focus)")}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher first channel")}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherW1C1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher second channel")}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherW1C2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher first channel")}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherW2C1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher second channel")}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherW2C2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Reset Peak Watcher first watcher")}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherW1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Reset Peak Watcher second watcher")}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherW2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Pause/resume Peak Watcher")}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report ripple editing mode")}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report muted tracks")}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report soloed tracks")}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC2", cmdReportPeakCurrentC2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of master track")}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 2 of master track")}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Delete all time signature markers")}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select next track/take envelope (depending on focus)")}, "OSARA_SELECTNEXTENV", cmdSelectNextEnvelope},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select previous track/take envelope (depending on focus)")}, "OSARA_SELECTPREVENV", cmdSelectPreviousEnvelope},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next envelope point")}, "OSARA_NEXTENVPOINT", cmdMoveToNextEnvelopePoint},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous envelope point")}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next envelope point (leaving other points selected)")}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous envelope point (leaving other points selected)")}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next transient")}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous transient")}, "OSARA_PREVTRANSIENT", cmdMoveToPreviousTransient},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show first context menu (depending on focus)")}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show second context menu (depending on focus)")}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show third context menu (depending on focus)")}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle through midi recording modes of selected tracks")}, "OSARA_CYCLEMIDIRECORDINGMODE", cmdCycleMidiRecordingMode},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configuration")}, "OSARA_CONFIG", cmdConfig},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report global / Track Automation Mode")}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle global automation override between latch preview and off")}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle automation mode of selected tracks")}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: About")}, "OSARA_ABOUT", cmdAbout},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report groups for current track")}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report regions, last project marker and items on selected tracks at current position")}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to first track")}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to last track")}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle shape of selected envelope points")}, "OSARA_CYCLEENVELOPEPOINTSHAPE", cmdCycleEnvelopePointShape},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take volume envelope visibility (depending on focus)")}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take mute envelope visibility (depending on focus)")}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)")}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord and add to selection")}, "OSARA_NEXTCHORDKEEPSEL", cmdMidiMoveToNextChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord and add to selection")}, "OSARA_PREVCHORDKEEPSEL", cmdMidiMoveToPreviousChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next note in chord")}, "OSARA_NEXTNOTE", cmdMidiMoveToNextNoteInChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous note in chord")}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next note in chord and add to selection")}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous note in chord and add to selection")}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToPreviousNoteInChordKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next CC")}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous CC")}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next CC and add to selection")}, "OSARA_NEXTCCKEEPSEL", cmdMidiMoveToNextCCKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous CC and add to selection")}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous midi item on track")}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next midi item on track")}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
+	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Select all notes with the same pitch starting in time selection")}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
+	{ MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ME_MUTENEXTMESSAGE", cmdMuteNextMessage},
 #ifdef _WIN32
-	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Focus event nearest edit cursor"}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
+	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Focus event nearest edit cursor")}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
 #endif
-	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, "OSARA: Mute next message from OSARA"}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	// translate firstString end
+	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
+	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;

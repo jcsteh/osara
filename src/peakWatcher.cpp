@@ -177,16 +177,12 @@ const int NUM_WATCHERS = 2;
 map<const ReaProject*, array<Watcher, NUM_WATCHERS> > watchers;
 
 const char* WATCHER_NAMES[NUM_WATCHERS] = {
-	// translate firstString begin
-	"1st watcher",
-	"2nd watcher",
-	// translate firstString end
+	_t("1st watcher"),
+	_t("2nd watcher"),
 };
 const char* CHANNEL_NAMES[NUM_CHANNELS] = {
-	// translate firstString begin
-	"1st chan",
-	"2nd chan",
-	// translate firstString end
+	_t("1st chan"),
+	_t("2nd chan"),
 };
 
 UINT_PTR timer = 0;
@@ -242,8 +238,7 @@ bool isTrackLevelTypeSupported(const Target& target) {
 const char FXPARM_GAIN_REDUCTION[] = "GainReduction_dB";
 
 const LevelType LEVEL_TYPES[] = {
-	// translate firstString begin
-	{"peak dB",
+	{_t("peak dB"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ true,
 		/* isSmallerSignificant */ false,
@@ -261,7 +256,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ nullptr,
 	},
-	{"integrated LUFS",
+	{_t("integrated LUFS"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -270,7 +265,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"momentary LUFS",
+	{_t("momentary LUFS"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -279,7 +274,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"short term LUFS",
+	{_t("short term LUFS"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -288,7 +283,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"loudness range LU",
+	{_t("loudness range LU"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -297,7 +292,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"integrated RMS",
+	{_t("integrated RMS"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -306,7 +301,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"momentary RMS",
+	{_t("momentary RMS"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -315,7 +310,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"true peak dBTP",
+	{_t("true peak dBTP"),
 		/* isSupported */ isTrackLevelTypeSupported,
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
@@ -324,7 +319,7 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
-	{"gain reduction dB",
+	{_t("gain reduction dB"),
 		/* isSupported */ [](const Target& target) {
 			const TrackFx* tfx = get_if<TrackFx>(&target);
 			if (!tfx) {
@@ -348,7 +343,6 @@ const LevelType LEVEL_TYPES[] = {
 		},
 		/* reset */ nullptr,
 	},
-	// translate firstString end
 };
 constexpr unsigned int NUM_LEVEL_TYPES = sizeof(LEVEL_TYPES) /
 	sizeof(LevelType);
