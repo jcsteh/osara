@@ -92,7 +92,7 @@ def addCppTranslateFirstNStrings(input, maxStrings):
 			data = m.groupdict()
 			addMessage(data)
 
-RE_CPP_TRANSLATE = re.compile(r'\btranslate\(\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
+RE_CPP_TRANSLATE = re.compile(r'\b(?:translate|_t)\(\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|[^)]*),?\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\(\s*(?:"(?P<msgid>.*?)"|[^)]*),?\s*(?:"(?P<plural>.*?)"|[^)]*),?\s*[^)]*\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_FIRST_N_STRINGS_BEGIN = re.compile(r"^\s*// translate first(?P<maxStrings>\d)?Strings? begin$")
