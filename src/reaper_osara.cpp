@@ -2282,6 +2282,43 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 42363}, {_t("samples secondary"), nullptr}}, // View: Secondary time unit for ruler: Samples
 	{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
 	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
+	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
+	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
+	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
+	{{MAIN_SECTION, 24803}, {_t("alt 1"), nullptr}}, // Main action section: Toggle override to alt-1
+	{{MAIN_SECTION, 24804}, {_t("alt 2"), nullptr}}, // Main action section: Toggle override to alt-2
+	{{MAIN_SECTION, 24805}, {_t("alt 3"), nullptr}}, // Main action section: Toggle override to alt-3
+	{{MAIN_SECTION, 24806}, {_t("alt 4"), nullptr}}, // Main action section: Toggle override to alt-4
+	{{MAIN_SECTION, 24807}, {_t("alt 5"), nullptr}}, // Main action section: Toggle override to alt-5
+	{{MAIN_SECTION, 24808}, {_t("alt 6"), nullptr}}, // Main action section: Toggle override to alt-6
+	{{MAIN_SECTION, 24809}, {_t("alt 7"), nullptr}}, // Main action section: Toggle override to alt-7
+	{{MAIN_SECTION, 24810}, {_t("alt 8"), nullptr}}, // Main action section: Toggle override to alt-8
+	{{MAIN_SECTION, 24811}, {_t("alt 9"), nullptr}}, // Main action section: Toggle override to alt-9
+	{{MAIN_SECTION, 24812}, {_t("alt 10"), nullptr}}, // Main action section: Toggle override to alt-10
+	{{MAIN_SECTION, 24813}, {_t("alt 11"), nullptr}}, // Main action section: Toggle override to alt-11
+	{{MAIN_SECTION, 24814}, {_t("alt 12"), nullptr}}, // Main action section: Toggle override to alt-12
+	{{MAIN_SECTION, 24815}, {_t("alt 13"), nullptr}}, // Main action section: Toggle override to alt-13
+	{{MAIN_SECTION, 24816}, {_t("alt 14"), nullptr}}, // Main action section: Toggle override to alt-14
+	{{MAIN_SECTION, 24817}, {_t("alt 15"), nullptr}}, // Main action section: Toggle override to alt-15
+	{{MAIN_SECTION, 24818}, {_t("alt 16"), nullptr}}, // Main action section: Toggle override to alt-16
+	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
+	{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}}, // Main action section: Momentarily set override to recording
+	{{MAIN_SECTION, 24853}, {_t("alt 1 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-1
+	{{MAIN_SECTION, 24854}, {_t("alt 2 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-2
+	{{MAIN_SECTION, 24855}, {_t("alt 3 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-3
+	{{MAIN_SECTION, 24856}, {_t("alt 4 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-4
+	{{MAIN_SECTION, 24857}, {_t("alt 5 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-5
+	{{MAIN_SECTION, 24858}, {_t("alt 6 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-6
+	{{MAIN_SECTION, 24859}, {_t("alt 7 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-7
+	{{MAIN_SECTION, 24860}, {_t("alt 8 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-8
+	{{MAIN_SECTION, 24861}, {_t("alt 9 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-9
+	{{MAIN_SECTION, 24862}, {_t("alt 10 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-10
+	{{MAIN_SECTION, 24863}, {_t("alt 11 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-11
+	{{MAIN_SECTION, 24864}, {_t("alt 12 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-12
+	{{MAIN_SECTION, 24865}, {_t("alt 13 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-13
+	{{MAIN_SECTION, 24866}, {_t("alt 14 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-14
+	{{MAIN_SECTION, 24867}, {_t("alt 15 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-15
+	{{MAIN_SECTION, 24868}, {_t("alt 16 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-16
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}}, // Preview: Toggle repeat on/off

@@ -320,6 +320,44 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Tempo: Increase current project tempo 01 BPM: alt+=
 - SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo": Alt+Backspace
 
+#### Alternative Key Map Layers (requires Reaper 7.0 or newer)
+- Main action section: Set override to default
+- Main action section: Toggle override to recording
+- Main action section: Toggle override to alt-1
+- Main action section: Toggle override to alt-2
+- Main action section: Toggle override to alt-3
+- Main action section: Toggle override to alt-4
+- Main action section: Toggle override to alt-5
+- Main action section: Toggle override to alt-6
+- Main action section: Toggle override to alt-7
+- Main action section: Toggle override to alt-8
+- Main action section: Toggle override to alt-9
+- Main action section: Toggle override to alt-10
+- Main action section: Toggle override to alt-11
+- Main action section: Toggle override to alt-12
+- Main action section: Toggle override to alt-13
+- Main action section: Toggle override to alt-14
+- Main action section: Toggle override to alt-15
+- Main action section: Toggle override to alt-16
+- Main action section: Momentarily set override to default
+- Main action section: Momentarily set override to recording
+- Main action section: Momentarily set override to alt-1
+- Main action section: Momentarily set override to alt-2
+- Main action section: Momentarily set override to alt-3
+- Main action section: Momentarily set override to alt-4
+- Main action section: Momentarily set override to alt-5
+- Main action section: Momentarily set override to alt-6
+- Main action section: Momentarily set override to alt-7
+- Main action section: Momentarily set override to alt-8
+- Main action section: Momentarily set override to alt-19
+- Main action section: Momentarily set override to alt-10
+- Main action section: Momentarily set override to alt-11
+- Main action section: Momentarily set override to alt-12
+- Main action section: Momentarily set override to alt-13
+- Main action section: Momentarily set override to alt-14
+- Main action section: Momentarily set override to alt-15
+- Main action section: Momentarily set override to alt-16
+
 #### MIDI Editor
 - View: Go to start of file: Control+Home
 - View: Go to end of file: Control+End
