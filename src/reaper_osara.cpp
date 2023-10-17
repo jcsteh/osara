@@ -4544,6 +4544,14 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
+	if ((1 <= section->uniqueID && section->uniqueID <= 16) ||
+			section->uniqueID == 100) {
+		// This is a main alt-1 through alt-16 section or the main (alt recording)
+		// section. Map this to the main section. Otherwise, some REAPER functions
+		// won't behave correctly. This also makes things easier for our own code,
+		// since we don't need to special case these alt sections everywhere.
+		section = SectionFromUniqueID(MAIN_SECTION);
+	}
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
 	if (it != commandsMap.end()
 		// Allow shortcut help to be disabled.
