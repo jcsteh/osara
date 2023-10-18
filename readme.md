@@ -982,3 +982,4 @@ The resulting installer can be found in the installer directory.
 - Glen Gordon
 - James Scholes
 - Christian Fillion
+- Jenny K Brennan
