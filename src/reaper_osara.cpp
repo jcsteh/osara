@@ -4544,8 +4544,12 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
-	if ((1 <= section->uniqueID && section->uniqueID <= 16) ||
-			section->uniqueID == 100) {
+	constexpr int MAIN_ALT1_SECTION = 1;
+	constexpr int MAIN_ALT16_SECTION = 16;
+	constexpr int MAIN_ALT_REC_SECTION = 100;
+	if ((MAIN_ALT1_SECTION <= section->uniqueID &&
+				section->uniqueID <= MAIN_ALT16_SECTION) ||
+			section->uniqueID == MAIN_ALT_REC_SECTION) {
 		// This is a main alt-1 through alt-16 section or the main (alt recording)
 		// section. Map this to the main section. Otherwise, some REAPER functions
 		// won't behave correctly. This also makes things easier for our own code,
@@ -4573,7 +4577,13 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		} 
 		return true;
 	}
-	if (isShortcutHelpEnabled) {
+	// Allow "Main action section: Momentarily set override" actions to pass
+	// through shortcut help so that users can learn about shortcuts in those
+	// alternative sections.
+	constexpr int ACTION_MOMENTARY_DEFAULT = 24851;
+	constexpr int ACTION_MOMENTARY_ALT16 = 24868;
+	if (isShortcutHelpEnabled &&
+			(command < ACTION_MOMENTARY_DEFAULT || command > ACTION_MOMENTARY_ALT16)) {
 		outputMessage(getActionName(command, section, false));
 		return true;
 	}
