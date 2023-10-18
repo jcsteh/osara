@@ -74,8 +74,9 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 	return true;
 }
 
+constexpr long WCID_FX_LIST = 1076;
 bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
+	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST &&
 		getFocusedFx();
 }
 
@@ -102,12 +103,31 @@ void shortenFxName(const char* name, ostringstream& s) {
 
 bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetForegroundWindow();
-	if (!getFocusedFx()) {
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (!getFocusedFx(&track, &take, &fx)) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
 	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
 		return false;
+	}
+	// Check whether this is an FX container.
+	char type[10];
+	type[0] = '\0';
+	if (take) {
+		TakeFX_GetNamedConfigParm(take, fx, "fx_type", type, sizeof(type));
+	} else {
+		TrackFX_GetNamedConfigParm(track, fx, "fx_type", type, sizeof(type));
+	}
+	if (strcmp(type, "Container") == 0) {
+		// An FX container is focused. Focus its FX list.
+		window = GetDlgItem(window, WCID_FX_LIST);
+		if (window) {
+			SetFocus(window);
+		}
+		return true;
 	}
 	// Descend. Observed as the first or as the last. 
 	// Can not just search, we do not know the class nor name.

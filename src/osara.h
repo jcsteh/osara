@@ -209,6 +209,7 @@
 #define REAPERAPI_WANT_MIDI_GetGrid
 #define REAPERAPI_WANT_GetParentTrack
 #define REAPERAPI_WANT_LocalizeString
+#define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
