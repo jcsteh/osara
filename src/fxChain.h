@@ -8,12 +8,11 @@
 
 #include <sstream>
 
-bool getFocusedFx(MediaTrack** track = nullptr, MediaItem_Take** take = nullptr,
-	int* fx = nullptr);
+bool getFocusedFx(MediaTrack** track = nullptr, MediaItem_Take** take = nullptr, int* fx = nullptr);
 bool isFxListFocused();
 void shortenFxName(const char* name, std::ostringstream& s);
 bool maybeSwitchToFxPluginWindow();
-bool maybeReportFxChainBypass(bool aboutToToggle=false);
+bool maybeReportFxChainBypass(bool aboutToToggle = false);
 bool maybeReportFxChainBypassDelayed();
 bool maybeOpenFxPresetDialog();
 bool maybeSwitchFxTab(bool previous);

@@ -37,15 +37,14 @@ int getEnvelopePointByProjectTime(double time) {
 		}
 		offset = GetMediaItemInfo_Value(item, "D_POSITION");
 		MediaItem_Take* take = GetActiveTake(item);
-		if(!take) {
+		if (!take) {
 			return -1;
 		}
 		rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
 	}
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
-	return GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
-		(time + 0.0001 - offset) * rate);
+	return GetEnvelopePointByTimeEx(envelope, currentAutomationItem, (time + 0.0001 - offset) * rate);
 }
 
 int getEnvelopePointAtCursor() {
@@ -66,7 +65,7 @@ double envelopeTimeToProjectTime(double time) {
 		}
 		offset = GetMediaItemInfo_Value(item, "D_POSITION");
 		MediaItem_Take* take = GetActiveTake(item);
-		if(!take) {
+		if (!take) {
 			return time + offset;
 		}
 		rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
@@ -127,9 +126,9 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		if (removed > 0 || !checkPoints) {
 			// Translators: Reported when removing automation items. {} will be
 			// replaced with the number of items; e.g. "2 automation items removed".
-			outputMessage(format(
-				translate_plural("{} automation item removed", "{} automation items removed", removed),
-				removed));
+			outputMessage(
+					format(translate_plural("{} automation item removed", "{} automation items removed", removed), removed)
+			);
 			return;
 		}
 	}
@@ -137,9 +136,7 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		removed = oldPoints - countEnvelopePointsIncludingAutoItems(envelope);
 		// Translators: Reported when removing envelope points. {} will be
 		// replaced with the number of points; e.g. "2 points removed".
-		outputMessage(format(
-			translate_plural("{} point removed", "{} points removed", removed),
-			removed));
+		outputMessage(format(translate_plural("{} point removed", "{} points removed", removed), removed));
 	}
 }
 
@@ -157,8 +154,7 @@ void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
 		int pointCount = CountEnvelopePointsEx(envelope, item);
 		for (int point = 0; point < pointCount; ++point) {
 			bool selected;
-			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, nullptr, nullptr,
-				&selected);
+			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, nullptr, nullptr, &selected);
 			if (selected && !func(item, point)) {
 				return;
 			}
@@ -168,14 +164,12 @@ void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
 
 // If max2 is true, this only counts to 2;
 // i.e. 2 or more selected envelope points returns 2.
-int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
+int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2 = false) {
 	int numSel = 0;
-	forEachSelectedEnvelopePoint(envelope,
-		[max2, &numSel](int item, int point) {
-			++numSel;
-			return !(max2 && numSel == 2);
-		}
-	);
+	forEachSelectedEnvelopePoint(envelope, [max2, &numSel](int item, int point) {
+		++numSel;
+		return !(max2 && numSel == 2);
+	});
 	return numSel;
 }
 
@@ -183,23 +177,23 @@ optional<int> currentEnvelopePoint{};
 
 const char* getEnvelopeShapeName(int shape) {
 	static const char* names[] = {
-		// Translators: A shape for an envelope point.
-		translate("linear"),
-		// Translators: A shape for an envelope point.
-		translate("square"),
-		// Translators: A shape for an envelope point.
-		translate("slow start/end"),
-		// Translators: A shape for an envelope point.
-		translate("fast start"),
-		// Translators: A shape for an envelope point.
-		translate("fast end"),
-		// Translators: A shape for an envelope point.
-		translate("bezier"),
+			// Translators: A shape for an envelope point.
+			translate("linear"),
+			// Translators: A shape for an envelope point.
+			translate("square"),
+			// Translators: A shape for an envelope point.
+			translate("slow start/end"),
+			// Translators: A shape for an envelope point.
+			translate("fast start"),
+			// Translators: A shape for an envelope point.
+			translate("fast end"),
+			// Translators: A shape for an envelope point.
+			translate("bezier"),
 	};
 	return names[shape];
 }
 
-void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = true) {
+void moveToEnvelopePoint(int direction, bool clearSelection = true, bool select = true) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
 		return;
@@ -218,23 +212,20 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	double time, value;
 	int shape;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
-		&shape, nullptr, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, &shape, nullptr, &selected);
 	time = envelopeTimeToProjectTime(time);
 	if ((direction == 1 && time < now)
-		// If this point is at the cursor, skip it only if it's the current point.
-		// This allows you to easily get to a point at the cursor
-		// while still allowing you to move beyond it once you do.
-		|| (direction == 1 && point == currentEnvelopePoint && time == now)
-		// Moving backward should skip the point at the cursor.
-		|| (direction == -1 && time >= now)
-	) {
+			// If this point is at the cursor, skip it only if it's the current point.
+			// This allows you to easily get to a point at the cursor
+			// while still allowing you to move beyond it once you do.
+			|| (direction == 1 && point == currentEnvelopePoint && time == now)
+			// Moving backward should skip the point at the cursor.
+			|| (direction == -1 && time >= now)) {
 		// This isn't the point we want. Try the next.
 		int newPoint = point + direction;
 		if (0 <= newPoint && newPoint < count) {
 			point = newPoint;
-			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
-				&shape, nullptr, &selected);
+			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value, &shape, nullptr, &selected);
 			time = envelopeTimeToProjectTime(time);
 		}
 	}
@@ -246,7 +237,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		Main_OnCommand(40331, 0); // Envelope: Unselect all points
 		isSelectionContiguous = true;
 	}
-	if(select)
+	if (select)
 		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
@@ -257,8 +248,10 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	// replaced with the number of the point. {value} will be replaced with its
 	// value. {shape} will be replaced with its shape.
 	// For example: "point 1 value 0.00 dB linear".
-	s << format(translate("point {point} value {value} {shape}"),
-		"point"_a=point, "value"_a=out, "shape"_a=getEnvelopeShapeName(shape));
+	s << format(
+			translate("point {point} value {value} {shape}"), "point"_a = point, "value"_a = out,
+			"shape"_a = getEnvelopeShapeName(shape)
+	);
 	bool isSelected;
 	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
 	if (isSelected) {
@@ -282,7 +275,9 @@ optional<bool> toggleCurrentEnvelopePointSelection() {
 	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
 		return nullopt;
 	isSelected = !isSelected;
-	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	SetEnvelopePointEx(
+			envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue
+	);
 	return {isSelected};
 }
 
@@ -298,6 +293,7 @@ void cmdInsertEnvelopePoint(Command* command) {
 }
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
+
 void cmdhSelectEnvelope(int direction) {
 	MediaTrack* track = NULL;
 	int count;
@@ -311,17 +307,16 @@ void cmdhSelectEnvelope(int direction) {
 		if (!take)
 			return;
 		count = CountTakeEnvelopes(take);
-		getEnvelope = [take] (int index) { return GetTakeEnvelope(take, index); };
+		getEnvelope = [take](int index) { return GetTakeEnvelope(take, index); };
 	} else {
 		track = GetLastTouchedTrack();
 		if (!track)
 			return;
 		count = CountTrackEnvelopes(track);
-		getEnvelope = [track] (int index) { return GetTrackEnvelope(track, index); };
+		getEnvelope = [track](int index) { return GetTrackEnvelope(track, index); };
 	}
 	if (count == 0) {
-		outputMessage(selectedEnvelopeIsTake ?
-			translate("no take envelopes") : translate("no track envelopes"));
+		outputMessage(selectedEnvelopeIsTake ? translate("no take envelopes") : translate("no track envelopes"));
 		return;
 	}
 
@@ -348,7 +343,7 @@ void cmdhSelectEnvelope(int direction) {
 	// Get the next envelope in the requested direction.
 	cmatch m;
 	index = origIndex;
-	for (; ;) {
+	for (;;) {
 		index += direction;
 		if (index < 0 || index >= count) {
 			if (origEnv) {
@@ -443,7 +438,7 @@ void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
 	moveToEnvelopePoint(-1, false, isSelectionContiguous);
 }
 
-void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) {
+void selectAutomationItem(TrackEnvelope* envelope, int index, bool select = true) {
 	GetSetAutomationItemInfo(envelope, index, "D_UISEL", select, true);
 }
 
@@ -460,7 +455,7 @@ bool isAutomationItemSelected(TrackEnvelope* envelope, int index) {
 
 // If max2 is true, this only counts to 2;
 // i.e. 2 or more selected automation items returns 2.
-int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2=false) {
+int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2 = false) {
 	int count = CountAutomationItems(envelope);
 	int sel = 0;
 	for (int i = 0; i < count; ++i) {
@@ -475,7 +470,7 @@ int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2=false) {
 	return sel;
 }
 
-void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true) {
+void moveToAutomationItem(int direction, bool clearSelection = true, bool select = true) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope) {
 		return;
@@ -571,16 +566,12 @@ void reportCopiedEnvelopePointsOrAutoItems() {
 	if ((count = countSelectedAutomationItems(envelope))) {
 		// Translators: Reported when copying automation items. {} will be replaced
 		// with the number of items; e.g. "2 automation items copied".
-		outputMessage(format(
-			translate_plural("{} automation item copied", "{} automation items copied", count),
-			count));
+		outputMessage(format(translate_plural("{} automation item copied", "{} automation items copied", count), count));
 	} else {
 		count = countSelectedEnvelopePoints(envelope);
 		// Translators: Reported when copying envelope points. {} will be replaced
 		// with the number of points; e.g. "2 envelope points copied".
-		outputMessage(format(
-			translate_plural("{} envelope point copied", "{} envelope points copied", count),
-			count));
+		outputMessage(format(translate_plural("{} envelope point copied", "{} envelope points copied", count), count));
 	}
 }
 
@@ -592,9 +583,7 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
-	auto countFunc, auto getFunc
-) {
+set<TrackEnvelope*> getVisibleEnvelopes(auto obj, auto countFunc, auto getFunc) {
 	set<TrackEnvelope*> envelopes;
 	int count = countFunc(obj);
 	for (int i = 0; i < count; ++i) {
@@ -606,9 +595,8 @@ set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
 	return envelopes;
 }
 
-void cmdhToggleEnvelope(int command, auto obj,
-	auto countFunc, auto getFunc,
-	const char* showedMsg, const char* hidMsg
+void cmdhToggleEnvelope(
+		int command, auto obj, auto countFunc, auto getFunc, const char* showedMsg, const char* hidMsg
 ) {
 	set<TrackEnvelope*> before = getVisibleEnvelopes(obj, countFunc, getFunc);
 	Main_OnCommand(command, 0);
@@ -618,8 +606,9 @@ void cmdhToggleEnvelope(int command, auto obj,
 		return;
 	}
 	set<TrackEnvelope*> difference;
-	set_symmetric_difference(before.begin(), before.end(),
-		after.begin(), after.end(), inserter(difference, difference.end()));
+	set_symmetric_difference(
+			before.begin(), before.end(), after.begin(), after.end(), inserter(difference, difference.end())
+	);
 	TrackEnvelope* envelope = *difference.begin();
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
@@ -635,9 +624,10 @@ void cmdhToggleTrackEnvelope(int command) {
 	if (!track) {
 		return;
 	}
-	cmdhToggleEnvelope(command, track, CountTrackEnvelopes, GetTrackEnvelope,
-		translate("showed track {} envelope"),
-		translate("hid track {} envelope"));
+	cmdhToggleEnvelope(
+			command, track, CountTrackEnvelopes, GetTrackEnvelope, translate("showed track {} envelope"),
+			translate("hid track {} envelope")
+	);
 }
 
 void cmdToggleTrackEnvelope(Command* command) {
@@ -653,9 +643,10 @@ void cmdhToggleTakeEnvelope(int command) {
 	if (!take) {
 		return;
 	}
-	cmdhToggleEnvelope(command, take, CountTakeEnvelopes, GetTakeEnvelope,
-		translate("showed take {} envelope"),
-		translate("hid take {} envelope"));
+	cmdhToggleEnvelope(
+			command, take, CountTakeEnvelopes, GetTakeEnvelope, translate("showed take {} envelope"),
+			translate("hid take {} envelope")
+	);
 }
 
 void cmdToggleTakeEnvelope(Command* command) {
@@ -670,28 +661,30 @@ void postSelectMultipleEnvelopePoints(int command) {
 	int count = countSelectedEnvelopePoints(envelope);
 	// Translators: Reported when selecting envelope points. {} will be replaced
 	// with the number of points; e.g. "2 points selected".
-	outputMessage(format(
-		translate_plural("{} point selected", "{} points selected", count),
-		count));
+	outputMessage(format(translate_plural("{} point selected", "{} points selected", count), count));
 }
 
 void cmdMoveSelEnvelopePoints(Command* command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
-	if(!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
+	if (!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
-	double oldPos {0.0};
-	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &oldPos, nullptr, nullptr, nullptr, nullptr);
+	double oldPos{0.0};
+	GetEnvelopePointEx(
+			envelope, currentAutomationItem, *currentEnvelopePoint, &oldPos, nullptr, nullptr, nullptr, nullptr
+	);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	double newPos{0.0};
-	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr);
+	GetEnvelopePointEx(
+			envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr
+	);
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if(lastCommand != command->gaccel.accel.cmd) { 
+	if (lastCommand != command->gaccel.accel.cmd) {
 		s << getActionName(command->gaccel.accel.cmd) << " ";
 	}
-	if(oldPos == newPos) {
+	if (oldPos == newPos) {
 		s << translate("no change");
 	} else {
 		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
@@ -705,26 +698,22 @@ void cmdCycleEnvelopePointShape(Command* command) {
 		return;
 	}
 	int shape = -1;
-	forEachSelectedEnvelopePoint(envelope,
-		[envelope, &shape](int item, int point) {
-			if (shape == -1) {
-				// Get the shape of the first selected point. (The shape variable will
-				// only be -1 for the first point we encounter.)
-				GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
-					nullptr);
-				// Adjust the shape. This will be set for all selected points.
-				++shape;
-				if (shape > 4) {
-					// 4 is fast end. Don't support setting bezier (5) here, as that requires
-					// a tension value.
-					shape = 0; // Linear
-				}
+	forEachSelectedEnvelopePoint(envelope, [envelope, &shape](int item, int point) {
+		if (shape == -1) {
+			// Get the shape of the first selected point. (The shape variable will
+			// only be -1 for the first point we encounter.)
+			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr, nullptr);
+			// Adjust the shape. This will be set for all selected points.
+			++shape;
+			if (shape > 4) {
+				// 4 is fast end. Don't support setting bezier (5) here, as that requires
+				// a tension value.
+				shape = 0; // Linear
 			}
-			SetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
-				nullptr, nullptr);
-			return true;
 		}
-	);
+		SetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr, nullptr, nullptr);
+		return true;
+	});
 	if (shape == -1) {
 		return; // No selected points.
 	}

@@ -16,7 +16,7 @@ namespace settings {
 #define BoolSetting(name, sectionId, displayName, default) extern bool name;
 #include "settings.h"
 #undef BoolSetting
-}
+} // namespace settings
 
 const char CONFIG_SECTION[] = "osara";
 

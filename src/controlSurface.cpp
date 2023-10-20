@@ -36,10 +36,9 @@ const uint8_t TC_ARMED = 1 << 4;
 const uint8_t TC_UNARMED = 1 << 5;
 
 // Make it easier to manipulate these cached states.
-template<uint8_t enableFlag, uint8_t disableFlag>
-class TrackCacheState {
+template<uint8_t enableFlag, uint8_t disableFlag> class TrackCacheState {
 	public:
-	TrackCacheState(uint8_t& value): value(value) {}
+	TrackCacheState(uint8_t& value) : value(value) {}
 
 	// Check if a supplied new state has changed from the cached state.
 	bool hasChanged(bool isEnabled) {
@@ -66,7 +65,7 @@ class TrackCacheState {
 
 /*** A control surface to obtain certain info that can only be retrieved that way.
  */
-class Surface: public IReaperControlSurface {
+class Surface : public IReaperControlSurface {
 	public:
 	virtual const char* GetTypeString() override {
 		return "OSARA";
@@ -146,8 +145,7 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_MUTED, TC_UNMUTED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(mute)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() && cache.hasChanged(mute)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (mute ? translate("muted") : translate("unmuted"));
@@ -166,8 +164,7 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_SOLOED, TC_UNSOLOED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(solo)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() && cache.hasChanged(solo)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (solo ? translate("soloed") : translate("unsoloed"));
@@ -181,8 +178,7 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_ARMED, TC_UNARMED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(arm)) {
+		if (!isParamsDialogOpen && !this->wasCausedByCommand() && cache.hasChanged(arm)) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (arm ? translate("armed") : translate("unarmed"));
@@ -196,11 +192,10 @@ class Surface: public IReaperControlSurface {
 
 	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
 		if (!selected || !settings::reportSurfaceChanges ||
-			// REAPER calls this a *lot*, even if the track was already selected; e.g.
-			// for mute, arm, solo, etc. Ignore this if we were already told about
-			// this track being selected.
-			track == lastSelectedTrack
-		) {
+				// REAPER calls this a *lot*, even if the track was already selected; e.g.
+				// for mute, arm, solo, etc. Ignore this if we were already told about
+				// this track being selected.
+				track == lastSelectedTrack) {
 			return;
 		}
 		// Cache the track even if we're handling a command because that command
@@ -243,8 +238,7 @@ class Surface: public IReaperControlSurface {
 				s << chunk << " ";
 			}
 			this->lastParam = param;
-			TrackFX_FormatParamValueNormalized(track, fx, param, normVal, chunk,
-				sizeof(chunk));
+			TrackFX_FormatParamValueNormalized(track, fx, param, normVal, chunk, sizeof(chunk));
 			if (chunk[0]) {
 				s << chunk;
 			} else {
@@ -267,10 +261,10 @@ class Surface: public IReaperControlSurface {
 	private:
 	bool wasCausedByCommand() {
 		return isHandlingCommand ||
-			// Sometimes, REAPER updates control surfaces after a command rather than
-			// during. If the last command OSARA handled was <= 50 ms ago, we assume
-			// this update was caused by that command.
-			GetTickCount() - lastCommandTime <= 50;
+				// Sometimes, REAPER updates control surfaces after a command rather than
+				// during. If the last command OSARA handled was <= 50 ms ago, we assume
+				// this update was caused by that command.
+				GetTickCount() - lastCommandTime <= 50;
 	}
 
 	// Used for parameters we don't cache such as volume, pan and FX parameters.
@@ -285,14 +279,14 @@ class Surface: public IReaperControlSurface {
 		// Only handle param changes if the last change was 100ms or more ago.
 		return now - prevChangeTime >= 100;
 	}
+
 	DWORD lastParamChangeTime = 0;
 
 	bool reportTrackIfDifferent(MediaTrack* track, ostringstream& output) {
 		bool different = track != this->lastChangedTrack;
 		if (different) {
 			this->lastChangedTrack = track;
-			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
-				nullptr);
+			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
 			if (trackNum <= 0) {
 				output << translate("master");
 			} else {

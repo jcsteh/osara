@@ -74,6 +74,7 @@ bool muteNextMessage = false;
 #ifdef _WIN32
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
+
 wstring widen(const string& text) {
 	try {
 		return utf8Utf16.from_bytes(text);
@@ -87,14 +88,16 @@ wstring widen(const string& text) {
 		return s.str();
 	}
 }
+
 string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
 }
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
+
 void outputMessage(const string& message, bool interrupt) {
-	if(muteNextMessage && isHandlingCommand){
+	if (muteNextMessage && isHandlingCommand) {
 		return;
 	}
 	if (shouldUseUiaNotifications()) {
@@ -114,10 +117,14 @@ void outputMessage(const string& message, bool interrupt) {
 		// Append a space to make it different.
 		string procMessage = message;
 		procMessage += ' ';
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
+		accPropServices->SetHwndPropStr(
+				guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str()
+		);
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
+		accPropServices->SetHwndPropStr(
+				guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str()
+		);
 		lastMessage = message;
 	}
 	// Fire a nameChange event so ATs will report this text.
@@ -128,7 +135,7 @@ void outputMessage(const string& message, bool interrupt) {
 #else // _WIN32
 
 void outputMessage(const string& message, bool interrupt) {
-	if(muteNextMessage && isHandlingCommand){
+	if (muteNextMessage && isHandlingCommand) {
 		return;
 	}
 	NSA11yWrapper::osxa11y_announce(message);
@@ -140,11 +147,11 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
-string formatTime(double time, TimeFormat timeFormat, bool isLength,
-	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset
+string formatTime(
+		double time, TimeFormat timeFormat, bool isLength, FormatTimeCacheRequest cache, bool includeZeros,
+		bool includeProjectStartOffset
 ) {
-	const bool useCache = cache == FT_USE_CACHE ||
-		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
+	const bool useCache = cache == FT_USE_CACHE || (cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
 	ostringstream s;
 	HWND midiEditor = MIDIEditor_GetActive();
 	if (timeFormat == TF_RULER) {
@@ -169,8 +176,8 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			timeFormat = TF_MEASURE;
 		}
 	}
-	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE &&
-			timeFormat != TF_MEASURETICK && timeFormat != TF_SAMPLE) {
+	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK &&
+			timeFormat != TF_SAMPLE) {
 		time += GetProjectTimeOffset(nullptr, false);
 	}
 	switch (timeFormat) {
@@ -180,12 +187,12 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			int measureLength;
 			double beat = TimeMap2_timeToBeats(NULL, time, &measure, &measureLength, NULL, NULL);
 			int wholeBeat = (int)beat;
-			int beatFraction = lround((beat - wholeBeat) * 100)  ;
-			if(beatFraction==100) {
+			int beatFraction = lround((beat - wholeBeat) * 100);
+			if (beatFraction == 100) {
 				beatFraction = 0;
 				++wholeBeat;
 			}
-			if(wholeBeat==measureLength) {
+			if (wholeBeat == measureLength) {
 				wholeBeat = 0;
 				++measure;
 			}
@@ -201,7 +208,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			}
 			if (timeFormat == TF_MEASURETICK) {
 				assert(midiEditor);
-				MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
+				MediaItem_Take* take = MIDIEditor_GetTake(midiEditor);
 				MediaItem* item = GetMediaItemTake_Item(take);
 				beatFraction = beatFraction * getItemPPQ(item) / 100;
 			}
@@ -211,9 +218,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 						// Translators: Used when reporting a length of time in measures.
 						// {} will be replaced with the number of measures; e.g.
 						// "2 bars".
-						s << format(
-							translate_plural("{} bar", "{} bars", measure), measure)
-							<< " ";
+						s << format(translate_plural("{} bar", "{} bars", measure), measure) << " ";
 					}
 				} else {
 					// Translators: Used when reporting the measure of a time position.
@@ -227,9 +232,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 					if (includeZeros || wholeBeat != 0) {
 						// Translators: Used when reporting a length of time in beats.
 						// {} will be replaced with the number of beats; e.g. "2 beats".
-						s << format(
-							translate_plural("{} beat", "{} beats", wholeBeat),
-							wholeBeat) << " ";
+						s << format(translate_plural("{} beat", "{} beats", wholeBeat), wholeBeat) << " ";
 					}
 				} else {
 					// Translators: Used when reporting the beat of a time position.
@@ -245,9 +248,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 					} else {
 						// Translators: used when reporting a time in ticks. {} will be replaced
 						// with the number of ticks; e.g. "2 ticks".
-						s << format(
-							translate_plural("{} tick", "{} ticks", beatFraction),
-							beatFraction);
+						s << format(translate_plural("{} tick", "{} ticks", beatFraction), beatFraction);
 					}
 				}
 				oldbeatFraction = beatFraction;
@@ -280,8 +281,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			if (!useCache || oldFrame != frame) {
 				// Translators: Used when reporting a time in frames. {} will be
 				// replaced with the number of frames; e.g. "2 frames".
-				s << format(
-					translate_plural("{} frame", "{} frames", frame), frame);
+				s << format(translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -293,8 +293,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			if (!useCache || oldHour != hour) {
 				// Translators: used when reporting a time in hours. {} will be replaced
 				// with the number of hours; e.g. "2 hours".
-				s << format(
-					translate_plural("{} hour", "{} hours", hour), hour) << " ";
+				s << format(translate_plural("{} hour", "{} hours", hour), hour) << " ";
 				oldHour = hour;
 			}
 			int minute = (int)(time / 60);
@@ -313,8 +312,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			time = time - second;
 			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
 			if (!useCache || oldFrame != frame) {
-				s << format(
-					translate_plural("{} frame", "{} frames", frame), frame);
+				s << format(translate_plural("{} frame", "{} frames", frame), frame);
 				oldFrame = frame;
 			}
 			break;
@@ -359,38 +357,34 @@ string formatNoteLength(double start, double end) {
 	double endBeats;
 	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
 	TimeMap2_timeToBeats(NULL, end, NULL, NULL, &endBeats, NULL);
-	double lengthBeats = endBeats-startBeats;
-	int bars = int(lengthBeats)/measureLength;
-	int remBeats = int(lengthBeats)%measureLength;
-	int fraction = lround((lengthBeats-int(lengthBeats))*100);
-	if(fraction>99) {
+	double lengthBeats = endBeats - startBeats;
+	int bars = int(lengthBeats) / measureLength;
+	int remBeats = int(lengthBeats) % measureLength;
+	int fraction = lround((lengthBeats - int(lengthBeats)) * 100);
+	if (fraction > 99) {
 		fraction = 0;
 		++remBeats;
 	}
-	if(remBeats==measureLength) {
+	if (remBeats == measureLength) {
 		remBeats = 0;
 		++bars;
 	}
-	const bool useTicks = GetToggleCommandState2(
-		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
+	const bool useTicks = GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
 	if (useTicks) {
-		MediaItem_Take* take = MIDIEditor_GetTake (MIDIEditor_GetActive());
+		MediaItem_Take* take = MIDIEditor_GetTake(MIDIEditor_GetActive());
 		MediaItem* item = GetMediaItemTake_Item(take);
 		fraction = fraction * getItemPPQ(item) / 100;
 	}
 	ostringstream s;
-	if(bars>0) {
-		s << format(
-			translate_plural("{} bar", "{} bars", bars), bars) << " ";
+	if (bars > 0) {
+		s << format(translate_plural("{} bar", "{} bars", bars), bars) << " ";
 	}
-	if(remBeats>0){
-		s << format(
-			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
+	if (remBeats > 0) {
+		s << format(translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
 	}
-	if(fraction>0) {
+	if (fraction > 0) {
 		if (useTicks) {
-			s << format(
-				translate_plural("{} tick", "{} ticks", fraction), fraction);
+			s << format(translate_plural("{} tick", "{} ticks", fraction), fraction);
 		} else {
 			s << fraction << "%";
 		}
@@ -419,10 +413,10 @@ string formatFolderState(MediaTrack* track) {
 		s << translate("end of folder");
 		// find the folder being ended by this track
 		MediaTrack* folderTrack = track;
-		for(int i = state; i<0; ++i) {
-			folderTrack = GetParentTrack(folderTrack); 
+		for (int i = state; i < 0; ++i) {
+			folderTrack = GetParentTrack(folderTrack);
 		}
-		if(!folderTrack) { // shouldn't happen
+		if (!folderTrack) { // shouldn't happen
 			return "";
 		}
 		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
@@ -554,7 +548,7 @@ const char* automationModeAsString(int mode) {
 }
 
 const char* recordingModeAsString(int mode) {
-	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
+	switch (mode) { // fixme: this list is incomplete, but the other modes are currently not used by Osara.
 		case 0:
 			// Translators: A recording mode.
 			return translate("input");
@@ -595,14 +589,12 @@ const char* recordingModeAsString(int mode) {
 }
 
 bool isTrackInClosedFolder(MediaTrack* track) {
-	MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK",
-		nullptr);
+	MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK", nullptr);
 	// Folders can be nested, so we need to check all ancestor tracks, not just
 	// the parent.
 	while (parent) {
-		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
-			&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
-		) {
+		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1 &&
+				*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2) {
 			return true;
 		}
 		parent = (MediaTrack*)GetSetMediaTrackInfo(parent, "P_PARTRACK", nullptr);
@@ -612,11 +604,9 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 
 MediaItem* getItemWithFocus() {
 	// try to provide information based on the last item spoken by osara if it is selected
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& IsMediaItemSelected(currentItem)
-	) 
-	return currentItem;
-	if(CountSelectedMediaItems(0)>0)
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*") && IsMediaItemSelected(currentItem))
+		return currentItem;
+	if (CountSelectedMediaItems(0) > 0)
 		return GetSelectedMediaItem(0, 0);
 	return nullptr;
 }
@@ -629,9 +619,7 @@ bool shouldReportTimeMovement() {
 	return !(GetPlayState() & 1);
 }
 
-INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
-	LPARAM lParam
-) {
+INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDCANCEL) {
@@ -647,9 +635,9 @@ INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 }
 
 void reviewMessage(const char* title, const char* message) {
-	HWND dialog = CreateDialog(pluginHInstance,
-		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), GetForegroundWindow(),
-		reviewMessage_dialogProc);
+	HWND dialog = CreateDialog(
+			pluginHInstance, MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), GetForegroundWindow(), reviewMessage_dialogProc
+	);
 	SetWindowText(dialog, title);
 	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
 	ShowWindow(dialog, SW_SHOWNORMAL);
@@ -658,7 +646,7 @@ void reviewMessage(const char* title, const char* message) {
 unsigned int getConfigUndoMask() {
 	int size{0};
 	unsigned int* undomask = static_cast<unsigned int*>(get_config_var("undomask", &size));
-	if(!undomask || (size!=sizeof(unsigned int)))
+	if (!undomask || (size != sizeof(unsigned int)))
 		return 0;
 	return *undomask;
 }
@@ -667,29 +655,29 @@ struct {
 	const char* displayName;
 	const char* name;
 } TRACK_GROUP_TOGGLES[] = {
-	{_t("volume lead"), "VOLUME_LEAD"},
-	{_t("volume follow"), "VOLUME_FOLLOW"},
-	{_t("VCA lead"), "VOLUME_VCA_LEAD"},
-	{_t("VCA follow"), "VOLUME_VCA_FOLLOW"},
-	{_t("pan lead"), "PAN_LEAD"},
-	{_t("pan follow"), "PAN_FOLLOW"},
-	{_t("width lead"), "WIDTH_LEAD"},
-	{_t("width follow"), "WIDTH_FOLLOW"},
-	{_t("mute lead"), "MUTE_LEAD"},
-	{_t("mute follow"), "MUTE_FOLLOW"},
-	{_t("solo lead"), "SOLO_LEAD"},
-	{_t("solo follow"), "SOLO_FOLLOW"},
-	{_t("record arm lead"), "RECARM_LEAD"},
-	{_t("record arm follow"), "RECARM_FOLLOW"},
-	{_t("polarity lead"), "POLARITY_LEAD"},
-	{_t("polarity follow"), "POLARITY_FOLLOW"},
-	{_t("automation mode lead"), "AUTOMODE_LEAD"},
-	{_t("automation mode follow"), "AUTOMODE_FOLLOW"},
-	{_t("reverse volume"), "VOLUME_REVERSE"},
-	{_t("reverse pan"), "PAN_REVERSE"},
-	{_t("reverse width"), "WIDTH_REVERSE"},
-	{_t("do not lead when following"), "NO_LEAD_WHEN_FOLLOW"},
-	{_t("VCA pre-FX follow"), "VOLUME_VCA_FOLLOW_ISPREFX"},
+		{_t("volume lead"), "VOLUME_LEAD"},
+		{_t("volume follow"), "VOLUME_FOLLOW"},
+		{_t("VCA lead"), "VOLUME_VCA_LEAD"},
+		{_t("VCA follow"), "VOLUME_VCA_FOLLOW"},
+		{_t("pan lead"), "PAN_LEAD"},
+		{_t("pan follow"), "PAN_FOLLOW"},
+		{_t("width lead"), "WIDTH_LEAD"},
+		{_t("width follow"), "WIDTH_FOLLOW"},
+		{_t("mute lead"), "MUTE_LEAD"},
+		{_t("mute follow"), "MUTE_FOLLOW"},
+		{_t("solo lead"), "SOLO_LEAD"},
+		{_t("solo follow"), "SOLO_FOLLOW"},
+		{_t("record arm lead"), "RECARM_LEAD"},
+		{_t("record arm follow"), "RECARM_FOLLOW"},
+		{_t("polarity lead"), "POLARITY_LEAD"},
+		{_t("polarity follow"), "POLARITY_FOLLOW"},
+		{_t("automation mode lead"), "AUTOMODE_LEAD"},
+		{_t("automation mode follow"), "AUTOMODE_FOLLOW"},
+		{_t("reverse volume"), "VOLUME_REVERSE"},
+		{_t("reverse pan"), "PAN_REVERSE"},
+		{_t("reverse width"), "WIDTH_REVERSE"},
+		{_t("do not lead when following"), "NO_LEAD_WHEN_FOLLOW"},
+		{_t("VCA pre-FX follow"), "VOLUME_VCA_FOLLOW_ISPREFX"},
 };
 
 bool isTrackGrouped(MediaTrack* track) {
@@ -707,12 +695,12 @@ bool isTrackGrouped(MediaTrack* track) {
 string formatDouble(double d, int precision, bool plus) {
 	string s = format(plus ? "{:+.{}f}" : "{:.{}f}", d, precision);
 	size_t pos = s.find_last_not_of("0");
-	if(s[pos] == '.') {
+	if (s[pos] == '.') {
 		// also strip the trailing decimal point
 		pos -= 1;
 	}
 	auto stripped = s.substr(0, pos + 1);
-	if(stripped == "+0" || stripped == "-0") {
+	if (stripped == "+0" || stripped == "-0") {
 		return "0";
 	}
 	return stripped;
@@ -758,8 +746,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << translate("unselected");
 	}
 	const bool armed = isTrackArmed(track);
-	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM",
-		nullptr);
+	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM", nullptr);
 	// This will be null in REAPER < 6.30.
 	const bool autoArm = pAutoArm ? *pAutoArm : false;
 	// If auto armed, don't report this before the track name.
@@ -804,7 +791,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// number in lieu of the name.
 			s << trackNum;
 		}
-		if (folderDepth <0){ //end of folder
+		if (folderDepth < 0) { // end of folder
 			separate();
 			s << formatFolderState(track);
 		}
@@ -827,8 +814,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// the track has. {} will be replaced by the number of items; e.g.
 		// "2 items".
 		if (itemCount > 0) {
-			s << " " << format(translate_plural("{} item", "{} items", itemCount),
-				itemCount);
+			s << " " << format(translate_plural("{} item", "{} items", itemCount), itemCount);
 		}
 		if (isFreeItemPositioningEnabled(track)) {
 			s << " " << translate("free item positioning");
@@ -849,8 +835,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 				s << " " << translate("bypassed");
 			}
 			int deltaParam = TrackFX_GetParamFromIdent(track, f, ":delta");
-			if (deltaParam != -1 &&
-					TrackFX_GetParam(track, f, deltaParam, nullptr, nullptr)) {
+			if (deltaParam != -1 && TrackFX_GetParam(track, f, deltaParam, nullptr, nullptr)) {
 				s << " " << translate("delta");
 			}
 		}
@@ -870,27 +855,21 @@ void postToggleTrackMute(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackMuted(track) ?
-		translate("muted") :
-		translate("unmuted"));
+	outputMessage(isTrackMuted(track) ? translate("muted") : translate("unmuted"));
 }
 
 void postToggleTrackSolo(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackSoloed(track) ?
-		translate("soloed") :
-		translate("unsoloed"));
+	outputMessage(isTrackSoloed(track) ? translate("soloed") : translate("unsoloed"));
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackArmed(track) ?
-		translate("armed") :
-		translate("unarmed"));
+	outputMessage(isTrackArmed(track) ? translate("armed") : translate("unarmed"));
 }
 
 void postCycleTrackMonitor(int command) {
@@ -915,15 +894,11 @@ void postInvertTrackPhase(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	outputMessage(isTrackPhaseInverted(track) ?
-		translate("phase inverted") :
-		translate("phase normal"));
+	outputMessage(isTrackPhaseInverted(track) ? translate("phase inverted") : translate("phase normal"));
 }
 
 void postToggleTrackFxBypass(MediaTrack* track) {
-	outputMessage(isTrackFxBypassed(track) ?
-		translate("FX bypassed") :
-		translate("FX active"));
+	outputMessage(isTrackFxBypassed(track) ? translate("FX bypassed") : translate("FX active"));
 }
 
 void postToggleTrackFxBypass(int command) {
@@ -954,15 +929,11 @@ void postToggleAllTracksFxBypass(int command) {
 			break;
 		}
 	}
-	outputMessage(bypassed ?
-		translate("all tracks FX bypassed") :
-		translate("all tracks FX active"));
+	outputMessage(bypassed ? translate("all tracks FX bypassed") : translate("all tracks FX active"));
 }
 
 void postToggleLastFocusedFxDeltaSolo(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled delta solo") :
-		translate("disabled delta solo"));
+	outputMessage(GetToggleCommandState(command) ? translate("enabled delta solo") : translate("disabled delta solo"));
 }
 
 void postCursorMovement(int command) {
@@ -990,14 +961,15 @@ void postItemNormalize(int command) {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items normalized to common gain".
 		outputMessage(format(
-			translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
-			selectedItemsCount));
+				translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
+				selectedItemsCount
+		));
 	} else {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items normalized".
-		outputMessage(format(
-			translate_plural("{} item normalized", "{} items normalized", selectedItemsCount),
-			selectedItemsCount));
+		outputMessage(
+				format(translate_plural("{} item normalized", "{} items normalized", selectedItemsCount), selectedItemsCount)
+		);
 	}
 }
 
@@ -1021,7 +993,7 @@ void postCycleTrackFolderCollapsed(int command) {
 
 int findRegionEndingAt(double wantedEndPos) {
 	double start = wantedEndPos;
-	for (; ;) {
+	for (;;) {
 		if (start == 0) {
 			return -1;
 		}
@@ -1172,12 +1144,12 @@ void postGoToSpecificMarker(int command) {
 				// replaced with the name of the marker; e.g. "v2 marker"
 				s << format(translate("{} marker"), name);
 			}
-		} else{ // unnamed
-			if(reg){
-				// Translators: used to report an unnamed region. {} is replaced with the region number.  
+		} else { // unnamed
+			if (reg) {
+				// Translators: used to report an unnamed region. {} is replaced with the region number.
 				s << format(translate("region {}"), num);
 			} else {
-				// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+				// Translators: used to report an unnamed marker. {} is replaced with the marker number.
 				s << format(translate("marker {}"), num);
 			}
 		}
@@ -1189,7 +1161,7 @@ void postGoToSpecificMarker(int command) {
 
 void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
-	if(lastCommand != command) 
+	if (lastCommand != command)
 		s << commandMessage << " ";
 	s << formatDouble(VAL2DB(volume), 2, true);
 	outputMessage(s);
@@ -1198,7 +1170,7 @@ void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+	if (!GetTrackUIVolPan(track, &volume, NULL))
 		return;
 	postChangeVolumeH(volume, command, translate("Track"));
 }
@@ -1206,14 +1178,14 @@ void postChangeTrackVolume(int command) {
 void postChangeMasterTrackVolume(int command) {
 	MediaTrack* track = GetMasterTrack(0);
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+	if (!GetTrackUIVolPan(track, &volume, NULL))
 		return;
 	postChangeVolumeH(volume, command, translate("Master"));
 }
 
 void postChangeItemVolume(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	double volume = GetMediaItemInfo_Value(item, "D_VOL");
 	postChangeVolumeH(volume, command, translate("Item"));
@@ -1221,14 +1193,14 @@ void postChangeItemVolume(int command) {
 
 void postChangeTakeVolume(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	MediaItem_Take* take = GetActiveTake(item);
 	if (!take) {
 		return;
 	}
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
-	volume = fabs(volume);// volume is negative if take polarity is flipped
+	volume = fabs(volume); // volume is negative if take polarity is flipped
 	postChangeVolumeH(volume, command, translate("Take"));
 }
 
@@ -1240,7 +1212,7 @@ void postChangeHorizontalZoom(int command) {
 }
 
 void formatPan(double pan, ostringstream& output) {
-	pan *=100.0;
+	pan *= 100.0;
 	if (pan == 0) {
 		// Translators: Panned to the center.
 		output << translate("center");
@@ -1259,8 +1231,8 @@ void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	double pan =0.0;
-	if ( !GetTrackUIVolPan(track, NULL, &pan) )
+	double pan = 0.0;
+	if (!GetTrackUIVolPan(track, NULL, &pan))
 		return;
 	ostringstream s;
 	formatPan(pan, s);
@@ -1278,16 +1250,14 @@ void postCycleRippleMode(int command) {
 }
 
 void reportRepeat(bool repeat) {
-	outputMessage(repeat ?
-		translate("repeat on") :
-		translate("repeat off"));
+	outputMessage(repeat ? translate("repeat on") : translate("repeat off"));
 }
 
 void postToggleRepeat(int command) {
 	reportRepeat(GetToggleCommandState(1068)); // Transport: Toggle repeat
 }
 
-void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
+void addTakeFxNames(MediaItem_Take* take, ostringstream& s) {
 	if (!settings::reportFx)
 		return;
 	int count = TakeFX_GetCount(take);
@@ -1319,8 +1289,7 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
-		<< GetTakeName(take);
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " " << GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
 }
@@ -1332,18 +1301,14 @@ void postCopy(int command) {
 			if ((count = CountSelectedTracks(0)) > 0) {
 				// Translators: Reported when copying tracks. {} will be replaced with
 				// the number of tracks; e.g. "2 tracks copied".
-				outputMessage(format(
-					translate_plural("{} track copied", "{} tracks copied", count),
-					count));
+				outputMessage(format(translate_plural("{} track copied", "{} tracks copied", count), count));
 			}
 			return;
 		case 1: // Item
 			if ((count = CountSelectedMediaItems(0)) > 0) {
 				// Translators: Reported when copying items. {} will be replaced with
 				// the number of items; e.g. "2 items copied".
-				outputMessage(format(
-					translate_plural("{} item copied", "{} items copied", count),
-					count));
+				outputMessage(format(translate_plural("{} item copied", "{} items copied", count), count));
 			}
 			return;
 		case 2: // Envelope
@@ -1373,16 +1338,13 @@ void postMoveToTimeSig(int command) {
 		// Translators: Reported when moving to a time signature change. {num} will
 		// be replaced with the time signature numerator. {denom} will be replaced
 		// with the time signature denominator. For example: "time sig 6/8".
-		s << " " << format(translate("time sig {num}/{denom}"),
-			"num"_a=sigNum, "denom"_a=sigDenom);
+		s << " " << format(translate("time sig {num}/{denom}"), "num"_a = sigNum, "denom"_a = sigDenom);
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
 }
 
-int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
-	double playRate
-) {
+int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart, double playRate) {
 	// Stretch marker positions are relative to the start of the item and the
 	// take's play rate.
 	double posRel = (pos - itemStart) * playRate;
@@ -1445,6 +1407,7 @@ void postTrackFxChain(int command) {
 }
 
 void cmdIoMaster(Command* command);
+
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
 		// Make this work for the master track. It doesn't out of the box.
@@ -1453,15 +1416,11 @@ void postTrackIo(int command) {
 }
 
 void postToggleMetronome(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("metronome on") :
-		translate("metronome off"));
+	outputMessage(GetToggleCommandState(command) ? translate("metronome on") : translate("metronome off"));
 }
 
 void postToggleMasterTrackVisible(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("master track visible") :
-		translate("master track hidden"));
+	outputMessage(GetToggleCommandState(command) ? translate("master track visible") : translate("master track hidden"));
 }
 
 void reportTransportState(int state) {
@@ -1486,9 +1445,7 @@ void postSelectMultipleItems(int command) {
 	int count = CountSelectedMediaItems(0);
 	// Translators: Reported when items are selected. {} will be replaced with
 	// the number of items; e.g. "2 items selected".
-	outputMessage(format(
-		translate_plural("{} item selected", "{} items selected", count),
-		count));
+	outputMessage(format(translate_plural("{} item selected", "{} items selected", count), count));
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
@@ -1508,71 +1465,63 @@ bool isItemMuted(MediaItem* item) {
 }
 
 void postToggleItemMute(int command) {
-	int muteCount=0;
-	int unmuteCount=0;
+	int muteCount = 0;
+	int unmuteCount = 0;
 	int count = CountSelectedMediaItems(0);
-	if(count==0)
+	if (count == 0)
 		return;
-	if(count==1)  {
-		outputMessage(isItemMuted(GetSelectedMediaItem(0,0)) ?
-			translate("muted") : translate("unmuted"));
+	if (count == 1) {
+		outputMessage(isItemMuted(GetSelectedMediaItem(0, 0)) ? translate("muted") : translate("unmuted"));
 		return;
 	}
-	for (int i=0; i<count; ++i) {
-		if(isItemMuted(GetSelectedMediaItem(0, i)))
+	for (int i = 0; i < count; ++i) {
+		if (isItemMuted(GetSelectedMediaItem(0, i)))
 			++muteCount;
 		else
 			++unmuteCount;
 	}
 	ostringstream s;
-	if(muteCount>0){
+	if (muteCount > 0) {
 		// Translators: Reported when multiple items are muted. {} will be replaced
 		// with the number of items; e.g. "2 items muted".
-		s << format(translate_plural("{} item muted", "{} items muted", muteCount),
-			muteCount);
+		s << format(translate_plural("{} item muted", "{} items muted", muteCount), muteCount);
 		if (unmuteCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unmuteCount>0)  {
+	if (unmuteCount > 0) {
 		// Translators: Reported when multiple items are unmuted. {} will be
 		// replaced with the number of items; e.g. "2 items unmuted".
-		s << format(
-			translate_plural("{} item unmuted", "{} items unmuted", unmuteCount),
-			unmuteCount);
+		s << format(translate_plural("{} item unmuted", "{} items unmuted", unmuteCount), unmuteCount);
 	}
 	outputMessage(s);
 }
 
 void postToggleItemSolo(int command) {
-	bool soloed=true;
-	int itemCount=CountMediaItems(0);
+	bool soloed = true;
+	int itemCount = CountMediaItems(0);
 	int selectedCount = CountSelectedMediaItems(0);
-	if(selectedCount==0)
+	if (selectedCount == 0)
 		return;
-	for(int i=0; i<itemCount; ++i) {
+	for (int i = 0; i < itemCount; ++i) {
 		MediaItem* item = GetMediaItem(0, i);
-		if((!isItemSelected(item)) && (!isItemMuted(item)))  {
-			soloed=false;
+		if ((!isItemSelected(item)) && (!isItemMuted(item))) {
+			soloed = false;
 			break;
 		}
 	}
-	if(selectedCount==1) {
+	if (selectedCount == 1) {
 		outputMessage(soloed ? translate("soloed") : translate("unsoloed"));
 		return;
 	}
 	if (soloed) {
 		// Translators: Reported when multiple items are soloed. {} will be replaced
 		// with the number of items; e.g. "2 items soloed".
-		outputMessage(format(
-			translate_plural("{} item soloed", "{} items soloed", selectedCount),
-			selectedCount));
+		outputMessage(format(translate_plural("{} item soloed", "{} items soloed", selectedCount), selectedCount));
 	} else {
 		// Translators: Reported when multiple items are unsoloed. {} will be
 		// replaced with the number of items; e.g. "2 items unsoloed".
-		outputMessage(format(
-			translate_plural("{} item unsoloed", "{} items unsoloed", selectedCount),
-			selectedCount));
+		outputMessage(format(translate_plural("{} item unsoloed", "{} items unsoloed", selectedCount), selectedCount));
 	}
 }
 
@@ -1582,25 +1531,23 @@ void postSetSelectionEnd(int command) {
 }
 
 void postToggleMasterMono(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("master mono") : translate("master stereo"));
+	outputMessage(GetToggleCommandState(command) ? translate("master mono") : translate("master stereo"));
 }
 
 void postToggleAutoCrossfade(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("crossfade on") : translate("crossfade off"));
+	outputMessage(GetToggleCommandState(command) ? translate("crossfade on") : translate("crossfade off"));
 }
 
 void postToggleLocking(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("locking on") : translate("locking off"));
+	outputMessage(GetToggleCommandState(command) ? translate("locking on") : translate("locking off"));
 }
 
 void postToggleSoloInFront(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("solo in front") :
-		// Translators: Solo in front was turned off.
-		translate("normal solo"));
+	outputMessage(
+			GetToggleCommandState(command) ? translate("solo in front") :
+																		 // Translators: Solo in front was turned off.
+					translate("normal solo")
+	);
 }
 
 void postAdjustPlayRate(int command) {
@@ -1611,8 +1558,7 @@ void postAdjustPlayRate(int command) {
 }
 
 void postToggleMonitoringFxBypass(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("FX bypassed") : translate("fx active"));
+	outputMessage(GetToggleCommandState(command) ? translate("FX bypassed") : translate("fx active"));
 }
 
 void postCycleRecordMode(int command) {
@@ -1637,35 +1583,37 @@ void postChangeGlobalAutomationOverride(int command) {
 
 void postReverseTake(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
 	// Translators: Reported when reversing takes. {} will be replaced by the
 	// number of takes; e.g. "2 takes reversed".
-	outputMessage(format(
-		translate_plural("{} take reversed", "{} takes reversed", count),
-		count));
+	outputMessage(format(translate_plural("{} take reversed", "{} takes reversed", count), count));
 }
 
 void postTogglePreRoll(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled pre roll before recording") : translate("disabled pre roll before recording"));
+	outputMessage(
+			GetToggleCommandState(command) ? translate("enabled pre roll before recording")
+																		 : translate("disabled pre roll before recording")
+	);
 }
 
 void postToggleCountIn(int command) {
-	outputMessage(GetToggleCommandState(command) ? 
-		translate("enabled count in before recording") : translate("disabled count in before recording"));
+	outputMessage(
+			GetToggleCommandState(command) ? translate("enabled count in before recording")
+																		 : translate("disabled count in before recording")
+	);
 }
 
 void postTakeChannelMode(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
 	const char* mode;
-	switch(command) {
+	switch (command) {
 		case 40176: {
 			// Translators: A take channel mode.
 			mode = translate_ctxt("take channel mode", "normal");
@@ -1696,8 +1644,9 @@ void postTakeChannelMode(int command) {
 	// {mode} will be replaced with the mode being set.
 	// For example: "set 2 takes to mono (left)"
 	outputMessage(format(
-		translate_plural("set {count} take to {mode}", "set {count} takes to {mode}", count),
-		"count"_a=count, "mode"_a=mode));
+			translate_plural("set {count} take to {mode}", "set {count} takes to {mode}", count), "count"_a = count,
+			"mode"_a = mode
+	));
 }
 
 void postChangeTempo(int command) {
@@ -1708,35 +1657,38 @@ void postChangeTempo(int command) {
 }
 
 void postTogglePlaybackPositionFollowsTimebase(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled playback position follows project timebase when changing tempo") :
-		translate("disabled playback position follows project timebase when changing tempo"));
+	outputMessage(
+			GetToggleCommandState(command)
+					? translate("enabled playback position follows project timebase when changing tempo")
+					: translate("disabled playback position follows project timebase when changing tempo")
+	);
 }
 
 void postTogglePreservePitchWhenPlayRateChanged(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("preserving pitch when changing play rate") :
-		translate("not preserving pitch when changing play rate"));
+	outputMessage(
+			GetToggleCommandState(command) ? translate("preserving pitch when changing play rate")
+																		 : translate("not preserving pitch when changing play rate")
+	);
 }
 
 void postSetItemEnd(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	int selCount = CountSelectedMediaItems(0);
-	if(selCount > 1){
+	if (selCount > 1) {
 		// Translators: Reported when setting the ends of multiple items to the end
 		// of their source media. {} will be replaced with the number of items; e.g.
 		// "2 item ends set to source media end"
-		outputMessage(format(translate("{} item ends set to source media end"),
-			selCount));
+		outputMessage(format(translate("{} item ends set to source media end"), selCount));
 	} else {
 		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
 		// Translators: Reported when setting the end of a single item to its source
 		// media end. {} will be replaced with the end time; e.g.
 		// "item end set to source media end: bar 3 beat 1 25%"
-		outputMessage(format(translate("item end set to source media end: {}"),
-			formatTime(endPos, TF_RULER, false, FT_NO_CACHE, true)));
+		outputMessage(format(
+				translate("item end set to source media end: {}"), formatTime(endPos, TF_RULER, false, FT_NO_CACHE, true)
+		));
 	}
 }
 
@@ -1781,8 +1733,7 @@ void postSelectMultipleTracks(int command) {
 	int count = CountSelectedTracks(nullptr);
 	// Translators: Reported when an action selects tracks. {} will be replaced
 	// with the number of tracks; e.g. "2 tracks selected".
-	outputMessage(format(
-		translate_plural("{} track selected", "{} tracks selected", count), count));
+	outputMessage(format(translate_plural("{} track selected", "{} tracks selected", count), count));
 }
 
 void postSelectAll(int command) {
@@ -1813,31 +1764,28 @@ void postToggleTrackSoloDefeat(int command) {
 	if (!defeat) {
 		return;
 	}
-	outputMessage(*defeat ?
-		translate("defeating solo") : translate("not defeating solo"));
+	outputMessage(*defeat ? translate("defeating solo") : translate("not defeating solo"));
 }
 
 void postChangeTransientDetectionSensitivity(int command) {
-	double sensitivity = *(double*)get_config_var("transientsensitivity",
-		nullptr) * 100;
-		// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
-		// E.g. "13% sensitivity"
-	outputMessage(format(
-		translate("{:g}% sensitivity"), sensitivity));
+	double sensitivity = *(double*)get_config_var("transientsensitivity", nullptr) * 100;
+	// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+	// E.g. "13% sensitivity"
+	outputMessage(format(translate("{:g}% sensitivity"), sensitivity));
 }
 
 void postChangeTransientDetectionThreshold(int command) {
-	double threshold = *(double*)get_config_var("transientthreshold",
-		nullptr);
+	double threshold = *(double*)get_config_var("transientthreshold", nullptr);
 	// Translators: Reported when changing the transient detection threshold.
 	// {:g} will be replaced with the threshold; e.g. "{} dB threshold".
 	outputMessage(format(translate("{:g} dB threshold"), threshold));
 }
 
 void postToggleEnvelopePointsMoveWithMediaItems(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled envelope points move with media items") :
-		translate("disabled envelope points move with media items"));
+	outputMessage(
+			GetToggleCommandState(command) ? translate("enabled envelope points move with media items")
+																		 : translate("disabled envelope points move with media items")
+	);
 }
 
 void postToggleFreeItemPositioning(int command) {
@@ -1845,18 +1793,20 @@ void postToggleFreeItemPositioning(int command) {
 	if (!track) {
 		return;
 	}
-	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr) ?
-		translate("enabled free item positioning") :
-		translate("disabled free item positioning"));
+	outputMessage(
+			*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr)
+					? translate("enabled free item positioning")
+					: translate("disabled free item positioning")
+	);
 }
 
 void postChangeItemRate(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
 	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
@@ -1866,11 +1816,11 @@ void postChangeItemRate(int command) {
 
 void postChangeItemPitch(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
 	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
@@ -1880,17 +1830,18 @@ void postChangeItemPitch(int command) {
 
 void postToggleTakePreservePitch(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
 	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(take, "B_PPITCH", nullptr);
-	outputMessage(isPreserving ?
-		translate("enabled preserve pitch when changing item rate"):
-		translate("disabled preserve pitch when changing item rate"));
+	outputMessage(
+			isPreserving ? translate("enabled preserve pitch when changing item rate")
+									 : translate("disabled preserve pitch when changing item rate")
+	);
 }
 
 void postChangeVerticalZoom(int command) {
@@ -1922,18 +1873,19 @@ void postChangeVerticalZoom(int command) {
 
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
-	if(!w) {// support Reaper versions before 6.65
+	if (!w) { // support Reaper versions before 6.65
 		w = GetDlgItem(hwnd, 1047);
 	}
 	const int sz = 10;
 	char text[sz];
-	if(!GetWindowText(w, text ,sz)) {
+	if (!GetWindowText(w, text, sz)) {
 		return;
 	}
 	outputMessage(text);
 }
 
 typedef void (*PostCommandExecute)(int);
+
 typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
@@ -1951,308 +1903,313 @@ typedef struct {
 } PostCustomCommand;
 
 PostCommand POST_COMMANDS[] = {
-	{40001, postGoToTrack}, // Track: Insert new track
-	{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
-	{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
-	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
-	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
-	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
-	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
-	{40282, postInvertTrackPhase}, // Track: Invert track phase
-	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
-	{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
-	{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
-	{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
-	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
-	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
-	{40042, postCursorMovement}, // Transport: Go to start of project
-	{40043, postCursorMovement}, // Transport: Go to end of project
-	{40108, postItemNormalize}, // Item properties: Normalize items
-	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
-	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
-	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
-	{40646, postCursorMovement}, // View: Move cursor left to grid division
-	{40647, postCursorMovement}, // View: Move cursor right to grid division
-	{41040, postCursorMovement}, // Move edit cursor to start of next measure
-	{41041, postCursorMovement}, // Move edit cursor to start of current measure
-	{41042, postCursorMovement}, // Go forward one measure
-	{41043, postCursorMovement}, // Go back one measure
-	{41044, postCursorMovement}, // Go forward one beat
-	{41045, postCursorMovement}, // Go back one beat
-	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
-	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
-	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
-	{40173, postGoToMarker}, // Markers: Go to next marker/project end
-	{40161, postGoToSpecificMarker}, // Markers: Go to marker 01
-	{40162, postGoToSpecificMarker}, // Markers: Go to marker 02
-	{40163, postGoToSpecificMarker}, // Markers: Go to marker 03
-	{40164, postGoToSpecificMarker}, // Markers: Go to marker 04
-	{40165, postGoToSpecificMarker}, // Markers: Go to marker 05
-	{40166, postGoToSpecificMarker}, // Markers: Go to marker 06
-	{40167, postGoToSpecificMarker}, // Markers: Go to marker 07
-	{40168, postGoToSpecificMarker}, // Markers: Go to marker 08
-	{40169, postGoToSpecificMarker}, // Markers: Go to marker 09
-	{40160, postGoToSpecificMarker}, // Markers: Go to marker 10
-	{41761, postGoToSpecificMarker}, // Regions: Go to region 01 after current region finishes playing (smooth seek)
-	{41762, postGoToSpecificMarker}, // Regions: Go to region 02 after current region finishes playing (smooth seek)
-	{41763, postGoToSpecificMarker}, // Regions: Go to region 03 after current region finishes playing (smooth seek)
-	{41764, postGoToSpecificMarker}, // Regions: Go to region 04 after current region finishes playing (smooth seek)
-	{41765, postGoToSpecificMarker}, // Regions: Go to region 05 after current region finishes playing (smooth seek)
-	{41766, postGoToSpecificMarker}, // Regions: Go to region 06 after current region finishes playing (smooth seek)
-	{41767, postGoToSpecificMarker}, // Regions: Go to region 07 after current region finishes playing (smooth seek)
-	{41768, postGoToSpecificMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
-	{41769, postGoToSpecificMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
-	{41760, postGoToSpecificMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
-	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
-	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
-	{40743, postChangeMasterTrackVolume}, // Track: Nudge master track volume up
-	{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
-	{1011, postChangeHorizontalZoom}, // Zoom out horizontal
-	{1012, postChangeHorizontalZoom}, // Zoom in horizontal
-	{41190, postChangeHorizontalZoom}, // View: Set horizontal zoom to default project setting
-	{40283, postChangeTrackPan}, // Track: Nudge track pan left
-	{40284, postChangeTrackPan}, // Track: Nudge track pan right
-	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
-	{1068, postToggleRepeat}, // Transport: Toggle repeat
-	{40125, postSwitchToTake}, // Take: Switch items to next take
-	{40126, postSwitchToTake}, // Take: Switch items to previous take
-	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
-	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
-	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
-	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
-	{41860, postGoToStretch}, // Item: go to next stretch marker
-	{41861, postGoToStretch}, // Item: go to previous stretch marker
-	{40291, postTrackFxChain}, // Track: View FX chain for current track
-	{40293, postTrackIo}, // Track: View I/O for current track
-	{40364, postToggleMetronome}, // Options: Toggle metronome
-	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
-	{40044, postChangeTransportState}, // Transport: Play/stop
-	{40073, postChangeTransportState}, // Transport: Play/pause
-	{40328, postChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
-	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
-	{1013, postChangeTransportState}, // Transport: Record
-	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
-	{40421, postSelectMultipleItems}, // Item: Select all items in track
-	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
-	{40717, postSelectMultipleItems}, // Item: Select all items in current time selection
-	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
-	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
-	{40696, postRenameTrack}, // Track: Rename last touched track
-	{40175, postToggleItemMute}, // Item properties: Toggle mute
-	{41561, postToggleItemSolo}, // Item properties: Toggle solo
-	{40626, postSetSelectionEnd}, // Time selection: Set end point
-	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
-	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
-	{1135, postToggleLocking}, // Options: Toggle locking
-	{40745, postToggleSoloInFront}, // Options: Solo in front
-	{40522, postAdjustPlayRate}, // Transport: Increase playrate by ~6% (one semitone)
-	{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
-	{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
-	{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
-	{40521, postAdjustPlayRate}, // Set playrate to 1.0
-	{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
-	{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
-	{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
-	{40879, postChangeGlobalAutomationOverride}, // Global automation override: All automation in read mode
-	{40880, postChangeGlobalAutomationOverride}, // Global automation override: All automation in touch mode
-	{40878, postChangeGlobalAutomationOverride}, // Global automation override: All automation in trim/read mode
-	{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
-	{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
-	{40876, postChangeGlobalAutomationOverride}, // Global automation override: No override (set automation modes per track)
-	{41051, postReverseTake}, // Item properties: Toggle take reverse
-	{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
-	{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
-	{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
-	{40178, postTakeChannelMode}, //Item properties: Set take channel mode to mono (downmix)
-	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
-	{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
-	{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
-	{41138, postChangeTempo}, // Tempo: Decrease current project tempo 0.1 BPM 
-	{41136, postChangeTempo}, // Tempo: Decrease current project tempo 10 BPM 
-	{41132, postChangeTempo}, // Tempo: Decrease current project tempo 10 percent 
-	{41134, postChangeTempo}, // Tempo: Decrease current project tempo 50 percent (half) 
-	{41137, postChangeTempo}, // Tempo: Increase current project tempo 0.1 BPM 
-	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
-	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
-	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
-	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
-	{41925, postChangeItemVolume}, // Item: Nudge items volume +1dB
-	{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
-	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
-	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
-	{40612, postSetItemEnd}, // Item: Set item end to source media end
-	{40630, postCursorMovement}, // Go to start of time selection
-	{40631, postCursorMovement}, // Go to end of time selection
-	{40632, postCursorMovement}, // Go to start of loop
-	{40633, postCursorMovement}, // Go to end of loop
-	{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
-	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
-	{40296, postSelectMultipleTracks}, // Track: Select all tracks
-	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
-	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
-	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
-	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
-	{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
-	{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
-	{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
-	{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
-	{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
-	{40520, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents)
-	{40800, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch'
-	{40518, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone)
-	{40798, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch'
-	{40519, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents)
-	{40799, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch'
-	{40517, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone)
-	{40797, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch'
-	{42374, postChangeItemRate}, // Item properties: Set item rate from user-supplied source media tempo/bpm...
-	{40652, postChangeItemRate}, // Item properties: Set item rate to 1.0
-	{40207, postChangeItemPitch}, // Item properties: Pitch item down one cent
-	{40206, postChangeItemPitch}, // Item properties: Pitch item up one cent
-	{40205, postChangeItemPitch}, // Item properties: Pitch item down one semitone
-	{40204, postChangeItemPitch}, // Item properties: Pitch item up one semitone
-	{40516, postChangeItemPitch}, // Item properties: Pitch item down one octave
-	{40515, postChangeItemPitch}, // Item properties: Pitch item up one octave
-	{40653, postChangeItemPitch}, // Item properties: Reset item pitch
-	{40566, postToggleTakePreservePitch}, // Item properties: Toggle take preserve pitch
-	{40796, postToggleTakePreservePitch}, //Item properties: Clear take preserve pitch
-	{40795, postToggleTakePreservePitch}, // Item properties: Set take preserve pitch
-	{40110, postChangeVerticalZoom}, // View: Toggle track zoom to minimum height
-	{40111, postChangeVerticalZoom}, // View: Zoom in vertical
-	{40112, postChangeVerticalZoom}, // View: Zoom out vertical
-	{40113, postChangeVerticalZoom}, // View: Toggle track zoom to maximum height
-	{0},
+		{40001, postGoToTrack}, // Track: Insert new track
+		{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
+		{40280, postToggleTrackMute}, // Track: Mute/unmute tracks
+		{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
+		{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
+		{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+		{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
+		{40282, postInvertTrackPhase}, // Track: Invert track phase
+		{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
+		{16, postToggleMasterTrackFxBypass}, // Track: Toggle FX bypass for master track
+		{40344, postToggleAllTracksFxBypass}, // Track: toggle FX bypass on all tracks
+		{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
+		{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
+		{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
+		{40042, postCursorMovement}, // Transport: Go to start of project
+		{40043, postCursorMovement}, // Transport: Go to end of project
+		{40108, postItemNormalize}, // Item properties: Normalize items
+		{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
+		{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
+		{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
+		{40646, postCursorMovement}, // View: Move cursor left to grid division
+		{40647, postCursorMovement}, // View: Move cursor right to grid division
+		{41040, postCursorMovement}, // Move edit cursor to start of next measure
+		{41041, postCursorMovement}, // Move edit cursor to start of current measure
+		{41042, postCursorMovement}, // Go forward one measure
+		{41043, postCursorMovement}, // Go back one measure
+		{41044, postCursorMovement}, // Go forward one beat
+		{41045, postCursorMovement}, // Go back one beat
+		{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
+		{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
+		{40172, postGoToMarker}, // Markers: Go to previous marker/project start
+		{40173, postGoToMarker}, // Markers: Go to next marker/project end
+		{40161, postGoToSpecificMarker}, // Markers: Go to marker 01
+		{40162, postGoToSpecificMarker}, // Markers: Go to marker 02
+		{40163, postGoToSpecificMarker}, // Markers: Go to marker 03
+		{40164, postGoToSpecificMarker}, // Markers: Go to marker 04
+		{40165, postGoToSpecificMarker}, // Markers: Go to marker 05
+		{40166, postGoToSpecificMarker}, // Markers: Go to marker 06
+		{40167, postGoToSpecificMarker}, // Markers: Go to marker 07
+		{40168, postGoToSpecificMarker}, // Markers: Go to marker 08
+		{40169, postGoToSpecificMarker}, // Markers: Go to marker 09
+		{40160, postGoToSpecificMarker}, // Markers: Go to marker 10
+		{41761, postGoToSpecificMarker}, // Regions: Go to region 01 after current region finishes playing (smooth seek)
+		{41762, postGoToSpecificMarker}, // Regions: Go to region 02 after current region finishes playing (smooth seek)
+		{41763, postGoToSpecificMarker}, // Regions: Go to region 03 after current region finishes playing (smooth seek)
+		{41764, postGoToSpecificMarker}, // Regions: Go to region 04 after current region finishes playing (smooth seek)
+		{41765, postGoToSpecificMarker}, // Regions: Go to region 05 after current region finishes playing (smooth seek)
+		{41766, postGoToSpecificMarker}, // Regions: Go to region 06 after current region finishes playing (smooth seek)
+		{41767, postGoToSpecificMarker}, // Regions: Go to region 07 after current region finishes playing (smooth seek)
+		{41768, postGoToSpecificMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
+		{41769, postGoToSpecificMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
+		{41760, postGoToSpecificMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
+		{40115, postChangeTrackVolume}, // Track: Nudge track volume up
+		{40116, postChangeTrackVolume}, // Track: Nudge track volume down
+		{40743, postChangeMasterTrackVolume}, // Track: Nudge master track volume up
+		{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
+		{1011, postChangeHorizontalZoom}, // Zoom out horizontal
+		{1012, postChangeHorizontalZoom}, // Zoom in horizontal
+		{41190, postChangeHorizontalZoom}, // View: Set horizontal zoom to default project setting
+		{40283, postChangeTrackPan}, // Track: Nudge track pan left
+		{40284, postChangeTrackPan}, // Track: Nudge track pan right
+		{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
+		{1068, postToggleRepeat}, // Transport: Toggle repeat
+		{40125, postSwitchToTake}, // Take: Switch items to next take
+		{40126, postSwitchToTake}, // Take: Switch items to previous take
+		{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
+		{41383, postCopy
+		}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
+		{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
+		{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
+		{41860, postGoToStretch}, // Item: go to next stretch marker
+		{41861, postGoToStretch}, // Item: go to previous stretch marker
+		{40291, postTrackFxChain}, // Track: View FX chain for current track
+		{40293, postTrackIo}, // Track: View I/O for current track
+		{40364, postToggleMetronome}, // Options: Toggle metronome
+		{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
+		{40044, postChangeTransportState}, // Transport: Play/stop
+		{40073, postChangeTransportState}, // Transport: Play/pause
+		{40328, postChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
+		{40317, postChangeTransportState}, // Transport: Play (skip time selection)
+		{1013, postChangeTransportState}, // Transport: Record
+		{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
+		{40421, postSelectMultipleItems}, // Item: Select all items in track
+		{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
+		{40717, postSelectMultipleItems}, // Item: Select all items in current time selection
+		{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
+		{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
+		{40696, postRenameTrack}, // Track: Rename last touched track
+		{40175, postToggleItemMute}, // Item properties: Toggle mute
+		{41561, postToggleItemSolo}, // Item properties: Toggle solo
+		{40626, postSetSelectionEnd}, // Time selection: Set end point
+		{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
+		{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
+		{1135, postToggleLocking}, // Options: Toggle locking
+		{40745, postToggleSoloInFront}, // Options: Solo in front
+		{40522, postAdjustPlayRate}, // Transport: Increase playrate by ~6% (one semitone)
+		{40523, postAdjustPlayRate}, // Transport: Decrease playrate by ~6% (one semitone)
+		{40524, postAdjustPlayRate}, // Transport: Increase playrate by ~0.6% (10 cents)
+		{40525, postAdjustPlayRate}, // Transport: Decrease playrate by ~0.6% (10 cents)
+		{40521, postAdjustPlayRate}, // Set playrate to 1.0
+		{41884, postToggleMonitoringFxBypass}, // Monitoring FX: Toggle bypass
+		{40881, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch mode
+		{42022, postChangeGlobalAutomationOverride}, // Global automation override: All automation in latch preview mode
+		{40879, postChangeGlobalAutomationOverride}, // Global automation override: All automation in read mode
+		{40880, postChangeGlobalAutomationOverride}, // Global automation override: All automation in touch mode
+		{40878, postChangeGlobalAutomationOverride}, // Global automation override: All automation in trim/read mode
+		{40882, postChangeGlobalAutomationOverride}, // Global automation override: All automation in write mode
+		{40885, postChangeGlobalAutomationOverride}, // Global automation override: Bypass all automation
+		{40876, postChangeGlobalAutomationOverride
+		}, // Global automation override: No override (set automation modes per track)
+		{41051, postReverseTake}, // Item properties: Toggle take reverse
+		{41819, postTogglePreRoll}, // Pre-roll: Toggle pre-roll on record
+		{40176, postTakeChannelMode}, // Item properties: Set take channel mode to normal
+		{40179, postTakeChannelMode}, // Item properties: Set take channel mode to mono (left)
+		{40178, postTakeChannelMode}, // Item properties: Set take channel mode to mono (downmix)
+		{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
+		{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
+		{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
+		{41138, postChangeTempo}, // Tempo: Decrease current project tempo 0.1 BPM
+		{41136, postChangeTempo}, // Tempo: Decrease current project tempo 10 BPM
+		{41132, postChangeTempo}, // Tempo: Decrease current project tempo 10 percent
+		{41134, postChangeTempo}, // Tempo: Decrease current project tempo 50 percent (half)
+		{41137, postChangeTempo}, // Tempo: Increase current project tempo 0.1 BPM
+		{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM
+		{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent
+		{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
+		{40671, postTogglePreservePitchWhenPlayRateChanged
+		}, // Transport: Toggle preserve pitch in audio items when changing master playrate
+		{41925, postChangeItemVolume}, // Item: Nudge items volume +1dB
+		{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
+		{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
+		{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
+		{40612, postSetItemEnd}, // Item: Set item end to source media end
+		{40630, postCursorMovement}, // Go to start of time selection
+		{40631, postCursorMovement}, // Go to end of time selection
+		{40632, postCursorMovement}, // Go to start of loop
+		{40633, postCursorMovement}, // Go to end of loop
+		{42393, postGoToTakeMarker}, // Item: Set cursor to previous take marker in selected items
+		{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
+		{40296, postSelectMultipleTracks}, // Track: Select all tracks
+		{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
+		{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
+		{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
+		{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
+		{41537, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: decrease
+		{40218, postChangeTransientDetectionThreshold}, // Transient detection threshold: Increase
+		{40219, postChangeTransientDetectionThreshold}, // Transient detection threshold: Decrease
+		{40070, postToggleEnvelopePointsMoveWithMediaItems}, // Options: Envelope points move with media items
+		{40641, postToggleFreeItemPositioning}, // Track properties: Toggle free item positioning
+		{40520, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents)
+		{40800, postChangeItemRate}, // Item properties: Decrease item rate by ~0.6% (10 cents), clear 'preserve pitch'
+		{40518, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone)
+		{40798, postChangeItemRate}, // Item properties: Decrease item rate by ~6% (one semitone), clear 'preserve pitch'
+		{40519, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents)
+		{40799, postChangeItemRate}, // Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch'
+		{40517, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone)
+		{40797, postChangeItemRate}, // Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch'
+		{42374, postChangeItemRate}, // Item properties: Set item rate from user-supplied source media tempo/bpm...
+		{40652, postChangeItemRate}, // Item properties: Set item rate to 1.0
+		{40207, postChangeItemPitch}, // Item properties: Pitch item down one cent
+		{40206, postChangeItemPitch}, // Item properties: Pitch item up one cent
+		{40205, postChangeItemPitch}, // Item properties: Pitch item down one semitone
+		{40204, postChangeItemPitch}, // Item properties: Pitch item up one semitone
+		{40516, postChangeItemPitch}, // Item properties: Pitch item down one octave
+		{40515, postChangeItemPitch}, // Item properties: Pitch item up one octave
+		{40653, postChangeItemPitch}, // Item properties: Reset item pitch
+		{40566, postToggleTakePreservePitch}, // Item properties: Toggle take preserve pitch
+		{40796, postToggleTakePreservePitch}, // Item properties: Clear take preserve pitch
+		{40795, postToggleTakePreservePitch}, // Item properties: Set take preserve pitch
+		{40110, postChangeVerticalZoom}, // View: Toggle track zoom to minimum height
+		{40111, postChangeVerticalZoom}, // View: Zoom in vertical
+		{40112, postChangeVerticalZoom}, // View: Zoom out vertical
+		{40113, postChangeVerticalZoom}, // View: Toggle track zoom to maximum height
+		{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
-	{40006, postMidiSelectEvents, true}, // Edit: Select all events
-	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
-	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
-	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
-	{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
-	{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
-	{40180, postMidiChangePitch, true, true}, // Edit: Move notes down one octave
-	{40181, postMidiMoveStart}, // Edit: Move notes left one pixel
-	{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
-	{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
-	{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
-	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
-	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
-	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
-	{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
-	{40434, postMidiSelectNotes, true}, // Select all notes with the same pitch
-	{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
-	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
-	{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
-	{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
-	{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
-	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
-	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
-	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
-	{40501, postMidiSelectEvents}, // Invert selection
-	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
-	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
-	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
-	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
-	{40877, postMidiSelectNotes, true}, // Edit: Select all notes starting in time selection
-	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
-	{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
-	{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
-	{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
-	{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
-	{1014, postMidiToggleSnap}, // View: Toggle snap to grid
-	{1139, postToggleRepeat}, // Transport: Toggle repeat
-	{1011, postMidiChangeZoom}, // View: Zoom out horizontally
-	{1012, postMidiChangeZoom}, // View: Zoom in horizontally
+		{40006, postMidiSelectEvents, true}, // Edit: Select all events
+		{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
+		{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
+		{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
+		{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
+		{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
+		{40180, postMidiChangePitch, true, true}, // Edit: Move notes down one octave
+		{40181, postMidiMoveStart}, // Edit: Move notes left one pixel
+		{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
+		{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
+		{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
+		{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
+		{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
+		{40234, postMidiSwitchCCLane}, // CC: Next CC lane
+		{40235, postMidiSwitchCCLane}, // CC: Previous CC lane
+		{40434, postMidiSelectNotes, true}, // Select all notes with the same pitch
+		{40444, postMidiChangeLength}, // Edit: Lengthen notes one pixel
+		{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
+		{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
+		{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
+		{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
+		{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
+		{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
+		{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
+		{40501, postMidiSelectEvents}, // Invert selection
+		{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
+		{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
+		{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
+		{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
+		{40877, postMidiSelectNotes, true}, // Edit: Select all notes starting in time selection
+		{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
+		{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
+		{41027, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone ignoring scale/key
+		{40481, postToggleMidiInputsAsStepInput, true}, // Options: MIDI inputs as step input mode
+		{40053, postToggleFunctionKeysAsStepInput, true}, // Options: F1-F12 as step input mode
+		{1014, postMidiToggleSnap}, // View: Toggle snap to grid
+		{1139, postToggleRepeat}, // Transport: Toggle repeat
+		{1011, postMidiChangeZoom}, // View: Zoom out horizontally
+		{1012, postMidiChangeZoom}, // View: Zoom in horizontally
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
-	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
-	{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
-	{"_XENAKIOS_NUDMASVOL1DBU", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB up
-	{"_XENAKIOS_NUDMASVOL1DBD", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB down
-	{"_XENAKIOS_SETMASTVOLTO0", postChangeMasterTrackVolume}, // Xenakios/SWS: Set master volume to 0 dB
-	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
-	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
-	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
-	{"_BR_CYCLE_RECORD_MODES", postCycleRecordMode}, // SWS/BR: Options - Cycle through record modes
-	{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
-	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
-	{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
-	{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
-	{"_XENAKIOS_NUDGETAKEVOLDOWN", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume down
-	{"_XENAKIOS_NUDGETAKEVOLUP", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume up
-	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
-	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
-	{NULL},
+		{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up
+		{"_XENAKIOS_NUDGSELTKVOLDOWN", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks down
+		{"_XENAKIOS_NUDMASVOL1DBU", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB up
+		{"_XENAKIOS_NUDMASVOL1DBD", postChangeMasterTrackVolume}, // Xenakios/SWS: Nudge master volume 1 dB down
+		{"_XENAKIOS_SETMASTVOLTO0", postChangeMasterTrackVolume}, // Xenakios/SWS: Set master volume to 0 dB
+		{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
+		{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
+		{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems
+		}, // Xenakios/SWS: Select items under edit cursor on selected tracks
+		{"_BR_CYCLE_RECORD_MODES", postCycleRecordMode}, // SWS/BR: Options - Cycle through record modes
+		{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
+		{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, // SWS: Select nearest next folder
+		{"_SWS_SELNEARESTPREVFOLDER", postGoToTrack}, // SWS: Select nearest previous folder
+		{"_BR_OPTIONS_PLAYBACK_TEMPO_CHANGE", postTogglePlaybackPositionFollowsTimebase
+		}, // SWS/BR: Options - Toggle "Playback position follows project timebase when changing tempo"
+		{"_XENAKIOS_NUDGETAKEVOLDOWN", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume down
+		{"_XENAKIOS_NUDGETAKEVOLUP", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume up
+		{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
+		{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
+		{NULL},
 };
 
 using MExplorerPostExecute = void (*)(int, HWND);
 map<int, MExplorerPostExecute> mExplorerPostCommands{
-	{42178, postMExplorerChangeVolume }, // Preview: decrease volume by 1 dB
-	{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
+		{42178, postMExplorerChangeVolume}, // Preview: decrease volume by 1 dB
+		{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
 };
 
 map<int, PostCommandExecute> postCommandsMap;
 map<int, string> POST_COMMAND_MESSAGES = {
-	{40625, _t("set selection start")}, // Time selection: Set start point
-	{40222, _t("set loop start")}, // Loop points: Set start point
-	{40223, _t("set loop end")}, // Loop points: Set end point
-	{40781, _t("grid whole")}, // Grid: Set to 1
-	{40780, _t("grid half")}, // Grid: Set to 1/2
-	{40775, _t("grid thirty second")}, // Grid: Set to 1/32
-	{40779, _t("grid quarter")}, // Grid: Set to 1/4
-	{41214, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
-	{40776, _t("grid sixteenth")}, // Grid: Set to 1/16
-	{41213, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
-	{40778, _t("grid eighth")}, // Grid: Set to 1/8
-	{40777, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
-	{41212, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
-	{40774, _t("grid sixty forth")}, // Grid: Set to 1/64
-	{41047, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
-	{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
-	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
-	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
-	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
+		{40625, _t("set selection start")}, // Time selection: Set start point
+		{40222, _t("set loop start")}, // Loop points: Set start point
+		{40223, _t("set loop end")}, // Loop points: Set end point
+		{40781, _t("grid whole")}, // Grid: Set to 1
+		{40780, _t("grid half")}, // Grid: Set to 1/2
+		{40775, _t("grid thirty second")}, // Grid: Set to 1/32
+		{40779, _t("grid quarter")}, // Grid: Set to 1/4
+		{41214, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
+		{40776, _t("grid sixteenth")}, // Grid: Set to 1/16
+		{41213, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
+		{40778, _t("grid eighth")}, // Grid: Set to 1/8
+		{40777, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
+		{41212, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
+		{40774, _t("grid sixty forth")}, // Grid: Set to 1/64
+		{41047, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
+		{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
+		{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
+		{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
+		{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
-	40104, // View: Move cursor left one pixel
-	40105, // View: Move cursor right one pixel
-	41042, // Go forward one measure
-	41043, // Go back one measure
-	41044, // Go forward one beat
-	41045, // Go back one beat
-	41041, // Move edit cursor to start of current measure
-	41040, // Move edit cursor to start of next measure
-	40646, // View: Move cursor left to grid division
-40647, // View: Move cursor right to grid division
+		40104, // View: Move cursor left one pixel
+		40105, // View: Move cursor right one pixel
+		41042, // Go forward one measure
+		41043, // Go back one measure
+		41044, // Go forward one beat
+		41045, // Go back one beat
+		41041, // Move edit cursor to start of current measure
+		41040, // Move edit cursor to start of next measure
+		40646, // View: Move cursor left to grid division
+		40647, // View: Move cursor right to grid division
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
-	{40204, _t("grid whole")}, // Grid: Set to 1
-	{40203, _t("grid half")}, // Grid: Set to 1/2
-	{40190, _t("grid thirty second")}, // Grid: Set to 1/32
-	{40201, _t("grid quarter")}, // Grid: Set to 1/4
-	{40199, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
-	{40192, _t("grid sixteenth")}, // Grid: Set to 1/16
-	{40191, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
-	{40197, _t("grid eighth")}, // Grid: Set to 1/8
-	{40193, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
-	{40189, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
-	{41020, _t("grid sixty forth")}, // Grid: Set to 1/64
-	{41019, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
-	{41081, _t("length whole")}, // Set length for next inserted note: 1
-	{41079, _t("length half")}, // Set length for next inserted note: 1/2
-	{41067, _t("length thirty second")}, // Set length for next inserted note: 1/32
-	{41076, _t("length quarter")}, // Set length for next inserted note: 1/4
-	{41075, _t("length quarter triplet")}, // Set length for next inserted note: 1/4T
-	{41070, _t("length sixteenth")}, // Set length for next inserted note: 1/16
-	{41069, _t("length sixteenth triplet")}, // Set length for next inserted note: 1/16T
-	{41073, _t("length eighth")}, // Set length for next inserted note: 1/8
-	{41072, _t("length eighth triplet")}, // Set length for next inserted note: 1/8T
-	{41066, _t("length thirty second triplet")}, // Set length for next inserted note: 1/32T
-	{41064, _t("length sixty forth")}, // Set length for next inserted note: 1/64
-	{41062, _t("length one hundred twenty eighth")}, // Set length for next inserted note: 1/128
+		{40204, _t("grid whole")}, // Grid: Set to 1
+		{40203, _t("grid half")}, // Grid: Set to 1/2
+		{40190, _t("grid thirty second")}, // Grid: Set to 1/32
+		{40201, _t("grid quarter")}, // Grid: Set to 1/4
+		{40199, _t("grid quarter triplet")}, // Grid: Set to 1/6 (1/4 triplet)
+		{40192, _t("grid sixteenth")}, // Grid: Set to 1/16
+		{40191, _t("grid sixteenth triplet")}, // Grid: Set to 1/24 (1/16 triplet)
+		{40197, _t("grid eighth")}, // Grid: Set to 1/8
+		{40193, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
+		{40189, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
+		{41020, _t("grid sixty forth")}, // Grid: Set to 1/64
+		{41019, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
+		{41081, _t("length whole")}, // Set length for next inserted note: 1
+		{41079, _t("length half")}, // Set length for next inserted note: 1/2
+		{41067, _t("length thirty second")}, // Set length for next inserted note: 1/32
+		{41076, _t("length quarter")}, // Set length for next inserted note: 1/4
+		{41075, _t("length quarter triplet")}, // Set length for next inserted note: 1/4T
+		{41070, _t("length sixteenth")}, // Set length for next inserted note: 1/16
+		{41069, _t("length sixteenth triplet")}, // Set length for next inserted note: 1/16T
+		{41073, _t("length eighth")}, // Set length for next inserted note: 1/8
+		{41072, _t("length eighth triplet")}, // Set length for next inserted note: 1/8T
+		{41066, _t("length thirty second triplet")}, // Set length for next inserted note: 1/32T
+		{41064, _t("length sixty forth")}, // Set length for next inserted note: 1/64
+		{41062, _t("length one hundred twenty eighth")}, // Set length for next inserted note: 1/128
 };
 
 struct ToggleCommandMessage {
@@ -2264,83 +2221,102 @@ struct ToggleCommandMessage {
 // toggle action isn't included here or in another of OSARA's action maps,
 // OSARA will fall back to reporting the toggle state and the action name.
 map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
-	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
-	// Specify nullptr to report nothing for a particular message.
-	// Main section toggles
-	{{MAIN_SECTION, 40346}, {_t("full screen"), _t("normal screen")}}, // Toggle fullscreen
-	{{MAIN_SECTION, 50124}, {_t("showed Media Explorer"), _t("hid Media Explorer")}}, // Media explorer: Show/hide media explorer
-	{{MAIN_SECTION, 41973}, {_t("absolute frames"), nullptr}}, // View: Time unit for ruler: Absolute frames
-	{{MAIN_SECTION, 40370}, {_t("hours:minutes:seconds:frames"), nullptr}}, // View: Time unit for ruler: Hours:Minutes:Seconds:Frames
-	{{MAIN_SECTION, 40367}, {_t("measures.beats"), nullptr}}, // View: Time unit for ruler: Measures.Beats
-	{{MAIN_SECTION, 40365}, {_t("minutes:seconds"), nullptr}}, // View: Time unit for ruler: Minutes:Seconds
-	{{MAIN_SECTION, 40369}, {_t("samples"), nullptr}}, // View: Time unit for ruler: Samples
-	{{MAIN_SECTION, 40368}, {_t("seconds"), nullptr}}, // View: Time unit for ruler: Seconds
-	{{MAIN_SECTION, 42365}, {_t("absolute frames secondary"), nullptr}}, // View: Secondary time unit for ruler: Absolute frames
-	{{MAIN_SECTION, 42364}, {_t("hours:minutes:seconds:frames secondary"), nullptr}}, // View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
-	{{MAIN_SECTION, 42361}, {_t("minutes:seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Minutes:Seconds
-	{{MAIN_SECTION, 42360}, {_t("no secondary time unit"), nullptr}}, // View: Secondary time unit for ruler: None
-	{{MAIN_SECTION, 42363}, {_t("samples secondary"), nullptr}}, // View: Secondary time unit for ruler: Samples
-	{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
-	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
-	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
-	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
-	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
-	{{MAIN_SECTION, 24803}, {_t("alt 1"), nullptr}}, // Main action section: Toggle override to alt-1
-	{{MAIN_SECTION, 24804}, {_t("alt 2"), nullptr}}, // Main action section: Toggle override to alt-2
-	{{MAIN_SECTION, 24805}, {_t("alt 3"), nullptr}}, // Main action section: Toggle override to alt-3
-	{{MAIN_SECTION, 24806}, {_t("alt 4"), nullptr}}, // Main action section: Toggle override to alt-4
-	{{MAIN_SECTION, 24807}, {_t("alt 5"), nullptr}}, // Main action section: Toggle override to alt-5
-	{{MAIN_SECTION, 24808}, {_t("alt 6"), nullptr}}, // Main action section: Toggle override to alt-6
-	{{MAIN_SECTION, 24809}, {_t("alt 7"), nullptr}}, // Main action section: Toggle override to alt-7
-	{{MAIN_SECTION, 24810}, {_t("alt 8"), nullptr}}, // Main action section: Toggle override to alt-8
-	{{MAIN_SECTION, 24811}, {_t("alt 9"), nullptr}}, // Main action section: Toggle override to alt-9
-	{{MAIN_SECTION, 24812}, {_t("alt 10"), nullptr}}, // Main action section: Toggle override to alt-10
-	{{MAIN_SECTION, 24813}, {_t("alt 11"), nullptr}}, // Main action section: Toggle override to alt-11
-	{{MAIN_SECTION, 24814}, {_t("alt 12"), nullptr}}, // Main action section: Toggle override to alt-12
-	{{MAIN_SECTION, 24815}, {_t("alt 13"), nullptr}}, // Main action section: Toggle override to alt-13
-	{{MAIN_SECTION, 24816}, {_t("alt 14"), nullptr}}, // Main action section: Toggle override to alt-14
-	{{MAIN_SECTION, 24817}, {_t("alt 15"), nullptr}}, // Main action section: Toggle override to alt-15
-	{{MAIN_SECTION, 24818}, {_t("alt 16"), nullptr}}, // Main action section: Toggle override to alt-16
-	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
-	{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}}, // Main action section: Momentarily set override to recording
-	{{MAIN_SECTION, 24853}, {_t("alt 1 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-1
-	{{MAIN_SECTION, 24854}, {_t("alt 2 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-2
-	{{MAIN_SECTION, 24855}, {_t("alt 3 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-3
-	{{MAIN_SECTION, 24856}, {_t("alt 4 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-4
-	{{MAIN_SECTION, 24857}, {_t("alt 5 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-5
-	{{MAIN_SECTION, 24858}, {_t("alt 6 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-6
-	{{MAIN_SECTION, 24859}, {_t("alt 7 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-7
-	{{MAIN_SECTION, 24860}, {_t("alt 8 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-8
-	{{MAIN_SECTION, 24861}, {_t("alt 9 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-9
-	{{MAIN_SECTION, 24862}, {_t("alt 10 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-10
-	{{MAIN_SECTION, 24863}, {_t("alt 11 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-11
-	{{MAIN_SECTION, 24864}, {_t("alt 12 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-12
-	{{MAIN_SECTION, 24865}, {_t("alt 13 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-13
-	{{MAIN_SECTION, 24866}, {_t("alt 14 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-14
-	{{MAIN_SECTION, 24867}, {_t("alt 15 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-15
-	{{MAIN_SECTION, 24868}, {_t("alt 16 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-16
-	// Media Explorer toggles
-	{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}}, // Preview: Toggle repeat on/off
-	{{MEDIA_EXPLORER_SECTION, 1012}, {_t("starting on bar"), _t("not starting on bar")}}, // Start on bar: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 40068}, {_t("preserving pitch"), _t("not preserving pitch")}}, // Options: Preserve pitch when tempo-matching or changing play rate
-	{{MEDIA_EXPLORER_SECTION, 42239}, {_t("reset pitch"), nullptr}}, // Preview: reset pitch
-	{{MEDIA_EXPLORER_SECTION, 40023}, {_t("tempo matching"), _t("not tempo  matching")}}, // Tempo match: Toggle on/off
-	{{MEDIA_EXPLORER_SECTION, 40021}, {_t("half time"), _t("normal time")}}, // Tempo match: /2
-	{{MEDIA_EXPLORER_SECTION, 40022}, {_t("double time"), _t("normal time")}}, // Tempo match: x2
-	{{MEDIA_EXPLORER_SECTION, 40008}, {_t("docked Media Explorer"), _t("removed Media Explorer from dock")}}, // Dock Media Explorer in Docker
-	// MIDI Editor toggles
-	{{MIDI_EDITOR_SECTION, 40042}, {_t("Piano roll view"), nullptr}}, // Mode: Piano Roll
-	{{MIDI_EDITOR_SECTION, 40043}, {_t("Named notes view"), nullptr}}, // Mode: Named Notes (Drum Map)
-	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40954}, {_t("Notation view"), nullptr}}, // Mode: Notation
-	{{MIDI_EDITOR_SECTION, 40449}, {_t("Rectangle notes"), nullptr}}, // View: Show events as rectangles (normal mode)
-	{{MIDI_EDITOR_SECTION, 40448}, {_t("Triangle notes"), nullptr}}, // View: Show events as triangles (drum mode)
-	{{MIDI_EDITOR_SECTION, 40450}, {_t("Diamond notes"), nullptr}}, // View: Show events as diamonds (drum mode)
-	{{MIDI_EDITOR_SECTION, 40632}, {_t("Showed velocity numbers on notes"), _t("Hid velocity numbers on notes")}}, // View: Show velocity numbers on notes
-	{{MIDI_EDITOR_SECTION, 40045}, {_t("Showed note names"), _t("Hid note names")}}, // View: Show note names
-	{{MIDI_EDITOR_SECTION, 41295}, {_t("Inserted notes matching grid"), nullptr}}, // Set length for next inserted note: grid
+		// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
+		// Specify nullptr to report nothing for a particular message.
+		// Main section toggles
+		{{MAIN_SECTION, 40346}, {_t("full screen"), _t("normal screen")}}, // Toggle fullscreen
+		{{MAIN_SECTION, 50124}, {_t("showed Media Explorer"), _t("hid Media Explorer")}
+		}, // Media explorer: Show/hide media explorer
+		{{MAIN_SECTION, 41973}, {_t("absolute frames"), nullptr}}, // View: Time unit for ruler: Absolute frames
+		{{MAIN_SECTION, 40370}, {_t("hours:minutes:seconds:frames"), nullptr}
+		}, // View: Time unit for ruler: Hours:Minutes:Seconds:Frames
+		{{MAIN_SECTION, 40367}, {_t("measures.beats"), nullptr}}, // View: Time unit for ruler: Measures.Beats
+		{{MAIN_SECTION, 40365}, {_t("minutes:seconds"), nullptr}}, // View: Time unit for ruler: Minutes:Seconds
+		{{MAIN_SECTION, 40369}, {_t("samples"), nullptr}}, // View: Time unit for ruler: Samples
+		{{MAIN_SECTION, 40368}, {_t("seconds"), nullptr}}, // View: Time unit for ruler: Seconds
+		{{MAIN_SECTION, 42365}, {_t("absolute frames secondary"), nullptr}
+		}, // View: Secondary time unit for ruler: Absolute frames
+		{{MAIN_SECTION, 42364}, {_t("hours:minutes:seconds:frames secondary"), nullptr}
+		}, // View: Secondary time unit for ruler: Hours:Minutes:Seconds:Frames
+		{{MAIN_SECTION, 42361}, {_t("minutes:seconds secondary"), nullptr}
+		}, // View: Secondary time unit for ruler: Minutes:Seconds
+		{{MAIN_SECTION, 42360}, {_t("no secondary time unit"), nullptr}}, // View: Secondary time unit for ruler: None
+		{{MAIN_SECTION, 42363}, {_t("samples secondary"), nullptr}}, // View: Secondary time unit for ruler: Samples
+		{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
+		{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
+		// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
+		{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
+		{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
+		{{MAIN_SECTION, 24803}, {_t("alt 1"), nullptr}}, // Main action section: Toggle override to alt-1
+		{{MAIN_SECTION, 24804}, {_t("alt 2"), nullptr}}, // Main action section: Toggle override to alt-2
+		{{MAIN_SECTION, 24805}, {_t("alt 3"), nullptr}}, // Main action section: Toggle override to alt-3
+		{{MAIN_SECTION, 24806}, {_t("alt 4"), nullptr}}, // Main action section: Toggle override to alt-4
+		{{MAIN_SECTION, 24807}, {_t("alt 5"), nullptr}}, // Main action section: Toggle override to alt-5
+		{{MAIN_SECTION, 24808}, {_t("alt 6"), nullptr}}, // Main action section: Toggle override to alt-6
+		{{MAIN_SECTION, 24809}, {_t("alt 7"), nullptr}}, // Main action section: Toggle override to alt-7
+		{{MAIN_SECTION, 24810}, {_t("alt 8"), nullptr}}, // Main action section: Toggle override to alt-8
+		{{MAIN_SECTION, 24811}, {_t("alt 9"), nullptr}}, // Main action section: Toggle override to alt-9
+		{{MAIN_SECTION, 24812}, {_t("alt 10"), nullptr}}, // Main action section: Toggle override to alt-10
+		{{MAIN_SECTION, 24813}, {_t("alt 11"), nullptr}}, // Main action section: Toggle override to alt-11
+		{{MAIN_SECTION, 24814}, {_t("alt 12"), nullptr}}, // Main action section: Toggle override to alt-12
+		{{MAIN_SECTION, 24815}, {_t("alt 13"), nullptr}}, // Main action section: Toggle override to alt-13
+		{{MAIN_SECTION, 24816}, {_t("alt 14"), nullptr}}, // Main action section: Toggle override to alt-14
+		{{MAIN_SECTION, 24817}, {_t("alt 15"), nullptr}}, // Main action section: Toggle override to alt-15
+		{{MAIN_SECTION, 24818}, {_t("alt 16"), nullptr}}, // Main action section: Toggle override to alt-16
+		{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}
+		}, // Main action section: Momentarily set override to default
+		{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}
+		}, // Main action section: Momentarily set override to recording
+		{{MAIN_SECTION, 24853}, {_t("alt 1 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-1
+		{{MAIN_SECTION, 24854}, {_t("alt 2 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-2
+		{{MAIN_SECTION, 24855}, {_t("alt 3 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-3
+		{{MAIN_SECTION, 24856}, {_t("alt 4 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-4
+		{{MAIN_SECTION, 24857}, {_t("alt 5 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-5
+		{{MAIN_SECTION, 24858}, {_t("alt 6 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-6
+		{{MAIN_SECTION, 24859}, {_t("alt 7 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-7
+		{{MAIN_SECTION, 24860}, {_t("alt 8 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-8
+		{{MAIN_SECTION, 24861}, {_t("alt 9 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-9
+		{{MAIN_SECTION, 24862}, {_t("alt 10 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-10
+		{{MAIN_SECTION, 24863}, {_t("alt 11 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-11
+		{{MAIN_SECTION, 24864}, {_t("alt 12 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-12
+		{{MAIN_SECTION, 24865}, {_t("alt 13 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-13
+		{{MAIN_SECTION, 24866}, {_t("alt 14 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-14
+		{{MAIN_SECTION, 24867}, {_t("alt 15 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-15
+		{{MAIN_SECTION, 24868}, {_t("alt 16 momentary"), nullptr}
+		}, // Main action section: Momentarily set override to alt-16
+		// Media Explorer toggles
+		{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
+		{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}
+		}, // Preview: Toggle repeat on/off
+		{{MEDIA_EXPLORER_SECTION, 1012}, {_t("starting on bar"), _t("not starting on bar")}}, // Start on bar: Toggle on/off
+		{{MEDIA_EXPLORER_SECTION, 40068}, {_t("preserving pitch"), _t("not preserving pitch")}
+		}, // Options: Preserve pitch when tempo-matching or changing play rate
+		{{MEDIA_EXPLORER_SECTION, 42239}, {_t("reset pitch"), nullptr}}, // Preview: reset pitch
+		{{MEDIA_EXPLORER_SECTION, 40023}, {_t("tempo matching"), _t("not tempo  matching")}}, // Tempo match: Toggle on/off
+		{{MEDIA_EXPLORER_SECTION, 40021}, {_t("half time"), _t("normal time")}}, // Tempo match: /2
+		{{MEDIA_EXPLORER_SECTION, 40022}, {_t("double time"), _t("normal time")}}, // Tempo match: x2
+		{{MEDIA_EXPLORER_SECTION, 40008}, {_t("docked Media Explorer"), _t("removed Media Explorer from dock")}
+		}, // Dock Media Explorer in Docker
+		// MIDI Editor toggles
+		{{MIDI_EDITOR_SECTION, 40042}, {_t("Piano roll view"), nullptr}}, // Mode: Piano Roll
+		{{MIDI_EDITOR_SECTION, 40043}, {_t("Named notes view"), nullptr}}, // Mode: Named Notes (Drum Map)
+		{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
+		{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
+		{{MIDI_EDITOR_SECTION, 40954}, {_t("Notation view"), nullptr}}, // Mode: Notation
+		{{MIDI_EDITOR_SECTION, 40449}, {_t("Rectangle notes"), nullptr}}, // View: Show events as rectangles (normal mode)
+		{{MIDI_EDITOR_SECTION, 40448}, {_t("Triangle notes"), nullptr}}, // View: Show events as triangles (drum mode)
+		{{MIDI_EDITOR_SECTION, 40450}, {_t("Diamond notes"), nullptr}}, // View: Show events as diamonds (drum mode)
+		{{MIDI_EDITOR_SECTION, 40632}, {_t("Showed velocity numbers on notes"), _t("Hid velocity numbers on notes")}
+		}, // View: Show velocity numbers on notes
+		{{MIDI_EDITOR_SECTION, 40045}, {_t("Showed note names"), _t("Hid note names")}}, // View: Show note names
+		{{MIDI_EDITOR_SECTION, 41295}, {_t("Inserted notes matching grid"), nullptr}
+		}, // Set length for next inserted note: grid
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
@@ -2374,13 +2350,11 @@ bool showReaperContextMenu(const int menu) {
 			return true;
 		case FOCUS_ENVELOPE: {
 			int point = getEnvelopePointAtCursor();
-			ShowPopupMenu("envelope_point", 0, 0, nullptr, nullptr,
-				point, currentAutomationItem + 1);
+			ShowPopupMenu("envelope_point", 0, 0, nullptr, nullptr, point, currentAutomationItem + 1);
 			return true;
 		}
 		case FOCUS_AUTOMATIONITEM:
-			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr,
-				currentAutomationItem + 1, 0);
+			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr, currentAutomationItem + 1, 0);
 			return true;
 		default:
 			break;
@@ -2473,9 +2447,8 @@ void sendMenu(HWND sendWindow) {
 bool isTrackViewWindow(HWND hwnd) {
 	WCHAR className[22] = L"\0";
 	GetClassNameW(hwnd, className, ARRAYSIZE(className));
-	return wcscmp(className, L"REAPERTrackListWindow") == 0
-		|| wcscmp(className, L"REAPERtrackvu") == 0
-		|| wcscmp(className, L"REAPERTCPDisplay") == 0;
+	return wcscmp(className, L"REAPERTrackListWindow") == 0 || wcscmp(className, L"REAPERtrackvu") == 0 ||
+			wcscmp(className, L"REAPERTCPDisplay") == 0;
 }
 
 bool isListView(HWND hwnd) {
@@ -2483,8 +2456,7 @@ bool isListView(HWND hwnd) {
 }
 
 bool isMidiEditorEventListView(HWND hwnd) {
-	return isListView(hwnd)
-		&& isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
+	return isListView(hwnd) && isClassName(GetAncestor(hwnd, GA_PARENT), "REAPERmidieditorwnd");
 }
 
 void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
@@ -2492,8 +2464,7 @@ void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
 	if (child == -1) {
 		return;
 	}
-	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT,
-		child + 1);
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT, child + 1);
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -2509,8 +2480,7 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
-	if (isClassName(pref, "Button")
-			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
+	if (isClassName(pref, "Button") && (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
 		return nullptr;
 	}
 	// if the control id for the description isn't in this root window, it's not
@@ -2519,9 +2489,8 @@ HWND getPreferenceDescHwnd(HWND pref) {
 }
 
 UINT_PTR annotatePreferenceDescriptionTimer = 0;
-void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
+
+void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(nullptr, annotatePreferenceDescriptionTimer);
 	annotatePreferenceDescriptionTimer = 0;
 	HWND focus = GetFocus();
@@ -2534,10 +2503,10 @@ void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
 		return;
 	}
 	// Set the accDescription on the control.
-	accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF,
-		PROPID_ACC_DESCRIPTION, widen(string(text)).c_str());
-	NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT,
-		CHILDID_SELF);
+	accPropServices->SetHwndPropStr(
+			focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_DESCRIPTION, widen(string(text)).c_str()
+	);
+	NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT, CHILDID_SELF);
 }
 
 bool maybeAnnotatePreferenceDescription() {
@@ -2557,8 +2526,7 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must use a timer.
-	annotatePreferenceDescriptionTimer = SetTimer(nullptr, 0, 300,
-		annotatePreferenceDescription);
+	annotatePreferenceDescriptionTimer = SetTimer(nullptr, 0, 300, annotatePreferenceDescription);
 	return true;
 }
 
@@ -2592,12 +2560,9 @@ bool maybeFixTabInSaveDialog(bool previous) {
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	const bool isKeyDown = !(lParam & 0x80000000);
-	if (!isKeyDown || code != HC_ACTION || (
-		wParam != VK_APPS && wParam != VK_CONTROL &&
-				wParam != VK_F10 && wParam != VK_RETURN &&
-				wParam != VK_F6 && wParam != 'B' &&
-				wParam != VK_TAB && wParam != VK_DOWN &&
-				wParam != VK_UP && wParam != VK_SPACE)) {
+	if (!isKeyDown || code != HC_ACTION ||
+			(wParam != VK_APPS && wParam != VK_CONTROL && wParam != VK_F10 && wParam != VK_RETURN && wParam != VK_F6 &&
+			 wParam != 'B' && wParam != VK_TAB && wParam != VK_DOWN && wParam != VK_UP && wParam != VK_SPACE)) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(nullptr, code, wParam, lParam);
 	}
@@ -2609,9 +2574,9 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	const bool alt = GetKeyState(VK_MENU) & 0x8000;
 	const bool control = GetKeyState(VK_CONTROL) & 0x8000;
 	const bool isContextMenu = wParam == VK_APPS ||
-		// Alt+shift+f10 should not display a context menu, as that would override
-		// a command in the key map. Control+alt+shift+f10 should, though.
-		(wParam == VK_F10 && shift && (!alt || control));
+			// Alt+shift+f10 should not display a context menu, as that would override
+			// a command in the key map. Control+alt+shift+f10 should, though.
+			(wParam == VK_F10 && shift && (!alt || control));
 	if (isContextMenu && isTrackViewWindow(focus)) {
 		// Reaper doesn't handle the applications key for these windows and it
 		// doesn't work even when bound to an action. Shift+f10 does work when bound
@@ -2640,11 +2605,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		sendMenu(window);
 		return 1;
 	}
-	if (
-		(isContextMenu ||
-			(wParam == VK_RETURN && control)) &&
-		isListView(focus)
-	) {
+	if ((isContextMenu || (wParam == VK_RETURN && control)) && isListView(focus)) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
 		if (item != -1) {
@@ -2654,8 +2615,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			if (GetWindowLong(focus, GWL_ID) == 1071) {
 				// In the Project Render Metadata list, we need to click in the centre of
 				// the item.
-				point = {rect.left + (rect.right - rect.left) / 2,
-					rect.top + (rect.bottom - rect.top) / 2};
+				point = {rect.left + (rect.right - rect.left) / 2, rect.top + (rect.bottom - rect.top) / 2};
 			} else {
 				// #478: Clicking in the centre of the Media Explorer list misbehaves for
 				// some users, so use the top left for most lists.
@@ -2705,6 +2665,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	}
 	return CallNextHookEx(nullptr, code, wParam, lParam);
 }
+
 HHOOK keyboardHook = nullptr;
 
 #endif // _WIN32
@@ -2716,9 +2677,9 @@ HHOOK keyboardHook = nullptr;
 int int0 = 0;
 int int1 = 1;
 
-void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
+void moveToTrack(int direction, bool clearSelection = true, bool select = true) {
 	unsigned int undoMask = getConfigUndoMask();
-	bool makeUndoPoint = undoMask&1<<4;
+	bool makeUndoPoint = undoMask & 1 << 4;
 	int count = CountTracks(0);
 	if (count == 0) {
 		// Translators: Reported when there are no tracks to navigate to.
@@ -2811,31 +2772,31 @@ void cmdGoToPrevTrackKeepSel(Command* command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
-void cmdGoToFirstTrack(Command* command){
+void cmdGoToFirstTrack(Command* command) {
 	MediaTrack* track = GetTrack(nullptr, 0);
-	if(!track) {
+	if (!track) {
 		return;
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
 }
 
-void cmdGoToLastTrack(Command* command){
+void cmdGoToLastTrack(Command* command) {
 	int trackNo = CountTracks(nullptr) - 1;
 	if (trackNo < 0) {
 		return;
 	}
 	MediaTrack* track = GetTrack(nullptr, trackNo);
-	if(!track) {
+	if (!track) {
 		return;
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(trackNo);
 }
 
-void moveToItem(int direction, bool clearSelection=true, bool select=true) {
+void moveToItem(int direction, bool clearSelection = true, bool select = true) {
 	unsigned int undoMask = getConfigUndoMask();
-	bool makeUndoPoint = undoMask&1;
+	bool makeUndoPoint = undoMask & 1;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -2843,9 +2804,8 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	int count = CountTrackMediaItems(track);
 	double pos;
 	int start = direction == 1 ? 0 : count - 1;
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track
-	) {
+	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*") &&
+			(MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track) {
 		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", NULL);
 		if (direction == 1 ? pos <= cursor : pos >= cursor) {
 			// The cursor is right at or has moved past the item to which the user last moved.
@@ -2969,8 +2929,7 @@ void cmdSplitItems(Command* command) {
 	int added = CountMediaItems(0) - oldCount;
 	// Translators: Reported when items are added. {} will be replaced with the
 	// number of items; e.g. "2 items added".
-	outputMessage(format(
-		translate_plural("{} item added", "{} items added", added), added));
+	outputMessage(format(translate_plural("{} item added", "{} items added", added), added));
 }
 
 void cmdPaste(Command* command) {
@@ -3009,20 +2968,14 @@ void cmdPaste(Command* command) {
 		outputMessage(s);
 		return;
 	}
-	if (envelope &&
-			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
-			> 0) {
+	if (envelope && (added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints) > 0) {
 		// Translators: Reported when envelope points are added. {} will be replaced
 		// with the number of points; e.g. "2 points added".
-		outputMessage(format(
-			translate_plural("{} point added", "{} points added", added), added));
-	} else if (envelope &&
-			(added = CountAutomationItems(envelope) - oldAutoItems)
-			> 0) {
+		outputMessage(format(translate_plural("{} point added", "{} points added", added), added));
+	} else if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0) {
 		// Translators: Reported when automation items are added. {} will be
 		// replaced with the number of items; e.g. "2 automation items added".
-		outputMessage(format(
-			translate_plural("{} automation item added", "{} automation items added", added), added));
+		outputMessage(format(translate_plural("{} automation item added", "{} automation items added", added), added));
 	} else {
 		outputMessage(translate("nothing pasted"));
 	}
@@ -3034,9 +2987,7 @@ void cmdhRemoveTracks(int command) {
 	int removed = oldCount - CountTracks(0);
 	// Translators: Reported when tracks are removed. {} will be replaced with the
 	// number of tracks; e.g. "2 tracks removed".
-	outputMessage(format(
-		translate_plural("{} track removed", "{} tracks removed", removed),
-		removed));
+	outputMessage(format(translate_plural("{} track removed", "{} tracks removed", removed), removed));
 }
 
 void cmdRemoveTracks(Command* command) {
@@ -3049,28 +3000,25 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	int selItems = CountSelectedMediaItems(nullptr);
 	auto countAffected = [start, end](auto getFunc, int totalCount) {
 		int count = 0;
-		for(int i = 0; i < totalCount; ++i) {
+		for (int i = 0; i < totalCount; ++i) {
 			MediaItem* item = getFunc(nullptr, i);
 			double itemStart = GetMediaItemInfo_Value(item, "D_POSITION");
 			double itemEnd = itemStart + GetMediaItemInfo_Value(item, "D_LENGTH");
-			if((start < itemStart && itemStart < end) ||
-				(start < itemEnd && itemEnd < end) ||
-				(itemStart < start && start < itemEnd) ||
-				(itemStart < end && end < itemEnd) ||
-				(start == itemStart && end == itemEnd)
-			) {
+			if ((start < itemStart && itemStart < end) || (start < itemEnd && itemEnd < end) ||
+					(itemStart < start && start < itemEnd) || (itemStart < end && end < itemEnd) ||
+					(start == itemStart && end == itemEnd)) {
 				++count;
 			}
 		}
 		return count;
 	};
-	if(start == end) {
+	if (start == end) {
 		outputMessage(translate("no time selection"));
 	} else {
 		switch (command->gaccel.accel.cmd) {
 			case 40060: // Item: Copy selected area of items
 			case 40014: { // Item: Copy loop of selected area of audio items
-				if(selItems == 0) {
+				if (selItems == 0) {
 					outputMessage(translate("no items selected"));
 					break;
 				}
@@ -3078,12 +3026,13 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				// Translators: used for  "Item: Copy selected area of items".
 				// {} is replaced by the number of items affected.
 				outputMessage(format(
-					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
+						translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count
+				));
 				break;
 			}
 			default: {
 				int count = 0;
-				if(selItems == 0) { // these commands treat no item selection as if all items are selected
+				if (selItems == 0) { // these commands treat no item selection as if all items are selected
 					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
 				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
@@ -3092,7 +3041,8 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
 				outputMessage(format(
-					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count));
+						translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count
+				));
 			}
 		}
 	}
@@ -3105,9 +3055,7 @@ void cmdhRemoveItems(int command) {
 	int removed = oldCount - CountMediaItems(0);
 	// Translators: Reported when items are removed. {} will be replaced with the
 	// number of items; e.g. "2 items removed".
-	outputMessage(format(
-		translate_plural("{} item removed", "{} items removed", removed),
-		removed));
+	outputMessage(format(translate_plural("{} item removed", "{} items removed", removed), removed));
 }
 
 void cmdRemoveItems(Command* command) {
@@ -3146,22 +3094,22 @@ void cmdMoveItemEdge(Command* command) {
 	}
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if(lastCommand != command->gaccel.accel.cmd) { 
-		s<< getActionName(command->gaccel.accel.cmd) << " ";
+	if (lastCommand != command->gaccel.accel.cmd) {
+		s << getActionName(command->gaccel.accel.cmd) << " ";
 		cache = FT_NO_CACHE;
 	}
-	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
-	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	double oldStart = GetMediaItemInfo_Value(item, "D_POSITION");
+	double oldEnd = oldStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!shouldReportTimeMovement()) {
 		return;
 	}
-	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
-	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
-	if(newStart!=oldStart)
-		s<<formatTime(newStart, TF_RULER, false, cache);
-	else if(newEnd!=oldEnd)
-		s<<formatTime(newEnd, TF_RULER, false, cache);
+	double newStart = GetMediaItemInfo_Value(item, "D_POSITION");
+	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
+	if (newStart != oldStart)
+		s << formatTime(newStart, TF_RULER, false, cache);
+	else if (newEnd != oldEnd)
+		s << formatTime(newEnd, TF_RULER, false, cache);
 	else {
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
@@ -3171,8 +3119,8 @@ void cmdMoveItemEdge(Command* command) {
 }
 
 void cmdMoveItemsOrEnvPoint(Command* command) {
-	if(GetCursorContext2(true) == 2 ) {// Envelope
-	cmdMoveSelEnvelopePoints(command);
+	if (GetCursorContext2(true) == 2) { // Envelope
+		cmdMoveSelEnvelopePoints(command);
 	} else {
 		cmdMoveItemEdge(command);
 	}
@@ -3228,11 +3176,9 @@ void cmdClearTimeLoopSel(Command* command) {
 }
 
 void cmdUnselAllTracksItemsPoints(Command* command) {
-	int old = CountSelectedTracks(0) + CountSelectedMediaItems(0)
-		+ (GetSelectedEnvelope(0) ? 1 : 0);
+	int old = CountSelectedTracks(0) + CountSelectedMediaItems(0) + (GetSelectedEnvelope(0) ? 1 : 0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
-		+ (GetSelectedEnvelope(0) ? 1 : 0);
+	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0) + (GetSelectedEnvelope(0) ? 1 : 0);
 	if (old != cur)
 		outputMessage(translate("unselected tracks/items/envelope points"));
 }
@@ -3289,9 +3235,7 @@ void cmdReportRippleMode(Command* command) {
 	postCycleRippleMode(command->gaccel.accel.cmd);
 }
 
-string formatTrackRange(int start, const char* startName,
-	int end, const char* endName, const char* separator
-) {
+string formatTrackRange(int start, const char* startName, int end, const char* endName, const char* separator) {
 	ostringstream s;
 	s << start;
 	if (startName && startName[0]) {
@@ -3318,13 +3262,12 @@ string formatTrackRange(int start, const char* startName,
 	// Translators: Used when reporting a range of tracks. {start} will be
 	// replaced with the first track. {end} will be replaced with the last track
 	// in the range. For example: "1 drums through 5 piano"
-	return format(translate("{start} through {end}"),
-		"start"_a=startText, "end"_a=endText);
+	return format(translate("{start} through {end}"), "start"_a = startText, "end"_a = endText);
 }
 
-template <typename Func>
-string formatTracksWithState(const char* prefix, Func checkState,
-	bool includeMaster, bool multiLine, bool outputIfNone = true
+template<typename Func>
+string formatTracksWithState(
+		const char* prefix, Func checkState, bool includeMaster, bool multiLine, bool outputIfNone = true
 ) {
 	const char* separator = multiLine ? "\r\n" : ", ";
 	int rangeStart = 0;
@@ -3334,12 +3277,11 @@ string formatTracksWithState(const char* prefix, Func checkState,
 	ostringstream s;
 
 	if (prefix) {
-		s << prefix << ":" <<
-			(multiLine ? separator : " ");
+		s << prefix << ":" << (multiLine ? separator : " ");
 	}
 
 	int count = 0;
-	if(includeMaster) {
+	if (includeMaster) {
 		MediaTrack* master = GetMasterTrack(nullptr);
 		if (checkState(master)) {
 			++count;
@@ -3384,8 +3326,10 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				s << formatTrackRange(inActiveRange ? rangeStart : trackCount,
-					inActiveRange ? startingTrackName : name, trackCount, name, separator);
+				s << formatTrackRange(
+						inActiveRange ? rangeStart : trackCount, inActiveRange ? startingTrackName : name, trackCount, name,
+						separator
+				);
 				break;
 			}
 			if (inActiveRange) {
@@ -3402,8 +3346,7 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				s << formatTrackRange(rangeStart, startingTrackName, i, prevTrackName,
-					separator);
+				s << formatTrackRange(rangeStart, startingTrackName, i, prevTrackName, separator);
 				startingTrackName = nullptr;
 				rangeStart = 0;
 				inActiveRange = false;
@@ -3422,13 +3365,9 @@ string formatTracksWithState(const char* prefix, Func checkState,
 	return s.str();
 }
 
-template <typename Func>
-void reportTracksWithState(const char* prefix, Func checkState,
-	bool includeMaster
-) {
+template<typename Func> void reportTracksWithState(const char* prefix, Func checkState, bool includeMaster) {
 	bool multiLine = lastCommandRepeatCount == 1;
-	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState,
-		includeMaster, multiLine);
+	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState, includeMaster, multiLine);
 	if (multiLine) {
 		reviewMessage(prefix, s.c_str());
 	} else {
@@ -3443,11 +3382,11 @@ void cmdReportMutedTracks(Command* command) {
 void cmdReportSoloedTracks(Command* command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true,
-		multiLine);
-	string defeat = formatTracksWithState(translate("defeating solo"),
-		isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
-		/* outputIfNone */ false);
+	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true, multiLine);
+	string defeat = formatTracksWithState(
+			translate("defeating solo"), isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
+			/* outputIfNone */ false
+	);
 	if (!defeat.empty()) {
 		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
 	}
@@ -3463,17 +3402,20 @@ void cmdReportArmedTracks(Command* command) {
 }
 
 void cmdReportMonitoredTracks(Command* command) {
-	reportTracksWithState(translate("Monitored"), isTrackMonitored,
-		/* includeMaster */ false);
+	reportTracksWithState(
+			translate("Monitored"), isTrackMonitored,
+			/* includeMaster */ false
+	);
 }
 
 void cmdReportPhaseInvertedTracks(Command* command) {
-	reportTracksWithState(translate("Phase inverted"), isTrackPhaseInverted,
-		/* includeMaster */ false);
+	reportTracksWithState(
+			translate("Phase inverted"), isTrackPhaseInverted,
+			/* includeMaster */ false
+	);
 }
 
-template <typename Func>
-string formatItemsWithState(Func stateCheck, bool multiLine) {
+template<typename Func> string formatItemsWithState(Func stateCheck, bool multiLine) {
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
 	int count = 0;
@@ -3510,18 +3452,15 @@ void cmdReportSelection(Command* command) {
 		GetSet_LoopTimeRange(false, false, &start, &end, false);
 		if (start != end) {
 			s <<
-				// Translators: Used when reporting the time selection. {} will be
-				// replaced with the start time; e.g. "start bar 2 beat 1 0%".
-				format(translate("start {}"),
-					formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
-				// Translators: Used when reporting the time selection. {} will be
-				// replaced with the end time; e.g. "end bar 4 beat 1 0%".
-				format(translate("end {}"),
-					formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
-				// Translators: Used when reporting the time selection. {} will be
-				// replaced with the length; e.g. "length 2 bars 0 beats 0%".
-				format(translate("length {}"),
-					formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the start time; e.g. "start bar 2 beat 1 0%".
+					format(translate("start {}"), formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the end time; e.g. "end bar 4 beat 1 0%".
+					format(translate("end {}"), formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
+					// Translators: Used when reporting the time selection. {} will be
+					// replaced with the length; e.g. "length 2 bars 0 beats 0%".
+					format(translate("length {}"), formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
 			resetTimeCache();
 		} else if (multiLine) {
 			s << translate("none");
@@ -3530,21 +3469,23 @@ void cmdReportSelection(Command* command) {
 		}
 	}
 
-	if (fakeFocus ==  FOCUS_TRACK || multiLine) {
+	if (fakeFocus == FOCUS_TRACK || multiLine) {
 		if (multiLine) {
 			if (s.tellp() > 0) {
 				s << separator << separator;
 			}
 			s << translate("Selected tracks:") << separator;
 		}
-		s << formatTracksWithState(nullptr, isTrackSelected,
-			/* includeMaster */ true, multiLine, /* outputIfNone */ multiLine);
+		s << formatTracksWithState(
+				nullptr, isTrackSelected,
+				/* includeMaster */ true, multiLine, /* outputIfNone */ multiLine
+		);
 		if (!multiLine && s.tellp() == 0) {
 			s << translate("no selected tracks");
 		}
 	}
 
-	if (fakeFocus ==  FOCUS_ITEM || multiLine) {
+	if (fakeFocus == FOCUS_ITEM || multiLine) {
 		if (multiLine) {
 			if (s.tellp() > 0) {
 				s << separator << separator;
@@ -3593,9 +3534,7 @@ void cmdhDeleteTakeMarkers(int command) {
 	int removed = oldCount - countTakeMarkersInSelectedTakes();
 	// Translators: Reported when deleting take markers. {} will be replaced with
 	// the number of markers; e.g. "2 take markers deleted".
-	outputMessage(format(
-		translate_plural("take marker deleted", "{} take markers deleted", removed),
-		removed));
+	outputMessage(format(translate_plural("take marker deleted", "{} take markers deleted", removed), removed));
 }
 
 void cmdDeleteTakeMarkers(Command* command) {
@@ -3638,8 +3577,7 @@ void cmdRemoveFocus(Command* command) {
 
 void cmdShortcutHelp(Command* command) {
 	isShortcutHelpEnabled = !isShortcutHelpEnabled;
-	outputMessage(isShortcutHelpEnabled ?
-		translate("shortcut help on") : translate("shortcut help off"));
+	outputMessage(isShortcutHelpEnabled ? translate("shortcut help on") : translate("shortcut help off"));
 }
 
 void cmdReportCursorPosition(Command* command) {
@@ -3701,10 +3639,9 @@ void cmdToggleSelection(Command* command) {
 		case FOCUS_AUTOMATIONITEM:
 			select = toggleCurrentAutomationItemSelection();
 			break;
-		case FOCUS_ENVELOPE:
-		{
+		case FOCUS_ENVELOPE: {
 			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
-			if(!selectOpt)
+			if (!selectOpt)
 				return;
 			select = *selectOpt;
 			break;
@@ -3833,29 +3770,25 @@ void cmdShowContextMenu3(Command* command) {
 void cmdReportAutomationMode(Command* command) {
 	// This reports the global automation override if set, otherwise the current track automation mode.
 	MediaTrack* track = GetLastTouchedTrack();
-	const int globalMode = GetGlobalAutomationOverride() ;
+	const int globalMode = GetGlobalAutomationOverride();
 	if (globalMode >= 0) {
 		// Translators: Used to report global automation override mode.  {} is
 		// replaced with the mode; e.g. "Global automation override latch
 		// preview"
-		outputMessage(format(
-			translate("global automation override {}"),
-			automationModeAsString(globalMode)));
+		outputMessage(format(translate("global automation override {}"), automationModeAsString(globalMode)));
 	} else {
 		// Translators: Used to report track automation override mode.  {} is
 		// replaced with the mode; e.g. "track automation override latch
 		// preview"
-		outputMessage(format(
-			translate("track automation mode {}"),
-			automationModeAsString(GetTrackAutomationMode(track))));
+		outputMessage(format(translate("track automation mode {}"), automationModeAsString(GetTrackAutomationMode(track))));
 	}
 }
 
 void cmdToggleGlobalAutomationLatchPreview(Command* command) {
-	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
+	if (GetGlobalAutomationOverride() == 5) { // in latch preview mode
 		SetGlobalAutomationOverride(-1);
 		outputMessage(translate("global automation override off"));
-	} else { //not in latch preview.
+	} else { // not in latch preview.
 		SetGlobalAutomationOverride(5);
 		outputMessage(translate("global automation override latch preview"));
 	}
@@ -3876,9 +3809,7 @@ void cmdCycleTrackAutomation(Command* command) {
 	}
 	// Translators: Report the track automation mode. {} is replaced with the
 	// automation mode; e.g. "automation mode trim/read for selected tracks"
-	outputMessage(format(
-		translate("{} automation mode for selected tracks"),
-		automationModeAsString(newmode)));
+	outputMessage(format(translate("{} automation mode for selected tracks"), automationModeAsString(newmode)));
 }
 
 void cmdCycleMidiRecordingMode(Command* command) {
@@ -3919,7 +3850,7 @@ void cmdCycleMidiRecordingMode(Command* command) {
 }
 
 void cmdNudgeTimeSelection(Command* command) {
-	bool first= (lastCommand!=command->gaccel.accel.cmd);
+	bool first = (lastCommand != command->gaccel.accel.cmd);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -3929,16 +3860,16 @@ void cmdNudgeTimeSelection(Command* command) {
 	}
 	auto cache = first ? FT_NO_CACHE : FT_USE_CACHE;
 	ostringstream s;
-	if(newStart!=oldStart) {
-		if(first) {
+	if (newStart != oldStart) {
+		if (first) {
 			s << translate("time selection start") << " ";
 		}
-		s<<formatTime(newStart, TF_RULER, false, cache, false);
-	} else if(newEnd!=oldEnd) {
-		if(first) {
+		s << formatTime(newStart, TF_RULER, false, cache, false);
+	} else if (newEnd != oldEnd) {
+		if (first) {
 			s << translate("time selection end") << " ";
 		}
-		s<<formatTime(newEnd, TF_RULER, false, cache, false);
+		s << formatTime(newEnd, TF_RULER, false, cache, false);
 	}
 	outputMessage(s);
 }
@@ -3946,11 +3877,12 @@ void cmdNudgeTimeSelection(Command* command) {
 void cmdAbout(Command* command) {
 	ostringstream s;
 	// Translators: OSARA's full name presented in the About dialog.
-	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
-	// Translators: osara version. {} is replaced with the version; e.g.
-	// "Version: 2021.1pre-588,0531135a"
-		format(translate("Version: {}"), OSARA_VERSION) << "\r\n" <<
-		OSARA_COPYRIGHT;
+	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n"
+		<<
+			// Translators: osara version. {} is replaced with the version; e.g.
+			// "Version: 2021.1pre-588,0531135a"
+			format(translate("Version: {}"), OSARA_VERSION) << "\r\n"
+		<< OSARA_COPYRIGHT;
 	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
@@ -3959,6 +3891,7 @@ void cmdAbout(Command* command) {
 // To work around this, when this dialog is opened, we register an accelerator
 // hook which passes tab, arrow keys, etc. to the dialog.
 accelerator_register_t transDetect_accelReg;
+
 int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	HWND transDialog = (HWND)accelReg->user;
 	if (!IsWindow(transDialog)) {
@@ -4067,7 +4000,7 @@ void cmdInsertRegion(Command* command) {
 
 void cmdChangeItemGroup(Command* command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
@@ -4080,15 +4013,17 @@ void cmdChangeItemGroup(Command* command) {
 		// replaced with the number of items. {group} will be replaced with the
 		// group number. For example: "2 items added to group 1".
 		outputMessage(format(
-			translate_plural("item added to group {group}", "{count} items added to group {group}", selCount),
-			"count"_a=selCount, "group"_a=newGroupId));
+				translate_plural("item added to group {group}", "{count} items added to group {group}", selCount),
+				"count"_a = selCount, "group"_a = newGroupId
+		));
 	} else if (oldGroupId) {
 		// Translators: Reported when removing items from a group. {count} will be
 		// replaced with the number of items. {group} will be replaced with the group
 		// number. For example: "2 items removed from group 1".
 		outputMessage(format(
-			translate_plural("item removed from group {group}", "{count} items removed from group {group}", selCount),
-			"count"_a=selCount, "group"_a=oldGroupId));
+				translate_plural("item removed from group {group}", "{count} items removed from group {group}", selCount),
+				"count"_a = selCount, "group"_a = oldGroupId
+		));
 	}
 }
 
@@ -4138,12 +4073,12 @@ void cmdReportTrackGroups(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMuteNextMessage(Command* command){
+void cmdMuteNextMessage(Command* command) {
 	muteNextMessage = true;
 }
 
 void cmdToggleLoopSegScrub(Command* command) {
-	if(settings::moveFromPlayCursor && (GetPlayState() & 1) ) {
+	if (settings::moveFromPlayCursor && (GetPlayState() & 1)) {
 		SetEditCurPos(GetPlayPosition(), false, false);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -4153,246 +4088,474 @@ void cmdReportRegionMarkerItems(Command* command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
 	auto separate = [&s, multiLine]() {
-		if(s.tellp()) {
+		if (s.tellp()) {
 			s << (multiLine ? "\r\n" : ", ");
 		}
 	};
-	double pos = GetPlayState()? GetPlayPosition():GetCursorPosition();
-	double start,end;
+	double pos = GetPlayState() ? GetPlayPosition() : GetCursorPosition();
+	double start, end;
 	bool isrgn;
 	int number;
 	const char* name{nullptr};
 	int idx = 0;
-	while(EnumProjectMarkers(idx++, &isrgn, &start, &end, &name, &number)>0) {
-		if(!(isrgn && start <= pos && pos <= end)) {
+	while (EnumProjectMarkers(idx++, &isrgn, &start, &end, &name, &number) > 0) {
+		if (!(isrgn && start <= pos && pos <= end)) {
 			continue;
-		} 
+		}
 		separate();
-		if(name[0]) {
-			s << name ;
+		if (name[0]) {
+			s << name;
 		} else {
-			// Translators: used to report an unnamed region. {} is replaced with the region number.  
+			// Translators: used to report an unnamed region. {} is replaced with the region number.
 			s << format(translate("region {}"), number);
 		}
 	}
 	int markerIdx;
 	GetLastMarkerAndCurRegion(nullptr, pos, &markerIdx, nullptr);
-	if(markerIdx >=0) {
+	if (markerIdx >= 0) {
 		EnumProjectMarkers(markerIdx, nullptr, nullptr, nullptr, &name, &number);
 		separate();
 		if (name[0]) {
 			s << name;
 		} else {
-			// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+			// Translators: used to report an unnamed marker. {} is replaced with the marker number.
 			s << format(translate("marker {}"), number);
 		}
 	}
 	separate();
-	s << formatItemsWithState([pos](MediaItem* item) -> bool{
-		MediaTrack* track = GetMediaItem_Track(item);
-		return (isTrackSelected(track) && isPosInItem(pos, item));
-	}, multiLine);
-	if(multiLine) {
-		// Translators: The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
+	s << formatItemsWithState(
+			[pos](MediaItem* item) -> bool {
+				MediaTrack* track = GetMediaItem_Track(item);
+				return (isTrackSelected(track) && isPosInItem(pos, item));
+			},
+			multiLine
+	);
+	if (multiLine) {
+		// Translators: The title of the review message for the action "OSARA: Report regions, last project marker and items
+		// on selected tracks at current position".
 		reviewMessage(translate("At Current Position"), s.str().c_str());
-	} else{
+	} else {
 		outputMessage(s);
 	}
 }
 
-#define DEFACCEL {0, 0, 0}
+#define DEFACCEL \
+	{ 0, 0, 0 }
 
 Command COMMANDS[] = {
-	// Commands we want to intercept.
-	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
-	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
-	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
-	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
-	{MAIN_SECTION, {{0, 0, 40417}, NULL}, NULL, cmdMoveToNextItem}, // Item navigation: Select and move to next item
-	{MAIN_SECTION, {{0, 0, 40416}, NULL}, NULL, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
-	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
-	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
-	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
-	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
-	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
-	{MAIN_SECTION, {{0, 0, 42398}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
-	{MAIN_SECTION, {{0, 0, 40062}, NULL}, NULL, cmdPaste}, // Track: Duplicate tracks
-	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
-	{MAIN_SECTION, {{0, 0, 40337}, NULL}, NULL, cmdRemoveTracks}, // Track: Cut tracks
-	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
-	{MAIN_SECTION, {{0, 0, 40699}, NULL}, NULL, cmdRemoveItems}, // Edit: Cut items
-	{MAIN_SECTION, {{0, 0, 40333}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
-	{MAIN_SECTION, {{0, 0, 40089}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
-	{MAIN_SECTION, {{0, 0, 40336}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
-	{MAIN_SECTION, {{0, 0, 40325}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut points within time selection
-	{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
-	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
-	{MAIN_SECTION, {{0, 0, 40312}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Remove selected area of items
-	{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
-	{MAIN_SECTION, {{0, 0, 40060}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
-	{MAIN_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
-	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
-	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
-	{MAIN_SECTION, {{0, 0, 40793}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
-	{MAIN_SECTION, {{0, 0, 40794}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
-	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
-	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
-	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
-	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
-	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
-	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
-	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
-	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)
-	{MAIN_SECTION, {{0, 0, 40106}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (do not remove nearby points)
-	{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
-	{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
-	{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
-	{MAIN_SECTION, {{0, 0, 41929}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab (ignore default template)
-	{MAIN_SECTION, {{0, 0, 40861}, NULL}, NULL, cmdSwitchProjectTab}, // Next project tab
-	{MAIN_SECTION, {{0, 0, 40862}, NULL}, NULL, cmdSwitchProjectTab}, // Previous project tab
-	{MAIN_SECTION, {{0, 0, 40320}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge left
-	{MAIN_SECTION, {{0, 0, 40321}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge right
-	{MAIN_SECTION, {{0, 0, 40322}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge left
-	{MAIN_SECTION, {{0, 0, 40323}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge right
-	{MAIN_SECTION, {{0, 0, 40039}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left
-	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
-	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
-	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
-	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
-	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
-	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
-	{MAIN_SECTION, {{0, 0, 40406}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
-	{MAIN_SECTION, {{0, 0, 40407}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
-	{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
-	{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
-	{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
-	{MAIN_SECTION, {{0, 0, 40693}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
-	{MAIN_SECTION, {{0, 0, 40694}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
-	{MAIN_SECTION, {{0, 0, 41612}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
-	{MAIN_SECTION, {{0, 0, 40695}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
-	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
-	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
-	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
-	{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
-	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
-	{MAIN_SECTION, {{0, 0, 40032}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Group items
-	{MAIN_SECTION, {{0, 0, 40033}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Remove items from group
-	{MAIN_SECTION, {{0, 0, 41187}, NULL}, NULL, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40440}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to start of selected events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40639}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to end of selected events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
-	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
-	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0, 1000}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor (no advance edit cursor)
-	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, NULL}, NULL, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
+		// Commands we want to intercept.
+		{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
+		{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
+		{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel
+		}, // Track: Go to next track (leaving other tracks selected)
+		{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel
+		}, // Track: Go to previous track (leaving other tracks selected)
+		{MAIN_SECTION, {{0, 0, 40417}, NULL}, NULL, cmdMoveToNextItem}, // Item navigation: Select and move to next item
+		{MAIN_SECTION, {{0, 0, 40416}, NULL}, NULL, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
+		{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
+		{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
+		{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
+		{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
+		{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste
+		}, // Item: Paste items/tracks (old-style handling of hidden tracks)
+		{MAIN_SECTION, {{0, 0, 42398}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
+		{MAIN_SECTION, {{0, 0, 40062}, NULL}, NULL, cmdPaste}, // Track: Duplicate tracks
+		{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
+		{MAIN_SECTION, {{0, 0, 40337}, NULL}, NULL, cmdRemoveTracks}, // Track: Cut tracks
+		{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
+		{MAIN_SECTION, {{0, 0, 40699}, NULL}, NULL, cmdRemoveItems}, // Edit: Cut items
+		{MAIN_SECTION, {{0, 0, 40333}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
+		{MAIN_SECTION, {{0, 0, 40089}, NULL}, NULL, cmdDeleteEnvelopePoints
+		}, // Envelope: Delete all points in time selection
+		{MAIN_SECTION, {{0, 0, 40336}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
+		{MAIN_SECTION, {{0, 0, 40325}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut points within time selection
+		{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut
+		}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
+		{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection
+		}, // Time selection: Remove contents of time selection (moving later items)
+		{MAIN_SECTION, {{0, 0, 40312}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Remove selected area of items
+		{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
+		{MAIN_SECTION, {{0, 0, 40060}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
+		{MAIN_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems
+		}, // Item: Copy loop of selected area of audio items
+		{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
+		{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
+		{MAIN_SECTION, {{0, 0, 40793}, NULL}, NULL, cmdMoveItemsOrEnvPoint
+		}, // Item edit: Move items/envelope points left by grid size
+		{MAIN_SECTION, {{0, 0, 40794}, NULL}, NULL, cmdMoveItemsOrEnvPoint
+		}, // Item edit: Move items/envelope points right by grid size
+		{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
+		{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
+		{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
+		{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
+		{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
+		{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
+		{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
+		{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
+		{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel
+		}, // Time selection: Remove time selection and loop point selection
+		{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints
+		}, // Unselect all tracks/items/envelope points
+		{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint
+		}, // Envelope: Insert new point at current position (remove nearby points)
+		{MAIN_SECTION, {{0, 0, 40106}, NULL}, NULL, cmdInsertEnvelopePoint
+		}, // Envelope: Insert new point at current position (do not remove nearby points)
+		{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
+		{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
+		{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
+		{MAIN_SECTION, {{0, 0, 41929}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab (ignore default template)
+		{MAIN_SECTION, {{0, 0, 40861}, NULL}, NULL, cmdSwitchProjectTab}, // Next project tab
+		{MAIN_SECTION, {{0, 0, 40862}, NULL}, NULL, cmdSwitchProjectTab}, // Previous project tab
+		{MAIN_SECTION, {{0, 0, 40320}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge left
+		{MAIN_SECTION, {{0, 0, 40321}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge right
+		{MAIN_SECTION, {{0, 0, 40322}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge left
+		{MAIN_SECTION, {{0, 0, 40323}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge right
+		{MAIN_SECTION, {{0, 0, 40039}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left
+		{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
+		{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection
+		}, // Time selection: Shift left (by time selection length)
+		{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection
+		}, // Time selection: Shift right (by time selection length)
+		{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection
+		}, // Time selection: Swap left edge of time selection to next transient in items
+		{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection
+		}, // Time selection: Extend time selection to next transient in items
+		{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope
+		}, // FX: Show/hide track envelope for last touched FX parameter
+		{MAIN_SECTION, {{0, 0, 40406}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
+		{MAIN_SECTION, {{0, 0, 40407}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
+		{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope
+		}, // Track: Toggle track pre-FX volume envelope visible
+		{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope
+		}, // Track: Toggle track pre-FX pan envelope visible
+		{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
+		{MAIN_SECTION, {{0, 0, 40693}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
+		{MAIN_SECTION, {{0, 0, 40694}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
+		{MAIN_SECTION, {{0, 0, 41612}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
+		{MAIN_SECTION, {{0, 0, 40695}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
+		{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
+		{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
+		{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings
+		}, // Transient detection sensitivity/threshold: Adjust...
+		{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
+		{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
+		{MAIN_SECTION, {{0, 0, 40032}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Group items
+		{MAIN_SECTION, {{0, 0, 40033}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Remove items from group
+		{MAIN_SECTION, {{0, 0, 41187}, NULL}, NULL, cmdToggleLoopSegScrub
+		}, // Scrub: Toggle looped-segment scrub at edit cursor
+		{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
+		{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
+		{MIDI_EDITOR_SECTION, {{0, 0, 40440}, NULL}, NULL, cmdMidiMoveCursor
+		}, // Navigate: Move edit cursor to start of selected events
+		{MIDI_EDITOR_SECTION, {{0, 0, 40639}, NULL}, NULL, cmdMidiMoveCursor
+		}, // Navigate: Move edit cursor to end of selected events
+		{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
+		{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
+		{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
+		{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
+		{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
+		{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+		{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor
+		}, // Navigate: Move edit cursor right one measure
+		{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor
+		}, // Navigate: Move edit cursor left one measure
+		{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
+		{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
+		{MIDI_EDITOR_SECTION, {{0, 0, 1000}, NULL}, NULL, cmdMidiInsertNote
+		}, // Edit: Insert note at edit cursor (no advance edit cursor)
+		{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
+		{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
+		{MIDI_EDITOR_SECTION, {{0, 0, 40664}, NULL}, NULL, cmdMidiToggleSelCC
+		}, // Edit: Toggle selection of all CC events under selected notes
 #ifdef _WIN32
-	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
-	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
-	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
-	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
+		{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
+		{MIDI_EDITOR_SECTION, {{0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow
+		}, // Filter: Enable/disable event filter and show/hide filter window...
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
+		{MIDI_EVENT_LIST_SECTION, {{0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow
+		}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
-	// Our own commands.
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next item (leaving other items selected)")}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous item (leaving other items selected)")}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View properties for current media item/take/automation item (depending on focus)")}, "OSARA_PROPERTIES", cmdPropertiesFocus},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View parameters for current track/item/FX (depending on focus)")}, "OSARA_PARAMS", cmdParamsFocus},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for current track/take (depending on focus)")}, "OSARA_FXPARAMS", cmdFxParamsFocus},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for master track")}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure Peak Watcher for current track/track FX (depending on focus)")}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher first channel")}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherW1C1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher second channel")}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherW1C2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher first channel")}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherW2C1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher second channel")}, "OSARA_REPORTPEAKWATCHERT2C2", cmdReportPeakWatcherW2C2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Reset Peak Watcher first watcher")}, "OSARA_RESETPEAKWATCHERT1", cmdResetPeakWatcherW1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Reset Peak Watcher second watcher")}, "OSARA_RESETPEAKWATCHERT2", cmdResetPeakWatcherW2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Pause/resume Peak Watcher")}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report ripple editing mode")}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report muted tracks")}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report soloed tracks")}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC2", cmdReportPeakCurrentC2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of master track")}, "OSARA_REPORTPEAKMASTERC1", cmdReportPeakMasterC1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 2 of master track")}, "OSARA_REPORTPEAKMASTERC2", cmdReportPeakMasterC2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Delete all time signature markers")}, "OSARA_DELETEALLTIMESIGS", cmdDeleteAllTimeSigs},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select next track/take envelope (depending on focus)")}, "OSARA_SELECTNEXTENV", cmdSelectNextEnvelope},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select previous track/take envelope (depending on focus)")}, "OSARA_SELECTPREVENV", cmdSelectPreviousEnvelope},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next envelope point")}, "OSARA_NEXTENVPOINT", cmdMoveToNextEnvelopePoint},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous envelope point")}, "OSARA_PREVENVPOINT", cmdMoveToPrevEnvelopePoint},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next envelope point (leaving other points selected)")}, "OSARA_NEXTENVPOINTKEEPSEL", cmdMoveToNextEnvelopePointKeepSel},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous envelope point (leaving other points selected)")}, "OSARA_PREVENVPOINTKEEPSEL", cmdMoveToPrevEnvelopePointKeepSel},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next transient")}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous transient")}, "OSARA_PREVTRANSIENT", cmdMoveToPreviousTransient},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show first context menu (depending on focus)")}, "OSARA_CONTEXTMENU1", cmdShowContextMenu1},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show second context menu (depending on focus)")}, "OSARA_CONTEXTMENU2", cmdShowContextMenu2},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Show third context menu (depending on focus)")}, "OSARA_CONTEXTMENU3", cmdShowContextMenu3},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle through midi recording modes of selected tracks")}, "OSARA_CYCLEMIDIRECORDINGMODE", cmdCycleMidiRecordingMode},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configuration")}, "OSARA_CONFIG", cmdConfig},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report global / Track Automation Mode")}, "OSARA_REPORTAUTOMATIONMODE", cmdReportAutomationMode},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle global automation override between latch preview and off")}, "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW", cmdToggleGlobalAutomationLatchPreview },
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle automation mode of selected tracks")}, "OSARA_CYCLETRACKAUTOMATION", cmdCycleTrackAutomation},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: About")}, "OSARA_ABOUT", cmdAbout},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report groups for current track")}, "OSARA_REPORTTRACKGROUPS", cmdReportTrackGroups},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report regions, last project marker and items on selected tracks at current position")}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to first track")}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to last track")}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle shape of selected envelope points")}, "OSARA_CYCLEENVELOPEPOINTSHAPE", cmdCycleEnvelopePointShape},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take volume envelope visibility (depending on focus)")}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take mute envelope visibility (depending on focus)")}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
-	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)")}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord and add to selection")}, "OSARA_NEXTCHORDKEEPSEL", cmdMidiMoveToNextChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord and add to selection")}, "OSARA_PREVCHORDKEEPSEL", cmdMidiMoveToPreviousChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next note in chord")}, "OSARA_NEXTNOTE", cmdMidiMoveToNextNoteInChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous note in chord")}, "OSARA_PREVNOTE", cmdMidiMoveToPreviousNoteInChord},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next note in chord and add to selection")}, "OSARA_NEXTNOTEKEEPSEL", cmdMidiMoveToNextNoteInChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous note in chord and add to selection")}, "OSARA_PREVNOTEKEEPSEL", cmdMidiMoveToPreviousNoteInChordKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next CC")}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous CC")}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next CC and add to selection")}, "OSARA_NEXTCCKEEPSEL", cmdMidiMoveToNextCCKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous CC and add to selection")}, "OSARA_PREVCCKEEPSEL", cmdMidiMoveToPreviousCCKeepSel},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous midi item on track")}, "OSARA_MIDIPREVITEM", cmdMidiMoveToPrevItem},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next midi item on track")}, "OSARA_MIDINEXTITEM", cmdMidiMoveToNextItem},
-	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Select all notes with the same pitch starting in time selection")}, "OSARA_SELSAMEPITCHTIMESEL", cmdMidiSelectSamePitchStartingInTimeSelection},
-	{ MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ME_MUTENEXTMESSAGE", cmdMuteNextMessage},
+		// Our own commands.
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next item (leaving other items selected)")},
+		 "OSARA_NEXTITEMKEEPSEL",
+		 cmdMoveToNextItemKeepSel},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous item (leaving other items selected)")},
+		 "OSARA_PREVITEMKEEPSEL",
+		 cmdMoveToPrevItemKeepSel},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: View properties for current media item/take/automation item (depending on focus)")},
+		 "OSARA_PROPERTIES",
+		 cmdPropertiesFocus},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: View parameters for current track/item/FX (depending on focus)")},
+		 "OSARA_PARAMS",
+		 cmdParamsFocus},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: View FX parameters for current track/take (depending on focus)")},
+		 "OSARA_FXPARAMS",
+		 cmdFxParamsFocus},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: View FX parameters for master track")},
+		 "OSARA_FXPARAMSMASTER",
+		 cmdFxParamsMaster},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Configure Peak Watcher for current track/track FX (depending on focus)")},
+		 "OSARA_PEAKWATCHER",
+		 cmdPeakWatcher},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher first channel")},
+		 "OSARA_REPORTPEAKWATCHERT1C1",
+		 cmdReportPeakWatcherW1C1},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher second channel")},
+		 "OSARA_REPORTPEAKWATCHERT1C2",
+		 cmdReportPeakWatcherW1C2},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher first channel")},
+		 "OSARA_REPORTPEAKWATCHERT2C1",
+		 cmdReportPeakWatcherW2C1},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher second channel")},
+		 "OSARA_REPORTPEAKWATCHERT2C2",
+		 cmdReportPeakWatcherW2C2},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Reset Peak Watcher first watcher")},
+		 "OSARA_RESETPEAKWATCHERT1",
+		 cmdResetPeakWatcherW1},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Reset Peak Watcher second watcher")},
+		 "OSARA_RESETPEAKWATCHERT2",
+		 cmdResetPeakWatcherW2},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Pause/resume Peak Watcher")}, "OSARA_PAUSEPEAKWATCHER", cmdPausePeakWatcher},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report ripple editing mode")}, "OSARA_REPORTRIPPLE", cmdReportRippleMode},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report muted tracks")}, "OSARA_REPORTMUTED", cmdReportMutedTracks},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report soloed tracks")}, "OSARA_REPORTSOLOED", cmdReportSoloedTracks},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report tracks with record monitor on")},
+		 "OSARA_REPORTMONITORED",
+		 cmdReportMonitoredTracks},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report tracks with phase inverted")},
+		 "OSARA_REPORTPHASED",
+		 cmdReportPhaseInvertedTracks},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report track/item/time selection (depending on focus)")},
+		 "OSARA_REPORTSEL",
+		 cmdReportSelection},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")
+		 },
+		 "OSARA_REMOVE",
+		 cmdRemoveFocus},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")},
+		 "OSARA_CURSORPOS",
+		 cmdReportCursorPosition},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")
+		 },
+		 "OSARA_TOGGLESEL",
+		 cmdToggleSelection},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")},
+		 "OSARA_MOVESTRETCH",
+		 cmdMoveStretch},
+		{MAIN_SECTION,
+		 {DEFACCEL,
+			_t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
+			)},
+		 "OSARA_REPORTPEAKCURRENTC1",
+		 cmdReportPeakCurrentC1},
+		{MAIN_SECTION,
+		 {DEFACCEL,
+			_t("OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
+			)},
+		 "OSARA_REPORTPEAKCURRENTC2",
+		 cmdReportPeakCurrentC2},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of master track")},
+		 "OSARA_REPORTPEAKMASTERC1",
+		 cmdReportPeakMasterC1},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 2 of master track")},
+		 "OSARA_REPORTPEAKMASTERC2",
+		 cmdReportPeakMasterC2},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Delete all time signature markers")},
+		 "OSARA_DELETEALLTIMESIGS",
+		 cmdDeleteAllTimeSigs},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Select next track/take envelope (depending on focus)")},
+		 "OSARA_SELECTNEXTENV",
+		 cmdSelectNextEnvelope},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Select previous track/take envelope (depending on focus)")},
+		 "OSARA_SELECTPREVENV",
+		 cmdSelectPreviousEnvelope},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next envelope point")},
+		 "OSARA_NEXTENVPOINT",
+		 cmdMoveToNextEnvelopePoint},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous envelope point")},
+		 "OSARA_PREVENVPOINT",
+		 cmdMoveToPrevEnvelopePoint},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next envelope point (leaving other points selected)")},
+		 "OSARA_NEXTENVPOINTKEEPSEL",
+		 cmdMoveToNextEnvelopePointKeepSel},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous envelope point (leaving other points selected)")},
+		 "OSARA_PREVENVPOINTKEEPSEL",
+		 cmdMoveToPrevEnvelopePointKeepSel},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next transient")}, "OSARA_NEXTTRANSIENT", cmdMoveToNextTransient},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous transient")},
+		 "OSARA_PREVTRANSIENT",
+		 cmdMoveToPreviousTransient},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Show first context menu (depending on focus)")},
+		 "OSARA_CONTEXTMENU1",
+		 cmdShowContextMenu1},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Show second context menu (depending on focus)")},
+		 "OSARA_CONTEXTMENU2",
+		 cmdShowContextMenu2},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Show third context menu (depending on focus)")},
+		 "OSARA_CONTEXTMENU3",
+		 cmdShowContextMenu3},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Cycle through midi recording modes of selected tracks")},
+		 "OSARA_CYCLEMIDIRECORDINGMODE",
+		 cmdCycleMidiRecordingMode},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configuration")}, "OSARA_CONFIG", cmdConfig},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report global / Track Automation Mode")},
+		 "OSARA_REPORTAUTOMATIONMODE",
+		 cmdReportAutomationMode},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Toggle global automation override between latch preview and off")},
+		 "OSARA_TOGGLEGLOBALAUTOMATIONLATCHPREVIEW",
+		 cmdToggleGlobalAutomationLatchPreview},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Cycle automation mode of selected tracks")},
+		 "OSARA_CYCLETRACKAUTOMATION",
+		 cmdCycleTrackAutomation},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: About")}, "OSARA_ABOUT", cmdAbout},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report groups for current track")},
+		 "OSARA_REPORTTRACKGROUPS",
+		 cmdReportTrackGroups},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MUTENEXTMESSAGE", cmdMuteNextMessage},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Report regions, last project marker and items on selected tracks at current position")},
+		 "OSARA_REPORTREGIONMARKERITEMS",
+		 cmdReportRegionMarkerItems},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to first track")}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
+		{MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to last track")}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Cycle shape of selected envelope points")},
+		 "OSARA_CYCLEENVELOPEPOINTSHAPE",
+		 cmdCycleEnvelopePointShape},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Toggle track/take volume envelope visibility (depending on focus)")},
+		 "OSARA_TOGGLEVOLUMEENVELOPE",
+		 cmdToggleVolumeEnvelope},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")},
+		 "OSARA_TOGGLEPANENVELOPE",
+		 cmdTogglePanEnvelope},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Toggle track/take mute envelope visibility (depending on focus)")},
+		 "OSARA_TOGGLEMUTEENVELOPE",
+		 cmdToggleMuteEnvelope},
+		{MAIN_SECTION,
+		 {DEFACCEL, _t("OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)")},
+		 "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE",
+		 cmdTogglePreFXPanOrTakePitchEnvelope},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")},
+		 "OSARA_MIDITOGGLESEL",
+		 cmdMidiToggleSelection},
+		{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
+		{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord
+		},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next chord and add to selection")},
+		 "OSARA_NEXTCHORDKEEPSEL",
+		 cmdMidiMoveToNextChordKeepSel},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous chord and add to selection")},
+		 "OSARA_PREVCHORDKEEPSEL",
+		 cmdMidiMoveToPreviousChordKeepSel},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next note in chord")},
+		 "OSARA_NEXTNOTE",
+		 cmdMidiMoveToNextNoteInChord},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous note in chord")},
+		 "OSARA_PREVNOTE",
+		 cmdMidiMoveToPreviousNoteInChord},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next note in chord and add to selection")},
+		 "OSARA_NEXTNOTEKEEPSEL",
+		 cmdMidiMoveToNextNoteInChordKeepSel},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous note in chord and add to selection")},
+		 "OSARA_PREVNOTEKEEPSEL",
+		 cmdMidiMoveToPreviousNoteInChordKeepSel},
+		{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next CC")}, "OSARA_NEXTCC", cmdMidiMoveToNextCC},
+		{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous CC")}, "OSARA_PREVCC", cmdMidiMoveToPreviousCC},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next CC and add to selection")},
+		 "OSARA_NEXTCCKEEPSEL",
+		 cmdMidiMoveToNextCCKeepSel},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous CC and add to selection")},
+		 "OSARA_PREVCCKEEPSEL",
+		 cmdMidiMoveToPreviousCCKeepSel},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to previous midi item on track")},
+		 "OSARA_MIDIPREVITEM",
+		 cmdMidiMoveToPrevItem},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Move to next midi item on track")},
+		 "OSARA_MIDINEXTITEM",
+		 cmdMidiMoveToNextItem},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Select all notes with the same pitch starting in time selection")},
+		 "OSARA_SELSAMEPITCHTIMESEL",
+		 cmdMidiSelectSamePitchStartingInTimeSelection},
+		{MIDI_EDITOR_SECTION,
+		 {DEFACCEL, _t("OSARA: Mute next message from OSARA")},
+		 "OSARA_ME_MUTENEXTMESSAGE",
+		 cmdMuteNextMessage},
 #ifdef _WIN32
-	{MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Focus event nearest edit cursor")}, "OSARA_FOCUSMIDIEVENT", cmdFocusNearestMidiEvent},
+		{MIDI_EVENT_LIST_SECTION,
+		 {DEFACCEL, _t("OSARA: Focus event nearest edit cursor")},
+		 "OSARA_FOCUSMIDIEVENT",
+		 cmdFocusNearestMidiEvent},
 #endif
-	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{0, {}, NULL, NULL},
+		{MIDI_EVENT_LIST_SECTION,
+		 {DEFACCEL, _t("OSARA: Mute next message from OSARA")},
+		 "OSARA_ML_MUTENEXTMESSAGE",
+		 cmdMuteNextMessage},
+		{MEDIA_EXPLORER_SECTION,
+		 {DEFACCEL, _t("OSARA: Mute next message from OSARA")},
+		 "OSARA_MX_MUTENEXTMESSAGE",
+		 cmdMuteNextMessage},
+		{0, {}, NULL, NULL},
 };
 map<pair<int, int>, Command*> commandsMap;
 
@@ -4400,10 +4563,8 @@ map<pair<int, int>, Command*> commandsMap;
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
-	int relMode=0, HWND hwnd=nullptr
-) {
-	if (section==MAIN_SECTION) {
+bool handlePostCommand(int section, int command, int val = 63, int valHw = -1, int relMode = 0, HWND hwnd = nullptr) {
+	if (section == MAIN_SECTION) {
 		const auto postIt = postCommandsMap.find(command);
 		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -4419,7 +4580,7 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 			// executing the command so that toggles, etc. work as expected.
 			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			postIt->second(command);
-			lastCommand=command;
+			lastCommand = command;
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
@@ -4433,7 +4594,7 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 			isHandlingCommand = false;
 			return true;
 		}
-	}else if (section==MIDI_EDITOR_SECTION) {
+	} else if (section == MIDI_EDITOR_SECTION) {
 		const auto it = midiPostCommandsMap.find(command);
 		if (it != midiPostCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -4454,7 +4615,7 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 			isHandlingCommand = false;
 			return true;
 		}
-	}else if (section==MIDI_EVENT_LIST_SECTION) {
+	} else if (section == MIDI_EVENT_LIST_SECTION) {
 		const auto it = midiEventListPostCommandsMap.find(command);
 		if (it != midiEventListPostCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -4462,20 +4623,20 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second.first(command);
-			#ifdef _WIN32
+#ifdef _WIN32
 			if (it->second.second) { // changesValueInMidiEventList
 				HWND focus = GetFocus();
 				if (focus && isMidiEditorEventListView(focus)) {
 					sendNameChangeEventToMidiEditorEventListItem(focus);
 				}
 			}
-			#endif
+#endif
 			isHandlingCommand = false;
 			return true;
 		}
-	} else if(section == MEDIA_EXPLORER_SECTION) {
+	} else if (section == MEDIA_EXPLORER_SECTION) {
 		const auto it = mExplorerPostCommands.find(command);
-		if(it != mExplorerPostCommands.end()){
+		if (it != mExplorerPostCommands.end()) {
 			isHandlingCommand = true;
 			SendMessage(hwnd, WM_COMMAND, command, 0);
 			it->second(command, hwnd);
@@ -4489,8 +4650,7 @@ bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
 
 bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	const auto entry = TOGGLE_COMMAND_MESSAGES.find({section->uniqueID, command});
-	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg &&
-			!entry->second.offMsg) {
+	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg && !entry->second.offMsg) {
 		return false; // Ignore.
 	}
 	int oldState = GetToggleCommandState2(section, command);
@@ -4535,8 +4695,8 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 	}
 	// Generic feedback.
 	ostringstream s;
-	s << (newState ? translate("enabled") : translate("disabled")) <<
-		" " << getActionName(command, section, /* skipCategory */ false);
+	s << (newState ? translate("enabled") : translate("disabled")) << " "
+		<< getActionName(command, section, /* skipCategory */ false);
 	outputMessage(s);
 	return true;
 }
@@ -4547,8 +4707,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	constexpr int MAIN_ALT1_SECTION = 1;
 	constexpr int MAIN_ALT16_SECTION = 16;
 	constexpr int MAIN_ALT_REC_SECTION = 100;
-	if ((MAIN_ALT1_SECTION <= section->uniqueID &&
-				section->uniqueID <= MAIN_ALT16_SECTION) ||
+	if ((MAIN_ALT1_SECTION <= section->uniqueID && section->uniqueID <= MAIN_ALT16_SECTION) ||
 			section->uniqueID == MAIN_ALT_REC_SECTION) {
 		// This is a main alt-1 through alt-16 section or the main (alt recording)
 		// section. Map this to the main section. Otherwise, some REAPER functions
@@ -4558,12 +4717,10 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	}
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
 	if (it != commandsMap.end()
-		// Allow shortcut help to be disabled.
-		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
-	) {
+			// Allow shortcut help to be disabled.
+			&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)) {
 		isHandlingCommand = true;
-		if (it->second->gaccel.accel.cmd == lastCommand &&
-				GetTickCount() - lastCommandTime < 500) {
+		if (it->second->gaccel.accel.cmd == lastCommand && GetTickCount() - lastCommandTime < 500) {
 			++lastCommandRepeatCount;
 		} else {
 			lastCommandRepeatCount = 0;
@@ -4572,9 +4729,9 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		lastCommand = it->second->gaccel.accel.cmd;
 		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
-		if(it->second->execute != cmdMuteNextMessage) {
+		if (it->second->execute != cmdMuteNextMessage) {
 			muteNextMessage = false;
-		} 
+		}
 		return true;
 	}
 	// Allow "Main action section: Momentarily set override" actions to pass
@@ -4582,13 +4739,11 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	// alternative sections.
 	constexpr int ACTION_MOMENTARY_DEFAULT = 24851;
 	constexpr int ACTION_MOMENTARY_ALT16 = 24868;
-	if (isShortcutHelpEnabled &&
-			(command < ACTION_MOMENTARY_DEFAULT || command > ACTION_MOMENTARY_ALT16)) {
+	if (isShortcutHelpEnabled && (command < ACTION_MOMENTARY_DEFAULT || command > ACTION_MOMENTARY_ALT16)) {
 		outputMessage(getActionName(command, section, false));
 		return true;
 	}
-	if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
-			hwnd)) {
+	if (handlePostCommand(section->uniqueID, command, val, valHw, relMode, hwnd)) {
 		muteNextMessage = false;
 		return true;
 	}
@@ -4608,8 +4763,7 @@ bool handleMainCommandFallback(int command, int flag) {
 	const auto it = commandsMap.find(make_pair(MAIN_SECTION, command));
 	if (it != commandsMap.end()) {
 		isHandlingCommand = true;
-		if (it->second->gaccel.accel.cmd == lastCommand &&
-				GetTickCount() - lastCommandTime < 500) {
+		if (it->second->gaccel.accel.cmd == lastCommand && GetTickCount() - lastCommandTime < 500) {
 			++lastCommandRepeatCount;
 		} else {
 			lastCommandRepeatCount = 0;
@@ -4618,11 +4772,11 @@ bool handleMainCommandFallback(int command, int flag) {
 		lastCommand = it->second->gaccel.accel.cmd;
 		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
-		if(it->second->execute != cmdMuteNextMessage) {
+		if (it->second->execute != cmdMuteNextMessage) {
 			muteNextMessage = false;
-		} 
+		}
 		return true;
-	} else if (handlePostCommand(MAIN_SECTION, command)){
+	} else if (handlePostCommand(MAIN_SECTION, command)) {
 		muteNextMessage = false;
 		return true;
 	}
@@ -4639,8 +4793,7 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 #endif
 	surface = createSurface();
 	plugin_register("csurf_inst", (void*)surface);
-	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
-		"NF_GetSWSTrackNotes");
+	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi("NF_GetSWSTrackNotes");
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
 		if (cmd)
@@ -4655,17 +4808,14 @@ void annotateAccRole(HWND hwnd, long role) {
 	VARIANT var;
 	var.vt = VT_I4;
 	var.lVal = role;
-	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE,
-		var);
+	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE, var);
 }
 
 // Several windows in REAPER report as dialogs/property pages, but they aren't really.
 // This includes the main window.
 // Annotate these to prevent screen readers from potentially reading a spurious caption.
 void annotateSpuriousDialog(HWND hwnd) {
-	annotateAccRole(hwnd,
-		hwnd == mainHwnd || hwnd == GetForegroundWindow() ? ROLE_SYSTEM_CLIENT :
-		ROLE_SYSTEM_GROUPING);
+	annotateAccRole(hwnd, hwnd == mainHwnd || hwnd == GetForegroundWindow() ? ROLE_SYSTEM_CLIENT : ROLE_SYSTEM_GROUPING);
 	// If the previous hwnd is static text, oleacc will use this as the name.
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0) {
@@ -4676,15 +4826,13 @@ void annotateSpuriousDialog(HWND hwnd) {
 void annotateSpuriousDialogs(HWND hwnd) {
 	annotateSpuriousDialog(hwnd);
 	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
-		child = FindWindowExW(hwnd, child, L"#32770", NULL)
-	)
+			 child = FindWindowExW(hwnd, child, L"#32770", NULL))
 		annotateSpuriousDialogs(child);
 }
 
 UINT_PTR annotateFxDialogTimer = 0;
-void CALLBACK annotateFxDialog(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
+
+void CALLBACK annotateFxDialog(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(nullptr, annotateFxDialogTimer);
 	annotateFxDialogTimer = 0;
 	if (!GetFocusedFX(nullptr, nullptr, nullptr)) {
@@ -4697,7 +4845,8 @@ HWND prevForegroundHwnd = nullptr;
 DWORD prevForegroundTime = 0;
 HWND prevPrevForegroundHwnd = nullptr;
 
-void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
+void CALLBACK
+handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
 	if (event == EVENT_OBJECT_FOCUS) {
 		HWND foreground = GetForegroundWindow();
 		if (foreground != prevForegroundHwnd) {
@@ -4743,11 +4892,9 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			if (lastWasTrackView) {
 				// These objects can get a bogus name from oleacc, so set an empty name
 				// instead of clearing it.
-				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
-					PROPID_ACC_NAME, L" ");
+				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L" ");
 			} else {
-				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
-					&PROPID_ACC_NAME, 1);
+				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1);
 			}
 			if (lastWasTrackView && focusIsTrackView) {
 				// REAPER 6.0 moves focus between two track view windows in some cases.
@@ -4792,12 +4939,12 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 				if (annotateFxDialogTimer) {
 					KillTimer(nullptr, annotateFxDialogTimer);
 				}
-				annotateFxDialogTimer = SetTimer(nullptr, 0, 200,
-					annotateFxDialog);
+				annotateFxDialogTimer = SetTimer(nullptr, 0, 200, annotateFxDialog);
 			}
 		}
 	}
 }
+
 HWINEVENTHOOK winEventHook = NULL;
 
 #endif // _WIN32
@@ -4818,12 +4965,14 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		peakWatcher::initialize();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
+		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) !=
+				S_OK) {
 			return 0;
 		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
-		winEventHook = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS,
-			hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
+		winEventHook = SetWinEventHook(
+				EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS, hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT
+		);
 		annotateSpuriousDialogs(mainHwnd);
 #else
 		NSA11yWrapper::init();
@@ -4832,10 +4981,12 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
 			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
 
-		for (auto &midiPostCommand: MIDI_POST_COMMANDS) {
+		for (auto& midiPostCommand : MIDI_POST_COMMANDS) {
 			midiPostCommandsMap.insert(make_pair(midiPostCommand.cmd, midiPostCommand.execute));
 			if (midiPostCommand.supportedInMidiEventList) {
-				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
+				midiEventListPostCommandsMap.insert(make_pair(
+						midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)
+				));
 			}
 		}
 
@@ -4886,7 +5037,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		return 0;
 	}
 }
-
 }
 
 #ifndef _WIN32

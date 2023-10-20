@@ -26,8 +26,7 @@ class UiaCore {
 	private:
 	HMODULE dll = LoadLibraryA("UIAutomationCore.dll");
 
-	template<typename FuncType>
-	FuncType* getFunc(const char* funcName) {
+	template<typename FuncType> FuncType* getFunc(const char* funcName) {
 		return (FuncType*)GetProcAddress(this->dll, funcName);
 	}
 
@@ -37,11 +36,11 @@ class UiaCore {
 	}
 
 	decltype(UiaRaiseNotificationEvent)* RaiseNotificationEvent =
-		getFunc<decltype(UiaRaiseNotificationEvent)>("UiaRaiseNotificationEvent");
-	decltype(UiaDisconnectProvider)* DisconnectProvider = 
-		getFunc<decltype(UiaDisconnectProvider)>("UiaDisconnectProvider");
+			getFunc<decltype(UiaRaiseNotificationEvent)>("UiaRaiseNotificationEvent");
+	decltype(UiaDisconnectProvider)* DisconnectProvider =
+			getFunc<decltype(UiaDisconnectProvider)>("UiaDisconnectProvider");
 	decltype(UiaDisconnectAllProviders)* DisconnectAllProviders =
-		getFunc<decltype(UiaDisconnectAllProviders)>("UiaDisconnectAllProviders");
+			getFunc<decltype(UiaDisconnectAllProviders)>("UiaDisconnectAllProviders");
 };
 
 unique_ptr<UiaCore> uiaCore;
@@ -49,7 +48,7 @@ unique_ptr<UiaCore> uiaCore;
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
 class UiaProvider : public IRawElementProviderSimple {
 	public:
-	UiaProvider(_In_ HWND hwnd): refCount(0), controlHWnd(hwnd) {}
+	UiaProvider(_In_ HWND hwnd) : refCount(0), controlHWnd(hwnd) {}
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() {
@@ -69,9 +68,9 @@ class UiaProvider : public IRawElementProviderSimple {
 			return E_INVALIDARG;
 		}
 		if (riid == __uuidof(IUnknown)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+			*ppInterface = static_cast<IRawElementProviderSimple*>(this);
 		} else if (riid == __uuidof(IRawElementProviderSimple)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+			*ppInterface = static_cast<IRawElementProviderSimple*>(this);
 		} else {
 			*ppInterface = nullptr;
 			return E_NOINTERFACE;
@@ -120,8 +119,7 @@ class UiaProvider : public IRawElementProviderSimple {
 	}
 
 	private:
-	virtual ~UiaProvider() {
-	}
+	virtual ~UiaProvider() {}
 
 	ULONG refCount; // Ref Count for this COM object
 	HWND controlHWnd; // The HWND for the control.
@@ -166,20 +164,10 @@ bool initializeUia() {
 		return false;
 	}
 	uiaWnd = CreateWindowEx(
-		// Make it transparent because it has to have width/height.
-		WS_EX_TRANSPARENT,
-		WINDOW_CLASS_NAME,
-		"Reaper OSARA Notifications",
-		WS_CHILD | WS_DISABLED,
-		0,
-		0,
-		// UIA notifications fail if the window has 0 width/height.
-		1,
-		1,
-		mainHwnd,
-		0,
-		pluginHInstance,
-		nullptr
+			// Make it transparent because it has to have width/height.
+			WS_EX_TRANSPARENT, WINDOW_CLASS_NAME, "Reaper OSARA Notifications", WS_CHILD | WS_DISABLED, 0, 0,
+			// UIA notifications fail if the window has 0 width/height.
+			1, 1, mainHwnd, 0, pluginHInstance, nullptr
 	);
 	if (!uiaWnd) {
 		return false;
@@ -226,9 +214,8 @@ bool shouldUseUiaNotifications() {
 		// Setting not present or '1' means auto.
 		// Several screen readers ignore or don't support UIA notification events.
 		// First check for screen readers with in-process dlls.
-		if (
-			GetModuleHandleA("jhook.dll") // JAWS
-			|| GetModuleHandleA("dolwinhk.dll") // Dolphin
+		if (GetModuleHandleA("jhook.dll") // JAWS
+				|| GetModuleHandleA("dolwinhk.dll") // Dolphin
 		) {
 			return false;
 		}
@@ -241,13 +228,13 @@ bool sendUiaNotification(const string& message, bool interrupt) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
-	return (uiaCore->RaiseNotificationEvent(
-		uiaProvider,
-		NotificationKind_Other,
-		interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
-		SysAllocString(widen(message).c_str()),
-		SysAllocString(L"REAPER_OSARA")
-	) == S_OK);
+	return (
+			uiaCore->RaiseNotificationEvent(
+					uiaProvider, NotificationKind_Other,
+					interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
+					SysAllocString(widen(message).c_str()), SysAllocString(L"REAPER_OSARA")
+			) == S_OK
+	);
 }
 
 void resetUia() {

@@ -10,13 +10,13 @@
 #define _OSARA_H
 
 #ifdef _WIN32
-# include <windows.h>
+#include <windows.h>
 #else
 // Disable warnings for SWELL, since we don't have any control over those.
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Weverything"
-# include <windows.h>
-# pragma clang diagnostic pop
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#include <windows.h>
+#pragma clang diagnostic pop
 #endif
 #include <string>
 #include <sstream>
@@ -226,6 +226,7 @@ typedef struct Command {
 	const char* id;
 	void (*execute)(Command*);
 } Command;
+
 extern int lastCommandRepeatCount;
 extern DWORD lastCommandTime;
 extern bool isShortcutHelpEnabled;
@@ -255,7 +256,7 @@ extern bool isSelectionContiguous;
 extern bool shouldMoveToAutoItem;
 extern int lastCommand;
 
-bool shouldReportTimeMovement() ;
+bool shouldReportTimeMovement();
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
 
@@ -269,23 +270,26 @@ typedef enum {
 	TF_SAMPLE,
 	TF_MEASURETICK
 } TimeFormat;
+
 const TimeFormat TF_RULER = TF_NONE;
+
 enum FormatTimeCacheRequest {
 	FT_NO_CACHE, // Don't use the cache.
 	FT_USE_CACHE, // Use the cache.
 	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
 };
-std::string formatTime(double time, TimeFormat format=TF_RULER,
-	bool isLength=false, FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
-	bool includeZeros=true, bool includeProjectStartOffset=true);
-void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
+
+std::string formatTime(
+		double time, TimeFormat format = TF_RULER, bool isLength = false, FormatTimeCacheRequest cache = FT_CACHE_DEFAULT,
+		bool includeZeros = true, bool includeProjectStartOffset = true
+);
+void resetTimeCache(TimeFormat excludeFormat = TF_NONE);
 std::string formatNoteLength(double start, double end);
-std::string formatCursorPosition(TimeFormat format=TF_RULER,
-	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
-const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
+std::string formatCursorPosition(TimeFormat format = TF_RULER, FormatTimeCacheRequest cache = FT_CACHE_DEFAULT);
+const char* getActionName(int command, KbdSectionInfo* section = nullptr, bool skipCategory = true);
 
 bool isTrackSelected(MediaTrack* track);
-std::string formatDouble(double d, int precision, bool plus=false);
+std::string formatDouble(double d, int precision, bool plus = false);
 MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
