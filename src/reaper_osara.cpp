@@ -2388,6 +2388,8 @@ bool showReaperContextMenu(const int menu) {
 	return false;
 }
 
+const char* WCS_DIALOG = "#32770";
+
 bool isClassName(HWND hwnd, string className) {
 	char buffer[50];
 	if (GetClassName(hwnd, buffer, sizeof(buffer)) == 0) {

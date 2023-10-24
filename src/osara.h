@@ -221,6 +221,8 @@ const int MEDIA_EXPLORER_SECTION = 32063;
 static bool bFalse = false;
 static bool bTrue = true;
 
+extern const char* WCS_DIALOG;
+
 typedef struct Command {
 	int section;
 	gaccel_register_t gaccel;

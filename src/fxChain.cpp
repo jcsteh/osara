@@ -114,7 +114,7 @@ bool maybeSwitchToFxPluginWindow() {
 	HWND window = GetFocus();
 	do {
 		window = GetParent(window);
-		if (isClassName(window, "#32770")) {
+		if (isClassName(window, WCS_DIALOG)) {
 			break;
 		}
 	} while (window);
@@ -122,7 +122,7 @@ bool maybeSwitchToFxPluginWindow() {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
+	if (!(window = FindWindowExA(window, nullptr, WCS_DIALOG, nullptr))) {
 		return false;
 	}
 	// Check whether this is an FX container.
@@ -145,11 +145,7 @@ bool maybeSwitchToFxPluginWindow() {
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
+	if (isClassName(window, "ComboBox")) {
 		// Plugin window should be the last.
 		if (!(window = GetWindow(window, GW_HWNDLAST))) {
 			return false;
