@@ -102,11 +102,23 @@ void shortenFxName(const char* name, ostringstream& s) {
 #ifdef _WIN32
 
 bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
 	MediaTrack* track;
 	MediaItem_Take* take;
 	int fx;
 	if (!getFocusedFx(&track, &take, &fx)) {
+		return false;
+	}
+	// Find the nearest ancestor FX chain parent window. This might be the top
+	// level FX chain or it might be a container. This allows f6 to focus FX
+	// inside a focused container.
+	HWND window = GetFocus();
+	do {
+		window = GetParent(window);
+		if (isClassName(window, "#32770")) {
+			break;
+		}
+	} while (window);
+	if (!window) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
