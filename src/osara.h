@@ -209,6 +209,7 @@
 #define REAPERAPI_WANT_MIDI_GetGrid
 #define REAPERAPI_WANT_GetParentTrack
 #define REAPERAPI_WANT_LocalizeString
+#define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -219,6 +220,8 @@ const int MEDIA_EXPLORER_SECTION = 32063;
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
 static bool bTrue = true;
+
+extern const char* WCS_DIALOG;
 
 typedef struct Command {
 	int section;

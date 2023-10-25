@@ -74,8 +74,9 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 	return true;
 }
 
+constexpr long WCID_FX_LIST = 1076;
 bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
+	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST &&
 		getFocusedFx();
 }
 
@@ -101,23 +102,50 @@ void shortenFxName(const char* name, ostringstream& s) {
 #ifdef _WIN32
 
 bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
-	if (!getFocusedFx()) {
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (!getFocusedFx(&track, &take, &fx)) {
+		return false;
+	}
+	// Find the nearest ancestor FX chain parent window. This might be the top
+	// level FX chain or it might be a container. This allows f6 to focus FX
+	// inside a focused container.
+	HWND window = GetFocus();
+	do {
+		window = GetParent(window);
+		if (isClassName(window, WCS_DIALOG)) {
+			break;
+		}
+	} while (window);
+	if (!window) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
+	if (!(window = FindWindowExA(window, nullptr, WCS_DIALOG, nullptr))) {
 		return false;
+	}
+	// Check whether this is an FX container.
+	char type[10];
+	type[0] = '\0';
+	if (take) {
+		TakeFX_GetNamedConfigParm(take, fx, "fx_type", type, sizeof(type));
+	} else {
+		TrackFX_GetNamedConfigParm(track, fx, "fx_type", type, sizeof(type));
+	}
+	if (strcmp(type, "Container") == 0) {
+		// An FX container is focused. Focus its FX list.
+		window = GetDlgItem(window, WCID_FX_LIST);
+		if (window) {
+			SetFocus(window);
+		}
+		return true;
 	}
 	// Descend. Observed as the first or as the last. 
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
+	if (isClassName(window, "ComboBox")) {
 		// Plugin window should be the last.
 		if (!(window = GetWindow(window, GW_HWNDLAST))) {
 			return false;
