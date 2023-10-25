@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-09-02 06:27\n"
+"PO-Revision-Date: 2023-10-25 01:39\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1787,6 +1787,114 @@ msgstr "主控軌靜音"
 
 msgid "master unmuted"
 msgstr "主控軌取消靜音"
+
+msgid "default key map"
+msgstr "預設鍵映射"
+
+msgid "recording key map"
+msgstr "錄音鍵映射"
+
+msgid "alt 1"
+msgstr "替代 1"
+
+msgid "alt 2"
+msgstr "替代 2"
+
+msgid "alt 3"
+msgstr "替代 3"
+
+msgid "alt 4"
+msgstr "替代 4"
+
+msgid "alt 5"
+msgstr "替代 5"
+
+msgid "alt 6"
+msgstr "替代 6"
+
+msgid "alt 7"
+msgstr "替代 7"
+
+msgid "alt 8"
+msgstr "替代 8"
+
+msgid "alt 9"
+msgstr "替代 9"
+
+msgid "alt 10"
+msgstr "替代 10"
+
+msgid "alt 11"
+msgstr "替代 11"
+
+msgid "alt 12"
+msgstr "替代 12"
+
+msgid "alt 13"
+msgstr "替代 13"
+
+msgid "alt 14"
+msgstr "替代 14"
+
+msgid "alt 15"
+msgstr "替代 15"
+
+msgid "alt 16"
+msgstr "替代 16"
+
+msgid "default momentary"
+msgstr "預設瞬時"
+
+msgid "recording key map momentary"
+msgstr "錄音鍵映射瞬時"
+
+msgid "alt 1 momentary"
+msgstr "替代 1 暫時"
+
+msgid "alt 2 momentary"
+msgstr "替代 2 暫時"
+
+msgid "alt 3 momentary"
+msgstr "替代 3 暫時"
+
+msgid "alt 4 momentary"
+msgstr "替代 4 暫時"
+
+msgid "alt 5 momentary"
+msgstr "替代 5 暫時"
+
+msgid "alt 6 momentary"
+msgstr "替代 6 暫時"
+
+msgid "alt 7 momentary"
+msgstr "替代 7 暫時"
+
+msgid "alt 8 momentary"
+msgstr "替代 8 暫時"
+
+msgid "alt 9 momentary"
+msgstr "替代 9 暫時"
+
+msgid "alt 10 momentary"
+msgstr "替代 10 暫時"
+
+msgid "alt 11 momentary"
+msgstr "替代 11 暫時"
+
+msgid "alt 12 momentary"
+msgstr "替代 12 暫時"
+
+msgid "alt 13 momentary"
+msgstr "替代 13 暫時"
+
+msgid "alt 14 momentary"
+msgstr "替代 14 暫時"
+
+msgid "alt 15 momentary"
+msgstr "替代 15 暫時"
+
+msgid "alt 16 momentary"
+msgstr "替代 16 暫時"
 
 msgid "auto playing"
 msgstr "自動播放"

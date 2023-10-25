@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-09-02 06:27\n"
+"PO-Revision-Date: 2023-10-25 01:38\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -123,7 +123,7 @@ msgid "point {point} value {value} {shape}"
 msgstr "点 {point} 值 {value} {shape}"
 
 msgid "selected"
-msgstr "已选定"
+msgstr "选定"
 
 msgid "unselected"
 msgstr "取消选定"
@@ -205,7 +205,7 @@ msgstr "c"
 
 #. The name of a musical note.
 msgid "c sharp"
-msgstr "C 升记号"
+msgstr "c 升记号"
 
 #. The name of a musical note.
 msgid "d"
@@ -213,7 +213,7 @@ msgstr "d"
 
 #. The name of a musical note.
 msgid "d sharp"
-msgstr "D 升记号"
+msgstr "d 升记号"
 
 #. The name of a musical note.
 msgid "e"
@@ -225,7 +225,7 @@ msgstr "F"
 
 #. The name of a musical note.
 msgid "f sharp"
-msgstr "F 升记号"
+msgstr "f 升记号"
 
 #. The name of a musical note.
 msgid "g"
@@ -233,7 +233,7 @@ msgstr "G"
 
 #. The name of a musical note.
 msgid "g sharp"
-msgstr "G 升记号"
+msgstr "g 升记号"
 
 #. The name of a musical note.
 msgid "a"
@@ -241,7 +241,7 @@ msgstr "A"
 
 #. The name of a musical note.
 msgid "a sharp"
-msgstr "A 升记号"
+msgstr "a 升记号"
 
 #. The name of a musical note.
 msgid "b"
@@ -1788,6 +1788,114 @@ msgstr "主控静音"
 msgid "master unmuted"
 msgstr "取消主控静音"
 
+msgid "default key map"
+msgstr "默认键映射"
+
+msgid "recording key map"
+msgstr "录音键映射"
+
+msgid "alt 1"
+msgstr "alt 1"
+
+msgid "alt 2"
+msgstr "alt 2"
+
+msgid "alt 3"
+msgstr "alt 3"
+
+msgid "alt 4"
+msgstr "alt 4"
+
+msgid "alt 5"
+msgstr "alt 5"
+
+msgid "alt 6"
+msgstr "alt 6"
+
+msgid "alt 7"
+msgstr "alt 7"
+
+msgid "alt 8"
+msgstr "alt 8"
+
+msgid "alt 9"
+msgstr "alt 9"
+
+msgid "alt 10"
+msgstr "alt 10"
+
+msgid "alt 11"
+msgstr "alt 11"
+
+msgid "alt 12"
+msgstr "alt 12"
+
+msgid "alt 13"
+msgstr "alt 13"
+
+msgid "alt 14"
+msgstr "alt 14"
+
+msgid "alt 15"
+msgstr "alt 15"
+
+msgid "alt 16"
+msgstr "alt 16"
+
+msgid "default momentary"
+msgstr "瞬时部分默认值"
+
+msgid "recording key map momentary"
+msgstr "录音快捷键映射瞬时部分"
+
+msgid "alt 1 momentary"
+msgstr "alt 1瞬时部分"
+
+msgid "alt 2 momentary"
+msgstr "alt 2瞬时部分"
+
+msgid "alt 3 momentary"
+msgstr "alt 3瞬时部分"
+
+msgid "alt 4 momentary"
+msgstr "alt 4瞬时部分"
+
+msgid "alt 5 momentary"
+msgstr "alt 5瞬时部分"
+
+msgid "alt 6 momentary"
+msgstr "alt 6瞬时部分"
+
+msgid "alt 7 momentary"
+msgstr "alt 7瞬时部分"
+
+msgid "alt 8 momentary"
+msgstr "alt 8瞬时部分"
+
+msgid "alt 9 momentary"
+msgstr "alt 9瞬时部分"
+
+msgid "alt 10 momentary"
+msgstr "alt 10瞬时部分"
+
+msgid "alt 11 momentary"
+msgstr "alt 11瞬时部分"
+
+msgid "alt 12 momentary"
+msgstr "alt 12瞬时部分"
+
+msgid "alt 13 momentary"
+msgstr "alt 13瞬时部分"
+
+msgid "alt 14 momentary"
+msgstr "alt 14瞬时部分"
+
+msgid "alt 15 momentary"
+msgstr "alt 15瞬时部分"
+
+msgid "alt 16 momentary"
+msgstr "alt 16瞬时部分"
+
 msgid "auto playing"
 msgstr "自动播放开"
 
@@ -2162,7 +2270,7 @@ msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
 msgstr "OSARA: 查看当前轨/对象/FX的参数(取决于焦点)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
-msgstr "OSARA: 查看当前轨道/片段的FX参数(取决于焦点)"
+msgstr "OSARA: 查看当前轨/片段的FX参数(取决于焦点)"
 
 msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: 查看主控的FX参数"
@@ -2189,25 +2297,25 @@ msgid "OSARA: Reset Peak Watcher second watcher"
 msgstr "OSARA: 重制第2峰值监视器"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: 暂停/恢复峰值观察器"
+msgstr "OSARA: 暂停/恢复峰值监视器"
 
 msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: 报告波纹编辑模式"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: 报告静音的轨道"
+msgstr "OSARA: 报告静音轨"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: 报告独奏的轨道"
+msgstr "OSARA: 报告独奏轨"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: 报告录音准备的轨道"
+msgstr "OSARA: 报告录音准备轨"
 
 msgid "OSARA: Report tracks with record monitor on"
-msgstr "OSARA: 报告录音监听的轨道"
+msgstr "OSARA: 报告录音监听轨"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: 报告相位反转的轨道"
+msgstr "OSARA: 报告相位反转轨"
 
 msgid "OSARA: Report track/item/time selection (depending on focus)"
 msgstr "OSARA: 报告轨道/对象/时间选区(取决于焦点)"
@@ -2321,7 +2429,7 @@ msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
 msgstr "OSARA: 切换轨道/片段禁音包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
-msgstr "OSARA: 切换轨道钱FX声像货片段音高包络可见 (取决于焦点)"
+msgstr "OSARA: 切换轨道前 FX 声像货片段音高包络可见 (取决于焦点)"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"
@@ -2506,7 +2614,7 @@ msgstr "报告轨道编号(&R)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr "移到轨道/片段时报告 &FX"
+msgstr "移到轨道/片段时报告&FX"
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating chords in MIDI editor"

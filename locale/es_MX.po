@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-09-02 06:27\n"
+"PO-Revision-Date: 2023-10-25 01:39\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1841,6 +1841,114 @@ msgstr "máster muteado"
 
 msgid "master unmuted"
 msgstr "máster desmuteado"
+
+msgid "default key map"
+msgstr ""
+
+msgid "recording key map"
+msgstr ""
+
+msgid "alt 1"
+msgstr ""
+
+msgid "alt 2"
+msgstr ""
+
+msgid "alt 3"
+msgstr ""
+
+msgid "alt 4"
+msgstr ""
+
+msgid "alt 5"
+msgstr ""
+
+msgid "alt 6"
+msgstr ""
+
+msgid "alt 7"
+msgstr ""
+
+msgid "alt 8"
+msgstr ""
+
+msgid "alt 9"
+msgstr ""
+
+msgid "alt 10"
+msgstr ""
+
+msgid "alt 11"
+msgstr ""
+
+msgid "alt 12"
+msgstr ""
+
+msgid "alt 13"
+msgstr ""
+
+msgid "alt 14"
+msgstr ""
+
+msgid "alt 15"
+msgstr ""
+
+msgid "alt 16"
+msgstr ""
+
+msgid "default momentary"
+msgstr ""
+
+msgid "recording key map momentary"
+msgstr ""
+
+msgid "alt 1 momentary"
+msgstr ""
+
+msgid "alt 2 momentary"
+msgstr ""
+
+msgid "alt 3 momentary"
+msgstr ""
+
+msgid "alt 4 momentary"
+msgstr ""
+
+msgid "alt 5 momentary"
+msgstr ""
+
+msgid "alt 6 momentary"
+msgstr ""
+
+msgid "alt 7 momentary"
+msgstr ""
+
+msgid "alt 8 momentary"
+msgstr ""
+
+msgid "alt 9 momentary"
+msgstr ""
+
+msgid "alt 10 momentary"
+msgstr ""
+
+msgid "alt 11 momentary"
+msgstr ""
+
+msgid "alt 12 momentary"
+msgstr ""
+
+msgid "alt 13 momentary"
+msgstr ""
+
+msgid "alt 14 momentary"
+msgstr ""
+
+msgid "alt 15 momentary"
+msgstr ""
+
+msgid "alt 16 momentary"
+msgstr ""
 
 msgid "auto playing"
 msgstr "reproducción automática"
