@@ -13,6 +13,7 @@
 #include <cstdint>
 #include "osara.h"
 #include "config.h"
+#include "fxChain.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
@@ -223,7 +224,8 @@ class Surface: public IReaperControlSurface {
 			int fx = *(int*)parm2 >> 16;
 			// Don't report parameter changes where they might already be reported by
 			// the UI.
-			if (isParamsDialogOpen || TrackFX_GetChainVisible(track) == fx) {
+			if (isParamsDialogOpen ||
+					(TrackFX_GetChainVisible(track) == fx && !isFxListFocused())) {
 				return 0; // Unsupported.
 			}
 			int param = *(int*)parm2 & 0xFFFF;
