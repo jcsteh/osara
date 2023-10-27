@@ -1364,7 +1364,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 			// container itself.
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
-			itemInfo.dwTypeData = (char*)translate("(container)");
+			itemInfo.dwTypeData = (char*)translate("(Container Parameters)");
 			itemInfo.cch = strlen(itemInfo.dwTypeData);
 			// We add 1 to wID because 0 means cancelled.
 			itemInfo.wID = fx + 1;
