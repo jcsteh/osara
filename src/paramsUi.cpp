@@ -1181,85 +1181,215 @@ void cmdParamsFocus(Command* command) {
 	new ParamsDialog(std::move(source));
 }
 
-typedef vector<pair<int, string>> FxList;
+// Iterates through effects, including effects in containers.
+template<typename ReaperObj>
+class FxIterator {
+	public:
+	FxIterator(ReaperObj obj): obj(obj) {
+		StackItem item;
+		// The first call to next() should move to the first effect, index 0.
+		item.indexInContainer = -1;
+		if constexpr(is_same_v<ReaperObj, MediaTrack*>) {
+			item.containerCount = TrackFX_GetCount(obj);
+		} else {
+			item.containerCount = TakeFX_GetCount(obj);
+		}
+		this->stack.push_back(item);
+	}
 
-FxList listFx(MediaTrack* track) {
-	FxList fxList;
-	char rawName[256];
-	const int count = TrackFX_GetCount(track);
-	for (int index = 0; index < count; ++index) {
-		TrackFX_GetFXName(track, index, rawName, sizeof(rawName));
-		fxList.push_back({index, rawName});
+	bool next() {
+		StackItem* current = &this->stack.back();
+		if (this->containedCount) {
+			// This is a container. Enter it.
+			StackItem sub;
+			if (this->stack.size() == 1) {
+				// This is a top level container.
+				sub.containerFxIndex = 0x2000000 + current->indexInContainer + 1;
+			} else {
+				sub.containerFxIndex = this->fxIndex;
+			}
+			sub.multiplier = current->multiplier * (current->containerCount + 1);
+			sub.containerCount = this->containedCount;
+			this->stack.push_back(sub);
+			return this->success();
+		}
+		for (;;) {
+			// Get the next effect.
+			++current->indexInContainer;
+			if (current->indexInContainer < current->containerCount) {
+				return this->success();
+			}
+			// We've reached the end of this container. Walk out of it.
+			this->stack.pop_back();
+			if (this->stack.empty()) {
+				// There are no more effects of this type.
+				break;
+			}
+			current = &this->stack.back();
+		}
+		if constexpr(is_same_v<ReaperObj, MediaTrack*>) {
+			if (!this->rec) {
+				// There might be input or monitoring effects.
+				return this->firstRec();
+			}
+		}
+		// There are no more effects.
+		return false;
 	}
-	const int recCount = TrackFX_GetRecCount(track);
-	if (recCount == 0) {
-		return fxList;
-	}
-	string suffix;
-	if (track == GetMasterTrack(0)) {
-		// Translators: In the menu of effects when opening the FX Parameters
-		// dialog, this is presented after effects which are monitoring FX.
-		suffix = translate("[monitor]");
-	} else {
-		// Translators: In the menu of effects when opening the FX Parameters
-		// dialog, this is presented after effects which are input FX.
-		suffix = translate("[input]");
-	}
-	for (int index = 0; index < recCount; ++index) {
-		const int rawIndex = 0x1000000 + index;
-		TrackFX_GetFXName(track, rawIndex, rawName, sizeof(rawName));
-		string name(rawName);
-		name += " ";
-		name += suffix;
-		fxList.push_back({rawIndex, name});
-	}
-	return fxList;
-}
 
-FxList listFx(MediaItem_Take* track) {
-	FxList fxList;
-	char rawName[256];
-	const int count = TakeFX_GetCount(track);
-	for (int index = 0; index < count; ++index) {
-		TakeFX_GetFXName(track, index, rawName, sizeof(rawName));
-		fxList.push_back({index, rawName});
+	int getFxIndex() {
+		return this->fxIndex;
 	}
-	return fxList;
-}
+
+	bool isContainer() {
+		return !!this->containedCount;
+	}
+
+	string getName() {
+		char name[256];
+		if constexpr (is_same_v<ReaperObj, MediaTrack*>) {
+			TrackFX_GetFXName(obj, this->fxIndex, name, sizeof(name));
+		} else {
+			TakeFX_GetFXName(obj, this->fxIndex, name, sizeof(name));
+		}
+		ostringstream s;
+		s << (this->stack.back().indexInContainer + 1) << " ";
+		shortenFxName(name, s);
+		if constexpr (is_same_v<ReaperObj, MediaTrack*>) {
+			if (rec && this->stack.size() == 1) {
+				s << " ";
+				if (obj == GetMasterTrack(nullptr)) {
+					// Translators: In the menu of effects when opening the FX Parameters
+					// dialog, this is presented after effects which are monitoring FX.
+					s << translate("[monitor]");
+				} else {
+					// Translators: In the menu of effects when opening the FX Parameters
+					// dialog, this is presented after effects which are input FX.
+					s << translate("[input]");
+				}
+			}
+		}
+		return s.str();
+	}
+
+	int getLevel() {
+		return this->stack.size();
+	}
+
+	private:
+	// Called when we successfully iterate to the next effect.
+	bool success() {
+		// Cache the index for this effect.
+		this->fxIndex = this->rec ? 0x1000000 : 0;
+		const StackItem& item = this->stack.back();
+		if (this->stack.size() == 1) {
+			// We're not in a container.
+			this->fxIndex += item.indexInContainer;
+		} else {
+			this->fxIndex +=
+				(item.indexInContainer + 1) * item.multiplier + item.containerFxIndex;
+		}
+		// If this is a container, cache how many effects it contains.
+		char res[5] = "0";
+		if constexpr (is_same_v<ReaperObj, MediaTrack*>) {
+			TrackFX_GetNamedConfigParm(obj, this->fxIndex, "container_count", res,
+				sizeof(res));
+		} else {
+			TakeFX_GetNamedConfigParm(obj, this->fxIndex, "container_count", res,
+				sizeof(res));
+		}
+		this->containedCount = atoi(res);
+		return true;
+	}
+
+	// Iterate to the first input or monitoring effect, if any.
+	bool firstRec() {
+		int count = TrackFX_GetRecCount(obj);
+		if (count > 0) {
+			this->rec = true;
+			StackItem item;
+			item.indexInContainer = 0;
+			item.containerCount = count;
+			this->stack.push_back(item);
+			return this->success();
+		}
+		return false;
+	}
+
+	ReaperObj obj;
+	bool rec = false;
+	int fxIndex = -1;
+	int containedCount = 0;
+
+	struct StackItem {
+		int indexInContainer = 0;
+		int containerCount = 0;
+		int containerFxIndex = 0;
+		int multiplier = 1;
+	};
+	vector<StackItem> stack;
+};
 
 template<typename ReaperObj>
 void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
-	const auto fxList = listFx(obj);
-	const size_t fxCount = fxList.size();
+	FxIterator iter(obj);
 	int fx = -1;
-	if (fxCount == 0) {
-		outputMessage(translate("no FX"));
-		return;
-	} else if (fxCount == 1)
-		fx = fxList[0].first;
-	else {
-		// Present a menu of effects.
-		HMENU effects = CreatePopupMenu();
-		MENUITEMINFO itemInfo;
-		itemInfo.cbSize = sizeof(MENUITEMINFO);
-		for (size_t f = 0; f < fxCount; ++f) {
+	// Present a menu of effects.
+	// We might have sub-menus, so we need a stack.
+	vector<HMENU> menus;
+	menus.push_back(CreatePopupMenu());
+	MENUITEMINFO itemInfo;
+	itemInfo.cbSize = sizeof(MENUITEMINFO);
+	int count = 0;
+	while (iter.next()) {
+		// If we've exited containers, move to the appropriate ancestor menu.
+		for (int level = menus.size(); level > iter.getLevel(); --level) {
+			menus.pop_back();
+		}
+		itemInfo.fMask = MIIM_TYPE;
+		itemInfo.fType = MFT_STRING;
+		// Make sure this stays around until the InsertMenuItem call.
+		const string name = iter.getName();
+		itemInfo.dwTypeData = (char*)name.c_str();
+		itemInfo.cch = name.length();
+		fx = iter.getFxIndex();
+		if (iter.isContainer()) {
+			// Create a sub-menu for this container.
+			itemInfo.fMask |= MIIM_SUBMENU;
+			HMENU subMenu = CreatePopupMenu();
+			itemInfo.hSubMenu = subMenu;
+			InsertMenuItem(menus.back(), (UINT)count, true, &itemInfo);
+			menus.push_back(subMenu);
+			// The first item in the sub-menu allows access to the parameters for the
+			// container itself.
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
-			itemInfo.wID = fxList[f].first + 1;
-			ostringstream s;
-			s << f + 1 << " ";
-			shortenFxName(fxList[f].second.c_str(), s);
-			// Make sure this stays around until the InsertMenuItem call.
-			const string str = s.str();
-			itemInfo.dwTypeData = (char*)str.c_str();
-			itemInfo.cch = (UINT)s.tellp();
-			InsertMenuItem(effects, (UINT)f, true, &itemInfo);
+			itemInfo.dwTypeData = (char*)translate("(container)");
+			itemInfo.cch = strlen(itemInfo.dwTypeData);
+			// We add 1 to wID because 0 means cancelled.
+			itemInfo.wID = fx + 1;
+			InsertMenuItem(subMenu, 0, true, &itemInfo);
+		} else {
+			itemInfo.fMask |= MIIM_ID;
+			// We add 1 to wID because 0 means cancelled.
+			itemInfo.wID = fx + 1;
+			InsertMenuItem(menus.back(), (UINT)count, true, &itemInfo);
 		}
-		fx = TrackPopupMenu(effects, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL) - 1;
-		DestroyMenu(effects);
-		if (fx == -1)
-			return; // Cancelled.
+		++count;
 	}
+	if (count == 0) {
+		outputMessage(translate("no FX"));
+		DestroyMenu(menus.front());
+		return;
+	}
+	if (count > 1) {
+		fx = TrackPopupMenu(menus.front(), TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0,
+			mainHwnd, nullptr) - 1;
+		if (fx == -1) {
+			return; // Cancelled.
+		}
+	}
+	DestroyMenu(menus.front());
 
 	auto source = make_unique<FxParams<ReaperObj>>(obj, apiPrefix, fx);
 	new ParamsDialog(std::move(source));
