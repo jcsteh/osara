@@ -196,7 +196,6 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	}
 	outputMessage(enabled ? translate("active") : translate("bypassed"),
 		/* interrupt */ false);
-	if (fx >= 0x2000000) outputMessage(format("{}", fx - 0x2000000));
 	return true;
 }
 
