@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2023-10-25 01:39\n"
+"PO-Revision-Date: 2023-11-02 21:40\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -893,6 +893,9 @@ msgstr "[retorno]"
 #. dialog, this is presented after effects which are input FX.
 msgid "[input]"
 msgstr "[Entrada]"
+
+msgid "(Container Parameters)"
+msgstr ""
 
 msgid "no FX"
 msgstr "Sem efeitos"

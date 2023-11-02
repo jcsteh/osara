@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-10-25 01:39\n"
+"PO-Revision-Date: 2023-11-02 21:40\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -857,6 +857,9 @@ msgstr "[監聽]"
 #. dialog, this is presented after effects which are input FX.
 msgid "[input]"
 msgstr "[輸入]"
+
+msgid "(Container Parameters)"
+msgstr "容器參數"
 
 msgid "no FX"
 msgstr "無 FX"
