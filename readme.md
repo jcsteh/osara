@@ -249,6 +249,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Transient detection sensitivity: Decrease: Alt+Shift+PageDown
 - Transient detection threshold: Increase: Control+Shift+PageUp
 - Transient detection threshold: Decrease: Control+Shift+PageDown
+- Options: Toggle snapping: Alt+N
 
 #### Undo
 - Edit: Undo: Control+Z

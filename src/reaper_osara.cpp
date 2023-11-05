@@ -2282,6 +2282,8 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 42363}, {_t("samples secondary"), nullptr}}, // View: Secondary time unit for ruler: Samples
 	{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
 	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
+	{{MAIN_SECTION, 1157}, {_t("enabled snap"), _t("disabled snap")}}, // Options: Toggle snapping
+	
 	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
 	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
 	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
