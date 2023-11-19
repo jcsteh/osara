@@ -1920,6 +1920,46 @@ void postChangeVerticalZoom(int command) {
 	outputMessage(translate(format("{} vertical zoom", zoom)));
 }
 
+string getShortenedAltSectionName(int sectionId) {
+	string full = SectionFromUniqueID(sectionId)->name;
+	// In English, the section name is "Main (%s)"; e.g. "Main (alt-1)". We only
+	// want the %s part; e.g. "alt-1".
+	// 1. Get the translated section name template.
+	string templ = LocalizeString("Main (%s)", "accel_sec", 0);
+	// 2. Find where %s starts.
+	size_t start = templ.find("%s");
+	if (start == string::npos) {
+		return full;
+	}
+	// 3. Calculate where %s ends relative to the end of the string. For example,
+	// in English, this will be 1, the ")" character.
+	size_t fromEnd = templ.length() - start - 2;
+	// 4. Get the expanded %s from the full section name using the positions we
+	// calculated in steps 2 and 3.
+	return full.substr(start, full.length() - start - fromEnd);
+}
+
+constexpr int CMD_TOGGLE_OVERRIDE_TO_ALT1 = 24803;
+constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1 = 24853;
+constexpr int MAIN_ALT1_SECTION = 1;
+constexpr int MAIN_ALT16_SECTION = 16;
+
+void postToggleOverrideToAltN(int command) {
+	int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
+		+ MAIN_ALT1_SECTION;
+	outputMessage(getShortenedAltSectionName(sectionId));
+}
+
+void postMomentarilySetOverrideToAltN(int command) {
+	int sectionId = command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1
+		+ MAIN_ALT1_SECTION;
+	// Translators: Reported when using "Main action section: Momentarily set
+	// override to alt-1", etc. {} is replaced with the shortened section name;
+	// e.g. "alt-1 momentary".
+	outputMessage(format(translate("{} momentary"),
+		getShortenedAltSectionName(sectionId)));
+}
+
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
 	if(!w) {// support Reaper versions before 6.65
@@ -2121,6 +2161,38 @@ PostCommand POST_COMMANDS[] = {
 	{40111, postChangeVerticalZoom}, // View: Zoom in vertical
 	{40112, postChangeVerticalZoom}, // View: Zoom out vertical
 	{40113, postChangeVerticalZoom}, // View: Toggle track zoom to maximum height
+	{24803, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-1
+	{24804, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-2
+	{24805, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-3
+	{24806, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-4
+	{24807, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-5
+	{24808, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-6
+	{24809, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-7
+	{24810, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-8
+	{24811, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-9
+	{24812, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-10
+	{24813, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-11
+	{24814, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-12
+	{24815, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-13
+	{24816, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-14
+	{24817, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-15
+	{24818, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-16
+	{24853, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-1
+	{24854, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-2
+	{24855, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-3
+	{24856, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-4
+	{24857, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-5
+	{24858, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-6
+	{24859, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-7
+	{24860, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-8
+	{24861, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-9
+	{24862, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-10
+	{24863, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-11
+	{24864, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-12
+	{24865, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-13
+	{24866, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-14
+	{24867, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-15
+	{24868, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-16
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
@@ -2285,40 +2357,8 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
 	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
 	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
-	{{MAIN_SECTION, 24803}, {_t("alt 1"), nullptr}}, // Main action section: Toggle override to alt-1
-	{{MAIN_SECTION, 24804}, {_t("alt 2"), nullptr}}, // Main action section: Toggle override to alt-2
-	{{MAIN_SECTION, 24805}, {_t("alt 3"), nullptr}}, // Main action section: Toggle override to alt-3
-	{{MAIN_SECTION, 24806}, {_t("alt 4"), nullptr}}, // Main action section: Toggle override to alt-4
-	{{MAIN_SECTION, 24807}, {_t("alt 5"), nullptr}}, // Main action section: Toggle override to alt-5
-	{{MAIN_SECTION, 24808}, {_t("alt 6"), nullptr}}, // Main action section: Toggle override to alt-6
-	{{MAIN_SECTION, 24809}, {_t("alt 7"), nullptr}}, // Main action section: Toggle override to alt-7
-	{{MAIN_SECTION, 24810}, {_t("alt 8"), nullptr}}, // Main action section: Toggle override to alt-8
-	{{MAIN_SECTION, 24811}, {_t("alt 9"), nullptr}}, // Main action section: Toggle override to alt-9
-	{{MAIN_SECTION, 24812}, {_t("alt 10"), nullptr}}, // Main action section: Toggle override to alt-10
-	{{MAIN_SECTION, 24813}, {_t("alt 11"), nullptr}}, // Main action section: Toggle override to alt-11
-	{{MAIN_SECTION, 24814}, {_t("alt 12"), nullptr}}, // Main action section: Toggle override to alt-12
-	{{MAIN_SECTION, 24815}, {_t("alt 13"), nullptr}}, // Main action section: Toggle override to alt-13
-	{{MAIN_SECTION, 24816}, {_t("alt 14"), nullptr}}, // Main action section: Toggle override to alt-14
-	{{MAIN_SECTION, 24817}, {_t("alt 15"), nullptr}}, // Main action section: Toggle override to alt-15
-	{{MAIN_SECTION, 24818}, {_t("alt 16"), nullptr}}, // Main action section: Toggle override to alt-16
 	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
 	{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}}, // Main action section: Momentarily set override to recording
-	{{MAIN_SECTION, 24853}, {_t("alt 1 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-1
-	{{MAIN_SECTION, 24854}, {_t("alt 2 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-2
-	{{MAIN_SECTION, 24855}, {_t("alt 3 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-3
-	{{MAIN_SECTION, 24856}, {_t("alt 4 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-4
-	{{MAIN_SECTION, 24857}, {_t("alt 5 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-5
-	{{MAIN_SECTION, 24858}, {_t("alt 6 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-6
-	{{MAIN_SECTION, 24859}, {_t("alt 7 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-7
-	{{MAIN_SECTION, 24860}, {_t("alt 8 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-8
-	{{MAIN_SECTION, 24861}, {_t("alt 9 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-9
-	{{MAIN_SECTION, 24862}, {_t("alt 10 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-10
-	{{MAIN_SECTION, 24863}, {_t("alt 11 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-11
-	{{MAIN_SECTION, 24864}, {_t("alt 12 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-12
-	{{MAIN_SECTION, 24865}, {_t("alt 13 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-13
-	{{MAIN_SECTION, 24866}, {_t("alt 14 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-14
-	{{MAIN_SECTION, 24867}, {_t("alt 15 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-15
-	{{MAIN_SECTION, 24868}, {_t("alt 16 momentary"), nullptr}}, // Main action section: Momentarily set override to alt-16
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}}, // Preview: Toggle repeat on/off
@@ -4546,8 +4586,6 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
-	constexpr int MAIN_ALT1_SECTION = 1;
-	constexpr int MAIN_ALT16_SECTION = 16;
 	constexpr int MAIN_ALT_REC_SECTION = 100;
 	if ((MAIN_ALT1_SECTION <= section->uniqueID &&
 				section->uniqueID <= MAIN_ALT16_SECTION) ||
