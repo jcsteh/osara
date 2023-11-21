@@ -517,8 +517,19 @@ bool isPosInItem(double pos, MediaItem* item) {
 	return (start <= pos && pos <= end);
 }
 
-bool isFreeItemPositioningEnabled(MediaTrack* track) {
-	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
+enum class FreeMode {
+	none,
+	free,
+	fixed
+};
+
+FreeMode getTrackFreeMode(MediaTrack* track) {
+	int* freeMode = (int*)GetSetMediaTrackInfo(track, "I_FREEMODE", nullptr);
+	if(freeMode) {
+		return static_cast<FreeMode>(*freeMode);
+	} else {// Reaper before version 7
+	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr) ? FreeMode::free : FreeMode::none;
+	}
 }
 
 const char* automationModeAsString(int mode) {
@@ -728,12 +739,14 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
+int trackFixedLane = -1;
 
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
 	shouldMoveToAutoItem = false;
 	SetCursorContext(0, nullptr);
+	trackFixedLane = -1;
 	if (!track)
 		return;
 	ostringstream s;
@@ -832,8 +845,19 @@ void postGoToTrack(int command, MediaTrack* track) {
 			s << " " << format(translate_plural("{} item", "{} items", itemCount),
 				itemCount);
 		}
-		if (isFreeItemPositioningEnabled(track)) {
-			s << " " << translate("free item positioning");
+		switch (getTrackFreeMode(track)) {
+			case FreeMode::free: {
+				s << " " << translate("free item positioning");
+				break;
+			}
+			case FreeMode::fixed: {
+				int laneCount = *(int*)GetSetMediaTrackInfo(track, "I_NUMFIXEDLANES", nullptr);
+				s << " " << format(
+					translate_plural("{} Fixed item lane", "{} fixed item lanes", laneCount), laneCount);
+				break;
+			}
+			case FreeMode::none:
+			break;
 		}
 	}
 	int count;
@@ -3152,6 +3176,9 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		pos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
 		if (direction == 1 ? pos < cursor : pos > cursor)
 			continue; // Not the right direction.
+		if (trackFixedLane >= 0 && (int)GetMediaItemInfo_Value(item, "I_FIXEDLANE") != trackFixedLane){ 
+			continue; // skip item not in focused lane
+		}
 		currentItem = item;
 		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
@@ -4589,6 +4616,31 @@ void cmdOpenDoc(Command* command) {
 		SW_SHOWNORMAL);
 }
 
+void MoveToFixedLane (int direction) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (getTrackFreeMode(track) != FreeMode::fixed) {
+		outputMessage("Track not in fixed lane mode");
+		return;
+	}
+	int laneCount = (int)GetMediaTrackInfo_Value(track, "I_NUMFIXEDLANES");
+	trackFixedLane += direction;
+	if (trackFixedLane < 0) {
+		trackFixedLane = laneCount-1;
+	}
+	if (trackFixedLane >= laneCount) {
+		trackFixedLane = 0;
+	}
+	outputMessage(format(translate("Lane {}"), trackFixedLane + 1));
+}
+
+void cmdNextLane(Command* cmd) {
+	MoveToFixedLane(1);
+}
+
+void cmdPreviousLane(Command* cmd) {
+	MoveToFixedLane(-1);
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -4779,6 +4831,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Next fixed item lane")}, "OSARA_NEXTLANE", cmdNextLane},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Previous fixed item lane")}, "OSARA_PREVIOUSLANE", cmdPreviousLane},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
