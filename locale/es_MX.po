@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2023-11-02 21:40\n"
+"PO-Revision-Date: 2023-11-28 11:01\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1844,6 +1844,12 @@ msgstr "máster muteado"
 
 msgid "master unmuted"
 msgstr "máster desmuteado"
+
+msgid "enabled snap"
+msgstr ""
+
+msgid "disabled snap"
+msgstr ""
 
 msgid "default key map"
 msgstr "mapa de teclas por defecto"

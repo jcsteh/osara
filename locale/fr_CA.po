@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-11-02 21:40\n"
+"PO-Revision-Date: 2023-11-28 11:01\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1845,6 +1845,12 @@ msgstr "mise en sourdine du master activé"
 msgid "master unmuted"
 msgstr "mise en sourdine du master désactivé"
 
+msgid "enabled snap"
+msgstr "magnétisme activé"
+
+msgid "disabled snap"
+msgstr "magnétisme désactivé"
+
 msgid "default key map"
 msgstr "keyMap par défaut"
 
@@ -2167,7 +2173,7 @@ msgstr "[Pas sauvegardé]"
 #. replaced with the first track. {end} will be replaced with the last track
 #. in the range. For example: "1 drums through 5 piano"
 msgid "{start} through {end}"
-msgstr "jusqu'à"
+msgstr "{start} jusqu'à {end}"
 
 msgid "Muted"
 msgstr "En sourdine"

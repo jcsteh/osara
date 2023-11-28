@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-11-02 21:40\n"
+"PO-Revision-Date: 2023-11-28 11:01\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1790,6 +1790,12 @@ msgstr "主控静音"
 
 msgid "master unmuted"
 msgstr "取消主控静音"
+
+msgid "enabled snap"
+msgstr "启用快照"
+
+msgid "disabled snap"
+msgstr "禁用快照"
 
 msgid "default key map"
 msgstr "默认键映射"
