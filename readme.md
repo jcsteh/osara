@@ -938,6 +938,7 @@ To build OSARA, you will need:
 - [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
 
 	Visual Studio 2022 Community/Professional/Enterprise is also supported.
+	However, Preview versions of Visual Studio will not be detected and cannot be used.
 
 	Whether installing Build Tools or Visual Studio, you must enable the following:
 
