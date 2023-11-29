@@ -4203,6 +4203,13 @@ void cmdReportRegionMarkerItems(Command* command) {
 	}
 }
 
+void cmdSelectFromCursorToStartOfProject(Command* cmd) {
+	Main_OnCommand(40626, 0); // Time selection: Set end point
+	Main_OnCommand(40042, 0); // Transport: Go to start of project
+	Main_OnCommand(40625, 0); // Time selection: Set start point
+	outputMessage(translate("selected to start of project"));
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -4373,6 +4380,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take mute envelope visibility (depending on focus)")}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)")}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Select from cursor to start of project")}, "OSARA_SELFROMCURSORTOSTART", cmdSelectFromCursorToStartOfProject},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
