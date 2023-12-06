@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-11-28 11:01\n"
+"PO-Revision-Date: 2023-12-06 04:51\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -2266,6 +2266,9 @@ msgstr "轨道未分组"
 msgid "At Current Position"
 msgstr "光标位置"
 
+msgid "selected to start of project"
+msgstr "到工程开始选中"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
 
@@ -2439,6 +2442,9 @@ msgstr "OSARA: 切换轨道/片段禁音包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
 msgstr "OSARA: 切换轨道前 FX 声像货片段音高包络可见 (取决于焦点)"
+
+msgid "OSARA: Select from cursor to start of project"
+msgstr "OSARA: 选择从光标到工程开始"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2023-11-28 11:01\n"
+"PO-Revision-Date: 2023-12-06 04:51\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2331,6 +2331,9 @@ msgstr "piste non groupée"
 msgid "At Current Position"
 msgstr "A la position actuelle"
 
+msgid "selected to start of project"
+msgstr ""
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: déplacement au prochain objet sans dé-sélectionner les autres objets"
 
@@ -2503,6 +2506,9 @@ msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
 msgstr ""
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
+msgstr ""
+
+msgid "OSARA: Select from cursor to start of project"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

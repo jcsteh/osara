@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-11-28 11:01\n"
+"PO-Revision-Date: 2023-12-06 04:51\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -152,7 +152,7 @@ msgid "bypassed"
 msgstr "обойденный"
 
 msgid "Change Automation Item Selection"
-msgstr "Изменить выбор объекта автоматизации"
+msgstr "Изменить выделение объекта автоматизации"
 
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
@@ -196,10 +196,10 @@ msgstr ""
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] "{} точка выбрана"
-msgstr[1] "{} точки выбраны"
-msgstr[2] "{} точек выбрано"
-msgstr[3] "{} точек выбрано"
+msgstr[0] "{} точка выделена"
+msgstr[1] "{} точки выделены"
+msgstr[2] "{} точек выделено"
+msgstr[3] "{} точек выделено"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
@@ -283,7 +283,7 @@ msgstr[2] "{} приглушено"
 msgstr[3] "{} приглушено"
 
 msgid "noncontiguous selection"
-msgstr "несмежный выбор"
+msgstr "несмежное выделение"
 
 msgid "velocity"
 msgstr "скорость"
@@ -303,19 +303,19 @@ msgstr[3] "{} событий удалено"
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] "{} нота выбрана"
-msgstr[1] "{} ноты выбраны"
-msgstr[2] "{} нот выбрано"
-msgstr[3] "{} нот выбрано"
+msgstr[0] "{} нота выделена"
+msgstr[1] "{} ноты выделены"
+msgstr[2] "{} нот выделено"
+msgstr[3] "{} нот выделено"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] "{} событие выбрано"
-msgstr[1] "{} события выбраны"
-msgstr[2] "{} событий выбрано"
-msgstr[3] "{} событий выбрано"
+msgstr[0] "{} событие выделено"
+msgstr[1] "{} события выделены"
+msgstr[2] "{} событий выделено"
+msgstr[3] "{} событий выделено"
 
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
@@ -572,13 +572,13 @@ msgid "item {num} {name}"
 msgstr "объект {num} {name}"
 
 msgid "no time selection"
-msgstr "нет выбора времени"
+msgstr "нет выделения времени"
 
 msgid "no notes selected"
-msgstr "нет выбранных нот"
+msgstr "нет выделенных нот"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
-msgstr "OSARA: Выбрать все ноты с одинаковой высотой в пределах выбранного времени"
+msgstr "OSARA: Выделить все ноты с одинаковой высотой в пределах выделенного времени"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -1382,7 +1382,7 @@ msgid "disabled delta solo"
 msgstr ""
 
 msgid "no selected items"
-msgstr "нет выбранных объектов"
+msgstr "нет выделенных объектов"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized to common gain".
@@ -1555,10 +1555,10 @@ msgstr "остановить"
 #. the number of items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
-msgstr[0] "{} объект выбран"
-msgstr[1] "{} объекта выбраны"
-msgstr[2] "{} объектов выбраны"
-msgstr[3] "{} объектов выбраны"
+msgstr[0] "{} объект выделен"
+msgstr[1] "{} объекта выделены"
+msgstr[2] "{} объектов выделено"
+msgstr[3] "{} объектов выделено"
 
 #. Reported when prompting for the name of a track.
 msgid "Track name"
@@ -2156,10 +2156,10 @@ msgid "no tracks"
 msgstr "нет треков"
 
 msgid "Change Track Selection"
-msgstr "Изменить выбор трека"
+msgstr "Изменить выделение трека"
 
 msgid "Change Item Selection"
-msgstr "Изменить выбор объекта"
+msgstr "Изменить выделение объекта"
 
 #. Used when navigating items to indicate that an item is
 #. locked.
@@ -2243,10 +2243,10 @@ msgstr[3] "{} треков удалено"
 #. {} is replaced by the number of items affected.
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
-msgstr[0] "выбранная область {} объекта скопирована"
-msgstr[1] "выбранные области {} объектов скопированы"
-msgstr[2] "выбранные области {} объектов скопированы"
-msgstr[3] "выбранные области {} объектов скопированы"
+msgstr[0] "выделенная область {} объекта скопирована"
+msgstr[1] "выделенные области {} объектов скопированы"
+msgstr[2] "выделенных областей {} объектов скопировано"
+msgstr[3] "выделенных областей {} объектов скопировано"
 
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
@@ -2268,7 +2268,7 @@ msgstr[2] "{} объектов удалено"
 msgstr[3] "{} объектов удалено"
 
 msgid "contents of time selection removed"
-msgstr "содержимое выбора времени удалено"
+msgstr "содержимое выделения времени удалено"
 
 msgid "marker deleted"
 msgstr "маркер удалён"
@@ -2461,11 +2461,14 @@ msgstr ""
 msgid "At Current Position"
 msgstr "На текущей позиции"
 
+msgid "selected to start of project"
+msgstr "выделено до начала проекта"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
-msgstr "OSARA: Перейти к следующему элементу (оставив другие элементы выбранными)"
+msgstr "OSARA: Перейти к следующему элементу (оставив другие элементы выделенными)"
 
 msgid "OSARA: Move to previous item (leaving other items selected)"
-msgstr "OSARA: Перейти к предыдущему элементу (оставив другие элементы выбранными)"
+msgstr "OSARA: Перейти к предыдущему элементу (оставив другие элементы выделенными)"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr ""
@@ -2603,7 +2606,7 @@ msgid "OSARA: Cycle automation mode of selected tracks"
 msgstr ""
 
 msgid "OSARA: About"
-msgstr "О плагине"
+msgstr "OSARA: О плагине"
 
 msgid "OSARA: Report groups for current track"
 msgstr ""
@@ -2634,6 +2637,9 @@ msgstr ""
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
 msgstr ""
+
+msgid "OSARA: Select from cursor to start of project"
+msgstr "OSARA: Выделить от курсора до начала проекта"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr ""

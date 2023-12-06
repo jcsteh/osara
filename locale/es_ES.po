@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-11-28 11:01\n"
+"PO-Revision-Date: 2023-12-06 04:51\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -2331,6 +2331,9 @@ msgstr "pista no agrupada"
 msgid "At Current Position"
 msgstr "En la Posición actual"
 
+msgid "selected to start of project"
+msgstr "seleccionado hasta comienzo de proyecto"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: mover al siguiente ítem, dejando los otros seleccionados"
 
@@ -2504,6 +2507,9 @@ msgstr ""
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
 msgstr ""
+
+msgid "OSARA: Select from cursor to start of project"
+msgstr "OSARA: selecciona desde el cursor hasta comienzo de proyecto"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
