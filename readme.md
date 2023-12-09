@@ -132,7 +132,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Select and move to next item: Control+RightArrow
 - Item: Split items at edit or play cursor: S
 - Item: Split items at time selection: Shift+S
-
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
 - Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6
@@ -297,6 +296,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
+- Toggle fullscreen: F11
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
@@ -731,10 +731,14 @@ OSARA also includes some other miscellaneous actions.
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report tracks with record monitor on: Control+Shift+F8
  - Pressing this twice will display the information in a dialog with a text box for easy review.
+- OSARA: Unmonitor all tracks: Alt+F8
 - OSARA: Report tracks with phase inverted: Alt+Shift+F9
  - Pressing this twice will display the information in a dialog with a text box for easy review.
+- OSARA: Set phase normal for all tracks: Alt+F9
 - OSARA: Report track/item/time selection (depending on focus): Control+Shift+Space
  - Pressing this twice will display the information for all selections (not just the focus) in a dialog with a text box for easy review.
+- OSARA: Select from cursor to start of project: Shift+Home
+- OSARA: Select from cursor to end of project: Shift+End
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): Delete
 - OSARA: Report edit/play cursor position and transport state: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
@@ -760,7 +764,6 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: About: Control+F1
-- Toggle fullscreen: F11
 
 #### Midi Editor section of actions list
 - OSARA: Move to next midi item on track: Control+RightArrow
