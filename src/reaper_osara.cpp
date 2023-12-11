@@ -4210,6 +4210,21 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 	outputMessage(translate("selected to start of project"));
 }
 
+void cmdSetPhaseNormalAllTracks(Command* command) {
+	int count = CountTracks(nullptr);
+	if (count == 0) {
+		outputMessage(translate("no tracks"));
+		return;
+	}
+	for (int t = 0; t < count; ++t) {
+		MediaTrack* track = GetTrack(nullptr, t);
+		if (isTrackPhaseInverted(track)) {
+			GetSetMediaTrackInfo(track, "B_PHASE", &bFalse);
+		}
+	}
+	outputMessage(translate("phase normal all tracks"));
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -4381,6 +4396,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take mute envelope visibility (depending on focus)")}, "OSARA_TOGGLEMUTEENVELOPE", cmdToggleMuteEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)")}, "OSARA_TOGGLEPREFXPANTAKEPITCHENVELOPE", cmdTogglePreFXPanOrTakePitchEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Select from cursor to start of project")}, "OSARA_SELFROMCURSORTOSTART", cmdSelectFromCursorToStartOfProject},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Set phase normal for all tracks")}, "OSARA_SETPHASENORMALALLTRACKS", cmdSetPhaseNormalAllTracks},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
