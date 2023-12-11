@@ -4225,7 +4225,7 @@ void cmdSetPhaseNormalAllTracks(Command* command) {
 	outputMessage(translate("phase normal all tracks"));
 }
 
-void cmdUnmonitorAllTracks(Command* cmd) {
+void cmdUnmonitorAllTracks(Command* command) {
 	int count = CountTracks(nullptr);
 	if (count == 0) {
 		outputMessage(translate("no tracks"));
