@@ -4210,17 +4210,16 @@ void cmdSelectFromCursorToStartOfProject(Command* cmd) {
 	outputMessage(translate("selected to start of project"));
 }
 
-void cmdSetPhaseNormalAllTracks(Command* cmd) {
+void cmdSetPhaseNormalAllTracks(Command* command) {
 	int count = CountTracks(nullptr);
 	if (count == 0) {
 		outputMessage(translate("no tracks"));
 		return;
 	}
-	int phaseVal = 0;
 	for (int t = 0; t < count; ++t) {
 		MediaTrack* track = GetTrack(nullptr, t);
 		if (isTrackPhaseInverted(track)) {
-			GetSetMediaTrackInfo(track, "B_PHASE", &phaseVal);
+			GetSetMediaTrackInfo(track, "B_PHASE", &bFalse);
 		}
 	}
 	outputMessage(translate("phase normal all tracks"));
