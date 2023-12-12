@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-12-06 04:51\n"
+"PO-Revision-Date: 2023-12-12 22:39\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2464,6 +2464,15 @@ msgstr "На текущей позиции"
 msgid "selected to start of project"
 msgstr "выделено до начала проекта"
 
+msgid "selected to end of project"
+msgstr "выделено до конца проекта"
+
+msgid "phase normal all tracks"
+msgstr "нормальная фаза для всех треков"
+
+msgid "unmonitored all tracks"
+msgstr "мониторинг всех треков отменён"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Перейти к следующему элементу (оставив другие элементы выделенными)"
 
@@ -2640,6 +2649,15 @@ msgstr ""
 
 msgid "OSARA: Select from cursor to start of project"
 msgstr "OSARA: Выделить от курсора до начала проекта"
+
+msgid "OSARA: Select from cursor to end of project"
+msgstr "OSARA: Выделить от курсора до конца проекта"
+
+msgid "OSARA: Set phase normal for all tracks"
+msgstr "OSARA: Установить нормальную фазу для всех треков"
+
+msgid "OSARA: Unmonitor all tracks"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr ""

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-12-06 04:51\n"
+"PO-Revision-Date: 2023-12-12 22:39\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2334,6 +2334,15 @@ msgstr "À la position actuelle"
 msgid "selected to start of project"
 msgstr "sélectionné à partir du début du projet"
 
+msgid "selected to end of project"
+msgstr "sélectionné jusqu'à la fin du projet"
+
+msgid "phase normal all tracks"
+msgstr "phase normale pour toutes les pistes"
+
+msgid "unmonitored all tracks"
+msgstr "moniteur de toutes les pistes désactivés"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Sélectionne l'objet suivant (en laissant les autres objets sélectionnés)"
 
@@ -2510,6 +2519,15 @@ msgstr "OSARA: Basculer l'affichage de l'enveloppe de panoramique Pré-FX de pis
 
 msgid "OSARA: Select from cursor to start of project"
 msgstr "OSARA: Sélectionner du curseur jusqu'au début du projet"
+
+msgid "OSARA: Select from cursor to end of project"
+msgstr "OSARA : Sélectionner du curseur jusqu'à la fin du projet"
+
+msgid "OSARA: Set phase normal for all tracks"
+msgstr "OSARA : Définir la phase normale pour toutes les pistes"
+
+msgid "OSARA: Unmonitor all tracks"
+msgstr "OSARA : Moniteur de toutes les pistes désactivés"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"

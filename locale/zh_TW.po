@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-12-06 04:51\n"
+"PO-Revision-Date: 2023-12-12 22:39\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2269,6 +2269,15 @@ msgstr "在當前位置"
 msgid "selected to start of project"
 msgstr "選擇到工程開始"
 
+msgid "selected to end of project"
+msgstr "選擇到工程結束"
+
+msgid "phase normal all tracks"
+msgstr "全不軌到像位正常"
+
+msgid "unmonitored all tracks"
+msgstr "取消監聽全部軌道"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一個對象（離開的對象保留被選中）"
 
@@ -2445,6 +2454,15 @@ msgstr "OSARA: 切換軌道 FX 前聲像或片段音高包絡可見（取決於�
 
 msgid "OSARA: Select from cursor to start of project"
 msgstr "OSARA: 從游標處選擇到工程開始"
+
+msgid "OSARA: Select from cursor to end of project"
+msgstr "OSARA: 從游標處選擇到工程結束"
+
+msgid "OSARA: Set phase normal for all tracks"
+msgstr "OSARA: 設定全部軌道像位正常"
+
+msgid "OSARA: Unmonitor all tracks"
+msgstr "OSARA: 取消監聽全部軌道"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
