@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -147,36 +147,35 @@ void cmdDeleteEnvelopePoints(Command* command) {
 	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, true, false);
 }
 
+// For each selected envelope point, Call func(autoItemIndex, pointIndex) .
+// func should return true to continue iterating, false to stop.
+void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
+	// Iterate the points in the envelope itself and each automation item. -1
+	// means the envelope itself.
+	int itemCount = CountAutomationItems(envelope);
+	for (int item = -1; item < itemCount; ++item) {
+		int pointCount = CountEnvelopePointsEx(envelope, item);
+		for (int point = 0; point < pointCount; ++point) {
+			bool selected;
+			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, nullptr, nullptr,
+				&selected);
+			if (selected && !func(item, point)) {
+				return;
+			}
+		}
+	}
+}
+
 // If max2 is true, this only counts to 2;
 // i.e. 2 or more selected envelope points returns 2.
 int countSelectedEnvelopePoints(TrackEnvelope* envelope, bool max2=false) {
 	int numSel = 0;
-	bool selected;
-	// First, count the points in the envelope itself.
-	int pointCount = CountEnvelopePoints(envelope);
-	for (int point = 0; point < pointCount; ++point) {
-		GetEnvelopePoint(envelope, point, NULL, NULL, NULL, NULL, &selected);
-		if (selected) {
+	forEachSelectedEnvelopePoint(envelope,
+		[max2, &numSel](int item, int point) {
 			++numSel;
+			return !(max2 && numSel == 2);
 		}
-		if (max2 && numSel == 2) {
-			return 2; // Don't care above this.
-		}
-	}
-	// Now add the count of the points in each automation item.
-	int itemCount = CountAutomationItems(envelope);
-	for (int item = 0; item < itemCount; ++item) {
-		pointCount = CountEnvelopePointsEx(envelope, item);
-		for (int point = 0; point < pointCount; ++point) {
-			GetEnvelopePointEx(envelope, item, point, NULL, NULL, NULL, NULL, &selected);
-			if (selected) {
-				++numSel;
-			}
-			if (max2 && numSel == 2) {
-				return 2; // Don't care above this.
-			}
-		}
-	}
+	);
 	return numSel;
 }
 
@@ -593,44 +592,13 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-void reportToggleTrackEnvelope(const char* envType) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track) {
-		return;
-	}
-	if (!isTrackSelected(track)) {
-		outputMessage(translate("track not selected"));
-		return;
-	}
-	auto envelope = (TrackEnvelope*)GetSetMediaTrackInfo(track, "P_ENV",
-		(void*)envType);
-	bool visible = envelope && isEnvelopeVisible(envelope);
-	char name[50];
-	GetEnvelopeName(envelope, name, sizeof(name));
-	if (visible) {
-		// Translators: Reported when showing an envelope. {} will be replaced with
-		// the name of the envelope; e.g. "showed volume envelope".
-		outputMessage(format(translate("showed {} envelope"), name));
-	} else {
-		// Translators: Reported when hiding an envelope. {} will be replaced with
-		// the name of the envelope; e.g. "hid volume envelope".
-		outputMessage(format(translate("hid {} envelope"), name));
-	}
-}
-
-void postToggleTrackVolumeEnvelope(int command) {
-	reportToggleTrackEnvelope("<VOLENV2");
-}
-
-void postToggleTrackPanEnvelope(int command) {
-	reportToggleTrackEnvelope("<PANENV2");
-}
-
-set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
+set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
+	auto countFunc, auto getFunc
+) {
 	set<TrackEnvelope*> envelopes;
-	int count = CountTrackEnvelopes(track);
+	int count = countFunc(obj);
 	for (int i = 0; i < count; ++i) {
-		TrackEnvelope* env = GetTrackEnvelope(track, i);
+		TrackEnvelope* env = getFunc(obj, i);
 		if (isEnvelopeVisible(env)) {
 			envelopes.emplace(env);
 		}
@@ -638,14 +606,13 @@ set<TrackEnvelope*> getVisibleTrackEnvelopes(MediaTrack* track) {
 	return envelopes;
 }
 
-void cmdToggleTrackEnvelope(Command* command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track) {
-		return;
-	}
-	set<TrackEnvelope*> before = getVisibleTrackEnvelopes(track);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	set<TrackEnvelope*> after = getVisibleTrackEnvelopes(track);
+void cmdhToggleEnvelope(int command, auto obj,
+	auto countFunc, auto getFunc,
+	const char* showedMsg, const char* hidMsg
+) {
+	set<TrackEnvelope*> before = getVisibleEnvelopes(obj, countFunc, getFunc);
+	Main_OnCommand(command, 0);
+	set<TrackEnvelope*> after = getVisibleEnvelopes(obj, countFunc, getFunc);
 	if (after.size() == before.size()) {
 		outputMessage(translate("no envelopes toggled"));
 		return;
@@ -657,10 +624,42 @@ void cmdToggleTrackEnvelope(Command* command) {
 	char name[50];
 	GetEnvelopeName(envelope, name, sizeof(name));
 	if (after.size() > before.size()) {
-		outputMessage(format(translate("showed {} envelope"), name));
+		outputMessage(format(showedMsg, name));
 	} else {
-		outputMessage(format(translate("hid {} envelope"), name));
+		outputMessage(format(hidMsg, name));
 	}
+}
+
+void cmdhToggleTrackEnvelope(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	cmdhToggleEnvelope(command, track, CountTrackEnvelopes, GetTrackEnvelope,
+		translate("showed track {} envelope"),
+		translate("hid track {} envelope"));
+}
+
+void cmdToggleTrackEnvelope(Command* command) {
+	cmdhToggleTrackEnvelope(command->gaccel.accel.cmd);
+}
+
+void cmdhToggleTakeEnvelope(int command) {
+	MediaItem* item = getItemWithFocus();
+	if (!item) {
+		return;
+	}
+	MediaItem_Take* take = GetActiveTake(item);
+	if (!take) {
+		return;
+	}
+	cmdhToggleEnvelope(command, take, CountTakeEnvelopes, GetTakeEnvelope,
+		translate("showed take {} envelope"),
+		translate("hid take {} envelope"));
+}
+
+void cmdToggleTakeEnvelope(Command* command) {
+	cmdhToggleTakeEnvelope(command->gaccel.accel.cmd);
 }
 
 void postSelectMultipleEnvelopePoints(int command) {
@@ -698,4 +697,68 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
 	}
 	outputMessage(s);
+}
+
+void cmdCycleEnvelopePointShape(Command* command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int shape = -1;
+	forEachSelectedEnvelopePoint(envelope,
+		[envelope, &shape](int item, int point) {
+			if (shape == -1) {
+				// Get the shape of the first selected point. (The shape variable will
+				// only be -1 for the first point we encounter.)
+				GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
+					nullptr);
+				// Adjust the shape. This will be set for all selected points.
+				++shape;
+				if (shape > 4) {
+					// 4 is fast end. Don't support setting bezier (5) here, as that requires
+					// a tension value.
+					shape = 0; // Linear
+				}
+			}
+			SetEnvelopePointEx(envelope, item, point, nullptr, nullptr, &shape, nullptr,
+				nullptr, nullptr);
+			return true;
+		}
+	);
+	if (shape == -1) {
+		return; // No selected points.
+	}
+	outputMessage(getEnvelopeShapeName(shape));
+}
+
+void cmdToggleVolumeEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40693); // Take: Toggle take volume envelope
+	} else {
+		cmdhToggleTrackEnvelope(40406); // Track: Toggle track volume envelope visible
+	}
+}
+
+void cmdTogglePanEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40694); // Take: Toggle take pan envelope
+	} else {
+		cmdhToggleTrackEnvelope(40407); // Track: Toggle track pan envelope visible
+	}
+}
+
+void cmdToggleMuteEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(40695); // Take: Toggle take mute envelope
+	} else {
+		cmdhToggleTrackEnvelope(40867); // Track: Toggle track mute envelope visible
+	}
+}
+
+void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(41612); // Take: Toggle take pitch envelope
+	} else {
+		cmdhToggleTrackEnvelope(40409); // Track: Toggle track pre-FX pan envelope visible
+	}
 }

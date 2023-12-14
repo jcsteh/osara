@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * MIDI Editor commands header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -65,3 +65,4 @@ void postMidiSwitchCCLane(int command);
 void postToggleMidiInputsAsStepInput(int command);
 void postToggleFunctionKeysAsStepInput(int command);
 void postMidiToggleSnap(int command);
+void postMidiChangeZoom(int command);

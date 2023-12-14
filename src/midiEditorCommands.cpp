@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * MIDI Editor commands code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -16,6 +16,7 @@
 #include <float.h>
 #include <compare>
 #include<regex>
+#include<string_view>
 #include "midiEditorCommands.h"
 #include "osara.h"
 #include "config.h"
@@ -48,6 +49,34 @@ int getItemPPQ(MediaItem* item) {
 	cachedPPQ = ppq;
 	cachedItem = item;
 	return ppq;
+}
+
+struct FreeReaperPtr {
+	void operator()(void* p) {
+		FreeHeapPtr(p);
+	}
+};
+
+// return the midi editor zoom ratio of the take
+double getMidiZoomRatio(MediaItem_Take* take) {
+	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
+	char guid[40]; 
+	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
+	MediaItem* item = GetMediaItemTake_Item(take);
+	unique_ptr<char, FreeReaperPtr> state(GetSetObjectState(item, ""));
+	if(!state) {
+		return -1;
+	}
+	auto stateSV = string_view(state.get());
+	size_t takePos = stateSV.find(guid);
+	if (takePos == string::npos) {
+		return -1;
+	}
+	match_results<string_view::const_iterator> match;
+	if (!regex_search(stateSV.cbegin() + takePos, stateSV.cend(), match, re)) {
+		return -1;
+	}
+	return stod(match.str(1));
 }
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
@@ -971,6 +1000,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
 		isSelectionContiguous = true;
 	}
+	const double oldCursor = GetCursorPosition();
 	// Move the edit cursor to this chord, select it and play it.
 	bool cursorSet = false;
 	vector<MidiNote> notes(chord.first, chord.second);
@@ -983,16 +1013,22 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			selectNote(take, note.index);
 		}
 	}
-	previewNotes(take, notes);
+	const bool cursorMoved = oldCursor != GetCursorPosition();
+	if (cursorMoved) {
+		previewNotes(take, notes);
+	}
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	if (settings::reportScrub) {
-		s << formatCursorPosition() << " ";
+	if (settings::reportPositionMIDI) {
+		s << formatCursorPosition();
+		if (s.tellp() > 0) {
+			s << " ";
+		}
 	}
-	if (!select && !isNoteSelected(take, chord.first.getIndex())) {
+	if (cursorMoved && !select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (settings::reportNotes && settings::reportScrub) {
+	if (cursorMoved && settings::reportNotes && settings::reportPositionMIDI) {
 		int count = chord.second - chord.first;
 		// Translators: used when reporting the number of notes in a chord.
 		// {} will be replaced by the number of notes. E.g. "3 notes"
@@ -1006,7 +1042,9 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
 		}
 	}
-	outputMessage(s);
+	if (s.tellp() > 0) {
+		outputMessage(s);
+	}
 }
 
 void cmdMidiMoveToNextChord(Command* command) {
@@ -1085,7 +1123,15 @@ void postMidiMovePitchCursor(int command) {
 	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
 	int chan = MIDIEditor_GetSetting_int(editor, "default_note_chan");
 	int vel = MIDIEditor_GetSetting_int(editor, "default_note_vel");
-	previewNotes(take, {{chan, pitch, vel}});
+	double start = GetCursorPosition();
+	double startQn = TimeMap2_timeToQN(nullptr, start);
+	double lenQn;
+	double gridQn = MIDI_GetGrid(take, nullptr, &lenQn);
+	if (lenQn == 0) {
+		lenQn = gridQn;
+	}
+	double end = TimeMap2_QNToTime(nullptr, startQn + lenQn);
+	previewNotes(take, {{chan, pitch, vel, -1, start, end}});
 	if (settings::reportNotes) {
 		outputMessage(getMidiNoteName(take, pitch, chan));
 	}
@@ -1214,75 +1260,73 @@ void cmdMidiToggleSelCC (Command* command) {
 
 const string getMidiControlName(MediaItem_Take *take, int control, int channel) {
 	static map<int, string> names = {
-		// translate firstString begin
-		{0, "Bank Select MSB"},
-		{1, "Mod Wheel MSB"},
-		{2, "Breath MSB"},
-		{4, "Foot Pedal MSB"},
-		{5, "Portamento MSB"},
-		{6, "Data Entry MSB"},
-		{7, "Volume MSB"},
-		{8, "Balance MSB"},
-		{10, "Pan Position MSB"},
-		{11, "Expression MSB"},
-		{12, "Control 1 MSB"},
-		{13, "Control 2 MSB"},
-		{16, "GP Slider 1"},
-		{17, "GP Slider 2"},
-		{18, "GP Slider 3"},
-		{19, "GP Slider 4"},
-		{32, "Bank Select LSB"},
-		{33, "Mod Wheel LSB"},
-		{34, "Breath LSB"},
-		{36, "Foot Pedal LSB"},
-		{37, "Portamento LSB"},
-		{38, "Data Entry LSB"},
-		{39, "Volume LSB"},
-		{40, "Balance LSB"},
-		{42, "Pan Position LSB"},
-		{43, "Expression LSB"},
-		{44, "Control 1 LSB"},
-		{45, "Control 2 LSB"},
-		{64, "Hold Pedal (on/off)"},
-		{65, "Portamento (on/off)"},
-		{66, "Sostenuto (on/off)"},
-		{67, "Soft Pedal (on/off)"},
-		{68, "Legato Pedal (on/off)"},
-		{69, "Hold 2 Pedal (on/off)"},
-		{70, "Sound Variation"},
-		{71, "Timbre/Resonance"},
-		{72, "Sound Release"},
-		{73, "Sound Attack"},
-		{74, "Brightness/Cutoff Freq"},
-		{75, "Sound Control 6"},
-		{76, "Sound Control 7"},
-		{77, "Sound Controll 8"},
-		{78, "Sound Control 9"},
-		{79, "Sound Control 10"},
-		{80, "GP Button 1 (on/off)"},
-		{81, "GP Button 2 (on/off)"},
-		{82, "GP Button 3 (on/off)"},
-		{83, "GP Button 4 (on/off)"},
-		{91, "Effects Level"},
-		{92, "Tremolo Level"},
-		{93, "Chorus Level"},
-		{94, "Celeste Level"},
-		{95, "Phaser Level"},
-		{96, "Data Button Inc"},
-		{97, "Data Button Dec"},
-		{98, "Non-Reg Parm LSB"},
-		{99, "Non-Reg Parm MSB"},
-		{100, "Reg Parm LSB"},
-		{101, "Reg Parm MSB"},
-		{120, "All Sound Off"},
-		{121, "Reset"},
-		{122, "Local"},
-		{123, "All Notes Off"},
-		{124, "Omni On"},
-		{125, "Omni Off"},
-		{126, "Mono On"},
-		{127, "Poly On"}
-		// translate firstString end
+		{0, _t("Bank Select MSB")},
+		{1, _t("Mod Wheel MSB")},
+		{2, _t("Breath MSB")},
+		{4, _t("Foot Pedal MSB")},
+		{5, _t("Portamento MSB")},
+		{6, _t("Data Entry MSB")},
+		{7, _t("Volume MSB")},
+		{8, _t("Balance MSB")},
+		{10, _t("Pan Position MSB")},
+		{11, _t("Expression MSB")},
+		{12, _t("Control 1 MSB")},
+		{13, _t("Control 2 MSB")},
+		{16, _t("GP Slider 1")},
+		{17, _t("GP Slider 2")},
+		{18, _t("GP Slider 3")},
+		{19, _t("GP Slider 4")},
+		{32, _t("Bank Select LSB")},
+		{33, _t("Mod Wheel LSB")},
+		{34, _t("Breath LSB")},
+		{36, _t("Foot Pedal LSB")},
+		{37, _t("Portamento LSB")},
+		{38, _t("Data Entry LSB")},
+		{39, _t("Volume LSB")},
+		{40, _t("Balance LSB")},
+		{42, _t("Pan Position LSB")},
+		{43, _t("Expression LSB")},
+		{44, _t("Control 1 LSB")},
+		{45, _t("Control 2 LSB")},
+		{64, _t("Hold Pedal (on/off)")},
+		{65, _t("Portamento (on/off)")},
+		{66, _t("Sostenuto (on/off)")},
+		{67, _t("Soft Pedal (on/off)")},
+		{68, _t("Legato Pedal (on/off)")},
+		{69, _t("Hold 2 Pedal (on/off)")},
+		{70, _t("Sound Variation")},
+		{71, _t("Timbre/Resonance")},
+		{72, _t("Sound Release")},
+		{73, _t("Sound Attack")},
+		{74, _t("Brightness/Cutoff Freq")},
+		{75, _t("Sound Control 6")},
+		{76, _t("Sound Control 7")},
+		{77, _t("Sound Controll 8")},
+		{78, _t("Sound Control 9")},
+		{79, _t("Sound Control 10")},
+		{80, _t("GP Button 1 (on/off)")},
+		{81, _t("GP Button 2 (on/off)")},
+		{82, _t("GP Button 3 (on/off)")},
+		{83, _t("GP Button 4 (on/off)")},
+		{91, _t("Effects Level")},
+		{92, _t("Tremolo Level")},
+		{93, _t("Chorus Level")},
+		{94, _t("Celeste Level")},
+		{95, _t("Phaser Level")},
+		{96, _t("Data Button Inc")},
+		{97, _t("Data Button Dec")},
+		{98, _t("Non-Reg Parm LSB")},
+		{99, _t("Non-Reg Parm MSB")},
+		{100, _t("Reg Parm LSB")},
+		{101, _t("Reg Parm MSB")},
+		{120, _t("All Sound Off")},
+		{121, _t("Reset")},
+		{122, _t("Local")},
+		{123, _t("All Notes Off")},
+		{124, _t("Omni On")},
+		{125, _t("Omni Off")},
+		{126, _t("Mono On")},
+		{127, _t("Poly On")}
 	};
 	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
@@ -1567,7 +1611,8 @@ void cmdMidiFilterWindow(Command *command) {
 	HWND editor = MIDIEditor_GetActive();
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	// TODO: we could also check the command state was "off", to skip searching otherwise
-	HWND filter = FindWindow(WC_DIALOG, "Filter Events");
+	HWND filter = FindWindowW(L"#32770",
+		widen(LocalizeString("Filter Events", "midi_DLG_128", 0)).c_str());
 	if (filter && (filter != GetFocus())) {
 		SetFocus(filter); // focus the window
 	}
@@ -2013,4 +2058,18 @@ void postMidiToggleSnap(int command) {
 	} else {
 		outputMessage(translate("disabled snap to grid"));
 	}
+}
+
+void postMidiChangeZoom(int command) {
+	MediaItem_Take* take = MIDIEditor_GetTake(MIDIEditor_GetActive());
+	if(!take) {
+		return;
+	}
+	double zoom = getMidiZoomRatio(take);
+	if (zoom <0) {
+		return;
+	}
+	// Translators: Reported when zooming in or out horizontally. {} will be
+	// replaced with the number of pixels per second; e.g. 100 pixels/second.
+	outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 }

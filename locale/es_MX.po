@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2022-12-16 12:07\n"
+"PO-Revision-Date: 2023-12-12 22:39\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -27,7 +27,7 @@ msgid "volume"
 msgstr "volumen"
 
 msgid "pan"
-msgstr "panorama"
+msgstr "paneo"
 
 msgid "muted"
 msgstr "muteado"
@@ -169,21 +169,20 @@ msgid_plural "{} envelope points copied"
 msgstr[0] "{} punto de envolvente copiado"
 msgstr[1] "{} puntos de envolvente copiados"
 
-msgid "track not selected"
-msgstr "pista no seleccionada"
-
-#. Reported when showing an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "showed volume envelope".
-msgid "showed {} envelope"
-msgstr "envolvente de {} mostrada"
-
-#. Reported when hiding an envelope. {} will be replaced with
-#. the name of the envelope; e.g. "hid volume envelope".
-msgid "hid {} envelope"
-msgstr "envolvente de {} oculta"
-
 msgid "no envelopes toggled"
 msgstr "no se ha mostrado ninguna envolvente"
+
+msgid "showed track {} envelope"
+msgstr "mostrando envolvente de {} para la pista"
+
+msgid "hid track {} envelope"
+msgstr "ocultando envolvente de {} para la pista"
+
+msgid "showed take {} envelope"
+msgstr "mostrando envolvente de {} para la toma"
+
+msgid "hid take {} envelope"
+msgstr "ocultando envolvente de {} para la toma"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -537,10 +536,10 @@ msgid "Pitch Bend {}"
 msgstr "Curvatura de Tono {}"
 
 msgid "OSARA: Move to next midi item on track"
-msgstr "OSARA: mover al siguiente ítem midi en la pista"
+msgstr "OSARA: mueve al siguiente ítem midi en la pista"
 
 msgid "OSARA: Move to previous midi item on track"
-msgstr "OSARA: mover al ítem midi anterior en la pista"
+msgstr "OSARA: mueve al ítem midi anterior en la pista"
 
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
@@ -555,7 +554,7 @@ msgid "no notes selected"
 msgstr "no hay notas seleccionadas"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
-msgstr "OSARA: seleccionar todas las notas con el mismo tono dentro de la selección de tiempo"
+msgstr "OSARA: selecciona todas las notas con el mismo tono dentro de la selección de tiempo"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -755,8 +754,8 @@ msgstr[1] "{} valores aumentados"
 #. number of values changed. E.g. "2 values decreased"
 msgid "{} value decreased"
 msgid_plural "{} values decreased"
-msgstr[0] "{} valor disminuído"
-msgstr[1] "{} valores disminuídos"
+msgstr[0] "{} valor disminuido"
+msgstr[1] "{} valores disminuidos"
 
 #. Used when MIDI CCs change. {} is replaced by the
 #. number of values changed. E.g. "2 values changed"
@@ -783,6 +782,13 @@ msgstr "ajuste a la cuadrícula habilitado"
 msgid "disabled snap to grid"
 msgstr "ajuste a la cuadrícula deshabililtado"
 
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per second; e.g. 100 pixels/second.
+msgid "{} pixels/second"
+msgstr "{} píxeles/segundo"
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -794,7 +800,7 @@ msgid "off"
 msgstr "apagado"
 
 msgid "FX Parameters"
-msgstr "Parámetros de FX"
+msgstr "Parámetros de EFECTOS"
 
 msgid "low shelf"
 msgstr "filtro de shelving bajo"
@@ -867,13 +873,13 @@ msgid "take volume"
 msgstr "volumen de toma"
 
 msgid "take pan"
-msgstr "panorama de toma"
+msgstr "paneo de toma"
 
 msgid "fade in length"
-msgstr "longitud del fundido de entrada"
+msgstr "longitud del fade in"
 
 msgid "Fade out length"
-msgstr "Longitud del fundido de salida"
+msgstr "Longitud del Fade out"
 
 msgid "Item Parameters"
 msgstr "Parámetros de Ítem"
@@ -888,8 +894,11 @@ msgstr "monitor"
 msgid "[input]"
 msgstr "[entrada]"
 
+msgid "(Container Parameters)"
+msgstr "(Parámetros del Contenedor)"
+
 msgid "no FX"
-msgstr "no hay FX"
+msgstr "no hay EFECTOS"
 
 #. A track which isn't a folder.
 msgid "track"
@@ -968,10 +977,10 @@ msgstr "El Medidor de Picos no es compatible con el enfoque actual"
 #. After this, information about the existing configuration for the value
 #. will be appended.
 msgid "paused Peak Watcher"
-msgstr "pausar Medidor de Picos"
+msgstr "pausando el Medidor de Picos"
 
 msgid "resumed Peak Watcher"
-msgstr "reanudar Medidor de Picos"
+msgstr "reanudando el Medidor de Picos"
 
 msgid "Peak Watcher not enabled"
 msgstr "El Medidor de Picos no está habilitado"
@@ -1025,8 +1034,8 @@ msgstr "{:.3f} milisegundos"
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
 msgid_plural "{} frames"
-msgstr[0] "{} cuadro"
-msgstr[1] "{} cuadros"
+msgstr[0] "{} frame"
+msgstr[1] "{} frames"
 
 #. used when reporting a time in hours. {} will be replaced
 #. with the number of hours; e.g. "2 hours".
@@ -1043,7 +1052,11 @@ msgstr "{} segundos"
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
-msgstr "{} muestras"
+msgstr "samples"
+
+#. A track which is a nested folder.
+msgid "nested folder"
+msgstr "subcarpeta"
 
 #. A track which is a folder.
 msgid "folder"
@@ -1157,10 +1170,10 @@ msgid "VCA follow"
 msgstr "Seguir VCA"
 
 msgid "pan lead"
-msgstr "liderar panorama"
+msgstr "liderar paneo"
 
 msgid "pan follow"
-msgstr "seguir panorama"
+msgstr "seguir paneo"
 
 msgid "width lead"
 msgstr "liderar tamaño"
@@ -1202,7 +1215,7 @@ msgid "reverse volume"
 msgstr "revertir volumen"
 
 msgid "reverse pan"
-msgstr "revertir panorama"
+msgstr "revertir paneo"
 
 msgid "reverse width"
 msgstr "revertir tamaño"
@@ -1211,7 +1224,7 @@ msgid "do not lead when following"
 msgstr "no liderar al seguir"
 
 msgid "VCA pre-FX follow"
-msgstr "Seguir VCA pre-FX"
+msgstr "Seguir VCA pre-EFECTOS"
 
 msgid "defeating solo"
 msgstr "solo defeating"
@@ -1220,7 +1233,7 @@ msgid "phase inverted"
 msgstr "fase invertida"
 
 msgid "FX bypassed"
-msgstr "FX desactivado"
+msgstr "EFECTO desactivado"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1273,10 +1286,10 @@ msgid "FX active"
 msgstr "FX activado"
 
 msgid "all tracks FX bypassed"
-msgstr "desactivar FX en todas las pistas"
+msgstr "desactivando FX en todas las pistas"
 
 msgid "all tracks FX active"
-msgstr "activar FX en todas las pistas"
+msgstr "activando FX en todas las pistas"
 
 msgid "enabled delta solo"
 msgstr "habilitar solo en modo delta"
@@ -1357,11 +1370,6 @@ msgstr "Ítem"
 
 msgid "Take"
 msgstr "Toma"
-
-#. Reported when zooming in or out horizontally. {} will be
-#. replaced with the number of pixels per second; e.g. 100 pixels/second.
-msgid "{} pixels/second"
-msgstr "{} píxeles/segundo"
 
 #. Panned to the center.
 msgid "center"
@@ -1551,17 +1559,17 @@ msgid_plural "{} takes reversed"
 msgstr[0] "{} toma en reversa"
 msgstr[1] "{} tomas en reversa"
 
-msgid "pre roll on"
-msgstr "pre roll encendido"
+msgid "enabled pre roll before recording"
+msgstr "habilitar pre-roll antes de grabar"
 
-msgid "pre roll off"
-msgstr "pre roll apagado"
+msgid "disabled pre roll before recording"
+msgstr "deshabilitar pre-roll antes de grabar"
 
-msgid "count in on"
-msgstr "conteo encendido"
+msgid "enabled count in before recording"
+msgstr "habilitar cuenta antes de grabar"
 
-msgid "count in off"
-msgstr "conteo apagado"
+msgid "disabled count in before recording"
+msgstr "deshabilitar cuenta antes de grabar"
 
 #. A take channel mode.
 msgctxt "take channel mode"
@@ -1648,10 +1656,10 @@ msgid "{:g} dB threshold"
 msgstr "{:g} dB umbral"
 
 msgid "enabled envelope points move with media items"
-msgstr "los puntos de la envolvente se mueven con los ítems de audio"
+msgstr "moviendo puntos de envolvente con los ítems de audio"
 
 msgid "disabled envelope points move with media items"
-msgstr "los puntos de la envolvente no se mueven con los ítems de audio"
+msgstr "dejar de mover puntos de envolvente con los ítems de audio"
 
 msgid "enabled free item positioning"
 msgstr "colocación libre de ítems activada"
@@ -1673,6 +1681,23 @@ msgstr "habilitar preservar el tono del ítem al cambiar la velocidad"
 msgid "disabled preserve pitch when changing item rate"
 msgstr "deshabilitar preservar el tono del ítem al cambiar la velocidad"
 
+msgid "minimum vertical zoom"
+msgstr "zoom vertical mínimo"
+
+msgid "small vertical zoom"
+msgstr "zoom vertical pequeño"
+
+msgid "medium vertical zoom"
+msgstr "zoom vertical medio"
+
+msgid "large vertical zoom"
+msgstr "zoom vertical grande"
+
+msgid "maximum vertical zoom"
+msgstr "zoom vertical máximo"
+
+#. Used when reporting the vertical zoom level as a number.
+#. {} will be replaced with the number; e.g. "35 vertical zoom".
 msgid "set selection start"
 msgstr "inicio de selección establecido"
 
@@ -1719,7 +1744,7 @@ msgid "grid one hundred twenty eighth"
 msgstr "cuadrícula en garrapateas"
 
 msgid "all tracks unmuted"
-msgstr "todas las pistas han sido desmuteadas"
+msgstr "todas las pistas desmuteadas"
 
 msgid "all tracks unsoloed"
 msgstr "solo en todas las pistas desactivado"
@@ -1773,16 +1798,178 @@ msgid "normal screen"
 msgstr "modo a pantalla normal"
 
 msgid "showed Media Explorer"
-msgstr "explorador de medios mostrado"
+msgstr "mostrando explorador de medios"
 
 msgid "hid Media Explorer"
-msgstr "explorador de medios oculto"
+msgstr "ocultando explorador de medios"
 
-msgid "enabled auto play"
-msgstr "auto reproducción habilitada"
+msgid "absolute frames"
+msgstr "frames absolutos"
 
-msgid "disabled auto play"
-msgstr "auto reproducción deshabilitada"
+msgid "hours:minutes:seconds:frames"
+msgstr "horas:minutos:segundos:frames"
+
+msgid "measures.beats"
+msgstr "medidas.pulsos"
+
+msgid "minutes:seconds"
+msgstr "minutos:segundos"
+
+msgid "samples"
+msgstr "samples"
+
+msgid "seconds"
+msgstr "segundos"
+
+msgid "absolute frames secondary"
+msgstr "frames absolutos secundarios"
+
+msgid "hours:minutes:seconds:frames secondary"
+msgstr "horas:minutos:segundos:frames secundarios"
+
+msgid "minutes:seconds secondary"
+msgstr "minutos:segundos secundarios"
+
+msgid "no secondary time unit"
+msgstr "sin unidad de tiempo secundaria"
+
+msgid "samples secondary"
+msgstr "samples secundarios"
+
+msgid "seconds secondary"
+msgstr "segundos secundarios"
+
+msgid "master muted"
+msgstr "máster muteado"
+
+msgid "master unmuted"
+msgstr "máster desmuteado"
+
+msgid "enabled snap"
+msgstr "snap habilitado"
+
+msgid "disabled snap"
+msgstr "snap deshabilitado"
+
+msgid "default key map"
+msgstr "mapa de teclas por defecto"
+
+msgid "recording key map"
+msgstr "grabar mapa de teclas"
+
+msgid "alt 1"
+msgstr "alt 1"
+
+msgid "alt 2"
+msgstr "alt 2"
+
+msgid "alt 3"
+msgstr "alt 3"
+
+msgid "alt 4"
+msgstr "alt 4"
+
+msgid "alt 5"
+msgstr "alt 5"
+
+msgid "alt 6"
+msgstr "alt 6"
+
+msgid "alt 7"
+msgstr "alt 7"
+
+msgid "alt 8"
+msgstr "alt 8"
+
+msgid "alt 9"
+msgstr "alt 9"
+
+msgid "alt 10"
+msgstr "alt 10"
+
+msgid "alt 11"
+msgstr "alt 11"
+
+msgid "alt 12"
+msgstr "alt 12"
+
+msgid "alt 13"
+msgstr "alt 13"
+
+msgid "alt 14"
+msgstr "alt 14"
+
+msgid "alt 15"
+msgstr "alt 15"
+
+msgid "alt 16"
+msgstr "alt 16"
+
+msgid "default momentary"
+msgstr "momentáneo por defecto"
+
+msgid "recording key map momentary"
+msgstr "se graba el mapa de teclas momentáneo"
+
+msgid "alt 1 momentary"
+msgstr "alt 1 momentáneo"
+
+msgid "alt 2 momentary"
+msgstr "alt 2 momentáneo"
+
+msgid "alt 3 momentary"
+msgstr "alt 3 momentáneo"
+
+msgid "alt 4 momentary"
+msgstr "alt 4 momentáneo"
+
+msgid "alt 5 momentary"
+msgstr "alt 5 momentáneo"
+
+msgid "alt 6 momentary"
+msgstr "alt 6 momentáneo"
+
+msgid "alt 7 momentary"
+msgstr "alt 7 momentáneo"
+
+msgid "alt 8 momentary"
+msgstr "alt 8 momentáneo"
+
+msgid "alt 9 momentary"
+msgstr "alt 9 momentáneo"
+
+msgid "alt 10 momentary"
+msgstr "alt 10 momentáneo"
+
+msgid "alt 11 momentary"
+msgstr "alt 11 momentáneo"
+
+msgid "alt 12 momentary"
+msgstr "alt 12 momentáneo"
+
+msgid "alt 13 momentary"
+msgstr "alt 13 momentáneo"
+
+msgid "alt 14 momentary"
+msgstr "alt 14 momentáneo"
+
+msgid "alt 15 momentary"
+msgstr "alt 15 momentáneo"
+
+msgid "alt 16 momentary"
+msgstr "alt 16 momentáneo"
+
+msgid "auto playing"
+msgstr "reproducción automática"
+
+msgid "not auto playing"
+msgstr "sin reproducción automática"
+
+msgid "repeating previews"
+msgstr "repitiendo vistas previas"
+
+msgid "not repeating previews"
+msgstr "sin repetir vistas previas"
 
 msgid "starting on bar"
 msgstr "iniciando en el compás"
@@ -1819,6 +2006,42 @@ msgstr "explorador de medios acomplado"
 
 msgid "removed Media Explorer from dock"
 msgstr "explorador de medios removido del dock"
+
+msgid "Piano roll view"
+msgstr "Vista a Piano roll"
+
+msgid "Named notes view"
+msgstr "Vista a notas con nombre"
+
+msgid "Event list view"
+msgstr "Vista a lista de eventos"
+
+msgid "Notation view"
+msgstr "Vista a partitura"
+
+msgid "Rectangle notes"
+msgstr "Notas rectangulares"
+
+msgid "Triangle notes"
+msgstr "Notas triangulares"
+
+msgid "Diamond notes"
+msgstr "Notas de Diamante"
+
+msgid "Showed velocity numbers on notes"
+msgstr "Mostrando el número de velócity en notas"
+
+msgid "Hid velocity numbers on notes"
+msgstr "Ocultando el número de velócity en notas"
+
+msgid "Showed note names"
+msgstr "Mostrando nombres de notas"
+
+msgid "Hid note names"
+msgstr "Ocultando nombres de notas"
+
+msgid "Inserted notes matching grid"
+msgstr "Notas insertadas en la rejilla según coincida"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -1944,7 +2167,7 @@ msgstr "deseleccionar pistas/ítems/puntos de envolvente"
 #. Reported when switching to a project tab containing an
 #. unsaved project.
 msgid "[Unsaved]"
-msgstr "[no guardado]"
+msgstr "[sin guardar]"
 
 #. Used when reporting a range of tracks. {start} will be
 #. replaced with the first track. {end} will be replaced with the last track
@@ -1988,11 +2211,14 @@ msgstr "longitud {}"
 msgid "Selected tracks:"
 msgstr "Pistas seleccionadas:"
 
+msgid "no selected tracks"
+msgstr "no hay pistas seleccionadas"
+
 msgid "Selected items:"
 msgstr "Ítems seleccionados:"
 
 msgid "no selection"
-msgstr "no hay selección"
+msgstr "sin selección"
 
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
@@ -2002,13 +2228,13 @@ msgstr[0] "{} marcador de toma eliminado"
 msgstr[1] "{} marcadores de toma eliminados"
 
 msgid "shortcut help on"
-msgstr "ayuda de teclado activada"
+msgstr "ayuda activada"
 
 msgid "shortcut help off"
-msgstr "ayuda de teclado desactivada"
+msgstr "ayuda desactivada"
 
 msgid "paused"
-msgstr "pausado"
+msgstr "en pausa"
 
 msgid "recording"
 msgstr "grabando"
@@ -2049,13 +2275,10 @@ msgstr "anulación global de automatización apagada"
 msgid "global automation override latch preview"
 msgstr "anulación global de automatización en modo escucha previa"
 
-msgid "no selected tracks"
-msgstr "no hay pistas seleccionadas"
-
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
-msgid "automation mode {} for selected tracks"
-msgstr "modo de automatización {} para las pistas seleccionadas"
+msgid "{} automation mode for selected tracks"
+msgstr "modo de automatización de {} para pistas seleccionadas"
 
 msgid "time selection start"
 msgstr "selección de tiempo iniciada"
@@ -2108,146 +2331,158 @@ msgstr "pista no agrupada"
 msgid "At Current Position"
 msgstr "En la posición actual"
 
+msgid "selected to start of project"
+msgstr "se ha seleccionado desde el cursor hasta el inicio del proyecto"
+
+msgid "selected to end of project"
+msgstr ""
+
+msgid "phase normal all tracks"
+msgstr ""
+
+msgid "unmonitored all tracks"
+msgstr ""
+
 msgid "OSARA: Move to next item (leaving other items selected)"
-msgstr "OSARA: mover al siguiente ítem (dejando otros ítems seleccionados)"
+msgstr "OSARA: se Mueve al siguiente ítem (dejando otros ítems seleccionados)"
 
 msgid "OSARA: Move to previous item (leaving other items selected)"
-msgstr "OSARA: Mover al ítem anterior (dejando otros ítems seleccionados)"
+msgstr "OSARA: se Mueve al ítem anterior (dejando otros ítems seleccionados)"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
-msgstr "OSARA: Ver propiedades para el ítem de audio actual / toma / ítem de automatización (según el foco)"
+msgstr "OSARA: Ve las propiedades para el ítem de audio actual / toma / ítem de automatización (según el foco)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
-msgstr "OSARA: Ver parámetros para la pista/ítem/FX actual (según el foco)"
+msgstr "OSARA: Ve los parámetros para la pista/ítem/FX actual (según el foco)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
-msgstr "OSARA: ver los parámetros de FX para la pista / toma actual (según el foco)"
+msgstr "OSARA: ve los parámetros de FX para la pista / toma actual (según el foco)"
 
 msgid "OSARA: View FX parameters for master track"
-msgstr "OSARA: ver los parámetros de FX para la pista master"
+msgstr "OSARA: ve los parámetros de FX para la pista master"
 
 msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
-msgstr "OSARA: Configurar el Medidor de Picos para la pista actual/pista de efectos (según el foco)"
+msgstr "OSARA: Configura el Medidor de Picos para la pista actual/pista de efectos (según el foco)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
-msgstr "OSARA: anunciar el valor del Primer Medidor de Picos para el canal 1"
+msgstr "OSARA: anuncia el valor del Primer Medidor de Picos para el canal 1"
 
 msgid "OSARA: Report Peak Watcher value for first watcher second channel"
-msgstr "OSARA: anunciar el valor del Primer Medidor de Picos para el canal 2"
+msgstr "OSARA: anuncia el valor del Primer Medidor de Picos para el canal 2"
 
 msgid "OSARA: Report Peak Watcher value for second watcher first channel"
-msgstr "OSARA: anunciar el valor del Segundo Medidor de Picos para el canal 1"
+msgstr "OSARA: anuncia el valor del Segundo Medidor de Picos para el canal 1"
 
 msgid "OSARA: Report Peak Watcher value for second watcher second channel"
-msgstr "OSARA: anunciar el valor del Segundo Medidor de Picos para el canal 2"
+msgstr "OSARA: anuncia el valor del Segundo Medidor de Picos para el canal 2"
 
 msgid "OSARA: Reset Peak Watcher first watcher"
-msgstr "OSARA: Reiniciar el primer Medidor de Picos"
+msgstr "OSARA: Reinicia el primer Medidor de Picos"
 
 msgid "OSARA: Reset Peak Watcher second watcher"
-msgstr "OSARA: Reiniciar el segundo Medidor de picos"
+msgstr "OSARA: Reinicia el segundo Medidor de picos"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: pausar/reanudar el Medidor de Picos"
+msgstr "OSARA: pausa/reanuda el Medidor de Picos"
 
 msgid "OSARA: Report ripple editing mode"
-msgstr "OSARA: Anunciar el estado del ripple"
+msgstr "OSARA: Anuncia el estado del ripple"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: Anunciar pistas muteadas"
+msgstr "OSARA: Anuncia las pistas muteadas"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: Anunciar pistas con el solo activado"
+msgstr "OSARA: Anuncia las pistas con el solo activado"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: Anunciar las pistas armadas para grabación"
+msgstr "OSARA: Anuncia las pistas armadas para grabación"
 
 msgid "OSARA: Report tracks with record monitor on"
-msgstr "OSARA: Anunciar las pistas con el monitor encendido"
+msgstr "OSARA: Anuncia las pistas con el monitor encendido"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: Anunciar pistas con la fase invertida"
+msgstr "OSARA: Anuncia las pistas con la fase invertida"
 
 msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: Anunciar pista/ítem/selección de tiempo (según el foco)"
+msgstr "OSARA: Anuncia pista/ítem/selección de tiempo (según el foco)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
-msgstr "OSARA: elimina ítems/pistas/contenido de la selección de tiempo/marcadores/puntos de envolvente (según el foco)"
+msgstr "OSARA: Elimina ítems/pistas/contenido de la selección de tiempo/marcadores/puntos de envolvente (según el foco)"
 
 msgid "OSARA: Toggle shortcut help"
-msgstr "OSARA: alternar ayuda de teclado"
+msgstr "OSARA: Alterna la ayuda de teclado"
 
 msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: Anunciar la posición del cursor de edición / reproducción y el estado de transporte"
+msgstr "OSARA: Anuncia la posición del cursor de edición / reproducción y el estado de transporte"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
-msgstr "OSARA: habilita la selección separada/alternar la selección de la pista/ítem actual (según el foco)"
+msgstr "OSARA: Habilita la selección separada/alternar la selección de la pista/ítem actual (según el foco)"
 
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
-msgstr "OSARA: mover el último marcador elástico enfocado a la posición actual del cursor de reproducción"
+msgstr "OSARA: Mueve el último marcador elástico enfocado a la posición actual del cursor de reproducción"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Anunciar el nivel en pico dB en el cursor de reproducción para el canal 1 de la pista actual (anuncia el nivel de entrada en su lugar cuando la pista está armada)"
+msgstr "OSARA: Anuncia el nivel en pico dB en el cursor de reproducción para el canal 1 de la pista actual (anuncia el nivel de entrada en su lugar cuando la pista está armada)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Anunciar el nivel en pico dB en el cursor de reproducción para el canal 2 de la pista actual (anuncia el nivel de entrada en su lugar cuando la pista está armada)"
+msgstr "OSARA: Anuncia el nivel en pico dB en el cursor de reproducción para el canal 2 de la pista actual (anuncia el nivel de entrada en su lugar cuando la pista está armada)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: Anunciar el nivel en pico dB en el cursor de reproducción para el canal 1 del Máster"
+msgstr "OSARA: Anuncia el nivel en pico dB en el cursor de reproducción para el canal 1 del Máster"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: Anunciar el nivel en pico dB en el cursor de reproducción para el canal 2 del Máster"
+msgstr "OSARA: Anuncia el nivel en pico dB en el cursor de reproducción para el canal 2 del Máster"
 
 msgid "OSARA: Delete all time signature markers"
-msgstr "OSARA: eliminar todos los marcadores de cambio de tempo"
+msgstr "OSARA: Elimina todos los marcadores de cambio de tempo"
 
 msgid "OSARA: Select next track/take envelope (depending on focus)"
-msgstr "OSARA: selecciona la siguiente envolvente de pista/toma (según el foco)"
+msgstr "OSARA: Selecciona la siguiente envolvente de pista/toma (según el foco)"
 
 msgid "OSARA: Select previous track/take envelope (depending on focus)"
-msgstr "OSARA: selecciona la envolvente aterior de pista/toma (según el foco)"
+msgstr "OSARA: Selecciona la envolvente aterior de pista/toma (según el foco)"
 
 msgid "OSARA: Move to next envelope point"
-msgstr "OSARA: mover al siguiente punto de la envolvente"
+msgstr "OSARA: se Mueve al siguiente punto de la envolvente"
 
 msgid "OSARA: Move to previous envelope point"
-msgstr "OSARA: mover al punto anterior de la envolvente"
+msgstr "OSARA: se Mueve al punto anterior de la envolvente"
 
 msgid "OSARA: Move to next envelope point (leaving other points selected)"
-msgstr "OSARA: mover al siguiente punto de la envolvente (dejando los otros seleccionados)"
+msgstr "OSARA: se Mueve al siguiente punto de la envolvente (dejando los otros seleccionados)"
 
 msgid "OSARA: Move to previous envelope point (leaving other points selected)"
-msgstr "OSARA: mover al punto anterior de la envolvente (dejando los otros seleccionados)"
+msgstr "OSARA: se Mueve al punto anterior de la envolvente (dejando los otros seleccionados)"
 
 msgid "OSARA: Move to next transient"
-msgstr "OSARA: mover al siguiente transitorio"
+msgstr "OSARA: se Mueve al siguiente transitorio"
 
 msgid "OSARA: Move to previous transient"
-msgstr "OSARA: mover al transitorio anterior"
+msgstr "OSARA: se Mueve al transitorio anterior"
 
 msgid "OSARA: Show first context menu (depending on focus)"
-msgstr "OSARA: mostrar menú de contexto principal (según el foco)"
+msgstr "OSARA: Muestra el menú contextual principal (según el foco)"
 
 msgid "OSARA: Show second context menu (depending on focus)"
-msgstr "OSARA: mostrar el menú de contexto secundario (según el foco)"
+msgstr "OSARA: Muestra el segundo menú contextual (según el foco)"
 
 msgid "OSARA: Show third context menu (depending on focus)"
-msgstr "OSARA: mostrar el tercer menú contextual (según el foco)"
+msgstr "OSARA: Muestra el tercer menú contextual (según el foco)"
 
 msgid "OSARA: Cycle through midi recording modes of selected tracks"
-msgstr "OSARA: recorre los modos de grabación midi en las pistas seleccionadas"
+msgstr "OSARA: Recorre los modos de grabación midi en las pistas seleccionadas"
 
 msgid "OSARA: Configuration"
-msgstr "OSARA: configuración"
+msgstr "OSARA: Configuraciones"
 
 msgid "OSARA: Report global / Track Automation Mode"
-msgstr "OSARA: Anunciar modo de automatización en la pista/global"
+msgstr "OSARA: Anuncia el Modo de Automatización en la Pista / global"
 
 msgid "OSARA: Toggle global automation override between latch preview and off"
-msgstr "OSARA: alternar la anulación global de automatización entre escucha previa y apagada"
+msgstr "OSARA: alterna la anulación global de automatización entre escucha previa y apagada"
 
 msgid "OSARA: Cycle automation mode of selected tracks"
-msgstr "OSARA: recorre los modos de automatización en las pistas seleccionadas"
+msgstr "OSARA: Recorre los modos de automatización en las pistas seleccionadas"
 
 msgid "OSARA: About"
 msgstr "OSARA: Acerca de"
@@ -2256,61 +2491,88 @@ msgid "OSARA: Report groups for current track"
 msgstr "OSARA: Anuncia los grupos para la pista actual"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr "OSARA: Silenciar el siguiente mensaje de OSARA"
+msgstr "OSARA: Silencia el siguiente mensaje de OSARA"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: Anunciar regiones, último marcador de proyecto e ítems de las pistas seleccionadas en la posición actual"
+msgstr "OSARA: Anuncia las regiones, último marcador de proyecto e ítems de las pistas seleccionadas en la posición actual"
 
 msgid "OSARA: Go to first track"
-msgstr "OSARA: Ir a la primera pista"
+msgstr "OSARA: Va a la primera pista"
 
 msgid "OSARA: Go to last track"
-msgstr "OSARA: Ir a la última pista"
+msgstr "OSARA: Va a la última pista"
+
+msgid "OSARA: Cycle shape of selected envelope points"
+msgstr "OSARA: Recore las formas de los puntos de envolvente seleccionados"
+
+msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
+msgstr "OSARA: Alterna la visibilidad de la envolvente de volumen en la pista/toma (según el foco)"
+
+msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
+msgstr "OSARA: Alterna la visibilidad de la envolvente de paneo en la pista/toma (según el foco)"
+
+msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
+msgstr "OSARA: Alterna la visibilidad de la envolvente de muteo en la pista/toma (según el foco)"
+
+msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
+msgstr "OSARA: Alterna la visibilidad de la envolvente de paneo en pre-FX en la pista, o la envolvente de tono en la toma (según el foco)"
+
+msgid "OSARA: Select from cursor to start of project"
+msgstr "OSARA: Seleccionar desde el cursor hasta el inicio del proyecto"
+
+msgid "OSARA: Select from cursor to end of project"
+msgstr ""
+
+msgid "OSARA: Set phase normal for all tracks"
+msgstr ""
+
+msgid "OSARA: Unmonitor all tracks"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
-msgstr "OSARA: habilitar/deshabilitar la selección separada en el acorde/nota actual"
+msgstr "OSARA: Habilita/deshabilita la selección separada en el acorde/nota actual"
 
 msgid "OSARA: Move to next chord"
-msgstr "OSARA: mover al siguiente acorde"
+msgstr "OSARA: se Mueve al siguiente acorde"
 
 msgid "OSARA: Move to previous chord"
-msgstr "OSARA: mover al acorde anterior"
+msgstr "OSARA: se Mueve al acorde anterior"
 
 msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: mover al siguiente acorde y agregar a la selección"
+msgstr "OSARA: se Mueve al siguiente acorde y lo agrega a la selección"
 
 msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: mover al acorde anterior y agregar a la selección"
+msgstr "OSARA: se Mueve al acorde anterior y lo agrega a la selección"
 
 msgid "OSARA: Move to next note in chord"
-msgstr "OSARA: mover a la siguiente nota del acorde"
+msgstr "OSARA: se Mueve a la siguiente nota del acorde"
 
 msgid "OSARA: Move to previous note in chord"
-msgstr "OSARA: mover a la nota anterior del acorde"
+msgstr "OSARA: se Mueve a la nota anterior del acorde"
 
 msgid "OSARA: Move to next note in chord and add to selection"
-msgstr "OSARA: mover a la siguiente nota del acorde y agregar a la selección"
+msgstr "OSARA: se Mueve a la siguiente nota del acorde y la agrega a la selección"
 
 msgid "OSARA: Move to previous note in chord and add to selection"
-msgstr "OSARA: mover a la nota anterior del acorde y agregar a la selección"
+msgstr "OSARA: se Mueve a la nota anterior del acorde y la agrega a la selección"
 
 msgid "OSARA: Move to next CC"
-msgstr "OSARA: mover al siguiente CC"
+msgstr "OSARA: se Mueve al siguiente CC"
 
 msgid "OSARA: Move to previous CC"
-msgstr "OSARA: mover al CC anterior"
+msgstr "OSARA: se Mueve al CC anterior"
 
 msgid "OSARA: Move to next CC and add to selection"
-msgstr "OSARA: mover al siguiente CC y agregar a la selección"
+msgstr "OSARA: se Mueve al siguiente CC y lo agrega a la selección"
 
 msgid "OSARA: Move to previous CC and add to selection"
-msgstr "OSARA: mover al CC anterior y agregar a la selección"
+msgstr "OSARA: se Mueve al CC anterior y lo agrega a la selección"
 
 msgid "OSARA: Select all notes with the same pitch starting in time selection"
-msgstr "OSARA: seleccionar todas las notas del mismo tono en la selección de tiempo"
+msgstr "OSARA: selecciona todas las notas del mismo tono en la selección de tiempo"
 
 msgid "OSARA: Focus event nearest edit cursor"
-msgstr "Osara: Enfocar el evento más cercano al cursor de edición"
+msgstr "Osara: Enfoca el evento más cercano al cursor de edición"
 
 msgctxt "Parameters"
 msgid "Parameters"
@@ -2326,7 +2588,11 @@ msgstr "Valor:"
 
 msgctxt "Parameters"
 msgid "&Filter:"
-msgstr "Filtro:"
+msgstr "&Filtro:"
+
+msgctxt "Parameters"
+msgid "Include &unnamed parameters"
+msgstr "Incluir &parámetros sin nombre"
 
 msgctxt "Parameters"
 msgid "&Close"
@@ -2414,27 +2680,27 @@ msgstr "&Cancelar"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
-msgstr "Configuración de OSARA"
+msgstr "Configurando OSARA"
 
 msgctxt "OSARA Configuration"
 msgid "Report position when &scrubbing"
-msgstr "Anunciar la posición cuando &mueve el cursor"
+msgstr "Anunciar posición cuando &mueve el cursor"
 
 msgctxt "OSARA Configuration"
 msgid "Report time movement during playback/recording"
-msgstr "Anunciar el movimiento del tiempo durante la reproducción/grabación"
+msgstr "Anunciar movimiento del tiempo durante la reproducción/grabación"
 
 msgctxt "OSARA Configuration"
 msgid "Report f&ull time for time movement commands"
-msgstr "Anunciar el tiempo para todos los comandos de movimiento de tiempo"
+msgstr "Anunciar tiempo para todos los comandos de movimiento de tiempo"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
 msgstr "&Mover en relación con el cursor de reproducción para los comandos de movimiento de tiempo durante la reproducción"
 
 msgctxt "OSARA Configuration"
-msgid "Report mar&kers during playback"
-msgstr "Anunciar mar&cadores durante la reproducción"
+msgid "Report mar&kers and regions during playback"
+msgstr "Anunciar mar&cadores y regiones durante la reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
@@ -2442,19 +2708,23 @@ msgstr "Anunciar estado de &transporte (reproducción, grabación, etc.)"
 
 msgctxt "OSARA Configuration"
 msgid "&Report track numbers"
-msgstr "&Anunciar el número de pistas"
+msgstr "&Anunciar número de pistas"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
 msgstr "Anunciar &FX al pasar a pistas / tomas"
 
 msgctxt "OSARA Configuration"
+msgid "Report &position when navigating chords in MIDI editor"
+msgstr "Anunciar &posición al navegar por acordes en el editor MIDI"
+
+msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr "Anunciar &notas MIDI en el editor MIDI"
+msgstr "Anunciar &notas en el editor MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr "Anunciar los cambios realizados a través de superficies de &control"
+msgstr "Anunciar cambios realizados a través de superficies de &control"
 
 msgctxt "OSARA Configuration"
 msgid "OK"

@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Utility to build translation (pot) template
 # Author: James Teh <jamie@jantrid.net>
-# Copyright 2021 James Teh
+# Copyright 2021-2023 James Teh
 # License: GNU General Public License version 2.0
 
 import re
@@ -66,6 +66,8 @@ def handleTranslatorsComment(line):
 
 def addMessage(data):
 	global messages, lastTranslatorsComment
+	if not data["msgid"]:
+		raise RuntimeError("Empty msgid")
 	key = (data.get("context"), data["msgid"])
 	data = messages.setdefault(key, data)
 	if lastTranslatorsComment:
@@ -73,41 +75,31 @@ def addMessage(data):
 		comments.extend(lastTranslatorsComment)
 		lastTranslatorsComment = []
 
-RE_CPP_TRANSLATE_FIRST_N_STRINGS_END = re.compile(r"^\s*// translate first\d?Strings? end$")
-RE_CPP_COMMENT = re.compile(r'^\s*/')
-RE_CPP_STRING = re.compile(r'"(?P<msgid>.*?)"')
-def addCppTranslateFirstNStrings(input, maxStrings):
-	for line in input:
-		if handleTranslatorsComment(line):
-			continue
-		if RE_CPP_TRANSLATE_FIRST_N_STRINGS_END.match(line):
-			break
-		if RE_CPP_COMMENT.match(line):
-			continue
-		for num, m in enumerate(RE_CPP_STRING.finditer(line)):
-			if num == maxStrings:
-				break
-			data = m.groupdict()
-			addMessage(data)
-
-RE_CPP_TRANSLATE = re.compile(r'\btranslate\("(?P<msgid>.*?)"\)')
-RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\("(?P<context>.*?)",\s*"(?P<msgid>.*?)"\)')
-RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\("(?P<msgid>.*?)",\s*"(?P<plural>.*?)", .*?\)')
-RE_CPP_TRANSLATE_FIRST_N_STRINGS_BEGIN = re.compile(r"^\s*// translate first(?P<maxStrings>\d)?Strings? begin$")
+RE_CPP_TRANSLATE = re.compile(r'\b(?:translate|_t)\(\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
+RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|[^)]*),?\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
+RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\(\s*(?:"(?P<msgid>.*?)"|[^)]*),?\s*(?:"(?P<plural>.*?)"|[^)]*),?\s*[^)]*\s*(?P<end>\))?')
 def addCpp(input):
 	for line in input:
 		if handleTranslatorsComment(line):
 			continue
-		m = RE_CPP_TRANSLATE_FIRST_N_STRINGS_BEGIN.match(line)
-		if m:
-			maxStrings = m.group("maxStrings")
-			maxStrings = int(maxStrings) if maxStrings else 1
-			addCppTranslateFirstNStrings(input, maxStrings)
-			continue
-		matches = itertools.chain(RE_CPP_TRANSLATE.finditer(line),
-			RE_CPP_TRANSLATE_CTXT.finditer(line),
-			RE_CPP_TRANSLATE_PLURAL.finditer(line))
+		while True:
+			matches = list(RE_CPP_TRANSLATE.finditer(line))
+			matches.extend(RE_CPP_TRANSLATE_CTXT.finditer(line))
+			matches.extend(RE_CPP_TRANSLATE_PLURAL.finditer(line))
+			# These regexps match even if the call is incomplete. For a complete call,
+			# the "end" match group will be ")". For an incomplete call, the "end"
+			# match group will be None.
+			if all(m.group("end") for m in matches):
+				# All translate calls are complete.
+				break
+			# There is an incomplete translate call. It must continue onto the next
+			# line. Add the next line and try again.
+			line += next(input)
 		for m in matches:
+			if not m.group("msgid"):
+				# This can happen if this is a runtime translation where the msgid is a
+				# variable.
+				continue
 			addMessage(m.groupdict())
 
 RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')

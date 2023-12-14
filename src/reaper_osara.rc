@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Resource script
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -12,7 +12,7 @@
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 
-ID_PARAMS_DLG DIALOGEX 250, 125, 188, 102
+ID_PARAMS_DLG DIALOGEX 250, 125, 188, 117
 	CAPTION "Parameters"
 	STYLE WS_POPUP | WS_SYSMENU | WS_CAPTION | WS_SIZEBOX
 BEGIN
@@ -25,15 +25,16 @@ BEGIN
 	LTEXT "", ID_PARAM_VAL_LABEL, 40, 45, 60, 10
 	LTEXT "&Filter:", IDC_STATIC, 10, 63, 23, 10
 	EDITTEXT ID_PARAM_FILTER, 40, 62, 40, 10
-	DEFPUSHBUTTON "&Close", IDCANCEL, 134, 78, 26, 14
+	CONTROL "Include &unnamed parameters", ID_PARAM_UNNAMED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 77, 140, 14
+	DEFPUSHBUTTON "&Close", IDCANCEL, 134, 93, 26, 14
 END
 
 ID_PEAK_WATCHER_DLG DIALOGEX 250, 125, 400, 184
 	CAPTION "Peak Watcher"
 BEGIN
-	CONTROL "&Follow when last touched track changes", ID_PEAK_FOLLOW, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 10, 20, 14
+	CONTROL "&Follow when last touched track changes", ID_PEAK_FOLLOW, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 10, 140, 14
 	LTEXT "Level type:", IDC_STATIC, 10, 30, 38, 10
-	COMBOBOX ID_PEAK_TYPE, 55, 28, 60, 12, CBS_DROPDOWNLIST | WS_TABSTOP
+	COMBOBOX ID_PEAK_TYPE, 55, 28, 65, 12, CBS_DROPDOWNLIST | WS_TABSTOP
 	GROUPBOX "Notify automatically for channels:", IDC_STATIC, 5, 77, 156, 60
 	CONTROL "&1", ID_PEAK_CHAN1, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 14, 93, 20, 14
 	CONTROL "&2", ID_PEAK_CHAN2, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 41, 93, 20, 14

@@ -1,4 +1,4 @@
-version: "2022.1pre-{build}"
+version: "2023.1pre-{build}"
 
 branches:
  only:

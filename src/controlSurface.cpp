@@ -1,7 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Control surface code
- * Copyright 2019-2022 NV Access Limited, James Teh, Leonard de Ruijter
+ * Copyright 2019-2023 NV Access Limited, James Teh, Leonard de Ruijter
  * License: GNU General Public License version 2.0
  */
 
@@ -13,6 +13,7 @@
 #include <cstdint>
 #include "osara.h"
 #include "config.h"
+#include "fxChain.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
@@ -98,7 +99,7 @@ class Surface: public IReaperControlSurface {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
-		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
+		if (this->wasCausedByCommand()) {
 			return;
 		}
 		// Calculate integer based transport state
@@ -226,7 +227,8 @@ class Surface: public IReaperControlSurface {
 			int fx = *(int*)parm2 >> 16;
 			// Don't report parameter changes where they might already be reported by
 			// the UI.
-			if (isParamsDialogOpen || TrackFX_GetChainVisible(track) == fx) {
+			if (isParamsDialogOpen ||
+					(TrackFX_GetChainVisible(track) == fx && !isFxListFocused())) {
 				return 0; // Unsupported.
 			}
 			int param = *(int*)parm2 & 0xFFFF;

@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Resource constants
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -14,6 +14,7 @@
 #define ID_PARAM_VAL_SLIDER 103
 #define ID_PARAM_FILTER 104
 #define ID_PARAM_VAL_LABEL 105
+#define ID_PARAM_UNNAMED 106
 
 #define ID_PEAK_WATCHER_DLG 200
 #define ID_PEAK_TYPE 201

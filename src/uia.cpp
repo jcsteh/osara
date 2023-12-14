@@ -1,7 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * UI Automation code
- * Copyright 2019-2022 Leonard de Ruijter, James Teh
+ * Copyright 2019-2023 Leonard de Ruijter, James Teh
  * License: GNU General Public License version 2.0
  */
 

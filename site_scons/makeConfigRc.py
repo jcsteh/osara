@@ -1,12 +1,12 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Utility to build Configuration dialog resource
 # Author: James Teh <jamie@jantrid.net>
-# Copyright 2022 James Teh
+# Copyright 2022-2023 James Teh
 # License: GNU General Public License version 2.0
 
 import re
 
-RE_BOOL_SETTING = re.compile(r'^BoolSetting\((?P<name>[^,]+),\s*(?P<displayName>"[^"]+"),\s*(?P<default>true|false)\)$')
+RE_BOOL_SETTING = re.compile(r'^BoolSetting\(\s*(?P<name>[^,]+),\s*(?P<sectionId>[^,]+),\s*(?P<displayName>"[^"]+"),\s*(?P<default>true|false)\s*\)$')
 def makeConfigRc(target, source, env):
 	out = open(target[0].path, "wt", encoding="UTF-8")
 	resourceH = open(source[0].path, "rt", encoding="UTF-8")

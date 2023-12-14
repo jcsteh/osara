@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Code related to FX chain windows
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2016-2022 NV Access Limited, James Teh
+ * Copyright 2016-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -20,14 +20,64 @@
 #include <memory>
 #include <regex>
 #include <WDL/win32_utf8.h>
+#include "fxChain.h"
 #include "resource.h"
 #include "translation.h"
 
 using namespace std;
 
+bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
+	// GetTouchedOrFocusedFX is only available in REAPER 7. To ease the
+	// transition, we don't use REAPERAPI_WANT for this and we use the older
+	// function if this is unavailable. This hack should be removed in a few
+	// months once we can reasonably bump our minimum REAPER version to 7+.
+	static bool (*GetTouchedOrFocusedFX)(int mode, int* trackidxOut, int* itemidxOut, int* takeidxOut, int* fxidxOut, int* parmOut) = [] {
+		return (decltype(GetTouchedOrFocusedFX))plugin_getapi("GetTouchedOrFocusedFX");
+	}();
+	int trackIdx, itemIdx, takeIdx;
+	if (GetTouchedOrFocusedFX) {
+		int param;
+		if (!GetTouchedOrFocusedFX(1, &trackIdx, &itemIdx, &takeIdx, fx, &param)) {
+			return false;
+		}
+		if (param & 1) {
+			return false; // Open, but no longer focused.
+		}
+	} else {
+		// Temporary REAPER 6 compatibility.
+		int type = GetFocusedFX2(&trackIdx, &itemIdx, fx);
+		if (!type || type & 4) {
+			return false;
+		}
+		--trackIdx;
+		if (type == 2 && fx) { // Take
+			takeIdx = HIWORD(*fx);
+			*fx = LOWORD(*fx);
+		} else { // Track
+			takeIdx = -1;
+		}
+	}
+	if (!track) {
+		return true;
+	}
+	*track = trackIdx == -1 ?
+		GetMasterTrack(nullptr) : GetTrack(nullptr, trackIdx);
+	if (!take) {
+		return true;
+	}
+	if (takeIdx != -1) {
+		MediaItem* item = GetTrackMediaItem(*track, itemIdx);
+		*take = GetTake(item, takeIdx);
+	} else {
+		*take = nullptr;
+	}
+	return true;
+}
+
+constexpr long WCID_FX_LIST = 1076;
 bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
-		GetFocusedFX(nullptr, nullptr, nullptr) != 0;
+	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST &&
+		getFocusedFx();
 }
 
 void shortenFxName(const char* name, ostringstream& s) {
@@ -52,31 +102,50 @@ void shortenFxName(const char* name, ostringstream& s) {
 #ifdef _WIN32
 
 bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
-	const unsigned int fxFocus = GetFocusedFX2(nullptr, nullptr, nullptr);
-	const bool isFxWindow = (fxFocus) && !(fxFocus & 4);
-	if (!isFxWindow) {
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (!getFocusedFx(&track, &take, &fx)) {
+		return false;
+	}
+	// Find the nearest ancestor FX chain parent window. This might be the top
+	// level FX chain or it might be a container. This allows f6 to focus FX
+	// inside a focused container.
+	HWND window = GetFocus();
+	do {
+		window = GetParent(window);
+		if (isClassName(window, WCS_DIALOG)) {
+			break;
+		}
+	} while (window);
+	if (!window) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
+	if (!(window = FindWindowExA(window, nullptr, WCS_DIALOG, nullptr))) {
 		return false;
 	}
-	// This is a property page containing the plugin window among other things.
-	// set property page name, to avoid CPU/PDC label audition after switching
-	char name[8];
-	if (GetWindowText(window, name, sizeof(name)) == 0) {
-		SetWindowText(window, " ");
+	// Check whether this is an FX container.
+	char type[10];
+	type[0] = '\0';
+	if (take) {
+		TakeFX_GetNamedConfigParm(take, fx, "fx_type", type, sizeof(type));
+	} else {
+		TrackFX_GetNamedConfigParm(track, fx, "fx_type", type, sizeof(type));
+	}
+	if (strcmp(type, "Container") == 0) {
+		// An FX container is focused. Focus its FX list.
+		window = GetDlgItem(window, WCID_FX_LIST);
+		if (window) {
+			SetFocus(window);
+		}
+		return true;
 	}
 	// Descend. Observed as the first or as the last. 
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
+	if (isClassName(window, "ComboBox")) {
 		// Plugin window should be the last.
 		if (!(window = GetWindow(window, GW_HWNDLAST))) {
 			return false;
@@ -110,24 +179,17 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	if (!isFxListFocused()) {
 		return false;
 	}
-	int trackNum, itemNum, fx;
-	int type = GetFocusedFX(&trackNum, &itemNum, &fx);
-	if (type == 0) {
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (!getFocusedFx(&track, &take, &fx)) {
 		return false; // No FX chain focused.
 	}
-	MediaTrack* track = trackNum == 0 ?
-		GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
 	bool enabled;
-	if (type == 1) { // Track
-		enabled = TrackFX_GetEnabled(track, fx);
-	} else if (type == 2) { // Item
-		MediaItem* item = GetTrackMediaItem(track, itemNum);
-		int takeNum = HIWORD(fx);
-		fx = LOWORD(fx);
-		MediaItem_Take* take = GetTake(item, takeNum);
+	if (take) {
 		enabled = TakeFX_GetEnabled(take, fx);
 	} else {
-		return false;
+		enabled = TrackFX_GetEnabled(track, fx);
 	}
 	if (aboutToToggle) {
 		enabled = !enabled;
@@ -295,7 +357,7 @@ class PresetDialog {
 bool maybeOpenFxPresetDialog() {
 	HWND hwnd = GetFocus();
 	if (GetWindowLong(hwnd, GWL_ID) != 1000 || !isClassName(hwnd, "ComboBox") ||
-			GetFocusedFX(nullptr, nullptr, nullptr) == 0) {
+			!getFocusedFx()) {
 		// Not the FX preset combo box.
 		return false;
 	}
@@ -312,7 +374,7 @@ void CALLBACK fireValueChangeOnFocus(HWND hwnd, UINT msg, UINT_PTR event,
 }
 
 bool maybeSwitchFxTab(bool previous) {
-	if (GetFocusedFX(nullptr, nullptr, nullptr) == 0) {
+	if (!getFocusedFx()) {
 		// No FX focused.
 		return false;
 	}

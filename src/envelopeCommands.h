@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2015-2022 NV Access Limited, James Teh
+ * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 #include <optional>
@@ -28,8 +28,12 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 bool toggleCurrentAutomationItemSelection();
 std::optional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
-void postToggleTrackVolumeEnvelope(int command);
-void postToggleTrackPanEnvelope(int command);
 void cmdToggleTrackEnvelope(Command* command);
+void cmdToggleTakeEnvelope(Command* command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(Command* command);
+void cmdCycleEnvelopePointShape(Command* command);
+void cmdToggleVolumeEnvelope(Command* command);
+void cmdTogglePanEnvelope(Command* command);
+void cmdToggleMuteEnvelope(Command* command);
+void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command);

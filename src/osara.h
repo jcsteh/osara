@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2022 NV Access Limited, James Teh
+ * Copyright 2014-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -199,6 +199,18 @@
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetItemStateChunk
 #define REAPERAPI_WANT_MIDI_GetRecentInputEvent
+#define REAPERAPI_WANT_GetTrackGUID
+#define REAPERAPI_WANT_guidToString
+#define REAPERAPI_WANT_stringToGuid
+#define REAPERAPI_WANT_GetCurrentProjectInLoadSave
+#define REAPERAPI_WANT_GetSetMediaItemTakeInfo_String
+#define REAPERAPI_WANT_GetSetObjectState
+#define REAPERAPI_WANT_FreeHeapPtr
+#define REAPERAPI_WANT_TimeMap2_timeToQN
+#define REAPERAPI_WANT_MIDI_GetGrid
+#define REAPERAPI_WANT_GetParentTrack
+#define REAPERAPI_WANT_LocalizeString
+#define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -209,6 +221,8 @@ const int MEDIA_EXPLORER_SECTION = 32063;
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
 static bool bTrue = true;
+
+extern const char* WCS_DIALOG;
 
 typedef struct Command {
 	int section;
@@ -275,7 +289,12 @@ std::string formatCursorPosition(TimeFormat format=TF_RULER,
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
+<<<<<<< HEAD
 bool isTrackArmed(MediaTrack* track);
+=======
+std::string formatDouble(double d, int precision, bool plus=false);
+MediaItem* getItemWithFocus();
+>>>>>>> origin/master
 
 #ifdef _WIN32
 #include <string>
@@ -313,8 +332,5 @@ IReaperControlSurface* createSurface();
 extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
-// translation.cpp
-void initTranslation();
-void translateDialog(HWND dialog);
 
 #endif

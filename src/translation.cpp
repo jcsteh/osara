@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Translation code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2021-2022 James Teh
+ * Copyright 2021-2023 James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -27,6 +27,8 @@ map<string, string> REAPER_LANG_TO_CODE = {
 	{"REAPER_SWS_french", "fr_FR"},
 	{"Reaper5965_fr_sws_wip", "fr_FR"},
 	{"REAPER_SWS_FRC", "fr_CA"},
+	{"Russian", "ru_RU"},
+	{"Turkish", "tr_TR"},
 };
 
 tinygettext::Dictionary translationDict;

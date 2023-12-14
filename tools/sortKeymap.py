@@ -1,6 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Keymap sorting utility
-# Copyright 2022 Robbie Murray
+# Copyright 2022-2023 Robbie Murray
 # License: GNU General Public License version 2.0
 
 import sys
@@ -10,7 +10,7 @@ import os
 regexs = {
 	'ACT': re.compile(r'(ACT) (?P<options>\d+) (?P<section>\d+) (?P<actionId>"[0-9a-f]+") (?P<description>".*") (.*)$'),
 	'SCR': re.compile(r'(SCR) (?P<options>\d+) (?P<section>\d+) (?P<actionId>[^ ]+) (?P<description>".*") (?P<fileName>.*)$'),
-	'KEY': re.compile(r'(KEY) (?P<modifiers>\d+) (?P<key>\d+) (?P<actionId>[^ ]+) (?P<section>\d+)$')
+	'KEY': re.compile(r'(KEY) (?P<modifiers>\d+) (?P<key>\d+) (?P<actionId>[^ ]+) (?P<section>\d+)(?:\s*#.*)?$')
 }
 
 

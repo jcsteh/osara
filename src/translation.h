@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Translation header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2021-2022 James Teh
+ * Copyright 2021-2023 James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -15,6 +15,9 @@
 
 extern tinygettext::Dictionary translationDict;
 
+void initTranslation();
+void translateDialog(HWND dialog);
+
 template<typename S>
 auto translate(S msg) {
 	return translationDict.translate(msg);
@@ -26,6 +29,12 @@ auto translate_ctxt(S context, S msg) {
 template<typename S, typename N>
 auto translate_plural(S msg, S msgPlural, N num) {
 	return translationDict.translate_plural(msg, msgPlural, num);
+}
+
+// This function is used to mark a string as translatable without actually
+// translating it. This is useful for strings in compile time data structures.
+constexpr auto _t(auto msg) {
+	return msg;
 }
 
 // Catch exceptions from fmt::format due to errors in translations so we can
