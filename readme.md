@@ -153,6 +153,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
+- Item properties: Toggle lock
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
 - Item: Open associated project in new tab: Alt+Shift+O

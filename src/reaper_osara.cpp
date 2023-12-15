@@ -1576,6 +1576,50 @@ void postToggleItemSolo(int command) {
 	}
 }
 
+bool isItemLocked(MediaItem* item) {
+	return *(char*)GetSetMediaItemInfo(item, "C_LOCK", nullptr) & 1;
+}
+
+void postToggleItemLock(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage(translate("no items selected"));
+		return;
+	}
+	if(count==1)  {
+		outputMessage(isItemLocked(GetSelectedMediaItem(0,0)) ?
+			translate("locked") : translate("unlocked"));
+		return;
+	}
+	int lockCount=0;
+	int unlockCount=0;
+	for (int i=0; i<count; ++i) {
+		if(isItemLocked(GetSelectedMediaItem(0, i))) {
+			++lockCount;
+		} else {
+			++unlockCount;
+		}
+	}
+	ostringstream s;
+	if(lockCount>0){
+		// Translators: Reported when multiple items are locked. {} will be replaced
+		// with the number of items; e.g. "2 items locked".
+		s << format(translate_plural("{} item locked", "{} items locked", lockCount),
+			lockCount);
+		if (unlockCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unlockCount>0)  {
+		// Translators: Reported when multiple items are unlocked. {} will be
+		// replaced with the number of items; e.g. "2 items unlocked".
+		s << format(
+			translate_plural("{} item unlocked", "{} items unlocked", unlockCount),
+			unlockCount);
+	}
+	outputMessage(s);
+}
+
 void postSetSelectionEnd(int command) {
 	outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
@@ -2040,6 +2084,7 @@ PostCommand POST_COMMANDS[] = {
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{41561, postToggleItemSolo}, // Item properties: Toggle solo
+	{40687, postToggleItemLock}, // Item properties: Toggle lock
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
@@ -2902,7 +2947,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL)) {
 			s << " " << translate("muted");
 		}
-		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1) {
+		if (isItemLocked(item)) {
 			// Translators: Used when navigating items to indicate that an item is
 			// locked.
 			s << " " << translate("locked");
