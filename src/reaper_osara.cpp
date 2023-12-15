@@ -1577,12 +1577,10 @@ void postToggleItemSolo(int command) {
 }
 
 bool isItemLocked(MediaItem* item) {
-	return *(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL);
+	return *(char*)GetSetMediaItemInfo(item, "C_LOCK", nullptr) & 1;
 }
 
 void postToggleItemLock(int command) {
-	int lockCount=0;
-	int unlockCount=0;
 	int count = CountSelectedMediaItems(0);
 	if(count==0) {
 		outputMessage(translate("no items selected"));
@@ -1593,11 +1591,14 @@ void postToggleItemLock(int command) {
 			translate("locked") : translate("unlocked"));
 		return;
 	}
+	int lockCount=0;
+	int unlockCount=0;
 	for (int i=0; i<count; ++i) {
-		if(isItemLocked(GetSelectedMediaItem(0, i)))
+		if(isItemLocked(GetSelectedMediaItem(0, i))) {
 			++lockCount;
-		else
+		} else {
 			++unlockCount;
+		}
 	}
 	ostringstream s;
 	if(lockCount>0){
@@ -2946,7 +2947,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL)) {
 			s << " " << translate("muted");
 		}
-		if (*(char*)GetSetMediaItemInfo(item, "C_LOCK", NULL) & 1) {
+		if (isItemLocked(item)) {
 			// Translators: Used when navigating items to indicate that an item is
 			// locked.
 			s << " " << translate("locked");
