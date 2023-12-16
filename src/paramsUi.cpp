@@ -824,9 +824,11 @@ class FxParam: public Param {
 			this->largeStep = this->step * 20;
 		}
 		this->isEditable = true;
-		// Set this as the last touched FX and FX parameter.
+		// Set this as the last touched FX and FX parameter, as well as the last
+		// focused FX.
 		string paramStr = format("{}", param);
 		source._SetNamedConfigParm(source.obj, fx, "last_touched", paramStr.c_str());
+		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
 
 	double getValue() {
@@ -884,9 +886,11 @@ class FxNamedConfigParam: public Param {
 		this->step = 1;
 		this->largeStep = 1;
 		this->isEditable = false;
-		// Set this as the last touched FX. We can't set named parameters as the
-		// last touched parameter, so just use the first numbered parameter (0).
+		// Set this as the last touched and focused FX. We can't set named parameters
+		// as the last touched parameter, so just use the first numbered parameter
+		// (0).
 		source._SetNamedConfigParm(source.obj, fx, "last_touched", "0");
+		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
 
 	double getValue() {
