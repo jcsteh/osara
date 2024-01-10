@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2023-12-12 22:39\n"
+"PO-Revision-Date: 2024-01-10 10:15\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -123,10 +123,10 @@ msgid "point {point} value {value} {shape}"
 msgstr "{point} 點 值 {value} {shape}"
 
 msgid "selected"
-msgstr "選中"
+msgstr "選取"
 
 msgid "unselected"
-msgstr "未選中"
+msgstr "未選取"
 
 msgid "no take envelopes"
 msgstr "無片段包絡"
@@ -184,7 +184,7 @@ msgstr "隱藏片段 {} 包絡"
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] "{} 點選中"
+msgstr[0] "{} 點選取"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
@@ -279,25 +279,25 @@ msgstr[0] "{} 事件移除"
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] "{} 音符選中"
+msgstr[0] "{} 音符選取"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] "{} 事件選中"
+msgstr[0] "{} 事件選取"
 
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
-msgstr[0] "{} CC 事件選中"
+msgstr[0] "{} CC 事件選取"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
 msgid "{} CC event unselected"
 msgid_plural "{} CC events unselected"
-msgstr[0] "{} CC 事件取消選中"
+msgstr[0] "{} CC 事件取消選取"
 
 msgid "Bank Select MSB"
 msgstr "音色庫選擇 MSB"
@@ -539,7 +539,7 @@ msgid "no time selection"
 msgstr "無時間選區"
 
 msgid "no notes selected"
-msgstr "無音符選中"
+msgstr "無音符選取"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
 msgstr "OSARA: 在時間選區內選擇所有具有相同音高的音符"
@@ -1256,7 +1256,7 @@ msgid "disabled delta solo"
 msgstr "停用效果獨奏"
 
 msgid "no selected items"
-msgstr "無項目選中"
+msgstr "無項目選取"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized to common gain".
@@ -1417,7 +1417,7 @@ msgstr "停止"
 #. the number of items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
-msgstr[0] "{} 對象選中"
+msgstr[0] "{} 對象選取"
 
 #. Reported when prompting for the name of a track.
 msgid "Track name"
@@ -1446,6 +1446,29 @@ msgstr[0] "{} 對象獨奏"
 msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
 msgstr[0] "{} 對象取消獨奏"
+
+msgid "no items selected"
+msgstr "無對象選取"
+
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "鎖定"
+
+msgid "unlocked"
+msgstr "取消鎖定"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] "{} 對象鎖定"
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] "{} 對象取消鎖定"
 
 msgid "set selection end"
 msgstr "設置選區結束"
@@ -1488,18 +1511,15 @@ msgid "normal record"
 msgstr "標準錄音"
 
 msgid "selected item auto-punch"
-msgstr "自動穿插選中的項目"
+msgstr "自動穿插錄音選取的項目"
 
 msgid "time selection auto-punch"
-msgstr "自動穿插時間選區"
+msgstr "自動穿插錄音時間選區"
 
 #. When changing the global automation override, reported prior
 #. to the chosen automation mode.
 msgid "override"
 msgstr "覆蓋"
-
-msgid "no items selected"
-msgstr "無對象選中"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1586,7 +1606,7 @@ msgstr "{} 片段標記"
 #. with the number of tracks; e.g. "2 tracks selected".
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
-msgstr[0] "{} 軌道選中"
+msgstr[0] "{} 軌道選取"
 
 msgid "not defeating solo"
 msgstr "取消獨奏失效"
@@ -1644,6 +1664,12 @@ msgstr "最大垂直縮放"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr "{} 瞬時"
+
 msgid "set selection start"
 msgstr "設置選區開始"
 
@@ -1803,107 +1829,11 @@ msgstr "預設鍵映射"
 msgid "recording key map"
 msgstr "錄音鍵映射"
 
-msgid "alt 1"
-msgstr "替代 1"
-
-msgid "alt 2"
-msgstr "替代 2"
-
-msgid "alt 3"
-msgstr "替代 3"
-
-msgid "alt 4"
-msgstr "替代 4"
-
-msgid "alt 5"
-msgstr "替代 5"
-
-msgid "alt 6"
-msgstr "替代 6"
-
-msgid "alt 7"
-msgstr "替代 7"
-
-msgid "alt 8"
-msgstr "替代 8"
-
-msgid "alt 9"
-msgstr "替代 9"
-
-msgid "alt 10"
-msgstr "替代 10"
-
-msgid "alt 11"
-msgstr "替代 11"
-
-msgid "alt 12"
-msgstr "替代 12"
-
-msgid "alt 13"
-msgstr "替代 13"
-
-msgid "alt 14"
-msgstr "替代 14"
-
-msgid "alt 15"
-msgstr "替代 15"
-
-msgid "alt 16"
-msgstr "替代 16"
-
 msgid "default momentary"
 msgstr "預設瞬時"
 
 msgid "recording key map momentary"
 msgstr "錄音鍵映射瞬時"
-
-msgid "alt 1 momentary"
-msgstr "替代 1 暫時"
-
-msgid "alt 2 momentary"
-msgstr "替代 2 暫時"
-
-msgid "alt 3 momentary"
-msgstr "替代 3 暫時"
-
-msgid "alt 4 momentary"
-msgstr "替代 4 暫時"
-
-msgid "alt 5 momentary"
-msgstr "替代 5 暫時"
-
-msgid "alt 6 momentary"
-msgstr "替代 6 暫時"
-
-msgid "alt 7 momentary"
-msgstr "替代 7 暫時"
-
-msgid "alt 8 momentary"
-msgstr "替代 8 暫時"
-
-msgid "alt 9 momentary"
-msgstr "替代 9 暫時"
-
-msgid "alt 10 momentary"
-msgstr "替代 10 暫時"
-
-msgid "alt 11 momentary"
-msgstr "替代 11 暫時"
-
-msgid "alt 12 momentary"
-msgstr "替代 12 暫時"
-
-msgid "alt 13 momentary"
-msgstr "替代 13 暫時"
-
-msgid "alt 14 momentary"
-msgstr "替代 14 暫時"
-
-msgid "alt 15 momentary"
-msgstr "替代 15 暫時"
-
-msgid "alt 16 momentary"
-msgstr "替代 16 暫時"
 
 msgid "auto playing"
 msgstr "自動播放"
@@ -2000,11 +1930,6 @@ msgid "Change Item Selection"
 msgstr "更改選取的對象"
 
 #. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr "鎖定"
-
-#. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
 msgid "group {}"
 msgstr "分組 {}"
@@ -2066,14 +1991,14 @@ msgstr[0] "{} 軌道移除"
 #. {} is replaced by the number of items affected.
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
-msgstr[0] "{} 對象中的選中區域已復制"
+msgstr[0] "{} 對象中的選取區域已復制"
 
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
 #. affected.
 msgid "selected area of {} item removed"
 msgid_plural "selected area of {} items removed"
-msgstr[0] "{} 對象中的選中區域已移除"
+msgstr[0] "{} 對象中的選取區域已移除"
 
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
@@ -2100,7 +2025,7 @@ msgid "cleared time/loop selection"
 msgstr "清除時間/循環選區"
 
 msgid "unselected tracks/items/envelope points"
-msgstr "取消選中軌道/對象/包絡點"
+msgstr "取消選取軌道/對象/包絡點"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -2147,13 +2072,13 @@ msgid "length {}"
 msgstr "長度 {}"
 
 msgid "Selected tracks:"
-msgstr "選中軌道"
+msgstr "選取軌道"
 
 msgid "no selected tracks"
-msgstr "未選中軌道"
+msgstr "未選取軌道"
 
 msgid "Selected items:"
-msgstr "選中對象"
+msgstr "選取對象"
 
 msgid "no selection"
 msgstr "未選取"
@@ -2279,10 +2204,10 @@ msgid "unmonitored all tracks"
 msgstr "取消監聽全部軌道"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
-msgstr "OSARA: 移到下一個對象（離開的對象保留被選中）"
+msgstr "OSARA: 移到下一個對象（離開的對象保留被選取）"
 
 msgid "OSARA: Move to previous item (leaving other items selected)"
-msgstr "OSARA: 移到上一個對象（離開的對象保留被選中）"
+msgstr "OSARA: 移到上一個對象（離開的對象保留被選取）"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
 msgstr "OSARA: 查看當前媒體對象/片段/自動化對象的屬性（取決於焦點）"
@@ -2384,10 +2309,10 @@ msgid "OSARA: Move to previous envelope point"
 msgstr "OSARA: 移至上一個包絡點"
 
 msgid "OSARA: Move to next envelope point (leaving other points selected)"
-msgstr "OSARA: 移至下一個包絡點（離開點保留被選中）"
+msgstr "OSARA: 移至下一個包絡點（離開點保留被選取）"
 
 msgid "OSARA: Move to previous envelope point (leaving other points selected)"
-msgstr "OSARA: 移至上一個包絡點（離開點保留被選中）"
+msgstr "OSARA: 移至上一個包絡點（離開點保留被選取）"
 
 msgid "OSARA: Move to next transient"
 msgstr "OSARA: 移至下一個瞬態"
@@ -2405,7 +2330,7 @@ msgid "OSARA: Show third context menu (depending on focus)"
 msgstr "OSARA: 顯示第三個快顯功能表（取決於焦點）"
 
 msgid "OSARA: Cycle through midi recording modes of selected tracks"
-msgstr "OSARA: 輪換報告選中軌道的Midi錄製模式"
+msgstr "OSARA: 輪換報告選取軌道的Midi錄製模式"
 
 msgid "OSARA: Configuration"
 msgstr "OSARA: 配置設定"
@@ -2417,7 +2342,7 @@ msgid "OSARA: Toggle global automation override between latch preview and off"
 msgstr "OSARA: 在鎖定預覽和關閉之間切換全局自動化覆蓋"
 
 msgid "OSARA: Cycle automation mode of selected tracks"
-msgstr "OSARA: 輪換選中軌道的自動化模式"
+msgstr "OSARA: 輪換選取軌道的自動化模式"
 
 msgid "OSARA: About"
 msgstr "OSARA: 關於版本"
@@ -2429,7 +2354,7 @@ msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: 將來自 OSARA 的下一條消息靜音"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: 報告當前位置的區間，工程標記和最後選中的軌道對象"
+msgstr "OSARA: 報告當前位置的區間，工程標記和最後選取的軌道對象"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: 轉道第一條軌道"

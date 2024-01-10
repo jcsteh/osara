@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-12-12 22:39\n"
+"PO-Revision-Date: 2024-01-10 10:15\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1498,6 +1498,31 @@ msgid_plural "{} items unsoloed"
 msgstr[0] "{} ítems con solo desactivado"
 msgstr[1] "{} ítems con solo desactivado"
 
+msgid "no items selected"
+msgstr "no hay ítems seleccionados"
+
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "bloqueado"
+
+msgid "unlocked"
+msgstr "desbloqueado"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] "{} ítem bloqueado"
+msgstr[1] "{} ítems bloqueados"
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] "{} ítem desbloqueado"
+msgstr[1] "{} ítems desbloqueados"
+
 msgid "set selection end"
 msgstr "fin de selección fijado"
 
@@ -1548,9 +1573,6 @@ msgstr "pinchazo automático en selección de tiempo: modo de grabación"
 #. to the chosen automation mode.
 msgid "override"
 msgstr "manual"
-
-msgid "no items selected"
-msgstr "no hay ítems seleccionados"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1698,6 +1720,12 @@ msgstr "zoom vertical máximo"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr "{} momentáneo"
+
 msgid "set selection start"
 msgstr "comienzo de selección fijado"
 
@@ -1857,107 +1885,11 @@ msgstr "mapa de teclado por defecto"
 msgid "recording key map"
 msgstr "mapa de teclado por defecto"
 
-msgid "alt 1"
-msgstr "alt 1"
-
-msgid "alt 2"
-msgstr "alt 2"
-
-msgid "alt 3"
-msgstr "alt 3"
-
-msgid "alt 4"
-msgstr "alt 4"
-
-msgid "alt 5"
-msgstr "alt 5"
-
-msgid "alt 6"
-msgstr "alt 6"
-
-msgid "alt 7"
-msgstr "alt 7"
-
-msgid "alt 8"
-msgstr "alt 8"
-
-msgid "alt 9"
-msgstr "alt 9"
-
-msgid "alt 10"
-msgstr "alt 10"
-
-msgid "alt 11"
-msgstr "alt 11"
-
-msgid "alt 12"
-msgstr "alt 12"
-
-msgid "alt 13"
-msgstr "alt 13"
-
-msgid "alt 14"
-msgstr "alt 14"
-
-msgid "alt 15"
-msgstr "alt 15"
-
-msgid "alt 16"
-msgstr "alt 16"
-
 msgid "default momentary"
 msgstr "momentáneo por defecto"
 
 msgid "recording key map momentary"
 msgstr "mapa de teclado de grabación momentáneo por defecto"
-
-msgid "alt 1 momentary"
-msgstr "alt 1 momentáneo"
-
-msgid "alt 2 momentary"
-msgstr "alt 2 Momentáneo"
-
-msgid "alt 3 momentary"
-msgstr "alt 3 Momentáneo"
-
-msgid "alt 4 momentary"
-msgstr "alt 4 Momentáneo"
-
-msgid "alt 5 momentary"
-msgstr "alt 5 Momentáneo"
-
-msgid "alt 6 momentary"
-msgstr "alt 6 Momentáneo"
-
-msgid "alt 7 momentary"
-msgstr "alt 7 Momentáneo"
-
-msgid "alt 8 momentary"
-msgstr "alt 8 Momentáneo"
-
-msgid "alt 9 momentary"
-msgstr "alt 9 Momentáneo"
-
-msgid "alt 10 momentary"
-msgstr "alt 10 Momentáneo"
-
-msgid "alt 11 momentary"
-msgstr "alt 11 Momentáneo"
-
-msgid "alt 12 momentary"
-msgstr "alt 12 Momentáneo"
-
-msgid "alt 13 momentary"
-msgstr "alt 13 Momentáneo"
-
-msgid "alt 14 momentary"
-msgstr "alt 14 Momentáneo"
-
-msgid "alt 15 momentary"
-msgstr "alt 15 Momentáneo"
-
-msgid "alt 16 momentary"
-msgstr "alt 16 Momentáneo"
 
 msgid "auto playing"
 msgstr ""
@@ -2052,11 +1984,6 @@ msgstr "Cambiar selección de pista"
 
 msgid "Change Item Selection"
 msgstr "Cambiar Selección de Ítem"
-
-#. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr "bloqueado"
 
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".

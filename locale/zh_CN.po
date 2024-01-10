@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2023-12-12 22:39\n"
+"PO-Revision-Date: 2024-01-10 10:15\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1447,6 +1447,29 @@ msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
 msgstr[0] "{} 对象已取消独奏"
 
+msgid "no items selected"
+msgstr "未选择对象"
+
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "锁定"
+
+msgid "unlocked"
+msgstr "解锁"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] "{} 对象锁定"
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] "{} 对象解锁"
+
 msgid "set selection end"
 msgstr "设置选区结束"
 
@@ -1497,9 +1520,6 @@ msgstr "时间选区自动穿入穿出"
 #. to the chosen automation mode.
 msgid "override"
 msgstr "覆写"
-
-msgid "no items selected"
-msgstr "未选择对象"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1644,6 +1664,12 @@ msgstr "最大垂直缩放"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr "{} 瞬时"
+
 msgid "set selection start"
 msgstr "设置选区开始"
 
@@ -1803,107 +1829,11 @@ msgstr "默认键映射"
 msgid "recording key map"
 msgstr "录音键映射"
 
-msgid "alt 1"
-msgstr "alt 1"
-
-msgid "alt 2"
-msgstr "alt 2"
-
-msgid "alt 3"
-msgstr "alt 3"
-
-msgid "alt 4"
-msgstr "alt 4"
-
-msgid "alt 5"
-msgstr "alt 5"
-
-msgid "alt 6"
-msgstr "alt 6"
-
-msgid "alt 7"
-msgstr "alt 7"
-
-msgid "alt 8"
-msgstr "alt 8"
-
-msgid "alt 9"
-msgstr "alt 9"
-
-msgid "alt 10"
-msgstr "alt 10"
-
-msgid "alt 11"
-msgstr "alt 11"
-
-msgid "alt 12"
-msgstr "alt 12"
-
-msgid "alt 13"
-msgstr "alt 13"
-
-msgid "alt 14"
-msgstr "alt 14"
-
-msgid "alt 15"
-msgstr "alt 15"
-
-msgid "alt 16"
-msgstr "alt 16"
-
 msgid "default momentary"
 msgstr "默认瞬时"
 
 msgid "recording key map momentary"
 msgstr "录音瞬时"
-
-msgid "alt 1 momentary"
-msgstr "alt 1 瞬时"
-
-msgid "alt 2 momentary"
-msgstr "alt 2 瞬时"
-
-msgid "alt 3 momentary"
-msgstr "alt 3 瞬时"
-
-msgid "alt 4 momentary"
-msgstr "alt 4 瞬时"
-
-msgid "alt 5 momentary"
-msgstr "alt 5 瞬时"
-
-msgid "alt 6 momentary"
-msgstr "alt 6 瞬时"
-
-msgid "alt 7 momentary"
-msgstr "alt 7 瞬时"
-
-msgid "alt 8 momentary"
-msgstr "alt 8 瞬时"
-
-msgid "alt 9 momentary"
-msgstr "alt 9 瞬时"
-
-msgid "alt 10 momentary"
-msgstr "alt 10 瞬时"
-
-msgid "alt 11 momentary"
-msgstr "alt 11 瞬时"
-
-msgid "alt 12 momentary"
-msgstr "alt 12 瞬时"
-
-msgid "alt 13 momentary"
-msgstr "alt 13 瞬时"
-
-msgid "alt 14 momentary"
-msgstr "alt 14 瞬时"
-
-msgid "alt 15 momentary"
-msgstr "alt 15 瞬时"
-
-msgid "alt 16 momentary"
-msgstr "alt 16 瞬时"
 
 msgid "auto playing"
 msgstr "自动播放开"
@@ -1998,11 +1928,6 @@ msgstr "更改轨道选择"
 
 msgid "Change Item Selection"
 msgstr "更改对象选择"
-
-#. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr "锁定"
 
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
