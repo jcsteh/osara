@@ -1,9 +1,8 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@jantrid.net&gt; & other contributors
-- Copyright: 2014-2023 NV Access Limited, James Teh & other contributors
-- License: GNU General Public License version 2.0
-
+- Copyright: 2014-2024 NV Access Limited, James Teh & other contributors
+- License: GNU General Public License version 2.
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
 It was heavily inspired by and based on the concepts of the abandoned ReaAccess extension.
 It runs on both Windows and Mac.
@@ -297,7 +296,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
-- Toggle fullscreen: F11
+- Toggle fullscreen: F11, Command+F11 on Mac
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
