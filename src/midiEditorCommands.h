@@ -66,3 +66,4 @@ void postToggleMidiInputsAsStepInput(int command);
 void postToggleFunctionKeysAsStepInput(int command);
 void postMidiToggleSnap(int command);
 void postMidiChangeZoom(int command);
+int countSelectedEvents(MediaItem_Take* take);

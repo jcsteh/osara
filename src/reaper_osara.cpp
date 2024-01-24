@@ -3647,6 +3647,31 @@ void cmdReportSelection(Command* command) {
 		}
 	}
 
+	if (fakeFocus ==  FOCUS_NOTE || fakeFocus == FOCUS_CC || multiLine) {
+		HWND editor = MIDIEditor_GetActive();
+		MediaItem_Take* take = editor ? MIDIEditor_GetTake(editor) : nullptr;
+		if (take) {
+			if (multiLine) {
+				if (s.tellp() > 0) {
+					s << separator << separator;
+				}
+				s << translate("MIDI Editor selection:") << separator;
+			}
+			int count = countSelectedEvents(take);
+			if (count == 0) {
+				if (multiLine) {
+					s << translate("none");
+				} else {
+					s << translate("no MIDI selection");
+				}
+			} else {
+				s << format(
+					translate_plural("{} event selected", "{} events selected", count),
+					count);
+			}
+		}
+	}
+
 	if (s.tellp() == 0) {
 		outputMessage(translate("no selection"));
 		return;
@@ -4465,7 +4490,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")}, "OSARA_CURSORPOS", cmdReportCursorPosition},

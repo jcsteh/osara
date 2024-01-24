@@ -736,7 +736,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report tracks with phase inverted: Alt+Shift+F9
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Set phase normal for all tracks: Alt+F9
-- OSARA: Report track/item/time selection (depending on focus): Control+Shift+Space
+- OSARA: Report track/item/time/MIDI selection (depending on focus): Control+Shift+Space
  - Pressing this twice will display the information for all selections (not just the focus) in a dialog with a text box for easy review.
 - OSARA: Select from cursor to start of project: Shift+Home
 - OSARA: Select from cursor to end of project: Shift+End
