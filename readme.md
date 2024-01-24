@@ -2,7 +2,8 @@
 
 - Author: James Teh &lt;jamie@jantrid.net&gt; & other contributors
 - Copyright: 2014-2024 NV Access Limited, James Teh & other contributors
-- License: GNU General Public License version 2.
+- License: GNU General Public License version 2.0
+
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
 It was heavily inspired by and based on the concepts of the abandoned ReaAccess extension.
 It runs on both Windows and Mac.
