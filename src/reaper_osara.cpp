@@ -41,8 +41,8 @@
 #include "buildVersion.h"
 #include "fxChain.h"
 #include "translation.h"
-
 using namespace std;
+#include "osara_keymap.h"
 using namespace fmt::literals;
 
 HINSTANCE pluginHInstance;
@@ -4362,7 +4362,7 @@ void cmdUnmonitorAllTracks(Command* command) {
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
-	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
+	{MAIN_SECTION, {{0, 'Y', 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
 	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
 	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
@@ -4791,6 +4791,25 @@ bool handleMainCommandFallback(int command, int flag) {
 
 IReaperControlSurface* surface = nullptr;
 
+void initKeyMap() {
+	for(auto& [secId, keys, namedKeys] : osaraKeySections) {
+		auto sec = SectionFromUniqueID(secId);
+		if(!sec) {
+			continue;
+		}
+		keys.reserve(keys.size() + namedKeys.size());
+		for(auto& key : namedKeys) {
+			int cmd = NamedCommandLookup(key.cmd);
+			if(cmd <= 0){
+				continue;
+			}
+			keys.push_back({key.key, cmd, key.flags});
+		}
+		sec->def_keys_cnt = keys.size();
+		sec->def_keys = keys.data();
+	}
+}
+
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
 void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
@@ -4808,7 +4827,6 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	KillTimer(NULL, event);
 }
-
 #ifdef _WIN32
 
 void annotateAccRole(HWND hwnd, long role) {
@@ -5030,6 +5048,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
 #endif
+initKeyMap();
 		return 1;
 
 	} else {

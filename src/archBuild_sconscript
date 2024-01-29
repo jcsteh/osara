@@ -6,6 +6,7 @@
 
 import os.path
 from makeConfigRc import makeConfigRc
+from tools.kb2header import buildKeymapHeader
 
 Import("env")
 
@@ -79,6 +80,7 @@ if env["PLATFORM"] == "win32":
 		"Advapi32",
 		"UIAutomationCore",
 	]
+	keymapFile = '#config/windows/reaper-kb.ini'
 
 else: # Mac
 	swellDir = env.Dir("#include/WDL/WDL/swell")
@@ -113,6 +115,7 @@ else: # Mac
 		"config.rc",
 		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
 	env.Depends("reaper_osara.cpp", [res, dialogRes])
+	keymapFile = '#config/mac/reaper-kb.ini'
 
 def addExternalSources(dir, files):
 	dir = env.Dir(dir)
@@ -131,6 +134,8 @@ addExternalSources("#include/tinygettext/src", (
 	"tinygettext.cpp",
 ))
 addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
+
+env.Command('osara_keymap.h', keymapFile, buildKeymapHeader)
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],
