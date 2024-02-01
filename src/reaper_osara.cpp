@@ -1232,6 +1232,29 @@ void postChangeTakeVolume(int command) {
 	postChangeVolumeH(volume, command, translate("Take"));
 }
 
+void postItemFades(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(0);
+	if (selectedItemsCount == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	if (command == 40509) {
+		// Item: Fade items in to cursor
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items faded in to cursor".
+		outputMessage(format(
+			translate_plural("{} item faded in to cursor", "{} items faded in to cursor", selectedItemsCount),
+			selectedItemsCount));
+	} else {
+		// Item: Fade items out from cursor
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items faded out from cursor".
+		outputMessage(format(
+			translate_plural("{} item faded out from cursor", "{} items faded out from cursor", selectedItemsCount),
+			selectedItemsCount));
+	}
+}
+
 void postChangeHorizontalZoom(int command) {
 	double hZoom = GetHZoomLevel();
 	// Translators: Reported when zooming in or out horizontally. {} will be
@@ -2165,6 +2188,8 @@ PostCommand POST_COMMANDS[] = {
 	{41924, postChangeItemVolume}, // Item: Nudge items volume -1dB
 	{41927, postChangeTakeVolume}, // Take: Nudge active takes volume +1dB
 	{41926, postChangeTakeVolume}, // Take: Nudge active takes volume -1dB
+	{40509, postItemFades}, // Item: Fade items in to cursor
+	{40510, postItemFades}, // Item: Fade items out from cursor
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
 	{40630, postCursorMovement}, // Go to start of time selection
 	{40631, postCursorMovement}, // Go to end of time selection
