@@ -159,6 +159,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Open associated project in new tab: Alt+Shift+O
 - Xenakios/SWS: Nudge item volume down: Control+Shift+DownArrow
 - Xenakios/SWS: Nudge item volume up: Control+Shift+UpArrow
+- Item: Fade items in to cursor: Control+Alt+I
+- Item: Fade items out from cursor: Control+Alt+O
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Win+Delete
 
