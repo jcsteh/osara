@@ -754,9 +754,7 @@ class FxParams: public ParamSource {
 		}
 	}
 
-	string getTitle() {
-		return translate("FX Parameters");
-	}
+	string getTitle();
 
 	int getParamCount() {
 		// Any named config params come first, followed by normal params.
@@ -979,6 +977,50 @@ unique_ptr<Param> FxParams<ReaperObj>::getParam(int fx, int param) {
 	return make_unique<FxParam<ReaperObj>>(*this, fx, param);
 }
 
+template<>
+string FxParams<MediaTrack>::getTitle() {
+	ostringstream s;
+	s << translate("FX Parameters") << ": ";
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->obj, "IP_TRACKNUMBER",
+		nullptr);
+	if (trackNum <= 0) {
+		s << "master";
+	} else {
+		s << trackNum;
+		char* trackName = (char*)GetSetMediaTrackInfo(this->obj, "P_NAME", nullptr);
+		if (trackName && trackName[0]) {
+			s << " " << trackName;
+		}
+	}
+	s << ": ";
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	s << fxName;
+	return s.str();
+}
+
+template<>
+string FxParams<MediaItem_Take>::getTitle() {
+	ostringstream s;
+	s << translate("FX Parameters") << ": ";
+	auto* track = (MediaTrack*)GetSetMediaItemTakeInfo(this->obj, "P_TRACK",
+		nullptr);
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
+		nullptr);
+	s << trackNum;
+	auto* item = (MediaItem*)GetSetMediaItemTakeInfo(this->obj, "P_ITEM",
+		nullptr);
+	int itemNum = (int)(size_t)GetSetMediaItemInfo(item, "IP_ITEMNUMBER",
+		nullptr);
+	s << "." << itemNum + 1;
+	s << " " << GetTakeName(this->obj);
+	s << ": ";
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	s << fxName;
+	return s.str();
+}
+
 class TrackParamProvider: public ReaperObjParamProvider {
 	public:
 	TrackParamProvider(const string displayName, MediaTrack* track,
@@ -1094,7 +1136,21 @@ class TrackParams: public ReaperObjParamSource {
 	}
 
 	string getTitle() {
-		return translate("Track Parameters");
+		ostringstream s;
+		s << translate("Track Parameters") << ": ";
+		int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->track,
+			"IP_TRACKNUMBER", nullptr);
+		if (trackNum <= 0) {
+			s << "master";
+		} else {
+			s << trackNum;
+			char* trackName = (char*)GetSetMediaTrackInfo(this->track, "P_NAME",
+				nullptr);
+			if (trackName && trackName[0]) {
+				s << " " << trackName;
+			}
+		}
+		return s.str();
 	}
 };
 
@@ -1130,7 +1186,7 @@ class TakeParamProvider: public ReaperObjParamProvider {
 
 class ItemParams: public ReaperObjParamSource {
 	public:
-	ItemParams(MediaItem* item) {
+	ItemParams(MediaItem* item): item(item) {
 		this->params.push_back(make_unique<ItemParamProvider>(
 			translate("item volume"), item, "D_VOL", ReaperObjVolParam::make));
 		// #74: Only add take parameters if there *is* a take. There isn't for empty items.
@@ -1151,8 +1207,25 @@ class ItemParams: public ReaperObjParamSource {
 	}
 
 	string getTitle() {
-		return translate("Item Parameters");
+		ostringstream s;
+		s << translate("Item Parameters") << ": ";
+		auto* track = (MediaTrack*)GetSetMediaItemInfo(this->item, "P_TRACK",
+			nullptr);
+		int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
+			nullptr);
+		s << trackNum;
+		int itemNum = (int)(size_t)GetSetMediaItemInfo(this->item, "IP_ITEMNUMBER",
+			nullptr);
+		s << "." << itemNum + 1;
+		MediaItem_Take* take = GetActiveTake(this->item);
+		if (take) {
+			s << " " << GetTakeName(take);
+		}
+		return s.str();
 	}
+
+	private:
+	MediaItem* item;
 };
 
 void cmdParamsFocus(Command* command) {
