@@ -981,6 +981,10 @@ template<>
 string FxParams<MediaTrack>::getTitle() {
 	ostringstream s;
 	s << translate("FX Parameters") << ": ";
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	shortenFxName(fxName, s);
+	s << ", ";
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->obj, "IP_TRACKNUMBER",
 		nullptr);
 	if (trackNum <= 0) {
@@ -992,10 +996,6 @@ string FxParams<MediaTrack>::getTitle() {
 			s << " " << trackName;
 		}
 	}
-	s << ": ";
-	char fxName[50];
-	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
-	s << fxName;
 	return s.str();
 }
 
@@ -1003,6 +1003,10 @@ template<>
 string FxParams<MediaItem_Take>::getTitle() {
 	ostringstream s;
 	s << translate("FX Parameters") << ": ";
+	char fxName[50];
+	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
+	shortenFxName(fxName, s);
+	s << ", ";
 	auto* track = (MediaTrack*)GetSetMediaItemTakeInfo(this->obj, "P_TRACK",
 		nullptr);
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
@@ -1014,10 +1018,6 @@ string FxParams<MediaItem_Take>::getTitle() {
 		nullptr);
 	s << "." << itemNum + 1;
 	s << " " << GetTakeName(this->obj);
-	s << ": ";
-	char fxName[50];
-	this->_GetFXName(this->obj, this->fx, fxName, sizeof(fxName));
-	s << fxName;
 	return s.str();
 }
 
