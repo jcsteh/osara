@@ -1611,7 +1611,10 @@ void postToggleItemLock(int command) {
 	}
 	if(count==1)  {
 		outputMessage(isItemLocked(GetSelectedMediaItem(0,0)) ?
-			translate("locked") : translate("unlocked"));
+			// Translators: Reported when an action is used to lock an item.
+			translate("locked")
+			// Translators: Reported when an action is used to unlock an item.
+			: translate("unlocked"));
 		return;
 	}
 	int lockCount=0;
@@ -3680,6 +3683,9 @@ void cmdReportSelection(Command* command) {
 				if (s.tellp() > 0) {
 					s << separator << separator;
 				}
+				// Translators: Placed before the information about the selection that has
+				// been made in the MIDI Editor when pressing OSARA's report selection
+				// action twice.
 				s << translate("MIDI Editor selection:") << separator;
 			}
 			int count = countSelectedEvents(take);
