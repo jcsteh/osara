@@ -1515,7 +1515,8 @@ void postSelectMultipleItems(int command) {
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
-	SetCursorContext(1, NULL);
+	shouldMoveToAutoItem = false;
+	SetCursorContext(1, nullptr);
 }
 
 void postRenameTrack(int command) {
@@ -3390,7 +3391,7 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 }
 
 void cmdPropertiesFocus(Command* command) {
-	if (shouldMoveToAutoItem) {
+	if (shouldMoveToAutoItem && currentAutomationItem != -1) {
 		Main_OnCommand(42090, 0); // Envelope: Automation item properties...
 	} else {
 		Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
