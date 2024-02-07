@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-01-10 10:15\n"
+"PO-Revision-Date: 2024-02-07 03:43\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -22,6 +22,12 @@ msgstr "已禁用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切换"
+
+msgid "OSARA: Enable"
+msgstr ""
+
+msgid "OSARA: Disable"
+msgstr ""
 
 msgid "volume"
 msgstr "音量"
@@ -763,9 +769,6 @@ msgstr "开"
 msgid "off"
 msgstr "关"
 
-msgid "FX Parameters"
-msgstr "FX 参数"
-
 msgid "low shelf"
 msgstr "低架"
 
@@ -810,6 +813,9 @@ msgstr "频带 {} 启用"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "频带 {} 类型"
+
+msgid "FX Parameters"
+msgstr "FX 参数"
 
 msgid "mute"
 msgstr "静音"
@@ -1327,6 +1333,18 @@ msgstr "{} 对象"
 msgid "Take"
 msgstr "片段"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] ""
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] ""
+
 #. Panned to the center.
 msgid "center"
 msgstr "中心"
@@ -1450,11 +1468,13 @@ msgstr[0] "{} 对象已取消独奏"
 msgid "no items selected"
 msgstr "未选择对象"
 
+#. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
 #. locked.
 msgid "locked"
 msgstr "锁定"
 
+#. Reported when an action is used to unlock an item.
 msgid "unlocked"
 msgstr "解锁"
 
@@ -2080,6 +2100,15 @@ msgstr "无选定轨"
 msgid "Selected items:"
 msgstr "选定的对象:"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr ""
+
+msgid "no MIDI selection"
+msgstr ""
+
 msgid "no selection"
 msgstr "无选择"
 
@@ -2263,8 +2292,8 @@ msgstr "OSARA: 报告录音监听轨"
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: 报告相位反转轨"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: 报告轨道/对象/时间选区(取决于焦点)"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr ""
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: 移除对象/轨道/时间选区的内容/标记/包络点(取决于焦点)"

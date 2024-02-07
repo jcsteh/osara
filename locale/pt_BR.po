@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-01-10 10:15\n"
+"PO-Revision-Date: 2024-02-07 03:43\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -22,6 +22,12 @@ msgstr "Desabilitado"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: Alternar"
+
+msgid "OSARA: Enable"
+msgstr ""
+
+msgid "OSARA: Disable"
+msgstr ""
 
 msgid "volume"
 msgstr "Volume"
@@ -799,9 +805,6 @@ msgstr "Ligado"
 msgid "off"
 msgstr "Desligado"
 
-msgid "FX Parameters"
-msgstr "Parâmetros do FX"
-
 msgid "low shelf"
 msgstr "Corte de graves"
 
@@ -846,6 +849,9 @@ msgstr "banda {} permitida"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "banda {} tipo"
+
+msgid "FX Parameters"
+msgstr "Parâmetros do FX"
 
 msgid "mute"
 msgstr "silenciar"
@@ -1371,6 +1377,20 @@ msgstr ""
 msgid "Take"
 msgstr ""
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] ""
+msgstr[1] ""
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] ""
+msgstr[1] ""
+
 #. Panned to the center.
 msgid "center"
 msgstr "Centro"
@@ -1501,11 +1521,13 @@ msgstr[1] "Itens com solo desativado"
 msgid "no items selected"
 msgstr "Sem itens selecionados"
 
+#. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
 #. locked.
 msgid "locked"
 msgstr "bloqueado"
 
+#. Reported when an action is used to unlock an item.
 msgid "unlocked"
 msgstr ""
 
@@ -2144,6 +2166,15 @@ msgstr "Sem pistas selecionadas"
 msgid "Selected items:"
 msgstr ""
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr ""
+
+msgid "no MIDI selection"
+msgstr ""
+
 msgid "no selection"
 msgstr "Sem seleção"
 
@@ -2330,8 +2361,8 @@ msgstr "Osara:  Anunciar pistas com o retorno de gravação ligado"
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "Osara:  Informar pistas com fase invertida"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: Reportar seleção de faixa / item / tempo (dependendo do foco)"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr ""
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: Remove itens / pistas / conteúdo da seleção de tempo / marcadores / pontos de envelope (dependendo do foco)"

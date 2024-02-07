@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-01-10 10:15\n"
+"PO-Revision-Date: 2024-02-07 03:43\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -22,6 +22,12 @@ msgstr "desactivado"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: conmutar"
+
+msgid "OSARA: Enable"
+msgstr "OSARA: Activa"
+
+msgid "OSARA: Disable"
+msgstr "OSARA: desactiva"
 
 msgid "volume"
 msgstr "volumen"
@@ -799,9 +805,6 @@ msgstr "activado"
 msgid "off"
 msgstr "desactivado"
 
-msgid "FX Parameters"
-msgstr "Parámetros de FX"
-
 msgid "low shelf"
 msgstr "low shelf"
 
@@ -846,6 +849,9 @@ msgstr "Banda {} activada"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "Banda {} clase"
+
+msgid "FX Parameters"
+msgstr "Parámetros de FX"
 
 msgid "mute"
 msgstr "silencio"
@@ -1371,6 +1377,20 @@ msgstr "Ítem"
 msgid "Take"
 msgstr "Toma"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] "{} item fade in, hasta cursor"
+msgstr[1] "{} items fade in, hasta cursor"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] "{} ítem fade out, desde cursor"
+msgstr[1] "{} ítems fade out, desde cursor"
+
 #. Panned to the center.
 msgid "center"
 msgstr "centro"
@@ -1501,11 +1521,13 @@ msgstr[1] "{} ítems con solo desactivado"
 msgid "no items selected"
 msgstr "no hay ítems seleccionados"
 
+#. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
 #. locked.
 msgid "locked"
 msgstr "bloqueado"
 
+#. Reported when an action is used to unlock an item.
 msgid "unlocked"
 msgstr "desbloqueado"
 
@@ -2144,6 +2166,15 @@ msgstr "no hay pistas seleccionadas"
 msgid "Selected items:"
 msgstr "Ítems seleccionados:"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr "Selección de editor midi:"
+
+msgid "no MIDI selection"
+msgstr "sin midi seleccionado"
+
 msgid "no selection"
 msgstr "sin selección"
 
@@ -2330,8 +2361,8 @@ msgstr "OSARA: anuncia pistas con monitor de grabación activado"
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: anuncia pistas con fase invertida"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: anuncia selección de pistas/ítems/selección de tiempo, dependiendo del foco"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr "OSARA: Anuncia selección de pista/ítem/tiempo/MIDI (dependiendo del foco)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: elimina Pistas/ítems/contenido de selección/marcadores/puntos de envolvente, dependiendo del foco"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-01-10 10:15\n"
+"PO-Revision-Date: 2024-02-07 03:43\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -22,6 +22,12 @@ msgstr "已停用"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: 切換"
+
+msgid "OSARA: Enable"
+msgstr "OSARA: 啟用"
+
+msgid "OSARA: Disable"
+msgstr "OSARA: 停用"
 
 msgid "volume"
 msgstr "音量"
@@ -763,9 +769,6 @@ msgstr "開"
 msgid "off"
 msgstr "關"
 
-msgid "FX Parameters"
-msgstr "FX 參數"
-
 msgid "low shelf"
 msgstr "低架"
 
@@ -810,6 +813,9 @@ msgstr "頻段 {} 啟用"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "頻段 {} 型態"
+
+msgid "FX Parameters"
+msgstr "FX 參數"
 
 msgid "mute"
 msgstr "靜音"
@@ -1327,6 +1333,18 @@ msgstr "對象"
 msgid "Take"
 msgstr "片段"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] "{} 對象淡入到游標處"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] "{} 對象從游標處淡出"
+
 #. Panned to the center.
 msgid "center"
 msgstr "中間"
@@ -1450,11 +1468,13 @@ msgstr[0] "{} 對象取消獨奏"
 msgid "no items selected"
 msgstr "無對象選取"
 
+#. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
 #. locked.
 msgid "locked"
 msgstr "鎖定"
 
+#. Reported when an action is used to unlock an item.
 msgid "unlocked"
 msgstr "取消鎖定"
 
@@ -2080,6 +2100,15 @@ msgstr "未選取軌道"
 msgid "Selected items:"
 msgstr "選取對象"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr "MIDI 編輯器選取"
+
+msgid "no MIDI selection"
+msgstr "無 MIDI 選取"
+
 msgid "no selection"
 msgstr "未選取"
 
@@ -2263,8 +2292,8 @@ msgstr "OSARA: 報告監聽的軌道"
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: 報告翻轉像位的軌道"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: 報告軌道、對象、時間選區 （取決於焦點）"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr "OSARA: 報告軌道、對象、MIDI 選取 （取決於焦點）"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: 移除對象、軌道、時間選區、包絡點 （取決於焦點）"
