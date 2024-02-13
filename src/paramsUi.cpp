@@ -988,7 +988,7 @@ string FxParams<MediaTrack>::getTitle() {
 	int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->obj, "IP_TRACKNUMBER",
 		nullptr);
 	if (trackNum <= 0) {
-		s << "master";
+		s << translate("master");
 	} else {
 		s << trackNum;
 		char* trackName = (char*)GetSetMediaTrackInfo(this->obj, "P_NAME", nullptr);
@@ -1141,7 +1141,7 @@ class TrackParams: public ReaperObjParamSource {
 		int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->track,
 			"IP_TRACKNUMBER", nullptr);
 		if (trackNum <= 0) {
-			s << "master";
+			s << translate("master");
 		} else {
 			s << trackNum;
 			char* trackName = (char*)GetSetMediaTrackInfo(this->track, "P_NAME",
