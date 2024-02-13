@@ -3081,13 +3081,35 @@ void cmdRedo(Command* command) {
 }
 
 void cmdSplitItems(Command* command) {
-	int oldCount = CountMediaItems(0);
+	int oldCount = CountMediaItems(nullptr);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	int added = CountMediaItems(0) - oldCount;
+	int added = CountMediaItems(nullptr) - oldCount;
 	// Translators: Reported when items are added. {} will be replaced with the
 	// number of items; e.g. "2 items added".
 	outputMessage(format(
 		translate_plural("{} item added", "{} items added", added), added));
+	if (!added) {
+		return;
+	}
+	// When an item is split, the item after the split is selected. We want
+	// moveToItem to behave as if the user moved to this item so that the user
+	// doesn't have to move previous twice to get to the item before the split.
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return;
+	}
+	double cursor = GetCursorPosition();
+	int selected = CountSelectedMediaItems(nullptr);
+	for (int i = 0; i < selected; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		if (
+			(MediaTrack*)GetSetMediaItemInfo(item, "P_TRACK", nullptr) == track
+			&& *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr) == cursor
+		) {
+			currentItem = item;
+			break;
+		}
+	}
 }
 
 void cmdPaste(Command* command) {
