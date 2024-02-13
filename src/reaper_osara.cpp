@@ -2546,8 +2546,6 @@ void sendMenu(HWND sendWindow) {
 	HMENU menu = CreatePopupMenu();
 	MENUITEMINFO itemInfo;
 	itemInfo.cbSize = sizeof(MENUITEMINFO);
-	// MIIM_TYPE is deprecated, but win32_utf8 still relies on it.
-	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	itemInfo.fType = MFT_STRING;
 	child.vt = VT_I4;
 	int item = 0;
@@ -2556,8 +2554,21 @@ void sendMenu(HWND sendWindow) {
 		VARIANT role;
 		if (acc->get_accRole(child, &role) != S_OK || role.vt != VT_I4)
 			continue;
-		if (role.lVal != ROLE_SYSTEM_PUSHBUTTON && role.lVal != ROLE_SYSTEM_COMBOBOX)
+		// MIIM_TYPE is deprecated, but win32_utf8 still relies on it.
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		if (role.lVal == ROLE_SYSTEM_CHECKBUTTON) {
+			itemInfo.fMask |= MIIM_STATE;
+			VARIANT state;
+			if (acc->get_accState(child, &state) == S_OK && state.vt == VT_I4 &&
+					state.lVal & STATE_SYSTEM_CHECKED) {
+				itemInfo.fState = MFS_CHECKED;
+			} else {
+				itemInfo.fState = MFS_UNCHECKED;
+			}
+		} else if (role.lVal != ROLE_SYSTEM_PUSHBUTTON &&
+				role.lVal != ROLE_SYSTEM_COMBOBOX) {
 			continue;
+		}
 		BSTR name = NULL;
 		if (acc->get_accName(child, &name) != S_OK || !name)
 			continue;
