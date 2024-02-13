@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-13 13:59\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1476,7 +1476,7 @@ msgstr "鎖定"
 
 #. Reported when an action is used to unlock an item.
 msgid "unlocked"
-msgstr "取消鎖定"
+msgstr "解鎖"
 
 #. Reported when multiple items are locked. {} will be replaced
 #. with the number of items; e.g. "2 items locked".
@@ -1488,7 +1488,7 @@ msgstr[0] "{} 對象鎖定"
 #. replaced with the number of items; e.g. "2 items unlocked".
 msgid "{} item unlocked"
 msgid_plural "{} items unlocked"
-msgstr[0] "{} 對象取消鎖定"
+msgstr[0] "{} 對象解鎖"
 
 msgid "set selection end"
 msgstr "設置選區結束"

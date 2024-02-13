@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-13 13:59\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -1381,15 +1381,15 @@ msgstr "Toma"
 #. "2 items faded in to cursor".
 msgid "{} item faded in to cursor"
 msgid_plural "{} items faded in to cursor"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "realizando fade in a {} ítem hasta el cursor"
+msgstr[1] "realizando fade in a {} ítems hasta el cursor"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items faded out from cursor".
 msgid "{} item faded out from cursor"
 msgid_plural "{} items faded out from cursor"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "realizando fade out a {} ítem desde el cursor"
+msgstr[1] "realizando fade out a {} ítems desde el cursor"
 
 #. Panned to the center.
 msgid "center"
@@ -1529,7 +1529,7 @@ msgstr "bloqueado"
 
 #. Reported when an action is used to unlock an item.
 msgid "unlocked"
-msgstr ""
+msgstr "desbloqueado"
 
 #. Reported when multiple items are locked. {} will be replaced
 #. with the number of items; e.g. "2 items locked".
@@ -1746,7 +1746,7 @@ msgstr "zoom vertical máximo"
 #. override to alt-1", etc. {} is replaced with the shortened section name;
 #. e.g. "alt-1 momentary".
 msgid "{} momentary"
-msgstr ""
+msgstr "{} momentáneo"
 
 msgid "set selection start"
 msgstr "inicio de selección establecido"
@@ -2170,7 +2170,7 @@ msgstr "Ítems seleccionados:"
 #. been made in the MIDI Editor when pressing OSARA's report selection
 #. action twice.
 msgid "MIDI Editor selection:"
-msgstr ""
+msgstr "Selección del Editor MIDI:"
 
 msgid "no MIDI selection"
 msgstr "sin selección MIDI"
