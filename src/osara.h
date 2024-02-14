@@ -210,6 +210,7 @@
 #define REAPERAPI_WANT_GetParentTrack
 #define REAPERAPI_WANT_LocalizeString
 #define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
+#define REAPERAPI_WANT_GetTrackSendName
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

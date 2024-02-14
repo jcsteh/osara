@@ -1079,13 +1079,23 @@ class TrackParams: public ReaperObjParamSource {
 	void addSendParams(int category, const char* categoryName, const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
 		for (int i = 0; i < count; ++i) {
-			MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, NULL);
 			ostringstream dispPrefix;
 			// Example display name: "1 Drums send volume"
-			dispPrefix << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
-			char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
-			if (trackName)
-				dispPrefix << trackName << " ";
+			if (trackParam) {
+				// Send or receive.
+				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, nullptr);
+				dispPrefix << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER",
+					nullptr) << " ";
+				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
+				if (trackName) {
+					dispPrefix << trackName << " ";
+				}
+			} else {
+				// Hardware output.
+				char sendName[100] = "";
+				GetTrackSendName(this->track, i, sendName, sizeof(sendName));
+				dispPrefix << sendName << " ";
+			}
 			dispPrefix << categoryName << " ";
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
@@ -1116,6 +1126,9 @@ class TrackParams: public ReaperObjParamSource {
 		// Translators: Indicates a parameter for a track receive in the Track
 		// Parameters dialog.
 		this->addSendParams(-1, translate("receive"), "P_SRCTRACK");
+		// Translators: Indicates a parameter for a hardware audio output in the
+		//  Track Parameters dialog.
+		this->addSendParams(1, translate("hardware"), nullptr);
 
 		int fxParamCount = CountTCPFXParms(nullptr, track);
 		if (fxParamCount > 0) {
