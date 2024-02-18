@@ -394,6 +394,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Grid: Set to 1/48 (1/32 triplet): 0
 - Grid: Set to 1/64
 - Grid: Set to 1/128
+- Grid: Set grid type to straight
+- Grid: Set grid type to dotted: .
+- Grid: Set grid type to triplet: Control+Shift+T
 - Set length for next inserted note: 1: Control+1
 - Set length for next inserted note: 1/2: Control+2
 - Set length for next inserted note: 1/32: Control+3
@@ -406,6 +409,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Set length for next inserted note: 1/32T: Control+0
 - Set length for next inserted note: 1/64
 - Set length for next inserted note: 1/128
+- Set length for next inserted note: grid: Control+Backspace
+- Set length for next inserted note: straight preserving division length
+- Set length for next inserted note: dotted preserving division length: Control+.
+- Set length for next inserted note: triplet preserving division length: Control+T
 - Activate next MIDI track: Ctrl+DownArrow
 - Activate previous MIDI track: Ctrl+UpArrow
 - Edit: Move notes up one semitone: NumPad8 or N

@@ -2387,6 +2387,9 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40189, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
 	{41020, _t("grid sixty forth")}, // Grid: Set to 1/64
 	{41019, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
+	{41003, _t("grid straight")}, // Grid: Set grid type to straight
+	{41005, _t("grid dotted")}, // Grid: Set grid type to dotted
+	{41004, _t("grid triplet")}, // Grid: Set grid type to triplet
 	{41081, _t("length whole")}, // Set length for next inserted note: 1
 	{41079, _t("length half")}, // Set length for next inserted note: 1/2
 	{41067, _t("length thirty second")}, // Set length for next inserted note: 1/32
@@ -2399,6 +2402,9 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41066, _t("length thirty second triplet")}, // Set length for next inserted note: 1/32T
 	{41064, _t("length sixty forth")}, // Set length for next inserted note: 1/64
 	{41062, _t("length one hundred twenty eighth")}, // Set length for next inserted note: 1/128
+	{41711, _t("length straight")}, // Set length for next inserted note: straight preserving division length
+	{41712, _t("length dotted")}, // Set length for next inserted note: dotted preserving division length
+	{41713, _t("length triplet")}, // Set length for next inserted note: triplet preserving division length
 };
 
 struct ToggleCommandMessage {
@@ -2445,17 +2451,16 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MEDIA_EXPLORER_SECTION, 40022}, {_t("double time"), _t("normal time")}}, // Tempo match: x2
 	{{MEDIA_EXPLORER_SECTION, 40008}, {_t("docked Media Explorer"), _t("removed Media Explorer from dock")}}, // Dock Media Explorer in Docker
 	// MIDI Editor toggles
-	{{MIDI_EDITOR_SECTION, 40042}, {_t("Piano roll view"), nullptr}}, // Mode: Piano Roll
-	{{MIDI_EDITOR_SECTION, 40043}, {_t("Named notes view"), nullptr}}, // Mode: Named Notes (Drum Map)
-	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40056}, {_t("Event list view"), nullptr}}, // Mode: Event List
-	{{MIDI_EDITOR_SECTION, 40954}, {_t("Notation view"), nullptr}}, // Mode: Notation
-	{{MIDI_EDITOR_SECTION, 40449}, {_t("Rectangle notes"), nullptr}}, // View: Show events as rectangles (normal mode)
-	{{MIDI_EDITOR_SECTION, 40448}, {_t("Triangle notes"), nullptr}}, // View: Show events as triangles (drum mode)
-	{{MIDI_EDITOR_SECTION, 40450}, {_t("Diamond notes"), nullptr}}, // View: Show events as diamonds (drum mode)
-	{{MIDI_EDITOR_SECTION, 40632}, {_t("Showed velocity numbers on notes"), _t("Hid velocity numbers on notes")}}, // View: Show velocity numbers on notes
-	{{MIDI_EDITOR_SECTION, 40045}, {_t("Showed note names"), _t("Hid note names")}}, // View: Show note names
-	{{MIDI_EDITOR_SECTION, 41295}, {_t("Inserted notes matching grid"), nullptr}}, // Set length for next inserted note: grid
+	{{MIDI_EDITOR_SECTION, 40042}, {_t("piano roll view"), nullptr}}, // Mode: Piano Roll
+	{{MIDI_EDITOR_SECTION, 40043}, {_t("named notes view"), nullptr}}, // Mode: Named Notes (Drum Map)
+	{{MIDI_EDITOR_SECTION, 40056}, {_t("event list view"), nullptr}}, // Mode: Event List
+	{{MIDI_EDITOR_SECTION, 40954}, {_t("notation view"), nullptr}}, // Mode: Notation
+	{{MIDI_EDITOR_SECTION, 40449}, {_t("rectangle notes (normal)"), nullptr}}, // View: Show events as rectangles (normal mode)
+	{{MIDI_EDITOR_SECTION, 40448}, {_t("triangle notes"), nullptr}}, // View: Show events as triangles (drum mode)
+	{{MIDI_EDITOR_SECTION, 40450}, {_t("diamond notes"), nullptr}}, // View: Show events as diamonds (drum mode)
+	{{MIDI_EDITOR_SECTION, 40632}, {_t("showed velocity numbers on notes"), _t("hid velocity numbers on notes")}}, // View: Show velocity numbers on notes
+	{{MIDI_EDITOR_SECTION, 40045}, {_t("showed note names"), _t("hid note names")}}, // View: Show note names
+	{{MIDI_EDITOR_SECTION, 41295}, {_t("length matching grid"), nullptr}}, // Set length for next inserted note: grid
 };
 
 /*** Code related to context menus and other UI that isn't just actions.
