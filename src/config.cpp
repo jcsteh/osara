@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Configuration code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2022-2023 James Teh
+ * Copyright 2022-2024 James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -201,4 +201,75 @@ void registerSettingCommands() {
 #include "settings.h"
 #undef BoolSetting
 	plugin_register("toggleaction", (void*)handleToggleState);
+}
+
+// We only support tweaking settings in reaper.ini for now.
+struct ReaperSetting {
+	const char* section;
+	const char* key;
+	const char* value;
+};
+// If any settings are added, changed or removed below, this number should be
+// increased.
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 1;
+const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
+
+void cmdConfigReaperOptimal(Command* command) {
+	// Even if the user chooses not to apply the configuration, we don't want to
+	// ask them again at startup until the optimal settings are updated.
+	string version = format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
+	SetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(),
+		true);
+	ostringstream s;
+	const char nl[] = "\r\n";
+	s <<
+		translate_ctxt("optimal REAPER configuration", "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Undocks the Media Explorer by default so that it gets focus when opened.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
+		<< nl;
+	if (MessageBox(
+		GetForegroundWindow(),
+		s.str().c_str(),
+		translate("Configure REAPER for Optimal Screen Reader Accessibility"),
+		MB_YESNO | MB_ICONQUESTION
+	) != IDYES) {
+		return;
+	}
+	const ReaperSetting settings[] = {
+		{"reaper_explorer", "docked", "0"},
+		{"REAPER", "legacy_filebrowse", "1"},
+		// Allow space key to be used for navigation in various windows
+		{"REAPER", "mousewheelmode", "130"},
+		// Show FX state as accessible text in name
+		{"REAPER", "fxfloat_focus", "1048579"},
+	};
+	for (const auto& setting: settings) {
+		if (!WritePrivateProfileString(setting.section, setting.key, setting.value,
+				get_ini_file())) {
+			MessageBox(
+				GetForegroundWindow(),
+				translate("Error writing configuration changes."),
+				nullptr,
+				MB_OK | MB_ICONERROR
+			);
+			break;
+		}
+	}
+	MessageBox(
+		GetForegroundWindow(),
+		translate("REAPER will now exit. Please restart REAPER  to apply the changes."),
+		translate("Restart REAPER"),
+		MB_ICONINFORMATION
+	);
+	Main_OnCommand(40004, 0); // File: Quit REAPER
+}
+
+void maybeAutoConfigReaperOptimal() {
+	const char* raw = GetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION);
+	int value = atoi(raw);
+	if (value < REAPER_OPTIMAL_CONFIG_VERSION) {
+		cmdConfigReaperOptimal(nullptr);
+	}
 }

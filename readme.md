@@ -883,6 +883,7 @@ This list is worth referencing when making your own key map additions, assigning
 - OSARA: Toggle Report time movement during playback/recording
 - OSARA: Toggle Report track numbers
 - OSARA: Toggle Report transport state (play, record, etc.)
+- OSARA: Configure REAPER for optimal screen reader accessibility
 
 ### Muting OSARA Messages in Custom/Cycle Actions
 The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action.
