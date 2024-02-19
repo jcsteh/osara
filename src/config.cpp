@@ -228,6 +228,7 @@ void cmdConfigReaperOptimal(Command* command) {
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Uses a standard, accessible edit control for the video code editor.")
 		<< nl;
 	if (MessageBox(
 		GetForegroundWindow(),
@@ -238,12 +239,24 @@ void cmdConfigReaperOptimal(Command* command) {
 		return;
 	}
 	const ReaperSetting settings[] = {
+		// Some of these settings are bit arrays. We just overwrite with the value
+		// which would be set if the setting we need were changed in a clean
+		// configuration. This isn't perfect because it might overwrite other settings
+		// in the same bit array, but the alternative is a lot messier and it
+		// probably doesn't matter too much for our purposes. Nevertheless, we try to
+		// document the correct bit flags below in case we need to change the
+		// approach.
 		{"reaper_explorer", "docked", "0"},
 		{"REAPER", "legacy_filebrowse", "1"},
 		// Allow space key to be used for navigation in various windows
+		// Flag is 1 << 7
 		{"REAPER", "mousewheelmode", "130"},
 		// Show FX state as accessible text in name
+		// Flag is 1 << 20
 		{"REAPER", "fxfloat_focus", "1048579"},
+		// Use standard edit control for video code editor (for accessibility, lacks many features)
+		// Flag is 1 << 11
+		{"REAPER", "video_colorspace", "789507"},
 	};
 	for (const auto& setting: settings) {
 		if (!WritePrivateProfileString(setting.section, setting.key, setting.value,
