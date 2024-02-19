@@ -5,16 +5,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: osara\n"
 "X-Crowdin-Project-ID: 442894\n"
-"X-Crowdin-Language: tr\n"
+"X-Crowdin-Language: nb\n"
 "X-Crowdin-File: osara.po\n"
 "X-Crowdin-File-ID: 4\n"
 "Project-Id-Version: osara\n"
-"Language-Team: Turkish\n"
-"Language: tr_TR\n"
+"Language-Team: Norwegian Bokmal\n"
+"Language: nb_NO\n"
 "PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
-msgstr "etkinleştirildi"
+msgstr ""
 
 #. A recording mode.
 msgid "disabled"
@@ -1071,7 +1071,7 @@ msgstr ""
 
 #. A track which is a folder.
 msgid "folder"
-msgstr "klasör"
+msgstr ""
 
 #. A track which ends its folder.
 msgid "end of folder"

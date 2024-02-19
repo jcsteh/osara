@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -868,6 +868,11 @@ msgstr "envío"
 #. Parameters dialog.
 msgid "receive"
 msgstr "recibe"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr "hardware"
 
 msgid "Track Parameters"
 msgstr "Parámetros de pista"
@@ -1805,6 +1810,15 @@ msgstr "desarmadas todas las pistas"
 msgid "all delta solos reset"
 msgstr "reiniciado todo delta solos,"
 
+msgid "grid straight"
+msgstr "cuadrícula recta"
+
+msgid "grid dotted"
+msgstr "cuadrícula punteada"
+
+msgid "grid triplet"
+msgstr "rejilla triplete"
+
 msgid "length whole"
 msgstr "duración 1"
 
@@ -1840,6 +1854,15 @@ msgstr "duraci'on sesenta y cuatro"
 
 msgid "length one hundred twenty eighth"
 msgstr "duraci'on ciento veinti ocho"
+
+msgid "length straight"
+msgstr "longitud recta"
+
+msgid "length dotted"
+msgstr "longitud con puntillo"
+
+msgid "length triplet"
+msgstr "longitud con puntillo"
 
 msgid "full screen"
 msgstr "pantalla completa"
@@ -1961,41 +1984,41 @@ msgstr "explorador media en el dock"
 msgid "removed Media Explorer from dock"
 msgstr "eliminado explorador media del dock"
 
-msgid "Piano roll view"
-msgstr "Vista Piano roll"
+msgid "piano roll view"
+msgstr "vista piano roll"
 
-msgid "Named notes view"
-msgstr "Vista de nombres de notas"
+msgid "named notes view"
+msgstr "vista de nombres de notas"
 
-msgid "Event list view"
-msgstr "Vista de lista de eventos"
+msgid "event list view"
+msgstr "vista lista de eventos"
 
-msgid "Notation view"
-msgstr "Vista de notación"
+msgid "notation view"
+msgstr "vista de notación"
 
-msgid "Rectangle notes"
-msgstr "Rectángulo"
+msgid "rectangle notes (normal)"
+msgstr "notas rectangulares (normal)"
 
-msgid "Triangle notes"
-msgstr "Triangle notes"
+msgid "triangle notes"
+msgstr "notas triangulares"
 
-msgid "Diamond notes"
-msgstr "Diamantes"
+msgid "diamond notes"
+msgstr "notas diamantes"
 
-msgid "Showed velocity numbers on notes"
-msgstr "Mostrado valor de velocity en notas"
+msgid "showed velocity numbers on notes"
+msgstr "mostrada velocidad en notas"
 
-msgid "Hid velocity numbers on notes"
-msgstr "Oculto valor de velocity en notas"
+msgid "hid velocity numbers on notes"
+msgstr "mostrar velocidad en notas"
 
-msgid "Showed note names"
-msgstr "Mostrado nombre de notas"
+msgid "showed note names"
+msgstr "mostrado nombre de notas"
 
-msgid "Hid note names"
-msgstr "Ocultado nombre de notas"
+msgid "hid note names"
+msgstr "ocultar nombre de notas"
 
-msgid "Inserted notes matching grid"
-msgstr "Notas insertadas de acuerdo a la rejilla"
+msgid "length matching grid"
+msgstr "longutud de la cuadrícula"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

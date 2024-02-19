@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-02-13 13:59\n"
+"PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -832,6 +832,11 @@ msgstr "發送"
 #. Parameters dialog.
 msgid "receive"
 msgstr "接收"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr "硬體"
 
 msgid "Track Parameters"
 msgstr "軌道參數"
@@ -1747,6 +1752,15 @@ msgstr "所有軌道取消待錄"
 msgid "all delta solos reset"
 msgstr "重設全部效果差異獨奏"
 
+msgid "grid straight"
+msgstr "網格直線"
+
+msgid "grid dotted"
+msgstr "往格付點音符"
+
+msgid "grid triplet"
+msgstr "網格3聯音"
+
 msgid "length whole"
 msgstr "全音符長"
 
@@ -1782,6 +1796,15 @@ msgstr "64分音符長"
 
 msgid "length one hundred twenty eighth"
 msgstr "128分音符長"
+
+msgid "length straight"
+msgstr "長度直線"
+
+msgid "length dotted"
+msgstr "長度付點音符"
+
+msgid "length triplet"
+msgstr "長度3聯音"
 
 msgid "full screen"
 msgstr "全螢幕"
@@ -1903,41 +1926,41 @@ msgstr "停靠媒體總管"
 msgid "removed Media Explorer from dock"
 msgstr "從停靠區中移除媒體總管"
 
-msgid "Piano roll view"
+msgid "piano roll view"
 msgstr "鋼琴捲簾檢視"
 
-msgid "Named notes view"
+msgid "named notes view"
 msgstr "音符名稱檢視"
 
-msgid "Event list view"
+msgid "event list view"
 msgstr "事件列表檢視"
 
-msgid "Notation view"
+msgid "notation view"
 msgstr "樂譜檢視"
 
-msgid "Rectangle notes"
-msgstr "音符矩形"
+msgid "rectangle notes (normal)"
+msgstr "音符矩形（正常）"
 
-msgid "Triangle notes"
+msgid "triangle notes"
 msgstr "音符三角形"
 
-msgid "Diamond notes"
+msgid "diamond notes"
 msgstr "音符菱形"
 
-msgid "Showed velocity numbers on notes"
-msgstr "在音符上顯示力度數字"
+msgid "showed velocity numbers on notes"
+msgstr "顯示音符力度數字"
 
-msgid "Hid velocity numbers on notes"
-msgstr "在音符上隱藏力度數字"
+msgid "hid velocity numbers on notes"
+msgstr "隱藏音符力度數字"
 
-msgid "Showed note names"
+msgid "showed note names"
 msgstr "顯示音符名稱"
 
-msgid "Hid note names"
+msgid "hid note names"
 msgstr "隱藏音符名稱"
 
-msgid "Inserted notes matching grid"
-msgstr "依循網格插入音符"
+msgid "length matching grid"
+msgstr "長度依循網格"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"

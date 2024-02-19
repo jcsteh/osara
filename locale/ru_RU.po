@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -940,6 +940,11 @@ msgstr "отправить"
 #. Parameters dialog.
 msgid "receive"
 msgstr "принять"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr ""
 
 msgid "Track Parameters"
 msgstr "Параметры трека"
@@ -1921,6 +1926,15 @@ msgstr ""
 msgid "all delta solos reset"
 msgstr ""
 
+msgid "grid straight"
+msgstr ""
+
+msgid "grid dotted"
+msgstr ""
+
+msgid "grid triplet"
+msgstr ""
+
 msgid "length whole"
 msgstr ""
 
@@ -1955,6 +1969,15 @@ msgid "length sixty forth"
 msgstr ""
 
 msgid "length one hundred twenty eighth"
+msgstr ""
+
+msgid "length straight"
+msgstr ""
+
+msgid "length dotted"
+msgstr ""
+
+msgid "length triplet"
 msgstr ""
 
 msgid "full screen"
@@ -2077,40 +2100,40 @@ msgstr ""
 msgid "removed Media Explorer from dock"
 msgstr ""
 
-msgid "Piano roll view"
+msgid "piano roll view"
 msgstr ""
 
-msgid "Named notes view"
+msgid "named notes view"
 msgstr ""
 
-msgid "Event list view"
+msgid "event list view"
 msgstr ""
 
-msgid "Notation view"
+msgid "notation view"
 msgstr ""
 
-msgid "Rectangle notes"
-msgstr "Прямоугольные ноты"
-
-msgid "Triangle notes"
-msgstr "Треугольные ноты"
-
-msgid "Diamond notes"
-msgstr "Ромбовидные ноты"
-
-msgid "Showed velocity numbers on notes"
+msgid "rectangle notes (normal)"
 msgstr ""
 
-msgid "Hid velocity numbers on notes"
+msgid "triangle notes"
 msgstr ""
 
-msgid "Showed note names"
+msgid "diamond notes"
 msgstr ""
 
-msgid "Hid note names"
+msgid "showed velocity numbers on notes"
 msgstr ""
 
-msgid "Inserted notes matching grid"
+msgid "hid velocity numbers on notes"
+msgstr ""
+
+msgid "showed note names"
+msgstr ""
+
+msgid "hid note names"
+msgstr ""
+
+msgid "length matching grid"
 msgstr ""
 
 #. Reported when there are no tracks to navigate to.

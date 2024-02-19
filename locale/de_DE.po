@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -868,6 +868,11 @@ msgstr "Send"
 #. Parameters dialog.
 msgid "receive"
 msgstr "Receive"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr ""
 
 msgid "Track Parameters"
 msgstr "Track Parameter"
@@ -1805,6 +1810,15 @@ msgstr "Alle Tracks Aufnahmebereitschaft aus"
 msgid "all delta solos reset"
 msgstr "Alle Solo geschalteten Deltas zurückgesetzt"
 
+msgid "grid straight"
+msgstr ""
+
+msgid "grid dotted"
+msgstr ""
+
+msgid "grid triplet"
+msgstr ""
+
 msgid "length whole"
 msgstr "Länge: Ganze Note"
 
@@ -1840,6 +1854,15 @@ msgstr "Länge: vierundsechzigstel"
 
 msgid "length one hundred twenty eighth"
 msgstr "Länge: hundertachtundzwanzigstel"
+
+msgid "length straight"
+msgstr ""
+
+msgid "length dotted"
+msgstr ""
+
+msgid "length triplet"
+msgstr ""
 
 msgid "full screen"
 msgstr "Full Screen"
@@ -1961,40 +1984,40 @@ msgstr "Angedockter Media Explorer"
 msgid "removed Media Explorer from dock"
 msgstr "Media Explorer vom Dock entfernt"
 
-msgid "Piano roll view"
+msgid "piano roll view"
 msgstr ""
 
-msgid "Named notes view"
+msgid "named notes view"
 msgstr ""
 
-msgid "Event list view"
+msgid "event list view"
 msgstr ""
 
-msgid "Notation view"
+msgid "notation view"
 msgstr ""
 
-msgid "Rectangle notes"
+msgid "rectangle notes (normal)"
 msgstr ""
 
-msgid "Triangle notes"
+msgid "triangle notes"
 msgstr ""
 
-msgid "Diamond notes"
+msgid "diamond notes"
 msgstr ""
 
-msgid "Showed velocity numbers on notes"
+msgid "showed velocity numbers on notes"
 msgstr ""
 
-msgid "Hid velocity numbers on notes"
+msgid "hid velocity numbers on notes"
 msgstr ""
 
-msgid "Showed note names"
+msgid "showed note names"
 msgstr ""
 
-msgid "Hid note names"
+msgid "hid note names"
 msgstr ""
 
-msgid "Inserted notes matching grid"
+msgid "length matching grid"
 msgstr ""
 
 #. Reported when there are no tracks to navigate to.

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-02-07 03:43\n"
+"PO-Revision-Date: 2024-02-19 21:39\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -832,6 +832,11 @@ msgstr "发送"
 #. Parameters dialog.
 msgid "receive"
 msgstr "接收"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr ""
 
 msgid "Track Parameters"
 msgstr "音轨参数"
@@ -1747,6 +1752,15 @@ msgstr "全部轨道已取消准备"
 msgid "all delta solos reset"
 msgstr "重制全部 delta 独奏"
 
+msgid "grid straight"
+msgstr ""
+
+msgid "grid dotted"
+msgstr ""
+
+msgid "grid triplet"
+msgstr ""
+
 msgid "length whole"
 msgstr "全音长度"
 
@@ -1782,6 +1796,15 @@ msgstr "64分长度"
 
 msgid "length one hundred twenty eighth"
 msgstr "128分长度"
+
+msgid "length straight"
+msgstr ""
+
+msgid "length dotted"
+msgstr ""
+
+msgid "length triplet"
+msgstr ""
 
 msgid "full screen"
 msgstr "全屏"
@@ -1903,41 +1926,41 @@ msgstr "媒体资源管理器停靠博物窗"
 msgid "removed Media Explorer from dock"
 msgstr "从博物窗移除媒体资源管理器"
 
-msgid "Piano roll view"
-msgstr "钢琴卷帘视图"
+msgid "piano roll view"
+msgstr ""
 
-msgid "Named notes view"
-msgstr "命名音符试图"
+msgid "named notes view"
+msgstr ""
 
-msgid "Event list view"
-msgstr "事件列表视图"
+msgid "event list view"
+msgstr ""
 
-msgid "Notation view"
-msgstr "乐谱视图"
+msgid "notation view"
+msgstr ""
 
-msgid "Rectangle notes"
-msgstr "矩形音符,标准模式"
+msgid "rectangle notes (normal)"
+msgstr ""
 
-msgid "Triangle notes"
-msgstr "三角形音符,鼓模式"
+msgid "triangle notes"
+msgstr ""
 
-msgid "Diamond notes"
-msgstr "菱形音符,鼓模式"
+msgid "diamond notes"
+msgstr ""
 
-msgid "Showed velocity numbers on notes"
-msgstr "显示音符上的力度数字"
+msgid "showed velocity numbers on notes"
+msgstr ""
 
-msgid "Hid velocity numbers on notes"
-msgstr "隐藏音符上的力度数字"
+msgid "hid velocity numbers on notes"
+msgstr ""
 
-msgid "Showed note names"
-msgstr "显示音符名称"
+msgid "showed note names"
+msgstr ""
 
-msgid "Hid note names"
-msgstr "影藏音符名称"
+msgid "hid note names"
+msgstr ""
 
-msgid "Inserted notes matching grid"
-msgstr "插入音符匹配网格"
+msgid "length matching grid"
+msgstr ""
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
