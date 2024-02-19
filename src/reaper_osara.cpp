@@ -650,6 +650,7 @@ void reviewMessage(const char* title, const char* message) {
 	HWND dialog = CreateDialog(pluginHInstance,
 		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), GetForegroundWindow(),
 		reviewMessage_dialogProc);
+	translateDialog(dialog);
 	SetWindowText(dialog, title);
 	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
 	ShowWindow(dialog, SW_SHOWNORMAL);
@@ -3747,7 +3748,9 @@ void cmdReportSelection(Command* command) {
 		return;
 	}
 	if (multiLine) {
-		reviewMessage("Selection", s.str().c_str());
+		// Translators: The title of the message dialog that appears when OSARA's
+		// report selection action is pressed twice.
+		reviewMessage(translate("Selection"), s.str().c_str());
 	} else {
 		outputMessage(s);
 	}
