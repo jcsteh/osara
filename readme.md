@@ -729,7 +729,7 @@ OSARA also includes some other miscellaneous actions.
 #### Main section of actions list
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
-- OSARA: go to master track
+- OSARA: go to master track: Control+Alt+Shift+Home
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
