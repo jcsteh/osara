@@ -2952,6 +2952,8 @@ void cmdGoToFirstTrack(Command* command){
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
+	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	SetMixerScroll(track); // MCP
 }
 
 void cmdGoToLastTrack(Command* command){
@@ -2964,7 +2966,29 @@ void cmdGoToLastTrack(Command* command){
 		return;
 	}
 	SetOnlyTrackSelected(track);
-	postGoToTrack(trackNo);
+	postGoToTrack(0);
+	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	SetMixerScroll(track); // MCP
+}
+
+void cmdGoToMasterTrack(Command* command){
+	if (MediaTrack* track1 = GetTrack(nullptr, 0)) {
+		// We can't scroll directly to the master track. Instead, scroll to track 1,
+		// which also scrolls the master track into view.
+		SetOnlyTrackSelected(track1);
+		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		SetMixerScroll(track1); // MCP
+		GetSetMediaTrackInfo(track1, "I_SELECTED", &int0);
+	}
+	// If the master track isn't visible, make it visible.
+	int vis = GetMasterTrackVisibility();
+	if (!(vis & 1)) {
+		vis |= 1;
+		SetMasterTrackVisibility(vis);
+	}
+	MediaTrack* master = GetMasterTrack(nullptr);
+	GetSetMediaTrackInfo(master, "I_SELECTED", &int1);
+	postGoToTrack(0);
 }
 
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
@@ -4596,6 +4620,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report regions, last project marker and items on selected tracks at current position")}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to first track")}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to last track")}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to master track")}, "OSARA_GOTOMASTERTRACK", cmdGoToMasterTrack},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle shape of selected envelope points")}, "OSARA_CYCLEENVELOPEPOINTSHAPE", cmdCycleEnvelopePointShape},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take volume envelope visibility (depending on focus)")}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
