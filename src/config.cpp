@@ -207,7 +207,11 @@ void registerSettingCommands() {
 struct ReaperSetting {
 	const char* section;
 	const char* key;
-	const char* value;
+	// If flag > 0, we will add this bit flag to the existing setting. If it
+	// doesn't exist, we will use value below.
+	int flag;
+	// If flag == 0, we will always use this value.
+	int value;
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
@@ -239,27 +243,30 @@ void cmdConfigReaperOptimal(Command* command) {
 		return;
 	}
 	const ReaperSetting settings[] = {
-		// Some of these settings are bit arrays. We just overwrite with the value
-		// which would be set if the setting we need were changed in a clean
-		// configuration. This isn't perfect because it might overwrite other settings
-		// in the same bit array, but the alternative is a lot messier and it
-		// probably doesn't matter too much for our purposes. Nevertheless, we try to
-		// document the correct bit flags below in case we need to change the
-		// approach.
-		{"reaper_explorer", "docked", "0"},
-		{"REAPER", "legacy_filebrowse", "1"},
+		{"reaper_explorer", "docked", 0, 0},
+		{"REAPER", "legacy_filebrowse", 0, 1},
 		// Allow space key to be used for navigation in various windows
-		// Flag is 1 << 7
-		{"REAPER", "mousewheelmode", "130"},
+		{"REAPER", "mousewheelmode", 1 << 7, 130},
 		// Show FX state as accessible text in name
-		// Flag is 1 << 20
-		{"REAPER", "fxfloat_focus", "1048579"},
+		{"REAPER", "fxfloat_focus", 1 << 20, 1048579},
 		// Use standard edit control for video code editor (for accessibility, lacks many features)
-		// Flag is 1 << 11
-		{"REAPER", "video_colorspace", "789507"},
+		{"REAPER", "video_colorspace", 1 << 11, 789507},
 	};
 	for (const auto& setting: settings) {
-		if (!WritePrivateProfileString(setting.section, setting.key, setting.value,
+		int newVal = setting.value;
+		if (setting.flag) {
+			char existingVal[50];
+			GetPrivateProfileString(setting.section, setting.key, "", existingVal,
+				sizeof(existingVal), get_ini_file());
+			if (existingVal[0]) {
+				// There is an existing value. Add the flag to it rather than overwriting it
+				// completely.
+				newVal = atoi(existingVal);
+				newVal |= setting.flag;
+			}
+		}
+		string writeVal = format("{}", newVal);
+		if (!WritePrivateProfileString(setting.section, setting.key, writeVal.c_str(),
 				get_ini_file())) {
 			MessageBox(
 				GetForegroundWindow(),
