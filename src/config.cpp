@@ -13,6 +13,7 @@
 #include <sstream>
 #include <vector>
 #include "config.h"
+#include <WDL/win32_utf8.h>
 #include "midiEditorCommands.h"
 #include "resource.h"
 #include "translation.h"
