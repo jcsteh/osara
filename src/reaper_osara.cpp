@@ -41,6 +41,7 @@
 #include "buildVersion.h"
 #include "fxChain.h"
 #include "translation.h"
+#include "updateCheck.h"
 
 using namespace std;
 using namespace fmt::literals;
@@ -4754,6 +4755,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Set phase normal for all tracks")}, "OSARA_SETPHASENORMALALLTRACKS", cmdSetPhaseNormalAllTracks},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Unmonitor all tracks")}, "OSARA_UNMONITORALLTRACKS", cmdUnmonitorAllTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -5029,6 +5031,7 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
 	maybeAutoConfigReaperOptimal();
+	startUpdateCheck();
 	KillTimer(NULL, event);
 }
 
