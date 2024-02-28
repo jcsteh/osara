@@ -1055,6 +1055,64 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	int index;
 };
 
+class SourceMidiChannelParam:  public ReaperObjParam {
+	public:
+	SourceMidiChannelParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
+		this->min = 0;
+		this->max = 16;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	double getValue() {
+		// Low 5 bits.
+		return *(int*)this->provider.getSetValue(nullptr) & 0x1F;
+	}
+
+	string getValueText(double value) {
+		if (value == 0) {
+			// Translators: Indicates all MIDI channels for a send in the Track
+			// Parameters dialog.
+			return translate("all");
+		}
+		return format("{}", value);
+	}
+
+	void setValue(double value) {
+		int oldVal = *(int*)this->provider.getSetValue(nullptr);
+		// Only touch the lower 5 bits.
+		int newVal = (oldVal & ~0x1F) | (int)value;
+		this->provider.getSetValue((void*)&newVal);
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<SourceMidiChannelParam>(provider);
+	}
+};
+
+class DestMidiChannelParam:  public SourceMidiChannelParam {
+	public:
+	using SourceMidiChannelParam::SourceMidiChannelParam;
+
+	double getValue() {
+		// Bits 6 through 10.
+		return *(int*)this->provider.getSetValue(nullptr) >> 5 & 0x1F;
+	}
+
+	void setValue(double value) {
+		int oldVal = *(int*)this->provider.getSetValue(nullptr);
+		// Only touch bits 6 through 10.
+		int newVal = (oldVal & ~0x3E0) | (int)value << 5;
+		this->provider.getSetValue((void*)&newVal);
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<DestMidiChannelParam>(provider);
+	}
+};
+
 class TcpFxParamProvider: public ParamProvider {
 	public:
 	TcpFxParamProvider(const string displayName, FxParams<MediaTrack>& source,
@@ -1109,6 +1167,16 @@ class TrackParams: public ReaperObjParamSource {
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + translate("mono"), this->track, category, i, "B_MONO",
 				ReaperObjToggleParam::make));
+			if (trackParam) {
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("source MIDI channel"),
+					this->track, category, i, "I_MIDIFLAGS",
+					SourceMidiChannelParam::make));
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("destination MIDI channel"),
+					this->track, category, i, "I_MIDIFLAGS",
+					DestMidiChannelParam::make));
+			}
 		}
 	}
 
