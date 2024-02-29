@@ -873,7 +873,7 @@ void postToggleTrackMute(int command) {
 	int count = CountSelectedTracks2(nullptr, true);
 	bool masterSelected = false;
 	MediaTrack* master = GetMasterTrack(nullptr);
-	if (isTrackSelected(master)) {
+	if(count==1 && isTrackSelected(master)) {
 		masterSelected = true;
 		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
 		translate("master muted") : translate("master unmuted"));
@@ -885,7 +885,7 @@ void postToggleTrackMute(int command) {
 	}
 	if(count==1) {
 		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("muted") : translate("unmuted"));
+		translate("muted") : translate("unmuted"));
 		return;
 	}
 	for (int i=0; i<count; ++i) {
@@ -895,6 +895,10 @@ void postToggleTrackMute(int command) {
 			++unmuteCount;
 	}
 	ostringstream s;
+	// if(isTrackSelected(master) && masterSelected==true) {
+		// outputMessage(translate("master"));
+		// s << ", ";
+	// }
 	if(muteCount>0) {
 		// Translators: Reported when multiple tracks are muted. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks muted".
