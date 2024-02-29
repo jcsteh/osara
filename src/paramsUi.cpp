@@ -1055,6 +1055,87 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	int index;
 };
 
+class SourceMidiChannelParam:  public ReaperObjParam {
+	public:
+	SourceMidiChannelParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
+		// We represent disabled as -1 (even though REAPER uses 31), as this is
+		// simpler to manage for our purposes.
+		this->min = -1;
+		this->max = 16;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	double getValue() {
+		// Low 5 bits.
+		int val = *(int*)this->provider.getSetValue(nullptr) & 0x1F;
+		if (val == 31) {
+			return -1; // Disabled.
+		}
+		return val;
+	}
+
+	string getValueText(double value) {
+		if (value == -1) {
+			// Translators: Indicates no MIDI channels for a send in the Track
+			// Parameters dialog.
+			return translate("none");
+		}
+		if (value == 0) {
+			// Translators: Indicates all MIDI channels for a send in the Track
+			// Parameters dialog.
+			return translate("all");
+		}
+		return format("{}", value);
+	}
+
+	void setValue(double value) {
+		if (value == -1) {
+			value = 31; // Disabled.
+		}
+		int oldVal = *(int*)this->provider.getSetValue(nullptr);
+		if (oldVal & 31) {
+			// REAPER seems to set MIDI bus bits when it disables MIDI. We're about to
+			// enable MIDI, so clear them.
+			oldVal = 31;
+		}
+		// Only touch the lower 5 bits.
+		int newVal = (oldVal & ~0x1F) | (int)value;
+		this->provider.getSetValue((void*)&newVal);
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<SourceMidiChannelParam>(provider);
+	}
+};
+
+class DestMidiChannelParam:  public SourceMidiChannelParam {
+	public:
+	DestMidiChannelParam(ReaperObjParamProvider& provider ):
+			SourceMidiChannelParam(provider) {
+		// You can't have no destination channel.
+		this->min = 0;
+	}
+
+	double getValue() {
+		// Bits 6 through 10.
+		return *(int*)this->provider.getSetValue(nullptr) >> 5 & 0x1F;
+	}
+
+	void setValue(double value) {
+		int oldVal = *(int*)this->provider.getSetValue(nullptr);
+		// Only touch bits 6 through 10.
+		int newVal = (oldVal & ~0x3E0) | (int)value << 5;
+		this->provider.getSetValue((void*)&newVal);
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<DestMidiChannelParam>(provider);
+	}
+};
+
 class TcpFxParamProvider: public ParamProvider {
 	public:
 	TcpFxParamProvider(const string displayName, FxParams<MediaTrack>& source,
@@ -1109,6 +1190,16 @@ class TrackParams: public ReaperObjParamSource {
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + translate("mono"), this->track, category, i, "B_MONO",
 				ReaperObjToggleParam::make));
+			if (trackParam) {
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("source MIDI channel"),
+					this->track, category, i, "I_MIDIFLAGS",
+					SourceMidiChannelParam::make));
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("destination MIDI channel"),
+					this->track, category, i, "I_MIDIFLAGS",
+					DestMidiChannelParam::make));
+			}
 		}
 	}
 

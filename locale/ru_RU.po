@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-02-19 21:39\n"
+"PO-Revision-Date: 2024-02-28 12:02\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -27,6 +27,42 @@ msgid "OSARA: Enable"
 msgstr ""
 
 msgid "OSARA: Disable"
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables the space key to be used for check boxes, etc. in various windows."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr ""
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr ""
+
+msgid "Error writing configuration changes."
+msgstr ""
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr ""
+
+msgid "Restart REAPER"
 msgstr ""
 
 msgid "volume"
@@ -925,10 +961,29 @@ msgstr "Диапазон {} типа"
 msgid "FX Parameters"
 msgstr ""
 
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "нет"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr ""
+
 msgid "mute"
 msgstr "приглушить"
 
 msgid "mono"
+msgstr ""
+
+msgid "source MIDI channel"
+msgstr ""
+
+msgid "destination MIDI channel"
 msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
@@ -1170,12 +1225,6 @@ msgstr ""
 #. A closed track folder.
 msgid "closed"
 msgstr "закрыто"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "нет"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2333,6 +2382,11 @@ msgstr ""
 msgid "no selection"
 msgstr "нет выделения"
 
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr ""
+
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
@@ -2621,6 +2675,9 @@ msgstr ""
 msgid "OSARA: Go to last track"
 msgstr ""
 
+msgid "OSARA: Go to master track"
+msgstr ""
+
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr ""
 
@@ -2646,6 +2703,9 @@ msgid "OSARA: Set phase normal for all tracks"
 msgstr "OSARA: Установить нормальную фазу для всех треков"
 
 msgid "OSARA: Unmonitor all tracks"
+msgstr ""
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

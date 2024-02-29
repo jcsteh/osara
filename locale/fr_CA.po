@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-02-19 21:39\n"
+"PO-Revision-Date: 2024-02-28 12:02\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -28,6 +28,42 @@ msgstr "OSARA : Activer"
 
 msgid "OSARA: Disable"
 msgstr "OSARA : Désactiver"
+
+msgctxt "optimal REAPER configuration"
+msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
+msgstr "Êtes-vous sûr de vouloir apporter des modifications à votre configuration REAPER ? Cela entraînera les modifications suivantes:"
+
+msgctxt "optimal REAPER configuration"
+msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr "Désancrer l'explorateur de média par défaut afin qu'il obtienne le focus lorsqu'il est ouvert."
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr "Activer les boîtes de dialogue de navigation dans les fichiers hérités afin que les options spécifiques à REAPER dans les boîtes de dialogue Ouvrir et sauvegarder-sous soient accessibles avec la touche de tabulation."
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables the space key to be used for check boxes, etc. in various windows."
+msgstr "Permettre d'utiliser la touche espace pour les cases à cocher, etc. dans diverses fenêtres. Configuration optimale de Reaper."
+
+msgctxt "optimal REAPER configuration"
+msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
+msgstr "Afficher le texte pour indiquer les paramètres, parallèles, hors ligne et contournés dans la liste FX. configuration optimale de REAPER."
+
+msgctxt "optimal REAPER configuration"
+msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr "Utiliser un contrôle d'édition standard et accessible pour l'éditeur de code vidéo. Configuration optimale de Reaper."
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "Configurer REAPER pour une accessibilité optimale pour les lecteur d'écran"
+
+msgid "Error writing configuration changes."
+msgstr "Erreur lors de l'écriture des changements de configuration."
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr "REAPER va maintenant se fermer. Veuillez redémarrer REAPER pour appliquer les modifications."
+
+msgid "Restart REAPER"
+msgstr "Redémarrer REAPPER"
 
 msgid "volume"
 msgstr "volume"
@@ -853,11 +889,30 @@ msgstr "Bande {} type"
 msgid "FX Parameters"
 msgstr "Paramètre d'FX"
 
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "aucun"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr ""
+
 msgid "mute"
 msgstr "sourdine"
 
 msgid "mono"
 msgstr "mono"
+
+msgid "source MIDI channel"
+msgstr ""
+
+msgid "destination MIDI channel"
+msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -1088,12 +1143,6 @@ msgstr "réduit"
 #. A closed track folder.
 msgid "closed"
 msgstr "fermé"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2201,6 +2250,11 @@ msgstr "aucune sélection MIDI"
 msgid "no selection"
 msgstr "aucune sélection"
 
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr "Sélection"
+
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
@@ -2483,6 +2537,9 @@ msgstr "OSARA: Aller à la première piste"
 msgid "OSARA: Go to last track"
 msgstr "OSARA: Aller à la dernière piste"
 
+msgid "OSARA: Go to master track"
+msgstr "OSARA : Aller à la piste principale"
+
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr "OSARA: Alterne entre les formes de point d'enveloppe pour les points sélectionnés"
 
@@ -2509,6 +2566,9 @@ msgstr "OSARA : Définir la phase normale pour toutes les pistes"
 
 msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA : Moniteur de toutes les pistes désactivés"
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
+msgstr "OSARA : configurer REAPER pour une accessibilité optimale pour les lecteurs d'écran"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
