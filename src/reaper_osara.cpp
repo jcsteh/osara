@@ -4518,7 +4518,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
 	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
 	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
-	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleTrackEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleLastTouchedEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
 	{MAIN_SECTION, {{0, 0, 40406}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
 	{MAIN_SECTION, {{0, 0, 40407}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
 	{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
