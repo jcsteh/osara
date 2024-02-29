@@ -767,6 +767,6 @@ void cmdToggleLastTouchedEnvelope(Command* command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
 	} else {
-		cmdhToggleTakeEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
+		cmdhToggleTrackEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
 	}
 }
