@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2023 NV Access Limited, James Teh
+ * Copyright 2014-2024 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -3076,6 +3076,8 @@ void cmdGoToFirstTrack(Command* command){
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
+	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	SetMixerScroll(track); // MCP
 }
 
 void cmdGoToLastTrack(Command* command){
@@ -3088,7 +3090,29 @@ void cmdGoToLastTrack(Command* command){
 		return;
 	}
 	SetOnlyTrackSelected(track);
-	postGoToTrack(trackNo);
+	postGoToTrack(0);
+	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	SetMixerScroll(track); // MCP
+}
+
+void cmdGoToMasterTrack(Command* command){
+	if (MediaTrack* track1 = GetTrack(nullptr, 0)) {
+		// We can't scroll directly to the master track. Instead, scroll to track 1,
+		// which also scrolls the master track into view.
+		SetOnlyTrackSelected(track1);
+		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		SetMixerScroll(track1); // MCP
+		GetSetMediaTrackInfo(track1, "I_SELECTED", &int0);
+	}
+	// If the master track isn't visible, make it visible.
+	int vis = GetMasterTrackVisibility();
+	if (!(vis & 1)) {
+		vis |= 1;
+		SetMasterTrackVisibility(vis);
+	}
+	MediaTrack* master = GetMasterTrack(nullptr);
+	GetSetMediaTrackInfo(master, "I_SELECTED", &int1);
+	postGoToTrack(0);
 }
 
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
@@ -3203,7 +3227,7 @@ void cmdMoveToPrevItem(Command* command) {
 
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(40029, 0); // Edit: Undo
 	if (!text)
 		return;
 	// Translators: Reported when undoing an action. {}
@@ -3213,7 +3237,7 @@ void cmdUndo(Command* command) {
 
 void cmdRedo(Command* command) {
 	const char* text = Undo_CanRedo2(0);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(40030, 0); // Edit: Redo
 	if (!text)
 		return;
 	// Translators: Reported when redoing an action. {}
@@ -4566,7 +4590,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40417}, NULL}, NULL, cmdMoveToNextItem}, // Item navigation: Select and move to next item
 	{MAIN_SECTION, {{0, 0, 40416}, NULL}, NULL, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
 	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
+	{MIDI_EDITOR_SECTION, {{0, 0, 40013}, NULL}, NULL, cmdUndo}, // Edit: Undo
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40013}, NULL}, NULL, cmdUndo}, // Edit: Undo
 	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
+	{MIDI_EDITOR_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRedo}, // Edit: Redo
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
 	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
 	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
@@ -4720,6 +4748,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Report regions, last project marker and items on selected tracks at current position")}, "OSARA_REPORTREGIONMARKERITEMS",cmdReportRegionMarkerItems},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to first track")}, "OSARA_GOTOFIRSTTRACK", cmdGoToFirstTrack},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to last track")}, "OSARA_GOTOLASTTRACK", cmdGoToLastTrack},
+	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Go to master track")}, "OSARA_GOTOMASTERTRACK", cmdGoToMasterTrack},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Cycle shape of selected envelope points")}, "OSARA_CYCLEENVELOPEPOINTSHAPE", cmdCycleEnvelopePointShape},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take volume envelope visibility (depending on focus)")}, "OSARA_TOGGLEVOLUMEENVELOPE", cmdToggleVolumeEnvelope},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle track/take pan envelope visibility (depending on focus)")}, "OSARA_TOGGLEPANENVELOPE", cmdTogglePanEnvelope},
@@ -4729,6 +4758,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Select from cursor to end of project")}, "OSARA_SELFROMCURSORTOEND", cmdSelectFromCursorToEndOfProject},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Set phase normal for all tracks")}, "OSARA_SETPHASENORMALALLTRACKS", cmdSetPhaseNormalAllTracks},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Unmonitor all tracks")}, "OSARA_UNMONITORALLTRACKS", cmdUnmonitorAllTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -5003,6 +5033,7 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		if (cmd)
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
+	maybeAutoConfigReaperOptimal();
 	KillTimer(NULL, event);
 }
 

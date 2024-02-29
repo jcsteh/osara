@@ -729,6 +729,7 @@ OSARA also includes some other miscellaneous actions.
 #### Main section of actions list
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
+- OSARA: go to master track: Control+Alt+Shift+Home
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
@@ -890,6 +891,7 @@ This list is worth referencing when making your own key map additions, assigning
 - OSARA: Toggle Report time movement during playback/recording
 - OSARA: Toggle Report track numbers
 - OSARA: Toggle Report transport state (play, record, etc.)
+- OSARA: Configure REAPER for optimal screen reader accessibility
 
 ### Muting OSARA Messages in Custom/Cycle Actions
 The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action.

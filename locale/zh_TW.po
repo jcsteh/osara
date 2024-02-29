@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-02-19 21:39\n"
+"PO-Revision-Date: 2024-02-28 12:02\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -28,6 +28,42 @@ msgstr "OSARA: 啟用"
 
 msgid "OSARA: Disable"
 msgstr "OSARA: 停用"
+
+msgctxt "optimal REAPER configuration"
+msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
+msgstr "您確定要變更 REAPER 配置嗎？這將進行以下更改："
+
+msgctxt "optimal REAPER configuration"
+msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr "預設取消停靠媒體資源管理器，以便它在開啟時獲得焦點。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr "啟用舊檔案瀏覽對話框，以便可以使用 Tab 鍵存取「開啟」和「另存為」對話框中的 REAPER 特定選項。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables the space key to be used for check boxes, etc. in various windows."
+msgstr "啟用空白鍵可用於各種視窗中的複選框等。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
+msgstr "顯示文字以指示 FX 列表中的並行、離線和旁通。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr "使用標準的、可存取的影片程式碼編輯器編輯控制項。"
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "配置 REAPER 以獲得最佳螢幕閱讀器輔助功能"
+
+msgid "Error writing configuration changes."
+msgstr "寫入配置變更時發生錯誤。"
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr "REAPER 現在將退出。請重新啟動 REAPER 以套用變更。"
+
+msgid "Restart REAPER"
+msgstr "重啟 REAPER"
 
 msgid "volume"
 msgstr "音量"
@@ -794,7 +830,7 @@ msgid "band pass"
 msgstr "帶通"
 
 msgid "parallel band pass"
-msgstr "平行帶通"
+msgstr "並行帶通"
 
 msgid "band (alt)"
 msgstr "頻段 (alt)"
@@ -817,11 +853,30 @@ msgstr "頻段 {} 型態"
 msgid "FX Parameters"
 msgstr "FX 參數"
 
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "沒有"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr ""
+
 msgid "mute"
 msgstr "靜音"
 
 msgid "mono"
 msgstr "單聲道"
+
+msgid "source MIDI channel"
+msgstr ""
+
+msgid "destination MIDI channel"
+msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -1047,12 +1102,6 @@ msgstr "小"
 #. A closed track folder.
 msgid "closed"
 msgstr "關閉"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "沒有"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2135,6 +2184,11 @@ msgstr "無 MIDI 選取"
 msgid "no selection"
 msgstr "未選取"
 
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr "選取"
+
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
@@ -2414,6 +2468,9 @@ msgstr "OSARA: 轉道第一條軌道"
 msgid "OSARA: Go to last track"
 msgstr "OSARA: 轉道最後一條軌道"
 
+msgid "OSARA: Go to master track"
+msgstr "OSARA: 轉道主控軌"
+
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr "OSARA: 輪換選定包絡點的形狀"
 
@@ -2440,6 +2497,9 @@ msgstr "OSARA: 設定全部軌道像位正常"
 
 msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA: 取消監聽全部軌道"
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
+msgstr "OSARA：配置 REAPER 以獲得最佳螢幕閱讀器可訪問性"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"

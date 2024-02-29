@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Configuration header
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2022-2023 James Teh
+ * Copyright 2022-2024 James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -24,3 +24,5 @@ void loadConfig();
 void cmdConfig(Command* command);
 void registerSettingCommands();
 bool handleSettingCommand(int command);
+void cmdConfigReaperOptimal(Command* command);
+void maybeAutoConfigReaperOptimal();
