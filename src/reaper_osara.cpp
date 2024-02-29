@@ -873,7 +873,9 @@ void postToggleTrackMute(int command) {
 	int count = CountSelectedTracks2(nullptr, true);
 	bool masterSelected = false;
 	MediaTrack* master = GetMasterTrack(nullptr);
-	if(count==1 && isTrackSelected(master)) {
+	if(isTrackSelected(master))
+		masterSelected = true;
+	if(count==1 && masterSelected == true) {
 		masterSelected = true;
 		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
 		translate("master muted") : translate("master unmuted"));
@@ -888,17 +890,18 @@ void postToggleTrackMute(int command) {
 		translate("muted") : translate("unmuted"));
 		return;
 	}
-	for (int i=0; i<count; ++i) {
+	ostringstream s;
+	if(masterSelected == true) {
+		s << (isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
+		translate("master muted") : translate("master unmuted"));
+		s << ", ";
+	}
+	for (int i=masterSelected; i<count; ++i) {
 		if(isTrackMuted(GetSelectedTrack2(nullptr, i, true)))
 			++muteCount;
 		else
 			++unmuteCount;
 	}
-	ostringstream s;
-	// if(isTrackSelected(master) && masterSelected==true) {
-		// outputMessage(translate("master"));
-		// s << ", ";
-	// }
 	if(muteCount>0) {
 		// Translators: Reported when multiple tracks are muted. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks muted".
@@ -922,22 +925,37 @@ void postToggleTrackSolo(int command) {
 	int soloCount=0;
 	int unsoloCount=0;
 	int count = CountSelectedTracks2(nullptr, true);
-	if(count==0) {
+	bool masterSelected = false;
+	MediaTrack* master = GetMasterTrack(nullptr);
+	if(isTrackSelected(master))
+		masterSelected = true;
+	if(count==1 && masterSelected == true) {
+		masterSelected = true;
+		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
+		translate("master soloed") : translate("master unsoloed"));
+		return;
+	}
+	if(count== 0) {
 		outputMessage(		translate("no selected tracks"));
 		return;
 	}
 	if(count==1) {
 		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("soloed") : translate("unsoloed"));
+		translate("soloed") : translate("unsoloed"));
 		return;
 	}
-	for (int i=0; i<count; ++i) {
+	ostringstream s;
+	if(masterSelected == true) {
+		s << (isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
+		translate("master soloed") : translate("master unsoloed"));
+		s << ", ";
+	}
+	for (int i=masterSelected; i<count; ++i) {
 		if(isTrackSoloed(GetSelectedTrack2(nullptr, i, true)))
 			++soloCount;
 		else
 			++unsoloCount;
 	}
-	ostringstream s;
 	if(soloCount>0) {
 		// Translators: Reported when multiple tracks are soloed. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks soloed".
