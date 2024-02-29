@@ -762,3 +762,11 @@ void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
 		cmdhToggleTrackEnvelope(40409); // Track: Toggle track pre-FX pan envelope visible
 	}
 }
+
+void cmdToggleLastTouchedEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
+	} else {
+		cmdhToggleTrackEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
+	}
+}
