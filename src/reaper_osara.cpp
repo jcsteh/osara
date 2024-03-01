@@ -868,27 +868,113 @@ void postGoToTrack(int command) {
 }
 
 void postToggleTrackMute(int command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	int muteCount=0;
+	int unmuteCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
+	if(selCount==1 && masterSelected) {
+		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("master muted") : translate("master unmuted"));
 		return;
-	outputMessage(isTrackMuted(track) ?
-		translate("muted") :
-		translate("unmuted"));
+	}
+	if(selCount== 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if(selCount==1) {
+		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("muted") : translate("unmuted"));
+		return;
+	}
+	ostringstream s;
+	if(masterSelected) {
+		s << (isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("master muted") : translate("master unmuted"));
+		s << ", ";
+	}
+	for (int i=masterSelected; i<selCount; ++i) {
+		if(isTrackMuted(GetSelectedTrack2(nullptr, i, true))) {
+			++muteCount;
+		} else {
+			++unmuteCount;
+		}
+	}
+	if(muteCount>0) {
+		// Translators: Reported when multiple tracks are muted. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks muted".
+		s << format(translate_plural("{} track muted", "{} tracks muted", muteCount),
+			muteCount);
+		if (unmuteCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unmuteCount>0) {
+		// Translators: Reported when multiple tracks are unmuted. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unmuted".
+		s << format(
+			translate_plural("{} track unmuted", "{} tracks unmuted", unmuteCount),
+			unmuteCount);
+	}
+	outputMessage(s);
 }
 
 void postToggleTrackSolo(int command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	int soloCount=0;
+	int unsoloCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
+	if(selCount==1 && masterSelected) {
+		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("master soloed") : translate("master unsoloed"));
 		return;
-	outputMessage(isTrackSoloed(track) ?
-		translate("soloed") :
-		translate("unsoloed"));
+	}
+	if(selCount== 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if(selCount==1) {
+		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("soloed") : translate("unsoloed"));
+		return;
+	}
+	ostringstream s;
+	if(masterSelected) {
+		s << (isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("master soloed") : translate("master unsoloed"));
+		s << ", ";
+	}
+	for (int i=masterSelected; i<selCount; ++i) {
+		if(isTrackSoloed(GetSelectedTrack2(nullptr, i, true))) {
+			++soloCount;
+		} else {
+			++unsoloCount;
+		}
+	}
+	if(soloCount>0) {
+		// Translators: Reported when multiple tracks are soloed. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks soloed".
+		s << format(translate_plural("{} track soloed", "{} tracks soloed", soloCount),
+			soloCount);
+		if (unsoloCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unsoloCount>0) {
+		// Translators: Reported when multiple tracks are unsoloed. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unsoloed".
+		s << format(
+			translate_plural("{} track unsoloed", "{} tracks unsoloed", unsoloCount),
+			unsoloCount);
+	}
+	outputMessage(s);
 }
 
 void postToggleTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	if (!track) {
+		outputMessage(translate("no selected tracks"));
 		return;
+	}
 	outputMessage(isTrackArmed(track) ?
 		translate("armed") :
 		translate("unarmed"));
@@ -896,9 +982,11 @@ void postToggleTrackArm(int command) {
 
 void postCycleTrackMonitor(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	if (!track) {
+		outputMessage(translate("no selected tracks"));
 		return;
-	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL)) {
+	}
+	switch (*(int*)GetSetMediaTrackInfo(track, "I_RECMON", nullptr)) {
 		case 0:
 			outputMessage(translate("record monitor off"));
 			break;
@@ -913,12 +1001,43 @@ void postCycleTrackMonitor(int command) {
 }
 
 void postInvertTrackPhase(int command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track)
+	int flipCount=0;
+	int normCount=0;
+	int selCount = CountSelectedTracks(nullptr);
+	if(selCount==0) {
+		outputMessage(translate("no selected tracks"));
 		return;
-	outputMessage(isTrackPhaseInverted(track) ?
-		translate("phase inverted") :
-		translate("phase normal"));
+	}
+	if(selCount==1) {
+		outputMessage(isTrackPhaseInverted(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("phase inverted") : translate("phase normal"));
+		return;
+	}
+	for (int i=0; i<selCount; ++i) {
+		if(isTrackPhaseInverted(GetSelectedTrack2(nullptr, i, true))) {
+			++flipCount;
+		} else {
+			++normCount;
+		}
+	}
+	ostringstream s;
+	if(flipCount>0){
+		// Translators: Reported when multiple tracks have phase inverted. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks phase inverted".
+		s << format(translate_plural("{} track phase inverted", "{} tracks phase inverted", flipCount),
+			flipCount);
+		if (normCount > 0) {
+			s << ", ";
+		}
+	}
+	if(normCount>0) {
+		// Translators: Reported when multiple tracks have phase normal. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks phase normal".
+		s << format(
+			translate_plural("{} track phase normal", "{} tracks phase normal", normCount),
+			normCount);
+	}
+	outputMessage(s);
 }
 
 void postToggleTrackFxBypass(MediaTrack* track) {
