@@ -68,6 +68,13 @@ void startUpdateCheck(bool manual) {
 	auto curTime = time(nullptr);
 	const char LAST_CHECK_KEY[] = "lastUpdateCheck";
 	if (!manual) {
+		// If REAPER update checks are disabled, disable ours too.
+		char verCheck[2];
+		GetPrivateProfileString("REAPER", "verchk", "", verCheck,
+			sizeof(verCheck), get_ini_file());
+		if (verCheck[0] == '0') {
+			return;
+		}
 		// If we've checked for an update within the last day, don't check again.
 		const char* lastCheckStr = GetExtState(CONFIG_SECTION, LAST_CHECK_KEY);
 		uint64_t lastCheck = atoll(lastCheckStr);
