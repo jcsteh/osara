@@ -165,8 +165,11 @@ void UpdateChecker::tick() {
 }
 
 void UpdateChecker::error() {
-	MessageBox(GetForegroundWindow(), translate("Error checking for update"),
-		nullptr, MB_OK | MB_ICONERROR);
+	if (this->manual) {
+		MessageBox(GetForegroundWindow(),
+			translate("Error checking for OSARA update."),
+			nullptr, MB_OK | MB_ICONERROR);
+	}
 }
 
 INT_PTR CALLBACK UpdateChecker::dialogProc(HWND dialog, UINT msg, WPARAM wParam,
