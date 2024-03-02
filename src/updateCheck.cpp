@@ -124,8 +124,8 @@ void UpdateChecker::tick() {
 		if ((std::string)obj["version"] == curVersion) {
 			// We're running the latest version.
 			if (this->manual) {
-				MessageBox(GetForegroundWindow(), translate("No update available."),
-					translate_ctxt("Update OSARA", "Update OSARA"),
+				MessageBox(GetForegroundWindow(), translate("No OSARA update available."),
+					translate_ctxt("OSARA Update", "OSARA Update"),
 					MB_ICONINFORMATION | MB_OK);
 			}
 			cancelUpdateCheck();
