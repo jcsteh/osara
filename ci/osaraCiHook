@@ -70,6 +70,7 @@ def getCommits():
 	return out
 
 def writeUpdateData(data):
+	print("Writing update check data")
 	out = {"version": data["version"], "commits": getCommits()}
 	with open(UPDATE_FILE, "w") as f:
 		json.dump(out, f)
