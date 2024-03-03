@@ -1236,8 +1236,7 @@ class DestAudioChannelParam:  public AudioChannelParam {
 		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
 		auto* dstTrack = (MediaTrack*)sendProv.getSetValue("P_DESTTRACK", nullptr);
 		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
-		int srcChans = *(int*)static_cast<TrackSendParamProvider&>(provider)
-			.getSetValue("I_SRCCHAN", nullptr) >> 10;
+		int srcChans = *(int*)sendProv.getSetValue("I_SRCCHAN", nullptr) >> 10;
 		if (srcChans == 0) {
 			srcChans = 2;
 		} else if (srcChans > 1) {
