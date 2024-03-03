@@ -61,6 +61,10 @@ class UpdateChecker {
 UpdateChecker* UpdateChecker::instance = nullptr;
 
 void startUpdateCheck(bool manual) {
+	if (UpdateChecker::instance) {
+		// An update check is already running.
+		return;
+	}
 	if (std::string(OSARA_VERSION).find(",") == std::string::npos) {
 		// No commit in the version string. This is a local build.
 		return;
