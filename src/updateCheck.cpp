@@ -19,6 +19,7 @@
 #include <WDL/jnetlib/httpGet.h>
 #include <WDL/jnetlib/util.h>
 # pragma clang diagnostic pop
+#include <WDL/win32_utf8.h>
 #include "buildVersion.h"
 #include "config.h"
 #include "resource.h"
