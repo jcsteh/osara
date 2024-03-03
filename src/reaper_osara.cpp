@@ -4575,6 +4575,12 @@ void cmdUnmonitorAllTracks(Command* command) {
 	outputMessage(translate("unmonitored all tracks"));
 }
 
+void cmdOpenDoc(Command* command) {
+	const char DOC_URL[] = "https://osara.reaperaccessibility.com/";
+	ShellExecute(nullptr, "open", DOC_URL, nullptr, nullptr,
+		SW_SHOWNORMAL);
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -4756,6 +4762,7 @@ Command COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Unmonitor all tracks")}, "OSARA_UNMONITORALLTRACKS", cmdUnmonitorAllTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
@@ -5035,6 +5042,37 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(NULL, event);
 }
 
+void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
+	if (flag != 0 || strcmp(menuId, "Main extensions") != 0) {
+		return;
+	}
+	// The Extensions menu is being initialised.
+	// Add the OSARA sub-menu.
+	HMENU osaraMenu = CreatePopupMenu();
+	MENUITEMINFO itemInfo;
+	itemInfo.cbSize = sizeof(MENUITEMINFO);
+	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU;
+	itemInfo.fType = MFT_STRING;
+	itemInfo.dwTypeData = (char*)"OSARA";
+	itemInfo.cch = 5;
+	itemInfo.hSubMenu = osaraMenu;
+	InsertMenuItem(menu, GetMenuItemCount(menu), true, &itemInfo);
+
+	// Now add items to the OSARA sub-menu.
+	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+	int index = 0;
+	auto addItem = [&] (const char* itemName, const char* idStr) {
+		itemInfo.dwTypeData = (char*)itemName;
+		itemInfo.cch = strlen(itemName);
+		itemInfo.wID = NamedCommandLookup(idStr);
+		InsertMenuItem(osaraMenu, index++, true, &itemInfo);
+	};
+
+	addItem(translate("Online documentation"), "_OSARA_OPENDOC");
+	addItem(translate("Check for update"), "_OSARA_UPDATE");
+	addItem(translate("About OSARA"), "_OSARA_ABOUT");
+}
+
 #ifdef _WIN32
 
 void annotateAccRole(HWND hwnd, long role) {
@@ -5253,6 +5291,8 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 
 		registerExports(rec);
 		SetTimer(nullptr, 0, 0, delayedInit);
+		rec->Register("hookcustommenu", (void*)handleCustomMenu);
+		AddExtensionsMainMenu();
 #ifdef _WIN32
 		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
 #endif
