@@ -5068,8 +5068,9 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 		InsertMenuItem(osaraMenu, index++, true, &itemInfo);
 	};
 
-	addItem(translate("Online documentation"), "_OSARA_OPENDOC");
-	addItem(translate("Check for update"), "_OSARA_UPDATE");
+	addItem(translate("Configuration..."), "_OSARA_CONFIG");
+	addItem(translate("Online &documentation"), "_OSARA_OPENDOC");
+	addItem(translate("Check for &update"), "_OSARA_UPDATE");
 	addItem(translate("About OSARA"), "_OSARA_ABOUT");
 }
 
