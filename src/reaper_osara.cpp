@@ -5071,7 +5071,7 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 	addItem(translate("Configuration..."), "_OSARA_CONFIG");
 	addItem(translate("Online &documentation"), "_OSARA_OPENDOC");
 	addItem(translate("Check for &update"), "_OSARA_UPDATE");
-	addItem(translate("Configure REAPER for optimal screen reader accessibility"), "_OSARA_CONFIGREAPEROPTIMAL");
+	addItem(translate("Configure REAPER for &optimal screen reader accessibility"), "_OSARA_CONFIGREAPEROPTIMAL");
 	addItem(translate("About OSARA"), "_OSARA_ABOUT");
 }
 
