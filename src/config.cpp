@@ -228,12 +228,13 @@ void cmdConfigReaperOptimal(Command* command) {
 	ostringstream s;
 	const char nl[] = "\r\n";
 	s <<
-		translate_ctxt("optimal REAPER configuration", "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:")
+		translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Saying yes will make the following changes:")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Undocks the Media Explorer by default so that it gets focus when opened.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Uses a standard, accessible edit control for the video code editor.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions top menu, OSARA submenu.")
 		<< nl;
 	if (MessageBox(
 		GetForegroundWindow(),
