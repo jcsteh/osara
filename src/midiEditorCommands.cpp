@@ -1646,6 +1646,16 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	previewNotes(take, {note});
 }
 
+void toggleListViewItemSelection(HWND list) {
+	const int item = ListView_GetNextItem(list, -1, LVNI_FOCUSED);
+	if (item == -1) {
+		return;
+	}
+	UINT prevState = ListView_GetItemState(list, item, LVIS_SELECTED);
+	ListView_SetItemState(list, item,
+		prevState == LVIS_SELECTED? 0 : LVIS_SELECTED, LVIS_SELECTED);
+}
+
 #endif // _WIN32
 
 void postMidiChangeVelocity(int command) {

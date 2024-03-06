@@ -2953,8 +2953,19 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		&& isListView(focus)
 		// exclude the second list in the Edit custom action dialog because Ctrl+up/down reorder items.
 		&& GetWindowLong(focus, GWL_ID) != 1322
+		// Exclude control+space in the MIDI Editor Event List because play/pause is
+		// super useful there.
+		&& !(isMidiEditorEventListView(focus) && wParam == VK_SPACE)
 	) {
+		// Send control+upArrow, control+downArrow and control+space to most
+		// SysListView32 controls to allow for non-contiguous item selection.
 		SendMessage(focus, WM_KEYDOWN, wParam, lParam);
+		return 1;
+	}
+	if (shift && !control && !alt && wParam == VK_SPACE &&
+			isMidiEditorEventListView(focus)) {
+		// In the MIDI Editor Event List, make shift+space toggle selection.
+		toggleListViewItemSelection(focus);
 		return 1;
 	}
 	return CallNextHookEx(nullptr, code, wParam, lParam);
