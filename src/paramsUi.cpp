@@ -1044,9 +1044,13 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
 		track(track), category(category), index(index) {}
 
-	virtual void* getSetValue(void* newValue) override {
+	void* getSetValue(const char* name, void* newValue) {
 		return GetSetTrackSendInfo(this->track, this->category, this->index,
-			name.c_str(), newValue);
+			name, newValue);
+	}
+
+	virtual void* getSetValue(void* newValue) override {
+		return this->getSetValue(name.c_str(), newValue);
 	}
 
 	private:
@@ -1136,6 +1140,137 @@ class DestMidiChannelParam:  public SourceMidiChannelParam {
 	}
 };
 
+class AudioChannelParam:  public ReaperObjParam {
+	protected:
+	AudioChannelParam(ReaperObjParamProvider& provider):
+			ReaperObjParam(provider) {
+		this->min = 0;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	void addMonoOptions(int channels) {
+		for (int c = 0; c < channels; ++c) {
+			this->options.push_back({
+				format("{}", c + 1),
+				c + MONO_FLAG
+			});
+		}
+	}
+
+	void addStereoOptions(int channels) {
+		for (int c = 0; c <= channels - 2; ++c) {
+			this->options.push_back({
+				format("{}/{}", c + 1, c + 2),
+				c
+			});
+		}
+	}
+
+	void addMultiChannelOptions(int trackChannels, int srcChannels, bool isDest) {
+		const int countFlag = isDest ? 0 : (srcChannels / 2 << 10);
+		for (int c = 0; c <= trackChannels - srcChannels; ++c) {
+			this->options.push_back({
+				format("{}-{}", c + 1, c + srcChannels),
+				c + countFlag
+			});
+		}
+	}
+
+	void finishOptions() {
+		this->max = this->options.size() - 1;
+	}
+
+	public:
+	double getValue() {
+		int val = *(int*)this->provider.getSetValue(nullptr);
+		int index = 0;
+		for (auto& [display, raw]: options) {
+			if (val == raw) {
+				return index;
+			}
+			++index;
+		}
+		return 0;
+	}
+
+	string getValueText(double value) {
+		return options[(int)value].first;
+	}
+
+	void setValue(double value) {
+		this->provider.getSetValue((void*)&options[(int)value].second);
+	}
+
+	protected:
+	vector<pair<string, int>> options;
+	static constexpr int MONO_FLAG = 1 << 10;
+};
+
+class SourceAudioChannelParam: public AudioChannelParam {
+	public:
+	SourceAudioChannelParam(ReaperObjParamProvider& provider ):
+			AudioChannelParam(provider) {
+		options.push_back({translate("none"), -1});
+		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
+		auto* srcTrack = (MediaTrack*)sendProv.getSetValue("P_SRCTRACK", nullptr);
+		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
+		this->addMonoOptions(channels);
+		this->addStereoOptions(channels);
+		for (int multi = 4; channels / multi > 0; multi += 2) {
+			this->addMultiChannelOptions(channels, multi, false);
+		}
+		this->finishOptions();
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<SourceAudioChannelParam>(provider);
+	}
+};
+
+class DestAudioChannelParam:  public AudioChannelParam {
+	public:
+	DestAudioChannelParam(ReaperObjParamProvider& provider ):
+			AudioChannelParam(provider) {
+		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
+		auto* dstTrack = (MediaTrack*)sendProv.getSetValue("P_DESTTRACK", nullptr);
+		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
+		int srcChans = *(int*)sendProv.getSetValue("I_SRCCHAN", nullptr) >> 10;
+		if (srcChans == 0) {
+			srcChans = 2;
+		} else if (srcChans > 1) {
+			srcChans *= 2;
+		}
+		if (srcChans == -1) {
+			// If no source audio channel is set, we don't know how many destination
+			// channels there are. Just expose the current setting.
+			int dest = *(int*)provider.getSetValue(nullptr);
+			if (dest & MONO_FLAG) {
+				this->options.push_back({format("{}", (dest & ~MONO_FLAG) + 1), dest});
+			} else {
+				// Multi-channel, but we don't know how many.
+				this->options.push_back({format("{}-", dest + 1), dest});
+			}
+			this->max = 0;
+			return;
+		}
+		// Destination only supports stereo if the source is mono or stereo.
+		if (srcChans <= 2) {
+			this->addStereoOptions(trackChans);
+		} else {
+			// Destination must have the same number of channels.
+			this->addMultiChannelOptions(trackChans, srcChans, true);
+		}
+		this->addMonoOptions(trackChans);
+		this->finishOptions();
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<DestAudioChannelParam>(provider);
+	}
+};
+
 class TcpFxParamProvider: public ParamProvider {
 	public:
 	TcpFxParamProvider(const string displayName, FxParams<MediaTrack>& source,
@@ -1199,6 +1334,14 @@ class TrackParams: public ReaperObjParamSource {
 					dispPrefix.str() + translate("destination MIDI channel"),
 					this->track, category, i, "I_MIDIFLAGS",
 					DestMidiChannelParam::make));
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("source audio channel"),
+					this->track, category, i, "I_SRCCHAN",
+					SourceAudioChannelParam::make));
+				this->params.push_back(make_unique<TrackSendParamProvider>(
+					dispPrefix.str() + translate("destination audio channel"),
+					this->track, category, i, "I_DSTCHAN",
+					DestAudioChannelParam::make));
 			}
 		}
 	}
