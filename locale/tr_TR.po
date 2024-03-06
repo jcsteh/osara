@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2024-02-28 12:02\n"
+"PO-Revision-Date: 2024-03-06 02:16\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -30,7 +30,7 @@ msgid "OSARA: Disable"
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -51,6 +51,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
 msgstr ""
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
@@ -1327,6 +1331,49 @@ msgstr ""
 msgid "delta"
 msgstr ""
 
+msgid "master muted"
+msgstr ""
+
+msgid "master unmuted"
+msgstr ""
+
+msgid "no selected tracks"
+msgstr ""
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "master soloed"
+msgstr ""
+
+msgid "master unsoloed"
+msgstr ""
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "record monitor off"
 msgstr ""
 
@@ -1341,6 +1388,20 @@ msgstr ""
 
 msgid "phase normal"
 msgstr ""
+
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "FX active"
 msgstr ""
@@ -1961,12 +2022,6 @@ msgstr ""
 msgid "seconds secondary"
 msgstr ""
 
-msgid "master muted"
-msgstr ""
-
-msgid "master unmuted"
-msgstr ""
-
 msgid "enabled snap"
 msgstr ""
 
@@ -2230,9 +2285,6 @@ msgid "length {}"
 msgstr ""
 
 msgid "Selected tracks:"
-msgstr ""
-
-msgid "no selected tracks"
 msgstr ""
 
 msgid "Selected items:"
@@ -2570,6 +2622,12 @@ msgstr ""
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr ""
 
+msgid "OSARA: Check for update"
+msgstr ""
+
+msgid "OSARA: Open online documentation"
+msgstr ""
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr ""
 
@@ -2613,6 +2671,31 @@ msgid "OSARA: Select all notes with the same pitch starting in time selection"
 msgstr ""
 
 msgid "OSARA: Focus event nearest edit cursor"
+msgstr ""
+
+msgid "Configuration..."
+msgstr ""
+
+msgid "Online &documentation"
+msgstr ""
+
+msgid "Check for &update"
+msgstr ""
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr ""
+
+msgid "No OSARA update available."
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr ""
+
+msgid "OSARA version {} is available. Changes:"
+msgstr ""
+
+msgid "Error checking for OSARA update."
 msgstr ""
 
 msgctxt "Parameters"
@@ -2717,6 +2800,14 @@ msgstr ""
 
 msgctxt "FX Preset"
 msgid "&Cancel"
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "&Close"
 msgstr ""
 
 msgctxt "OSARA Configuration"

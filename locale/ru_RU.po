@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-02-28 12:02\n"
+"PO-Revision-Date: 2024-03-06 02:16\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -24,14 +24,14 @@ msgid "OSARA: Toggle"
 msgstr "Osara: Переключатель"
 
 msgid "OSARA: Enable"
-msgstr ""
+msgstr "OSARA: Включить"
 
 msgid "OSARA: Disable"
-msgstr ""
+msgstr "OSARA: Выключить"
 
 msgctxt "optimal REAPER configuration"
-msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
-msgstr ""
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+msgstr "Хотите ли вы изменить настройки REAPER для оптимальной совместимости с программами чтения с экрана? Выбрав \"да\", вы внесёте следующие изменения:"
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
@@ -53,17 +53,21 @@ msgctxt "optimal REAPER configuration"
 msgid "Uses a standard, accessible edit control for the video code editor."
 msgstr ""
 
-msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
 msgstr ""
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "Настройте REAPER для оптимальной работы с программой чтения с экрана"
 
 msgid "Error writing configuration changes."
-msgstr ""
+msgstr "Ошибка при записи изменений конфигурации."
 
 msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr ""
+msgstr "Сейчас REAPER  перезапустится. Пожалуйста, перезапустите REAPER, чтобы применить изменения."
 
 msgid "Restart REAPER"
-msgstr ""
+msgstr "Перезапустить REAPER"
 
 msgid "volume"
 msgstr "громкость"
@@ -1411,6 +1415,57 @@ msgstr ""
 msgid "delta"
 msgstr "дельта"
 
+msgid "master muted"
+msgstr "мастер приглушен"
+
+msgid "master unmuted"
+msgstr "мастер не приглушен"
+
+msgid "no selected tracks"
+msgstr "нет выделенных треков"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] "{} трек приглушён"
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+msgid "master soloed"
+msgstr ""
+
+msgid "master unsoloed"
+msgstr ""
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 msgid "record monitor off"
 msgstr ""
 
@@ -1425,6 +1480,24 @@ msgstr ""
 
 msgid "phase normal"
 msgstr ""
+
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "FX active"
 msgstr ""
@@ -2077,12 +2150,6 @@ msgstr ""
 msgid "seconds secondary"
 msgstr ""
 
-msgid "master muted"
-msgstr "мастер приглушен"
-
-msgid "master unmuted"
-msgstr "мастер не приглушен"
-
 msgid "enabled snap"
 msgstr "включенная привязка"
 
@@ -2363,9 +2430,6 @@ msgstr "длина {}"
 
 msgid "Selected tracks:"
 msgstr "Выделенные треки:"
-
-msgid "no selected tracks"
-msgstr "нет выделенных треков"
 
 msgid "Selected items:"
 msgstr "Выделенные объекты:"
@@ -2708,6 +2772,12 @@ msgstr ""
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr ""
 
+msgid "OSARA: Check for update"
+msgstr ""
+
+msgid "OSARA: Open online documentation"
+msgstr ""
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr ""
 
@@ -2751,6 +2821,31 @@ msgid "OSARA: Select all notes with the same pitch starting in time selection"
 msgstr ""
 
 msgid "OSARA: Focus event nearest edit cursor"
+msgstr ""
+
+msgid "Configuration..."
+msgstr ""
+
+msgid "Online &documentation"
+msgstr ""
+
+msgid "Check for &update"
+msgstr ""
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr ""
+
+msgid "No OSARA update available."
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr ""
+
+msgid "OSARA version {} is available. Changes:"
+msgstr ""
+
+msgid "Error checking for OSARA update."
 msgstr ""
 
 msgctxt "Parameters"
@@ -2856,6 +2951,14 @@ msgstr "&ОК"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "&Отменить"
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

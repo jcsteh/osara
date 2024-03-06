@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2024-02-28 12:02\n"
+"PO-Revision-Date: 2024-03-06 02:16\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -30,7 +30,7 @@ msgid "OSARA: Disable"
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -51,6 +51,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
 msgstr ""
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
@@ -1327,6 +1331,49 @@ msgstr "FX:"
 msgid "delta"
 msgstr "Delta"
 
+msgid "master muted"
+msgstr ""
+
+msgid "master unmuted"
+msgstr ""
+
+msgid "no selected tracks"
+msgstr "Keine selektierten Tracks"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "master soloed"
+msgstr ""
+
+msgid "master unsoloed"
+msgstr ""
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "record monitor off"
 msgstr "Aufnahme Monitor deaktiviert"
 
@@ -1341,6 +1388,20 @@ msgstr "nicht während dem Abspielen"
 
 msgid "phase normal"
 msgstr "Phase normal"
+
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "FX active"
 msgstr "FX aktiviert"
@@ -1961,12 +2022,6 @@ msgstr ""
 msgid "seconds secondary"
 msgstr ""
 
-msgid "master muted"
-msgstr ""
-
-msgid "master unmuted"
-msgstr ""
-
 msgid "enabled snap"
 msgstr ""
 
@@ -2231,9 +2286,6 @@ msgstr "Länge: {}"
 
 msgid "Selected tracks:"
 msgstr ""
-
-msgid "no selected tracks"
-msgstr "Keine selektierten Tracks"
 
 msgid "Selected items:"
 msgstr ""
@@ -2570,6 +2622,12 @@ msgstr ""
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr ""
 
+msgid "OSARA: Check for update"
+msgstr ""
+
+msgid "OSARA: Open online documentation"
+msgstr ""
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "Osara: Aktivieren nicht zusammenhängender Selektion / Umschalten der Selektion von Noten und Akkorden"
 
@@ -2614,6 +2672,31 @@ msgstr "Osara: Selektiere alle Noten der gleichen Tonhöhe, beginnend in der Tim
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "Osara: Selektiere den am nächsten beim Edit Cursor liegenden Event"
+
+msgid "Configuration..."
+msgstr ""
+
+msgid "Online &documentation"
+msgstr ""
+
+msgid "Check for &update"
+msgstr ""
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr ""
+
+msgid "No OSARA update available."
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr ""
+
+msgid "OSARA version {} is available. Changes:"
+msgstr ""
+
+msgid "Error checking for OSARA update."
+msgstr ""
 
 msgctxt "Parameters"
 msgid "Parameters"
@@ -2718,6 +2801,14 @@ msgstr "&OK"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "Abbre&chen"
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

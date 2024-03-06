@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-02-28 12:02\n"
+"PO-Revision-Date: 2024-03-06 02:16\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -30,8 +30,8 @@ msgid "OSARA: Disable"
 msgstr "OSARA: 停用"
 
 msgctxt "optimal REAPER configuration"
-msgid "Are you sure you want to make changes to your REAPER configuration? This will make the following changes:"
-msgstr "您確定要變更 REAPER 配置嗎？這將進行以下更改："
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
@@ -52,6 +52,10 @@ msgstr "顯示文字以指示 FX 列表中的並行、離線和旁通。"
 msgctxt "optimal REAPER configuration"
 msgid "Uses a standard, accessible edit control for the video code editor."
 msgstr "使用標準的、可存取的影片程式碼編輯器編輯控制項。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
+msgstr ""
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
 msgstr "配置 REAPER 以獲得最佳螢幕閱讀器輔助功能"
@@ -584,7 +588,7 @@ msgid "no notes selected"
 msgstr "無音符選取"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
-msgstr "OSARA: 在時間選區內選擇所有具有相同音高的音符"
+msgstr "OSARA: 在時間選區內選擇全部具有相同音高的音符"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -864,7 +868,7 @@ msgstr "沒有"
 #. Indicates all MIDI channels for a send in the Track
 #. Parameters dialog.
 msgid "all"
-msgstr ""
+msgstr "全部"
 
 msgid "mute"
 msgstr "靜音"
@@ -873,10 +877,10 @@ msgid "mono"
 msgstr "單聲道"
 
 msgid "source MIDI channel"
-msgstr ""
+msgstr "MIDI 來源通道"
 
 msgid "destination MIDI channel"
-msgstr ""
+msgstr "MIDI 目標 通道"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -1285,6 +1289,45 @@ msgstr "FX"
 msgid "delta"
 msgstr "效果差異"
 
+msgid "master muted"
+msgstr "主控軌靜音"
+
+msgid "master unmuted"
+msgstr "主控軌取消靜音"
+
+msgid "no selected tracks"
+msgstr "未選取軌道"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] "{} 軌道靜音"
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] "{} 軌道取消靜音"
+
+msgid "master soloed"
+msgstr "主控獨奏"
+
+msgid "master unsoloed"
+msgstr "主控取消獨奏"
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] "{} 軌道獨奏"
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] "{} 軌道取消獨奏"
+
 msgid "record monitor off"
 msgstr "錄音監聽關"
 
@@ -1300,14 +1343,26 @@ msgstr "播放部監聽"
 msgid "phase normal"
 msgstr "像位正常"
 
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] "{} 軌道翻轉像位"
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] "{} 軌道像位正常"
+
 msgid "FX active"
 msgstr "FX 活躍"
 
 msgid "all tracks FX bypassed"
-msgstr "所有軌道 FX 旁通"
+msgstr "全部軌道 FX 旁通"
 
 msgid "all tracks FX active"
-msgstr "所有軌道 FX 活躍"
+msgstr "全部軌道 FX 活躍"
 
 msgid "enabled delta solo"
 msgstr "啟用效果差異獨奏"
@@ -1790,13 +1845,13 @@ msgid "grid one hundred twenty eighth"
 msgstr "128分網格"
 
 msgid "all tracks unmuted"
-msgstr "所有軌道取消靜音"
+msgstr "全部軌道取消靜音"
 
 msgid "all tracks unsoloed"
-msgstr "所有軌道取消獨奏"
+msgstr "全部軌道取消獨奏"
 
 msgid "all tracks unarmed"
-msgstr "所有軌道取消待錄"
+msgstr "全部軌道取消待錄"
 
 msgid "all delta solos reset"
 msgstr "重設全部效果差異獨奏"
@@ -1902,12 +1957,6 @@ msgstr "採樣點 次要"
 
 msgid "seconds secondary"
 msgstr "秒 次要"
-
-msgid "master muted"
-msgstr "主控軌靜音"
-
-msgid "master unmuted"
-msgstr "主控軌取消靜音"
 
 msgid "enabled snap"
 msgstr "啟用吸附"
@@ -2166,9 +2215,6 @@ msgstr "長度 {}"
 msgid "Selected tracks:"
 msgstr "選取軌道"
 
-msgid "no selected tracks"
-msgstr "未選取軌道"
-
 msgid "Selected items:"
 msgstr "選取對象"
 
@@ -2220,10 +2266,10 @@ msgid "stretch marker moved"
 msgstr "拉伸標記移動"
 
 msgid "Delete all time signature markers"
-msgstr "刪除所有拍號標記"
+msgstr "刪除全部拍號標記"
 
 msgid "deleted all time signature markers"
-msgstr "刪除所有拍號標記"
+msgstr "刪除全部拍號標記"
 
 #. Used to report global automation override mode.  {} is
 #. replaced with the mode; e.g. "Global automation override latch
@@ -2400,7 +2446,7 @@ msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master tra
 msgstr "OSARA: 報告主控軌通道 2 播放游標處的峰值 dB 電平"
 
 msgid "OSARA: Delete all time signature markers"
-msgstr "OSARA: 刪除所有拍號標記"
+msgstr "OSARA: 刪除全部拍號標記"
 
 msgid "OSARA: Select next track/take envelope (depending on focus)"
 msgstr "OSARA: 選則軌道或片段的下一個包絡（取決於交扁） "
@@ -2499,7 +2545,13 @@ msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA: 取消監聽全部軌道"
 
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
-msgstr "OSARA：配置 REAPER 以獲得最佳螢幕閱讀器可訪問性"
+msgstr "OSARA: 配置 REAPER 以獲得最佳螢幕閱讀器可訪問性"
+
+msgid "OSARA: Check for update"
+msgstr "OSARA:  檢查更新"
+
+msgid "OSARA: Open online documentation"
+msgstr "OSARA: 開啟線上說明文件"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
@@ -2541,10 +2593,35 @@ msgid "OSARA: Move to previous CC and add to selection"
 msgstr "OSARA: 移至上一個CC並添加到選區"
 
 msgid "OSARA: Select all notes with the same pitch starting in time selection"
-msgstr "OSARA: 從時間選區開始選擇具有相同音高的所有音符"
+msgstr "OSARA: 從時間選區開始選擇具有相同音高的全部音符"
 
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: 焦點到編輯游標最近的事件"
+
+msgid "Configuration..."
+msgstr ""
+
+msgid "Online &documentation"
+msgstr ""
+
+msgid "Check for &update"
+msgstr ""
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr ""
+
+msgid "No OSARA update available."
+msgstr "無 OSARA 更新"
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr "OSARA: 更新"
+
+msgid "OSARA version {} is available. Changes:"
+msgstr "OSARA 版本 {} 可用。更換："
+
+msgid "Error checking for OSARA update."
+msgstr "檢查 OSARA 更新時發生錯誤。"
 
 msgctxt "Parameters"
 msgid "Parameters"
@@ -2649,6 +2726,14 @@ msgstr "確定(&O)"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "取消(&C)"
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr "轉到下載頁面(&D)"
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr "關閉(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
