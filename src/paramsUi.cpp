@@ -315,6 +315,7 @@ class ParamsDialog {
 	unique_ptr<ParamSource> source;
 	HWND dialog;
 	HWND paramCombo;
+	WNDPROC paramComboOrigProc;
 	HWND slider;
 	HWND valueEdit;
 	HWND valueLabel;
@@ -479,6 +480,20 @@ class ParamsDialog {
 				}
 		}
 		return FALSE;
+	}
+
+	static INT_PTR CALLBACK wndProc(HWND hwnd, UINT msg, WPARAM wParam,
+		LPARAM lParam
+	) {
+		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(GetParent(hwnd),
+			GWLP_USERDATA);
+		if (msg == WM_SETFOCUS && dialog && hwnd == dialog->paramCombo) {
+			// Changing a param value might update param names; e.g. changing the
+			// band type in ReaEq.
+			dialog->updateParamList();
+			return 0;
+		}
+		return CallWindowProc(dialog->paramComboOrigProc, hwnd, msg, wParam, lParam);
 	}
 
 	accelerator_register_t accelReg;
@@ -672,6 +687,8 @@ class ParamsDialog {
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
+		this->paramComboOrigProc = (WNDPROC)SetWindowLongPtr(this->paramCombo,
+			GWLP_WNDPROC, (LONG_PTR)this->wndProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
 		// We need to do exotic stuff with this slider that we can't support on Mac:
 		// 1. Custom step values (TBM_SETLINESIZE, TBM_SETPAGESIZE).
