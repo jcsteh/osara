@@ -71,7 +71,6 @@ MediaItem* currentItem = nullptr;
 
 /*** Utilities */
 
-bool muteNextMessage = false;
 #ifdef _WIN32
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
@@ -94,10 +93,7 @@ string narrow(const wstring& text) {
 
 string lastMessage;
 HWND lastMessageHwnd = NULL;
-void outputMessage(const string& message, bool interrupt) {
-	if(muteNextMessage && isHandlingCommand){
-		return;
-	}
+void _outputMessage(const string& message, bool interrupt) {
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;
@@ -128,14 +124,20 @@ void outputMessage(const string& message, bool interrupt) {
 
 #else // _WIN32
 
-void outputMessage(const string& message, bool interrupt) {
-	if(muteNextMessage && isHandlingCommand){
-		return;
-	}
+void _outputMessage(const string& message, bool interrupt) {
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
 #endif // _WIN32
+
+bool muteNextMessage = false;
+void outputMessage(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		muteNextMessage = false;
+		return;
+	}
+	_outputMessage(message, interrupt);
+}
 
 void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
@@ -4920,14 +4922,15 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 			isHandlingCommand = false;
 			return false; // We can't send commands for this section.
 	}
-	isHandlingCommand = false;
 	if (oldFocus != GetFocus()) {
 		// Don't report if the focus changes. The focus changing is better
 		// feedback and we don't want to interrupt that.
+		isHandlingCommand = false;
 		return true;
 	}
 	int newState = GetToggleCommandState2(section, command);
 	if (oldState == newState) {
+		isHandlingCommand = false;
 		return true; // No change, report nothing.
 	}
 	if (entry != TOGGLE_COMMAND_MESSAGES.end()) {
@@ -4935,6 +4938,7 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 		if (message) {
 			outputMessage(translate(message));
 		}
+		isHandlingCommand = false;
 		return true;
 	}
 	// Generic feedback.
@@ -4942,6 +4946,7 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 	s << (newState ? translate("enabled") : translate("disabled")) <<
 		" " << getActionName(command, section, /* skipCategory */ false);
 	outputMessage(s);
+	isHandlingCommand = false;
 	return true;
 }
 
@@ -4974,9 +4979,6 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		lastCommand = it->second->gaccel.accel.cmd;
 		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;
-		if(it->second->execute != cmdMuteNextMessage) {
-			muteNextMessage = false;
-		} 
 		return true;
 	}
 	// Allow "Main action section: Momentarily set override" actions to pass
@@ -4991,11 +4993,9 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	}
 	if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
 			hwnd)) {
-		muteNextMessage = false;
 		return true;
 	}
 	if (handleSettingCommand(command)) {
-		muteNextMessage = false;
 		return true;
 	}
 	if (handleToggleCommand(section, command, val, valHw, relMode, hwnd)) {
