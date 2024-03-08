@@ -4903,6 +4903,15 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 	if (oldState == -1) {
 		return false; // Not a toggle action.
 	}
+	const char* name = getActionName(command, section, false);
+	if (strncmp(name, "Custom: ", 8) == 0) {
+		// This is a custom action. Rather than reporting it generically, let OSARA
+		// report and/or handle the inner actions. This is particularly important
+		// for OSARA setting toggles, which would otherwise just be dropped.
+		// The string "Custom: " in this context doesn't seem to be in the REAPER
+		// template language pack, so this should be constant regardless of language.
+		return false;
+	}
 	HWND oldFocus = GetFocus();
 	isHandlingCommand = true;
 	switch (section->uniqueID) {
