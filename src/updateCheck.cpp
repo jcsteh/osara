@@ -125,6 +125,11 @@ void UpdateChecker::tick() {
 		// Still waiting for the connection to close.
 		return;
 	}
+	if (!IsWindowEnabled(GetAncestor(GetForegroundWindow(), GA_ROOTOWNER))) {
+		// A modal dialog is open. We must not try to display a dialog until it is
+		// closed. Otherwise, our dialog will be somewhat unusable.
+		return;
+	}
 	// The connection has closed, so we've received all the data.
 	this->killTimer();
 	char data[16384];
