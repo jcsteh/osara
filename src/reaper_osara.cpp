@@ -4804,8 +4804,8 @@ map<pair<int, int>, Command*> commandsMap;
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int section, int command, int val=63, int valHw=-1,
-	int relMode=0, HWND hwnd=nullptr
+bool handlePostCommand(int section, int command, int val, int valHw,
+	int relMode, HWND hwnd
 ) {
 	if (section==MAIN_SECTION) {
 		const auto postIt = postCommandsMap.find(command);
@@ -5005,30 +5005,8 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 }
 
 bool handleMainCommandFallback(int command, int flag) {
-	if (isHandlingCommand)
-		return false; // Prevent re-entrance.
-	const auto it = commandsMap.find(make_pair(MAIN_SECTION, command));
-	if (it != commandsMap.end()) {
-		isHandlingCommand = true;
-		if (it->second->gaccel.accel.cmd == lastCommand &&
-				GetTickCount() - lastCommandTime < 500) {
-			++lastCommandRepeatCount;
-		} else {
-			lastCommandRepeatCount = 0;
-		}
-		it->second->execute(it->second);
-		lastCommand = it->second->gaccel.accel.cmd;
-		lastCommandTime = GetTickCount();
-		isHandlingCommand = false;
-		if(it->second->execute != cmdMuteNextMessage) {
-			muteNextMessage = false;
-		} 
-		return true;
-	} else if (handlePostCommand(MAIN_SECTION, command)){
-		muteNextMessage = false;
-		return true;
-	}
-	return false;
+	return handleCommand(SectionFromUniqueID(MAIN_SECTION), command, 63, -1, 0,
+		nullptr);
 }
 
 IReaperControlSurface* surface = nullptr;
