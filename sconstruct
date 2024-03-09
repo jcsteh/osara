@@ -36,15 +36,23 @@ if env["PLATFORM"] == "win32":
 		import winreg
 	except ImportError:
 		import _winreg as winreg
-	# Get the path to makensis.
-	try:
-		with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS",
-				0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
-			makensis = os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
-	except WindowsError:
-		makensis = "makensis"
+	def getMakensis():
+		"""Get the path to makensis."""
+		try:
+			with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS\Unicode",
+					0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
+				return os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
+		except WindowsError:
+			pass
+		try:
+			with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS",
+					0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
+				return os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
+		except WindowsError:
+			pass
+		return "makensis.exe"
 	installer = env.Command("installer/osara_${version}.exe", ["installer/osara.nsi", "build"],
-		[[makensis, "/V2",
+		[[getMakensis(), "/V2",
 		"/DVERSION=$version", '/DPUBLISHER="$publisher"','/DCOPYRIGHT="$copyright"',
 		"/DOUTFILE=${TARGET.abspath}",
 		"$SOURCE"]])

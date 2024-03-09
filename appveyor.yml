@@ -55,6 +55,9 @@ install:
      }
  - git submodule update --init --depth 1
  - sh: sudo xcode-select -s /Applications/Xcode-13.2.1.app
+ # Use NSIS v2.46 to reduce AV false positives. Borrowed from SWS.
+ - cmd: '"%ProgramFiles(x86)%\NSIS\uninst-nsis.exe" /S'
+ - cmd: choco install -y nsis-unicode
 
 build_script:
  - ps: |
