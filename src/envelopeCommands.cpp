@@ -770,3 +770,16 @@ void cmdToggleLastTouchedEnvelope(Command* command) {
 		cmdhToggleTrackEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
 	}
 }
+
+void cmdInsertAutoItem(Command* command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int oldItems = CountAutomationItems(envelope);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = CountAutomationItems(envelope) - oldItems;
+	if (added) {
+		outputMessage(translate("inserted automation item"));
+	}
+}

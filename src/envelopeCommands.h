@@ -38,3 +38,4 @@ void cmdTogglePanEnvelope(Command* command);
 void cmdToggleMuteEnvelope(Command* command);
 void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command);
 void cmdToggleLastTouchedEnvelope(Command* command);
+void cmdInsertAutoItem(Command* command);
