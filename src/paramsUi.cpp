@@ -379,7 +379,7 @@ class ParamsDialog {
 		this->param = this->source->getParam(this->paramNum);
 		this->val = this->param->getValue();
 		EnableWindow(this->valueEdit, this->param->isEditable);
-		EnableWindow(this->moreButton, this->param->getMoreOptions().size() > 0);
+		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
 	}
 
