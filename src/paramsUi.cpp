@@ -328,6 +328,7 @@ class ParamsDialog {
 	HWND slider;
 	HWND valueEdit;
 	HWND valueLabel;
+	HWND moreButton;
 	int paramCount;
 	string filter;
 	vector<int> visibleParams;
@@ -378,6 +379,7 @@ class ParamsDialog {
 		this->param = this->source->getParam(this->paramNum);
 		this->val = this->param->getValue();
 		EnableWindow(this->valueEdit, this->param->isEditable);
+		EnableWindow(this->moreButton, this->param->getMoreOptions().size() > 0);
 		this->updateValue();
 	}
 
@@ -461,6 +463,9 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == ID_PARAM_UNNAMED) {
 					dialog->updateParamList();
+					return TRUE;
+				} else if (LOWORD(wParam) == ID_PARAM_MORE) {
+					dialog->moreMenu();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
@@ -739,6 +744,7 @@ class ParamsDialog {
 		plugin_register("accelerator", &this->accelReg);
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
+		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
 		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
