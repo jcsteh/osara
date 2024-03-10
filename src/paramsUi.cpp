@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <functional>
 #include <iomanip>
 #include <memory>
 #include <regex>
@@ -52,6 +53,15 @@ class Param {
 	}
 	virtual void setValue(double value) = 0;
 	virtual void setValueFromEdited(const string& text) {
+	}
+
+	// Get the options to display in the context menu for this parameter. Each
+	// option is a pair {displayName, func}, where func is a function to run if the
+	// option is chosen. func should return true if it changed the available
+	// values for this parameter.
+	using MoreOptions = vector<pair<string, function<bool()>>>;
+	virtual MoreOptions getMoreOptions() {
+		return {};
 	}
 };
 
@@ -481,6 +491,18 @@ class ParamsDialog {
 		return FALSE;
 	}
 
+	static LRESULT sliderWndProc(HWND hwnd, UINT message, WPARAM wParam,
+		LPARAM lParam
+	) {
+		auto* dialog = (ParamsDialog*)GetWindowLongPtr(GetParent(hwnd),
+			GWLP_USERDATA);
+		if (message == WM_CONTEXTMENU) {
+			dialog->moreMenu();
+			return 0;
+		}
+		return DefWindowProc(hwnd, message, wParam, lParam);
+	}
+
 	accelerator_register_t accelReg;
 	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		ParamsDialog* dialog = (ParamsDialog*)accelReg->user;
@@ -657,6 +679,34 @@ class ParamsDialog {
 		this->updateParamList();
 	}
 
+	void moreMenu() {
+		Param::MoreOptions options = this->param->getMoreOptions();
+		if (options.empty()) {
+			return;
+		}
+		HMENU menu = CreatePopupMenu();
+		MENUITEMINFO itemInfo;
+		itemInfo.cbSize = sizeof(MENUITEMINFO);
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		itemInfo.fType = MFT_STRING;
+		int count = 0;
+		for (auto& [name, func]: options) {
+			itemInfo.dwTypeData = (char*)name.c_str();
+			itemInfo.cch = name.length();
+			itemInfo.wID = count + 1;
+			InsertMenuItem(menu, (UINT)count, true, &itemInfo);
+			++count;
+		}
+		int choice = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0,
+			this->dialog, nullptr) - 1;
+		if (choice == -1) {
+			return; // Cancelled.
+		}
+		if (options[choice].second()) {
+			this->onParamChange();
+		}
+	}
+
 	public:
 
 	ParamsDialog(unique_ptr<ParamSource> source): source(std::move(source)) {
@@ -673,6 +723,8 @@ class ParamsDialog {
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+		SetWindowLongPtr(this->slider, GWLP_WNDPROC,
+			(LONG_PTR)ParamsDialog::sliderWndProc);
 		// We need to do exotic stuff with this slider that we can't support on Mac:
 		// 1. Custom step values (TBM_SETLINESIZE, TBM_SETPAGESIZE).
 		// 2. Down arrow moving left instead of right (TBS_DOWNISLEFT).
@@ -1182,6 +1234,11 @@ class AudioChannelParam:  public ReaperObjParam {
 		this->max = this->options.size() - 1;
 	}
 
+	virtual MediaTrack* getTargetTrack() = 0;
+
+	vector<pair<string, int>> options;
+	static constexpr int MONO_FLAG = 1 << 10;
+
 	public:
 	double getValue() {
 		int val = *(int*)this->provider.getSetValue(nullptr);
@@ -1203,9 +1260,33 @@ class AudioChannelParam:  public ReaperObjParam {
 		this->provider.getSetValue((void*)&options[(int)value].second);
 	}
 
-	protected:
-	vector<pair<string, int>> options;
-	static constexpr int MONO_FLAG = 1 << 10;
+	MoreOptions getMoreOptions() {
+		return {
+			{
+				// Translators: An option in the context menu for the source and
+				// destination audio channel parameters in the OSARA Track Parameters
+				// dialog.
+				translate("Add &2 new channels"),
+				[this] () -> bool { return this->addChannels(2); }
+			},
+			{
+				// Translators: An option in the context menu for the source and
+				// destination audio channel parameters in the OSARA Track Parameters
+				// dialog.
+				translate("Add &4 new channels"),
+				[this] () -> bool { return this->addChannels(4); }
+			}
+		};
+	}
+
+	private:
+	bool addChannels(int count) {
+		MediaTrack* track = this->getTargetTrack();
+		int channels = *(int*)GetSetMediaTrackInfo(track, "I_NCHAN", nullptr);
+		channels += count;
+		GetSetMediaTrackInfo(track, "I_NCHAN", (void*)&channels);
+		return true;
+	}
 };
 
 class SourceAudioChannelParam: public AudioChannelParam {
@@ -1213,8 +1294,7 @@ class SourceAudioChannelParam: public AudioChannelParam {
 	SourceAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
 		options.push_back({translate("none"), -1});
-		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
-		auto* srcTrack = (MediaTrack*)sendProv.getSetValue("P_SRCTRACK", nullptr);
+		MediaTrack* srcTrack = this->getTargetTrack();
 		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
 		this->addMonoOptions(channels);
 		this->addStereoOptions(channels);
@@ -1227,15 +1307,21 @@ class SourceAudioChannelParam: public AudioChannelParam {
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
 		return make_unique<SourceAudioChannelParam>(provider);
 	}
+
+	protected:
+	MediaTrack* getTargetTrack() {
+		auto& sendProv = static_cast<TrackSendParamProvider&>(this->provider);
+		return (MediaTrack*)sendProv.getSetValue("P_SRCTRACK", nullptr);
+	}
 };
 
 class DestAudioChannelParam:  public AudioChannelParam {
 	public:
 	DestAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
-		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
-		auto* dstTrack = (MediaTrack*)sendProv.getSetValue("P_DESTTRACK", nullptr);
+		MediaTrack* dstTrack = this->getTargetTrack();
 		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
+		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
 		int srcChans = *(int*)sendProv.getSetValue("I_SRCCHAN", nullptr) >> 10;
 		if (srcChans == 0) {
 			srcChans = 2;
@@ -1268,6 +1354,12 @@ class DestAudioChannelParam:  public AudioChannelParam {
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
 		return make_unique<DestAudioChannelParam>(provider);
+	}
+
+	protected:
+	MediaTrack* getTargetTrack() {
+		auto& sendProv = static_cast<TrackSendParamProvider&>(this->provider);
+		return (MediaTrack*)sendProv.getSetValue("P_DESTTRACK", nullptr);
 	}
 };
 
