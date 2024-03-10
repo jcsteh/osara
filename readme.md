@@ -512,6 +512,10 @@ Note that some effects expose easily readable values, while others expose only p
 Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
 For parameters which support it, there is also an editable text field which allows you to edit the value textually.
 
+For a few parameters, there is a context menu with additional options related to the parameter.
+You access this using the More button after the value slider, which will only be available if the parameter provides a context menu.
+Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the value slider.
+
 The Filter field allows you to narrow the list to only contain parameters which include the entered text.
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
 Clearing the text in the Filter field shows the entire list.
