@@ -176,6 +176,11 @@ bool maybeSwitchToFxPluginWindow() {
 // If the FX list in an FX chain dialog is focused, report active/bypassed for
 // the selected effect.
 bool maybeReportFxChainBypass(bool aboutToToggle) {
+	string version = string(GetAppVersion(), 0, 4);
+	if (stod(version) >= 7.06) {
+		// REAPER >= 7.06 made this properly accessible.
+		return false;
+	}
 	if (!isFxListFocused()) {
 		return false;
 	}
