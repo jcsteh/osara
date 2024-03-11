@@ -212,6 +212,7 @@
 #define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetTrackSendName
 #define REAPERAPI_WANT_AddExtensionsMainMenu
+#define REAPERAPI_WANT_GetAppVersion
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
