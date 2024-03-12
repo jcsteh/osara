@@ -4915,23 +4915,7 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 	}
 	HWND oldFocus = GetFocus();
 	isHandlingCommand = true;
-	switch (section->uniqueID) {
-		case MAIN_SECTION:
-			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
-			break;
-		case MIDI_EDITOR_SECTION:
-		case MIDI_EVENT_LIST_SECTION: {
-			HWND editor = MIDIEditor_GetActive();
-			MIDIEditor_OnCommand(editor, command);
-			break;
-		}
-		case MEDIA_EXPLORER_SECTION:
-			SendMessage(hwnd, WM_COMMAND, command, 0);
-			break;
-		default:
-			isHandlingCommand = false;
-			return false; // We can't send commands for this section.
-	}
+	section->onAction(command, val, valHw, relMode, hwnd);
 	if (oldFocus != GetFocus()) {
 		// Don't report if the focus changes. The focus changing is better
 		// feedback and we don't want to interrupt that.
