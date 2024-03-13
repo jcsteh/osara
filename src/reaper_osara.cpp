@@ -7,12 +7,18 @@
 
 #ifdef _WIN32
 #include <initguid.h>
+#include <coguid.h>
+// Must be defined before any C++ STL header is included.
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <oleacc.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
+#include <atlcomcli.h>
+// We only need this on Windows and it apparently causes compilation issues on Mac.
+#include <codecvt>
+#else
+#include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
-// Must be defined before any C++ STL header is included.
-#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <string>
 #include <sstream>
 #include <map>
@@ -21,12 +27,6 @@
 #include <math.h>
 #include <optional>
 #include <set>
-#ifdef _WIN32
-// We only need this on Windows and it apparently causes compilation issues on Mac.
-#include <codecvt>
-#else
-#include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
-#endif
 #include <WDL/win32_utf8.h>
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
@@ -99,26 +99,25 @@ void _outputMessage(const string& message, bool interrupt) {
 		}
 	}
 	// Tweak the MSAA accName for the current focus.
-	GUITHREADINFO guiThreadInfo;
-	guiThreadInfo.cbSize = sizeof(GUITHREADINFO);
-	GetGUIThreadInfo(guiThread, &guiThreadInfo);
-	if (!guiThreadInfo.hwndFocus)
+	HWND focus = GetFocus();
+	if (!focus) {
 		return;
+	}
 	if (lastMessage.compare(message) == 0) {
 		// The last message was the same.
 		// Clients may ignore a nameChange event if the name didn't change.
 		// Append a space to make it different.
 		string procMessage = message;
 		procMessage += ' ';
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
+		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
+		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
 		lastMessage = message;
 	}
 	// Fire a nameChange event so ATs will report this text.
-	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, guiThreadInfo.hwndFocus, OBJID_CLIENT, CHILDID_SELF);
-	lastMessageHwnd = guiThreadInfo.hwndFocus;
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, focus, OBJID_CLIENT, CHILDID_SELF);
+	lastMessageHwnd = focus;
 }
 
 #else // _WIN32
@@ -2661,13 +2660,12 @@ void sendMenu(HWND sendWindow) {
 	// #24: The controls are exposed via MSAA,
 	// but this is difficult for most users to use, especially with the broken MSAA implementation.
 	// Present them in a menu.
-	IAccessible* acc = nullptr;
+	CComPtr<IAccessible> acc;
 	VARIANT child;
 	if (AccessibleObjectFromEvent(sendWindow, OBJID_CLIENT, CHILDID_SELF, &acc, &child) != S_OK)
 		return;
 	long count = 0;
 	if (acc->get_accChildCount(&count) != S_OK || count == 0) {
-		acc->Release();
 		return;
 	}
 	HMENU menu = CreatePopupMenu();
@@ -2696,29 +2694,27 @@ void sendMenu(HWND sendWindow) {
 				role.lVal != ROLE_SYSTEM_COMBOBOX) {
 			continue;
 		}
-		BSTR name = nullptr;
+		CComBSTR name;
 		if (acc->get_accName(child, &name) != S_OK || !name)
 			continue;
 		itemInfo.wID = c;
 		// Make sure this stays around until the InsertMenuItem call.
-		string nameN = narrow(name);
+		string nameN = narrow(name.m_str);
 		itemInfo.dwTypeData = (char*)nameN.c_str();
 		itemInfo.cch = SysStringLen(name);
 		InsertMenuItem(menu, item, true, &itemInfo);
-		SysFreeString(name);
 	}
 	child.lVal = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	DestroyMenu(menu);
 	if (child.lVal == -1) {
-		acc->Release();
 		return;
 	}
 	// Click the selected control.
 	long l, t, w, h;
 	HRESULT res = acc->accLocation(&l, &t, &w, &h, child);
-	acc->Release();
-	if (res != S_OK)
+	if (res != S_OK) {
 		return;
+	}
 	POINT point = {l, t};
 	ScreenToClient(sendWindow, &point);
 	SendMessage(sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
