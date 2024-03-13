@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-03-06 02:16\n"
+"PO-Revision-Date: 2024-03-13 04:53\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -31,7 +31,7 @@ msgstr "OSARA: 禁用"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr ""
+msgstr "您想调整 REAPER 首选项以获得与屏幕阅读器的最佳兼容性吗？选择是将进行以下更改："
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
@@ -55,7 +55,7 @@ msgstr "对视频代码编辑器使用标准的,可访问的编辑控件."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr ""
+msgstr "注意: 如果现在不是调整 REAPER 的好时机,您可以稍后通过转到菜单栏中的扩展菜单,然后转到 OSARA 来应用这些调整."
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
 msgstr "配置 REAPER 以获得最佳屏幕阅读器辅助功能"
@@ -236,6 +236,9 @@ msgstr[0] "{} 点选定"
 #. occurred.
 msgid "no change"
 msgstr "无变化"
+
+msgid "inserted automation item"
+msgstr "插入自动化对象"
 
 msgid "active"
 msgstr "活动"
@@ -870,6 +873,27 @@ msgstr "无"
 msgid "all"
 msgstr "所有"
 
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr ""
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr ""
+
+msgid "post-fader"
+msgstr ""
+
+msgid "pre-fx"
+msgstr ""
+
+msgid "post-fx"
+msgstr ""
+
 msgid "mute"
 msgstr "静音"
 
@@ -881,6 +905,15 @@ msgstr "来源 MIDI 通道"
 
 msgid "destination MIDI channel"
 msgstr "目标 MIDI 通道"
+
+msgid "source audio channel"
+msgstr "源音频通道"
+
+msgid "destination audio channel"
+msgstr "目标音频通道"
+
+msgid "send type"
+msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -1302,31 +1335,31 @@ msgstr "无选定轨"
 #. with the number of tracks; e.g. "2 tracks muted".
 msgid "{} track muted"
 msgid_plural "{} tracks muted"
-msgstr[0] ""
+msgstr[0] "{} 轨已静音"
 
 #. Reported when multiple tracks are unmuted. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unmuted".
 msgid "{} track unmuted"
 msgid_plural "{} tracks unmuted"
-msgstr[0] ""
+msgstr[0] "{} 已取消静音"
 
 msgid "master soloed"
-msgstr ""
+msgstr "主控已独奏"
 
 msgid "master unsoloed"
-msgstr ""
+msgstr "主控已取消独奏"
 
 #. Reported when multiple tracks are soloed. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks soloed".
 msgid "{} track soloed"
 msgid_plural "{} tracks soloed"
-msgstr[0] ""
+msgstr[0] "{} 轨已独奏"
 
 #. Reported when multiple tracks are unsoloed. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unsoloed".
 msgid "{} track unsoloed"
 msgid_plural "{} tracks unsoloed"
-msgstr[0] ""
+msgstr[0] "{} 轨已取消独奏"
 
 msgid "record monitor off"
 msgstr "录音监听关"
@@ -1347,13 +1380,13 @@ msgstr "正常相位"
 #. replaced with the number of tracks; e.g. "2 tracks phase inverted".
 msgid "{} track phase inverted"
 msgid_plural "{} tracks phase inverted"
-msgstr[0] ""
+msgstr[0] "{} 轨相位已倒置"
 
 #. Reported when multiple tracks have phase normal. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks phase normal".
 msgid "{} track phase normal"
 msgid_plural "{} tracks phase normal"
-msgstr[0] ""
+msgstr[0] "{} 轨相位正常"
 
 msgid "FX active"
 msgstr "FX活动"
@@ -1857,13 +1890,13 @@ msgid "all delta solos reset"
 msgstr "重制全部 delta 独奏"
 
 msgid "grid straight"
-msgstr ""
+msgstr "平直网格"
 
 msgid "grid dotted"
-msgstr ""
+msgstr "附点网格"
 
 msgid "grid triplet"
-msgstr ""
+msgstr "三连音网格"
 
 msgid "length whole"
 msgstr "全音长度"
@@ -1902,13 +1935,13 @@ msgid "length one hundred twenty eighth"
 msgstr "128分长度"
 
 msgid "length straight"
-msgstr ""
+msgstr "平直长度"
 
 msgid "length dotted"
-msgstr ""
+msgstr "附点长度"
 
 msgid "length triplet"
-msgstr ""
+msgstr "三连音长度"
 
 msgid "full screen"
 msgstr "全屏"
@@ -2025,40 +2058,40 @@ msgid "removed Media Explorer from dock"
 msgstr "从博物窗移除媒体资源管理器"
 
 msgid "piano roll view"
-msgstr ""
+msgstr "钢琴卷帘视图"
 
 msgid "named notes view"
-msgstr ""
+msgstr "命名音符视图"
 
 msgid "event list view"
-msgstr ""
+msgstr "事件列表视图"
 
 msgid "notation view"
-msgstr ""
+msgstr "乐谱视图"
 
 msgid "rectangle notes (normal)"
-msgstr ""
+msgstr "矩形音符(正常)"
 
 msgid "triangle notes"
-msgstr ""
+msgstr "三角形音符"
 
 msgid "diamond notes"
-msgstr ""
+msgstr "菱形音符"
 
 msgid "showed velocity numbers on notes"
-msgstr ""
+msgstr "显示音符上的力度数字"
 
 msgid "hid velocity numbers on notes"
-msgstr ""
+msgstr "隐藏音符上的力度数字"
 
 msgid "showed note names"
-msgstr ""
+msgstr "显示音符名称"
 
 msgid "hid note names"
-msgstr ""
+msgstr "影藏音符名称"
 
 msgid "length matching grid"
-msgstr ""
+msgstr "长度匹配网格"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2548,10 +2581,10 @@ msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr "OSARA:配置 REAPER 以获得最佳屏幕阅读器可访问性"
 
 msgid "OSARA: Check for update"
-msgstr ""
+msgstr "OSARA:检查更新"
 
 msgid "OSARA: Open online documentation"
-msgstr ""
+msgstr "OSARA:打开在线文档"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"
@@ -2599,29 +2632,29 @@ msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: 光标最近的焦点事件"
 
 msgid "Configuration..."
-msgstr ""
+msgstr "配置..."
 
 msgid "Online &documentation"
-msgstr ""
+msgstr "在线文档(&D)"
 
 msgid "Check for &update"
-msgstr ""
+msgstr "检查更新(&U)"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
-msgstr ""
+msgstr "配置 REAPER 以获得最佳屏幕阅读器可访问性(&O)"
 
 msgid "No OSARA update available."
-msgstr ""
+msgstr "无可用的 OSARA 更新."
 
 msgctxt "OSARA Update"
 msgid "OSARA Update"
-msgstr ""
+msgstr "OSARA 更新"
 
 msgid "OSARA version {} is available. Changes:"
-msgstr ""
+msgstr "OSARA 版本 {} 可用。变化:"
 
 msgid "Error checking for OSARA update."
-msgstr ""
+msgstr "检查 OSARA 更新时出错."
 
 msgctxt "Parameters"
 msgid "Parameters"
@@ -2634,6 +2667,10 @@ msgstr "参数:(&P)"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "值:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Filter:"
@@ -2729,11 +2766,11 @@ msgstr "取消(&C)"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"
-msgstr ""
+msgstr "转到下载页面(&D)"
 
 msgctxt "OSARA Update"
 msgid "&Close"
-msgstr ""
+msgstr "关闭(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

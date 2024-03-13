@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-03-06 02:16\n"
+"PO-Revision-Date: 2024-03-13 04:53\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -35,7 +35,7 @@ msgstr "¿quieres configurar las preferencias de Reaper para una óptima compati
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
-msgstr "Eliminando del dock el explorador de medios por defecto, éste obtendrá el foco cuando sea abierto."
+msgstr "Eliminar del dock el explorador de medios por defecto, éste obtendrá el foco cuando sea abierto."
 
 msgctxt "optimal REAPER configuration"
 msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
@@ -241,6 +241,9 @@ msgstr[1] "{} puntos seleccionados"
 #. occurred.
 msgid "no change"
 msgstr "sin cambios"
+
+msgid "inserted automation item"
+msgstr "ítem de automatización insertado"
 
 msgid "active"
 msgstr "activo"
@@ -906,6 +909,27 @@ msgstr "ninguna"
 msgid "all"
 msgstr "todos"
 
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr "Añadidos &2 nuevos canales"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr "Añadidos &4 nuevos canales"
+
+msgid "post-fader"
+msgstr ""
+
+msgid "pre-fx"
+msgstr ""
+
+msgid "post-fx"
+msgstr ""
+
 msgid "mute"
 msgstr "silencio"
 
@@ -917,6 +941,15 @@ msgstr "canal midi fuente"
 
 msgid "destination MIDI channel"
 msgstr "canal midi destino"
+
+msgid "source audio channel"
+msgstr "canal fuente de audio"
+
+msgid "destination audio channel"
+msgstr "canal destino de audio"
+
+msgid "send type"
+msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -2599,7 +2632,7 @@ msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
 msgstr "OSARA: conmuta visibilidad de envolvente de volumen de pista, toma (dependiendo del foco)"
 
 msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
-msgstr "OSARA: conmuta visibilidad de panorama de pista, toma (dependiendo del foco)"
+msgstr "OSARA: conmuta visibilidad de envolvente de panorama de pista, toma (dependiendo del foco)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
 msgstr ""
@@ -2709,6 +2742,10 @@ msgstr "&Parámetro:"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "valor:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr "&Más"
 
 msgctxt "Parameters"
 msgid "&Filter:"

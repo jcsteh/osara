@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2024-03-06 02:16\n"
+"PO-Revision-Date: 2024-03-13 04:53\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -241,6 +241,9 @@ msgstr[1] "{} points sélectionnés"
 #. occurred.
 msgid "no change"
 msgstr "aucun changement"
+
+msgid "inserted automation item"
+msgstr ""
 
 msgid "active"
 msgstr "actif"
@@ -906,6 +909,27 @@ msgstr "aucun"
 msgid "all"
 msgstr ""
 
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr ""
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr ""
+
+msgid "post-fader"
+msgstr ""
+
+msgid "pre-fx"
+msgstr ""
+
+msgid "post-fx"
+msgstr ""
+
 msgid "mute"
 msgstr "muet"
 
@@ -916,6 +940,15 @@ msgid "source MIDI channel"
 msgstr ""
 
 msgid "destination MIDI channel"
+msgstr ""
+
+msgid "source audio channel"
+msgstr ""
+
+msgid "destination audio channel"
+msgstr ""
+
+msgid "send type"
 msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
@@ -2709,6 +2742,10 @@ msgstr "&Paramètre:"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "Valeur:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Filter:"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-03-06 02:16\n"
+"PO-Revision-Date: 2024-03-13 03:30\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -31,7 +31,7 @@ msgstr "OSARA: 停用"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr ""
+msgstr "您想調整 REAPER 偏好設定以獲得與螢幕閱讀器的最佳相容性嗎？選擇是將進行以下更改："
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
@@ -55,7 +55,7 @@ msgstr "使用標準的、可存取的影片程式碼編輯器編輯控制項。
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr ""
+msgstr "注意：如果現在不是調整 REAPER 的好時機，您可以稍後透過前往功能表列中的「擴充功能」選單，然後前往「OSARA」子選單來套用這些調整。"
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
 msgstr "配置 REAPER 以獲得最佳螢幕閱讀器輔助功能"
@@ -236,6 +236,9 @@ msgstr[0] "{} 點選取"
 #. occurred.
 msgid "no change"
 msgstr "無更改"
+
+msgid "inserted automation item"
+msgstr "插入自動化對象"
 
 msgid "active"
 msgstr "活躍"
@@ -870,6 +873,27 @@ msgstr "沒有"
 msgid "all"
 msgstr "全部"
 
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr "添加 &2 新通道"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr "添加 &4 新通道"
+
+msgid "post-fader"
+msgstr "推子後"
+
+msgid "pre-fx"
+msgstr "fx 前"
+
+msgid "post-fx"
+msgstr "fx 後"
+
 msgid "mute"
 msgstr "靜音"
 
@@ -881,6 +905,15 @@ msgstr "MIDI 來源通道"
 
 msgid "destination MIDI channel"
 msgstr "MIDI 目標 通道"
+
+msgid "source audio channel"
+msgstr "音訊來源通道"
+
+msgid "destination audio channel"
+msgstr "音訊目標 通道"
+
+msgid "send type"
+msgstr "發送型態"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -2599,16 +2632,16 @@ msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: 焦點到編輯游標最近的事件"
 
 msgid "Configuration..."
-msgstr ""
+msgstr "配置..."
 
 msgid "Online &documentation"
-msgstr ""
+msgstr "線上說明文件(&d)"
 
 msgid "Check for &update"
-msgstr ""
+msgstr "檢查更新(&u)"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
-msgstr ""
+msgstr "配置 REAPER 以獲得最佳螢幕閱讀器的可訪問性"
 
 msgid "No OSARA update available."
 msgstr "無 OSARA 更新"
@@ -2618,7 +2651,7 @@ msgid "OSARA Update"
 msgstr "OSARA: 更新"
 
 msgid "OSARA version {} is available. Changes:"
-msgstr "OSARA 版本 {} 可用。更換："
+msgstr "OSARA 版本 {} 可用。更新："
 
 msgid "Error checking for OSARA update."
 msgstr "檢查 OSARA 更新時發生錯誤。"
@@ -2634,6 +2667,10 @@ msgstr "參數(&P)"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "值:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr "更多(&M)"
 
 msgctxt "Parameters"
 msgid "&Filter:"
