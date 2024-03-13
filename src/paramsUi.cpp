@@ -502,7 +502,7 @@ class ParamsDialog {
 		return FALSE;
 	}
 
-	static LRESULT sliderWndProc(HWND hwnd, UINT message, WPARAM wParam,
+	static LRESULT contextWndProc(HWND hwnd, UINT message, WPARAM wParam,
 		LPARAM lParam
 	) {
 		auto* dialog = (ParamsDialog*)GetWindowLongPtr(GetParent(hwnd),
@@ -511,7 +511,8 @@ class ParamsDialog {
 			dialog->moreMenu();
 			return 0;
 		}
-		return DefWindowProc(hwnd, message, wParam, lParam);
+		auto origProc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		return CallWindowProc(origProc, hwnd, message, wParam, lParam);
 	}
 
 	accelerator_register_t accelReg;
@@ -732,9 +733,13 @@ class ParamsDialog {
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
 		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
 		WDL_UTF8_HookComboBox(this->paramCombo);
+		LONG_PTR origProc = SetWindowLongPtr(this->paramCombo, GWLP_WNDPROC,
+			(LONG_PTR)ParamsDialog::contextWndProc);
+		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
-		SetWindowLongPtr(this->slider, GWLP_WNDPROC,
-			(LONG_PTR)ParamsDialog::sliderWndProc);
+		origProc = SetWindowLongPtr(this->slider, GWLP_WNDPROC,
+			(LONG_PTR)ParamsDialog::contextWndProc);
+		SetWindowLongPtr(this->slider, GWLP_USERDATA, origProc);
 		// We need to do exotic stuff with this slider that we can't support on Mac:
 		// 1. Custom step values (TBM_SETLINESIZE, TBM_SETPAGESIZE).
 		// 2. Down arrow moving left instead of right (TBS_DOWNISLEFT).
