@@ -514,7 +514,7 @@ For parameters which support it, there is also an editable text field which allo
 
 For a few parameters, there is a context menu with additional options related to the parameter.
 You access this using the More button after the value slider, which will only be available if the parameter provides a context menu.
-Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the value slider.
+Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the Parameter combo box or Value slider.
 
 The Filter field allows you to narrow the list to only contain parameters which include the entered text.
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
