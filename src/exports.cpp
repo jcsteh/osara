@@ -2,7 +2,6 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Exported API functions code
  * Exports functions to be called by REAPER extensions and scripts.
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2020-2023 James Teh
  * License: GNU General Public License version 2.0
  */

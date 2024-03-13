@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+# OSARA: Open Source Accessibility for the REAPER Application
+# CI server script to publish OSARA snapshots
+# Copyright 2016-2024 NV Access Limited, James Teh
+# License: GNU General Public License version 2.0
+
 import sys
 import os.path
 import json
