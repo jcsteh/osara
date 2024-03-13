@@ -1126,7 +1126,8 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 				translate("Go to send destination track"),
 				[this] { return this->goToTargetTrack("P_DESTTRACK"); }
 			}};
-		} else if (this->category == -1) {
+		}
+		if (this->category == -1) {
 			return {{
 				translate("Go to receive source track"),
 				[this] { return this->goToTargetTrack("P_SRCTRACK"); }
