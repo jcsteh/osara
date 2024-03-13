@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Parameters UI code
  * Author: James Teh <jamie@jantrid.net>
- * Copyright 2014-2023 NV Access Limited, James Teh
+ * Copyright 2014-2024 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -1369,6 +1369,49 @@ class DestAudioChannelParam:  public AudioChannelParam {
 	}
 };
 
+class SendTypeParam:  public ReaperObjParam {
+	public:
+	SendTypeParam(ReaperObjParamProvider& provider ): ReaperObjParam(provider) {
+		this->min = 0;
+		this->max = 2;
+		this->step = 1;
+		this->largeStep = 1;
+		this->isEditable = false;
+	}
+
+	double getValue() {
+		int val = *(int*)this->provider.getSetValue(nullptr);
+		if (val == 3) {
+			// Raw value 2 is deprecated. Raw value 3 maps to OSARA value 2.
+			val = 2;
+		}
+		return val;
+	}
+
+	string getValueText(double value) {
+		if (value == 0) {
+			return translate("post-fader");
+		}
+		if (value == 1) {
+			return translate("pre-fx");
+		}
+		return translate("post-fx");
+	}
+
+	void setValue(double value) {
+		int newVal = value;
+		if (newVal == 2) {
+			// OSARA value 2 maps to raw value 3.
+			newVal = 3;
+		}
+		this->provider.getSetValue((void*)&newVal);
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<SendTypeParam>(provider);
+	}
+};
+
 class TcpFxParamProvider: public ParamProvider {
 	public:
 	TcpFxParamProvider(const string displayName, FxParams<MediaTrack>& source,
@@ -1441,6 +1484,9 @@ class TrackParams: public ReaperObjParamSource {
 					this->track, category, i, "I_DSTCHAN",
 					DestAudioChannelParam::make));
 			}
+			this->params.push_back(make_unique<TrackSendParamProvider>(
+				dispPrefix.str() + translate("send type"), this->track, category, i,
+				"I_SENDMODE", SendTypeParam::make));
 		}
 	}
 
