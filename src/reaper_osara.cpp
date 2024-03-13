@@ -286,7 +286,7 @@ string formatTimeHMSF(double time, bool useCache) {
 		oldSecond = second;
 	}
 	time = time - second;
-	int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
+	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
 		s << format(
 			translate_plural("{} frame", "{} frames", frame), frame);
@@ -370,39 +370,7 @@ string formatTime(double time, TimeFormat timeFormat,
 		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
-<<<<<<< HEAD
-			int hour = (int)(time / 3600);
-			time = fmod(time, 3600);
-			if (!useCache || oldHour != hour) {
-				// Translators: used when reporting a time in hours. {} will be replaced
-				// with the number of hours; e.g. "2 hours".
-				s << format(
-					translate_plural("{} hour", "{} hours", hour), hour) << " ";
-				oldHour = hour;
-			}
-			int minute = (int)(time / 60);
-			time = fmod(time, 60);
-			if (!useCache || oldMinute != minute) {
-				s << format(translate("{} min"), minute) << " ";
-				oldMinute = minute;
-			}
-			int second = (int)time;
-			if (!useCache || oldSecond != second) {
-				// Translators: Used when reporting a time in seconds. {} will be
-				// replaced with the number of seconds; e.g. "2 sec".
-				s << format(translate("{} sec"), second) << " ";
-				oldSecond = second;
-			}
-			time = time - second;
-			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
-			if (!useCache || oldFrame != frame) {
-				s << format(
-					translate_plural("{} frame", "{} frames", frame), frame);
-				oldFrame = frame;
-			}
-=======
 			s = formatTimeHMSF(time, useCache);
->>>>>>> 7ff6583 (Fix issue with reporting the length of a time selection when there are tempo/time signature changes. fixes #839)
 			break;
 		}
 		case TF_SAMPLE: {
