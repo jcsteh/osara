@@ -304,7 +304,7 @@ class ReaperObjLenParam: public ReaperObjParam {
 
 	string getValueText(double value) final {
 		static string lastText;
-		string text = formatLength(0, value); // fixme: should give the same result as before but I don't understand the rationale behind this; RDMurray 2024-03-13
+		string text = formatLength(0, value);
 		if (text.empty()) {
 			// formatTime returned nothing because value produced the same value text as the last call.
 			// Therefore, we cache the text and return it here.
