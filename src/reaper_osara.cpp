@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main plug-in code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2014-2024 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -50,7 +49,7 @@ HINSTANCE pluginHInstance;
 HWND mainHwnd;
 #ifdef _WIN32
 DWORD guiThread;
-IAccPropServices* accPropServices = NULL;
+IAccPropServices* accPropServices = nullptr;
 #endif
 
 // We cache the last reported time so we can report just the components which have changed.
@@ -92,7 +91,7 @@ string narrow(const wstring& text) {
 }
 
 string lastMessage;
-HWND lastMessageHwnd = NULL;
+HWND lastMessageHwnd = nullptr;
 void _outputMessage(const string& message, bool interrupt) {
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
@@ -181,7 +180,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 		case TF_MEASURETICK: {
 			int measure;
 			int measureLength;
-			double beat = TimeMap2_timeToBeats(NULL, time, &measure, &measureLength, NULL, NULL);
+			double beat = TimeMap2_timeToBeats(nullptr, time, &measure, &measureLength, nullptr, nullptr);
 			int wholeBeat = (int)beat;
 			int beatFraction = lround((beat - wholeBeat) * 100)  ;
 			if(beatFraction==100) {
@@ -314,7 +313,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 				oldSecond = second;
 			}
 			time = time - second;
-			int frame = (int)(time * TimeMap_curFrameRate(0, NULL));
+			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 			if (!useCache || oldFrame != frame) {
 				s << format(
 					translate_plural("{} frame", "{} frames", frame), frame);
@@ -361,7 +360,7 @@ string formatNoteLength(double start, double end) {
 	double startBeats;
 	double endBeats;
 	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
-	TimeMap2_timeToBeats(NULL, end, NULL, NULL, &endBeats, NULL);
+	TimeMap2_timeToBeats(nullptr, end, nullptr, nullptr, &endBeats, nullptr);
 	double lengthBeats = endBeats-startBeats;
 	int bars = int(lengthBeats)/measureLength;
 	int remBeats = int(lengthBeats)%measureLength;
@@ -430,7 +429,7 @@ string formatFolderState(MediaTrack* track) {
 		}
 		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
 		if (settings::reportTrackNumbers || !folderTrackName[0]) {
-			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", NULL);
+			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", nullptr);
 		}
 		if (folderTrackName[0]) {
 			s << " " << folderTrackName;
@@ -440,7 +439,7 @@ string formatFolderState(MediaTrack* track) {
 }
 
 const char* getFolderCompacting(MediaTrack* track) {
-	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", NULL)) {
+	switch (*(int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", nullptr)) {
 		case 0:
 			// Translators: An open track folder.
 			return translate("open");
@@ -480,7 +479,7 @@ bool isTrackSoloed(MediaTrack* track) {
 		// Method for normal tracks doesn't seem to work for master.
 		return GetMasterMuteSoloFlags() & 2;
 	}
-	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", NULL);
+	return *(int*)GetSetMediaTrackInfo(track, "I_SOLO", nullptr);
 }
 
 bool isTrackDefeatingSolo(MediaTrack* track) {
@@ -490,27 +489,27 @@ bool isTrackDefeatingSolo(MediaTrack* track) {
 }
 
 bool isTrackArmed(MediaTrack* track) {
-	return *(int*)GetSetMediaTrackInfo(track, "I_RECARM", NULL);
+	return *(int*)GetSetMediaTrackInfo(track, "I_RECARM", nullptr);
 }
 
 bool isTrackMonitored(MediaTrack* track) {
-	return *(int*)GetSetMediaTrackInfo(track, "I_RECMON", NULL);
+	return *(int*)GetSetMediaTrackInfo(track, "I_RECMON", nullptr);
 }
 
 bool isTrackPhaseInverted(MediaTrack* track) {
-	return *(bool*)GetSetMediaTrackInfo(track, "B_PHASE", NULL);
+	return *(bool*)GetSetMediaTrackInfo(track, "B_PHASE", nullptr);
 }
 
 bool isTrackFxBypassed(MediaTrack* track) {
-	return *(int*)GetSetMediaTrackInfo(track, "I_FXEN", NULL) == 0;
+	return *(int*)GetSetMediaTrackInfo(track, "I_FXEN", nullptr) == 0;
 }
 
 bool isTrackSelected(MediaTrack* track) {
-	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", NULL);
+	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", nullptr);
 }
 
 bool isItemSelected(MediaItem* item) {
-	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", NULL);
+	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", nullptr);
 }
 
 bool isPosInItem(double pos, MediaItem* item) {
@@ -603,8 +602,8 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 	// Folders can be nested, so we need to check all ancestor tracks, not just
 	// the parent.
 	while (parent) {
-		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", NULL) == 1
-			&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", NULL) == 2
+		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", nullptr) == 1
+			&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", nullptr) == 2
 		) {
 			return true;
 		}
@@ -735,7 +734,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
 	shouldMoveToAutoItem = false;
-	SetCursorContext(0, NULL);
+	SetCursorContext(0, nullptr);
 	if (!track)
 		return;
 	ostringstream s;
@@ -744,7 +743,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			s << " ";
 		}
 	};
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
 	if (trackNum <= 0) {
 		// Translators: Reported when navigating to the master track.
 		s << translate("master");
@@ -1178,7 +1177,7 @@ void postGoToMarker(int command) {
 	const char* name;
 	int number;
 	if (marker >= 0) {
-		EnumProjectMarkers(marker, NULL, &markerPos, NULL, &name, &number);
+		EnumProjectMarkers(marker, nullptr, &markerPos, nullptr, &name, &number);
 		if (markerPos == cursorPos) {
 			fakeFocus = FOCUS_MARKER;
 			if (name[0]) {
@@ -1260,7 +1259,7 @@ void postGoToMarker(int command) {
 // if that marker/region doesn't exist or there are two at the same position.
 // This function reports only if the number matches the target number.
 void postGoToSpecificMarker(int command) {
-	int count = CountProjectMarkers(0, NULL, NULL);
+	int count = CountProjectMarkers(0, nullptr, nullptr);
 	int wantNum;
 	bool wantReg = false;
 	// Work out the desired marker/region number based on the command id.
@@ -1280,7 +1279,7 @@ void postGoToSpecificMarker(int command) {
 		bool reg;
 		int num;
 		const char* name;
-		EnumProjectMarkers(i, &reg, NULL, NULL, &name, &num);
+		EnumProjectMarkers(i, &reg, nullptr, nullptr, &name, &num);
 		if (num != wantNum || reg != wantReg)
 			continue;
 		fakeFocus = reg ? FOCUS_REGION : FOCUS_MARKER;
@@ -1321,7 +1320,7 @@ void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+	if ( !GetTrackUIVolPan(track, &volume, nullptr) )
 		return;
 	postChangeVolumeH(volume, command, translate("Track"));
 }
@@ -1329,7 +1328,7 @@ void postChangeTrackVolume(int command) {
 void postChangeMasterTrackVolume(int command) {
 	MediaTrack* track = GetMasterTrack(0);
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, NULL) )
+	if ( !GetTrackUIVolPan(track, &volume, nullptr) )
 		return;
 	postChangeVolumeH(volume, command, translate("Master"));
 }
@@ -1406,7 +1405,7 @@ void postChangeTrackPan(int command) {
 	if (!track)
 		return;
 	double pan =0.0;
-	if ( !GetTrackUIVolPan(track, NULL, &pan) )
+	if ( !GetTrackUIVolPan(track, nullptr, &pan) )
 		return;
 	ostringstream s;
 	formatPan(pan, s);
@@ -1465,7 +1464,7 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", NULL) + 1 << " "
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << " "
 		<< GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
@@ -1507,7 +1506,7 @@ void postMoveToTimeSig(int command) {
 	int marker = FindTempoTimeSigMarker(0, cursor + 0.0001);
 	double pos, bpm;
 	int sigNum, sigDenom;
-	GetTempoTimeSigMarker(0, marker, &pos, NULL, NULL, &bpm, &sigNum, &sigDenom, NULL);
+	GetTempoTimeSigMarker(0, marker, &pos, nullptr, nullptr, &bpm, &sigNum, &sigDenom, nullptr);
 	if (pos != cursor)
 		return;
 	fakeFocus = FOCUS_TIMESIG;
@@ -1536,12 +1535,12 @@ int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
 	double posRelAdj = posRel - STRETCH_FUZZ_FACTOR;
 	if (posRelAdj < 0)
 		return -1;
-	int index = GetTakeStretchMarker(take, -1, &posRelAdj, NULL);
+	int index = GetTakeStretchMarker(take, -1, &posRelAdj, nullptr);
 	if (index < 0)
 		return -1;
 	double stretchRel;
 	// Get the real position; pos wasn't written.
-	GetTakeStretchMarker(take, index, &stretchRel, NULL);
+	GetTakeStretchMarker(take, index, &stretchRel, nullptr);
 	if (abs(stretchRel - posRel) > STRETCH_FUZZ_FACTOR)
 		return -1; // Marker not near to  pos.
 	return index;
@@ -1562,8 +1561,8 @@ void postGoToStretch(int command) {
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take)
 			continue;
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
 		if (getStretchAtPos(take, cursor, itemStart, playRate) != -1) {
 			found = true;
 			break;
@@ -1594,7 +1593,7 @@ void cmdIoMaster(Command* command);
 void postTrackIo(int command) {
 	if (GetLastTouchedTrack() == GetMasterTrack(0)) {
 		// Make this work for the master track. It doesn't out of the box.
-		cmdIoMaster(NULL);
+		cmdIoMaster(nullptr);
 	}
 }
 
@@ -1651,7 +1650,7 @@ void postRenameTrack(int command) {
 }
 
 bool isItemMuted(MediaItem* item) {
-	return *(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL);
+	return *(bool*)GetSetMediaItemInfo(item, "B_MUTE", nullptr);
 }
 
 void postToggleItemMute(int command) {
@@ -1947,8 +1946,8 @@ void postGoToTakeMarker(int command) {
 		if (!take) {
 			continue;
 		}
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
 		// Take marker positions are relative to the start of the item and the
 		// take's play rate.
 		double cursorRel = (cursor - itemStart) * playRate;
@@ -2451,7 +2450,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGETAKEVOLUP", postChangeTakeVolume}, // Xenakios/SWS: Nudge active take volume up
 	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
-	{NULL},
+	{nullptr},
 };
 
 using MExplorerPostExecute = void (*)(int, HWND);
@@ -2662,7 +2661,7 @@ void sendMenu(HWND sendWindow) {
 	// #24: The controls are exposed via MSAA,
 	// but this is difficult for most users to use, especially with the broken MSAA implementation.
 	// Present them in a menu.
-	IAccessible* acc = NULL;
+	IAccessible* acc = nullptr;
 	VARIANT child;
 	if (AccessibleObjectFromEvent(sendWindow, OBJID_CLIENT, CHILDID_SELF, &acc, &child) != S_OK)
 		return;
@@ -2697,7 +2696,7 @@ void sendMenu(HWND sendWindow) {
 				role.lVal != ROLE_SYSTEM_COMBOBOX) {
 			continue;
 		}
-		BSTR name = NULL;
+		BSTR name = nullptr;
 		if (acc->get_accName(child, &name) != S_OK || !name)
 			continue;
 		itemInfo.wID = c;
@@ -2708,7 +2707,7 @@ void sendMenu(HWND sendWindow) {
 		InsertMenuItem(menu, item, true, &itemInfo);
 		SysFreeString(name);
 	}
-	child.lVal = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, NULL);
+	child.lVal = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	DestroyMenu(menu);
 	if (child.lVal == -1) {
 		acc->Release();
@@ -2859,7 +2858,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	}
 	HWND focus = GetFocus();
 	if (!focus) {
-		return CallNextHookEx(NULL, code, wParam, lParam);
+		return CallNextHookEx(nullptr, code, wParam, lParam);
 	}
 	const bool shift = GetKeyState(VK_SHIFT) & 0x8000;
 	const bool alt = GetKeyState(VK_MENU) & 0x8000;
@@ -2995,7 +2994,7 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	int num;
 	MediaTrack* origTrack = GetLastTouchedTrack();
 	if (origTrack) {
-		num = (int)(size_t)GetSetMediaTrackInfo(origTrack, "IP_TRACKNUMBER", NULL);
+		num = (int)(size_t)GetSetMediaTrackInfo(origTrack, "IP_TRACKNUMBER", nullptr);
 		if (num >= 0) // Not master
 			--num; // We need 0-based.
 		num += direction;
@@ -3135,14 +3134,14 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	double pos;
 	int start = direction == 1 ? 0 : count - 1;
 	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", NULL) == track
+		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", nullptr) == track
 	) {
-		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", NULL);
+		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", nullptr);
 		if (direction == 1 ? pos <= cursor : pos >= cursor) {
 			// The cursor is right at or has moved past the item to which the user last moved.
 			// Therefore, start at the adjacent item.
 			// This is faster and also allows the user to move to items which start at the same position.
-			start = (int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", NULL) + direction;
+			start = (int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", nullptr) + direction;
 			if (start < 0 || start >= count) {
 				// There's no adjacent item in this direction,
 				// so move to the current one again.
@@ -3150,11 +3149,11 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 			}
 		}
 	} else
-		currentItem = NULL; // Invalid.
+		currentItem = nullptr; // Invalid.
 
 	for (int i = start; 0 <= i && i < count; i += direction) {
 		MediaItem* item = GetTrackMediaItem(track, i);
-		pos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
+		pos = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
 		if (direction == 1 ? pos < cursor : pos > cursor)
 			continue; // Not the right direction.
 		currentItem = item;
@@ -3171,7 +3170,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		SetEditCurPos(pos, true, true); // Seek playback.
 		fakeFocus = FOCUS_ITEM;
 		selectedEnvelopeIsTake = true;
-		SetCursorContext(1, NULL);
+		SetCursorContext(1, nullptr);
 		if (!shouldReportTimeMovement()) {
 			return;
 		}
@@ -3187,7 +3186,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		} else {
 			s << " " << translate("unselected");
 		}
-		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", NULL)) {
+		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", nullptr)) {
 			s << " " << translate("muted");
 		}
 		if (isItemLocked(item)) {
@@ -3492,16 +3491,16 @@ void cmdMoveItemsOrEnvPoint(Command* command) {
 }
 
 void cmdDeleteMarker(Command* command) {
-	int count = CountProjectMarkers(0, NULL, NULL);
+	int count = CountProjectMarkers(0, nullptr, nullptr);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
-	if (CountProjectMarkers(0, NULL, NULL) != count)
+	if (CountProjectMarkers(0, nullptr, nullptr) != count)
 		outputMessage(translate("marker deleted"));
 }
 
 void cmdDeleteRegion(Command* command) {
-	int count = CountProjectMarkers(0, NULL, NULL);
+	int count = CountProjectMarkers(0, nullptr, nullptr);
 	Main_OnCommand(40615, 0); // Markers: Delete region near cursor
-	if (CountProjectMarkers(0, NULL, NULL) != count)
+	if (CountProjectMarkers(0, nullptr, nullptr) != count)
 		outputMessage(translate("region deleted"));
 }
 
@@ -3954,16 +3953,16 @@ void cmdRemoveFocus(Command* command) {
 			cmdhRemoveItems(40006); // Item: Remove items
 			break;
 		case FOCUS_MARKER:
-			cmdDeleteMarker(NULL);
+			cmdDeleteMarker(nullptr);
 			break;
 		case FOCUS_REGION:
-			cmdDeleteRegion(NULL);
+			cmdDeleteRegion(nullptr);
 			break;
 		case FOCUS_TIMESIG:
-			cmdDeleteTimeSig(NULL);
+			cmdDeleteTimeSig(nullptr);
 			break;
 		case FOCUS_STRETCH:
-			cmdRemoveStretch(NULL);
+			cmdRemoveStretch(nullptr);
 			break;
 		case FOCUS_ENVELOPE:
 			cmdhDeleteEnvelopePointsOrAutoItems(40333, true, false); // Envelope: Delete all selected points
@@ -3975,7 +3974,7 @@ void cmdRemoveFocus(Command* command) {
 			cmdhDeleteTakeMarkers(42386); // Item: Delete take marker at cursor);
 			break;
 		default:
-			cmdRemoveTimeSelection(NULL);
+			cmdRemoveTimeSelection(nullptr);
 	}
 }
 
@@ -4072,15 +4071,15 @@ void cmdMoveStretch(Command* command) {
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take)
 			continue;
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", NULL);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", NULL);
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
 		int index = getStretchAtPos(take, lastStretchPos, itemStart, playRate);
 		if (index == -1)
 			continue;
 		// Stretch marker positions are relative to the start of the item and the
 		// take's play rate.
 		double destPos = (cursor - itemStart) * playRate;
-		SetTakeStretchMarker(take, index, destPos, NULL);
+		SetTakeStretchMarker(take, index, destPos, nullptr);
 		done = true;
 	}
 	Undo_EndBlock(translate("Move stretch marker"), UNDO_STATE_ITEMS);
@@ -4598,117 +4597,117 @@ void cmdOpenDoc(Command* command) {
 
 Command COMMANDS[] = {
 	// Commands we want to intercept.
-	{MAIN_SECTION, {{0, 0, 40285}, NULL}, NULL, cmdGoToNextTrack}, // Track: Go to next track
-	{MAIN_SECTION, {{0, 0, 40286}, NULL}, NULL, cmdGoToPrevTrack}, // Track: Go to previous track
-	{MAIN_SECTION, {{0, 0, 40287}, NULL}, NULL, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
-	{MAIN_SECTION, {{0, 0, 40288}, NULL}, NULL, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
-	{MAIN_SECTION, {{0, 0, 40417}, NULL}, NULL, cmdMoveToNextItem}, // Item navigation: Select and move to next item
-	{MAIN_SECTION, {{0, 0, 40416}, NULL}, NULL, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
-	{MAIN_SECTION, {{0, 0, 40029}, NULL}, NULL, cmdUndo}, // Edit: Undo
-	{MIDI_EDITOR_SECTION, {{0, 0, 40013}, NULL}, NULL, cmdUndo}, // Edit: Undo
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40013}, NULL}, NULL, cmdUndo}, // Edit: Undo
-	{MAIN_SECTION, {{0, 0, 40030}, NULL}, NULL, cmdRedo}, // Edit: Redo
-	{MIDI_EDITOR_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRedo}, // Edit: Redo
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRedo}, // Edit: Redo
-	{MAIN_SECTION, {{0, 0, 40012}, NULL}, NULL, cmdSplitItems}, // Item: Split items at edit or play cursor
-	{MAIN_SECTION, {{0, 0, 40061}, NULL}, NULL, cmdSplitItems}, // Item: Split items at time selection
-	{MAIN_SECTION, {{0, 0, 40058}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
-	{MAIN_SECTION, {{0, 0, 42398}, NULL}, NULL, cmdPaste}, // Item: Paste items/tracks
-	{MAIN_SECTION, {{0, 0, 40062}, NULL}, NULL, cmdPaste}, // Track: Duplicate tracks
-	{MAIN_SECTION, {{0, 0, 40005}, NULL}, NULL, cmdRemoveTracks}, // Track: Remove tracks
-	{MAIN_SECTION, {{0, 0, 40337}, NULL}, NULL, cmdRemoveTracks}, // Track: Cut tracks
-	{MAIN_SECTION, {{0, 0, 40006}, NULL}, NULL, cmdRemoveItems}, // Item: Remove items
-	{MAIN_SECTION, {{0, 0, 40699}, NULL}, NULL, cmdRemoveItems}, // Edit: Cut items
-	{MAIN_SECTION, {{0, 0, 40333}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
-	{MAIN_SECTION, {{0, 0, 40089}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
-	{MAIN_SECTION, {{0, 0, 40336}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
-	{MAIN_SECTION, {{0, 0, 40325}, NULL}, NULL, cmdDeleteEnvelopePoints}, // Envelope: Cut points within time selection
-	{MAIN_SECTION, {{0, 0, 40059}, NULL}, NULL, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
-	{MAIN_SECTION, {{0, 0, 40201}, NULL}, NULL, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
-	{MAIN_SECTION, {{0, 0, 40312}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Remove selected area of items
-	{MAIN_SECTION, {{0, 0, 40307}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
-	{MAIN_SECTION, {{0, 0, 40060}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
-	{MAIN_SECTION, {{0, 0, 40014}, NULL}, NULL, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
-	{MAIN_SECTION, {{0, 0, 40119}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
-	{MAIN_SECTION, {{0, 0, 40120}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
-	{MAIN_SECTION, {{0, 0, 40793}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
-	{MAIN_SECTION, {{0, 0, 40794}, NULL}, NULL, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
-	{MAIN_SECTION, {{0, 0, 40225}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, NULL}, NULL, cmdMoveItemEdge}, // Item edit: Grow right edge of items
-	{MAIN_SECTION, {{0, 0, 40613}, NULL}, NULL, cmdDeleteMarker}, // Markers: Delete marker near cursor
-	{MAIN_SECTION, {{0, 0, 40615}, NULL}, NULL, cmdDeleteRegion}, // Markers: Delete region near cursor
-	{MAIN_SECTION, {{0, 0, 40617}, NULL}, NULL, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
-	{MAIN_SECTION, {{0, 0, 41859}, NULL}, NULL, cmdRemoveStretch}, // Item: remove stretch marker at current position
-	{MAIN_SECTION, {{0, 0, 40020}, NULL}, NULL, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
-	{MAIN_SECTION, {{0, 0, 40769}, NULL}, NULL, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
-	{MAIN_SECTION, {{0, 0, 40915}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)
-	{MAIN_SECTION, {{0, 0, 40106}, NULL}, NULL, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (do not remove nearby points)
-	{MAIN_SECTION, {{0, 0, 40860}, NULL}, NULL, cmdSwitchProjectTab}, // Close current project tab
-	{MAIN_SECTION, {{0, 0, 41816}, NULL}, NULL, cmdSwitchProjectTab}, // Item: Open associated project in new tab
-	{MAIN_SECTION, {{0, 0, 40859}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab
-	{MAIN_SECTION, {{0, 0, 41929}, NULL}, NULL, cmdSwitchProjectTab}, // New project tab (ignore default template)
-	{MAIN_SECTION, {{0, 0, 40861}, NULL}, NULL, cmdSwitchProjectTab}, // Next project tab
-	{MAIN_SECTION, {{0, 0, 40862}, NULL}, NULL, cmdSwitchProjectTab}, // Previous project tab
-	{MAIN_SECTION, {{0, 0, 40320}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge left
-	{MAIN_SECTION, {{0, 0, 40321}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left edge right
-	{MAIN_SECTION, {{0, 0, 40322}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge left
-	{MAIN_SECTION, {{0, 0, 40323}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right edge right
-	{MAIN_SECTION, {{0, 0, 40039}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge left
-	{MAIN_SECTION, {{0, 0, 40040}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Nudge right
-	{MAIN_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
-	{MAIN_SECTION, {{0, 0, 40038}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
-	{MAIN_SECTION, {{0, 0, 40803}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
-	{MAIN_SECTION, {{0, 0, 40802}, NULL}, NULL, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
-	{MAIN_SECTION, {{0, 0, 41142}, NULL}, NULL, cmdToggleLastTouchedEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
-	{MAIN_SECTION, {{0, 0, 40406}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
-	{MAIN_SECTION, {{0, 0, 40407}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
-	{MAIN_SECTION, {{0, 0, 40408}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
-	{MAIN_SECTION, {{0, 0, 40409}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
-	{MAIN_SECTION, {{0, 0, 40867}, NULL}, NULL, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
-	{MAIN_SECTION, {{0, 0, 40693}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
-	{MAIN_SECTION, {{0, 0, 40694}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
-	{MAIN_SECTION, {{0, 0, 41612}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
-	{MAIN_SECTION, {{0, 0, 40695}, NULL}, NULL, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
-	{MAIN_SECTION, {{0, 0, 42386}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
-	{MAIN_SECTION, {{0, 0, 42387}, NULL}, NULL, cmdDeleteTakeMarkers}, // Item: Delete all take markers
-	{MAIN_SECTION, {{0, 0, 41208}, NULL}, NULL, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
-	{MAIN_SECTION, {{0, 0, 40157}, NULL}, NULL, cmdInsertMarker}, // Markers: Insert marker at current position
-	{MAIN_SECTION, {{0, 0, 40174}, NULL}, NULL, cmdInsertRegion}, // Markers: Insert region from time selection
-	{MAIN_SECTION, {{0, 0, 40032}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Group items
-	{MAIN_SECTION, {{0, 0, 40033}, NULL}, NULL, cmdChangeItemGroup}, // Item grouping: Remove items from group
-	{MAIN_SECTION, {{0, 0, 41187}, NULL}, NULL, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
-	{MAIN_SECTION, {{0, 0, 42082}, NULL}, NULL, cmdInsertAutoItem}, // Envelope: Insert automation item
-	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to start of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, NULL}, NULL, cmdMidiMoveCursor}, // View: Go to end of file
-	{MIDI_EDITOR_SECTION, {{0, 0, 40440}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to start of selected events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40639}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor to end of selected events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
-	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
-	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, NULL}, NULL, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
-	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, NULL}, NULL, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
-	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, NULL}, NULL, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
-	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, NULL}, NULL, cmdMidiDeleteEvents}, // Edit: Delete events
-	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
-	{MIDI_EDITOR_SECTION, {{0, 0, 1000}, NULL}, NULL, cmdMidiInsertNote}, // Edit: Insert note at edit cursor (no advance edit cursor)
-	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate next MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
-	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, NULL}, NULL, cmdMidiMoveToTrack}, // Activate previous MIDI track
-	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, NULL}, NULL, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
+	{MAIN_SECTION, {{0, 0, 40285}, nullptr}, nullptr, cmdGoToNextTrack}, // Track: Go to next track
+	{MAIN_SECTION, {{0, 0, 40286}, nullptr}, nullptr, cmdGoToPrevTrack}, // Track: Go to previous track
+	{MAIN_SECTION, {{0, 0, 40287}, nullptr}, nullptr, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
+	{MAIN_SECTION, {{0, 0, 40288}, nullptr}, nullptr, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
+	{MAIN_SECTION, {{0, 0, 40417}, nullptr}, nullptr, cmdMoveToNextItem}, // Item navigation: Select and move to next item
+	{MAIN_SECTION, {{0, 0, 40416}, nullptr}, nullptr, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
+	{MAIN_SECTION, {{0, 0, 40029}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
+	{MIDI_EDITOR_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
+	{MAIN_SECTION, {{0, 0, 40030}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
+	{MIDI_EDITOR_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
+	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor
+	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
+	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
+	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
+	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
+	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
+	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
+	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
+	{MAIN_SECTION, {{0, 0, 40699}, nullptr}, nullptr, cmdRemoveItems}, // Edit: Cut items
+	{MAIN_SECTION, {{0, 0, 40333}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
+	{MAIN_SECTION, {{0, 0, 40089}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
+	{MAIN_SECTION, {{0, 0, 40336}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
+	{MAIN_SECTION, {{0, 0, 40325}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut points within time selection
+	{MAIN_SECTION, {{0, 0, 40059}, nullptr}, nullptr, cmdCut}, // Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection
+	{MAIN_SECTION, {{0, 0, 40201}, nullptr}, nullptr, cmdRemoveTimeSelection}, // Time selection: Remove contents of time selection (moving later items)
+	{MAIN_SECTION, {{0, 0, 40312}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Remove selected area of items
+	{MAIN_SECTION, {{0, 0, 40307}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
+	{MAIN_SECTION, {{0, 0, 40060}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
+	{MAIN_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
+	{MAIN_SECTION, {{0, 0, 40119}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
+	{MAIN_SECTION, {{0, 0, 40120}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
+	{MAIN_SECTION, {{0, 0, 40793}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
+	{MAIN_SECTION, {{0, 0, 40794}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
+	{MAIN_SECTION, {{0, 0, 40225}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 40613}, nullptr}, nullptr, cmdDeleteMarker}, // Markers: Delete marker near cursor
+	{MAIN_SECTION, {{0, 0, 40615}, nullptr}, nullptr, cmdDeleteRegion}, // Markers: Delete region near cursor
+	{MAIN_SECTION, {{0, 0, 40617}, nullptr}, nullptr, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
+	{MAIN_SECTION, {{0, 0, 41859}, nullptr}, nullptr, cmdRemoveStretch}, // Item: remove stretch marker at current position
+	{MAIN_SECTION, {{0, 0, 40020}, nullptr}, nullptr, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
+	{MAIN_SECTION, {{0, 0, 40769}, nullptr}, nullptr, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
+	{MAIN_SECTION, {{0, 0, 40915}, nullptr}, nullptr, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)
+	{MAIN_SECTION, {{0, 0, 40106}, nullptr}, nullptr, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (do not remove nearby points)
+	{MAIN_SECTION, {{0, 0, 40860}, nullptr}, nullptr, cmdSwitchProjectTab}, // Close current project tab
+	{MAIN_SECTION, {{0, 0, 41816}, nullptr}, nullptr, cmdSwitchProjectTab}, // Item: Open associated project in new tab
+	{MAIN_SECTION, {{0, 0, 40859}, nullptr}, nullptr, cmdSwitchProjectTab}, // New project tab
+	{MAIN_SECTION, {{0, 0, 41929}, nullptr}, nullptr, cmdSwitchProjectTab}, // New project tab (ignore default template)
+	{MAIN_SECTION, {{0, 0, 40861}, nullptr}, nullptr, cmdSwitchProjectTab}, // Next project tab
+	{MAIN_SECTION, {{0, 0, 40862}, nullptr}, nullptr, cmdSwitchProjectTab}, // Previous project tab
+	{MAIN_SECTION, {{0, 0, 40320}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge left edge left
+	{MAIN_SECTION, {{0, 0, 40321}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge left edge right
+	{MAIN_SECTION, {{0, 0, 40322}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge right edge left
+	{MAIN_SECTION, {{0, 0, 40323}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge right edge right
+	{MAIN_SECTION, {{0, 0, 40039}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge left
+	{MAIN_SECTION, {{0, 0, 40040}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Nudge right
+	{MAIN_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Shift left (by time selection length)
+	{MAIN_SECTION, {{0, 0, 40038}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Shift right (by time selection length)
+	{MAIN_SECTION, {{0, 0, 40803}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Swap left edge of time selection to next transient in items
+	{MAIN_SECTION, {{0, 0, 40802}, nullptr}, nullptr, cmdNudgeTimeSelection}, // Time selection: Extend time selection to next transient in items
+	{MAIN_SECTION, {{0, 0, 41142}, nullptr}, nullptr, cmdToggleLastTouchedEnvelope}, // FX: Show/hide track envelope for last touched FX parameter
+	{MAIN_SECTION, {{0, 0, 40406}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track volume envelope visible
+	{MAIN_SECTION, {{0, 0, 40407}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track pan envelope visible
+	{MAIN_SECTION, {{0, 0, 40408}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX volume envelope visible
+	{MAIN_SECTION, {{0, 0, 40409}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track pre-FX pan envelope visible
+	{MAIN_SECTION, {{0, 0, 40867}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
+	{MAIN_SECTION, {{0, 0, 40693}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
+	{MAIN_SECTION, {{0, 0, 40694}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
+	{MAIN_SECTION, {{0, 0, 41612}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
+	{MAIN_SECTION, {{0, 0, 40695}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
+	{MAIN_SECTION, {{0, 0, 42386}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
+	{MAIN_SECTION, {{0, 0, 42387}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete all take markers
+	{MAIN_SECTION, {{0, 0, 41208}, nullptr}, nullptr, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
+	{MAIN_SECTION, {{0, 0, 40157}, nullptr}, nullptr, cmdInsertMarker}, // Markers: Insert marker at current position
+	{MAIN_SECTION, {{0, 0, 40174}, nullptr}, nullptr, cmdInsertRegion}, // Markers: Insert region from time selection
+	{MAIN_SECTION, {{0, 0, 40032}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Group items
+	{MAIN_SECTION, {{0, 0, 40033}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Remove items from group
+	{MAIN_SECTION, {{0, 0, 41187}, nullptr}, nullptr, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 42082}, nullptr}, nullptr, cmdInsertAutoItem}, // Envelope: Insert automation item
+	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
+	{MIDI_EDITOR_SECTION, {{0, 0, 40440}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor to start of selected events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40639}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor to end of selected events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
+	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, nullptr}, nullptr, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, nullptr}, nullptr, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
+	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, nullptr}, nullptr, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
+	{MIDI_EDITOR_SECTION, {{0, 0, 1000}, nullptr}, nullptr, cmdMidiInsertNote}, // Edit: Insert note at edit cursor (no advance edit cursor)
+	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40835}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate next MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
+	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, nullptr}, nullptr, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
 #ifdef _WIN32
-	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
-	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
-	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40762}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
-	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, NULL}, NULL, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
+	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
+	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
+	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
+	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
 	// Our own commands.
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next item (leaving other items selected)")}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
@@ -4799,7 +4798,7 @@ Command COMMANDS[] = {
 #endif
 	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{0, {}, NULL, NULL},
+	{0, {}, nullptr, nullptr},
 };
 map<pair<int, int>, Command*> commandsMap;
 
@@ -5022,7 +5021,7 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	maybeAutoConfigReaperOptimal();
 	startUpdateCheck();
-	KillTimer(NULL, event);
+	KillTimer(nullptr, event);
 }
 
 void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
@@ -5084,8 +5083,8 @@ void annotateSpuriousDialog(HWND hwnd) {
 
 void annotateSpuriousDialogs(HWND hwnd) {
 	annotateSpuriousDialog(hwnd);
-	for (HWND child = FindWindowExW(hwnd, NULL, L"#32770", NULL); child;
-		child = FindWindowExW(hwnd, child, L"#32770", NULL)
+	for (HWND child = FindWindowExW(hwnd, nullptr, L"#32770", nullptr); child;
+		child = FindWindowExW(hwnd, child, L"#32770", nullptr)
 	)
 		annotateSpuriousDialogs(child);
 }
@@ -5207,7 +5206,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		}
 	}
 }
-HWINEVENTHOOK winEventHook = NULL;
+HWINEVENTHOOK winEventHook = nullptr;
 
 #endif // _WIN32
 
@@ -5227,10 +5226,10 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		peakWatcher::initialize();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, NULL, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
+		if (CoCreateInstance(CLSID_AccPropServices, nullptr, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
 			return 0;
 		}
-		guiThread = GetWindowThreadProcessId(mainHwnd, NULL);
+		guiThread = GetWindowThreadProcessId(mainHwnd, nullptr);
 		winEventHook = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS,
 			hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);

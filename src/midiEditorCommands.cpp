@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * MIDI Editor commands code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -439,7 +438,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 #ifdef _WIN32
 		InitializeCriticalSection(&previewReg.cs);
 #else
-		pthread_mutex_init(&previewReg.mutex, NULL);
+		pthread_mutex_init(&previewReg.mutex, nullptr);
 #endif
 		previewReg.src = &previewSource;
 		previewReg.m_out_chan = -1; // Use .preview_track.
@@ -461,7 +460,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewingNotes.push_back(note);
 	}
 	// Send the events.
-	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
+	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", nullptr);
 	previewReg.preview_track = track;
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
@@ -759,12 +758,12 @@ void cmdMidiMoveCursor(Command* command) {
 }
 
 void selectNote(MediaItem_Take* take, const int note, bool select=true) {
-	MIDI_SetNote(take, note, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_SetNote(take, note, &select, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 bool isNoteSelected(MediaItem_Take* take, const int note) {
 	bool sel;
-	MIDI_GetNote(take, note, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_GetNote(take, note, &sel, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	return sel;
 }
 
@@ -900,12 +899,12 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
-	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_SetCC(take, cc, &select, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 bool isCCSelected(MediaItem_Take* take, const int cc) {
 	bool sel;
-	MIDI_GetCC(take, cc, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_GetCC(take, cc, &sel, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	return sel;
 }
 
@@ -919,7 +918,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		}
 		double position;
 		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
+		MIDI_GetCC(take, ccIndex, nullptr, nullptr, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
 		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
 	}
@@ -1183,9 +1182,9 @@ void cmdMidiInsertNote(Command* command) {
 void cmdMidiDeleteEvents(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount = MIDI_CountEvts(take, NULL, NULL, NULL);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	int removed = oldCount - MIDI_CountEvts(take, NULL, NULL, NULL);
+	int removed = oldCount - MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	// Translators: Used when events are deleted in the MIDI editor. {} is
 	// replaced by the number of events. E.g. "3 events removed"
 	outputMessage(format(
@@ -1471,9 +1470,9 @@ void cmdMidiMoveToTrack(Command* command) {
 	}
 	fakeFocus = FOCUS_TRACK;
 	ostringstream s;
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
 	s << trackNum;
-	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 	if (trackName)
 		s << " " << trackName;
 	// Translators: Used when reporting activation of the next/previous track in

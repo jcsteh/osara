@@ -52,11 +52,11 @@ class UiaProvider : public IRawElementProviderSimple {
 	UiaProvider(_In_ HWND hwnd): refCount(0), controlHWnd(hwnd) {}
 
 	// IUnknown methods
-	ULONG STDMETHODCALLTYPE AddRef() {
+	ULONG STDMETHODCALLTYPE AddRef() final {
 		return InterlockedIncrement(&refCount);
 	}
 
-	ULONG STDMETHODCALLTYPE Release() {
+	ULONG STDMETHODCALLTYPE Release() final {
 		long val = InterlockedDecrement(&refCount);
 		if (val == 0) {
 			delete this;
@@ -64,7 +64,9 @@ class UiaProvider : public IRawElementProviderSimple {
 		return val;
 	}
 
-	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid, _Outptr_ void** ppInterface) {
+	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid,
+		_Outptr_ void** ppInterface
+	) final {
 		if (ppInterface) {
 			return E_INVALIDARG;
 		}
@@ -81,18 +83,23 @@ class UiaProvider : public IRawElementProviderSimple {
 	}
 
 	// IRawElementProviderSimple methods
-	HRESULT STDMETHODCALLTYPE get_ProviderOptions(_Out_ ProviderOptions* pRetVal) {
+	HRESULT STDMETHODCALLTYPE get_ProviderOptions(_Out_ ProviderOptions* pRetVal
+	) final {
 		*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal) {
+	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId,
+		_Outptr_result_maybenull_ IUnknown** pRetVal
+	) final {
 		// We do not support any pattern.
-		*pRetVal = NULL;
+		*pRetVal = nullptr;
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId, _Out_ VARIANT* pRetVal) {
+	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId,
+		_Out_ VARIANT* pRetVal
+	) final {
 		switch (propertyId) {
 			case UIA_ControlTypePropertyId:
 				// Stop Narrator from ever speaking this as a window
@@ -115,7 +122,9 @@ class UiaProvider : public IRawElementProviderSimple {
 		return S_OK;
 	}
 
-	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(IRawElementProviderSimple** pRetVal) {
+	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(
+		IRawElementProviderSimple** pRetVal
+	) final {
 		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
 	}
 

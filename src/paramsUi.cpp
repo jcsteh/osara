@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Parameters UI code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2014-2024 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -92,12 +91,7 @@ class ReaperObjParamProvider;
 typedef unique_ptr<Param>(*MakeParamFromProviderFunc)(ReaperObjParamProvider&);
 class ReaperObjParamProvider: public ParamProvider {
 	public:
-	ReaperObjParamProvider(const string displayName, const string name,
-		MakeParamFromProviderFunc makeParamFromProvider):
-		ParamProvider(displayName), name(name),
-		makeParamFromProvider(makeParamFromProvider) {}
-
-	virtual unique_ptr<Param> makeParam() override {
+	unique_ptr<Param> makeParam() final {
 		return makeParamFromProvider(*this);
 	}
 
@@ -108,6 +102,11 @@ class ReaperObjParamProvider: public ParamProvider {
 	}
 
 	protected:
+	ReaperObjParamProvider(const string displayName, const string name,
+		MakeParamFromProviderFunc makeParamFromProvider):
+		ParamProvider(displayName), name(name),
+		makeParamFromProvider(makeParamFromProvider) {}
+
 	const string name;
 
 	private:
@@ -132,19 +131,17 @@ class ReaperObjParamSource: public ParamSource {
 	vector<unique_ptr<ParamProvider>> params;
 
 	public:
-
-	int getParamCount() {
+	int getParamCount() final {
 		return (int)this->params.size();
 	}
 
-	string getParamName(int param) {
+	string getParamName(int param) final {
 		return this->params[param]->displayName;
 	}
 
-	unique_ptr<Param> getParam(int param) {
+	unique_ptr<Param> getParam(int param) final {
 		return this->params[param]->makeParam();
 	}
-
 };
 
 class ReaperObjToggleParam: public ReaperObjParam {
@@ -157,11 +154,11 @@ class ReaperObjToggleParam: public ReaperObjParam {
 		this->largeStep = 1;
 	}
 
-	double getValue() {
+	double getValue() final {
 		return (double)*(bool*)this->provider.getSetValue(nullptr);
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		return value ?
 			// Translators: Reported in Parameters dialogs for a toggle (such as mute)
 			// which is on.
@@ -171,7 +168,7 @@ class ReaperObjToggleParam: public ReaperObjParam {
 			translate("off");
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		bool val = (bool)value;
 		this->provider.getSetValue((void*)&val);
 	}
@@ -196,7 +193,7 @@ class ReaperObjVolParam: public ReaperObjParam {
 		}
 	}
 
-	double getValue() {
+	double getValue() final {
 		double result = *(double*)this->provider.getSetValue(nullptr);
 		if (this->flipSign) {
 			result = -result;
@@ -204,17 +201,17 @@ class ReaperObjVolParam: public ReaperObjParam {
 		return result;
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		char out[64];
 		mkvolstr(out, value);
 		return out;
 	}
 
-	string getValueForEditing() {
+	string getValueForEditing() final {
 		return this->getValueText(this->getValue());
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		if (this->flipSign) {
 			double flipped = -value;
 			this->provider.getSetValue((void*)&flipped);
@@ -223,7 +220,7 @@ class ReaperObjVolParam: public ReaperObjParam {
 		}
 	}
 
-	void setValueFromEdited(const string& text) {
+	void setValueFromEdited(const string& text) final {
 		if (text.compare(0, 4, "-inf") == 0) {
 			this->setValue(0);
 			return;
@@ -251,25 +248,25 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->isEditable = true;
 	}
 
-	double getValue() {
+	double getValue() final {
 		return *(double*)this->provider.getSetValue(nullptr);
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		char out[64];
 		mkpanstr(out, value);
 		return out;
 	}
 
-	string getValueForEditing() {
+	string getValueForEditing() final {
 		return this->getValueText(this->getValue());
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) {
+	void setValueFromEdited(const string& text) final {
 		this->setValue(parsepanstr(text.c_str()));
 	}
 
@@ -290,11 +287,11 @@ class ReaperObjLenParam: public ReaperObjParam {
 		resetTimeCache();
 	}
 
-	double getValue() {
+	double getValue() final {
 		return *(double*)this->provider.getSetValue(nullptr);
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		static string lastText;
 		string text = formatTime(value, TF_RULER, true);
 		if (text.empty()) {
@@ -306,17 +303,17 @@ class ReaperObjLenParam: public ReaperObjParam {
 		return text;
 	}
 
-	string getValueForEditing() {
+	string getValueForEditing() final {
 		char out[64];
 		format_timestr_pos(this->getValue(), out, sizeof(out), -1);
 		return out;
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) {
+	void setValueFromEdited(const string& text) final {
 		this->setValue(parse_timestr_pos(text.c_str(), -1));
 	}
 
@@ -722,7 +719,6 @@ class ParamsDialog {
 	}
 
 	public:
-
 	ParamsDialog(unique_ptr<ParamSource> source): source(std::move(source)) {
 		this->paramCount = this->source->getParamCount();
 		if (this->paramCount == 0) {
@@ -760,7 +756,6 @@ class ParamsDialog {
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 		isParamsDialogOpen = true;
 	}
-
 };
 
 // The FX functions in the REAPER API are the same for tracks and takes
@@ -799,7 +794,6 @@ class FxParams: public ParamSource {
 	void initNamedConfigParams();
 
 	public:
-
 	FxParams(ReaperObj* obj, const string& apiPrefix, int fx=-1):
 			obj(obj), fx(fx) {
 		// Get functions.
@@ -821,15 +815,15 @@ class FxParams: public ParamSource {
 		}
 	}
 
-	string getTitle();
+	string getTitle() final;
 
-	int getParamCount() {
+	int getParamCount() final {
 		// Any named config params come first, followed by normal params.
 		return (int)this->namedConfigParams.size() +
 			this->_GetNumParams(this->obj, this->fx);
 	}
 
-	string getParamName(int param) {
+	string getParamName(int param) final {
 		ostringstream ns;
 		auto namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
@@ -847,7 +841,7 @@ class FxParams: public ParamSource {
 	}
 
 	unique_ptr<Param> getParam(int fx, int param);
-	unique_ptr<Param> getParam(int param) {
+	unique_ptr<Param> getParam(int param) final {
 		auto namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			return make_unique<FxNamedConfigParam<ReaperObj>>(
@@ -865,7 +859,6 @@ class FxParam: public Param {
 	int param;
 
 	public:
-
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
 		source._GetParam(source.obj, fx, param, &this->min, &this->max);
@@ -896,12 +889,12 @@ class FxParam: public Param {
 		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
 
-	double getValue() {
+	double getValue() final {
 		return this->source._GetParam(this->source.obj, this->fx, this->param,
 			nullptr, nullptr);
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		char text[50];
 		if (this->source._FormatParamValue(this->source.obj, this->fx, param, value,
 				text, sizeof(text)))
@@ -909,7 +902,7 @@ class FxParam: public Param {
 		return "";
 	}
 
-	string getValueForEditing() {
+	string getValueForEditing() final {
 		ostringstream s;
 		s << fixed << setprecision(4);
 		s << this->source._GetParam(this->source.obj, this->fx, this->param,
@@ -917,11 +910,11 @@ class FxParam: public Param {
 		return s.str();
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		this->source._SetParam(this->source.obj, this->fx, this->param, value);
 	}
 
-	void setValueFromEdited(const string& text) {
+	void setValueFromEdited(const string& text) final {
 		this->setValue(atof(text.c_str()));
 	}
 };
@@ -940,7 +933,6 @@ class FxNamedConfigParam: public Param {
 	const FxNamedConfigParamValues& values;
 
 	public:
-
 	FxNamedConfigParam(FxParams<ReaperObj>& source,
 			const string displayName, const string name,
 			const FxNamedConfigParamValues& values):
@@ -958,7 +950,7 @@ class FxNamedConfigParam: public Param {
 		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
 
-	double getValue() {
+	double getValue() final {
 		char valueStr[50];
 		valueStr[0] = '\0';
 		this->source._GetNamedConfigParm(this->source.obj, this->source.fx,
@@ -974,11 +966,11 @@ class FxNamedConfigParam: public Param {
 		return 0.0;
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		return translate(this->values[(int)value].first);
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		const char* valueStr = this->values[(int)value].second;
 		this->source._SetNamedConfigParm(this->source.obj, this->source.fx,
 			this->name.c_str(), valueStr);
@@ -1095,7 +1087,7 @@ class TrackParamProvider: public ReaperObjParamProvider {
 		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
 		track(track) {}
 
-	virtual void* getSetValue(void* newValue) override {
+	void* getSetValue(void* newValue) final {
 		return GetSetMediaTrackInfo(this->track, this->name.c_str(), newValue);
 	}
 
@@ -1116,11 +1108,11 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 			name, newValue);
 	}
 
-	virtual void* getSetValue(void* newValue) override {
+	void* getSetValue(void* newValue) final {
 		return this->getSetValue(name.c_str(), newValue);
 	}
 
-	virtual Param::MoreOptions getMoreOptions() override {
+	Param::MoreOptions getMoreOptions() final {
 		if (this->category == 0) {
 			return {{
 				translate("Go to send destination track"),
@@ -1163,7 +1155,7 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 		this->isEditable = false;
 	}
 
-	double getValue() {
+	double getValue() override {
 		// Low 5 bits.
 		int val = *(int*)this->provider.getSetValue(nullptr) & 0x1F;
 		if (val == 31) {
@@ -1172,7 +1164,7 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 		return val;
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		if (value == -1) {
 			// Translators: Indicates no MIDI channels for a send in the Track
 			// Parameters dialog.
@@ -1186,7 +1178,7 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 		return format("{}", value);
 	}
 
-	void setValue(double value) {
+	void setValue(double value) override {
 		if (value == -1) {
 			value = 31; // Disabled.
 		}
@@ -1214,12 +1206,12 @@ class DestMidiChannelParam:  public SourceMidiChannelParam {
 		this->min = 0;
 	}
 
-	double getValue() {
+	double getValue() final {
 		// Bits 6 through 10.
 		return *(int*)this->provider.getSetValue(nullptr) >> 5 & 0x1F;
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		int oldVal = *(int*)this->provider.getSetValue(nullptr);
 		// Only touch bits 6 through 10.
 		int newVal = (oldVal & ~0x3E0) | (int)value << 5;
@@ -1279,7 +1271,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	static constexpr int MONO_FLAG = 1 << 10;
 
 	public:
-	double getValue() {
+	double getValue() final {
 		int val = *(int*)this->provider.getSetValue(nullptr);
 		int index = 0;
 		for (auto& [display, raw]: options) {
@@ -1291,15 +1283,15 @@ class AudioChannelParam:  public ReaperObjParam {
 		return 0;
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		return options[(int)value].first;
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		this->provider.getSetValue((void*)&options[(int)value].second);
 	}
 
-	MoreOptions getMoreOptions() {
+	MoreOptions getMoreOptions() final {
 		MoreOptions options = ReaperObjParam::getMoreOptions();
 		options.insert(options.begin(), {
 			{
@@ -1350,7 +1342,7 @@ class SourceAudioChannelParam: public AudioChannelParam {
 	}
 
 	protected:
-	MediaTrack* getTargetTrack() {
+	MediaTrack* getTargetTrack() final {
 		auto& sendProv = static_cast<TrackSendParamProvider&>(this->provider);
 		return (MediaTrack*)sendProv.getSetValue("P_SRCTRACK", nullptr);
 	}
@@ -1398,7 +1390,7 @@ class DestAudioChannelParam:  public AudioChannelParam {
 	}
 
 	protected:
-	MediaTrack* getTargetTrack() {
+	MediaTrack* getTargetTrack() final {
 		auto& sendProv = static_cast<TrackSendParamProvider&>(this->provider);
 		return (MediaTrack*)sendProv.getSetValue("P_DESTTRACK", nullptr);
 	}
@@ -1414,7 +1406,7 @@ class SendTypeParam:  public ReaperObjParam {
 		this->isEditable = false;
 	}
 
-	double getValue() {
+	double getValue() final {
 		int val = *(int*)this->provider.getSetValue(nullptr);
 		if (val == 3) {
 			// Raw value 2 is deprecated. Raw value 3 maps to OSARA value 2.
@@ -1423,7 +1415,7 @@ class SendTypeParam:  public ReaperObjParam {
 		return val;
 	}
 
-	string getValueText(double value) {
+	string getValueText(double value) final {
 		if (value == 0) {
 			return translate("post-fader");
 		}
@@ -1433,7 +1425,7 @@ class SendTypeParam:  public ReaperObjParam {
 		return translate("post-fx");
 	}
 
-	void setValue(double value) {
+	void setValue(double value) final {
 		int newVal = value;
 		if (newVal == 2) {
 			// OSARA value 2 maps to raw value 3.
@@ -1453,7 +1445,7 @@ class TcpFxParamProvider: public ParamProvider {
 		int fx, int param):
 		ParamProvider(displayName), source(source), fx(fx), param(param) {}
 
-	unique_ptr<Param> makeParam() {
+	unique_ptr<Param> makeParam() final {
 		return this->source.getParam(this->fx, this->param);
 	}
 
@@ -1561,7 +1553,7 @@ class TrackParams: public ReaperObjParamSource {
 		}
 	}
 
-	string getTitle() {
+	string getTitle() final {
 		ostringstream s;
 		s << translate("Track Parameters") << ": ";
 		int trackNum = (int)(size_t)GetSetMediaTrackInfo(this->track,
@@ -1587,7 +1579,7 @@ class ItemParamProvider: public ReaperObjParamProvider {
 		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
 		item(item) {}
 
-	virtual void* getSetValue(void* newValue) override {
+	virtual void* getSetValue(void* newValue) final {
 		return GetSetMediaItemInfo(this->item, this->name.c_str(), newValue);
 	}
 
@@ -1602,7 +1594,7 @@ class TakeParamProvider: public ReaperObjParamProvider {
 		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
 		take(take) {}
 
-	virtual void* getSetValue(void* newValue) override {
+	void* getSetValue(void* newValue) final {
 		return GetSetMediaItemTakeInfo(this->take, this->name.c_str(), newValue);
 	}
 
@@ -1632,7 +1624,7 @@ class ItemParams: public ReaperObjParamSource {
 			ReaperObjLenParam::make));
 	}
 
-	string getTitle() {
+	string getTitle() final {
 		ostringstream s;
 		s << translate("Item Parameters") << ": ";
 		auto* track = (MediaTrack*)GetSetMediaItemInfo(this->item, "P_TRACK",

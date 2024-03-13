@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Configuration code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2022-2024 James Teh
  * License: GNU General Public License version 2.0
  */
@@ -28,7 +27,7 @@ namespace settings {
 }
 
 void loadConfig() {
-	// GetExtState returns an empty string (not NULL) if the key doesn't exist.
+	// GetExtState returns an empty string (not null) if the key doesn't exist.
 	char v = '\0';
 #define BoolSetting(name, sectionId, displayName, default) \
 	v = GetExtState(CONFIG_SECTION, #name)[0]; \

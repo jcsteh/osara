@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -85,7 +84,7 @@ void postMoveEnvelopePoint(int command) {
 		return;
 	double value;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, &value, nullptr, nullptr, &selected);
 	if (!selected)
 		return; // Not moved.
 	char out[64];
@@ -247,7 +246,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		isSelectionContiguous = true;
 	}
 	if(select)
-		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+		SetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, nullptr, nullptr, nullptr, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
 	char out[64];
@@ -260,7 +259,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	s << format(translate("point {point} value {value} {shape}"),
 		"point"_a=point, "value"_a=out, "shape"_a=getEnvelopeShapeName(shape));
 	bool isSelected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, nullptr, nullptr, nullptr, &isSelected);
 	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
@@ -279,10 +278,10 @@ optional<bool> toggleCurrentEnvelopePointSelection() {
 	if (!envelope || !currentEnvelopePoint)
 		return nullopt;
 	bool isSelected;
-	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
+	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, nullptr, nullptr, nullptr, nullptr, &isSelected))
 		return nullopt;
 	isSelected = !isSelected;
-	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, nullptr, nullptr, nullptr, nullptr, &isSelected, &bTrue);
 	return {isSelected};
 }
 
@@ -299,7 +298,7 @@ void cmdInsertEnvelopePoint(Command* command) {
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
 void cmdhSelectEnvelope(int direction) {
-	MediaTrack* track = NULL;
+	MediaTrack* track = nullptr;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
 	// selectedEnvelopeIsTake is set when focus changes to track or item.
@@ -340,7 +339,7 @@ void cmdhSelectEnvelope(int direction) {
 	}
 	if (origIndex == -1) {
 		// The current envelope isn't for this track/take.
-		origEnv = NULL;
+		origEnv = nullptr;
 		// Start at the start.
 		origIndex = start - direction;
 	}
@@ -356,7 +355,7 @@ void cmdhSelectEnvelope(int direction) {
 				index = start;
 			} else {
 				// We started at the start, so there are no more.
-				env = NULL;
+				env = nullptr;
 				break;
 			}
 		}
@@ -395,9 +394,9 @@ void cmdhSelectEnvelope(int direction) {
 		for (int i = 0; i < sendCount; ++i) {
 			TrackEnvelope* sendEnv = (TrackEnvelope*)GetSetTrackSendInfo(track, 0, i, "P_ENV", (void*)envType.c_str());
 			if (sendEnv == env) {
-				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", NULL);
-				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
-				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
+				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", nullptr);
+				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", nullptr) << " ";
+				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
 				if (trackName)
 					s << trackName << " ";
 			}

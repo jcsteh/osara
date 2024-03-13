@@ -69,19 +69,19 @@ class TrackCacheState {
  */
 class Surface: public IReaperControlSurface {
 	public:
-	virtual const char* GetTypeString() override {
+	const char* GetTypeString() final {
 		return "OSARA";
 	}
 
-	virtual const char* GetDescString() override {
+	const char* GetDescString() final {
 		return "OSARA";
 	}
 
-	virtual const char* GetConfigString() override {
+	const char* GetConfigString() final {
 		return "";
 	}
 
-	virtual void Run() override {
+	void Run() final {
 		if (settings::reportMarkersWhilePlaying && GetPlayState() & 1) {
 			double playPos = GetPlayPosition();
 			if (playPos == this->lastPlayPos) {
@@ -92,7 +92,7 @@ class Surface: public IReaperControlSurface {
 		}
 	}
 
-	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+	void SetPlayState(bool play, bool pause, bool rec) final {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
@@ -104,14 +104,14 @@ class Surface: public IReaperControlSurface {
 		reportTransportState(TransportState);
 	}
 
-	virtual void SetRepeatState(bool repeat) override {
+	void SetRepeatState(bool repeat) final {
 		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		reportRepeat(repeat);
 	}
 
-	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
+	void SetSurfaceVolume(MediaTrack* track, double volume) final {
 		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
@@ -127,7 +127,7 @@ class Surface: public IReaperControlSurface {
 		outputMessage(s);
 	}
 
-	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
+	void SetSurfacePan(MediaTrack* track, double pan) final {
 		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
@@ -142,7 +142,7 @@ class Surface: public IReaperControlSurface {
 		outputMessage(s);
 	}
 
-	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
+	void SetSurfaceMute(MediaTrack* track, bool mute) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -157,7 +157,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(mute);
 	}
 
-	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
+	void SetSurfaceSolo(MediaTrack* track, bool solo) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -177,7 +177,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(solo);
 	}
 
-	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
+	void SetSurfaceRecArm(MediaTrack* track, bool arm) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -195,7 +195,7 @@ class Surface: public IReaperControlSurface {
 		this->lastParamChangeTime = GetTickCount();
 	}
 
-	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
+	void SetSurfaceSelected(MediaTrack* track, bool selected) final {
 		if (!selected || !settings::reportSurfaceChanges ||
 			// REAPER calls this a *lot*, even if the track was already selected; e.g.
 			// for mute, arm, solo, etc. Ignore this if we were already told about
@@ -215,7 +215,7 @@ class Surface: public IReaperControlSurface {
 		postGoToTrack(0, track);
 	}
 
-	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
+	int Extended(int call, void* parm1, void* parm2, void* parm3) final {
 		if (call == CSURF_EXT_SETFXPARAM) {
 			if (!this->shouldHandleParamChange()) {
 				return 0; // Unsupported.
@@ -257,7 +257,7 @@ class Surface: public IReaperControlSurface {
 		return 0; // Unsupported.
 	}
 
-	virtual void SetTrackListChange() override {
+	void SetTrackListChange() final {
 #ifdef _WIN32
 		// hack: A bug in earlier versions of JUCE breaks OSARA UIA events when
 		// a JUCE plugin is removed, which can happen when a track is removed. Hiding
