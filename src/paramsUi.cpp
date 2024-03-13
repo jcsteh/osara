@@ -103,6 +103,10 @@ class ReaperObjParamProvider: public ParamProvider {
 
 	virtual void* getSetValue(void* newValue) = 0;
 
+	virtual Param::MoreOptions getMoreOptions() {
+		return {};
+	}
+
 	protected:
 	const string name;
 
@@ -116,6 +120,11 @@ class ReaperObjParam: public Param {
 
 	ReaperObjParam(ReaperObjParamProvider& provider):
 		Param(), provider(provider) {}
+
+	public:
+	MoreOptions getMoreOptions() override {
+		return provider.getMoreOptions();
+	}
 };
 
 class ReaperObjParamSource: public ParamSource {
@@ -1111,7 +1120,30 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 		return this->getSetValue(name.c_str(), newValue);
 	}
 
+	virtual Param::MoreOptions getMoreOptions() override {
+		if (this->category == 0) {
+			return {{
+				translate("Go to send destination track"),
+				[this] { return this->goToTargetTrack("P_DESTTRACK"); }
+			}};
+		} else if (this->category == -1) {
+			return {{
+				translate("Go to receive source track"),
+				[this] { return this->goToTargetTrack("P_SRCTRACK"); }
+			}};
+		}
+		return {};
+	}
+
 	private:
+	bool goToTargetTrack(const char* paramName) {
+		auto* track = (MediaTrack*)this->getSetValue(paramName, nullptr);
+		SetOnlyTrackSelected(track);
+		SendMessage(GetForegroundWindow(), WM_CLOSE, 0, 0);
+		postGoToTrack(0, track);
+		return false;
+	}
+
 	MediaTrack* track;
 	int category;
 	int index;
@@ -1267,22 +1299,24 @@ class AudioChannelParam:  public ReaperObjParam {
 	}
 
 	MoreOptions getMoreOptions() {
-		return {
+		MoreOptions options = ReaperObjParam::getMoreOptions();
+		options.insert(options.begin(), {
 			{
 				// Translators: An option in the context menu for the source and
 				// destination audio channel parameters in the OSARA Track Parameters
 				// dialog.
 				translate("Add &2 new channels"),
-				[this] () -> bool { return this->addChannels(2); }
+				[this] { return this->addChannels(2); }
 			},
 			{
 				// Translators: An option in the context menu for the source and
 				// destination audio channel parameters in the OSARA Track Parameters
 				// dialog.
 				translate("Add &4 new channels"),
-				[this] () -> bool { return this->addChannels(4); }
+				[this] { return this->addChannels(4); }
 			}
-		};
+		});
+		return options;
 	}
 
 	private:
