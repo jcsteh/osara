@@ -282,9 +282,10 @@ enum FormatTimeCacheRequest {
 	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
 };
 std::string formatTime(double time, TimeFormat format=TF_RULER,
-	bool isLength=false, FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
+	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
 	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
+std::string formatLength(double start, double end, TimeFormat format=TF_RULER);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
