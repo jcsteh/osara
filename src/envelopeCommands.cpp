@@ -103,6 +103,38 @@ int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope) {
 	return count;
 }
 
+// For each automation item in the project, Call func(envelope, autoItemIndex).
+// func should return true to continue iterating, false to stop.
+void forEachAutomationItem(auto func) {
+	auto handleTrack = [&] (MediaTrack* track) {
+		int envelopes = CountTrackEnvelopes(track);
+		for (int e = 0; e < envelopes; ++e) {
+			TrackEnvelope* env = GetTrackEnvelope(track, e);
+			int items = CountAutomationItems(env);
+			for (int i = 0; i < items; ++i) {
+				if (!func(env, i)) {
+					return;
+				}
+			}
+		}
+	};
+	handleTrack(GetMasterTrack(nullptr));
+	int tracks = CountTracks(nullptr);
+	for (int t = 0; t < tracks; ++t) {
+		handleTrack(GetTrack(nullptr, t));
+	}
+}
+
+// Counts automation items across all envelopes on all tracks.
+int countAllAutomationItems() {
+	int count = 0;
+	forEachAutomationItem([&count] (TrackEnvelope* env, int item) {
+		++count;
+		return true;
+	});
+	return count;
+}
+
 void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool checkItems) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
@@ -113,14 +145,14 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		oldPoints = countEnvelopePointsIncludingAutoItems(envelope);
 	}
 	if (checkItems) {
-		oldItems = CountAutomationItems(envelope);
+		oldItems = countAllAutomationItems();
 	}
 	Main_OnCommand(command, 0);
 	int removed;
 	// Check items first, since deleting an item might also implicitly remove
 	// points.
 	if (checkItems) {
-		removed = oldItems - CountAutomationItems(envelope);
+		removed = oldItems - countAllAutomationItems();
 		// If no items wer removed, fall through to the points check below unless
 		// we're not checking points, in which case report 0 items.
 		if (removed > 0 || !checkPoints) {
