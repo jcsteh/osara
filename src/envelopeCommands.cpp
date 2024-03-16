@@ -478,29 +478,16 @@ void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) 
 	GetSetAutomationItemInfo(envelope, index, "D_UISEL", select, true);
 }
 
-void unselectAllAutomationItems(TrackEnvelope* envelope) {
-	int count = CountAutomationItems(envelope);
-	for (int i = 0; i < count; ++i) {
-		selectAutomationItem(envelope, i, false);
-	}
-}
-
 bool isAutomationItemSelected(TrackEnvelope* envelope, int index) {
 	return GetSetAutomationItemInfo(envelope, index, "D_UISEL", 0, false);
 }
 
-// If max2 is true, this only counts to 2;
-// i.e. 2 or more selected automation items returns 2.
-int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2=false) {
+int countSelectedAutomationItems(TrackEnvelope* envelope) {
 	int count = CountAutomationItems(envelope);
 	int sel = 0;
 	for (int i = 0; i < count; ++i) {
 		if (isAutomationItemSelected(envelope, i)) {
 			++sel;
-		}
-		if (max2 && sel == 2) {
-			// optimisation: We don't care beyond 2.
-			break;
 		}
 	}
 	return sel;
@@ -545,7 +532,10 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 			Undo_BeginBlock();
 		}
 		if (clearSelection) {
-			unselectAllAutomationItems(envelope);
+			forEachAutomationItem([&] (TrackEnvelope* env, int item) {
+				selectAutomationItem(env, item, false);
+				return true;
+			});
 			isSelectionContiguous = true;
 		}
 		if (select) {
@@ -570,7 +560,21 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
-			if (countSelectedAutomationItems(envelope, true) > 1) {
+			int selCount = 0;
+			if (clearSelection) {
+				// If we cleared the selection, we already know that only 1 item is
+				// selected, so don't bother counting.
+				selCount = 1;
+			} else {
+				forEachAutomationItem([&] (TrackEnvelope* env, int item) {
+					if (isAutomationItemSelected(env, item)) {
+						++selCount;
+					}
+					// We only need to count to 2, since we handle >= 2 the same.
+					return selCount < 2;
+				});
+			}
+			if (selCount > 1) {
 				s << " " << translate("selected");
 			}
 		} else {
