@@ -155,6 +155,12 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		removed = oldItems - countAllAutomationItems();
 		// If no items wer removed, fall through to the points check below unless
 		// we're not checking points, in which case report 0 items.
+		if (removed > 0) {
+			// currentAutomationItem was likely just deleted. Even if it wasn't, it
+			// likely changed index and we don't know the new index. Either way, focus
+			// the envelope itself.
+			currentAutomationItem = -1;
+		}
 		if (removed > 0 || !checkPoints) {
 			// Translators: Reported when removing automation items. {} will be
 			// replaced with the number of items; e.g. "2 automation items removed".
