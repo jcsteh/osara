@@ -232,6 +232,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Envelope: Insert automation item: Control+Shift+I
 - Envelope: Delete automation items
 - Envelope: Delete automation items, preserve points
+- Envelope: Split automation items
+- Envelope: Duplicate automation items
+- Envelope: Duplicate and pool automation items
+- Envelope: Convert all project automation to automation items
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-

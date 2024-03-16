@@ -828,3 +828,14 @@ void cmdInsertAutoItem(Command* command) {
 void cmdDeleteAutoItems(Command* command) {
 	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, false, true);
 }
+
+void cmdAddAutoItems(Command* command) {
+	int oldItems = countAllAutomationItems();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = countAllAutomationItems() - oldItems;
+	// Translators: Reported when adding automation items. {} will be
+	// replaced with the number of items; e.g. "2 automation items added".
+	outputMessage(format(
+		translate_plural("{} automation item added", "{} automation items added", added),
+		added));
+}

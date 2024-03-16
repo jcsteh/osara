@@ -4677,6 +4677,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42082}, nullptr}, nullptr, cmdInsertAutoItem}, // Envelope: Insert automation item
 	{MAIN_SECTION, {{0, 0, 42086}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items
 	{MAIN_SECTION, {{0, 0, 42088}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items, preserve points
+	{MAIN_SECTION, {{0, 0, 42087}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Split automation items
+	{MAIN_SECTION, {{0, 0, 42083}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Duplicate automation items
+	{MAIN_SECTION, {{0, 0, 42085}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Duplicate and pool automation items
+	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
