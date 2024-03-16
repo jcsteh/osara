@@ -229,6 +229,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
+- Envelope: Insert automation item: Control+Shift+I
+- Envelope: Delete automation items
+- Envelope: Delete automation items, preserve points
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-

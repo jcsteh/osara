@@ -824,3 +824,7 @@ void cmdInsertAutoItem(Command* command) {
 		outputMessage(translate("inserted automation item"));
 	}
 }
+
+void cmdDeleteAutoItems(Command* command) {
+	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, false, true);
+}

@@ -4675,6 +4675,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40033}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Remove items from group
 	{MAIN_SECTION, {{0, 0, 41187}, nullptr}, nullptr, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
 	{MAIN_SECTION, {{0, 0, 42082}, nullptr}, nullptr, cmdInsertAutoItem}, // Envelope: Insert automation item
+	{MAIN_SECTION, {{0, 0, 42086}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items
+	{MAIN_SECTION, {{0, 0, 42088}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items, preserve points
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
