@@ -839,3 +839,14 @@ void cmdAddAutoItems(Command* command) {
 		translate_plural("{} automation item added", "{} automation items added", added),
 		added));
 }
+
+void cmdGlueAutoItems(Command* command) {
+	int oldItems = countAllAutomationItems();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int removed = oldItems - countAllAutomationItems();
+	if (removed == 0) {
+		outputMessage(translate("no automation items glued"));
+	} else {
+		outputMessage(translate("glued automation items"));
+	}
+}

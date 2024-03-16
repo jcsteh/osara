@@ -236,6 +236,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Envelope: Duplicate automation items
 - Envelope: Duplicate and pool automation items
 - Envelope: Convert all project automation to automation items
+- Envelope: Glue automation items
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-

@@ -40,3 +40,4 @@ void cmdToggleLastTouchedEnvelope(Command* command);
 void cmdInsertAutoItem(Command* command);
 void cmdDeleteAutoItems(Command* command);
 void cmdAddAutoItems(Command* command);
+void cmdGlueAutoItems(Command* command);
