@@ -3318,19 +3318,19 @@ void cmdPaste(Command* command) {
 		return;
 	}
 	if (envelope &&
-			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
-			> 0) {
-		// Translators: Reported when envelope points are added. {} will be replaced
-		// with the number of points; e.g. "2 points added".
-		outputMessage(format(
-			translate_plural("{} point added", "{} points added", added), added));
-	} else if (envelope &&
 			(added = CountAutomationItems(envelope) - oldAutoItems)
 			> 0) {
 		// Translators: Reported when automation items are added. {} will be
 		// replaced with the number of items; e.g. "2 automation items added".
 		outputMessage(format(
 			translate_plural("{} automation item added", "{} automation items added", added), added));
+	} else if (envelope &&
+			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
+			> 0) {
+		// Translators: Reported when envelope points are added. {} will be replaced
+		// with the number of points; e.g. "2 points added".
+		outputMessage(format(
+			translate_plural("{} point added", "{} points added", added), added));
 	} else {
 		outputMessage(translate("nothing pasted"));
 	}
