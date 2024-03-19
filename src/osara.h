@@ -212,6 +212,7 @@
 #define REAPERAPI_WANT_GetTrackSendName
 #define REAPERAPI_WANT_AddExtensionsMainMenu
 #define REAPERAPI_WANT_GetAppVersion
+#define REAPERAPI_WANT_RemoveTrackSend
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 

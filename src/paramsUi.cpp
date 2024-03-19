@@ -54,11 +54,17 @@ class Param {
 	virtual void setValueFromEdited(const string& text) {
 	}
 
+	// Possible reactions after an option has been chosen from the context menu.
+	enum class AfterOption {
+		nothing,
+		invalidateValues, // The available values for this parameter have changed.
+		invalidateParams, // The available parameters have changed.
+		dismiss, // The Parameters dialog should be dismissed.
+	};
 	// Get the options to display in the context menu for this parameter. Each
 	// option is a pair {displayName, func}, where func is a function to run if the
-	// option is chosen. func should return true if it changed the available
-	// values for this parameter.
-	using MoreOptions = vector<pair<string, function<bool()>>>;
+	// option is chosen. func should return a value from AfterOption.
+	using MoreOptions = vector<pair<string, function<AfterOption()>>>;
 	virtual MoreOptions getMoreOptions() {
 		return {};
 	}
@@ -71,6 +77,7 @@ class ParamSource {
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	virtual void rebuildParams() {}
 };
 
 // Provides data for a parameter and allows you to create a Param instance for
@@ -335,7 +342,6 @@ class ParamsDialog {
 	HWND valueEdit;
 	HWND valueLabel;
 	HWND moreButton;
-	int paramCount;
 	string filter;
 	vector<int> visibleParams;
 	int paramNum;
@@ -661,7 +667,7 @@ class ParamsDialog {
 		// Use the first item if the previously selected param gets filtered out.
 		int newComboSel = 0;
 		ComboBox_ResetContent(this->paramCombo);
-		for (int p = 0; p < this->paramCount; ++p) {
+		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
 			if (!this->shouldIncludeParam(name))
 				continue;
@@ -714,15 +720,20 @@ class ParamsDialog {
 		if (choice == -1) {
 			return; // Cancelled.
 		}
-		if (options[choice].second()) {
+		Param::AfterOption after = options[choice].second();
+		if (after == Param::AfterOption::invalidateValues) {
 			this->onParamChange();
+		} else if (after == Param::AfterOption::invalidateParams) {
+			this->source->rebuildParams();
+			this->updateParamList();
+		} else {
+			SendMessage(this->dialog, WM_CLOSE, 0, 0);
 		}
 	}
 
 	public:
 	ParamsDialog(unique_ptr<ParamSource> source): source(std::move(source)) {
-		this->paramCount = this->source->getParamCount();
-		if (this->paramCount == 0) {
+		if (this->source->getParamCount() == 0) {
 			delete this;
 			return;
 		}
@@ -1119,27 +1130,48 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 
 	Param::MoreOptions getMoreOptions() final {
 		if (this->category == 0) {
-			return {{
-				translate("Go to send destination track"),
-				[this] { return this->goToTargetTrack("P_DESTTRACK"); }
-			}};
+			return {
+				{
+					translate("Go to send destination track"),
+					[this] { return this->goToTargetTrack("P_DESTTRACK"); }
+				},
+				{
+					translate("Delete send"),
+					[this] { return this->remove(); }
+				},
+			};
 		}
 		if (this->category == -1) {
-			return {{
-				translate("Go to receive source track"),
-				[this] { return this->goToTargetTrack("P_SRCTRACK"); }
-			}};
+			return {
+				{
+					translate("Go to receive source track"),
+					[this] { return this->goToTargetTrack("P_SRCTRACK"); }
+				},
+				{
+					translate("Delete receive"),
+					[this] { return this->remove(); }
+				},
+			};
 		}
-		return {};
+		return {
+			{
+				translate("Delete hardware output"),
+				[this] { return this->remove(); }
+			},
+		};
 	}
 
 	private:
-	bool goToTargetTrack(const char* paramName) {
+	Param::AfterOption goToTargetTrack(const char* paramName) {
 		auto* track = (MediaTrack*)this->getSetValue(paramName, nullptr);
 		SetOnlyTrackSelected(track);
-		SendMessage(GetForegroundWindow(), WM_CLOSE, 0, 0);
 		postGoToTrack(0, track);
-		return false;
+		return Param::AfterOption::dismiss;
+	}
+
+	Param::AfterOption remove() {
+		RemoveTrackSend(this->track, this->category, this->index);
+		return Param::AfterOption::invalidateParams;
 	}
 
 	MediaTrack* track;
@@ -1318,12 +1350,12 @@ class AudioChannelParam:  public ReaperObjParam {
 	}
 
 	private:
-	bool addChannels(int count) {
+	Param::AfterOption addChannels(int count) {
 		MediaTrack* track = this->getTargetTrack();
 		int channels = *(int*)GetSetMediaTrackInfo(track, "I_NCHAN", nullptr);
 		channels += count;
 		GetSetMediaTrackInfo(track, "I_NCHAN", (void*)&channels);
-		return true;
+		return Param::AfterOption::invalidateValues;
 	}
 };
 
@@ -1524,12 +1556,17 @@ class TrackParams: public ReaperObjParamSource {
 
 	public:
 	TrackParams(MediaTrack* track): track(track) {
+		this->rebuildParams();
+	}
+
+	void rebuildParams() final {
+		this->params.clear();
 		this->params.push_back(make_unique<TrackParamProvider>(translate("volume"),
-			track, "D_VOL", ReaperObjVolParam::make));
+			this->track, "D_VOL", ReaperObjVolParam::make));
 		this->params.push_back(make_unique<TrackParamProvider>(translate("pan"),
-			track, "D_PAN", ReaperObjPanParam::make));
+			this->track, "D_PAN", ReaperObjPanParam::make));
 		this->params.push_back(make_unique<TrackParamProvider>(translate("mute"),
-			track, "B_MUTE", ReaperObjToggleParam::make));
+			this->track, "B_MUTE", ReaperObjToggleParam::make));
 		// Translators: Indicates a parameter for a track send in the Track Parameters
 		// dialog.
 		this->addSendParams(0, translate("send"), "P_DESTTRACK");
