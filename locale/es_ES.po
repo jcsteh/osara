@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-03-13 04:53\n"
+"PO-Revision-Date: 2024-03-19 21:35\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -244,6 +244,21 @@ msgstr "sin cambios"
 
 msgid "inserted automation item"
 msgstr "ítem de automatización insertado"
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} ítem de automatización agregado"
+msgstr[1] "{} ítems de automatización agregados"
+
+msgid "no automation items glued"
+msgstr "sin ítem de automatización pegado"
+
+msgid "glued automation items"
+msgstr "ítem de automatización pegado"
 
 msgid "active"
 msgstr "activo"
@@ -896,6 +911,12 @@ msgstr "Banda {} clase"
 msgid "FX Parameters"
 msgstr "Parámetros de FX"
 
+msgid "Go to send destination track"
+msgstr "Ir a la pista envío destino"
+
+msgid "Go to receive source track"
+msgstr "Ir a la pista receptora origen"
+
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
 #. An automation mode.
@@ -922,13 +943,13 @@ msgid "Add &4 new channels"
 msgstr "Añadidos &4 nuevos canales"
 
 msgid "post-fader"
-msgstr ""
+msgstr "post-fader"
 
 msgid "pre-fx"
-msgstr ""
+msgstr "pre-fx"
 
 msgid "post-fx"
-msgstr ""
+msgstr "post-fx"
 
 msgid "mute"
 msgstr "silencio"
@@ -949,7 +970,7 @@ msgid "destination audio channel"
 msgstr "canal destino de audio"
 
 msgid "send type"
-msgstr ""
+msgstr "tipo de envío"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -2212,13 +2233,6 @@ msgid "{} point added"
 msgid_plural "{} points added"
 msgstr[0] "{} punto agregado"
 msgstr[1] "{} puntos agregados"
-
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} ítem de automatización agregado"
-msgstr[1] "{} ítems de automatización agregados"
 
 msgid "nothing pasted"
 msgstr "nada pegado"

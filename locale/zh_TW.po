@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-03-13 03:30\n"
+"PO-Revision-Date: 2024-03-19 21:35\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -239,6 +239,20 @@ msgstr "無更改"
 
 msgid "inserted automation item"
 msgstr "插入自動化對象"
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} 自動化對象添加"
+
+msgid "no automation items glued"
+msgstr "無自動化對象黏合"
+
+msgid "glued automation items"
+msgstr "黏合自動化對象"
 
 msgid "active"
 msgstr "活躍"
@@ -859,6 +873,12 @@ msgstr "頻段 {} 型態"
 
 msgid "FX Parameters"
 msgstr "FX 參數"
+
+msgid "Go to send destination track"
+msgstr "前往發送目標軌道(&g)"
+
+msgid "Go to receive source track"
+msgstr "前往接收來源軌道(&g)"
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
@@ -2145,12 +2165,6 @@ msgstr "添加"
 msgid "{} point added"
 msgid_plural "{} points added"
 msgstr[0] "{} 點添加"
-
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} 自動化對象添加"
 
 msgid "nothing pasted"
 msgstr "沒有粘貼"

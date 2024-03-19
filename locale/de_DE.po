@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2024-03-13 04:53\n"
+"PO-Revision-Date: 2024-03-19 21:35\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -243,6 +243,21 @@ msgid "no change"
 msgstr "Keine Änderungen"
 
 msgid "inserted automation item"
+msgstr ""
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} Automation Item hinzugefügt"
+msgstr[1] "{} Automation Items hinzugefügt"
+
+msgid "no automation items glued"
+msgstr ""
+
+msgid "glued automation items"
 msgstr ""
 
 msgid "active"
@@ -895,6 +910,12 @@ msgstr "Band {} Typ"
 
 msgid "FX Parameters"
 msgstr "FX Parameter"
+
+msgid "Go to send destination track"
+msgstr ""
+
+msgid "Go to receive source track"
+msgstr ""
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
@@ -2212,13 +2233,6 @@ msgid "{} point added"
 msgid_plural "{} points added"
 msgstr[0] "{} Punkt hinzugefügt"
 msgstr[1] "{} Punkte hinzugefügt"
-
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} Automation Item hinzugefügt"
-msgstr[1] "{} Automation Items hinzugefügt"
 
 msgid "nothing pasted"
 msgstr "Nichts eingefügt"
