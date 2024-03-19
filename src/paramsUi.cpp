@@ -77,6 +77,10 @@ class ParamSource {
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+
+	// Called to rebuild the parameter list because one or more parameters were
+	// invalidated. This need only be implemented if the source doesn't
+	// dynamically fetch parameter info when the getParam* methods are called.
 	virtual void rebuildParams() {}
 };
 
