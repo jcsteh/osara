@@ -304,7 +304,7 @@ class ReaperObjLenParam: public ReaperObjParam {
 
 	string getValueText(double value) final {
 		static string lastText;
-		string text = formatLength(0, value);
+		string text = formatLength(0, value, TF_RULER, FT_USE_CACHE);
 		if (text.empty()) {
 			// formatTime returned nothing because value produced the same value text as the last call.
 			// Therefore, we cache the text and return it here.

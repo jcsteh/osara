@@ -418,11 +418,11 @@ string formatNoteLength(double start, double end) {
 	return formatTimeMeasure(bars, beats, measureLength, useTicks, true, false, false, false );
 }
 
-string formatLength(double start, double end, TimeFormat timeFormat) {
+string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeCacheRequest cache) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// formatTime can handle all other cases correctly.
-		return formatTime(end - start, timeFormat, FT_NO_CACHE, true, false);
+		return formatTime(end - start, timeFormat, cache, true, false);
 	}
 	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure, &startMeasureLength, nullptr, nullptr);
@@ -430,7 +430,7 @@ string formatLength(double start, double end, TimeFormat timeFormat) {
 	int measures = (startBeat == 0.0 ? endMeasure - startMeasure :
 		endMeasure - startMeasure - 1); // don't include the first measure if it is not a full measure
 		double beats = (startMeasureLength - startBeat) + endBeat;
-		return formatTimeMeasure(measures, beats, max(startMeasureLength, endMeasureLength), timeFormat == TF_MEASURETICK, true, false, true, false);
+		return formatTimeMeasure(measures, beats, max(startMeasureLength, endMeasureLength), timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, true, false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {

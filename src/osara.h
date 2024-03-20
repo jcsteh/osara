@@ -285,7 +285,7 @@ std::string formatTime(double time, TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
 	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
-std::string formatLength(double start, double end, TimeFormat format=TF_RULER);
+std::string formatLength(double start, double end, TimeFormat format=TF_RULER, FormatTimeCacheRequest cache=FT_NO_CACHE);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
