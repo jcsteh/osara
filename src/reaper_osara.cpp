@@ -427,10 +427,30 @@ string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeC
 	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure, &startMeasureLength, nullptr, nullptr);
 	double endBeat = TimeMap2_timeToBeats(nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr);
-	int measures = (startBeat == 0.0 ? endMeasure - startMeasure :
-		endMeasure - startMeasure - 1); // don't include the first measure if it is not a full measure
-		double beats = (startMeasureLength - startBeat) + endBeat;
-		return formatTimeMeasure(measures, beats, max(startMeasureLength, endMeasureLength), timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, true, false);
+	int measures = endMeasure - startMeasure ;
+	double beats = 0;
+	const double epsilon = 0.005; // half a percent
+	if(measures > 0) {
+		if(startBeat > epsilon) {
+			// don't count the first measure if it is not a complete measure
+			--measures;
+			beats += startMeasureLength - startBeat;
+		}
+		if(endBeat > endMeasureLength - epsilon) {
+			//last measure is complete
+			++measures;
+		} else {
+			beats += endBeat;
+		}
+	} else {
+		beats = endBeat - startBeat;
+	}
+	int measureLength = max(startMeasureLength, endMeasureLength);
+	if(beats >= measureLength) {
+		++measures;
+		beats -= measureLength;
+	}
+	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, false, false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {

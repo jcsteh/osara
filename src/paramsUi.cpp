@@ -286,53 +286,6 @@ class ReaperObjPanParam: public ReaperObjParam {
 	}
 };
 
-class ReaperObjLenParam: public ReaperObjParam {
-	public:
-	ReaperObjLenParam(ReaperObjParamProvider& provider ):
-			ReaperObjParam(provider) {
-		this->min = 0;
-		this->max = 500;
-		this->step = 0.02;
-		this->largeStep = 10;
-		this->isEditable = true;
-		resetTimeCache();
-	}
-
-	double getValue() final {
-		return *(double*)this->provider.getSetValue(nullptr);
-	}
-
-	string getValueText(double value) final {
-		static string lastText;
-		string text = formatLength(0, value, TF_RULER, FT_USE_CACHE);
-		if (text.empty()) {
-			// formatTime returned nothing because value produced the same value text as the last call.
-			// Therefore, we cache the text and return it here.
-			return lastText;
-		}
-		lastText = text;
-		return text;
-	}
-
-	string getValueForEditing() final {
-		char out[64];
-		format_timestr_pos(this->getValue(), out, sizeof(out), -1);
-		return out;
-	}
-
-	void setValue(double value) final {
-		this->provider.getSetValue((void*)&value);
-	}
-
-	void setValueFromEdited(const string& text) final {
-		this->setValue(parse_timestr_pos(text.c_str(), -1));
-	}
-
-	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
-		return make_unique<ReaperObjLenParam>(provider);
-	}
-};
-
 const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
 
 bool isParamsDialogOpen = false;
@@ -1629,8 +1582,99 @@ class ItemParamProvider: public ReaperObjParamProvider {
 		return GetSetMediaItemInfo(this->item, this->name.c_str(), newValue);
 	}
 
-	private:
+	protected:
 	MediaItem* item;
+};
+
+class ItemLenParamProvider: public ItemParamProvider {
+	public:
+	ItemLenParamProvider(const string displayName, MediaItem* item,
+		const string name, MakeParamFromProviderFunc makeParamFromProvider):
+		ItemParamProvider(displayName, item, name, makeParamFromProvider) {}
+
+	virtual double getOffset() = 0;
+};
+
+class ReaperObjLenParam: public ReaperObjParam {
+	public:
+	ReaperObjLenParam(ReaperObjParamProvider& provider ):
+			ReaperObjParam(provider) {
+		this->min = 0;
+		this->max = 500;
+		this->step = 0.02;
+		this->largeStep = 10;
+		this->isEditable = true;
+		resetTimeCache();
+	}
+
+	double getValue() final {
+		return *(double*)this->provider.getSetValue(nullptr);
+	}
+
+	string getValueText(double value) final {
+		double offset = this->getOffset();
+		static string lastText;
+		string text = formatLength(offset, offset + value, TF_RULER, FT_NO_CACHE);
+		if (text.empty()) {
+			// formatLength returned nothing because value produced the same value text as the last call.
+			// Therefore, we cache the text and return it here.
+			return lastText;
+		}
+		lastText = text;
+		return text;
+	}
+
+	string getValueForEditing() final {
+		char out[64];
+		double offset = this->getOffset();
+		format_timestr_len(this->getValue(), out, sizeof(out), offset, -1);
+		return out;
+	}
+
+	void setValue(double value) final {
+		this->provider.getSetValue((void*)&value);
+	}
+
+	void setValueFromEdited(const string& text) final {
+		double offset = this->getOffset();
+		this->setValue(parse_timestr_len(text.c_str(), offset, -1));
+	}
+
+	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
+		return make_unique<ReaperObjLenParam>(provider);
+	}
+
+	private:
+	double getOffset() {
+		auto& provider = static_cast<ItemLenParamProvider&>(this->provider);
+		return provider.getOffset();
+	}
+};
+
+class ItemFadeInLenParamProvider: public ItemLenParamProvider {
+	public:
+	ItemFadeInLenParamProvider(const string displayName, MediaItem* item,
+		MakeParamFromProviderFunc makeParamFromProvider):
+		ItemLenParamProvider(displayName, item, "D_FADEINLEN", makeParamFromProvider) {}
+
+	virtual double getOffset() final {
+		double start = *(double*)GetSetMediaItemInfo(this->item, "D_POSITION", nullptr);
+		return start;
+	}
+};
+
+class ItemFadeOutLenParamProvider: public ItemLenParamProvider {
+	public:
+	ItemFadeOutLenParamProvider(const string displayName, MediaItem* item,
+		MakeParamFromProviderFunc makeParamFromProvider):
+		ItemLenParamProvider(displayName, item, "D_FADEOUTLEN", makeParamFromProvider) {}
+
+	virtual double getOffset() final {
+		double itemStart = *(double*)GetSetMediaItemInfo(this->item, "D_POSITION", nullptr);
+		double end = itemStart + *(double*)GetSetMediaItemInfo(this->item, "D_LENGTH", nullptr);
+		double len = *(double*)this->getSetValue(nullptr);
+		return end - len;
+	}
 };
 
 class TakeParamProvider: public ReaperObjParamProvider {
@@ -1662,11 +1706,11 @@ class ItemParams: public ReaperObjParamSource {
 		}
 		this->params.push_back(make_unique<ItemParamProvider>(translate("mute"),
 			item, "B_MUTE", ReaperObjToggleParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>(
-			translate("fade in length"), item, "D_FADEINLEN",
+		this->params.push_back(make_unique<ItemFadeInLenParamProvider>(
+			translate("fade in length"), item,
 			ReaperObjLenParam::make));
-		this->params.push_back(make_unique<ItemParamProvider>(
-			translate("Fade out length"), item, "D_FADEOUTLEN",
+		this->params.push_back(make_unique<ItemFadeOutLenParamProvider>(
+			translate("Fade out length"), item,
 			ReaperObjLenParam::make));
 	}
 

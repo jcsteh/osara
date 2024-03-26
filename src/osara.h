@@ -213,6 +213,9 @@
 #define REAPERAPI_WANT_AddExtensionsMainMenu
 #define REAPERAPI_WANT_GetAppVersion
 #define REAPERAPI_WANT_RemoveTrackSend
+#define REAPERAPI_WANT_format_timestr_len
+#define REAPERAPI_WANT_parse_timestr_len
+#define REAPERAPI_WANT_ShowConsoleMsg
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
