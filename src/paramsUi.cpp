@@ -1614,7 +1614,7 @@ class ItemLenParam: public ReaperObjParam {
 	string getValueText(double value) final {
 		double offset = this->getOffset();
 		static string lastText;
-		string text = formatLength(offset, offset + value, TF_RULER, FT_NO_CACHE);
+		string text = formatLength(offset, offset + value, TF_RULER, FT_USE_CACHE);
 		if (text.empty()) {
 			// formatLength returned nothing because value produced the same value text as the last call.
 			// Therefore, we cache the text and return it here.
