@@ -1595,9 +1595,9 @@ class ItemLenParamProvider: public ItemParamProvider {
 	virtual double getOffset() = 0;
 };
 
-class ReaperObjLenParam: public ReaperObjParam {
+class ItemLenParam: public ReaperObjParam {
 	public:
-	ReaperObjLenParam(ReaperObjParamProvider& provider ):
+	ItemLenParam(ReaperObjParamProvider& provider ):
 			ReaperObjParam(provider) {
 		this->min = 0;
 		this->max = 500;
@@ -1641,7 +1641,7 @@ class ReaperObjLenParam: public ReaperObjParam {
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
-		return make_unique<ReaperObjLenParam>(provider);
+		return make_unique<ItemLenParam>(provider);
 	}
 
 	private:
@@ -1708,10 +1708,10 @@ class ItemParams: public ReaperObjParamSource {
 			item, "B_MUTE", ReaperObjToggleParam::make));
 		this->params.push_back(make_unique<ItemFadeInLenParamProvider>(
 			translate("fade in length"), item,
-			ReaperObjLenParam::make));
+			ItemLenParam::make));
 		this->params.push_back(make_unique<ItemFadeOutLenParamProvider>(
 			translate("Fade out length"), item,
-			ReaperObjLenParam::make));
+			ItemLenParam::make));
 	}
 
 	string getTitle() final {
