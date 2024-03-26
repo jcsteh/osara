@@ -4619,7 +4619,7 @@ void cmdOpenDoc(Command* command) {
 void MoveToFixedLane (int direction) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (getTrackFreeMode(track) != FreeMode::fixed) {
-		outputMessage("Track not in fixed lane mode");
+		outputMessage(translate("Track not in fixed lane mode"));
 		return;
 	}
 	int laneCount = (int)GetMediaTrackInfo_Value(track, "I_NUMFIXEDLANES");
@@ -4630,7 +4630,11 @@ void MoveToFixedLane (int direction) {
 	if (trackFixedLane >= laneCount) {
 		trackFixedLane = 0;
 	}
-	outputMessage(format(translate("Lane {}"), trackFixedLane + 1));
+	const char* laneName = (char*)GetSetMediaTrackInfo(track, format("P_LANENAME:{}", trackFixedLane).c_str(), nullptr);
+	if(!laneName) {
+		laneName = "";
+	}
+	outputMessage(format(translate("Lane {} {}"), trackFixedLane + 1, laneName));
 }
 
 void cmdNextLane(Command* cmd) {
