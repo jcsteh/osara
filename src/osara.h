@@ -213,6 +213,8 @@
 #define REAPERAPI_WANT_AddExtensionsMainMenu
 #define REAPERAPI_WANT_GetAppVersion
 #define REAPERAPI_WANT_RemoveTrackSend
+#define REAPERAPI_WANT_format_timestr_len
+#define REAPERAPI_WANT_parse_timestr_len
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -282,9 +284,10 @@ enum FormatTimeCacheRequest {
 	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
 };
 std::string formatTime(double time, TimeFormat format=TF_RULER,
-	bool isLength=false, FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
+	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
 	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
+std::string formatLength(double start, double end, TimeFormat format=TF_RULER, FormatTimeCacheRequest cache=FT_NO_CACHE);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
