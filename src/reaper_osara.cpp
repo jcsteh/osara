@@ -453,7 +453,7 @@ string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeC
 		++measures;
 		beats -= measureLength;
 	}
-	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, false, false);
+	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, true, false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
