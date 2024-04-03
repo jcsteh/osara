@@ -735,6 +735,9 @@ When you are done, press the OK button to accept any changes or the Cancel butto
 There is also an action to toggle each setting; e.g. OSARA: Toggle Report position when scrubbing.
 These do not have keyboard shortcuts mapped by default, but you can add shortcuts in the Actions dialog (hit F4 to go there).
 
+Although there is no option in this dialog to configure whether OSARA should automatically check for updates when REAPER starts, OSARA respects the setting for REAPER updates.
+You can configure this via the "Automatically check for new versions of REAPER on startup" option in the General section of REAPER Preferences.
+
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 
