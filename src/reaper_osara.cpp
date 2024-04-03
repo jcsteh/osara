@@ -147,7 +147,7 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 ) {
 	int wholeBeat = (int)beat;
 	int beatFractionDenominator;
-		if (useTicks) {
+	if (useTicks) {
 		HWND midiEditor = MIDIEditor_GetActive();
 		assert(midiEditor);
 		MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
@@ -296,11 +296,11 @@ string formatTimeHMSF(double time, bool useCache) {
 }
 
 string formatTimeSample(double time) {
-				char buf[20];
-			format_timestr_pos(time, buf, sizeof(buf), 4);
-			// Translators: Used when reporting a time in samples. {} will be replaced
-			// with the number of samples; e.g. "2 samples".
-			return format(translate("{} samples"), buf);
+	char buf[20];
+	format_timestr_pos(time, buf, sizeof(buf), 4);
+	// Translators: Used when reporting a time in samples. {} will be replaced
+	// with the number of samples; e.g. "2 samples".
+	return format(translate("{} samples"), buf);
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -310,25 +310,27 @@ TimeFormat getTimeFormat(TimeFormat timeFormat) {
 			KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
 			if (GetToggleCommandState2(section, 40737)) {
 				return TF_MEASURETICK;
-			} else {
-				return TF_MEASURE;
 			}
-		} else if (GetToggleCommandState(40365)) {
-			return TF_MINSEC;
-		} else if (GetToggleCommandState(40368)) {
-			return TF_SEC;
-		} else if (GetToggleCommandState(41973)) {
-			return TF_FRAME;
-		} else if (GetToggleCommandState(40370)) {
-			return TF_HMSF;
-		} else if (GetToggleCommandState(40369)) {
-			return TF_SAMPLE;
-		} else {
 			return TF_MEASURE;
 		}
-	} else {
-		return timeFormat;
+		if (GetToggleCommandState(40365)) {
+			return TF_MINSEC;
+		}
+		if (GetToggleCommandState(40368)) {
+			return TF_SEC;
+		}
+		if (GetToggleCommandState(41973)) {
+			return TF_FRAME;
+		}
+		if (GetToggleCommandState(40370)) {
+			return TF_HMSF;
+		}
+		if (GetToggleCommandState(40369)) {
+			return TF_SAMPLE;
+		}
+		return TF_MEASURE;
 	}
+	return timeFormat;
 }
 
 string formatTime(double time, TimeFormat timeFormat,
@@ -421,7 +423,8 @@ string formatNoteLength(double start, double end) {
 string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeCacheRequest cache) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
-		// formatTime can handle all other cases correctly.
+		// In all other cases, position and length reports are the same, so
+		// formatTime can handle them.
 		return formatTime(end - start, timeFormat, cache, true, false);
 	}
 	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
@@ -429,7 +432,7 @@ string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeC
 	double endBeat = TimeMap2_timeToBeats(nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr);
 	int measures = endMeasure - startMeasure ;
 	double beats = 0;
-	const double epsilon = 0.005; // half a percent
+	constexpr double epsilon = 0.005; // half a percent
 	if(measures > 0) {
 		if(startBeat > epsilon) {
 			// don't count the first measure if it is not a complete measure

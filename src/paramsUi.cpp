@@ -1657,9 +1657,8 @@ class ItemFadeInLenParamProvider: public ItemLenParamProvider {
 		MakeParamFromProviderFunc makeParamFromProvider):
 		ItemLenParamProvider(displayName, item, "D_FADEINLEN", makeParamFromProvider) {}
 
-	virtual double getOffset() final {
-		double start = *(double*)GetSetMediaItemInfo(this->item, "D_POSITION", nullptr);
-		return start;
+	double getOffset() final {
+		return *(double*)GetSetMediaItemInfo(this->item, "D_POSITION", nullptr);
 	}
 };
 
@@ -1669,7 +1668,7 @@ class ItemFadeOutLenParamProvider: public ItemLenParamProvider {
 		MakeParamFromProviderFunc makeParamFromProvider):
 		ItemLenParamProvider(displayName, item, "D_FADEOUTLEN", makeParamFromProvider) {}
 
-	virtual double getOffset() final {
+	double getOffset() final {
 		double itemStart = *(double*)GetSetMediaItemInfo(this->item, "D_POSITION", nullptr);
 		double end = itemStart + *(double*)GetSetMediaItemInfo(this->item, "D_LENGTH", nullptr);
 		double len = *(double*)this->getSetValue(nullptr);
