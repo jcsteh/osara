@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-03-19 21:35\n"
+"PO-Revision-Date: 2024-04-03 11:01\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -877,8 +877,17 @@ msgstr "FX 參數"
 msgid "Go to send destination track"
 msgstr "前往發送目標軌道(&g)"
 
+msgid "Delete send"
+msgstr "刪除發送"
+
 msgid "Go to receive source track"
 msgstr "前往接收來源軌道(&g)"
+
+msgid "Delete receive"
+msgstr "刪除接收"
+
+msgid "Delete hardware output"
+msgstr "刪除硬體輸出"
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.

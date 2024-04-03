@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-03-19 21:35\n"
+"PO-Revision-Date: 2024-04-03 11:01\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -249,10 +249,10 @@ msgid_plural "{} automation items added"
 msgstr[0] "{} 自动化对象已添加"
 
 msgid "no automation items glued"
-msgstr ""
+msgstr "无自动化对象粘合"
 
 msgid "glued automation items"
-msgstr ""
+msgstr "粘合自动化对象"
 
 msgid "active"
 msgstr "活动"
@@ -875,10 +875,19 @@ msgid "FX Parameters"
 msgstr "FX 参数"
 
 msgid "Go to send destination track"
-msgstr ""
+msgstr "转到发送轨"
+
+msgid "Delete send"
+msgstr "删除发送"
 
 msgid "Go to receive source track"
-msgstr ""
+msgstr "转到接收轨"
+
+msgid "Delete receive"
+msgstr "删除接收"
+
+msgid "Delete hardware output"
+msgstr "删除硬件输出"
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
@@ -897,22 +906,22 @@ msgstr "所有"
 #. destination audio channel parameters in the OSARA Track Parameters
 #. dialog.
 msgid "Add &2 new channels"
-msgstr ""
+msgstr "添加&2个新通道"
 
 #. An option in the context menu for the source and
 #. destination audio channel parameters in the OSARA Track Parameters
 #. dialog.
 msgid "Add &4 new channels"
-msgstr ""
+msgstr "添加&4个新通道"
 
 msgid "post-fader"
-msgstr ""
+msgstr "推子-后"
 
 msgid "pre-fx"
-msgstr ""
+msgstr "推子前 (前置-FX) "
 
 msgid "post-fx"
-msgstr ""
+msgstr "推子前 (后端-FX) "
 
 msgid "mute"
 msgstr "静音"
@@ -933,7 +942,7 @@ msgid "destination audio channel"
 msgstr "目标音频通道"
 
 msgid "send type"
-msgstr ""
+msgstr "发送类型"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -2684,7 +2693,7 @@ msgstr "值:"
 
 msgctxt "Parameters"
 msgid "&More"
-msgstr ""
+msgstr "更多"
 
 msgctxt "Parameters"
 msgid "&Filter:"
