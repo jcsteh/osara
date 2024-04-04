@@ -2203,6 +2203,8 @@ PostCommand POST_COMMANDS[] = {
 	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
+	{41173, postCursorMovement}, // Item navigation: Move cursor to start of items
+	{41174, postCursorMovement}, // Item navigation: Move cursor to end of items
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
 	{41040, postCursorMovement}, // Move edit cursor to start of next measure

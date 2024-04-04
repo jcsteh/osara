@@ -826,6 +826,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Item: Remove items
 - Item: Copy loop of selected area of audio items
 - Edit: Cut items
+- Item navigation: Move cursor to start of items
+- Item navigation: Move cursor to end of items
 - Item properties: Pitch item down one octave
 - Item properties: Pitch item up one octave
 - Item properties: Toggle take preserve pitch
