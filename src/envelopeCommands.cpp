@@ -735,7 +735,7 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	if(oldPos == newPos) {
 		s << translate("no change");
 	} else {
-		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
+		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, cache);
 	}
 	outputMessage(s);
 }

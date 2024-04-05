@@ -141,36 +141,206 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
-string formatTime(double time, TimeFormat timeFormat, bool isLength,
-	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset
+string formatTimeMeasure(int measure, double beat, int measureLength,
+	bool useTicks, bool isLength, bool useCache,
+	bool includeZeros, bool includeProjectStartOffset
 ) {
-	const bool useCache = cache == FT_USE_CACHE ||
-		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
+	int wholeBeat = (int)beat;
+	int beatFractionDenominator;
+	if (useTicks) {
+		HWND midiEditor = MIDIEditor_GetActive();
+		assert(midiEditor);
+		MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
+		MediaItem* item = GetMediaItemTake_Item(take);
+		beatFractionDenominator = getItemPPQ(item);
+	} else {
+		beatFractionDenominator = 100;
+	}
+	int beatFraction = lround((beat - wholeBeat) * beatFractionDenominator);
+	if(beatFraction==beatFractionDenominator) {
+		beatFraction = 0;
+		++wholeBeat;
+	}
+	if(wholeBeat==measureLength) {
+		wholeBeat = 0;
+		++measure;
+	}
+	if (!isLength) {
+		++measure;
+		++wholeBeat;
+		if (includeProjectStartOffset) {
+			int size = 0;
+			int index = projectconfig_var_getoffs("projmeasoffs", &size);
+			assert(size == sizeof(int));
+			measure += *(int*)projectconfig_var_addr(nullptr, index);
+		}
+	}
 	ostringstream s;
+	if (!useCache || measure != oldMeasure) {
+		if (isLength) {
+			if (includeZeros || measure != 0) {
+				// Translators: Used when reporting a length of time in measures.
+				// {} will be replaced with the number of measures; e.g.
+				// "2 bars".
+				s << format(
+					translate_plural("{} bar", "{} bars", measure), measure)
+					<< " ";
+			}
+		} else {
+			// Translators: Used when reporting the measure of a time position.
+			// {} will be replaced with the measure number; e.g. "bar 2".
+			s << format(translate("bar {}"), measure) << " ";
+		}
+		oldMeasure = measure;
+	}
+	if (!useCache || wholeBeat != oldBeat) {
+		if (isLength) {
+			if (includeZeros || wholeBeat != 0) {
+				// Translators: Used when reporting a length of time in beats.
+				// {} will be replaced with the number of beats; e.g. "2 beats".
+				s << format(
+					translate_plural("{} beat", "{} beats", wholeBeat),
+					wholeBeat) << " ";
+			}
+		} else {
+			// Translators: Used when reporting the beat of a time position.
+			// {} will be replaced with the beat number; e.g. "beat 2".
+			s << format(translate("beat {}"), wholeBeat) << " ";
+		}
+		oldBeat = wholeBeat;
+	}
+	if (!useCache || beatFraction != oldbeatFraction) {
+		if (includeZeros || beatFraction != 0) {
+			if (useTicks) {
+				// Translators: used when reporting a time in ticks. {} will be replaced
+				// with the number of ticks; e.g. "2 ticks".
+				s << format(
+					translate_plural("{} tick", "{} ticks", beatFraction),
+					beatFraction);
+			} else {
+				s << beatFraction << "%";
+			}
+		}
+		oldbeatFraction = beatFraction;
+	}
+	return s.str();
+}
+
+string formatTimeMinsec(double time, bool useCache) {
+	ostringstream s;
+	int minute = (int)(time / 60);
+	time = fmod(time, 60);
+	if (!useCache || oldMinute != minute) {
+		// Translators: Used when reporting a time in minutes. {} will be
+		// replaced with the number of minutes; e.g. "2 min".
+		s << format(translate("{} min"), minute) << " ";
+		oldMinute = minute;
+	}
+	// Translators: Used when reporting a time in seconds. {:.3f} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	s << format(translate("{:#.3f} sec"), time);
+	return s.str();
+}
+
+string formatTimeSec (double time) {
+	// Translators: Used when reporting a time in seconds. {:.3f} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{:.3f} sec"), time);
+}
+
+string formatTimeFrame(double time, bool useCache) {
+	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
+	if (!useCache || oldFrame != frame) {
+		oldFrame = frame;
+		// Translators: Used when reporting a time in frames. {} will be
+		// replaced with the number of frames; e.g. "2 frames".
+		return format(
+			translate_plural("{} frame", "{} frames", frame), frame);
+	} else {
+		return "";
+	}
+}
+
+string formatTimeHMSF(double time, bool useCache) {
+	ostringstream s;
+	int hour = (int)(time / 3600);
+	time = fmod(time, 3600);
+	if (!useCache || oldHour != hour) {
+		// Translators: used when reporting a time in hours. {} will be replaced
+		// with the number of hours; e.g. "2 hours".
+		s << format(
+			translate_plural("{} hour", "{} hours", hour), hour) << " ";
+		oldHour = hour;
+	}
+	int minute = (int)(time / 60);
+	time = fmod(time, 60);
+	if (!useCache || oldMinute != minute) {
+		s << format(translate("{} min"), minute) << " ";
+		oldMinute = minute;
+	}
+	int second = (int)time;
+	if (!useCache || oldSecond != second) {
+		// Translators: Used when reporting a time in seconds. {} will be
+		// replaced with the number of seconds; e.g. "2 sec".
+		s << format(translate("{} sec"), second) << " ";
+		oldSecond = second;
+	}
+	time = time - second;
+	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
+	if (!useCache || oldFrame != frame) {
+		s << format(
+			translate_plural("{} frame", "{} frames", frame), frame);
+		oldFrame = frame;
+	}
+	return s.str();
+}
+
+string formatTimeSample(double time) {
+	char buf[20];
+	format_timestr_pos(time, buf, sizeof(buf), 4);
+	// Translators: Used when reporting a time in samples. {} will be replaced
+	// with the number of samples; e.g. "2 samples".
+	return format(translate("{} samples"), buf);
+}
+
+TimeFormat getTimeFormat(TimeFormat timeFormat) {
 	HWND midiEditor = MIDIEditor_GetActive();
 	if (timeFormat == TF_RULER) {
 		if (midiEditor && GetParent(GetFocus()) == midiEditor) {
 			KbdSectionInfo* section = SectionFromUniqueID(MIDI_EDITOR_SECTION);
 			if (GetToggleCommandState2(section, 40737)) {
-				timeFormat = TF_MEASURETICK;
-			} else {
-				timeFormat = TF_MEASURE;
+				return TF_MEASURETICK;
 			}
-		} else if (GetToggleCommandState(40365)) {
-			timeFormat = TF_MINSEC;
-		} else if (GetToggleCommandState(40368)) {
-			timeFormat = TF_SEC;
-		} else if (GetToggleCommandState(41973)) {
-			timeFormat = TF_FRAME;
-		} else if (GetToggleCommandState(40370)) {
-			timeFormat = TF_HMSF;
-		} else if (GetToggleCommandState(40369)) {
-			timeFormat = TF_SAMPLE;
-		} else {
-			timeFormat = TF_MEASURE;
+			return TF_MEASURE;
 		}
+		if (GetToggleCommandState(40365)) {
+			return TF_MINSEC;
+		}
+		if (GetToggleCommandState(40368)) {
+			return TF_SEC;
+		}
+		if (GetToggleCommandState(41973)) {
+			return TF_FRAME;
+		}
+		if (GetToggleCommandState(40370)) {
+			return TF_HMSF;
+		}
+		if (GetToggleCommandState(40369)) {
+			return TF_SAMPLE;
+		}
+		return TF_MEASURE;
 	}
-	if (!isLength && includeProjectStartOffset && timeFormat != TF_MEASURE &&
+	return timeFormat;
+}
+
+string formatTime(double time, TimeFormat timeFormat,
+	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset
+) {
+	const bool useCache = cache == FT_USE_CACHE ||
+		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
+	timeFormat = getTimeFormat(timeFormat);
+	string s;
+	if (includeProjectStartOffset && timeFormat != TF_MEASURE &&
 			timeFormat != TF_MEASURETICK && timeFormat != TF_SAMPLE) {
 		time += GetProjectTimeOffset(nullptr, false);
 	}
@@ -180,152 +350,34 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 			int measure;
 			int measureLength;
 			double beat = TimeMap2_timeToBeats(nullptr, time, &measure, &measureLength, nullptr, nullptr);
-			int wholeBeat = (int)beat;
-			int beatFraction = lround((beat - wholeBeat) * 100)  ;
-			if(beatFraction==100) {
-				beatFraction = 0;
-				++wholeBeat;
-			}
-			if(wholeBeat==measureLength) {
-				wholeBeat = 0;
-				++measure;
-			}
-			if (!isLength) {
-				++measure;
-				++wholeBeat;
-				if (includeProjectStartOffset) {
-					int size = 0;
-					int index = projectconfig_var_getoffs("projmeasoffs", &size);
-					assert(size == sizeof(int));
-					measure += *(int*)projectconfig_var_addr(nullptr, index);
-				}
-			}
-			if (timeFormat == TF_MEASURETICK) {
-				assert(midiEditor);
-				MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
-				MediaItem* item = GetMediaItemTake_Item(take);
-				beatFraction = beatFraction * getItemPPQ(item) / 100;
-			}
-			if (!useCache || measure != oldMeasure) {
-				if (isLength) {
-					if (includeZeros || measure != 0) {
-						// Translators: Used when reporting a length of time in measures.
-						// {} will be replaced with the number of measures; e.g.
-						// "2 bars".
-						s << format(
-							translate_plural("{} bar", "{} bars", measure), measure)
-							<< " ";
-					}
-				} else {
-					// Translators: Used when reporting the measure of a time position.
-					// {} will be replaced with the measure number; e.g. "bar 2".
-					s << format(translate("bar {}"), measure) << " ";
-				}
-				oldMeasure = measure;
-			}
-			if (!useCache || wholeBeat != oldBeat) {
-				if (isLength) {
-					if (includeZeros || wholeBeat != 0) {
-						// Translators: Used when reporting a length of time in beats.
-						// {} will be replaced with the number of beats; e.g. "2 beats".
-						s << format(
-							translate_plural("{} beat", "{} beats", wholeBeat),
-							wholeBeat) << " ";
-					}
-				} else {
-					// Translators: Used when reporting the beat of a time position.
-					// {} will be replaced with the beat number; e.g. "beat 2".
-					s << format(translate("beat {}"), wholeBeat) << " ";
-				}
-				oldBeat = wholeBeat;
-			}
-			if (!useCache || beatFraction != oldbeatFraction) {
-				if (includeZeros || beatFraction != 0) {
-					if (timeFormat == TF_MEASURE) {
-						s << beatFraction << "%";
-					} else {
-						// Translators: used when reporting a time in ticks. {} will be replaced
-						// with the number of ticks; e.g. "2 ticks".
-						s << format(
-							translate_plural("{} tick", "{} ticks", beatFraction),
-							beatFraction);
-					}
-				}
-				oldbeatFraction = beatFraction;
-			}
+			s = formatTimeMeasure(measure, beat, measureLength,
+				timeFormat == TF_MEASURETICK, false, useCache,
+				includeZeros, includeProjectStartOffset);
 			break;
 		}
 		case TF_MINSEC: {
 			// Minutes:seconds
-			int minute = (int)(time / 60);
-			time = fmod(time, 60);
-			if (!useCache || oldMinute != minute) {
-				// Translators: Used when reporting a time in minutes. {} will be
-				// replaced with the number of minutes; e.g. "2 min".
-				s << format(translate("{} min"), minute) << " ";
-				oldMinute = minute;
-			}
-			// Translators: Used when reporting a time in seconds. {:.3f} will be
-			// replaced with the number of seconds; e.g. "2 sec".
-			s << format(translate("{:#.3f} sec"), time);
+			s = formatTimeMinsec(time, useCache);
 			break;
 		}
 		case TF_SEC: {
 			// Seconds
-			s << format(translate("{:.3f} sec"), time);
+			s = formatTimeSec(time);
 			break;
 		}
 		case TF_FRAME: {
 			// Frames
-			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
-			if (!useCache || oldFrame != frame) {
-				// Translators: Used when reporting a time in frames. {} will be
-				// replaced with the number of frames; e.g. "2 frames".
-				s << format(
-					translate_plural("{} frame", "{} frames", frame), frame);
-				oldFrame = frame;
-			}
+			s = formatTimeFrame(time, useCache);
 			break;
 		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
-			int hour = (int)(time / 3600);
-			time = fmod(time, 3600);
-			if (!useCache || oldHour != hour) {
-				// Translators: used when reporting a time in hours. {} will be replaced
-				// with the number of hours; e.g. "2 hours".
-				s << format(
-					translate_plural("{} hour", "{} hours", hour), hour) << " ";
-				oldHour = hour;
-			}
-			int minute = (int)(time / 60);
-			time = fmod(time, 60);
-			if (!useCache || oldMinute != minute) {
-				s << format(translate("{} min"), minute) << " ";
-				oldMinute = minute;
-			}
-			int second = (int)time;
-			if (!useCache || oldSecond != second) {
-				// Translators: Used when reporting a time in seconds. {} will be
-				// replaced with the number of seconds; e.g. "2 sec".
-				s << format(translate("{} sec"), second) << " ";
-				oldSecond = second;
-			}
-			time = time - second;
-			int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
-			if (!useCache || oldFrame != frame) {
-				s << format(
-					translate_plural("{} frame", "{} frames", frame), frame);
-				oldFrame = frame;
-			}
+			s = formatTimeHMSF(time, useCache);
 			break;
 		}
 		case TF_SAMPLE: {
-			char buf[20];
-			format_timestr_pos(time, buf, sizeof(buf), 4);
-			// Translators: Used when reporting a time in samples. {} will be replaced
-			// with the number of samples; e.g. "2 samples".
-			s << format(translate("{} samples"), buf);
+			// Samples
+			s = formatTimeSample(time);
 			break;
 		}
 		default:
@@ -333,7 +385,7 @@ string formatTime(double time, TimeFormat timeFormat, bool isLength,
 	}
 	// #31: Clear cache for other units to avoid confusion if they are used later.
 	resetTimeCache(timeFormat);
-	return s.str();
+	return s;
 }
 
 void resetTimeCache(TimeFormat excludeFormat) {
@@ -361,46 +413,51 @@ string formatNoteLength(double start, double end) {
 	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
 	TimeMap2_timeToBeats(nullptr, end, nullptr, nullptr, &endBeats, nullptr);
 	double lengthBeats = endBeats-startBeats;
-	int bars = int(lengthBeats)/measureLength;
-	int remBeats = int(lengthBeats)%measureLength;
-	int fraction = lround((lengthBeats-int(lengthBeats))*100);
-	if(fraction>99) {
-		fraction = 0;
-		++remBeats;
-	}
-	if(remBeats==measureLength) {
-		remBeats = 0;
-		++bars;
-	}
+	const int bars = int(lengthBeats)/measureLength;
+	const double beats = lengthBeats - measureLength * bars;
 	const bool useTicks = GetToggleCommandState2(
 		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
-	if (useTicks) {
-		MediaItem_Take* take = MIDIEditor_GetTake (MIDIEditor_GetActive());
-		MediaItem* item = GetMediaItemTake_Item(take);
-		fraction = fraction * getItemPPQ(item) / 100;
-	}
-	ostringstream s;
-	if(bars>0) {
-		s << format(
-			translate_plural("{} bar", "{} bars", bars), bars) << " ";
-	}
-	if(remBeats>0){
-		s << format(
-			translate_plural("{} beat", "{} beats", remBeats), remBeats) << " ";
-	}
-	if(fraction>0) {
-		if (useTicks) {
-			s << format(
-				translate_plural("{} tick", "{} ticks", fraction), fraction);
-		} else {
-			s << fraction << "%";
-		}
-	}
-	return s.str();
+	return formatTimeMeasure(bars, beats, measureLength, useTicks, true, false, false, false );
 }
 
+string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeCacheRequest cache) {
+	timeFormat = getTimeFormat(timeFormat);
+	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
+		// In all other cases, position and length reports are the same, so
+		// formatTime can handle them.
+		return formatTime(end - start, timeFormat, cache, true, false);
+	}
+	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
+	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure, &startMeasureLength, nullptr, nullptr);
+	double endBeat = TimeMap2_timeToBeats(nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr);
+	int measures = endMeasure - startMeasure ;
+	double beats = 0;
+	constexpr double epsilon = 0.005; // half a percent
+	if(measures > 0) {
+		if(startBeat > epsilon) {
+			// don't count the first measure if it is not a complete measure
+			--measures;
+			beats += startMeasureLength - startBeat;
+		}
+		if(endBeat > endMeasureLength - epsilon) {
+			//last measure is complete
+			++measures;
+		} else {
+			beats += endBeat;
+		}
+	} else {
+		beats = endBeat - startBeat;
+	}
+	int measureLength = max(startMeasureLength, endMeasureLength);
+	if(beats >= measureLength) {
+		++measures;
+		beats -= measureLength;
+	}
+	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, true, false);
+} 
+
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
-	return formatTime(GetCursorPosition(), format, false, cache);
+	return formatTime(GetCursorPosition(), format, cache);
 }
 
 string formatFolderState(MediaTrack* track) {
@@ -1928,7 +1985,7 @@ void postSetItemEnd(int command) {
 		// media end. {} will be replaced with the end time; e.g.
 		// "item end set to source media end: bar 3 beat 1 25%"
 		outputMessage(format(translate("item end set to source media end: {}"),
-			formatTime(endPos, TF_RULER, false, FT_NO_CACHE, true)));
+			formatTime(endPos, TF_RULER, FT_NO_CACHE, true)));
 	}
 }
 
@@ -3469,9 +3526,9 @@ void cmdMoveItemEdge(Command* command) {
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	if(newStart!=oldStart)
-		s<<formatTime(newStart, TF_RULER, false, cache);
+		s<<formatTime(newStart, TF_RULER, cache);
 	else if(newEnd!=oldEnd)
-		s<<formatTime(newEnd, TF_RULER, false, cache);
+		s<<formatTime(newEnd, TF_RULER, cache);
 	else {
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
@@ -3823,15 +3880,15 @@ void cmdReportSelection(Command* command) {
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the start time; e.g. "start bar 2 beat 1 0%".
 				format(translate("start {}"),
-					formatTime(start, TF_RULER, false, FT_NO_CACHE)) << separator <<
+					formatTime(start, TF_RULER, FT_NO_CACHE)) << separator <<
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the end time; e.g. "end bar 4 beat 1 0%".
 				format(translate("end {}"),
-					formatTime(end, TF_RULER, false, FT_NO_CACHE)) << separator <<
+					formatTime(end, TF_RULER, FT_NO_CACHE)) << separator <<
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the length; e.g. "length 2 bars 0 beats 0%".
 				format(translate("length {}"),
-					formatTime(end - start, TF_RULER, true, FT_NO_CACHE));
+					formatLength(start, end, TF_RULER));
 			resetTimeCache();
 		} else if (multiLine) {
 			s << translate("none");
@@ -4003,7 +4060,7 @@ void cmdReportCursorPosition(Command* command) {
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
-	s << formatTime(pos, tf, false, FT_NO_CACHE) << " ";
+	s << formatTime(pos, tf, FT_NO_CACHE) << " ";
 	if (state & 2) {
 		s << translate("paused");
 	} else if (state & 4) {
@@ -4273,12 +4330,12 @@ void cmdNudgeTimeSelection(Command* command) {
 		if(first) {
 			s << translate("time selection start") << " ";
 		}
-		s<<formatTime(newStart, TF_RULER, false, cache, false);
+		s<<formatTime(newStart, TF_RULER, cache, false);
 	} else if(newEnd!=oldEnd) {
 		if(first) {
 			s << translate("time selection end") << " ";
 		}
-		s<<formatTime(newEnd, TF_RULER, false, cache, false);
+		s<<formatTime(newEnd, TF_RULER, cache, false);
 	}
 	outputMessage(s);
 }
