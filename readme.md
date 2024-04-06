@@ -142,8 +142,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
 - Item: go to next stretch marker: Control+'
 - Item: go to previous stretch marker: Control+;
-- Item navigation: Move cursor left to edge of item: Control+Shift+,
-- Item navigation: Move cursor right to edge of item: Control+Shift+.
+- Item navigation: Move cursor to start of items: Control+Shift+,
+- Item navigation: Move cursor to end of items: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
 - Item: Select all items on selected tracks in current time selection: Alt+Shift+A
 - Item grouping: Group items: Control+G
