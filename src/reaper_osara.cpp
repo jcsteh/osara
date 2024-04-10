@@ -420,12 +420,13 @@ string formatNoteLength(double start, double end) {
 	return formatTimeMeasure(bars, beats, measureLength, useTicks, true, false, false, false );
 }
 
-string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeCacheRequest cache) {
+string formatLength(double start, double end, TimeFormat timeFormat,
+	FormatTimeCacheRequest cache, bool includeZeros) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// In all other cases, position and length reports are the same, so
 		// formatTime can handle them.
-		return formatTime(end - start, timeFormat, cache, true, false);
+		return formatTime(end - start, timeFormat, cache, includeZeros, false);
 	}
 	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure, &startMeasureLength, nullptr, nullptr);
@@ -453,7 +454,7 @@ string formatLength(double start, double end, TimeFormat timeFormat, FormatTimeC
 		++measures;
 		beats -= measureLength;
 	}
-	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, true, false);
+	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros, false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
@@ -3888,7 +3889,7 @@ void cmdReportSelection(Command* command) {
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the length; e.g. "length 2 bars 0 beats 0%".
 				format(translate("length {}"),
-					formatLength(start, end, TF_RULER));
+					formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
 			resetTimeCache();
 		} else if (multiLine) {
 			s << translate("none");
