@@ -141,6 +141,31 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
+void CallLater::cancel() {
+	// If this->self is null, the function has already run or been
+	// cancelled.
+	if (this->self) {
+		KillTimer(mainHwnd, (UINT_PTR)this);
+		// Don't keep this alive any longer.
+		this->self = nullptr;
+	}
+}
+
+void CallLater::init(Ptr self, UINT ms) {
+	// The caller might throw away its reference to this instance. Keep it alive
+	// until func runs.
+	this->self = self;
+	SetTimer(mainHwnd, (UINT_PTR)this, ms, timerProc);
+}
+
+void CALLBACK CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+	KillTimer(hwnd, event);
+	auto* instance = (CallLater*)event;
+	instance->func();
+	// func has run, so we don't need to keep this instance alive any longer.
+	instance->self = nullptr;
+}
+
 string formatTimeMeasure(int measure, double beat, int measureLength,
 	bool useTicks, bool isLength, bool useCache,
 	bool includeZeros, bool includeProjectStartOffset
