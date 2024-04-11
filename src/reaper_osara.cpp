@@ -4726,6 +4726,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40226}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
 	{MAIN_SECTION, {{0, 0, 40227}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
 	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim left edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim right edge of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 40613}, nullptr}, nullptr, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, nullptr}, nullptr, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, nullptr}, nullptr, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
