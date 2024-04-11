@@ -4673,6 +4673,15 @@ void cmdOpenDoc(Command* command) {
 		SW_SHOWNORMAL);
 }
 
+void cmdJumpToTime(Command* command) {
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	// Delay the message slightly to avoid it being clobbered by other VoiceOver
+	// speech when the Jump dialog closes.
+	callLater([] {
+		outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE));
+	}, 50);
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -4766,6 +4775,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42085}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Duplicate and pool automation items
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
+	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
