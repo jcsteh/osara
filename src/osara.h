@@ -17,6 +17,8 @@
 # include <windows.h>
 # pragma clang diagnostic pop
 #endif
+#include <functional>
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -266,6 +268,39 @@ extern int lastCommand;
 bool shouldReportTimeMovement() ;
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
+
+// This class should not be instantiated directly. Use the callLater function
+// below instead.
+class CallLater {
+	public:
+	CallLater(auto func): func(func) {}
+
+	void cancel();
+
+	using Ptr = std::shared_ptr<CallLater>;
+
+	private:
+	void init(Ptr self, UINT ms);
+	friend Ptr callLater(auto func, UINT ms);
+	static void CALLBACK timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time);
+
+	std::function<void()> func;
+	Ptr self;
+};
+
+// Call a function or lambda (even a lambda with capture) asynchronously after
+// the specified number of ms. The function must take no parameters and return
+// nothing. You must ensure any captured objects remain alive until the lambda
+// is called, remembering that the outer function will have returned before
+// the lambda runs.
+// callLater returns a pointer which allows you to ->cancel() the call before
+// it runs. However, you can discard this returned pointer if you will never
+// need to cancel it and the call will still run.
+CallLater::Ptr callLater(auto func, UINT ms) {
+	auto instance = std::make_shared<CallLater>(func);
+	instance->init(instance, ms);
+	return instance;
+}
 
 typedef enum {
 	TF_NONE,
