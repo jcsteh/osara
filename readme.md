@@ -140,6 +140,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item edit: Trim left edge of item to edit cursor
+- Item edit: Trim right edge of item to edit cursor
 - Item: go to next stretch marker: Control+'
 - Item: go to previous stretch marker: Control+;
 - Item navigation: Move cursor to start of items: Control+Shift+,
