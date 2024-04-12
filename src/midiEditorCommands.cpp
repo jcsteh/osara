@@ -305,7 +305,7 @@ struct MidiEventListData {
 } ;
 
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
-UINT_PTR previewDoneTimer = 0;
+CallLater::Ptr previewDoneLater;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
@@ -414,16 +414,6 @@ void previewNotesOff(bool sendNoteOff) {
 	previewingNotes.clear();
 }
 
-// Called after the preview length elapses to turn off notes currently being previewed.
-void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
-	if (event != previewDoneTimer) {
-		return; // Cancelled.
-	}
-	bool canceled = cancelPendingMidiPreviewNotesOff();
-	assert(canceled);
-	previewNotesOff(true);
-}
-
 // Used to find out the minimum note length.
 bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 	return note1.getLength() < note2.getLength();
@@ -467,14 +457,15 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	// Calculate the minimum note length.
 	double minLength = min_element(previewingNotes.cbegin(), previewingNotes.cend(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(nullptr, 0,
-		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
+	previewDoneLater = callLater([] {
+		previewNotesOff(true);
+	}, (UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH));
 }
 
 bool cancelPendingMidiPreviewNotesOff() {
-	if (previewDoneTimer) {
-		KillTimer(nullptr, previewDoneTimer);
-		previewDoneTimer = 0;
+	if (previewDoneLater) {
+		previewDoneLater->cancel();
+		previewDoneLater = nullptr;
 		return true;
 	}
 	return false;
