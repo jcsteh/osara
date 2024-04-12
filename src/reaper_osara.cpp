@@ -2854,33 +2854,12 @@ HWND getPreferenceDescHwnd(HWND pref) {
 	return GetDlgItem(dialog, 1259);
 }
 
-UINT_PTR annotatePreferenceDescriptionTimer = 0;
-void CALLBACK annotatePreferenceDescription(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
-	KillTimer(nullptr, annotatePreferenceDescriptionTimer);
-	annotatePreferenceDescriptionTimer = 0;
-	HWND focus = GetFocus();
-	HWND desc = getPreferenceDescHwnd(focus);
-	if (!desc) {
-		return;
-	}
-	char text[1000];
-	if (GetWindowText(desc, text, sizeof(text)) == 0) {
-		return;
-	}
-	// Set the accDescription on the control.
-	accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF,
-		PROPID_ACC_DESCRIPTION, widen(string(text)).c_str());
-	NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT,
-		CHILDID_SELF);
-}
-
 bool maybeAnnotatePreferenceDescription() {
-	if (annotatePreferenceDescriptionTimer) {
+	static CallLater::Ptr later;
+	if (later) {
 		// Cancel previous annotation if focus moved before it could complete.
-		KillTimer(nullptr, annotatePreferenceDescriptionTimer);
-		annotatePreferenceDescriptionTimer = 0;
+		later->cancel();
+		later = nullptr;
 	}
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
@@ -2892,9 +2871,19 @@ bool maybeAnnotatePreferenceDescription() {
 	RECT rect;
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
-	// The description takes some time to appear, so we must use a timer.
-	annotatePreferenceDescriptionTimer = SetTimer(nullptr, 0, 300,
-		annotatePreferenceDescription);
+	// The description takes some time to appear, so we must delay it.
+	later = callLater([focus, desc] {
+		later = nullptr;
+		char text[1000];
+		if (GetWindowText(desc, text, sizeof(text)) == 0) {
+			return;
+		}
+		// Set the accDescription on the control.
+		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF,
+			PROPID_ACC_DESCRIPTION, widen(string(text)).c_str());
+		NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT,
+			CHILDID_SELF);
+	}, 300);
 	return true;
 }
 
@@ -5106,7 +5095,7 @@ IReaperControlSurface* surface = nullptr;
 
 // Initialisation that must be done after REAPER_PLUGIN_ENTRYPOINT;
 // e.g. because it depends on stuff registered by other plug-ins.
-void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+void delayedInit() {
 #ifdef _WIN32
 	initializeUia();
 #endif
@@ -5121,7 +5110,6 @@ void CALLBACK delayedInit(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	}
 	maybeAutoConfigReaperOptimal();
 	startUpdateCheck();
-	KillTimer(nullptr, event);
 }
 
 void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
@@ -5189,12 +5177,9 @@ void annotateSpuriousDialogs(HWND hwnd) {
 		annotateSpuriousDialogs(child);
 }
 
-UINT_PTR annotateFxDialogTimer = 0;
-void CALLBACK annotateFxDialog(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
-	KillTimer(nullptr, annotateFxDialogTimer);
-	annotateFxDialogTimer = 0;
+CallLater::Ptr annotateFxDialogLater;
+void annotateFxDialog() {
+	annotateFxDialogLater = nullptr;
 	if (!GetFocusedFX(nullptr, nullptr, nullptr)) {
 		return;
 	}
@@ -5293,15 +5278,14 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 	} else if (event == EVENT_OBJECT_SHOW) {
 		if (isClassName(hwnd, "#32770")) {
 			if (GetFocusedFX(nullptr, nullptr, nullptr)) {
-				annotateFxDialog(0, 0, 0, 0);
+				annotateFxDialog();
 			} else {
 				// This might be an FX dialog, but REAPER won't answer that query
 				// immediately, so delay it a bit.
-				if (annotateFxDialogTimer) {
-					KillTimer(nullptr, annotateFxDialogTimer);
+				if (annotateFxDialogLater) {
+					annotateFxDialogLater->cancel();
 				}
-				annotateFxDialogTimer = SetTimer(nullptr, 0, 200,
-					annotateFxDialog);
+				annotateFxDialogLater = callLater(annotateFxDialog, 200);
 			}
 		}
 	}
@@ -5374,7 +5358,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
 		registerExports(rec);
-		SetTimer(nullptr, 0, 0, delayedInit);
+		callLater(delayedInit, 0);
 		rec->Register("hookcustommenu", (void*)handleCustomMenu);
 		AddExtensionsMainMenu();
 #ifdef _WIN32

@@ -208,20 +208,19 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 // 2. We want the bypass state to be consistently reported after the effect.
 // 3. We want to give braille users a chance to read the effect name before
 // the message with the bypass state clobbers it.
-UINT_PTR reportFxChainBypassTimer = 0;
 bool maybeReportFxChainBypassDelayed() {
-	if (reportFxChainBypassTimer) {
-		KillTimer(nullptr, reportFxChainBypassTimer);
+	static CallLater::Ptr later;
+	if (later) {
+		later->cancel();
+		later = nullptr;
 	}
 	if (!isFxListFocused()) {
 		return false;
 	}
-	auto callback = [](HWND hwnd, UINT msg, UINT_PTR event, DWORD time) -> void {
-		KillTimer(nullptr, event);
-		reportFxChainBypassTimer = 0;
+	later = callLater([] {
+		later = nullptr;
 		maybeReportFxChainBypass(/* aboutToToggle */ false);
-	};
-	reportFxChainBypassTimer = SetTimer(nullptr, 0, 1000, callback);
+	}, 1000);
 	return true;
 }
 
@@ -369,14 +368,6 @@ bool maybeOpenFxPresetDialog() {
 	return true;
 }
 
-void CALLBACK fireValueChangeOnFocus(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
-	KillTimer(nullptr, event);
-	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
-		CHILDID_SELF);
-}
-
 bool maybeSwitchFxTab(bool previous) {
 	if (!getFocusedFx()) {
 		// No FX focused.
@@ -424,7 +415,10 @@ bool maybeSwitchFxTab(bool previous) {
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this
 	// because these ComboBox controls take a while to update.
-	SetTimer(nullptr, 0, 30, fireValueChangeOnFocus);
+	callLater([] {
+		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
+			CHILDID_SELF);
+	}, 30);
 	return true;
 }
 
