@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-04-03 11:01\n"
+"PO-Revision-Date: 2024-04-13 00:59\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1160,6 +1160,8 @@ msgstr "{} minutes"
 msgid "{:#.3f} sec"
 msgstr "{:#.3f} seconde"
 
+#. Used when reporting a time in seconds. {:.3f} will be
+#. replaced with the number of seconds; e.g. "2 sec".
 msgid "{:.3f} sec"
 msgstr "{:.3f} seconde"
 
@@ -1479,7 +1481,7 @@ msgid "enabled delta solo"
 msgstr "delta solo activé"
 
 msgid "disabled delta solo"
-msgstr "elta solo, désactivé"
+msgstr "delta solo désactivé"
 
 msgid "no selected items"
 msgstr "aucun objets n'est sélectionné"
