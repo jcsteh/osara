@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands header
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -37,3 +36,8 @@ void cmdToggleVolumeEnvelope(Command* command);
 void cmdTogglePanEnvelope(Command* command);
 void cmdToggleMuteEnvelope(Command* command);
 void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command);
+void cmdToggleLastTouchedEnvelope(Command* command);
+void cmdInsertAutoItem(Command* command);
+void cmdDeleteAutoItems(Command* command);
+void cmdAddAutoItems(Command* command);
+void cmdGlueAutoItems(Command* command);

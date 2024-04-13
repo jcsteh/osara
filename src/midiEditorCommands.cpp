@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * MIDI Editor commands code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -306,7 +305,7 @@ struct MidiEventListData {
 } ;
 
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
-UINT_PTR previewDoneTimer = 0;
+CallLater previewDoneLater;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
@@ -415,16 +414,6 @@ void previewNotesOff(bool sendNoteOff) {
 	previewingNotes.clear();
 }
 
-// Called after the preview length elapses to turn off notes currently being previewed.
-void CALLBACK previewDone(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
-	if (event != previewDoneTimer) {
-		return; // Cancelled.
-	}
-	bool canceled = cancelPendingMidiPreviewNotesOff();
-	assert(canceled);
-	previewNotesOff(true);
-}
-
 // Used to find out the minimum note length.
 bool compareNotesByLength(const MidiNote& note1, const MidiNote& note2) {
 	return note1.getLength() < note2.getLength();
@@ -439,7 +428,7 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 #ifdef _WIN32
 		InitializeCriticalSection(&previewReg.cs);
 #else
-		pthread_mutex_init(&previewReg.mutex, NULL);
+		pthread_mutex_init(&previewReg.mutex, nullptr);
 #endif
 		previewReg.src = &previewSource;
 		previewReg.m_out_chan = -1; // Use .preview_track.
@@ -461,24 +450,20 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 		previewingNotes.push_back(note);
 	}
 	// Send the events.
-	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", NULL);
+	void* track = GetSetMediaItemTakeInfo(take, "P_TRACK", nullptr);
 	previewReg.preview_track = track;
 	previewReg.curpos = 0.0;
 	PlayTrackPreview(&previewReg);
 	// Calculate the minimum note length.
 	double minLength = min_element(previewingNotes.cbegin(), previewingNotes.cend(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneTimer = SetTimer(nullptr, 0,
-		(UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH), previewDone);
+	previewDoneLater = CallLater([] {
+		previewNotesOff(true);
+	}, (UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH));
 }
 
 bool cancelPendingMidiPreviewNotesOff() {
-	if (previewDoneTimer) {
-		KillTimer(nullptr, previewDoneTimer);
-		previewDoneTimer = 0;
-		return true;
-	}
-	return false;
+	return previewDoneLater.cancel();
 }
 
 // A random access iterator for MIDI events.
@@ -759,12 +744,12 @@ void cmdMidiMoveCursor(Command* command) {
 }
 
 void selectNote(MediaItem_Take* take, const int note, bool select=true) {
-	MIDI_SetNote(take, note, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_SetNote(take, note, &select, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 bool isNoteSelected(MediaItem_Take* take, const int note) {
 	bool sel;
-	MIDI_GetNote(take, note, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_GetNote(take, note, &sel, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	return sel;
 }
 
@@ -900,12 +885,12 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
-	MIDI_SetCC(take, cc, &select, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_SetCC(take, cc, &select, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 bool isCCSelected(MediaItem_Take* take, const int cc) {
 	bool sel;
-	MIDI_GetCC(take, cc, &sel, NULL, NULL, NULL, NULL, NULL, NULL);
+	MIDI_GetCC(take, cc, &sel, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 	return sel;
 }
 
@@ -919,7 +904,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		}
 		double position;
 		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, NULL, NULL, &position, &msg1, &chan, &msg2, &msg3);
+		MIDI_GetCC(take, ccIndex, nullptr, nullptr, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
 		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
 	}
@@ -1183,9 +1168,9 @@ void cmdMidiInsertNote(Command* command) {
 void cmdMidiDeleteEvents(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount = MIDI_CountEvts(take, NULL, NULL, NULL);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	int removed = oldCount - MIDI_CountEvts(take, NULL, NULL, NULL);
+	int removed = oldCount - MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	// Translators: Used when events are deleted in the MIDI editor. {} is
 	// replaced by the number of events. E.g. "3 events removed"
 	outputMessage(format(
@@ -1471,9 +1456,9 @@ void cmdMidiMoveToTrack(Command* command) {
 	}
 	fakeFocus = FOCUS_TRACK;
 	ostringstream s;
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", NULL);
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
 	s << trackNum;
-	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", NULL);
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 	if (trackName)
 		s << " " << trackName;
 	// Translators: Used when reporting activation of the next/previous track in
@@ -1644,6 +1629,16 @@ void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
 	auto note = event.toMidiNote();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	previewNotes(take, {note});
+}
+
+void toggleListViewItemSelection(HWND list) {
+	const int item = ListView_GetNextItem(list, -1, LVNI_FOCUSED);
+	if (item == -1) {
+		return;
+	}
+	UINT prevState = ListView_GetItemState(list, item, LVIS_SELECTED);
+	ListView_SetItemState(list, item,
+		prevState == LVIS_SELECTED? 0 : LVIS_SELECTED, LVIS_SELECTED);
 }
 
 #endif // _WIN32

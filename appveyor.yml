@@ -1,4 +1,4 @@
-version: "2023.1pre-{build}"
+version: "b{build}"
 
 branches:
  only:
@@ -23,7 +23,7 @@ init:
       If ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
        Update-AppveyorBuild -Version ("pr$env:APPVEYOR_PULL_REQUEST_NUMBER-$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
       } Else {
-       Update-AppveyorBuild -Version ("$env:APPVEYOR_BUILD_VERSION," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
+       Update-AppveyorBuild -Version ($(Get-Date -Format "yyyy.M.d") + ".$env:APPVEYOR_BUILD_NUMBER," + $env:APPVEYOR_REPO_COMMIT.Substring(0, 8))
       }
      }
  - cmd: py -m pip --disable-pip-version-check install --no-warn-script-location scons
@@ -55,6 +55,9 @@ install:
      }
  - git submodule update --init --depth 1
  - sh: sudo xcode-select -s /Applications/Xcode-13.2.1.app
+ # Use NSIS v2.46 to reduce AV false positives. Borrowed from SWS.
+ - cmd: '"%ProgramFiles(x86)%\NSIS\uninst-nsis.exe" /S'
+ - cmd: choco install -y nsis-unicode
 
 build_script:
  - ps: |

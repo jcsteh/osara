@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2023-12-12 22:39\n"
+"PO-Revision-Date: 2024-04-13 00:59\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -22,6 +22,52 @@ msgstr "выключено"
 
 msgid "OSARA: Toggle"
 msgstr "Osara: Переключатель"
+
+msgid "OSARA: Enable"
+msgstr "OSARA: Включить"
+
+msgid "OSARA: Disable"
+msgstr "OSARA: Выключить"
+
+msgctxt "optimal REAPER configuration"
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+msgstr "Хотите ли вы изменить настройки REAPER для оптимальной совместимости с программами чтения с экрана? Выбрав \"да\", вы внесёте следующие изменения:"
+
+msgctxt "optimal REAPER configuration"
+msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables the space key to be used for check boxes, etc. in various windows."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
+msgstr ""
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "Настройте REAPER для оптимальной работы с программой чтения с экрана"
+
+msgid "Error writing configuration changes."
+msgstr "Ошибка при записи изменений конфигурации."
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr "Сейчас REAPER  перезапустится. Пожалуйста, перезапустите REAPER, чтобы применить изменения."
+
+msgid "Restart REAPER"
+msgstr "Перезапустить REAPER"
 
 msgid "volume"
 msgstr "громкость"
@@ -103,7 +149,7 @@ msgstr "линейный"
 
 #. A shape for an envelope point.
 msgid "square"
-msgstr ""
+msgstr "квадрат"
 
 #. A shape for an envelope point.
 msgid "slow start/end"
@@ -146,7 +192,7 @@ msgstr ""
 #. Reported when selecting an envelope. {} will be replaced
 #. with the name of the envelope; e.g. "volume envelope".
 msgid "{} envelope"
-msgstr ""
+msgstr "огибающая {}"
 
 msgid "bypassed"
 msgstr "обойденный"
@@ -172,10 +218,10 @@ msgstr[3] "{} объектов автоматизации скопировано
 #. with the number of points; e.g. "2 envelope points copied".
 msgid "{} envelope point copied"
 msgid_plural "{} envelope points copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{} точка огибания скопирована"
+msgstr[1] "{} точки огибания скопированы"
+msgstr[2] "{} точек огибания скопировано"
+msgstr[3] "{} точек огибания скопировано"
 
 msgid "no envelopes toggled"
 msgstr ""
@@ -205,6 +251,26 @@ msgstr[3] "{} точек выделено"
 #. occurred.
 msgid "no change"
 msgstr "изменений нет"
+
+msgid "inserted automation item"
+msgstr ""
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} объект автоматизации добавлен"
+msgstr[1] "{} объекта автоматизации добавлено"
+msgstr[2] "{} объектов автоматизации добавлено"
+msgstr[3] "{} объектов автоматизации добавлено"
+
+msgid "no automation items glued"
+msgstr ""
+
+msgid "glued automation items"
+msgstr ""
 
 msgid "active"
 msgstr "активно"
@@ -871,9 +937,6 @@ msgstr "включено"
 msgid "off"
 msgstr "отключено"
 
-msgid "FX Parameters"
-msgstr ""
-
 msgid "low shelf"
 msgstr ""
 
@@ -919,10 +982,77 @@ msgstr ""
 msgid "Band {} type"
 msgstr "Диапазон {} типа"
 
+msgid "FX Parameters"
+msgstr ""
+
+msgid "Go to send destination track"
+msgstr ""
+
+msgid "Delete send"
+msgstr ""
+
+msgid "Go to receive source track"
+msgstr ""
+
+msgid "Delete receive"
+msgstr ""
+
+msgid "Delete hardware output"
+msgstr ""
+
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "нет"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr ""
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr ""
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr ""
+
+msgid "post-fader"
+msgstr ""
+
+msgid "pre-fx"
+msgstr ""
+
+msgid "post-fx"
+msgstr ""
+
 msgid "mute"
 msgstr "приглушить"
 
 msgid "mono"
+msgstr ""
+
+msgid "source MIDI channel"
+msgstr ""
+
+msgid "destination MIDI channel"
+msgstr ""
+
+msgid "source audio channel"
+msgstr ""
+
+msgid "destination audio channel"
+msgstr ""
+
+msgid "send type"
 msgstr ""
 
 #. Indicates a parameter for a track send in the Track Parameters
@@ -934,6 +1064,11 @@ msgstr "отправить"
 #. Parameters dialog.
 msgid "receive"
 msgstr "принять"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr ""
 
 msgid "Track Parameters"
 msgstr "Параметры трека"
@@ -1105,6 +1240,8 @@ msgstr ""
 msgid "{:#.3f} sec"
 msgstr ""
 
+#. Used when reporting a time in seconds. {:.3f} will be
+#. replaced with the number of seconds; e.g. "2 sec".
 msgid "{:.3f} sec"
 msgstr ""
 
@@ -1159,12 +1296,6 @@ msgstr ""
 #. A closed track folder.
 msgid "closed"
 msgstr "закрыто"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "нет"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1351,6 +1482,57 @@ msgstr ""
 msgid "delta"
 msgstr "дельта"
 
+msgid "master muted"
+msgstr "мастер приглушен"
+
+msgid "master unmuted"
+msgstr "мастер не приглушен"
+
+msgid "no selected tracks"
+msgstr "нет выделенных треков"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] "{} трек приглушён"
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+msgid "master soloed"
+msgstr ""
+
+msgid "master unsoloed"
+msgstr ""
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 msgid "record monitor off"
 msgstr ""
 
@@ -1365,6 +1547,24 @@ msgstr ""
 
 msgid "phase normal"
 msgstr ""
+
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "FX active"
 msgstr ""
@@ -1458,6 +1658,24 @@ msgstr "Объект"
 
 msgid "Take"
 msgstr ""
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. Panned to the center.
 msgid "center"
@@ -1600,6 +1818,37 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
+msgid "no items selected"
+msgstr "нет выделенных объектов"
+
+#. Reported when an action is used to lock an item.
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr ""
+
+#. Reported when an action is used to unlock an item.
+msgid "unlocked"
+msgstr "разблокировано"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] "{} объектов заблокировано"
+msgstr[3] ""
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
 msgid "set selection end"
 msgstr "установить конец выделения"
 
@@ -1650,9 +1899,6 @@ msgstr ""
 #. to the chosen automation mode.
 msgid "override"
 msgstr "переопределение"
-
-msgid "no items selected"
-msgstr "нет выделенных объектов"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1745,10 +1991,10 @@ msgstr ""
 #. with the number of tracks; e.g. "2 tracks selected".
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{} трек выделен"
+msgstr[1] "{} трека выделено"
+msgstr[2] "{} треков выделено"
+msgstr[3] "{} треков выделено"
 
 msgid "not defeating solo"
 msgstr ""
@@ -1806,6 +2052,12 @@ msgstr ""
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr ""
+
 msgid "set selection start"
 msgstr "установить начало выделения"
 
@@ -1863,6 +2115,15 @@ msgstr ""
 msgid "all delta solos reset"
 msgstr ""
 
+msgid "grid straight"
+msgstr ""
+
+msgid "grid dotted"
+msgstr ""
+
+msgid "grid triplet"
+msgstr ""
+
 msgid "length whole"
 msgstr ""
 
@@ -1897,6 +2158,15 @@ msgid "length sixty forth"
 msgstr ""
 
 msgid "length one hundred twenty eighth"
+msgstr ""
+
+msgid "length straight"
+msgstr ""
+
+msgid "length dotted"
+msgstr ""
+
+msgid "length triplet"
 msgstr ""
 
 msgid "full screen"
@@ -1947,12 +2217,6 @@ msgstr ""
 msgid "seconds secondary"
 msgstr ""
 
-msgid "master muted"
-msgstr "мастер приглушен"
-
-msgid "master unmuted"
-msgstr "мастер не приглушен"
-
 msgid "enabled snap"
 msgstr "включенная привязка"
 
@@ -1965,106 +2229,10 @@ msgstr ""
 msgid "recording key map"
 msgstr ""
 
-msgid "alt 1"
-msgstr ""
-
-msgid "alt 2"
-msgstr ""
-
-msgid "alt 3"
-msgstr ""
-
-msgid "alt 4"
-msgstr ""
-
-msgid "alt 5"
-msgstr ""
-
-msgid "alt 6"
-msgstr ""
-
-msgid "alt 7"
-msgstr ""
-
-msgid "alt 8"
-msgstr ""
-
-msgid "alt 9"
-msgstr ""
-
-msgid "alt 10"
-msgstr ""
-
-msgid "alt 11"
-msgstr ""
-
-msgid "alt 12"
-msgstr ""
-
-msgid "alt 13"
-msgstr ""
-
-msgid "alt 14"
-msgstr ""
-
-msgid "alt 15"
-msgstr ""
-
-msgid "alt 16"
-msgstr ""
-
 msgid "default momentary"
 msgstr ""
 
 msgid "recording key map momentary"
-msgstr ""
-
-msgid "alt 1 momentary"
-msgstr ""
-
-msgid "alt 2 momentary"
-msgstr ""
-
-msgid "alt 3 momentary"
-msgstr ""
-
-msgid "alt 4 momentary"
-msgstr ""
-
-msgid "alt 5 momentary"
-msgstr ""
-
-msgid "alt 6 momentary"
-msgstr ""
-
-msgid "alt 7 momentary"
-msgstr ""
-
-msgid "alt 8 momentary"
-msgstr ""
-
-msgid "alt 9 momentary"
-msgstr ""
-
-msgid "alt 10 momentary"
-msgstr ""
-
-msgid "alt 11 momentary"
-msgstr ""
-
-msgid "alt 12 momentary"
-msgstr ""
-
-msgid "alt 13 momentary"
-msgstr ""
-
-msgid "alt 14 momentary"
-msgstr ""
-
-msgid "alt 15 momentary"
-msgstr ""
-
-msgid "alt 16 momentary"
 msgstr ""
 
 msgid "auto playing"
@@ -2095,10 +2263,10 @@ msgid "reset pitch"
 msgstr ""
 
 msgid "tempo matching"
-msgstr ""
+msgstr "соответствие темпу"
 
 msgid "not tempo  matching"
-msgstr ""
+msgstr "не соответствует темпу"
 
 msgid "half time"
 msgstr ""
@@ -2115,40 +2283,40 @@ msgstr ""
 msgid "removed Media Explorer from dock"
 msgstr ""
 
-msgid "Piano roll view"
+msgid "piano roll view"
 msgstr ""
 
-msgid "Named notes view"
+msgid "named notes view"
 msgstr ""
 
-msgid "Event list view"
+msgid "event list view"
 msgstr ""
 
-msgid "Notation view"
+msgid "notation view"
 msgstr ""
 
-msgid "Rectangle notes"
-msgstr "Прямоугольные ноты"
-
-msgid "Triangle notes"
-msgstr "Треугольные ноты"
-
-msgid "Diamond notes"
-msgstr "Ромбовидные ноты"
-
-msgid "Showed velocity numbers on notes"
+msgid "rectangle notes (normal)"
 msgstr ""
 
-msgid "Hid velocity numbers on notes"
+msgid "triangle notes"
 msgstr ""
 
-msgid "Showed note names"
+msgid "diamond notes"
 msgstr ""
 
-msgid "Hid note names"
+msgid "showed velocity numbers on notes"
 msgstr ""
 
-msgid "Inserted notes matching grid"
+msgid "hid velocity numbers on notes"
+msgstr ""
+
+msgid "showed note names"
+msgstr ""
+
+msgid "hid note names"
+msgstr ""
+
+msgid "length matching grid"
 msgstr ""
 
 #. Reported when there are no tracks to navigate to.
@@ -2160,11 +2328,6 @@ msgstr "Изменить выделение трека"
 
 msgid "Change Item Selection"
 msgstr "Изменить выделение объекта"
-
-#. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr ""
 
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
@@ -2217,15 +2380,6 @@ msgstr[0] "{} точка добавлена"
 msgstr[1] "{} точки добавлены"
 msgstr[2] "{} точек добавлено"
 msgstr[3] "{} точек добавлено"
-
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} объект автоматизации добавлен"
-msgstr[1] "{} объекта автоматизации добавлено"
-msgstr[2] "{} объектов автоматизации добавлено"
-msgstr[3] "{} объектов автоматизации добавлено"
 
 msgid "nothing pasted"
 msgstr "ничего не вставлено"
@@ -2335,14 +2489,25 @@ msgstr "длина {}"
 msgid "Selected tracks:"
 msgstr "Выделенные треки:"
 
-msgid "no selected tracks"
-msgstr "нет выделенных треков"
-
 msgid "Selected items:"
 msgstr "Выделенные объекты:"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr ""
+
+msgid "no MIDI selection"
+msgstr ""
+
 msgid "no selection"
 msgstr "нет выделения"
+
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr ""
 
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
@@ -2533,7 +2698,7 @@ msgstr ""
 msgid "OSARA: Report tracks with phase inverted"
 msgstr ""
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr ""
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
@@ -2632,6 +2797,9 @@ msgstr ""
 msgid "OSARA: Go to last track"
 msgstr ""
 
+msgid "OSARA: Go to master track"
+msgstr ""
+
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr ""
 
@@ -2657,6 +2825,15 @@ msgid "OSARA: Set phase normal for all tracks"
 msgstr "OSARA: Установить нормальную фазу для всех треков"
 
 msgid "OSARA: Unmonitor all tracks"
+msgstr ""
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
+msgstr ""
+
+msgid "OSARA: Check for update"
+msgstr ""
+
+msgid "OSARA: Open online documentation"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
@@ -2704,6 +2881,31 @@ msgstr ""
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr ""
 
+msgid "Configuration..."
+msgstr ""
+
+msgid "Online &documentation"
+msgstr ""
+
+msgid "Check for &update"
+msgstr ""
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr ""
+
+msgid "No OSARA update available."
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr ""
+
+msgid "OSARA version {} is available. Changes:"
+msgstr ""
+
+msgid "Error checking for OSARA update."
+msgstr ""
+
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "Параметры"
@@ -2715,6 +2917,10 @@ msgstr "&Параметр:"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "Значение:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Filter:"
@@ -2807,6 +3013,14 @@ msgstr "&ОК"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "&Отменить"
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr ""
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

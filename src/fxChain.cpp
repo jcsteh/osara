@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Code related to FX chain windows
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2016-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -176,6 +175,11 @@ bool maybeSwitchToFxPluginWindow() {
 // If the FX list in an FX chain dialog is focused, report active/bypassed for
 // the selected effect.
 bool maybeReportFxChainBypass(bool aboutToToggle) {
+	string version = string(GetAppVersion(), 0, 4);
+	if (stod(version) >= 7.06) {
+		// REAPER >= 7.06 made this properly accessible.
+		return false;
+	}
 	if (!isFxListFocused()) {
 		return false;
 	}
@@ -204,20 +208,15 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 // 2. We want the bypass state to be consistently reported after the effect.
 // 3. We want to give braille users a chance to read the effect name before
 // the message with the bypass state clobbers it.
-UINT_PTR reportFxChainBypassTimer = 0;
 bool maybeReportFxChainBypassDelayed() {
-	if (reportFxChainBypassTimer) {
-		KillTimer(nullptr, reportFxChainBypassTimer);
-	}
+	static CallLater later;
+	later.cancel();
 	if (!isFxListFocused()) {
 		return false;
 	}
-	auto callback = [](HWND hwnd, UINT msg, UINT_PTR event, DWORD time) -> void {
-		KillTimer(nullptr, event);
-		reportFxChainBypassTimer = 0;
+	later = CallLater([] {
 		maybeReportFxChainBypass(/* aboutToToggle */ false);
-	};
-	reportFxChainBypassTimer = SetTimer(nullptr, 0, 1000, callback);
+	}, 1000);
 	return true;
 }
 
@@ -365,14 +364,6 @@ bool maybeOpenFxPresetDialog() {
 	return true;
 }
 
-void CALLBACK fireValueChangeOnFocus(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
-	KillTimer(nullptr, event);
-	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
-		CHILDID_SELF);
-}
-
 bool maybeSwitchFxTab(bool previous) {
 	if (!getFocusedFx()) {
 		// No FX focused.
@@ -420,7 +411,10 @@ bool maybeSwitchFxTab(bool previous) {
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this
 	// because these ComboBox controls take a while to update.
-	SetTimer(nullptr, 0, 30, fireValueChangeOnFocus);
+	CallLater([] {
+		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
+			CHILDID_SELF);
+	}, 30);
 	return true;
 }
 

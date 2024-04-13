@@ -1,6 +1,5 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConscript for architecture-specific building of the source
-# Author: James Teh <jamie@jantrid.net>
 # Copyright 2015-2023 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
@@ -36,6 +35,7 @@ sources = [
 	"exports.cpp",
 	"fxChain.cpp",
 	"translation.cpp",
+	"updateCheck.cpp",
 ]
 
 if env["PLATFORM"] == "win32":
@@ -78,6 +78,7 @@ if env["PLATFORM"] == "win32":
 		"Comdlg32",
 		"Advapi32",
 		"UIAutomationCore",
+		"ws2_32",
 	]
 
 else: # Mac
@@ -114,12 +115,12 @@ else: # Mac
 		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
 	env.Depends("reaper_osara.cpp", [res, dialogRes])
 
-def addExternalSources(dir, files):
+def addExternalSources(dir, files, **kwargs):
 	dir = env.Dir(dir)
 	# We want the object to be built in our build dir, so we must
 	# use env.SharedObject explicitly.
 	sources.extend(
-		env.SharedObject(os.path.splitext(f)[0], dir.File(f))
+		env.SharedObject(os.path.splitext(f)[0], dir.File(f), **kwargs)
 		for f in files)
 
 addExternalSources("#include/tinygettext/src", (
@@ -131,6 +132,16 @@ addExternalSources("#include/tinygettext/src", (
 	"tinygettext.cpp",
 ))
 addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
+addExternalSources(
+	"#include/WDL/WDL/jnetlib",
+	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
+	CCFLAGS="-Wno-deprecated-declarations"
+)
+addExternalSources(
+	"#include/simpleson",
+	("json.cpp",),
+	CCFLAGS="-Wno-deprecated-declarations"
+)
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],

@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+# OSARA: Open Source Accessibility for the REAPER Application
+# CI server script to publish OSARA snapshots
+# Copyright 2016-2024 NV Access Limited, James Teh
+# License: GNU General Public License version 2.0
+
 import sys
 import os.path
 import json
@@ -10,6 +15,7 @@ import markdown
 SNAPSHOT_INDEX_DIR = os.path.expanduser("~osara/data/snapshotIndex")
 SNAPSHOTS_DIR = os.path.expanduser("~osara/www/main/snapshots")
 SNAPSHOT_INDEX_FILE = os.path.join(SNAPSHOTS_DIR, "index.html")
+UPDATE_FILE = os.path.join(SNAPSHOTS_DIR, "update.json")
 README_URL = "https://github.com/jcsteh/osara/raw/master/readme.md"
 README_FILE = os.path.expanduser("~osara/www/main/index.html")
 
@@ -58,6 +64,22 @@ def writeSnapshotIndex(winData, macData):
 			"</body>\n"
 			"</html>\n")
 
+def getCommits():
+	with urllib.request.urlopen(
+		f"https://api.github.com/repos/jcsteh/osara/commits?per_page=30"
+	) as req:
+		commits = json.load(req)
+	out = []
+	for commit in commits:
+		out.append([commit["sha"][:8], commit["commit"]["message"]])
+	return out
+
+def writeUpdateData(data):
+	print("Writing update check data")
+	out = {"version": data["version"], "commits": getCommits()}
+	with open(UPDATE_FILE, "w") as f:
+		json.dump(out, f)
+
 def updateReadme():
 	print("Downloading readme")
 	with urllib.request.urlopen(README_URL) as req:
@@ -92,6 +114,7 @@ def main():
 
 	writeSnapshotIndex(winData, macData)
 	if buildOs == "win":
+		writeUpdateData(winData)
 		updateReadme()
 
 if __name__ == "__main__":

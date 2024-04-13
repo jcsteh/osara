@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@jantrid.net&gt; & other contributors
-- Copyright: 2014-2023 NV Access Limited, James Teh & other contributors
+- Copyright: 2014-2024 NV Access Limited, James Teh & other contributors
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -140,10 +140,12 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item edit: Trim left edge of item to edit cursor
+- Item edit: Trim right edge of item to edit cursor
 - Item: go to next stretch marker: Control+'
 - Item: go to previous stretch marker: Control+;
-- Item navigation: Move cursor left to edge of item: Control+Shift+,
-- Item navigation: Move cursor right to edge of item: Control+Shift+.
+- Item navigation: Move cursor to start of items: Control+Shift+,
+- Item navigation: Move cursor to end of items: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
 - Item: Select all items on selected tracks in current time selection: Alt+Shift+A
 - Item grouping: Group items: Control+G
@@ -153,11 +155,14 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
+- Item properties: Toggle lock
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
 - Item: Open associated project in new tab: Alt+Shift+O
 - Xenakios/SWS: Nudge item volume down: Control+Shift+DownArrow
 - Xenakios/SWS: Nudge item volume up: Control+Shift+UpArrow
+- Item: Fade items in to cursor: Control+Alt+I
+- Item: Fade items out from cursor: Control+Alt+O
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Win+Delete
 
@@ -226,6 +231,14 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
+- Envelope: Insert automation item: Control+Shift+I
+- Envelope: Delete automation items
+- Envelope: Delete automation items, preserve points
+- Envelope: Split automation items
+- Envelope: Duplicate automation items
+- Envelope: Duplicate and pool automation items
+- Envelope: Convert all project automation to automation items
+- Envelope: Glue automation items
 
 #### Zoom
 - View: Zoom out horizontal: - or NumPad-
@@ -296,7 +309,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
-- Toggle fullscreen: F11
+- Toggle fullscreen: F11, Command+F11 on Mac
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
@@ -391,6 +404,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Grid: Set to 1/48 (1/32 triplet): 0
 - Grid: Set to 1/64
 - Grid: Set to 1/128
+- Grid: Set grid type to straight
+- Grid: Set grid type to dotted: .
+- Grid: Set grid type to triplet: Control+Shift+T
 - Set length for next inserted note: 1: Control+1
 - Set length for next inserted note: 1/2: Control+2
 - Set length for next inserted note: 1/32: Control+3
@@ -403,6 +419,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Set length for next inserted note: 1/32T: Control+0
 - Set length for next inserted note: 1/64
 - Set length for next inserted note: 1/128
+- Set length for next inserted note: grid: Control+Backspace
+- Set length for next inserted note: straight preserving division length
+- Set length for next inserted note: dotted preserving division length: Control+.
+- Set length for next inserted note: triplet preserving division length: Control+T
 - Activate next MIDI track: Ctrl+DownArrow
 - Activate previous MIDI track: Ctrl+UpArrow
 - Edit: Move notes up one semitone: NumPad8 or N
@@ -501,6 +521,10 @@ Note that some effects expose easily readable values, while others expose only p
 #### Using Parameter Lists
 Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
 For parameters which support it, there is also an editable text field which allows you to edit the value textually.
+
+For a few parameters, there is a context menu with additional options related to the parameter.
+You access this using the More button after the value slider, which will only be available if the parameter provides a context menu.
+Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the Parameter combo box or Value slider.
 
 The Filter field allows you to narrow the list to only contain parameters which include the entered text.
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
@@ -715,12 +739,16 @@ When you are done, press the OK button to accept any changes or the Cancel butto
 There is also an action to toggle each setting; e.g. OSARA: Toggle Report position when scrubbing.
 These do not have keyboard shortcuts mapped by default, but you can add shortcuts in the Actions dialog (hit F4 to go there).
 
+Although there is no option in this dialog to configure whether OSARA should automatically check for updates when REAPER starts, OSARA respects the setting for REAPER updates.
+You can configure this via the "Automatically check for new versions of REAPER on startup" option in the General section of REAPER Preferences.
+
 ### Miscellaneous Actions
 OSARA also includes some other miscellaneous actions.
 
 #### Main section of actions list
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
+- OSARA: go to master track: Control+Alt+Shift+Home
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
@@ -737,7 +765,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report tracks with phase inverted: Alt+Shift+F9
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Set phase normal for all tracks: Alt+F9
-- OSARA: Report track/item/time selection (depending on focus): Control+Shift+Space
+- OSARA: Report track/item/time/MIDI selection (depending on focus): Control+Shift+Space
  - Pressing this twice will display the information for all selections (not just the focus) in a dialog with a text box for easy review.
 - OSARA: Select from cursor to start of project: Shift+Home
 - OSARA: Select from cursor to end of project: Shift+End
@@ -802,6 +830,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Item: Remove items
 - Item: Copy loop of selected area of audio items
 - Edit: Cut items
+- Item navigation: Move cursor to start of items
+- Item navigation: Move cursor to end of items
 - Item properties: Pitch item down one octave
 - Item properties: Pitch item up one octave
 - Item properties: Toggle take preserve pitch
@@ -882,6 +912,9 @@ This list is worth referencing when making your own key map additions, assigning
 - OSARA: Toggle Report time movement during playback/recording
 - OSARA: Toggle Report track numbers
 - OSARA: Toggle Report transport state (play, record, etc.)
+- OSARA: Configure REAPER for optimal screen reader accessibility
+- OSARA: Check for update
+- OSARA: Open online documentation
 
 ### Muting OSARA Messages in Custom/Cycle Actions
 The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action.

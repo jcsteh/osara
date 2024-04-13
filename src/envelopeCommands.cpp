@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Envelope commands code
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -85,7 +84,7 @@ void postMoveEnvelopePoint(int command) {
 		return;
 	double value;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, &value, NULL, NULL, &selected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, &value, nullptr, nullptr, &selected);
 	if (!selected)
 		return; // Not moved.
 	char out[64];
@@ -104,6 +103,38 @@ int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope) {
 	return count;
 }
 
+// For each automation item in the project, Call func(envelope, autoItemIndex).
+// func should return true to continue iterating, false to stop.
+void forEachAutomationItem(auto func) {
+	auto handleTrack = [&] (MediaTrack* track) {
+		int envelopes = CountTrackEnvelopes(track);
+		for (int e = 0; e < envelopes; ++e) {
+			TrackEnvelope* env = GetTrackEnvelope(track, e);
+			int items = CountAutomationItems(env);
+			for (int i = 0; i < items; ++i) {
+				if (!func(env, i)) {
+					return;
+				}
+			}
+		}
+	};
+	handleTrack(GetMasterTrack(nullptr));
+	int tracks = CountTracks(nullptr);
+	for (int t = 0; t < tracks; ++t) {
+		handleTrack(GetTrack(nullptr, t));
+	}
+}
+
+// Counts automation items across all envelopes on all tracks.
+int countAllAutomationItems() {
+	int count = 0;
+	forEachAutomationItem([&count] (TrackEnvelope* env, int item) {
+		++count;
+		return true;
+	});
+	return count;
+}
+
 void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool checkItems) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
@@ -114,16 +145,22 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 		oldPoints = countEnvelopePointsIncludingAutoItems(envelope);
 	}
 	if (checkItems) {
-		oldItems = CountAutomationItems(envelope);
+		oldItems = countAllAutomationItems();
 	}
 	Main_OnCommand(command, 0);
 	int removed;
 	// Check items first, since deleting an item might also implicitly remove
 	// points.
 	if (checkItems) {
-		removed = oldItems - CountAutomationItems(envelope);
+		removed = oldItems - countAllAutomationItems();
 		// If no items wer removed, fall through to the points check below unless
 		// we're not checking points, in which case report 0 items.
+		if (removed > 0) {
+			// currentAutomationItem was likely just deleted. Even if it wasn't, it
+			// likely changed index and we don't know the new index. Either way, focus
+			// the envelope itself.
+			currentAutomationItem = -1;
+		}
 		if (removed > 0 || !checkPoints) {
 			// Translators: Reported when removing automation items. {} will be
 			// replaced with the number of items; e.g. "2 automation items removed".
@@ -247,7 +284,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		isSelectionContiguous = true;
 	}
 	if(select)
-		SetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &bTrue, &bTrue);
+		SetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, nullptr, nullptr, nullptr, &bTrue, &bTrue);
 	if (direction != 0)
 		SetEditCurPos(time, true, true);
 	char out[64];
@@ -260,7 +297,7 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	s << format(translate("point {point} value {value} {shape}"),
 		"point"_a=point, "value"_a=out, "shape"_a=getEnvelopeShapeName(shape));
 	bool isSelected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, NULL, NULL, NULL, NULL, &isSelected);
+	GetEnvelopePointEx(envelope, currentAutomationItem, point, nullptr, nullptr, nullptr, nullptr, &isSelected);
 	if (isSelected) {
 		int numSel = countSelectedEnvelopePoints(envelope, true);
 		// One selected point is the norm, so don't report selected in this case.
@@ -279,10 +316,10 @@ optional<bool> toggleCurrentEnvelopePointSelection() {
 	if (!envelope || !currentEnvelopePoint)
 		return nullopt;
 	bool isSelected;
-	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected))
+	if (!GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, nullptr, nullptr, nullptr, nullptr, &isSelected))
 		return nullopt;
 	isSelected = !isSelected;
-	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, NULL, NULL, NULL, NULL, &isSelected, &bTrue);
+	SetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, nullptr, nullptr, nullptr, nullptr, &isSelected, &bTrue);
 	return {isSelected};
 }
 
@@ -299,7 +336,7 @@ void cmdInsertEnvelopePoint(Command* command) {
 
 const regex RE_ENVELOPE_STATE("<(AUX|HW)?(\\S+)[^]*?\\sACT (0|1)[^]*?\\sVIS (0|1)[^]*?\\sARM (0|1)");
 void cmdhSelectEnvelope(int direction) {
-	MediaTrack* track = NULL;
+	MediaTrack* track = nullptr;
 	int count;
 	function<TrackEnvelope*(int)> getEnvelope;
 	// selectedEnvelopeIsTake is set when focus changes to track or item.
@@ -340,7 +377,7 @@ void cmdhSelectEnvelope(int direction) {
 	}
 	if (origIndex == -1) {
 		// The current envelope isn't for this track/take.
-		origEnv = NULL;
+		origEnv = nullptr;
 		// Start at the start.
 		origIndex = start - direction;
 	}
@@ -356,7 +393,7 @@ void cmdhSelectEnvelope(int direction) {
 				index = start;
 			} else {
 				// We started at the start, so there are no more.
-				env = NULL;
+				env = nullptr;
 				break;
 			}
 		}
@@ -395,9 +432,9 @@ void cmdhSelectEnvelope(int direction) {
 		for (int i = 0; i < sendCount; ++i) {
 			TrackEnvelope* sendEnv = (TrackEnvelope*)GetSetTrackSendInfo(track, 0, i, "P_ENV", (void*)envType.c_str());
 			if (sendEnv == env) {
-				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", NULL);
-				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", NULL) << " ";
-				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", NULL);
+				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(track, 0, i, "P_DESTTRACK", nullptr);
+				s << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER", nullptr) << " ";
+				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
 				if (trackName)
 					s << trackName << " ";
 			}
@@ -447,29 +484,16 @@ void selectAutomationItem(TrackEnvelope* envelope, int index, bool select=true) 
 	GetSetAutomationItemInfo(envelope, index, "D_UISEL", select, true);
 }
 
-void unselectAllAutomationItems(TrackEnvelope* envelope) {
-	int count = CountAutomationItems(envelope);
-	for (int i = 0; i < count; ++i) {
-		selectAutomationItem(envelope, i, false);
-	}
-}
-
 bool isAutomationItemSelected(TrackEnvelope* envelope, int index) {
 	return GetSetAutomationItemInfo(envelope, index, "D_UISEL", 0, false);
 }
 
-// If max2 is true, this only counts to 2;
-// i.e. 2 or more selected automation items returns 2.
-int countSelectedAutomationItems(TrackEnvelope* envelope, bool max2=false) {
+int countSelectedAutomationItems(TrackEnvelope* envelope) {
 	int count = CountAutomationItems(envelope);
 	int sel = 0;
 	for (int i = 0; i < count; ++i) {
 		if (isAutomationItemSelected(envelope, i)) {
 			++sel;
-		}
-		if (max2 && sel == 2) {
-			// optimisation: We don't care beyond 2.
-			break;
 		}
 	}
 	return sel;
@@ -514,7 +538,10 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 			Undo_BeginBlock();
 		}
 		if (clearSelection) {
-			unselectAllAutomationItems(envelope);
+			forEachAutomationItem([&] (TrackEnvelope* env, int item) {
+				selectAutomationItem(env, item, false);
+				return true;
+			});
 			isSelectionContiguous = true;
 		}
 		if (select) {
@@ -539,7 +566,21 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		}
 		if (isAutomationItemSelected(envelope, i)) {
 			// One selected item is the norm, so don't report selected in this case.
-			if (countSelectedAutomationItems(envelope, true) > 1) {
+			int selCount = 0;
+			if (clearSelection) {
+				// If we cleared the selection, we already know that only 1 item is
+				// selected, so don't bother counting.
+				selCount = 1;
+			} else {
+				forEachAutomationItem([&] (TrackEnvelope* env, int item) {
+					if (isAutomationItemSelected(env, item)) {
+						++selCount;
+					}
+					// We only need to count to 2, since we handle >= 2 the same.
+					return selCount < 2;
+				});
+			}
+			if (selCount > 1) {
 				s << " " << translate("selected");
 			}
 		} else {
@@ -694,7 +735,7 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	if(oldPos == newPos) {
 		s << translate("no change");
 	} else {
-		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, false, cache);
+		s << formatTime(envelopeTimeToProjectTime(newPos), TF_RULER, cache);
 	}
 	outputMessage(s);
 }
@@ -760,5 +801,52 @@ void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
 		cmdhToggleTakeEnvelope(41612); // Take: Toggle take pitch envelope
 	} else {
 		cmdhToggleTrackEnvelope(40409); // Track: Toggle track pre-FX pan envelope visible
+	}
+}
+
+void cmdToggleLastTouchedEnvelope(Command* command) {
+	if (fakeFocus == FOCUS_ITEM) {
+		cmdhToggleTakeEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
+	} else {
+		cmdhToggleTrackEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
+	}
+}
+
+void cmdInsertAutoItem(Command* command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	int oldItems = CountAutomationItems(envelope);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = CountAutomationItems(envelope) - oldItems;
+	if (added) {
+		outputMessage(translate("inserted automation item"));
+	}
+}
+
+void cmdDeleteAutoItems(Command* command) {
+	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, false, true);
+}
+
+void cmdAddAutoItems(Command* command) {
+	int oldItems = countAllAutomationItems();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = countAllAutomationItems() - oldItems;
+	// Translators: Reported when adding automation items. {} will be
+	// replaced with the number of items; e.g. "2 automation items added".
+	outputMessage(format(
+		translate_plural("{} automation item added", "{} automation items added", added),
+		added));
+}
+
+void cmdGlueAutoItems(Command* command) {
+	int oldItems = countAllAutomationItems();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int removed = oldItems - countAllAutomationItems();
+	if (removed == 0) {
+		outputMessage(translate("no automation items glued"));
+	} else {
+		outputMessage(translate("glued automation items"));
 	}
 }

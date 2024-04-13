@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2023-12-12 22:39\n"
+"PO-Revision-Date: 2024-04-13 00:59\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -22,6 +22,52 @@ msgstr "desactivado"
 
 msgid "OSARA: Toggle"
 msgstr "OSARA: conmutar"
+
+msgid "OSARA: Enable"
+msgstr "OSARA: Activa"
+
+msgid "OSARA: Disable"
+msgstr "OSARA: desactiva"
+
+msgctxt "optimal REAPER configuration"
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+msgstr "¿quieres configurar las preferencias de Reaper para una óptima compatibilidad con lectores de pantalla? Choosing yes will make the following changes:"
+
+msgctxt "optimal REAPER configuration"
+msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr "Eliminar del dock el explorador de medios por defecto, éste obtendrá el foco cuando sea abierto."
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr "Habilita los diálogos de exploración de archivos heredados de Windows, para que las opciones específicas de REAPER en los diálogos Abrir y Guardar como, puedan alcanzarse con la tecla de tabulación."
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables the space key to be used for check boxes, etc. in various windows."
+msgstr "Habilita la barra espaciadora para que pueda ser usada en casillas de verificaciones etc. en varias ventanas."
+
+msgctxt "optimal REAPER configuration"
+msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
+msgstr "Muestra texto para indicar paralelo, fuera de línea y con by pass aplicado. en la lista de Fx."
+
+msgctxt "optimal REAPER configuration"
+msgid "Uses a standard, accessible edit control for the video code editor."
+msgstr "Uso de controles estandar de edición accesible en el editor de vídeo."
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
+msgstr "Nota: Si prefieres no hacerlo ahora, Puedes aplicar los cambios más tarde iendo al menu extensión en la barra de menú en el submenú de Osara."
+
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "Configura REAPER para optimizar la accesibilidad con lectores de pantalla"
+
+msgid "Error writing configuration changes."
+msgstr "Error escribiendo cambios en la configuración."
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr "REAPER se cerrará. Por favor reinícielo para que los cambios sean aplicados."
+
+msgid "Restart REAPER"
+msgstr "Reiniciar Reaper"
 
 msgid "volume"
 msgstr "volumen"
@@ -195,6 +241,24 @@ msgstr[1] "{} puntos seleccionados"
 #. occurred.
 msgid "no change"
 msgstr "sin cambios"
+
+msgid "inserted automation item"
+msgstr "ítem de automatización insertado"
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} ítem de automatización agregado"
+msgstr[1] "{} ítems de automatización agregados"
+
+msgid "no automation items glued"
+msgstr "sin ítem de automatización pegado"
+
+msgid "glued automation items"
+msgstr "ítem de automatización pegado"
 
 msgid "active"
 msgstr "activo"
@@ -799,9 +863,6 @@ msgstr "activado"
 msgid "off"
 msgstr "desactivado"
 
-msgid "FX Parameters"
-msgstr "Parámetros de FX"
-
 msgid "low shelf"
 msgstr "low shelf"
 
@@ -847,11 +908,78 @@ msgstr "Banda {} activada"
 msgid "Band {} type"
 msgstr "Banda {} clase"
 
+msgid "FX Parameters"
+msgstr "Parámetros de FX"
+
+msgid "Go to send destination track"
+msgstr "Ir a la pista envío destino"
+
+msgid "Delete send"
+msgstr "Eliminar envío"
+
+msgid "Go to receive source track"
+msgstr "Ir a la pista receptora origen"
+
+msgid "Delete receive"
+msgstr "Eliminar recepción"
+
+msgid "Delete hardware output"
+msgstr "Eliminar salida hardware"
+
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "ninguna"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr "todos"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr "Añadidos &2 nuevos canales"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr "Añadidos &4 nuevos canales"
+
+msgid "post-fader"
+msgstr "post-fader"
+
+msgid "pre-fx"
+msgstr "pre-fx"
+
+msgid "post-fx"
+msgstr "post-fx"
+
 msgid "mute"
 msgstr "silencio"
 
 msgid "mono"
 msgstr "mono"
+
+msgid "source MIDI channel"
+msgstr "canal midi fuente"
+
+msgid "destination MIDI channel"
+msgstr "canal midi destino"
+
+msgid "source audio channel"
+msgstr "canal fuente de audio"
+
+msgid "destination audio channel"
+msgstr "canal destino de audio"
+
+msgid "send type"
+msgstr "tipo de envío"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -862,6 +990,11 @@ msgstr "envío"
 #. Parameters dialog.
 msgid "receive"
 msgstr "recibe"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr "hardware"
 
 msgid "Track Parameters"
 msgstr "Parámetros de pista"
@@ -1027,6 +1160,8 @@ msgstr "{} minutos"
 msgid "{:#.3f} sec"
 msgstr "{:#.3f} segs"
 
+#. Used when reporting a time in seconds. {:.3f} will be
+#. replaced with the number of seconds; e.g. "2 sec".
 msgid "{:.3f} sec"
 msgstr "{:#.3f} seg"
 
@@ -1077,12 +1212,6 @@ msgstr "mínima"
 #. A closed track folder.
 msgid "closed"
 msgstr "cerrada"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "ninguna"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1267,6 +1396,49 @@ msgstr "FX:"
 msgid "delta"
 msgstr "delta"
 
+msgid "master muted"
+msgstr "master silenciado"
+
+msgid "master unmuted"
+msgstr "master no silenciado"
+
+msgid "no selected tracks"
+msgstr "no hay pistas seleccionadas"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] "{} pista silenciada"
+msgstr[1] "{} pistas silenciadas"
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] "{} pista no silenciada"
+msgstr[1] "{} pistas no silenciadas"
+
+msgid "master soloed"
+msgstr "activado solo en pista master"
+
+msgid "master unsoloed"
+msgstr "desactivado solo en pista master"
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] "{} pista activado solo"
+msgstr[1] "{} pistas activado solo"
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] "{} pista desactivado solo"
+msgstr[1] "{} pistas desactivado solo"
+
 msgid "record monitor off"
 msgstr "apagado"
 
@@ -1281,6 +1453,20 @@ msgstr "apagado al reproducir"
 
 msgid "phase normal"
 msgstr "fase normal"
+
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] "{} pista con fase invertida"
+msgstr[1] "{} pistas con fase invertida"
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] "{} pista con fase normal"
+msgstr[1] "{} pistas con fase normal"
 
 msgid "FX active"
 msgstr "FX activo"
@@ -1370,6 +1556,20 @@ msgstr "Ítem"
 
 msgid "Take"
 msgstr "Toma"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] "{} item fade in, hasta cursor"
+msgstr[1] "{} items fade in, hasta cursor"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] "{} ítem fade out, desde cursor"
+msgstr[1] "{} ítems fade out, desde cursor"
 
 #. Panned to the center.
 msgid "center"
@@ -1498,6 +1698,33 @@ msgid_plural "{} items unsoloed"
 msgstr[0] "{} ítems con solo desactivado"
 msgstr[1] "{} ítems con solo desactivado"
 
+msgid "no items selected"
+msgstr "no hay ítems seleccionados"
+
+#. Reported when an action is used to lock an item.
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "bloqueado"
+
+#. Reported when an action is used to unlock an item.
+msgid "unlocked"
+msgstr "desbloqueado"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] "{} ítem bloqueado"
+msgstr[1] "{} ítems bloqueados"
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] "{} ítem desbloqueado"
+msgstr[1] "{} ítems desbloqueados"
+
 msgid "set selection end"
 msgstr "fin de selección fijado"
 
@@ -1548,9 +1775,6 @@ msgstr "pinchazo automático en selección de tiempo: modo de grabación"
 #. to the chosen automation mode.
 msgid "override"
 msgstr "manual"
-
-msgid "no items selected"
-msgstr "no hay ítems seleccionados"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1698,6 +1922,12 @@ msgstr "zoom vertical máximo"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr "{} momentáneo"
+
 msgid "set selection start"
 msgstr "comienzo de selección fijado"
 
@@ -1755,6 +1985,15 @@ msgstr "desarmadas todas las pistas"
 msgid "all delta solos reset"
 msgstr "reiniciado todo delta solos,"
 
+msgid "grid straight"
+msgstr "cuadrícula recta"
+
+msgid "grid dotted"
+msgstr "cuadrícula punteada"
+
+msgid "grid triplet"
+msgstr "rejilla triplete"
+
 msgid "length whole"
 msgstr "duración 1"
 
@@ -1790,6 +2029,15 @@ msgstr "duraci'on sesenta y cuatro"
 
 msgid "length one hundred twenty eighth"
 msgstr "duraci'on ciento veinti ocho"
+
+msgid "length straight"
+msgstr "longitud recta"
+
+msgid "length dotted"
+msgstr "longitud con puntillo"
+
+msgid "length triplet"
+msgstr "longitud con puntillo"
 
 msgid "full screen"
 msgstr "pantalla completa"
@@ -1839,12 +2087,6 @@ msgstr ""
 msgid "seconds secondary"
 msgstr ""
 
-msgid "master muted"
-msgstr "master silenciado"
-
-msgid "master unmuted"
-msgstr "master no silenciado"
-
 msgid "enabled snap"
 msgstr "instantánea activada"
 
@@ -1857,107 +2099,11 @@ msgstr "mapa de teclado por defecto"
 msgid "recording key map"
 msgstr "mapa de teclado por defecto"
 
-msgid "alt 1"
-msgstr "alt 1"
-
-msgid "alt 2"
-msgstr "alt 2"
-
-msgid "alt 3"
-msgstr "alt 3"
-
-msgid "alt 4"
-msgstr "alt 4"
-
-msgid "alt 5"
-msgstr "alt 5"
-
-msgid "alt 6"
-msgstr "alt 6"
-
-msgid "alt 7"
-msgstr "alt 7"
-
-msgid "alt 8"
-msgstr "alt 8"
-
-msgid "alt 9"
-msgstr "alt 9"
-
-msgid "alt 10"
-msgstr "alt 10"
-
-msgid "alt 11"
-msgstr "alt 11"
-
-msgid "alt 12"
-msgstr "alt 12"
-
-msgid "alt 13"
-msgstr "alt 13"
-
-msgid "alt 14"
-msgstr "alt 14"
-
-msgid "alt 15"
-msgstr "alt 15"
-
-msgid "alt 16"
-msgstr "alt 16"
-
 msgid "default momentary"
 msgstr "momentáneo por defecto"
 
 msgid "recording key map momentary"
 msgstr "mapa de teclado de grabación momentáneo por defecto"
-
-msgid "alt 1 momentary"
-msgstr "alt 1 momentáneo"
-
-msgid "alt 2 momentary"
-msgstr "alt 2 Momentáneo"
-
-msgid "alt 3 momentary"
-msgstr "alt 3 Momentáneo"
-
-msgid "alt 4 momentary"
-msgstr "alt 4 Momentáneo"
-
-msgid "alt 5 momentary"
-msgstr "alt 5 Momentáneo"
-
-msgid "alt 6 momentary"
-msgstr "alt 6 Momentáneo"
-
-msgid "alt 7 momentary"
-msgstr "alt 7 Momentáneo"
-
-msgid "alt 8 momentary"
-msgstr "alt 8 Momentáneo"
-
-msgid "alt 9 momentary"
-msgstr "alt 9 Momentáneo"
-
-msgid "alt 10 momentary"
-msgstr "alt 10 Momentáneo"
-
-msgid "alt 11 momentary"
-msgstr "alt 11 Momentáneo"
-
-msgid "alt 12 momentary"
-msgstr "alt 12 Momentáneo"
-
-msgid "alt 13 momentary"
-msgstr "alt 13 Momentáneo"
-
-msgid "alt 14 momentary"
-msgstr "alt 14 Momentáneo"
-
-msgid "alt 15 momentary"
-msgstr "alt 15 Momentáneo"
-
-msgid "alt 16 momentary"
-msgstr "alt 16 Momentáneo"
 
 msgid "auto playing"
 msgstr ""
@@ -2007,41 +2153,41 @@ msgstr "explorador media en el dock"
 msgid "removed Media Explorer from dock"
 msgstr "eliminado explorador media del dock"
 
-msgid "Piano roll view"
-msgstr "Vista Piano roll"
+msgid "piano roll view"
+msgstr "vista piano roll"
 
-msgid "Named notes view"
-msgstr "Vista de nombres de notas"
+msgid "named notes view"
+msgstr "vista de nombres de notas"
 
-msgid "Event list view"
-msgstr "Vista de lista de eventos"
+msgid "event list view"
+msgstr "vista lista de eventos"
 
-msgid "Notation view"
-msgstr "Vista de notación"
+msgid "notation view"
+msgstr "vista de notación"
 
-msgid "Rectangle notes"
-msgstr "Rectángulo"
+msgid "rectangle notes (normal)"
+msgstr "notas rectangulares (normal)"
 
-msgid "Triangle notes"
-msgstr "Triangle notes"
+msgid "triangle notes"
+msgstr "notas triangulares"
 
-msgid "Diamond notes"
-msgstr "Diamantes"
+msgid "diamond notes"
+msgstr "notas diamantes"
 
-msgid "Showed velocity numbers on notes"
-msgstr "Mostrado valor de velocity en notas"
+msgid "showed velocity numbers on notes"
+msgstr "mostrada velocidad en notas"
 
-msgid "Hid velocity numbers on notes"
-msgstr "Oculto valor de velocity en notas"
+msgid "hid velocity numbers on notes"
+msgstr "mostrar velocidad en notas"
 
-msgid "Showed note names"
-msgstr "Mostrado nombre de notas"
+msgid "showed note names"
+msgstr "mostrado nombre de notas"
 
-msgid "Hid note names"
-msgstr "Ocultado nombre de notas"
+msgid "hid note names"
+msgstr "ocultar nombre de notas"
 
-msgid "Inserted notes matching grid"
-msgstr "Notas insertadas de acuerdo a la rejilla"
+msgid "length matching grid"
+msgstr "longutud de la cuadrícula"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -2052,11 +2198,6 @@ msgstr "Cambiar selección de pista"
 
 msgid "Change Item Selection"
 msgstr "Cambiar Selección de Ítem"
-
-#. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr "bloqueado"
 
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
@@ -2103,13 +2244,6 @@ msgid "{} point added"
 msgid_plural "{} points added"
 msgstr[0] "{} punto agregado"
 msgstr[1] "{} puntos agregados"
-
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} ítem de automatización agregado"
-msgstr[1] "{} ítems de automatización agregados"
 
 msgid "nothing pasted"
 msgstr "nada pegado"
@@ -2211,14 +2345,25 @@ msgstr "longitud {}"
 msgid "Selected tracks:"
 msgstr "Pistas seleccionadas:"
 
-msgid "no selected tracks"
-msgstr "no hay pistas seleccionadas"
-
 msgid "Selected items:"
 msgstr "Ítems seleccionados:"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr "Selección de editor midi:"
+
+msgid "no MIDI selection"
+msgstr "sin midi seleccionado"
+
 msgid "no selection"
 msgstr "sin selección"
+
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr "Selección"
 
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
@@ -2403,8 +2548,8 @@ msgstr "OSARA: anuncia pistas con monitor de grabación activado"
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: anuncia pistas con fase invertida"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: anuncia selección de pistas/ítems/selección de tiempo, dependiendo del foco"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr "OSARA: Anuncia selección de pista/ítem/tiempo/MIDI (dependiendo del foco)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: elimina Pistas/ítems/contenido de selección/marcadores/puntos de envolvente, dependiendo del foco"
@@ -2413,7 +2558,7 @@ msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: cambia el modo de ayuda de atajos"
 
 msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: anuncia cursor de edición/reprodución y estado de reproducción"
+msgstr "OSARA: anuncia cursor de edición/reproducción y estado de reproducción"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: activa el modo de selección no contiguo, o cambia la selección   de la pista/ítem, dependiendo del foco"
@@ -2502,6 +2647,9 @@ msgstr "Pista"
 msgid "OSARA: Go to last track"
 msgstr "Pista"
 
+msgid "OSARA: Go to master track"
+msgstr "OSARA: Ir a la pista master"
+
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr "OSARA: forma cíclica de los puntos de envolventes seleccionados"
 
@@ -2509,7 +2657,7 @@ msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
 msgstr "OSARA: conmuta visibilidad de envolvente de volumen de pista, toma (dependiendo del foco)"
 
 msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
-msgstr "OSARA: conmuta visibilidad de panorama de pista, toma (dependiendo del foco)"
+msgstr "OSARA: conmuta visibilidad de envolvente de panorama de pista, toma (dependiendo del foco)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
 msgstr ""
@@ -2528,6 +2676,15 @@ msgstr "OSARA: ajustar fase normal en todas las pistas"
 
 msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA: desactivar monitor en todas las pistas"
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
+msgstr "OSARA: Configurar Reaper para optimizar la accesibilidad con lectores de pantalla"
+
+msgid "OSARA: Check for update"
+msgstr "OSARA: Comprobar actualización"
+
+msgid "OSARA: Open online documentation"
+msgstr "OSARA: abrir documentación en línea"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
@@ -2574,6 +2731,31 @@ msgstr "OSARA: selecciona todas las notas del mismo tono comenzando en la selecc
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: focaliza el evento más cercano al cursor"
 
+msgid "Configuration..."
+msgstr "Configuración..."
+
+msgid "Online &documentation"
+msgstr "Documentación en línea"
+
+msgid "Check for &update"
+msgstr "Comprobar actualización"
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr "Configurar Reaper para una óptima accesibilidad con lectores de pantalla"
+
+msgid "No OSARA update available."
+msgstr "No hay actualizaciones disponibles de Osara."
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr "Actualización de Osara"
+
+msgid "OSARA version {} is available. Changes:"
+msgstr "OSARA versión {} está disponible. Cambios:"
+
+msgid "Error checking for OSARA update."
+msgstr "Error al comprobar actualización de Osara."
+
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "parámetros"
@@ -2585,6 +2767,10 @@ msgstr "&Parámetro:"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "valor:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr "&Más"
 
 msgctxt "Parameters"
 msgid "&Filter:"
@@ -2677,6 +2863,14 @@ msgstr "&aceptar"
 msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "&cancelar"
+
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr "Ir a la Página de descarga"
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr "&Cerrar"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
