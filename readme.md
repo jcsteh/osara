@@ -606,6 +606,8 @@ You can achieve this using OSARA's shortcut help mode.
 
 You can turn shortcut help on and off by pressing F12 (OSARA: Toggle shortcut help).
 While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
+In addition, OSARA will report any MIDI notes received via a MIDI input if the current track is armed.
+Note that OSARA cannot prevent MIDI notes from being handled, so if you're recording, any notes received will still be recorded.
 
 ### Noncontiguous Selection
 Usually, selection is done contiguously; e.g. you might select tracks 1 through 4.
@@ -730,8 +732,6 @@ The dialog contains the following options:
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report position when navigating chords in MIDI editor: When enabled, OSARA will report the cursor position as you move through chords in the piano roll.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
-- Report named MIDI notes for current track on input: When enabled, if a MIDI note is received via a MIDI input and the current track is armed, OSARA will report the note's name if it has been explicitly named.
- This is useful for instruments with unfamiliar key switches.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.

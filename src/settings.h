@@ -44,9 +44,6 @@ BoolSetting(reportPositionMIDI, MIDI_EDITOR_SECTION,
 BoolSetting(reportNotes, MIDI_EDITOR_SECTION,
 	"Report MIDI &notes in MIDI editor",
 	true)
-BoolSetting(reportInputNotes, MAIN_SECTION,
-	"Report named MIDI notes for current track on &input",
-	false)
 BoolSetting(reportSurfaceChanges, MAIN_SECTION,
 	"Report changes made via &control surfaces",
 	false)

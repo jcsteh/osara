@@ -90,9 +90,7 @@ class Surface: public IReaperControlSurface {
 			this->lastPlayPos = playPos;
 			this->reportMarker(playPos);
 		}
-		if (settings::reportInputNotes) {
-			this->reportInputMidiNote();
-		}
+		this->reportInputMidiNote();
 	}
 
 	void SetPlayState(bool play, bool pause, bool rec) final {
@@ -357,6 +355,9 @@ class Surface: public IReaperControlSurface {
 	}
 
 	void reportInputMidiNote() {
+		if (!isShortcutHelpEnabled) {
+			return;
+		}
 		constexpr unsigned char MIDI_NOTE_ON_C0 = 0x90;
 		constexpr unsigned char MIDI_NOTE_ON_C15 = MIDI_NOTE_ON_C0 + 15;
 		static int lastIndex = 0;
@@ -377,12 +378,10 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		int channel = status - MIDI_NOTE_ON_C0;
-		int trackNum = (int) (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER"));
-		const char* noteName = GetTrackMIDINoteName(trackNum - 1, event[1], channel);
-		if (!noteName) {
-			return;
+		const string noteName = getMidiNoteName(track, event[1], channel);
+		if (!noteName.empty()) {
+			outputMessage(noteName);
 		}
-		outputMessage(noteName);
 	}
 
 	MediaTrack* lastSelectedTrack = nullptr;
