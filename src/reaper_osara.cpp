@@ -2971,7 +2971,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			return 1;
 		}
 	} else if (wParam == 'B' && control) {
-		maybeReportFxChainBypass(true);
+		maybeReportFxChainBypass(false, true);
 	} else if (wParam == VK_TAB && !alt) {
 		if (control && maybeSwitchFxTab(shift)) {
 			return 1;
@@ -5231,7 +5231,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			focusName << L": " << name;
 			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
 		} else if (childId > CHILDID_SELF) {
-			maybeReportFxChainBypassDelayed();
+			maybeReportFxChainBypass(true);
 		} else {
 			maybeAnnotatePreferenceDescription();
 		}

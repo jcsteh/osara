@@ -174,7 +174,7 @@ bool maybeSwitchToFxPluginWindow() {
 
 // If the FX list in an FX chain dialog is focused, report active/bypassed for
 // the selected effect.
-bool maybeReportFxChainBypass(bool aboutToToggle) {
+bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle) {
 	string version = string(GetAppVersion(), 0, 4);
 	if (stod(version) >= 7.06) {
 		// REAPER >= 7.06 made this properly accessible.
@@ -189,6 +189,19 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	if (!getFocusedFx(&track, &take, &fx)) {
 		return false; // No FX chain focused.
 	}
+	if (delayed) {
+		// When focusing a new effect, we delay reporting of bypass for three reasons:
+		// 1. The value returned by GetFocusedFX might not be updated immediately.
+		// 2. We want the bypass state to be consistently reported after the effect.
+		// 3. We want to give braille users a chance to read the effect name before
+		// the message with the bypass state clobbers it.
+		static CallLater later;
+		later.cancel();
+		later = CallLater([] {
+			maybeReportFxChainBypass(false, false);
+		}, 1000);
+		return true;
+	}
 	bool enabled;
 	if (take) {
 		enabled = TakeFX_GetEnabled(take, fx);
@@ -200,23 +213,6 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	}
 	outputMessage(enabled ? translate("active") : translate("bypassed"),
 		/* interrupt */ false);
-	return true;
-}
-
-// When focusing a new effect, we delay reporting of bypass for three reasons:
-// 1. The value returned by GetFocusedFX might not be updated immediately.
-// 2. We want the bypass state to be consistently reported after the effect.
-// 3. We want to give braille users a chance to read the effect name before
-// the message with the bypass state clobbers it.
-bool maybeReportFxChainBypassDelayed() {
-	static CallLater later;
-	later.cancel();
-	if (!isFxListFocused()) {
-		return false;
-	}
-	later = CallLater([] {
-		maybeReportFxChainBypass(/* aboutToToggle */ false);
-	}, 1000);
 	return true;
 }
 

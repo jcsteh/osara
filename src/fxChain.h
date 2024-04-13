@@ -12,7 +12,6 @@ bool getFocusedFx(MediaTrack** track = nullptr, MediaItem_Take** take = nullptr,
 bool isFxListFocused();
 void shortenFxName(const char* name, std::ostringstream& s);
 bool maybeSwitchToFxPluginWindow();
-bool maybeReportFxChainBypass(bool aboutToToggle=false);
-bool maybeReportFxChainBypassDelayed();
+bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle=false);
 bool maybeOpenFxPresetDialog();
 bool maybeSwitchFxTab(bool previous);
