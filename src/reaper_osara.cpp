@@ -141,29 +141,24 @@ void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
 }
 
-void CallLater::cancel() {
-	// If this->self is null, the function has already run or been
+bool CallLater::cancel() {
+	// If this->holder is dead, the function has already run or been
 	// cancelled.
-	if (this->self) {
-		KillTimer(mainHwnd, (UINT_PTR)this);
+	if (auto holder = this->holder.lock()) {
+		KillTimer(mainHwnd, (UINT_PTR)holder.get());
 		// Don't keep this alive any longer.
-		this->self = nullptr;
+		holder->self = nullptr;
+		return true;
 	}
-}
-
-void CallLater::init(Ptr self, UINT ms) {
-	// The caller might throw away its reference to this instance. Keep it alive
-	// until func runs.
-	this->self = self;
-	SetTimer(mainHwnd, (UINT_PTR)this, ms, timerProc);
+	return false;
 }
 
 void CALLBACK CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(hwnd, event);
-	auto* instance = (CallLater*)event;
-	instance->func();
-	// func has run, so we don't need to keep this instance alive any longer.
-	instance->self = nullptr;
+	auto* holder = (Holder*)event;
+	holder->func();
+	// func has run, so we don't need to keep holder alive any longer.
+	holder->self = nullptr;
 }
 
 string formatTimeMeasure(int measure, double beat, int measureLength,
@@ -2855,12 +2850,9 @@ HWND getPreferenceDescHwnd(HWND pref) {
 }
 
 bool maybeAnnotatePreferenceDescription() {
-	static CallLater::Ptr later;
-	if (later) {
-		// Cancel previous annotation if focus moved before it could complete.
-		later->cancel();
-		later = nullptr;
-	}
+	static CallLater later;
+	// Cancel previous annotation if focus moved before it could complete.
+	later.cancel();
 	HWND focus = GetFocus();
 	HWND desc = getPreferenceDescHwnd(focus);
 	if (!desc) {
@@ -2872,8 +2864,7 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must delay it.
-	later = callLater([focus, desc] {
-		later = nullptr;
+	later = CallLater([focus, desc] {
 		char text[1000];
 		if (GetWindowText(desc, text, sizeof(text)) == 0) {
 			return;
@@ -4638,7 +4629,7 @@ void cmdJumpToTime(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	// Delay the message slightly to avoid it being clobbered by other VoiceOver
 	// speech when the Jump dialog closes.
-	callLater([] {
+	CallLater([] {
 		outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE));
 	}, 50);
 }
@@ -5148,9 +5139,7 @@ void annotateSpuriousDialogs(HWND hwnd) {
 		annotateSpuriousDialogs(child);
 }
 
-CallLater::Ptr annotateFxDialogLater;
 void annotateFxDialog() {
-	annotateFxDialogLater = nullptr;
 	if (!GetFocusedFX(nullptr, nullptr, nullptr)) {
 		return;
 	}
@@ -5248,15 +5237,14 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		}
 	} else if (event == EVENT_OBJECT_SHOW) {
 		if (isClassName(hwnd, "#32770")) {
+			static CallLater fxLater;
+			fxLater.cancel();
 			if (GetFocusedFX(nullptr, nullptr, nullptr)) {
 				annotateFxDialog();
 			} else {
 				// This might be an FX dialog, but REAPER won't answer that query
 				// immediately, so delay it a bit.
-				if (annotateFxDialogLater) {
-					annotateFxDialogLater->cancel();
-				}
-				annotateFxDialogLater = callLater(annotateFxDialog, 200);
+				fxLater = CallLater(annotateFxDialog, 200);
 			}
 		}
 	}
@@ -5329,7 +5317,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcommand", (void*)handleMainCommandFallback);
 
 		registerExports(rec);
-		callLater(delayedInit, 0);
+		CallLater(delayedInit, 0);
 		rec->Register("hookcustommenu", (void*)handleCustomMenu);
 		AddExtensionsMainMenu();
 #ifdef _WIN32

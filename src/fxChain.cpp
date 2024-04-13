@@ -209,16 +209,12 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 // 3. We want to give braille users a chance to read the effect name before
 // the message with the bypass state clobbers it.
 bool maybeReportFxChainBypassDelayed() {
-	static CallLater::Ptr later;
-	if (later) {
-		later->cancel();
-		later = nullptr;
-	}
+	static CallLater later;
+	later.cancel();
 	if (!isFxListFocused()) {
 		return false;
 	}
-	later = callLater([] {
-		later = nullptr;
+	later = CallLater([] {
 		maybeReportFxChainBypass(/* aboutToToggle */ false);
 	}, 1000);
 	return true;
@@ -415,7 +411,7 @@ bool maybeSwitchFxTab(bool previous) {
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this
 	// because these ComboBox controls take a while to update.
-	callLater([] {
+	CallLater([] {
 		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
 			CHILDID_SELF);
 	}, 30);

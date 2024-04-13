@@ -305,7 +305,7 @@ struct MidiEventListData {
 } ;
 
 vector<MidiNote> previewingNotes; // Notes currently being previewed.
-CallLater::Ptr previewDoneLater;
+CallLater previewDoneLater;
 const int MIDI_NOTE_ON = 0x90;
 const int MIDI_NOTE_OFF = 0x80;
 
@@ -457,18 +457,13 @@ void previewNotes(MediaItem_Take* take, const vector<MidiNote>& notes) {
 	// Calculate the minimum note length.
 	double minLength = min_element(previewingNotes.cbegin(), previewingNotes.cend(), compareNotesByLength)->getLength();
 	// Schedule note off messages.
-	previewDoneLater = callLater([] {
+	previewDoneLater = CallLater([] {
 		previewNotesOff(true);
 	}, (UINT)(minLength ? minLength * 1000 : DEFAULT_PREVIEW_LENGTH));
 }
 
 bool cancelPendingMidiPreviewNotesOff() {
-	if (previewDoneLater) {
-		previewDoneLater->cancel();
-		previewDoneLater = nullptr;
-		return true;
-	}
-	return false;
+	return previewDoneLater.cancel();
 }
 
 // A random access iterator for MIDI events.
