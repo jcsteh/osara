@@ -606,6 +606,8 @@ You can achieve this using OSARA's shortcut help mode.
 
 You can turn shortcut help on and off by pressing F12 (OSARA: Toggle shortcut help).
 While shortcut help is enabled, pressing any shortcut will report the action associated with that shortcut, but the action itself will not be run.
+In addition, OSARA will report any MIDI notes received via a MIDI input if the current track is armed.
+Note that OSARA cannot prevent MIDI notes from being handled, so if you're recording, any notes received will still be recorded.
 
 ### Noncontiguous Selection
 Usually, selection is done contiguously; e.g. you might select tracks 1 through 4.

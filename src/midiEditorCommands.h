@@ -67,3 +67,4 @@ void postToggleFunctionKeysAsStepInput(int command);
 void postMidiToggleSnap(int command);
 void postMidiChangeZoom(int command);
 int countSelectedEvents(MediaItem_Take* take);
+const std::string getMidiNoteName(MediaTrack* track, int pitch, int channel);

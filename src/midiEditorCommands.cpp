@@ -571,7 +571,7 @@ class MidiEventIterator {
 
 using MidiNoteIterator = MidiEventIterator<MidiNote, MediaItem_Take*>;
 
-const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
+const string getMidiNoteName(MediaTrack* track, int pitch, int channel) {
 	static const char* names[] = {
 		// Translators: The name of a musical note.
 		translate("c"),
@@ -598,7 +598,6 @@ const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 		// Translators: The name of a musical note.
 		translate("b")
 	};
-	MediaTrack* track = GetMediaItemTake_Track(take);
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
 	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
 	ostringstream s;
@@ -615,6 +614,11 @@ const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
 		s << names[pitch] << " " << octave;
 	}
 	return s.str();
+}
+
+const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
+	MediaTrack* track = GetMediaItemTake_Track(take);
+	return getMidiNoteName(track, pitch, channel);
 }
 
 // Returns iterators to the first and exclusive last notes in a chord in a given direction.

@@ -199,6 +199,7 @@
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetItemStateChunk
+#define REAPERAPI_WANT_MIDI_GetRecentInputEvent
 #define REAPERAPI_WANT_GetTrackGUID
 #define REAPERAPI_WANT_guidToString
 #define REAPERAPI_WANT_stringToGuid
@@ -332,6 +333,7 @@ std::string formatCursorPosition(TimeFormat format=TF_RULER,
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
+bool isTrackArmed(MediaTrack* track);
 std::string formatDouble(double d, int precision, bool plus=false);
 MediaItem* getItemWithFocus();
 

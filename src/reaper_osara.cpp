@@ -4011,9 +4011,32 @@ void cmdRemoveFocus(Command* command) {
 }
 
 void cmdShortcutHelp(Command* command) {
-	isShortcutHelpEnabled = !isShortcutHelpEnabled;
-	outputMessage(isShortcutHelpEnabled ?
-		translate("shortcut help on") : translate("shortcut help off"));
+	static bool wasMidiStepInputEnabled = false;
+	auto toggleMidiStepInput = [] {
+		if (HWND editor = MIDIEditor_GetActive()) {
+			MIDIEditor_OnCommand(editor, 40481);
+		}
+	};
+	ostringstream s;
+	if (isShortcutHelpEnabled) {
+		isShortcutHelpEnabled = false;
+		s << translate("shortcut help off");
+		if (wasMidiStepInputEnabled) {
+			toggleMidiStepInput();
+			s << ", " << translate("resumed MIDI step input");
+		}
+	} else {
+		isShortcutHelpEnabled = true;
+		s << translate("shortcut help on");
+		wasMidiStepInputEnabled = MIDIEditor_GetActive() && GetToggleCommandState2(
+			SectionFromUniqueID(MIDI_EDITOR_SECTION), 40481);
+		if (wasMidiStepInputEnabled) {
+			// Don't add MIDI input to the take during shortcut help.
+			toggleMidiStepInput();
+			s << ", " << translate("paused MIDI step input");
+		}
+	}
+	outputMessage(s);
 }
 
 void cmdReportCursorPosition(Command* command) {
