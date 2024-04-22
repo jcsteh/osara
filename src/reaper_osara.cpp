@@ -4017,22 +4017,26 @@ void cmdShortcutHelp(Command* command) {
 			MIDIEditor_OnCommand(editor, 40481);
 		}
 	};
+	ostringstream s;
 	if (isShortcutHelpEnabled) {
 		isShortcutHelpEnabled = false;
+		s << translate("shortcut help off");
 		if (wasMidiStepInputEnabled) {
 			toggleMidiStepInput();
+			s << ", " << translate("resumed MIDI step input");
 		}
-		outputMessage(translate("shortcut help off"));
 	} else {
 		isShortcutHelpEnabled = true;
-		wasMidiStepInputEnabled = GetToggleCommandState2(
+		s << translate("shortcut help on");
+		wasMidiStepInputEnabled = MIDIEditor_GetActive() && GetToggleCommandState2(
 			SectionFromUniqueID(MIDI_EDITOR_SECTION), 40481);
 		if (wasMidiStepInputEnabled) {
 			// Don't add MIDI input to the take during shortcut help.
 			toggleMidiStepInput();
+			s << ", " << translate("paused MIDI step input");
 		}
-		outputMessage(translate("shortcut help on"));
 	}
+	outputMessage(s);
 }
 
 void cmdReportCursorPosition(Command* command) {
