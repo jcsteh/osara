@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-04-13 00:59\n"
+"PO-Revision-Date: 2024-04-22 22:53\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -39,15 +39,15 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "Включает устаревшие диалоговые окна просмотра файлов, чтобы с помощью клавиши tab можно было получить доступ к определённым параметрам REAPER в диалогах \"Открыть\" и \"Сохранить как\"."
 
 msgctxt "optimal REAPER configuration"
 msgid "Enables the space key to be used for check boxes, etc. in various windows."
-msgstr ""
+msgstr "Позволяет использовать клавишу пробела для установки флажков и других элементов выбора в различных окнах."
 
 msgctxt "optimal REAPER configuration"
 msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "Отображает текст для обозначения параллельного, автономного и обходимого режима в списке FX."
 
 msgctxt "optimal REAPER configuration"
 msgid "Uses a standard, accessible edit control for the video code editor."
@@ -55,7 +55,7 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr ""
+msgstr "Примечание: если сейчас не самое подходящее время для настройки REAPER, вы можете применить эти настройки позже, перейдя в меню расширений в строке меню, а затем в подменю OSARA."
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
 msgstr "Настройте REAPER для оптимальной работы с программой чтения с экрана"
@@ -165,7 +165,7 @@ msgstr ""
 
 #. A shape for an envelope point.
 msgid "bezier"
-msgstr "безье"
+msgstr "кривая Безье"
 
 #. Reported when moving to an envelope point. {point} will be
 #. replaced with the number of the point. {value} will be replaced with its
@@ -253,7 +253,7 @@ msgid "no change"
 msgstr "изменений нет"
 
 msgid "inserted automation item"
-msgstr ""
+msgstr "объект автоматизации вставлен"
 
 #. Reported when adding automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items added".
@@ -903,13 +903,13 @@ msgstr[2] "{} значений изменено"
 msgstr[3] "{} значений изменено"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "Включенные MIDI-входы в качестве пошагового ввода"
+msgstr "Включены MIDI-входы в качестве пошагового ввода"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "Отключенные MIDI-входы в качестве пошагового ввода"
+msgstr "Отключены MIDI-входы в качестве пошагового ввода"
 
 msgid "Enabled  f1-f12 as step input"
-msgstr "Включен f1-f12 в качестве пошагового ввода"
+msgstr "Включены клавиши f1-f12 в качестве пошагового ввода"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "Отключены клавиши f1-f12 в качестве пошагового ввода"
@@ -1154,6 +1154,9 @@ msgid "not configured"
 msgstr "не настроено"
 
 msgid "following last touched track"
+msgstr ""
+
+msgid "threshold"
 msgstr ""
 
 #. Reported when the user tries to reset a Peak Watcher
@@ -1496,9 +1499,9 @@ msgstr "нет выделенных треков"
 msgid "{} track muted"
 msgid_plural "{} tracks muted"
 msgstr[0] "{} трек приглушён"
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[1] "{} \\vтрека приглушены"
+msgstr[2] "{} треков приглушёны"
+msgstr[3] "{} треков приглушёны"
 
 #. Reported when multiple tracks are unmuted. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unmuted".
@@ -1835,10 +1838,10 @@ msgstr "разблокировано"
 #. with the number of items; e.g. "2 items locked".
 msgid "{} item locked"
 msgid_plural "{} items locked"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] "{} объектов заблокировано"
-msgstr[3] ""
+msgstr[0] "{} элемент заблокирован"
+msgstr[1] "{} элемента заблокированы"
+msgstr[2] "{} элементов заблокировано"
+msgstr[3] "{} элементов заблокировано"
 
 #. Reported when multiple items are unlocked. {} will be
 #. replaced with the number of items; e.g. "2 items unlocked".
@@ -2569,7 +2572,7 @@ msgstr ""
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
 msgid "{} automation mode for selected tracks"
-msgstr "{} режим автоматизации для выделенных треков"
+msgstr "режим автоматизации для выделенных треков {}"
 
 msgid "time selection start"
 msgstr ""
@@ -2882,29 +2885,29 @@ msgid "OSARA: Focus event nearest edit cursor"
 msgstr ""
 
 msgid "Configuration..."
-msgstr ""
+msgstr "Конфигурация..."
 
 msgid "Online &documentation"
 msgstr ""
 
 msgid "Check for &update"
-msgstr ""
+msgstr "Проверить наличие &обновлений"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
 msgstr ""
 
 msgid "No OSARA update available."
-msgstr ""
+msgstr "Обновление OSARA недоступно."
 
 msgctxt "OSARA Update"
 msgid "OSARA Update"
-msgstr ""
+msgstr "Обновление OSARA"
 
 msgid "OSARA version {} is available. Changes:"
-msgstr ""
+msgstr "Доступна OSARA версия {}. Изменения:"
 
 msgid "Error checking for OSARA update."
-msgstr ""
+msgstr "Ошибка при проверке обновления OSARA."
 
 msgctxt "Parameters"
 msgid "Parameters"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-04-13 00:59\n"
+"PO-Revision-Date: 2024-04-22 22:53\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -918,10 +918,10 @@ msgid "post-fader"
 msgstr "推子-后"
 
 msgid "pre-fx"
-msgstr "推子前 (前置-FX) "
+msgstr "推子前(前置-FX)"
 
 msgid "post-fx"
-msgstr "推子前 (后端-FX) "
+msgstr "推子前(后端-FX)"
 
 msgid "mute"
 msgstr "静音"
@@ -1044,6 +1044,9 @@ msgstr "未配置"
 
 msgid "following last touched track"
 msgstr "跟随当前触碰轨"
+
+msgid "threshold"
+msgstr "阈值"
 
 #. Reported when the user tries to reset a Peak Watcher
 #. value, but that watcher is disabled.

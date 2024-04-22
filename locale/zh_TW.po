@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-04-13 00:59\n"
+"PO-Revision-Date: 2024-04-22 22:53\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1044,6 +1044,9 @@ msgstr "未配置"
 
 msgid "following last touched track"
 msgstr "追蹤最後觸碰的軌道"
+
+msgid "threshold"
+msgstr "閾值"
 
 #. Reported when the user tries to reset a Peak Watcher
 #. value, but that watcher is disabled.

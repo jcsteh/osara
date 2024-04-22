@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2024-04-13 00:59\n"
+"PO-Revision-Date: 2024-04-22 22:53\n"
 
 msgid "enabled"
 msgstr ""
@@ -1080,6 +1080,9 @@ msgid "not configured"
 msgstr ""
 
 msgid "following last touched track"
+msgstr ""
+
+msgid "threshold"
 msgstr ""
 
 #. Reported when the user tries to reset a Peak Watcher

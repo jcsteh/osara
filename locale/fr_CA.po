@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-04-13 00:59\n"
+"PO-Revision-Date: 2024-04-22 22:53\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1081,6 +1081,9 @@ msgstr "pas encore configuré"
 
 msgid "following last touched track"
 msgstr "suivre la dernière piste touchée"
+
+msgid "threshold"
+msgstr "seuil"
 
 #. Reported when the user tries to reset a Peak Watcher
 #. value, but that watcher is disabled.
