@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-04-22 22:53\n"
+"PO-Revision-Date: 2024-05-02 09:11\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -2302,11 +2302,17 @@ msgid "take marker deleted"
 msgid_plural "{} take markers deleted"
 msgstr[0] "{} 片段标记已删除"
 
+msgid "shortcut help off"
+msgstr "快捷帮助关"
+
+msgid "resumed MIDI step input"
+msgstr ""
+
 msgid "shortcut help on"
 msgstr "快捷帮助开"
 
-msgid "shortcut help off"
-msgstr "快捷帮助关"
+msgid "paused MIDI step input"
+msgstr ""
 
 msgid "paused"
 msgstr "已暂停"

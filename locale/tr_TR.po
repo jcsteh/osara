@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2024-04-22 22:53\n"
+"PO-Revision-Date: 2024-05-02 09:11\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -2375,10 +2375,16 @@ msgid_plural "{} take markers deleted"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "shortcut help off"
+msgstr ""
+
+msgid "resumed MIDI step input"
+msgstr ""
+
 msgid "shortcut help on"
 msgstr ""
 
-msgid "shortcut help off"
+msgid "paused MIDI step input"
 msgstr ""
 
 msgid "paused"

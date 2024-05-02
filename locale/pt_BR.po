@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-04-22 22:53\n"
+"PO-Revision-Date: 2024-05-02 09:11\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -2375,11 +2375,17 @@ msgid_plural "{} take markers deleted"
 msgstr[0] "{} marcador de trecho (take) excluído"
 msgstr[1] "{} marcadores de trechos (takes) excluídos"
 
+msgid "shortcut help off"
+msgstr "Ajuda de comandos desativada"
+
+msgid "resumed MIDI step input"
+msgstr ""
+
 msgid "shortcut help on"
 msgstr "ajuda de comandos ativada"
 
-msgid "shortcut help off"
-msgstr "Ajuda de comandos desativada"
+msgid "paused MIDI step input"
+msgstr ""
 
 msgid "paused"
 msgstr "pausado"

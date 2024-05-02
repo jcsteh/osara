@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-04-22 22:53\n"
+"PO-Revision-Date: 2024-05-02 09:11\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1401,11 +1401,11 @@ msgstr "錄音監聽關"
 #. Record monitor set to normal.
 msgctxt "record monitor"
 msgid "normal"
-msgstr "正常"
+msgstr "監聽輸入"
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
-msgstr "播放部監聽"
+msgstr "監聽輸入(磁帶自動風格)"
 
 msgid "phase normal"
 msgstr "像位正常"
@@ -2302,11 +2302,17 @@ msgid "take marker deleted"
 msgid_plural "{} take markers deleted"
 msgstr[0] "片段標記刪除"
 
+msgid "shortcut help off"
+msgstr "熱鍵幫助關"
+
+msgid "resumed MIDI step input"
+msgstr "恢復 MIDI 步進輸入"
+
 msgid "shortcut help on"
 msgstr "熱鍵幫助開"
 
-msgid "shortcut help off"
-msgstr "熱鍵幫助關"
+msgid "paused MIDI step input"
+msgstr "暫停 MIDI 步進輸入"
 
 msgid "paused"
 msgstr "已暫停"
