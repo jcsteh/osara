@@ -368,8 +368,9 @@ class Surface: public IReaperControlSurface {
 			&device, nullptr, nullptr);
 		unsigned char status = event[0];
 		if (index == lastIndex || status < MIDI_NOTE_ON_C0 ||
-				status > MIDI_NOTE_ON_C15) {
-			// Already reported this note or not a MIDI note on.
+				status > MIDI_NOTE_ON_C15 || event[2] == 0) {
+			// Already reported this note, not a MIDI note on or MIDI note on with
+			// 0 velocity (which is equivalent to note off).
 			return;
 		}
 		lastIndex = index;
