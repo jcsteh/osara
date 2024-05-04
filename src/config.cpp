@@ -248,7 +248,7 @@ void cmdConfigReaperOptimal(Command* command) {
 		// Undock Media Explorer
 		{"reaper_explorer", "docked", 0, 0},
 		// Enable "Close window on escape key" option in Media Explorer menu
-		{"reaper_explorer", "autoplay", 0, 17},
+		{"reaper_explorer", "autoplay", 1 << 4, 17},
 		// Enable legacy file browse dialogs for more accessible check boxes
 		{"REAPER", "legacy_filebrowse", 0, 1},
 		// Prefs -> Keyboard/Multi-touch: Allow space key to be used for navigation in various windows
