@@ -215,7 +215,7 @@ struct ReaperSetting {
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
-constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 1;
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 2;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
 void cmdConfigReaperOptimal(Command* command) {
@@ -229,6 +229,7 @@ void cmdConfigReaperOptimal(Command* command) {
 	s <<
 		translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Undocks the Media Explorer by default so that it gets focus when opened.")
+		<< nl << translate_ctxt("optimal REAPER configuration", "Enables closing Media Explorer using the escape key.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
 		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
@@ -244,13 +245,17 @@ void cmdConfigReaperOptimal(Command* command) {
 		return;
 	}
 	const ReaperSetting settings[] = {
+		// Undock Media Explorer
 		{"reaper_explorer", "docked", 0, 0},
+		// Enable "Close window on escape key" option in Media Explorer menu
+		{"reaper_explorer", "autoplay", 1 << 4, 17},
+		// Enable legacy file browse dialogs for more accessible check boxes
 		{"REAPER", "legacy_filebrowse", 0, 1},
-		// Allow space key to be used for navigation in various windows
+		// Prefs -> Keyboard/Multi-touch: Allow space key to be used for navigation in various windows
 		{"REAPER", "mousewheelmode", 1 << 7, 130},
-		// Show FX state as accessible text in name
+		// Prefs -> Plug-ins: Show FX state as accessible text in name
 		{"REAPER", "fxfloat_focus", 1 << 20, 1048579},
-		// Use standard edit control for video code editor (for accessibility, lacks many features)
+		// Prefs -> Video: Use standard edit control for video code editor (for accessibility, lacks many features)
 		{"REAPER", "video_colorspace", 1 << 11, 789507},
 	};
 	for (const auto& setting: settings) {
