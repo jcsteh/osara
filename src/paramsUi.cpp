@@ -1456,6 +1456,8 @@ class TrackParams: public ReaperObjParamSource {
 
 	void addSendParams(int category, const char* categoryName, const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
+		string lastDispPrefix;
+		int sameDispPrefixCount = 1;
 		for (int i = 0; i < count; ++i) {
 			ostringstream dispPrefix;
 			// Example display name: "1 Drums send volume"
@@ -1475,6 +1477,16 @@ class TrackParams: public ReaperObjParamSource {
 				dispPrefix << sendName << " ";
 			}
 			dispPrefix << categoryName << " ";
+			if (dispPrefix.str() == lastDispPrefix) {
+				// There are multiple sends to the same target. Number the second onwards
+				// to differentiate them. We don't number the first to avoid unnecessary
+				// verbosity for the majority of cases where there is only one send to a
+				// given target.
+				dispPrefix << ++sameDispPrefixCount << " ";
+			} else {
+				sameDispPrefixCount = 1;
+				lastDispPrefix = dispPrefix.str();
+			}
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make));
