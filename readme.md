@@ -181,6 +181,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item properties: Increase item rate by ~0.6% (10 cents): Shift+2
 - Item properties: Increase item rate by ~0.6% (10 cents), clear 'preserve pitch': shift+4
 - Item properties: Increase item rate by ~6% (one semitone), clear 'preserve pitch': shift+6
+- SWS/FNG: Time compress selected items (fine): Control+Alt+-
+SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Item properties: Set item rate to 1.0: Control+Alt+Backspace
 - Item properties: Pitch item down one cent: Shift+7
 - Item properties: Pitch item up one cent: Shift+8
