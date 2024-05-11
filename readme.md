@@ -222,6 +222,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Insert region from time selection: Shift+R
 
 #### Time Signature/Tempo Markers
+- Manage current tempo and time signature: Shift+C (one press announces the current tempo and time signature, a double press allows you to insert a marker).
 - Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
 
