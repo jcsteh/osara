@@ -222,8 +222,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Insert region from time selection: Shift+R
 
 #### Time Signature/Tempo Markers
-- OSARA: Report tempo and time signature at play cursor (press twice to add/edit tempo marker): Shift+C
- - Move edit cursor to previous tempo or time signature change: Shift+;
+- Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
 
 #### Automation

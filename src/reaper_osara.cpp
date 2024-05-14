@@ -3584,23 +3584,22 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 }
 
 void reportTempoTimeSig() {
-ReaProject* proj=EnumProjects(-1, nullptr, 0);
-if(proj==nullptr) return;
-double tempo=0;
-int timesig1=0;
-int timesig2=0;
-double pos=GetPlayPosition();
-TimeMap_GetTimeSigAtTime(proj, pos, &timesig1, &timesig2, &tempo);
-outputMessage(formatDouble(tempo, 1, false)+", "+to_string(timesig1)+"/"+to_string(timesig2));
+	ReaProject* proj=EnumProjects(-1, nullptr, 0);
+	if(proj==nullptr) return;
+	double tempo=0;
+	int timesig_num=0;
+	int timesig_denom=0;
+	double pos=GetPlayPosition();
+	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
+	outputMessage(format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
 }
 
 void cmdManageTempoTimeSigMarkers(Command* command) {
-if(lastCommandRepeatCount==0)
-{
-reportTempoTimeSig();
-return;
-}
-Main_OnCommand(40256, 0);
+	if(lastCommandRepeatCount==0) {
+		reportTempoTimeSig();
+		return;
+	}
+	Main_OnCommand(40256, 0); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
 }
 
 void cmdSwitchProjectTab(Command* command) {
