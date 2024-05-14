@@ -3157,6 +3157,13 @@ void cmdGoToMasterTrack(Command* command){
 	postGoToTrack(0);
 }
 
+string getReportableSourceType(const char* type) {
+	if((!type)||(!*type)) return "";
+	string reported_type=type;
+	if((reported_type=="VIDEO")||(reported_type=="MIDI")) return reported_type;
+	return "AUDIO";
+}
+
 void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask&1;
@@ -3236,6 +3243,9 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		}
 		MediaItem_Take* take = GetActiveTake(item);
 		if (take) {
+			if (auto* source = (PCM_source*)GetSetMediaItemTakeInfo(take, "P_SOURCE", nullptr)) {
+				s << " " << getReportableSourceType(source->GetType());
+			}
 			s << " " << GetTakeName(take);
 		}
 		int takeCount = CountTakes(item);
