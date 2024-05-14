@@ -3585,7 +3585,9 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 
 void reportTempoTimeSig() {
 	ReaProject* proj=EnumProjects(-1, nullptr, 0);
-	if(proj==nullptr) return;
+	if (!proj) {
+		return;
+	}
 	double tempo=0;
 	int timesig_num=0;
 	int timesig_denom=0;
