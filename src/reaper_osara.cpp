@@ -3583,6 +3583,27 @@ void cmdUnselAllTracksItemsPoints(Command* command) {
 		outputMessage(translate("unselected tracks/items/envelope points"));
 }
 
+void reportTempoTimeSig() {
+	ReaProject* proj=EnumProjects(-1, nullptr, 0);
+	if (!proj) {
+		return;
+	}
+	double tempo=0;
+	int timesig_num=0;
+	int timesig_denom=0;
+	double pos=GetPlayPosition();
+	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
+	outputMessage(format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
+}
+
+void cmdManageTempoTimeSigMarkers(Command* command) {
+	if(lastCommandRepeatCount==0) {
+		reportTempoTimeSig();
+		return;
+	}
+	Main_OnCommand(40256, 0); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
+}
+
 void cmdSwitchProjectTab(Command* command) {
 	ReaProject* oldProj = EnumProjects(-1, nullptr, 0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -4852,6 +4873,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
