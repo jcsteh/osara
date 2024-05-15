@@ -4873,7 +4873,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor (press twice to add/edit tempo marker)")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
