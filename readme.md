@@ -1026,3 +1026,4 @@ The resulting installer can be found in the installer directory.
 - James Scholes
 - Christian Fillion
 - Jenny K Brennan
+- Day Garwood
