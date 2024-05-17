@@ -3524,11 +3524,17 @@ void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
-	if (GetToggleCommandState(40310 || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
-		// Translators: Reported when items are removed and ripple is enabled. We inform users that ripple is on because that can influence the resulting positions of items on their timeline.
-		// {} will be replaced with the number of items; e.g. "2 items removed with ripple enabled".
+	if (GetToggleCommandState(40310)) { // Set ripple editing per-track
+		// Translators: Reported when items are removed and ripple per track is enabled. We inform users that ripple is on because that can influence the resulting positions of items on their timeline.
+		// {} will be replaced with the number of items; e.g. "2 items removed with ripple per track enabled".
 		outputMessage(format(
-			translate_plural("{} item removed with ripple enabled", "{} items removed with ripple enabled", removed),
+			translate_plural("{} item removed with ripple per track enabled", "{} items removed with ripple per track enabled", removed),
+			removed));
+	} else if (GetToggleCommandState(40311)) { // Set ripple editing all tracks
+		// Translators: Reported when items are removed and ripple all tracks is enabled. We inform users that ripple is on because that can influence the resulting positions of items on their timeline.
+		// {} will be replaced with the number of items; e.g. "2 items removed with ripple all enabled".
+		outputMessage(format(
+			translate_plural("{} item removed with ripple all enabled", "{} items removed with ripple all enabled", removed),
 			removed));
 	} else {
 		// Translators: Reported when items are removed. {} will be replaced with the
