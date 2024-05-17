@@ -3506,14 +3506,23 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				int count = 0;
 				if(selItems == 0) { // these commands treat no item selection as if all items are selected
 					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
-				} else {
+				} else if (selItems > 0) {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
+				if(GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
+				// Translators: used for  "Item: Cut selected area of items" and "Item:
+				// Remove selected area of items" when ripple is enabled.
+				// {} is replaced by the number of items affected.
+				outputMessage(format(
+					translate_plural("selected area of {} item removed with ripple enabled", "selected area of {} items removed with ripple enabled", count), count));
+				} else {
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
 				outputMessage(format(
 					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count));
+				}
+				break;
 			}
 		}
 	}
