@@ -1918,6 +1918,19 @@ void postReverseTake(int command) {
 		count));
 }
 
+void postMoveEnvelopePoint(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage(translate("no items selected"));
+		return;
+	}
+	// Translators: Reported when moving items to previous track. {} will be replaced by the
+	// number of items; e.g. "2 items moved up".
+	outputMessage(format(
+		translate_plural("{} item moved up", "{} items moved up", count),
+		count));
+}
+
 void postTogglePreRoll(int command) {
 	outputMessage(GetToggleCommandState(command) ?
 		translate("enabled pre roll before recording") : translate("disabled pre roll before recording"));
