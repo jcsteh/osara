@@ -2068,7 +2068,18 @@ void postMidiChangeZoom(int command) {
 	if (zoom <0) {
 		return;
 	}
-	// Translators: Reported when zooming in or out horizontally. {} will be
-	// replaced with the number of pixels per second; e.g. 100 pixels/second.
-	outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
+	// If piano roll timebase is set to "project beats (default)" or "source beats",
+	//the zoom is in pixels per midi tick. we need to convert it to pixels per beat.
+	if(GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40459) == 1 // Timebase: Beats (project)
+		|| GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40470) == 1) { // Timebase: Beats (source)
+		MediaItem* item = GetMediaItemTake_Item(take);
+		zoom *= getItemPPQ(item);
+		// Translators: Reported when zooming in or out horizontally. {} will be
+		// replaced with the number of pixels per beat; e.g. 100 pixels/beat.
+		outputMessage(format(translate("{} pixels/beat"), formatDouble(zoom, 1)));
+	} else {
+		// Translators: Reported when zooming in or out horizontally. {} will be
+		// replaced with the number of pixels per second; e.g. 100 pixels/second.
+		outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
+	}
 }
