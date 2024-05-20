@@ -76,8 +76,32 @@ double envelopeTimeToProjectTime(double time) {
 void postMoveEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
+		int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage(translate("no items selected"));
 		return;
 	}
+	// Translators: Reported when moving items{} will be replaced by the
+	// number of items; e.g. "2 items moved".
+switch(command) {
+	case 40117: {
+		outputMessage(format(
+		translate_plural("{} item moved up", "{} items moved up", count),
+		count));
+	break;
+}
+	case 40118: {
+		outputMessage(format(
+		translate_plural("{} item moved down", "{} items moved down", count),
+		count));
+	break;
+}
+	default: {
+		outputMessage(translate("Unknown case "));
+	}
+} 
+}
+
 	fakeFocus = FOCUS_ENVELOPE;
 	int point = getEnvelopePointAtCursor();
 	if (point < 0)
