@@ -2010,6 +2010,19 @@ void postSetItemEnd(int command) {
 	}
 }
 
+void postTrimItemToSelection(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage(translate("no items selected"));
+		return;
+	}
+	// Translators: Reported when trimming items to selected area. {} will be replaced by the
+	// number of items; e.g. "2 items trimmed".
+	outputMessage(format(
+		translate_plural("{} item trimmed", "{} items trimmed", count),
+		count));
+}
+
 void postGoToTakeMarker(int command) {
 	int itemCount = CountSelectedMediaItems(0);
 	if (itemCount == 0) {
@@ -2243,6 +2256,7 @@ void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	outputMessage(text);
 }
 
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -2396,6 +2410,7 @@ PostCommand POST_COMMANDS[] = {
 	{40509, postItemFades}, // Item: Fade items in to cursor
 	{40510, postItemFades}, // Item: Fade items out from cursor
 	{40612, postSetItemEnd}, // Item: Set item end to source media end
+	{40508, postTrimItemToSelection}, //Item: Trim items to selected area
 	{40630, postCursorMovement}, // Go to start of time selection
 	{40631, postCursorMovement}, // Go to end of time selection
 	{40632, postCursorMovement}, // Go to start of loop
