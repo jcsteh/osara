@@ -3422,6 +3422,22 @@ void cmdPaste(Command* command) {
 	}
 }
 
+//JenWorkingHere 3378
+void cmdPasteAsNewTake(Command* command) {
+MediaItem* item = GetSelectedMediaItem(0, 0);
+	int oldCount = CountTakes(item);
+	//Main_OnCommand(command, 0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int added = CountTakes(item) - oldCount;
+	// Translators: Reported when takes are added. {} will be replaced with the
+	// number of takes; e.g. "2 takes added".
+	outputMessage(format(
+		translate_plural("{} take added", "{} takes added", added), added));
+	if (!added) {
+		return;
+	}
+}
+
 void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(command, 0);
@@ -4748,6 +4764,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
 	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
+	//JenWorkingHere 4722
+	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPasteAsNewTake}, // Take: Paste as takes in items
 	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
 	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
