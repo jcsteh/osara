@@ -1718,6 +1718,39 @@ void postSelectMultipleItems(int command) {
 	SetCursorContext(1, nullptr);
 }
 
+void postMoveItemOrEnvelopePoint(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		int count = CountSelectedMediaItems(0);
+		if(count==0) {
+			outputMessage(translate("no items selected"));
+			return;
+		}
+		switch(command) {
+			case 40117: { // Item edit: Move items/envelope points up one track/a bit
+				// Translators: Reported when moving items up. {} will be replaced by the
+				// number of items; e.g. "2 items moved up".
+				outputMessage(format(
+					translate_plural("{} item moved up", "{} items moved up", count),
+					count));
+				break;
+			}
+			case 40118: { // Item edit: Move items/envelope points down one track/a bit
+				// Translators: Reported when moving items down. {} will be replaced by the
+				// number of items; e.g. "2 items moved".
+				outputMessage(format(
+					translate_plural("{} item moved down", "{} items moved down", count),
+					count));
+				break;
+			}
+			default:
+				assert(false);
+		} 
+	} else {
+		postMoveEnvelopePoint(command);
+	}
+}
+
 void postRenameTrack(int command) {
 	if (!GetLastTouchedTrack())
 		return;
@@ -2360,8 +2393,8 @@ PostCommand POST_COMMANDS[] = {
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
 	{40717, postSelectMultipleItems}, // Item: Select all items in current time selection
-	{40117, postMoveEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
-	{40118, postMoveEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
+	{40117, postMoveItemOrEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
+	{40118, postMoveItemOrEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{41561, postToggleItemSolo}, // Item properties: Toggle solo
