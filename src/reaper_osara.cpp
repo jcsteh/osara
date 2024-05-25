@@ -2256,7 +2256,6 @@ void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	outputMessage(text);
 }
 
-
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
