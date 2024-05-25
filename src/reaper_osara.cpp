@@ -1726,27 +1726,29 @@ void postMoveItemOrEnvelopePoint(int command) {
 			outputMessage(translate("no items selected"));
 			return;
 		}
-		// Translators: Reported when moving items{} will be replaced by the
-	// number of items; e.g. "2 items moved".
 		switch(command) {
-			case 40117: {
+			case 40117: { // Item edit: Move items/envelope points up one track/a bit
+				// Translators: Reported when moving items up. {} will be replaced by the
+				// number of items; e.g. "2 items moved up".
 				outputMessage(format(
 					translate_plural("{} item moved up", "{} items moved up", count),
 					count));
 				break;
 			}
-			case 40118: {
+			case 40118: { // Item edit: Move items/envelope points down one track/a bit
+				// Translators: Reported when moving items down. {} will be replaced by the
+				// number of items; e.g. "2 items moved".
 				outputMessage(format(
 					translate_plural("{} item moved down", "{} items moved down", count),
 					count));
 				break;
 			}
-//			default: {
-//				outputMessage("Unknown case ");
-//			}
+			default:
+				assert(false);
 		} 
+	} else {
+		postMoveEnvelopePoint(command);
 	}
-	else postMoveEnvelopePoint(command);
 }
 
 void postRenameTrack(int command) {
