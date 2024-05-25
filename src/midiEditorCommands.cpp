@@ -1037,19 +1037,27 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 }
 
 void cmdMidiMoveToNextChord(Command* command) {
+	Undo_BeginBlock();
 	moveToChord(1);
+	Undo_EndBlock(translate("OSARA: Move to next chord"), 0);
 }
 
 void cmdMidiMoveToPreviousChord(Command* command) {
+	Undo_BeginBlock();
 	moveToChord(-1);
+	Undo_EndBlock(translate("OSARA: Move to previous chord"), 0);
 }
 
 void cmdMidiMoveToNextChordKeepSel(Command* command) {
+	Undo_BeginBlock();
 	moveToChord(1, false, isSelectionContiguous);
+Undo_EndBlock(translate("OSARA: Move to next chord and add to selection"), 0);
 }
 
 void cmdMidiMoveToPreviousChordKeepSel(Command* command) {
+	Undo_BeginBlock();
 	moveToChord(-1, false, isSelectionContiguous);
+	Undo_EndBlock(translate("OSARA: Move to next chord and add to selection"), 0);	
 }
 
 void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true) {
@@ -1091,19 +1099,27 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 }
 
 void cmdMidiMoveToNextNoteInChord(Command* command) {
+	Undo_BeginBlock();
 	moveToNoteInChord(1);
+	Undo_EndBlock(translate("OSARA: Move to next note in chord"), 0);
 }
 
 void cmdMidiMoveToPreviousNoteInChord(Command* command) {
+	Undo_BeginBlock();
 	moveToNoteInChord(-1);
+	Undo_EndBlock(translate("OSARA: Move to previous note in chord"), 0);
 }
 
 void cmdMidiMoveToNextNoteInChordKeepSel(Command* command) {
+	Undo_BeginBlock();
 	moveToNoteInChord(1, false, isSelectionContiguous);
+	Undo_EndBlock(translate("OSARA: Move to next note in chord and add to selection"), 0);
 }
 
 void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
+	Undo_BeginBlock();
 	moveToNoteInChord(-1, false, isSelectionContiguous);
+	Undo_EndBlock(translate("OSARA: Move to previous note in chord and add to selection"), 0);
 }
 
 void postMidiMovePitchCursor(int command) {
