@@ -3433,7 +3433,6 @@ void cmdPasteAsNewTake(Command* command) {
 		translate_plural("{} take added", "{} takes added", added), added));
 	if (!added) {
 		outputMessage(translate("no takes added"));
-		//return;
 	}
 }
 
