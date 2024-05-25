@@ -165,6 +165,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Fade items out from cursor: Control+Alt+O
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Win+Delete
+- Item: Trim items to selected area: Control+Win+T
 
 #### Takes
 - Take: Switch items to next take: T
