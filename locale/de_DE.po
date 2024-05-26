@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2024-05-02 09:11\n"
+"PO-Revision-Date: 2024-05-26 11:59\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -35,6 +35,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables closing Media Explorer using the escape key."
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -845,6 +849,11 @@ msgstr "Einrasten im Grid aktiviert"
 
 msgid "disabled snap to grid"
 msgstr "Einrasten am Grid deaktiviert"
+
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
+msgid "{} pixels/beat"
+msgstr ""
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -1669,6 +1678,23 @@ msgid_plural "{} items selected"
 msgstr[0] "{} Item selektiert"
 msgstr[1] "{} Items selektiert"
 
+msgid "no items selected"
+msgstr "Keine Items ausgewählt"
+
+#. Reported when moving items up. {} will be replaced by the
+#. number of items; e.g. "2 items moved up".
+msgid "{} item moved up"
+msgid_plural "{} items moved up"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when moving items down. {} will be replaced by the
+#. number of items; e.g. "2 items moved".
+msgid "{} item moved down"
+msgid_plural "{} items moved down"
+msgstr[0] ""
+msgstr[1] ""
+
 #. Reported when prompting for the name of a track.
 msgid "Track name"
 msgstr "Track Name"
@@ -1700,9 +1726,6 @@ msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
 msgstr[0] "{} Item Solo deaktiviert"
 msgstr[1] "{} Items Solo deaktiviert"
-
-msgid "no items selected"
-msgstr "Keine Items ausgewählt"
 
 #. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
@@ -1856,6 +1879,13 @@ msgstr "{} Item Enden auf das Ende des Quellmediums gesetzt"
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
 msgstr "Item Ende auf das Ende des Quellmediums gesetzt: {}"
+
+#. Reported when trimming items to selected area. {} will be replaced by the
+#. number of items; e.g. "2 items trimmed".
+msgid "{} item trimmed"
+msgid_plural "{} items trimmed"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -2693,6 +2723,9 @@ msgid "OSARA: Check for update"
 msgstr ""
 
 msgid "OSARA: Open online documentation"
+msgstr ""
+
+msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

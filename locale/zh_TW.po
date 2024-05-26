@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-05-02 09:11\n"
+"PO-Revision-Date: 2024-05-26 11:59\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -36,6 +36,10 @@ msgstr "您想調整 REAPER 偏好設定以獲得與螢幕閱讀器的最佳相�
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
 msgstr "預設取消停靠媒體資源管理器，以便它在開啟時獲得焦點。"
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables closing Media Explorer using the escape key."
+msgstr "啟用退出鍵關閉媒體總管"
 
 msgctxt "optimal REAPER configuration"
 msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
@@ -808,6 +812,11 @@ msgstr "啟用吸附網格"
 
 msgid "disabled snap to grid"
 msgstr "停用吸附網格"
+
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
+msgid "{} pixels/beat"
+msgstr "{} 像素/節拍"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -1613,6 +1622,21 @@ msgid "{} item selected"
 msgid_plural "{} items selected"
 msgstr[0] "{} 對象選取"
 
+msgid "no items selected"
+msgstr "無對象選取"
+
+#. Reported when moving items up. {} will be replaced by the
+#. number of items; e.g. "2 items moved up".
+msgid "{} item moved up"
+msgid_plural "{} items moved up"
+msgstr[0] "{} 對象上移"
+
+#. Reported when moving items down. {} will be replaced by the
+#. number of items; e.g. "2 items moved".
+msgid "{} item moved down"
+msgid_plural "{} items moved down"
+msgstr[0] "{} 對象下移"
+
 #. Reported when prompting for the name of a track.
 msgid "Track name"
 msgstr "軌道名"
@@ -1640,9 +1664,6 @@ msgstr[0] "{} 對象獨奏"
 msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
 msgstr[0] "{} 對象取消獨奏"
-
-msgid "no items selected"
-msgstr "無對象選取"
 
 #. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
@@ -1792,6 +1813,12 @@ msgstr "{} 對象結尾設置為源媒體結尾"
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
 msgstr "對象結尾設置為源媒體結尾：{}"
+
+#. Reported when trimming items to selected area. {} will be replaced by the
+#. number of items; e.g. "2 items trimmed".
+msgid "{} item trimmed"
+msgid_plural "{} items trimmed"
+msgstr[0] "{} 對象被修剪"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -2619,6 +2646,9 @@ msgstr "OSARA:  檢查更新"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: 開啟線上說明文件"
+
+msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
+msgstr "OSARA: 報告播放游標位置的速度與拍號，按兩次開啟添加/編輯速度標記"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"

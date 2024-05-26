@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-05-02 09:11\n"
+"PO-Revision-Date: 2024-05-26 11:59\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -36,6 +36,10 @@ msgstr "¿quieres configurar las preferencias de Reaper para una óptima compati
 msgctxt "optimal REAPER configuration"
 msgid "Undocks the Media Explorer by default so that it gets focus when opened."
 msgstr "Eliminar del dock el explorador de medios por defecto, éste obtendrá el foco cuando sea abierto."
+
+msgctxt "optimal REAPER configuration"
+msgid "Enables closing Media Explorer using the escape key."
+msgstr "Activar el cierre del explorador media con tecla escape."
 
 msgctxt "optimal REAPER configuration"
 msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
@@ -845,6 +849,11 @@ msgstr "activada snap a la rejilla"
 
 msgid "disabled snap to grid"
 msgstr "desactivada snap a la rejilla"
+
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
+msgid "{} pixels/beat"
+msgstr "{} pixels/beat"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -1669,6 +1678,23 @@ msgid_plural "{} items selected"
 msgstr[0] "{} ítem seleccionado"
 msgstr[1] "{} ítems seleccionados"
 
+msgid "no items selected"
+msgstr "no hay ítems seleccionados"
+
+#. Reported when moving items up. {} will be replaced by the
+#. number of items; e.g. "2 items moved up".
+msgid "{} item moved up"
+msgid_plural "{} items moved up"
+msgstr[0] "{} ítem subido"
+msgstr[1] "{} ítems subidos"
+
+#. Reported when moving items down. {} will be replaced by the
+#. number of items; e.g. "2 items moved".
+msgid "{} item moved down"
+msgid_plural "{} items moved down"
+msgstr[0] "{} ítem bajado"
+msgstr[1] "{} ítems bajados"
+
 #. Reported when prompting for the name of a track.
 msgid "Track name"
 msgstr "Nombre de pista"
@@ -1700,9 +1726,6 @@ msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
 msgstr[0] "{} ítems con solo desactivado"
 msgstr[1] "{} ítems con solo desactivado"
-
-msgid "no items selected"
-msgstr "no hay ítems seleccionados"
 
 #. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
@@ -1856,6 +1879,13 @@ msgstr "{} final de ítem colocado al final del audio"
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
 msgstr "final de ítem colocado al final del audio: {}"
+
+#. Reported when trimming items to selected area. {} will be replaced by the
+#. number of items; e.g. "2 items trimmed".
+msgid "{} item trimmed"
+msgid_plural "{} items trimmed"
+msgstr[0] "{} ítem recortado"
+msgstr[1] "{} ítems recortados"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -2694,6 +2724,9 @@ msgstr "OSARA: Comprobar actualización"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: abrir documentación en línea"
+
+msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
+msgstr "OSARA: Anuncia tempo and compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
