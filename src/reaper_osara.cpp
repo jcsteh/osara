@@ -3368,6 +3368,8 @@ void cmdSplitItems(Command* command) {
 }
 
 void cmdPaste(Command* command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	int oldTakes = CountTakes(item);
 	int oldItems = CountMediaItems(0);
 	int oldTracks = CountTracks(0);
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
@@ -3410,19 +3412,30 @@ void cmdPaste(Command* command) {
 		// replaced with the number of items; e.g. "2 automation items added".
 		outputMessage(format(
 			translate_plural("{} automation item added", "{} automation items added", added), added));
-	} else if (envelope &&
+	} 
+	else if (envelope &&
 			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
 			> 0) {
 		// Translators: Reported when envelope points are added. {} will be replaced
 		// with the number of points; e.g. "2 points added".
 		outputMessage(format(
-			translate_plural("{} point added", "{} points added", added), added));
-	} else {
+		translate_plural("{} point added", "{} points added", added), added));
+		} 
+		else if (item && 
+		(added = CountTakes(item) - oldTakes) 
+		> 0) 
+		{
+			// Translators: Reported when takes are added. {} will be replaced with the
+			// number of takes; e.g. "2 takes added".
+			outputMessage(format(
+			translate_plural("{} take added", "{} takes added", added), added));
+		}
+	else {
 		outputMessage(translate("nothing pasted"));
 	}
 }
 
-void cmdPasteAsNewTake(Command* command) {
+/*void cmdPasteAsNewTake(Command* command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	int oldCount = CountTakes(item);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -3435,7 +3448,7 @@ void cmdPasteAsNewTake(Command* command) {
 		outputMessage(translate("no takes added"));
 	}
 }
-
+*/
 void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(command, 0);
@@ -4760,9 +4773,9 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
 	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor
 	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
-	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
+	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // 40058Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
-	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPasteAsNewTake}, // Take: Paste as takes in items
+	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items
 	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
 	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
