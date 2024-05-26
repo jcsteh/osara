@@ -3421,13 +3421,12 @@ void cmdPaste(Command* command) {
 		outputMessage(format(
 		translate_plural("{} point added", "{} points added", added), added));
 		} 
-		else if (item && 
-		(added = CountTakes(item) - oldTakes) 
-		> 0) 
-		{
-			// Translators: Reported when takes are added. {} will be replaced with the
-			// number of takes; e.g. "2 takes added".
-			outputMessage(format(
+	else if (item && 
+			(added = CountTakes(item) - oldTakes) 
+			> 0){
+		// Translators: Reported when takes are added. {} will be replaced with the
+		// number of takes; e.g. "2 takes added".
+		outputMessage(format(
 			translate_plural("{} take added", "{} takes added", added), added));
 		}
 	else {
@@ -3435,20 +3434,6 @@ void cmdPaste(Command* command) {
 	}
 }
 
-/*void cmdPasteAsNewTake(Command* command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	int oldCount = CountTakes(item);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	int added = CountTakes(item) - oldCount;
-	// Translators: Reported when takes are added. {} will be replaced with the
-	// number of takes; e.g. "2 takes added".
-	outputMessage(format(
-		translate_plural("{} take added", "{} takes added", added), added));
-	if (!added) {
-		outputMessage(translate("no takes added"));
-	}
-}
-*/
 void cmdhRemoveTracks(int command) {
 	int oldCount = CountTracks(0);
 	Main_OnCommand(command, 0);
