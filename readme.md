@@ -166,6 +166,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Win+Delete
 - Item: Trim items to selected area: Control+Win+T
+- Xenakios/SWS: Play selected items once: Control+Alt+Space
 
 #### Takes
 - Take: Switch items to next take: T
