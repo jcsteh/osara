@@ -3412,15 +3412,14 @@ void cmdPaste(Command* command) {
 		// replaced with the number of items; e.g. "2 automation items added".
 		outputMessage(format(
 			translate_plural("{} automation item added", "{} automation items added", added), added));
-	} 
-	else if (envelope &&
+	} else if (envelope &&
 			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
 			> 0) {
 		// Translators: Reported when envelope points are added. {} will be replaced
 		// with the number of points; e.g. "2 points added".
 		outputMessage(format(
-		translate_plural("{} point added", "{} points added", added), added));
-		} 
+			translate_plural("{} point added", "{} points added", added), added));
+	}
 	else if (item && 
 			(added = CountTakes(item) - oldTakes) 
 			> 0){
@@ -3428,8 +3427,7 @@ void cmdPaste(Command* command) {
 		// number of takes; e.g. "2 takes added".
 		outputMessage(format(
 			translate_plural("{} take added", "{} takes added", added), added));
-		}
-	else {
+	} else {
 		outputMessage(translate("nothing pasted"));
 	}
 }
