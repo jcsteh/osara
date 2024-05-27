@@ -1510,7 +1510,7 @@ void postCycleRippleMode(int command) {
 	}
 }
 
-string getRippleMode(int command) {
+string maybeAddRippleMessage(int command) {
 	if (GetToggleCommandState(40310)) {
 		return translate("ripple per-track");
 	} else if (GetToggleCommandState(40311)) {
@@ -3522,7 +3522,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				if(GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
 				// Inform users that a ripple mode is enabled.
 				outputMessage(format(
-					translate_plural("selected area of {} item removed, " + getRippleMode(command->gaccel.accel.cmd), "selected area of {} items removed, " + getRippleMode(command->gaccel.accel.cmd), count), count));
+					translate_plural("selected area of {} item removed, " + maybeAddRippleMessage(command->gaccel.accel.cmd), "selected area of {} items removed, " + maybeAddRippleMessage(command->gaccel.accel.cmd), count), count));
 				} else {
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
@@ -3544,7 +3544,7 @@ void cmdhRemoveItems(int command) {
 	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
 		// Inform users that a ripple mode is active because that can influence the resulting positions of items on their timeline.
 		outputMessage(format(
-			translate_plural("{} item removed, " + getRippleMode(command), "{} items removed, " + getRippleMode(command), removed),
+			translate_plural("{} item removed, " + maybeAddRippleMessage(command), "{} items removed, " + maybeAddRippleMessage(command), removed),
 			removed));
 	} else {
 		// Translators: Reported when items are removed. {} will be replaced with the
