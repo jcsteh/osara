@@ -1510,6 +1510,16 @@ void postCycleRippleMode(int command) {
 	}
 }
 
+string getRippleMode(int command) {
+	if (GetToggleCommandState(40310)) {
+		return translate("ripple per-track");
+	} else if (GetToggleCommandState(40311)) {
+		return translate("ripple all tracks");
+	} else {
+		return translate("ripple off");
+	}
+}
+
 void reportRepeat(bool repeat) {
 	outputMessage(repeat ?
 		translate("repeat on") :
@@ -3510,11 +3520,9 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
 				if(GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
-				// Translators: used for  "Item: Cut selected area of items" and "Item:
-				// Remove selected area of items" when ripple is enabled.
-				// {} is replaced by the number of items affected.
+				// Inform users that a ripple mode is enabled.
 				outputMessage(format(
-					translate_plural("selected area of {} item removed with ripple enabled", "selected area of {} items removed with ripple enabled", count), count));
+					translate_plural("selected area of {} item removed, " + getRippleMode(command->gaccel.accel.cmd), "selected area of {} items removed, " + getRippleMode(command->gaccel.accel.cmd), count), count));
 				} else {
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
@@ -3534,10 +3542,9 @@ void cmdhRemoveItems(int command) {
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
 	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
-		// Translators: Reported when items are removed and ripple is enabled. We inform users that ripple is on because that can influence the resulting positions of items on their timeline.
-		// {} will be replaced with the number of items; e.g. "2 items removed with ripple enabled".
+		// Inform users that a ripple mode is active because that can influence the resulting positions of items on their timeline.
 		outputMessage(format(
-			translate_plural("{} item removed with ripple enabled", "{} items removed with ripple enabled", removed),
+			translate_plural("{} item removed, " + getRippleMode(command), "{} items removed, " + getRippleMode(command), removed),
 			removed));
 	} else {
 		// Translators: Reported when items are removed. {} will be replaced with the
