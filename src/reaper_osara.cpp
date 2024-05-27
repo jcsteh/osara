@@ -162,7 +162,7 @@ void CALLBACK CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD ti
 }
 
 string formatTimeMeasure(int measure, double beat, int measureLength,
-	bool useTicks, bool isLength, bool useCache,
+	int timeDenom, bool useTicks, bool isLength, bool useCache,
 	bool includeZeros, bool includeProjectStartOffset
 ) {
 	int wholeBeat = (int)beat;
@@ -172,7 +172,10 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 		assert(midiEditor);
 		MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
 		MediaItem* item = GetMediaItemTake_Item(take);
-		beatFractionDenominator = getItemPPQ(item);
+		// PPQ is per quarter note, but a beat might not be a quarter note depending
+		// on the time signature denominator. For example, if the time signature is
+		// 6/8, there are only PPQ / 2 ticks per beat.
+		beatFractionDenominator = getItemPPQ(item) * 4 / timeDenom;
 	} else {
 		beatFractionDenominator = 100;
 	}
@@ -369,8 +372,10 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_MEASURETICK: {
 			int measure;
 			int measureLength;
-			double beat = TimeMap2_timeToBeats(nullptr, time, &measure, &measureLength, nullptr, nullptr);
-			s = formatTimeMeasure(measure, beat, measureLength,
+			int timeDenom;
+			double beat = TimeMap2_timeToBeats(nullptr, time, &measure, &measureLength,
+				nullptr, &timeDenom);
+			s = formatTimeMeasure(measure, beat, measureLength, timeDenom,
 				timeFormat == TF_MEASURETICK, false, useCache,
 				includeZeros, includeProjectStartOffset);
 			break;
@@ -428,16 +433,19 @@ void resetTimeCache(TimeFormat excludeFormat) {
 
 string formatNoteLength(double start, double end) {
 	int measureLength;
+	int timeDenom;
 	double startBeats;
 	double endBeats;
-	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats, nullptr);
+	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats,
+		&timeDenom);
 	TimeMap2_timeToBeats(nullptr, end, nullptr, nullptr, &endBeats, nullptr);
 	double lengthBeats = endBeats-startBeats;
 	const int bars = int(lengthBeats)/measureLength;
 	const double beats = lengthBeats - measureLength * bars;
 	const bool useTicks = GetToggleCommandState2(
 		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
-	return formatTimeMeasure(bars, beats, measureLength, useTicks, true, false, false, false );
+	return formatTimeMeasure(bars, beats, measureLength, timeDenom, useTicks, true,
+		false, false, false );
 }
 
 string formatLength(double start, double end, TimeFormat timeFormat,
@@ -448,8 +456,9 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 		// formatTime can handle them.
 		return formatTime(end - start, timeFormat, cache, includeZeros, false);
 	}
-	int startMeasure, startMeasureLength, endMeasure, endMeasureLength;
-	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure, &startMeasureLength, nullptr, nullptr);
+	int startMeasure, startMeasureLength, timeDenom, endMeasure, endMeasureLength;
+	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure,
+		&startMeasureLength, nullptr, &timeDenom);
 	double endBeat = TimeMap2_timeToBeats(nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr);
 	int measures = endMeasure - startMeasure ;
 	double beats = 0;
@@ -474,7 +483,9 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 		++measures;
 		beats -= measureLength;
 	}
-	return formatTimeMeasure(measures, beats, measureLength, timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros, false);
+	return formatTimeMeasure(measures, beats, measureLength, timeDenom,
+		timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros,
+		false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
