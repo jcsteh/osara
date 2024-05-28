@@ -3648,9 +3648,10 @@ void reportTempoTimeSig() {
 		return;
 	}
 	double tempo=0;
+	int state=GetPlayState();
+	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	int timesig_num=0;
 	int timesig_denom=0;
-	double pos=GetPlayPosition();
 	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
 	outputMessage(format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
 }
