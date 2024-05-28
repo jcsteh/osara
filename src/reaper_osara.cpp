@@ -3421,12 +3421,17 @@ void cmdPaste(Command* command) {
 			translate_plural("{} point added", "{} points added", added), added));
 	}
 	else if (item && 
-			(added = CountTakes(item) - oldTakes) 
-			> 0){
+		(added = CountTakes(item) - oldTakes) 
+		> 0){
 		// Translators: Reported when takes are added. {} will be replaced with the
 		// number of takes; e.g. "2 takes added".
-		outputMessage(format(
-			translate_plural("{} take added", "{} takes added", added), added));
+		if(CountSelectedMediaItems(0)>1){
+			outputMessage(format(
+				translate_plural("{} take added to selected items", "{} takes added to selected items", added), added));
+		} else {
+			outputMessage(format(
+				translate_plural("{} take added", "{} takes added", added), added));
+		}
 	} else {
 		outputMessage(translate("nothing pasted"));
 	}
