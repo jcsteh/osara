@@ -1510,14 +1510,11 @@ void postCycleRippleMode(int command) {
 	}
 }
 
-string maybeAddRippleMessage(int command) {
-	if (GetToggleCommandState(40310)) {
-		return translate("ripple per-track");
-	} else if (GetToggleCommandState(40311)) {
-		return translate("ripple all tracks");
-	} else {
-		return translate("ripple off");
-	}
+void maybeAddRippleMessage(ostringstream& s, int command) {
+	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) // if either ripple mode is enabled
+		// Translators: This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
+		// "2 items removed ripple is on".
+		s << " " << translate("ripple is on");
 }
 
 void reportRepeat(bool repeat) {
@@ -3503,13 +3500,13 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 			case 40014: { // Item: Copy loop of selected area of audio items
 				if(selItems == 0) {
 					outputMessage(translate("no items selected"));
-					break;
+				} else {
+					int count = countAffected(GetSelectedMediaItem, selItems);
+					// Translators: used for "Item: Copy selected area of items".
+					// {} is replaced by the number of items affected.
+					outputMessage(format(
+						translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
 				}
-				int count = countAffected(GetSelectedMediaItem, selItems);
-				// Translators: used for  "Item: Copy selected area of items".
-				// {} is replaced by the number of items affected.
-				outputMessage(format(
-					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
 				break;
 			}
 			default: {
@@ -3519,17 +3516,17 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				} else if (selItems > 0) {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
-				if(GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
-				// Inform users that a ripple mode is enabled.
-				outputMessage(format(
-					translate_plural("selected area of {} item removed, " + maybeAddRippleMessage(command->gaccel.accel.cmd), "selected area of {} items removed, " + maybeAddRippleMessage(command->gaccel.accel.cmd), count), count));
+				ostringstream s;
+				if (count == 1) {
+					s << format(translate("selected area of {} item removed"), count);
 				} else {
-				// Translators: used for  "Item: Cut selected area of items" and "Item:
-				// Remove selected area of items".  {} is replaced by the number of items
-				// affected.
-				outputMessage(format(
-					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count));
+					// Translators: used for "Item: Cut selected area of items" and "Item:
+					// Remove selected area of items". {} is replaced by the number of items
+					// affected.
+					s << format(translate("selected area of {} items removed"), count);
 				}
+				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
+				outputMessage(s.str());
 				break;
 			}
 		}
@@ -3541,18 +3538,17 @@ void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
-	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) { // Set ripple editing per-track or Set ripple editing all tracks
-		// Inform users that a ripple mode is active because that can influence the resulting positions of items on their timeline.
-		outputMessage(format(
-			translate_plural("{} item removed, " + maybeAddRippleMessage(command), "{} items removed, " + maybeAddRippleMessage(command), removed),
-			removed));
+	ostringstream s;
+	if (removed == 1) {
+		// Translators: Reported when one item is removed.
+		s << format(translate("{} item removed"), removed);
 	} else {
-		// Translators: Reported when items are removed. {} will be replaced with the
+		// Translators: Reported when multiple items are removed. {} will be replaced with the
 		// number of items; e.g. "2 items removed".
-		outputMessage(format(
-			translate_plural("{} item removed", "{} items removed", removed),
-			removed));
+		s << format(translate("{} items removed"), removed);
 	}
+	maybeAddRippleMessage(s, command);
+	outputMessage(s.str());
 }
 
 void cmdRemoveItems(Command* command) {
