@@ -3379,6 +3379,8 @@ void cmdSplitItems(Command* command) {
 }
 
 void cmdPaste(Command* command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	int oldTakes = CountTakes(item);
 	int oldItems = CountMediaItems(0);
 	int oldTracks = CountTracks(0);
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
@@ -3428,6 +3430,20 @@ void cmdPaste(Command* command) {
 		// with the number of points; e.g. "2 points added".
 		outputMessage(format(
 			translate_plural("{} point added", "{} points added", added), added));
+	} else if (item && 
+			(added = CountTakes(item) - oldTakes)
+			> 0) {
+		if(CountSelectedMediaItems(0)>1){
+			// Translators: Reported when takes are added to multiple items. {} will be replaced with the
+			// number of takes; e.g. "2 takes added to selected items".
+			outputMessage(format(
+				translate_plural("{} take added to selected items", "{} takes added to selected items", added), added));
+		} else {
+			// Translators: Reported when takes are added. {} will be replaced with the
+			// number of takes; e.g. "2 takes added".
+			outputMessage(format(
+				translate_plural("{} take added", "{} takes added", added), added));
+		}
 	} else {
 		outputMessage(translate("nothing pasted"));
 	}
@@ -4760,6 +4776,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
 	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
+	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items
 	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
 	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
