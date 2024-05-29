@@ -3420,8 +3420,8 @@ void cmdPaste(Command* command) {
 		outputMessage(format(
 			translate_plural("{} point added", "{} points added", added), added));
 	} else if (item && 
-		(added = CountTakes(item) - oldTakes) 
-		> 0){
+			(added = CountTakes(item) - oldTakes)
+			> 0) {
 		if(CountSelectedMediaItems(0)>1){
 			// Translators: Reported when takes are added to multiple items. {} will be replaced with the
 			// number of takes; e.g. "2 takes added to selected items".
