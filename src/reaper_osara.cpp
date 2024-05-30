@@ -1510,6 +1510,14 @@ void postCycleRippleMode(int command) {
 	}
 }
 
+void maybeAddRippleMessage(ostringstream& s, int command) {
+	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) {
+		// Translators: This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
+		// "2 items removed ripple is on".
+		s << " " << translate("ripple is on");
+	}
+}
+
 void reportRepeat(bool repeat) {
 	outputMessage(repeat ?
 		translate("repeat on") :
@@ -3413,6 +3421,7 @@ void cmdPaste(Command* command) {
 	if (s.tellp() > 0) {
 		// Translators: Reported after the number of tracks and/or items added.
 		s << " " << translate("added");
+		maybeAddRippleMessage(s, command->gaccel.accel.cmd);
 		outputMessage(s);
 		return;
 	}
@@ -3509,11 +3518,14 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
+				ostringstream s;
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
-				outputMessage(format(
-					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count));
+				s << format(
+					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
+				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
+				outputMessage(s);
 			}
 		}
 	}
@@ -3524,11 +3536,14 @@ void cmdhRemoveItems(int command) {
 	int oldCount = CountMediaItems(0);
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
+	ostringstream s;
 	// Translators: Reported when items are removed. {} will be replaced with the
 	// number of items; e.g. "2 items removed".
-	outputMessage(format(
+	s << format(
 		translate_plural("{} item removed", "{} items removed", removed),
-		removed));
+		removed);
+	maybeAddRippleMessage(s, command);
+	outputMessage(s);
 }
 
 void cmdRemoveItems(Command* command) {
