@@ -3512,20 +3512,20 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				break;
 			}
 			default: {
-				ostringstream s;
 				int count = 0;
 				if(selItems == 0) { // these commands treat no item selection as if all items are selected
 					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
 				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
+				ostringstream s;
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
 				s << format(
 					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
 				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
-				outputMessage(s.str());
+				outputMessage(s);
 			}
 		}
 	}
@@ -3543,7 +3543,7 @@ void cmdhRemoveItems(int command) {
 		translate_plural("{} item removed", "{} items removed", removed),
 		removed);
 	maybeAddRippleMessage(s, command);
-	outputMessage(s.str());
+	outputMessage(s);
 }
 
 void cmdRemoveItems(Command* command) {
