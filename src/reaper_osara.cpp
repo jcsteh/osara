@@ -1511,10 +1511,11 @@ void postCycleRippleMode(int command) {
 }
 
 void maybeAddRippleMessage(ostringstream& s, int command) {
-	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) // if either ripple mode is enabled
+	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) {
 		// Translators: This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
 		// "2 items removed ripple is on".
 		s << " " << translate("ripple is on");
+	}
 }
 
 void reportRepeat(bool repeat) {
@@ -3420,6 +3421,7 @@ void cmdPaste(Command* command) {
 	if (s.tellp() > 0) {
 		// Translators: Reported after the number of tracks and/or items added.
 		s << " " << translate("added");
+		maybeAddRippleMessage(s, command->gaccel.accel.cmd);
 		outputMessage(s);
 		return;
 	}
@@ -3500,34 +3502,30 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 			case 40014: { // Item: Copy loop of selected area of audio items
 				if(selItems == 0) {
 					outputMessage(translate("no items selected"));
-				} else {
-					int count = countAffected(GetSelectedMediaItem, selItems);
-					// Translators: used for "Item: Copy selected area of items".
-					// {} is replaced by the number of items affected.
-					outputMessage(format(
-						translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
+					break;
 				}
+				int count = countAffected(GetSelectedMediaItem, selItems);
+				// Translators: used for  "Item: Copy selected area of items".
+				// {} is replaced by the number of items affected.
+				outputMessage(format(
+					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
 				break;
 			}
 			default: {
+				ostringstream s;
 				int count = 0;
 				if(selItems == 0) { // these commands treat no item selection as if all items are selected
 					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
-				} else if (selItems > 0) {
+				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
-				ostringstream s;
-				if (count == 1) {
-					s << format(translate("selected area of {} item removed"), count);
-				} else {
-					// Translators: used for "Item: Cut selected area of items" and "Item:
-					// Remove selected area of items". {} is replaced by the number of items
-					// affected.
-					s << format(translate("selected area of {} items removed"), count);
-				}
+				// Translators: used for  "Item: Cut selected area of items" and "Item:
+				// Remove selected area of items".  {} is replaced by the number of items
+				// affected.
+				s << format(
+					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
 				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
 				outputMessage(s.str());
-				break;
 			}
 		}
 	}
@@ -3539,14 +3537,11 @@ void cmdhRemoveItems(int command) {
 	Main_OnCommand(command, 0);
 	int removed = oldCount - CountMediaItems(0);
 	ostringstream s;
-	if (removed == 1) {
-		// Translators: Reported when one item is removed.
-		s << format(translate("{} item removed"), removed);
-	} else {
-		// Translators: Reported when multiple items are removed. {} will be replaced with the
-		// number of items; e.g. "2 items removed".
-		s << format(translate("{} items removed"), removed);
-	}
+	// Translators: Reported when items are removed. {} will be replaced with the
+	// number of items; e.g. "2 items removed".
+	s << format(
+		translate_plural("{} item removed", "{} items removed", removed),
+		removed);
 	maybeAddRippleMessage(s, command);
 	outputMessage(s.str());
 }
