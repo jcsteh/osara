@@ -601,7 +601,7 @@ const string getMidiNoteName(MediaTrack* track, int pitch, int channel) {
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
 	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
 	ostringstream s;
-	if (noteName) {
+	if (noteName &&  GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40045)) { // View: Show note names
 		s << noteName;
 	} else {
 		int octave = pitch / 12 - 1;
