@@ -4186,11 +4186,11 @@ void cmdReportCursorPosition(Command* command) {
 		s << translate("stopped");
 	}
 
-	int marker, region, num, markerCount;
+	int marker, region, num, markerCount, regionCount;
 	bool isRegion;
-	double markerPos;
+	double start;
 	const char* name;
-	int totalCount = CountProjectMarkers(nullptr, &markerCount, nullptr);
+	int totalCount = CountProjectMarkers(nullptr, &markerCount, &regionCount);
 	GetLastMarkerAndCurRegion(nullptr, pos, &marker, &region);
 	if (marker == -1) {
 		if (markerCount > 0) {
@@ -4209,8 +4209,8 @@ void cmdReportCursorPosition(Command* command) {
 			}
 		}
 	} else {
-		EnumProjectMarkers(marker, &isRegion, &markerPos, nullptr, &name, &num);
-		if (markerPos == pos) {
+		EnumProjectMarkers(marker, &isRegion, &start, nullptr, &name, &num);
+		if (start == pos) {
 			// The cursor is right at this marker.
 			string display = name[0] ? name : to_string(num);
 			// Translators: Reported when the cursor is right at a marker. {} will be
@@ -4251,6 +4251,43 @@ void cmdReportCursorPosition(Command* command) {
 		// Translators: Reported when the cursor is inside a region. {} will be
 		// replaced with the region's name or number; e.g. "in region intro".
 		s << ", " << format(translate("in region {}"), display);
+	} else if (regionCount > 0) {
+		s << ", ";
+		// There is no API call to get the region before or after the cursor, so we
+		// have to walk the regions ourselves.
+		string beforeDisplay, afterDisplay;
+		for (int i = 0; i < totalCount; ++i) {
+			double end;
+			EnumProjectMarkers(i, &isRegion, &start, &end, &name, &num);
+			if (!isRegion) {
+				continue;
+			}
+			if (end <= pos) {
+				beforeDisplay = name[0] ? name : to_string(num);
+			} else if (start > pos) {
+				afterDisplay = name[0] ? name : to_string(num);
+				break;
+			}
+		}
+		if (beforeDisplay.empty() && !afterDisplay.empty()) {
+			// Translators: Reported when the cursor is before the first region in the
+			// project. {} will be replaced with the region's name or number; e.g.
+			// "before region intro".
+			s << format(translate("before region {}"), afterDisplay);
+		} else if (!beforeDisplay.empty() && afterDisplay.empty()) {
+			// Translators: Reported when the cursor is after the last region in the
+			// project. {} will be replaced with the region's name or number; e.g.
+			// "before region intro".
+			s << format(translate("after region {}"), beforeDisplay);
+		} else {
+			assert(!beforeDisplay.empty() && !afterDisplay.empty());
+			// Translators: Reported when the cursor is between two regions. {before}
+			// will be replaced with the name or number of the region before the
+			// cursor. {after} will be replaced with the name or number of the region
+			// after the cursor. For example: "between regions intro, verse 1".
+			s << format(translate("between regions {before}, {after}"),
+				"before"_a=beforeDisplay, "after"_a=afterDisplay);
+		}
 	}
 
 	outputMessage(s);
