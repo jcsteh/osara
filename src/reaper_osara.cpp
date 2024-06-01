@@ -4174,7 +4174,8 @@ void cmdReportCursorPosition(Command* command) {
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
-	s << formatTime(pos, tf, FT_NO_CACHE) << " ";
+	s << formatTime(pos, tf, FT_NO_CACHE) << ", ";
+
 	if (state & 2) {
 		s << translate("paused");
 	} else if (state & 4) {
@@ -4184,6 +4185,74 @@ void cmdReportCursorPosition(Command* command) {
 	} else {
 		s << translate("stopped");
 	}
+
+	int marker, region, num, markerCount;
+	bool isRegion;
+	double markerPos;
+	const char* name;
+	int totalCount = CountProjectMarkers(nullptr, &markerCount, nullptr);
+	GetLastMarkerAndCurRegion(nullptr, pos, &marker, &region);
+	if (marker == -1) {
+		if (markerCount > 0) {
+			// The cursor is before the first marker. Find the first marker.
+			for (int i = 0; i < totalCount; ++i) {
+				EnumProjectMarkers(i, &isRegion, nullptr, nullptr, &name, &num);
+				if (isRegion) {
+					continue;
+				}
+				string display = name[0] ? name : to_string(num);
+				// Translators: Reported when the cursor is before the first marker in the
+				// project. {} will be replaced with the marker's name or number; e.g.
+				// "before marker intro".
+				s << " " << format(translate("before marker {}"), display);
+				break;
+			}
+		}
+	} else {
+		EnumProjectMarkers(marker, &isRegion, &markerPos, nullptr, &name, &num);
+		if (markerPos == pos) {
+			// The cursor is right at this marker.
+			string display = name[0] ? name : to_string(num);
+			// Translators: Reported when the cursor is right at a marker. {} will be
+			// replaced with the marker's name or number; e.g. "at marker intro".
+			s << " " << format(translate("at marker {}"), display);
+		} else {
+			string beforeDisplay = name[0] ? name : to_string(num);
+			// Check if there is a marker after the cursor.
+			bool foundAfter = false;
+			for (int i = marker + 1; i < totalCount; ++i) {
+				EnumProjectMarkers(i, &isRegion, nullptr, nullptr, &name, &num);
+				if (isRegion) {
+					continue;
+				}
+				// The cursor is between two markers.
+				foundAfter = true;
+				string afterDisplay = name[0] ? name : to_string(num);
+				// Translators: Reported when the cursor is between two markers. {before}
+				// will be replaced with the name or number of the marker before the
+				// cursor. {after} will be replaced with the name or number of the marker
+				// after the cursor. For example: "between markers intro, verse 1".
+				s << " " << format(translate("between markers {before}, {after}"),
+					"before"_a=beforeDisplay, "after"_a=afterDisplay);
+				break;
+			}
+			if (!foundAfter) {
+				// Translators: Reported when the cursor is after the last marker in the
+				// project. {} will be replaced with the marker's name or number; e.g.
+				// "after marker outro".
+				s << " " << format(translate("after marker {}"), beforeDisplay);
+			}
+		}
+	}
+
+	if (region != -1) {
+		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &num);
+		string display = name[0] ? name : to_string(num);
+		// Translators: Reported when the cursor is inside a region. {} will be
+		// replaced with the region's name or number; e.g. "in region intro".
+		s << ", " << format(translate("in region {}"), display);
+	}
+
 	outputMessage(s);
 }
 
