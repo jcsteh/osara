@@ -5028,7 +5028,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},

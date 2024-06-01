@@ -776,7 +776,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Select from cursor to start of project: Shift+Home
 - OSARA: Select from cursor to end of project: Shift+End
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): Delete
-- OSARA: Report edit/play cursor position and transport state: Control+Shift+J
+- OSARA: Report edit/play cursor position, transport state and nearest markers and regions: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Delete all time signature markers: Alt+Win+Delete
 - OSARA: Toggle track/take volume envelope visibility (depending on focus): Control+Alt+V
