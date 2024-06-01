@@ -4174,7 +4174,8 @@ void cmdReportCursorPosition(Command* command) {
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
-	s << formatTime(pos, tf, FT_NO_CACHE) << " ";
+	s << formatTime(pos, tf, FT_NO_CACHE) << ", ";
+
 	if (state & 2) {
 		s << translate("paused");
 	} else if (state & 4) {
@@ -4184,6 +4185,111 @@ void cmdReportCursorPosition(Command* command) {
 	} else {
 		s << translate("stopped");
 	}
+
+	int marker, region, num, markerCount, regionCount;
+	bool isRegion;
+	double start;
+	const char* name;
+	int totalCount = CountProjectMarkers(nullptr, &markerCount, &regionCount);
+	GetLastMarkerAndCurRegion(nullptr, pos, &marker, &region);
+	if (marker == -1) {
+		if (markerCount > 0) {
+			// The cursor is before the first marker. Find the first marker.
+			for (int i = 0; i < totalCount; ++i) {
+				EnumProjectMarkers(i, &isRegion, nullptr, nullptr, &name, &num);
+				if (isRegion) {
+					continue;
+				}
+				string display = name[0] ? name : to_string(num);
+				// Translators: Reported when the cursor is before the first marker in the
+				// project. {} will be replaced with the marker's name or number; e.g.
+				// "before marker intro".
+				s << " " << format(translate("before marker {}"), display);
+				break;
+			}
+		}
+	} else {
+		EnumProjectMarkers(marker, &isRegion, &start, nullptr, &name, &num);
+		if (start == pos) {
+			// The cursor is right at this marker.
+			string display = name[0] ? name : to_string(num);
+			// Translators: Reported when the cursor is right at a marker. {} will be
+			// replaced with the marker's name or number; e.g. "at marker intro".
+			s << " " << format(translate("at marker {}"), display);
+		} else {
+			string beforeDisplay = name[0] ? name : to_string(num);
+			// Check if there is a marker after the cursor.
+			bool foundAfter = false;
+			for (int i = marker + 1; i < totalCount; ++i) {
+				EnumProjectMarkers(i, &isRegion, nullptr, nullptr, &name, &num);
+				if (isRegion) {
+					continue;
+				}
+				// The cursor is between two markers.
+				foundAfter = true;
+				string afterDisplay = name[0] ? name : to_string(num);
+				// Translators: Reported when the cursor is between two markers. {before}
+				// will be replaced with the name or number of the marker before the
+				// cursor. {after} will be replaced with the name or number of the marker
+				// after the cursor. For example: "between markers intro, verse 1".
+				s << " " << format(translate("between markers {before}, {after}"),
+					"before"_a=beforeDisplay, "after"_a=afterDisplay);
+				break;
+			}
+			if (!foundAfter) {
+				// Translators: Reported when the cursor is after the last marker in the
+				// project. {} will be replaced with the marker's name or number; e.g.
+				// "after marker outro".
+				s << " " << format(translate("after marker {}"), beforeDisplay);
+			}
+		}
+	}
+
+	if (region != -1) {
+		EnumProjectMarkers(region, nullptr, nullptr, nullptr, &name, &num);
+		string display = name[0] ? name : to_string(num);
+		// Translators: Reported when the cursor is inside a region. {} will be
+		// replaced with the region's name or number; e.g. "in region intro".
+		s << ", " << format(translate("in region {}"), display);
+	} else if (regionCount > 0) {
+		s << ", ";
+		// There is no API call to get the region before or after the cursor, so we
+		// have to walk the regions ourselves.
+		string beforeDisplay, afterDisplay;
+		for (int i = 0; i < totalCount; ++i) {
+			double end;
+			EnumProjectMarkers(i, &isRegion, &start, &end, &name, &num);
+			if (!isRegion) {
+				continue;
+			}
+			if (end <= pos) {
+				beforeDisplay = name[0] ? name : to_string(num);
+			} else if (start > pos) {
+				afterDisplay = name[0] ? name : to_string(num);
+				break;
+			}
+		}
+		if (beforeDisplay.empty() && !afterDisplay.empty()) {
+			// Translators: Reported when the cursor is before the first region in the
+			// project. {} will be replaced with the region's name or number; e.g.
+			// "before region intro".
+			s << format(translate("before region {}"), afterDisplay);
+		} else if (!beforeDisplay.empty() && afterDisplay.empty()) {
+			// Translators: Reported when the cursor is after the last region in the
+			// project. {} will be replaced with the region's name or number; e.g.
+			// "before region intro".
+			s << format(translate("after region {}"), beforeDisplay);
+		} else {
+			assert(!beforeDisplay.empty() && !afterDisplay.empty());
+			// Translators: Reported when the cursor is between two regions. {before}
+			// will be replaced with the name or number of the region before the
+			// cursor. {after} will be replaced with the name or number of the region
+			// after the cursor. For example: "between regions intro, verse 1".
+			s << format(translate("between regions {before}, {after}"),
+				"before"_a=beforeDisplay, "after"_a=afterDisplay);
+		}
+	}
+
 	outputMessage(s);
 }
 
@@ -4922,7 +5028,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position and transport state")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
