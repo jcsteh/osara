@@ -16,7 +16,26 @@ using namespace std;
 
 namespace {
 preview_register_t soundPreviewReg = {0};
+double lastSoundCursorPos = 0.0;
+
+bool isMarkerOrRegionBetween(double start, double end) {
+	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
+	for (int i = 0; i < count; ++i) {
+		double markerPos, regionEnd;
+		bool isRegion;
+		EnumProjectMarkers(i, &isRegion, &markerPos, &regionEnd, nullptr, nullptr);
+		if (markerPos > end) {
+			break;
+		}
+		if ((start <= markerPos && markerPos <= end) ||
+				(isRegion && start <= regionEnd && regionEnd <= end)) {
+			return true;
+		}
+	}
+	return false;
 }
+
+} // namespace
 
 void playSound(const char* fileName) {
 	if (!settings::playSounds) {
@@ -40,4 +59,28 @@ void playSound(const char* fileName) {
 	soundPreviewReg.src = PCM_Source_CreateFromFile(path.c_str());
 	soundPreviewReg.curpos = 0.0;
 	PlayPreview(&soundPreviewReg);
+}
+
+void playSoundForCursorMovement() {
+	if (!settings::playSounds) {
+		return;
+	}
+	double cursor = GetCursorPosition();
+	if (cursor == lastSoundCursorPos) {
+		return; // No movement, nothing to do.
+	}
+	double start, end;
+	if (cursor > lastSoundCursorPos) {
+		// Moving forward.
+		start = lastSoundCursorPos;
+		end = cursor;
+	} else {
+		// Moving backward.
+		start = cursor;
+		end = lastSoundCursorPos;
+	}
+	if (isMarkerOrRegionBetween(start, end)) {
+		playSound("marker.mp3");
+	}
+	lastSoundCursorPos = cursor;
 }

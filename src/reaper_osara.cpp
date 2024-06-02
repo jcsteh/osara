@@ -41,6 +41,7 @@
 #include "fxChain.h"
 #include "translation.h"
 #include "updateCheck.h"
+#include "coreUtils.h"
 
 using namespace std;
 using namespace fmt::literals;
@@ -1180,6 +1181,7 @@ void postCursorMovement(int command) {
 	if (shouldReportTimeMovement()) {
 		outputMessage(formatCursorPosition().c_str());
 	}
+	playSoundForCursorMovement();
 }
 
 void postCursorMovementScrub(int command) {

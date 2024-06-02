@@ -8,3 +8,4 @@
 #pragma once
 
 void playSound(const char* fileName);
+void playSoundForCursorMovement();
