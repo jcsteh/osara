@@ -13,7 +13,7 @@ cp ../../../../config/mac/reaper-kb.ini OSARA.ReaperKeyMap
 mkdir locale
 cp ../../../../locale/*.po locale/
 mkdir sounds
-cp ../../../../sounds/*.mp3 locale/
+cp ../../../../sounds/*.mp3 sounds/
 cd ../..
 rm -f $dmg
 # We seem to need a delay here to avoid an "hdiutil: create failed - Resource busy" error.
