@@ -9,8 +9,8 @@
 
 #include <string>
 
-#include "config.h"
 #include "osara.h"
+#include "config.h"
 
 using namespace std;
 
