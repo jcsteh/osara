@@ -35,6 +35,33 @@ bool isMarkerOrRegionBetween(double start, double end) {
 	return false;
 }
 
+bool isPassingItemEdge(double start, double end) {
+	if (end - start > 0.020) {
+		// The cursor jumped more than 20 ms. We only want to report when passing
+		// close to an item edge.
+		return false;
+	}
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		return false;
+	}
+	int count = CountTrackMediaItems(track);
+	for (int i = 0; i < count; ++i) {
+		MediaItem* item = GetTrackMediaItem(track, i);
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
+		if (itemStart > end) {
+			break;
+		}
+		double length = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", nullptr);
+		double itemEnd = itemStart + length;
+		if ((start <= itemStart && itemStart <= end) ||
+				(start <= itemEnd && itemEnd <= end)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 } // namespace
 
 void playSound(const char* fileName) {
@@ -81,6 +108,9 @@ void playSoundForCursorMovement() {
 	}
 	if (isMarkerOrRegionBetween(start, end)) {
 		playSound("marker.mp3");
+	}
+	if (isPassingItemEdge(start, end)) {
+		playSound("item.mp3");
 	}
 	lastSoundCursorPos = cursor;
 }
