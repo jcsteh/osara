@@ -47,3 +47,6 @@ BoolSetting(reportNotes, MIDI_EDITOR_SECTION,
 BoolSetting(reportSurfaceChanges, MAIN_SECTION,
 	"Report changes made via &control surfaces",
 	false)
+BoolSetting(playSounds, MAIN_SECTION,
+	"Provide feedback using s&ounds",
+	false)

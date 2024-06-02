@@ -219,6 +219,10 @@
 #define REAPERAPI_WANT_format_timestr_len
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
+#define REAPERAPI_WANT_PCM_Source_CreateFromFile
+#define REAPERAPI_WANT_PCM_Source_Destroy
+#define REAPERAPI_WANT_PlayPreview
+#define REAPERAPI_WANT_StopPreview
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>

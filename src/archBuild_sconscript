@@ -32,6 +32,7 @@ sources = [
 	"midiEditorCommands.cpp",
 	"envelopeCommands.cpp",
 	"controlSurface.cpp",
+	"coreUtils.cpp",
 	"exports.cpp",
 	"fxChain.cpp",
 	"translation.cpp",
