@@ -90,6 +90,10 @@ struct MidiControlChange {
 	bool selected;
 	bool muted;
 
+	operator bool() const {
+		return this->index != -1;
+	}
+
 	struct ReqParams {
 		bool position = true;
 		bool message1 = false;
@@ -793,10 +797,15 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 
 using MidiControlChangeIterator = MidiEventIterator<MidiControlChange, MediaItem_Take*>;
 
-// Finds a single CC at the cursor in a given direction and returns its info.
-// This updates currentCC.
-MidiControlChange findCC(MediaItem_Take* take, int direction) {
-	MidiControlChangeIterator begin(take, {
+// #434: CC events are ordered arbitrarily and, unlike notes, order can change
+// when interacting with them. Therefore, when we are searching for the next
+// or previous CC, we need to sort CCs at the same position. This class
+// iterates CCs, sorting as necessary. Note that this is not a proper C++
+// iterator.
+class SortedMidiControlChangeIterator {
+	public:
+	SortedMidiControlChangeIterator(MediaItem_Take* take):
+	begin(MidiControlChangeIterator(take, {
 		true,  // position
 		true,  // message1
 		true,  // channel
@@ -804,88 +813,134 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 		true,  // message3,
 		true,  // selected
 		true  // muted
-	});
-	MidiControlChangeIterator end = begin;
-	end.moveToEnd();
-	if (begin == end) {
-		// No CCs.
-		currentCC = {-1, -1};
-		return {-1};
-	}
-	double now = GetCursorPosition();
-	// Find all CCs at the current position.
-	auto range = equal_range(begin, end, now, MidiControlChange::CompareByPosition{});
-	int count = range.second - range.first;
-	double position = currentCC.first;
-	int curCC= currentCC.second;
-	if (curCC!= -1 && position == now && count >0) {
-		// In this case, we have a cached CC at the current position
-		// and the range of CCs at the current position contains at least one CC.
-		// We can simmply move to the adjacent CC in the range,
-		// unless curCC is at the edge of the range.
-		// In that case, we skip this block entirely and behave as if there was nothing cached.
-		auto newCC = curCC+ direction;
-		if (direction == -1 ? newCC >= 0 : newCC < count) {
-			// #434: CC events are ordered arbitrarily and, unlike notes, order can change when interacting with them.
-			// Create a vector of CCs in order to sort them in a stable way.
-			vector<MidiControlChange> ccs(range.first, range.second);
-			stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
-			currentCC.second = newCC;
-			return ccs.at(newCC);
+	})),
+	// We'll set these properly below, but there's no default constructor, so we
+	// must initialise them to something here.
+	end(begin), firstAtPos(begin), firstAfterPos(begin) {
+		this->end.moveToEnd();
+		if (begin == end) {
+			// No CCs.
+			return;
 		}
+		double now = GetCursorPosition();
+		// Find all CCs at the current position.
+		tie(this->firstAtPos, this->firstAfterPos) = equal_range(begin, end, now,
+			MidiControlChange::CompareByPosition{});
+		this->sortCCsAtPos();
+		auto [position, curCC] = currentCC;
+		int count = this->firstAfterPos - this->firstAtPos;
+		if (curCC!= -1 && position == now && count >0) {
+			// In this case, we have a cached CC at the current position
+			// and the range of CCs at the current position contains at least one CC.
+			this->sortedIndexAtPos = curCC;
+		} else {
+			// We don't have a cached CC at the current position, so the first call to
+			// next() should move to the first CC at the current position.
+			this->sortedIndexAtPos = -1;
+		}
+	}
+
+	MidiControlChange next() {
+		// Try moving to the next CC at the current position.
+		++this->sortedIndexAtPos;
+		if (auto current = this->current()) {
+			return current;
+		}
+		// There are no more at this position, so move forward to a CC at another
+		// position.
+		if (this->firstAfterPos == this->end) {
+			return {};
+		}
+		this->firstAtPos = this->firstAfterPos;
+		// Find the first CC after this new position.
+		double newPos = this->firstAtPos->position;
+		for (this->firstAfterPos = this->firstAtPos; this->firstAfterPos != this->end;
+				++this->firstAfterPos) {
+			if (this->firstAfterPos->position != newPos) {
+				break;
+			}
+		}
+		// Finally, return the last sorted CC at this new position.
+		this->sortCCsAtPos();
+		this->sortedIndexAtPos = 0;
+		return this->current();
+	}
+
+	MidiControlChange previous() {
+		// Try moving to the previous CC at the current position.
+		--this->sortedIndexAtPos;
+		if (auto current = this->current()) {
+			return current;
+		}
+		// There are no more at this position, so move backward to a CC at another
+		// position.
+		if (this->firstAtPos == this->begin) {
+			return {};
+		}
+		this->firstAfterPos = this->firstAtPos;
+		this->firstAtPos = this->firstAfterPos - 1;
+		// Find the first unsorted CC at this new position.
+		double newPos = this->firstAtPos->position;
+		for (; this->firstAtPos != this->begin; --this->firstAtPos) {
+			if (this->firstAtPos->position != newPos) {
+				++this->firstAtPos;
+				break;
+			}
+		}
+		// Finally, return the last sorted CC at this new position.
+		this->sortCCsAtPos();
+		this->sortedIndexAtPos = this->sortedCCsAtPos.size() - 1;
+		return this->current();
+	}
+
+	MidiControlChange current() {
+		if (this->sortedIndexAtPos >= 0 &&
+				this->sortedIndexAtPos < this->sortedCCsAtPos.size()) {
+			return this->sortedCCsAtPos[this->sortedIndexAtPos];
+		}
+		return {};
+	}
+
+	void updateCurrentCC() {
+		currentCC = {this->firstAtPos->position, this->sortedIndexAtPos};
+	}
+
+	private:
+	void sortCCsAtPos() {
+		this->sortedCCsAtPos.assign(this->firstAtPos, this->firstAfterPos);
+		stable_sort(this->sortedCCsAtPos.begin(), this->sortedCCsAtPos.end(),
+			MidiControlChange::compareForSortAtPosition);
+	}
+
+	MidiControlChangeIterator begin;
+	MidiControlChangeIterator end;
+	// Points to the first CC at the current time position of this iterator.
+	MidiControlChangeIterator firstAtPos;
+	// Points to the first CC after the current time position of this iterator.
+	// That is, this is the exclusive end for a range containing all CCs at the
+	// current position.
+	MidiControlChangeIterator firstAfterPos;
+	vector<MidiControlChange> sortedCCsAtPos;
+	// The current index into sortedCCsAtPos.
+	int sortedIndexAtPos = -1;
+};
+
+// Finds a single CC at the cursor in a given direction and returns its info.
+// This updates currentCC.
+MidiControlChange findCC(MediaItem_Take* take, int direction) {
+	SortedMidiControlChangeIterator iter(take);
+	MidiControlChange cc;
+	if (direction == -1) {
+		cc = iter.previous();
 	} else if (direction == 1) {
-		// Direction is forward, but we want to ensure that focus lands on the first CC at or after the cursor.
-		// Sticking to direction == 1 would mean we'd focus a CC after the cursor, even if there was a CC at the cursor.
-		direction = 0;
-	}
-	MidiControlChangeIterator firstCC = end;
-	if (direction == 1 && range.second != end) {
-		// We want a CC after the cursor
-		// range.second is the first CC after now.
-		firstCC = range.second;
-	} else if (direction == -1 && range.first != begin) {
-		// We want a CC before the cursor
-		// range.First is the first CC at or after now, so one before that is
-		// the first CC before now.
-		firstCC = range.first;
-		--firstCC;
-	} else if (direction == 0 && range.first != end) {
-		// We want a CC at or after the cursor
-		// range.First is the first CC at or after now.
-		firstCC = range.first;
+		cc = iter.next();
 	} else {
-		// Nothing in the requested direction or at the cursor.
-		return {-1};
+		cc = iter.current();
 	}
-	// Find the last CC at the position of the first.
-	double firstPos = firstCC->position;
-	MidiControlChangeIterator lastCC = firstCC;
-	MidiControlChangeIterator cc = firstCC;
-	int movement = direction != -1 ? 1 : -1;
-	for (cc += movement; begin <= cc && cc < end; cc += movement) {
-		if (cc->position != firstPos) {
-			break;
-		}
-		lastCC = cc;
+	if (cc) {
+		iter.updateCurrentCC();
 	}
-	int index = 0;
-	MidiControlChange ret;
-	if (firstCC == lastCC) {
-		// There is only one CC at this position.
-		ret = *firstCC;
-	} else {
-		// #434: CC events are ordered arbitrarily.
-		// To sort them in a stable way, create a vector containing all the CCs at the position we're navigating to.
-		// Note that the constructor of vector expects an exclusive end, but our range is inclusive.
-		vector<MidiControlChange> ccs(movement != -1 ? firstCC : lastCC, movement != -1 ? lastCC + 1 : firstCC + 1);
-		stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
-		// Focus the first or last note in the vector, depending on direction being forward or backward, respectively.
-		index = movement != -1 ? 0 : (static_cast<int>(ccs.size()) -1);
-		ret = ccs.at(index);
-	}
-	// Save the new CC for future invocations of findCC.
-	currentCC = {ret.position, index};
-	return ret;
+	return cc;
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
@@ -954,15 +1009,14 @@ void cmdMidiToggleSelection(Command* command) {
 			}
 			break;
 		}
-		case FOCUS_CC: {
-			if (currentCC.first == -1 || currentCC.second == -1) {
+		case FOCUS_CC:
+			if (auto curCC= findCC(take, 0)) {
+				select = !curCC.selected;
+				selectCC(take, curCC.index, select);
+			} else {
 				return;
 			}
-			auto curCC= findCC(take, 0);
-			select = !curCC.selected;
-			selectCC(take, curCC.index, select);
 			break;
-		}
 		default:
 			return;
 	}
@@ -1337,7 +1391,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto cc = findCC(take, direction);
-	if (cc.channel == -1) {
+	if (!cc) {
 		return;
 	}
 	if (clearSelection || select) {
