@@ -4818,7 +4818,6 @@ void cmdReportRegionMarkerItems(Command* command) {
 }
 
 void cmdSelectFromCursorToStartOfProject(Command* command) {
-	Main_OnCommand(40769, 0); // Unselect (clear selection of) all tracks/items/envelope points
 	Main_OnCommand(40626, 0); // Time selection: Set end point
 	Main_OnCommand(40042, 0); // Transport: Go to start of project
 	Main_OnCommand(40625, 0); // Time selection: Set start point
@@ -4827,7 +4826,6 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 }
 
 void cmdSelectFromCursorToEndOfProject(Command* command) {
-	Main_OnCommand(40769, 0); // Unselect (clear selection of) all tracks/items/envelope points
 	Main_OnCommand(40625, 0); // Time selection: Set start point
 	Main_OnCommand(40043, 0); // Transport: Go to end of project
 	Main_OnCommand(40626, 0); // Time selection: Set end point
