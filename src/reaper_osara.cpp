@@ -3580,7 +3580,10 @@ int itemCount = CountSelectedMediaItems(0);
 	int oldTakes = CountTakes(item);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (itemCount > 1)//if multiple items selected
-				outputMessage(translate("Cropped to activetakes  on selected items "));
+			// Translators: Reported when cropped to active take on multiple items. {} will be replaced with the
+			// number of selected items; e.g. "2 items cropped to active take.".
+		outputMessage(format(translate("{} items cropped to active takes"),
+			itemCount));
 	else if (oldTakes == 1)//If single item is selected and item has no takes 
 			outputMessage(translate("No takes to remove. "));
 	else{//If item has more than 1 take
