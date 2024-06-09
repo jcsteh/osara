@@ -925,15 +925,52 @@ class SortedMidiControlChangeIterator {
 	int sortedIndexAtPos = -1;
 };
 
+bool isCCInLane(const MidiControlChange& cc, int lane) {
+	if (lane <= 127) {
+		// CC.
+		return cc.message1 == 0xB0 && cc.message2 == lane;
+	}
+	if (lane & 0x100) {
+		// We don't support 14-bit CC properly yet. For now, at least match both MSB
+		// and LSB CCs.
+		int ccNum = lane - 0x100;
+		return cc.message1 == 0xB0 &&
+			(cc.message2 == ccNum || cc.message2 == ccNum + 32);
+	}
+	if (lane == 0x201) {
+		// Pitch.
+		return cc.message1 == 0xE0;
+	}
+	if (lane == 0x202) {
+		// Program.
+		return cc.message1 == 0xC0;
+	}
+	if (lane == 0x203) {
+		// Channel pressure.
+		return cc.message1 == 0xD0;
+	}
+	return false;
+}
+
 // Finds a single CC at the cursor in a given direction and returns its info.
 // This updates currentCC.
 MidiControlChange findCC(MediaItem_Take* take, int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	int lane = MIDIEditor_GetSetting_int(editor, "last_clicked_cc_lane");
 	SortedMidiControlChangeIterator iter(take);
 	MidiControlChange cc;
 	if (direction == -1) {
-		cc = iter.previous();
+		while ((cc = iter.previous())) {
+			if (isCCInLane(cc, lane)) {
+				break;
+			}
+		}
 	} else if (direction == 1) {
-		cc = iter.next();
+		while ((cc = iter.next())) {
+			if (isCCInLane(cc, lane)) {
+				break;
+			}
+		}
 	} else {
 		cc = iter.current();
 	}
@@ -1430,7 +1467,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
 		s << format(translate("Program {}"), cc.message2);
 	} else if (cc.message1 == 0xD0) {
-		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		// Translators: Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 		s << format(translate("Channel pressure {}"), cc.message2);
 	} else if (cc.message1 == 0xE0) {
 		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
