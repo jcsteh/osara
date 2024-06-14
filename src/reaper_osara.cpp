@@ -2537,6 +2537,7 @@ PostCommand POST_COMMANDS[] = {
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
+	{40003, postMidiSelectNotes, true}, // Edit: Select all notes
 	{40006, postMidiSelectEvents, true}, // Edit: Select all events
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
