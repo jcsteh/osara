@@ -1227,7 +1227,7 @@ void postMidiSelectEvents(int command) {
 		count));
 }
 
-void cmdMidiSelCC (Command* command) {
+void cmdMidiSelCC(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount = 0;
