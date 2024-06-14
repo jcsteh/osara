@@ -1142,7 +1142,6 @@ void cmdMidiInsertCC(Command* command) {
 		return;
 	}
 	selectCC(take, cc.index);
-	SetEditCurPos(cc.position, true, false);
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
 	if (cc.message1 == 0xA0) {
