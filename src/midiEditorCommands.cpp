@@ -1145,7 +1145,6 @@ void cmdMidiInsertCC(Command* command) {
 	SetEditCurPos(cc.position, true, false);
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
-	s << formatCursorPosition() << " ";
 	if (cc.message1 == 0xA0) {
 		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
 		// name and {value} will be replaced with the aftertouch value; e.g.
