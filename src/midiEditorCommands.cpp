@@ -1227,6 +1227,26 @@ void postMidiSelectEvents(int command) {
 		count));
 }
 
+void cmdMidiSelCC (Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = countSelectedEvents (take);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount = countSelectedEvents (take);
+	int count = newCount;
+//	if (count >= 0) {
+		// Translators: Used in the MIDI editor when CC events are selected.  {}
+		// is replaced by the number of events selected.
+		outputMessage(format(
+			translate_plural("{} CC event selected", "{} CC events selected", count), count));
+//	} else {
+		// Translators: Used in the MIDI editor when CC events are unselected.  {}
+		// is replaced by the number of events unselected.
+//		outputMessage(format(
+//			translate_plural("{} CC event unselected", "{} CC events unselected", -count), -count));
+//	}
+}
+
 void cmdMidiToggleSelCC (Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);

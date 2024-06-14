@@ -2564,7 +2564,6 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
 	{40501, postMidiSelectEvents}, // Invert selection
 	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
-	{40668, postMidiSelectEvents}, // Select all CC events in last clicked lane
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
@@ -5003,6 +5002,7 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, nullptr}, nullptr, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40668}, nullptr}, nullptr, cmdMidiSelCC}, // Select all CC events in last clicked lane
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
