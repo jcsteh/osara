@@ -1137,34 +1137,37 @@ void cmdMidiInsertCC(Command* command) {
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
-	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
-	// Get selected notes.
-	vector<MidiNote> selectedNotes = getSelectedNotes(take);
-	// Find the just inserted note based on its pitch, as that makes it unique.
-	auto it = find_if(
-		selectedNotes.begin(), selectedNotes.end(),
-		[pitch](MidiNote n) { return n.pitch == pitch; }
-	);
-	if (it == selectedNotes.end()) {
+	auto cc = findCC(take, 0);
+	if (cc.channel == -1) {
 		return;
 	}
-	auto& note = *it;
-	// Play the inserted note when preview is enabled.
-	previewNotes(take, {note});
-	fakeFocus = FOCUS_NOTE;
+	selectCC(take, cc.index);
+	SetEditCurPos(cc.position, true, false);
+	fakeFocus = FOCUS_CC;
 	ostringstream s;
-	// If we're advancing the cursor position, we should report the new position.
-	const bool reportNewPos = command->gaccel.accel.cmd ==
-		40051; // Edit: Insert note at edit cursor
-	if (settings::reportNotes) {
-		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
-		s << formatNoteLength(note.start, note.end);
-		if (reportNewPos) {
-			s << ", ";
-		}
-	}
-	if (reportNewPos) {
-		s << formatCursorPosition();
+	s << formatCursorPosition() << " ";
+	if (cc.message1 == 0xA0) {
+		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
+		// name and {value} will be replaced with the aftertouch value; e.g.
+		// "Poly Aftertouch c sharp 4  96"
+		s << format(translate("Poly Aftertouch {note}  {value}"),
+			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
+	} else if (cc.message1 == 0xB0) {
+		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+		s << format(translate("Control {control}, {value}"),
+		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
+		"value"_a=cc.message3);
+	} else if (cc.message1 == 0xC0) {
+		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
+		s << format(translate("Program {}"), cc.message2);
+	} else if (cc.message1 == 0xD0) {
+		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		s << format(translate("Channel pressure {}"), cc.message2);
+	} else if (cc.message1 == 0xE0) {
+		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
+		s << format(translate("Pitch Bend {}"), pitchBendValue);
 	}
 	outputMessage(s);
 }
