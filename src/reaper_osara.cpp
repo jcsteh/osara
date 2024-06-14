@@ -5000,6 +5000,7 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, nullptr}, nullptr, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 42469}, nullptr}, nullptr, cmdMidiInsertCC}, // Edit: Insert CC event at edit cursor in current lane
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...

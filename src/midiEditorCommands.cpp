@@ -1126,6 +1126,49 @@ void postMidiMovePitchCursor(int command) {
 	}
 }
 
+void cmdMidiInsertCC(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount;
+	MIDI_CountEvts(take, &newCount, nullptr, nullptr);
+	if (newCount <= oldCount) {
+		return; // Not inserted.
+	}
+	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// Find the just inserted note based on its pitch, as that makes it unique.
+	auto it = find_if(
+		selectedNotes.begin(), selectedNotes.end(),
+		[pitch](MidiNote n) { return n.pitch == pitch; }
+	);
+	if (it == selectedNotes.end()) {
+		return;
+	}
+	auto& note = *it;
+	// Play the inserted note when preview is enabled.
+	previewNotes(take, {note});
+	fakeFocus = FOCUS_NOTE;
+	ostringstream s;
+	// If we're advancing the cursor position, we should report the new position.
+	const bool reportNewPos = command->gaccel.accel.cmd ==
+		40051; // Edit: Insert note at edit cursor
+	if (settings::reportNotes) {
+		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
+		s << formatNoteLength(note.start, note.end);
+		if (reportNewPos) {
+			s << ", ";
+		}
+	}
+	if (reportNewPos) {
+		s << formatCursorPosition();
+	}
+	outputMessage(s);
+}
+
 void cmdMidiInsertNote(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
