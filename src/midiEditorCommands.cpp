@@ -1227,6 +1227,27 @@ void postMidiSelectEvents(int command) {
 		count));
 }
 
+void cmdMidiSelCC (Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = 0;
+	int newCount = 0;
+	int count = 0;
+	Undo_BeginBlock();
+	MIDIEditor_OnCommand(editor, 40669); // Unselect all CC events in last clicked lane
+	oldCount = countSelectedEvents (take);
+	MIDIEditor_OnCommand(editor, 40668); // Select all CC events in last clicked lane
+	newCount = countSelectedEvents (take);
+		Undo_EndBlock(translate("Change CC Selection"), 0);
+	if (newCount > oldCount) {
+		count = newCount - oldCount;
+	}
+	// Translators: Used in the MIDI editor when CC events are selected.  {}
+	// is replaced by the number of events selected.
+	outputMessage(format(
+		translate_plural("{} CC event selected", "{} CC events selected", count), count));
+}
+
 void cmdMidiToggleSelCC (Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
