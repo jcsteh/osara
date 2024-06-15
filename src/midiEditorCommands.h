@@ -39,6 +39,7 @@ void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 void postMidiSelectNotes(int command);
 void postMidiSelectEvents(int command);
+void cmdMidiUnselCC(Command* command) ;
 void cmdMidiToggleSelCC (Command* command) ;
 void cmdMidiMoveToNextCC(Command* command);
 void cmdMidiMoveToPreviousCC(Command* command);
