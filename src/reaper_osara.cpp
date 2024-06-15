@@ -1595,6 +1595,25 @@ void postCopy(int command) {
 	}
 }
 
+void postCopyMoveTimeSelection(int command) {
+	double start, end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	fakeFocus = FOCUS_RULER;
+	if (start != end && command == 40397) {
+		// Time selection: Copy contents of time selection to edit cursor (moving later items)
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items faded in to cursor".
+		outputMessage(translate("copied time selection"));
+	} else if (start != end && command == 40396) {
+		// Time selection: Move contents of time selection to edit cursor (moving later items)
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items faded out from cursor".
+		outputMessage(translate("moved time selection"));
+	} else {
+		outputMessage(translate("no time selection"));
+	}
+}
+
 void postMoveToTimeSig(int command) {
 	double cursor = GetCursorPosition();
 	// FindTempoTimeSigMarker often returns the point before instead of right at the position.
@@ -2408,6 +2427,9 @@ PostCommand POST_COMMANDS[] = {
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
 	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
+
+	{40397, postCopyMoveTimeSelection}, // Time selection: Copy contents of time selection to edit cursor (moving later items)
+	{40396, postCopyMoveTimeSelection}, // Time selection: Move contents of time selection to edit cursor (moving later items)
 	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
 	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
 	{41860, postGoToStretch}, // Item: go to next stretch marker

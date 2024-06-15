@@ -285,6 +285,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 #### Selection
 - Time selection: Set start point: [
 - Time selection: Set end point: ]
+- Time selection: Copy contents of time selection to edit cursor (moving later items)
+- Time selection: Move contents of time selection to edit cursor (moving later items)
 - Loop points: Set start point: Alt+Shift+[
 - Loop points: Set end point: Alt+Shift+]
 - Go to start of loop: Alt+Shift+Home
