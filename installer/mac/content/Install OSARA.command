@@ -48,6 +48,8 @@ function run(argv) {
 	s(`cp '${source}/OSARA.ReaperKeyMap' '${target}/KeyMaps/'`);
 	s(`mkdir -p '${target}/osara/locale'`);
 	s(`cp '${source}/locale/'* '${target}/osara/locale/'`);
+	s(`mkdir -p '${target}/osara/sounds'`);
+	s(`cp '${source}/sounds/'* '${target}/osara/sounds/'`);
 	var res = app.displayDialog(
 		"Do you want to replace the existing keymap with the Osara keymap?", {
 		buttons: ["Yes", "No"],

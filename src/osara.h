@@ -8,6 +8,8 @@
 #ifndef _OSARA_H
 #define _OSARA_H
 
+// We need to include sstream first to avoid issues with SWELL.
+#include <sstream>
 #ifdef _WIN32
 # include <windows.h>
 #else
@@ -17,10 +19,9 @@
 # include <windows.h>
 # pragma clang diagnostic pop
 #endif
+#include <string>
 #include <functional>
 #include <memory>
-#include <string>
-#include <sstream>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -219,6 +220,10 @@
 #define REAPERAPI_WANT_format_timestr_len
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
+#define REAPERAPI_WANT_PCM_Source_CreateFromFile
+#define REAPERAPI_WANT_PCM_Source_Destroy
+#define REAPERAPI_WANT_PlayPreview
+#define REAPERAPI_WANT_StopPreview
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
