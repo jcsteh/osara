@@ -1236,7 +1236,7 @@ void cmdMidiSelCC(Command* command) {
 	Undo_BeginBlock();
 	MIDIEditor_OnCommand(editor, 40669); // Unselect all CC events in last clicked lane
 	oldCount = countSelectedEvents (take);
-	MIDIEditor_OnCommand(editor, 40668); // Select all CC events in last clicked lane
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd); // Select all CC events in last clicked lane
 	newCount = countSelectedEvents (take);
 		Undo_EndBlock(translate("Change CC Selection"), 0);
 	if (newCount > oldCount) {
