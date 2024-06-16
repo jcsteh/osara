@@ -1033,3 +1033,4 @@ The resulting installer can be found in the installer directory.
 - Christian Fillion
 - Jenny K Brennan
 - Day Garwood
+- Matej Golian
