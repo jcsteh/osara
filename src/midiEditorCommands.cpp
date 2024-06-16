@@ -1333,9 +1333,11 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-ostringstream describeCC(MidiControlChange cc, MediaItem_Take* take, bool select=true) {
+ostringstream describeCC(MidiControlChange cc, MediaItem_Take* take, bool select=true, bool reportPos=true) {
 	ostringstream s;
-	s << formatCursorPosition() << " ";
+	if (reportPos) {
+		s << formatCursorPosition() << " ";
+	}
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
@@ -2106,6 +2108,6 @@ void cmdMidiInsertCC(Command* command) {
 	}
 	selectCC(take, cc.index);
 	fakeFocus = FOCUS_CC;
-	ostringstream s = describeCC(cc, take);
+	ostringstream s = describeCC(cc, take, true, false);
 	outputMessage(s);
 }
