@@ -2295,6 +2295,19 @@ void postMomentarilySetOverrideToAltN(int command) {
 		getShortenedAltSectionName(sectionId)));
 }
 
+void postMidiResets(int command) {
+	if (command == 41175) { // Reset all MIDI devices
+		// Translators: Reported when users run the "Reset all MIDI devices" action.
+		outputMessage(translate("midi devices reset"));
+	} else if (command == 42348) { // Reset all MIDI control surface devices
+		// Translators: Reported when users run the "Reset all MIDI control surface devices" action.
+		outputMessage(translate("Control surfaces reset"));
+	} else { // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
+		// Translators: Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
+		outputMessage(translate("all notes off"));
+	}
+}
+
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
 	if(!w) {// support Reaper versions before 6.65
@@ -2534,6 +2547,9 @@ PostCommand POST_COMMANDS[] = {
 	{24866, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-14
 	{24867, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-15
 	{24868, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-16
+		{41175, postMidiResets}, // Reset all MIDI devices
+		{42348, postMidiResets}, // Reset all MIDI control surface devices
+		{40345, postMidiResets}, // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
