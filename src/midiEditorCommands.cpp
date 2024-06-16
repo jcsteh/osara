@@ -1193,6 +1193,33 @@ void postMidiSelectNotes(int command) {
 		count ));
 }
 
+int countSelectedCCs(MediaItem_Take* take) {
+	int evtIndex=-1;
+	int count=0;
+	for(;;){
+		evtIndex = MIDI_EnumSelCC(take, evtIndex);
+		if (evtIndex == -1) {
+			break;
+		}
+		++count;
+	}
+	return count;
+}
+
+void postMidiSelectCCs(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count = countSelectedCCs (take);
+	if (fakeFocus != FOCUS_NOTE && fakeFocus != FOCUS_CC) {
+		fakeFocus = FOCUS_CC;
+	}
+	// Translators: Reported when selecting CC events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 CC events selected".
+	outputMessage(format(
+		translate_plural("{} CC event selected", "{} CC events selected", count),
+		count));
+}
+
 int countSelectedEvents(MediaItem_Take* take) {
 	int evtIndex=-1;
 	int count=0;
@@ -1225,27 +1252,6 @@ void postMidiSelectEvents(int command) {
 	outputMessage(format(
 		translate_plural("{} event selected", "{} events selected", count),
 		count));
-}
-
-void cmdMidiSelCC(Command* command) {
-	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount = 0;
-	int newCount = 0;
-	int count = 0;
-	Undo_BeginBlock();
-	MIDIEditor_OnCommand(editor, 40669); // Unselect all CC events in last clicked lane
-	oldCount = countSelectedEvents (take);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd); // Select all CC events in last clicked lane
-	newCount = countSelectedEvents (take);
-		Undo_EndBlock(translate("Change CC Selection"), 0);
-	if (newCount > oldCount) {
-		count = newCount - oldCount;
-	}
-	// Translators: Used in the MIDI editor when CC events are selected.  {}
-	// is replaced by the number of events selected.
-	outputMessage(format(
-		translate_plural("{} CC event selected", "{} CC events selected", count), count));
 }
 
 void cmdMidiToggleSelCC (Command* command) {
