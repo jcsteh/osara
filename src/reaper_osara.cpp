@@ -1596,13 +1596,15 @@ void postCopy(int command) {
 }
 
 void postCopyMoveTimeSelection(int command) {
-	ostringstream s;
+	fakeFocus = FOCUS_RULER;
 	double start, end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
-	fakeFocus = FOCUS_RULER;
-	if (start == end)
+	if (start == end) {
 		outputMessage(translate("no time selection"));
-	else if (command == 40397) {
+		return;
+	}
+	ostringstream s;
+	if (command == 40397) {
 		// Time selection: Copy contents of time selection to edit cursor (moving later items)
 		// Translators: Reported when copying the content of a time selection. The new start of time selection will be appended in the primary ruler format, E.G. "copied time selection to bar 50".
 		s << translate("copied time selection to") << " " << formatTime(start, TF_RULER, FT_NO_CACHE);
