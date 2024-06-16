@@ -1333,28 +1333,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-void moveToCC(int direction, bool clearSelection=true, bool select=true) {
-	HWND editor = MIDIEditor_GetActive();
-	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	auto cc = findCC(take, direction);
-	if (cc.channel == -1) {
-		return;
-	}
-	if (clearSelection || select) {
-		Undo_BeginBlock();
-	}
-	if (clearSelection) {
-		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
-		isSelectionContiguous = true;
-	}
-	if (select) {
-		selectCC(take, cc.index);
-	}
-	if (clearSelection || select) {
-		Undo_EndBlock(translate("Change CC Selection"), 0);
-	}
-	SetEditCurPos(cc.position, true, false);
-	fakeFocus = FOCUS_CC;
+ostringstream describeCC(MidiControlChange cc, MediaItem_Take* take, bool select=true) {
 	ostringstream s;
 	s << formatCursorPosition() << " ";
 	if (cc.muted) {
@@ -1386,6 +1365,32 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << " " << translate("unselected");
 	}
+	return s;
+}
+
+void moveToCC(int direction, bool clearSelection=true, bool select=true) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	auto cc = findCC(take, direction);
+	if (cc.channel == -1) {
+		return;
+	}
+	if (clearSelection || select) {
+		Undo_BeginBlock();
+	}
+	if (clearSelection) {
+		MIDIEditor_OnCommand(editor, 40214); // Edit: Unselect all
+		isSelectionContiguous = true;
+	}
+	if (select) {
+		selectCC(take, cc.index);
+	}
+	if (clearSelection || select) {
+		Undo_EndBlock(translate("Change CC Selection"), 0);
+	}
+	SetEditCurPos(cc.position, true, false);
+	fakeFocus = FOCUS_CC;
+	ostringstream s = describeCC(cc, take, select);
 	outputMessage(s);
 }
 
@@ -2082,41 +2087,6 @@ void postMidiChangeZoom(int command) {
 		// replaced with the number of pixels per second; e.g. 100 pixels/second.
 		outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 	}
-}
-
-ostringstream describeCC(MidiControlChange cc, MediaItem_Take* take, bool select=true) {
-	ostringstream s;
-	s << formatCursorPosition() << " ";
-	if (cc.muted) {
-		s << translate("muted") << " ";
-	}
-	if (cc.message1 == 0xA0) {
-		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
-		// name and {value} will be replaced with the aftertouch value; e.g.
-		// "Poly Aftertouch c sharp 4  96"
-		s << format(translate("Poly Aftertouch {note}  {value}"),
-			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
-			"value"_a=cc.message3);
-	} else if (cc.message1 == 0xB0) {
-		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
-		s << format(translate("Control {control}, {value}"),
-		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
-		"value"_a=cc.message3);
-	} else if (cc.message1 == 0xC0) {
-		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
-		s << format(translate("Program {}"), cc.message2);
-	} else if (cc.message1 == 0xD0) {
-		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
-		s << format(translate("Channel pressure {}"), cc.message2);
-	} else if (cc.message1 == 0xE0) {
-		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
-		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
-		s << format(translate("Pitch Bend {}"), pitchBendValue);
-	}
-	if (!select && !isCCSelected(take, cc.index)) {
-		s << " " << translate("unselected");
-	}
-	return s;
 }
 
 void cmdMidiInsertCC(Command* command) {
