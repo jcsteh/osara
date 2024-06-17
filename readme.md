@@ -268,6 +268,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Transient detection threshold: Increase: Control+Shift+PageUp
 - Transient detection threshold: Decrease: Control+Shift+PageDown
 - Options: Toggle snapping: Alt+N
+- Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins: F3
 
 #### Undo
 - Edit: Undo: Control+Z
@@ -899,6 +900,8 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Secondary time unit for ruler: None
 - View: Secondary time unit for ruler: Samples
 - View: Secondary time unit for ruler: Seconds
+- Reset all MIDI devices
+- Reset all MIDI control surface devices
 
 #### Unmapped in MIDI Editor section
 - Edit: Select all notes in time selection
@@ -1030,3 +1033,4 @@ The resulting installer can be found in the installer directory.
 - Christian Fillion
 - Jenny K Brennan
 - Day Garwood
+- Matej Golian
