@@ -1488,19 +1488,16 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 void cmdMidiInsertCC(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount;
-	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	int oldCount = countSelectedEvents (take);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	int newCount;
-	MIDI_CountEvts(take, &newCount, nullptr, nullptr);
+	int newCount = countSelectedEvents (take);
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
-	auto cc = findCC(take, 0);
+	auto cc = findCC(take, 1);
 	if (cc.channel == -1) {
 		return;
 	}
-	selectCC(take, cc.index);
 	fakeFocus = FOCUS_CC;
 	outputMessage(describeCC(cc, take));
 }
