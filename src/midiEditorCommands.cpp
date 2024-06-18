@@ -1499,9 +1499,12 @@ void cmdMidiInsertCC(Command* command) {
 	if (count != 1) {
 		return;
 	}
-		auto cc = *selectedCCs.cbegin();
+	auto cc = *selectedCCs.cbegin();
 	fakeFocus = FOCUS_CC;
-	outputMessage(describeCC(cc, take));
+	ostringstream s;
+	//Translators: a MIDI CC {} will be replaced with the description of that CC; e.g. "Control 1 (Mod Wheel MSB), 64, inserted and selected"
+	s << format(translate("{}, inserted and selected"), describeCC(cc, take));
+	outputMessage(s);
 }
 
 void cmdMidiMoveToNextCC(Command* command) {
