@@ -1488,9 +1488,9 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 void cmdMidiInsertCC(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount = countSelectedEvents (take);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
-	int newCount = countSelectedEvents (take);
+	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
