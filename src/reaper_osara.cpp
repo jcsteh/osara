@@ -2427,7 +2427,6 @@ PostCommand POST_COMMANDS[] = {
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
 	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
-
 	{40397, postCopyMoveTimeSelection}, // Time selection: Copy contents of time selection to edit cursor (moving later items)
 	{40396, postCopyMoveTimeSelection}, // Time selection: Move contents of time selection to edit cursor (moving later items)
 	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
