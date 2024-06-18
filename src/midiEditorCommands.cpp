@@ -1494,10 +1494,12 @@ void cmdMidiInsertCC(Command* command) {
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
-	auto cc = findCC(take, 1);
-	if (cc.channel == -1) {
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int count = static_cast<int>(selectedCCs.size());
+	if (count != 1) {
 		return;
 	}
+		auto cc = *selectedCCs.cbegin();
 	fakeFocus = FOCUS_CC;
 	outputMessage(describeCC(cc, take));
 }
