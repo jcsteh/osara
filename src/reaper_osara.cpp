@@ -1603,17 +1603,15 @@ void postCopyMoveTimeSelection(int command) {
 		outputMessage(translate("no time selection"));
 		return;
 	}
-	ostringstream s;
 	if (command == 40397) {
 		// Time selection: Copy contents of time selection to edit cursor (moving later items)
-		// Translators: Reported when copying the content of a time selection. The new start of time selection will be appended in the primary ruler format, E.G. "copied time selection to bar 50".
-		s << translate("copied time selection to") << " " << formatTime(start, TF_RULER, FT_NO_CACHE);
+		// Translators: Reported when copying the content of a time selection to the edit cursor.
+		outputMessage(translate("copied time selection to edit cursor"));
 	} else {
 		// Time selection: Move contents of time selection to edit cursor (moving later items)
-		// Translators: Reported when moving the content of a time selection. The new start of time selection will be appended in the primary ruler format, E.G. "moved time selection to bar 50".
-		s << translate("moved time selection to") << " " << formatTime(start, TF_RULER, FT_NO_CACHE);
+		// Translators: Reported when moving the content of a time selection to edit cursor.
+		outputMessage(translate("moved time selection to edit cursor"));
 	}
-	outputMessage(s);
 }
 
 void postMoveToTimeSig(int command) {
