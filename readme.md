@@ -393,9 +393,12 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Increase pitch cursor one octave: Alt+Shift+UpArrow
 - Edit: Decrease pitch cursor one octave: Alt+Shift+DownArrow
 - Edit: copy: Control+C
+- Edit: Copy events within time selection, if any (smart copy): Control+shift+C
 - Edit: cut: Control+X
+- Edit: Cut events within time selection, if any (smart cut): Control+shift+X
 - Edit: Delete events: Delete
 - Edit: paste: Control+V
+- Edit: Paste preserving position in measure: control+Shift+V
 - Edit: Insert note at edit cursor: I or NumPad5
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
 - Edit: Select all events: Control+A
@@ -907,6 +910,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Reset all MIDI control surface devices
 
 #### Unmapped in MIDI Editor section
+- Edit: Select all events in time selection (even if CC lane is hidden)
 - Edit: Select all notes in time selection
 - Options: MIDI inputs as step input mode
 - Options: F1-F12 as step input mode
