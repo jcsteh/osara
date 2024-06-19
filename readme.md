@@ -392,7 +392,10 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Decrease pitch cursor one semitone: Alt+DownArrow or Ctrl+NumPad2
 - Edit: Increase pitch cursor one octave: Alt+Shift+UpArrow
 - Edit: Decrease pitch cursor one octave: Alt+Shift+DownArrow
+- Edit: copy: Control+C
+- Edit: cut: Control+X
 - Edit: Delete events: Delete
+- Edit: paste: Control+V
 - Edit: Insert note at edit cursor: I or NumPad5
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
 - Edit: Select all events: Control+A
