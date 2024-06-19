@@ -2581,9 +2581,12 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40465, postMidiChangeVelocity, true, true}, // Edit: Note velocity -10
 	{40501, postMidiSelectEvents}, // Invert selection
 	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
+	{40668, postMidiSelectCCs, false}, // Select all CC events in last clicked lane
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
+	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)
 	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
+	{40875, postMidiSelectEvents, true}, // Edit: Select all events in time selection (even if CC lane is hidden)
 	{40877, postMidiSelectNotes, true}, // Edit: Select all notes starting in time selection
 	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
 	{41026, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone ignoring scale/key
@@ -5007,12 +5010,14 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, nullptr}, nullptr, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel
 	{MIDI_EDITOR_SECTION, {{0, 0, 40186}, nullptr}, nullptr, cmdMidiMoveCursor}, // Edit: Move edit cursor right one pixel
+	{MIDI_EDITOR_SECTION, {{0, 0, 40429}, nullptr}, nullptr, cmdMidiPasteEvents}, // Edit: Paste preserving position in measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40456}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40456}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Join notes
 	{MIDI_EDITOR_SECTION, {{0, 0, 40682}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40683}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor left one measure
 	{MIDI_EDITOR_SECTION, {{0, 0, 40667}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Delete events
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40667}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Delete events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40734}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Cut events within time selection, if any (smart cut)
 	{MIDI_EDITOR_SECTION, {{0, 0, 40051}, nullptr}, nullptr, cmdMidiInsertNote}, // Edit: Insert note at edit cursor
 	{MIDI_EDITOR_SECTION, {{0, 0, 1000}, nullptr}, nullptr, cmdMidiInsertNote}, // Edit: Insert note at edit cursor (no advance edit cursor)
 	{MIDI_EDITOR_SECTION, {{0, 0, 40835}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate next MIDI track

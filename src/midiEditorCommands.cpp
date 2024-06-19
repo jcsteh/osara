@@ -1311,6 +1311,31 @@ void postMidiSelectNotes(int command) {
 		count ));
 }
 
+int countSelectedCCs(MediaItem_Take* take) {
+	int evtIndex=-1;
+	int count=0;
+	for(;;){
+		evtIndex = MIDI_EnumSelCC(take, evtIndex);
+		if (evtIndex == -1) {
+			break;
+		}
+		++count;
+	}
+	return count;
+}
+
+void postMidiSelectCCs(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count = countSelectedCCs (take);
+	fakeFocus = FOCUS_CC;
+	// Translators: Reported when selecting CC events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 CC events selected".
+	outputMessage(format(
+		translate_plural("{} CC event selected", "{} CC events selected", count),
+		count));
+}
+
 int countSelectedEvents(MediaItem_Take* take) {
 	int evtIndex=-1;
 	int count=0;

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-05-26 11:59\n"
+"PO-Revision-Date: 2024-06-19 12:34\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -334,11 +334,26 @@ msgstr "不連續選擇"
 msgid "velocity"
 msgstr "力度"
 
+msgid "nothing pasted"
+msgstr "沒有粘貼"
+
+#. Reported when pasting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events added".
+msgid "{} event added"
+msgid_plural "{} events added"
+msgstr[0] ""
+
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
 msgstr[0] "{} 事件移除"
+
+#. Reported when copying events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events copied".
+msgid "{} event copied"
+msgid_plural "{} events copied"
+msgstr[0] ""
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -567,9 +582,6 @@ msgstr "單通道開"
 msgid "Poly On"
 msgstr "多通道開"
 
-msgid "Change CC Selection"
-msgstr "更改選取的 CC"
-
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
@@ -589,6 +601,9 @@ msgstr "通道壓力 {}"
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
 msgstr "彎音 {}"
+
+msgid "Change CC Selection"
+msgstr "更改選取的 CC"
 
 msgid "OSARA: Move to next midi item on track"
 msgstr "OSARA: 移至軌道上的下一個Midi對象"
@@ -1553,6 +1568,11 @@ msgstr "波紋全部軌"
 msgid "ripple off"
 msgstr "波紋關"
 
+#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
+#. "2 items removed ripple is on".
+msgid "ripple is on"
+msgstr "波紋開啟"
+
 msgid "repeat on"
 msgstr "重複開"
 
@@ -1893,6 +1913,18 @@ msgstr "最大垂直縮放"
 msgid "{} momentary"
 msgstr "{} 瞬時"
 
+#. Reported when users run the "Reset all MIDI devices" action.
+msgid "midi devices reset"
+msgstr "MIDI 設備重置"
+
+#. Reported when users run the "Reset all MIDI control surface devices" action.
+msgid "Control surfaces reset"
+msgstr "控制面重置"
+
+#. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
+msgid "all notes off"
+msgstr "全部音符關"
+
 msgid "set selection start"
 msgstr "設置選區開始"
 
@@ -2207,8 +2239,17 @@ msgid "{} point added"
 msgid_plural "{} points added"
 msgstr[0] "{} 點添加"
 
-msgid "nothing pasted"
-msgstr "沒有粘貼"
+#. Reported when takes are added to multiple items. {} will be replaced with the
+#. number of takes; e.g. "2 takes added to selected items".
+msgid "{} take added to selected items"
+msgid_plural "{} takes added to selected items"
+msgstr[0] "{} 片段添加到選取的對向"
+
+#. Reported when takes are added. {} will be replaced with the
+#. number of takes; e.g. "2 takes added".
+msgid "{} take added"
+msgid_plural "{} takes added"
+msgstr[0] "{} 片段添加"
 
 #. Reported when tracks are removed. {} will be replaced with the
 #. number of tracks; e.g. "2 tracks removed".
@@ -2352,6 +2393,54 @@ msgstr "播放中"
 
 msgid "stopped"
 msgstr "已停止"
+
+#. Reported when the cursor is before the first marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "before marker intro".
+msgid "before marker {}"
+msgstr "在標記 {} 之前 "
+
+#. Reported when the cursor is right at a marker. {} will be
+#. replaced with the marker's name or number; e.g. "at marker intro".
+msgid "at marker {}"
+msgstr "在標記 {} "
+
+#. Reported when the cursor is between two markers. {before}
+#. will be replaced with the name or number of the marker before the
+#. cursor. {after} will be replaced with the name or number of the marker
+#. after the cursor. For example: "between markers intro, verse 1".
+msgid "between markers {before}, {after}"
+msgstr "在標記{}、{}之間"
+
+#. Reported when the cursor is after the last marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "after marker outro".
+msgid "after marker {}"
+msgstr "在標記 {} 之後 "
+
+#. Reported when the cursor is inside a region. {} will be
+#. replaced with the region's name or number; e.g. "in region intro".
+msgid "in region {}"
+msgstr "在區間 {} "
+
+#. Reported when the cursor is before the first region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "before region {}"
+msgstr "在區間 {} 之前"
+
+#. Reported when the cursor is after the last region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "after region {}"
+msgstr "在區間{}之後"
+
+#. Reported when the cursor is between two regions. {before}
+#. will be replaced with the name or number of the region before the
+#. cursor. {after} will be replaced with the name or number of the region
+#. after the cursor. For example: "between regions intro, verse 1".
+msgid "between regions {before}, {after}"
+msgstr "在區間{}、{}之間"
 
 msgid "Move stretch marker"
 msgstr "移除拉伸標記"
@@ -2518,8 +2607,8 @@ msgstr "OSARA: 移除對象、軌道、時間選區、包絡點 （取決於焦�
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切換熱鍵幫助"
 
-msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: 報告當前編輯/ 播放游標位置及走帶狀態"
+msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
+msgstr "OSARA: 報告編輯/播放遊標位置、走帶狀態以及最近的標記和區間"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦點）"
