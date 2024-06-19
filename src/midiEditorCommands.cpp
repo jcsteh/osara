@@ -1432,18 +1432,22 @@ string describeCC(MidiControlChange cc, MediaItem_Take* take) {
 		return format(translate("Poly Aftertouch {note}  {value}"),
 			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
 			"value"_a=cc.message3);
-	} else if (cc.message1 == 0xB0) {
+	}
+	if (cc.message1 == 0xB0) {
 		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 		return format(translate("Control {control}, {value}"),
 		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
 		"value"_a=cc.message3);
-	} else if (cc.message1 == 0xC0) {
+	}
+	if (cc.message1 == 0xC0) {
 		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
 		return format(translate("Program {}"), cc.message2);
-	} else if (cc.message1 == 0xD0) {
+	}
+	if (cc.message1 == 0xD0) {
 		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 		return format(translate("Channel pressure {}"), cc.message2);
-	} else if (cc.message1 == 0xE0) {
+	}
+	if (cc.message1 == 0xE0) {
 		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
 		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 		return format(translate("Pitch Bend {}"), pitchBendValue);
@@ -1501,7 +1505,7 @@ void cmdMidiInsertCC(Command* command) {
 	}
 	auto cc = *selectedCCs.cbegin();
 	fakeFocus = FOCUS_CC;
-	//Translators: a MIDI CC {} will be replaced with the description of that CC; e.g. "Control 1 (Mod Wheel MSB), 64, inserted and selected"
+	//Translators: Reported when inserting a MIDI CC. {} will be replaced with the description of that CC; e.g. "Control 1 (Mod Wheel MSB), 64, inserted and selected"
 	outputMessage(format(translate("{}, inserted and selected"), describeCC(cc, take)));
 }
 
