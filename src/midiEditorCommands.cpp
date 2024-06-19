@@ -1260,6 +1260,23 @@ void cmdMidiInsertNote(Command* command) {
 	outputMessage(s);
 }
 
+void cmdMidiPasteEvents(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	int added = newCount - oldCount;
+if (added <= 0) {
+		outputMessage(translate("nothing pasted"));
+		return;
+	}
+	// Translators: Reported when pasting events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 events added".
+	outputMessage(format(
+		translate_plural("{} event added", "{} events added", added), added));
+}
+
 void cmdMidiDeleteEvents(Command* command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -1270,6 +1287,16 @@ void cmdMidiDeleteEvents(Command* command) {
 	// replaced by the number of events. E.g. "3 events removed"
 	outputMessage(format(
 		translate_plural("{} event removed", "{} events removed", removed), removed));
+}
+
+void postMidiCopyEvents(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count = countSelectedEvents (take);
+	// Translators: Reported when copying events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 events copied".
+	outputMessage(format(
+		translate_plural("{} event copied", "{} events copied", count), count));
 }
 
 void postMidiSelectNotes(int command) {
