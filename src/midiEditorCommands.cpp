@@ -1328,9 +1328,7 @@ void postMidiSelectCCs(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int count = countSelectedCCs (take);
-	if (fakeFocus != FOCUS_NOTE && fakeFocus != FOCUS_CC) {
-		fakeFocus = FOCUS_CC;
-	}
+	fakeFocus = FOCUS_CC;
 	// Translators: Reported when selecting CC events in the MIDI editor. {} will be replaced with
 	// the number of events; e.g. "2 CC events selected".
 	outputMessage(format(
