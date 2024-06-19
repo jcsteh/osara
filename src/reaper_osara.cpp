@@ -2555,6 +2555,7 @@ PostCommand POST_COMMANDS[] = {
 MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40003, postMidiSelectNotes, true}, // Edit: Select all notes
 	{40006, postMidiSelectEvents, true}, // Edit: Select all events
+	{40010, postMidiCopyEvents, true}, // Edit: Copy
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
 	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
@@ -5000,6 +5001,8 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40440}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor to start of selected events
 	{MIDI_EDITOR_SECTION, {{0, 0, 40639}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor to end of selected events
+	{MIDI_EDITOR_SECTION, {{0, 0, 40011}, nullptr}, nullptr, cmdMidiPasteEvents}, // Edit: Paste
+	{MIDI_EDITOR_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Cut
 	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
@@ -5018,6 +5021,7 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40836}, nullptr}, nullptr, cmdMidiMoveToTrack}, // Activate previous MIDI track
 	{MIDI_EDITOR_SECTION, {{0, 0, 40664}, nullptr}, nullptr, cmdMidiToggleSelCC}, // Edit: Toggle selection of all CC events under selected notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 42469}, nullptr}, nullptr, cmdMidiInsertCC}, // Edit: Insert CC event at edit cursor in current lane
 #ifdef _WIN32
 	{MIDI_EDITOR_SECTION, {{0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EDITOR_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow }, // Filter: Enable/disable event filter and show/hide filter window...
