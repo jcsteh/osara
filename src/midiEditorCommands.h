@@ -41,6 +41,7 @@ void cmdMidiDeleteEvents(Command* command);
 void cmdMidiPasteEvents(Command* command);
 void postMidiCopyEvents(int command);
 void postMidiSelectNotes(int command);
+void postMidiSelectCCs(int command);
 void postMidiSelectEvents(int command);
 void cmdMidiToggleSelCC (Command* command) ;
 void cmdMidiMoveToNextCC(Command* command);
