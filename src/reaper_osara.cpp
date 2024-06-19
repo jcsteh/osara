@@ -2587,6 +2587,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)
 	{40746, postMidiSelectNotes, true}, // Edit: Select all notes in time selection
+	{40747, postMidiSelectCCs, true}, // Edit: Select all CC events in time selection (in last clicked CC lane)
 	{40875, postMidiSelectEvents, true}, // Edit: Select all events in time selection (even if CC lane is hidden)
 	{40877, postMidiSelectNotes, true}, // Edit: Select all notes starting in time selection
 	{40765, postMidiChangeLength}, // Edit: Make notes legato, preserving note start times
