@@ -1499,8 +1499,7 @@ void cmdMidiInsertCC(Command* command) {
 		return; // Not inserted.
 	}
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	int count = static_cast<int>(selectedCCs.size());
-	if (count != 1) {
+	if (selectedCCs.size() != 1) {
 		return;
 	}
 	auto cc = *selectedCCs.cbegin();
