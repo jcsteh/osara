@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2024-05-26 11:59\n"
+"PO-Revision-Date: 2024-06-19 12:34\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -342,12 +342,29 @@ msgstr "Nicht zusammenhängende Selektion"
 msgid "velocity"
 msgstr "Anschlagsempfindlichkeit"
 
+msgid "nothing pasted"
+msgstr "Nichts eingefügt"
+
+#. Reported when pasting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events added".
+msgid "{} event added"
+msgid_plural "{} events added"
+msgstr[0] ""
+msgstr[1] ""
+
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
 msgstr[0] "{} Event entfernt"
 msgstr[1] "{} Events entfernt"
+
+#. Reported when copying events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events copied".
+msgid "{} event copied"
+msgid_plural "{} events copied"
+msgstr[0] ""
+msgstr[1] ""
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -580,9 +597,6 @@ msgstr "Mono On"
 msgid "Poly On"
 msgstr "Poly On"
 
-msgid "Change CC Selection"
-msgstr "CC Selektion ändern"
-
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
@@ -602,6 +616,9 @@ msgstr "Channel pressure {}"
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
 msgstr "Pitch Bend {}"
+
+msgid "Change CC Selection"
+msgstr "CC Selektion ändern"
 
 msgid "OSARA: Move to next midi item on track"
 msgstr "Osara: gehe zum nächsten Midi Item im Track"
@@ -1606,6 +1623,11 @@ msgstr "Rippeln aller Tracks"
 msgid "ripple off"
 msgstr "Rippeln ausgeschaltet"
 
+#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
+#. "2 items removed ripple is on".
+msgid "ripple is on"
+msgstr ""
+
 msgid "repeat on"
 msgstr "Loopen aktiviert"
 
@@ -1961,6 +1983,18 @@ msgstr ""
 msgid "{} momentary"
 msgstr ""
 
+#. Reported when users run the "Reset all MIDI devices" action.
+msgid "midi devices reset"
+msgstr ""
+
+#. Reported when users run the "Reset all MIDI control surface devices" action.
+msgid "Control surfaces reset"
+msgstr ""
+
+#. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
+msgid "all notes off"
+msgstr ""
+
 msgid "set selection start"
 msgstr "Setze Time Selektion Anfang"
 
@@ -2278,8 +2312,19 @@ msgid_plural "{} points added"
 msgstr[0] "{} Punkt hinzugefügt"
 msgstr[1] "{} Punkte hinzugefügt"
 
-msgid "nothing pasted"
-msgstr "Nichts eingefügt"
+#. Reported when takes are added to multiple items. {} will be replaced with the
+#. number of takes; e.g. "2 takes added to selected items".
+msgid "{} take added to selected items"
+msgid_plural "{} takes added to selected items"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when takes are added. {} will be replaced with the
+#. number of takes; e.g. "2 takes added".
+msgid "{} take added"
+msgid_plural "{} takes added"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Reported when tracks are removed. {} will be replaced with the
 #. number of tracks; e.g. "2 tracks removed".
@@ -2428,6 +2473,54 @@ msgstr "spielt ab"
 
 msgid "stopped"
 msgstr "angehalten"
+
+#. Reported when the cursor is before the first marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "before marker intro".
+msgid "before marker {}"
+msgstr ""
+
+#. Reported when the cursor is right at a marker. {} will be
+#. replaced with the marker's name or number; e.g. "at marker intro".
+msgid "at marker {}"
+msgstr ""
+
+#. Reported when the cursor is between two markers. {before}
+#. will be replaced with the name or number of the marker before the
+#. cursor. {after} will be replaced with the name or number of the marker
+#. after the cursor. For example: "between markers intro, verse 1".
+msgid "between markers {before}, {after}"
+msgstr ""
+
+#. Reported when the cursor is after the last marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "after marker outro".
+msgid "after marker {}"
+msgstr ""
+
+#. Reported when the cursor is inside a region. {} will be
+#. replaced with the region's name or number; e.g. "in region intro".
+msgid "in region {}"
+msgstr ""
+
+#. Reported when the cursor is before the first region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "before region {}"
+msgstr ""
+
+#. Reported when the cursor is after the last region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "after region {}"
+msgstr ""
+
+#. Reported when the cursor is between two regions. {before}
+#. will be replaced with the name or number of the region before the
+#. cursor. {after} will be replaced with the name or number of the region
+#. after the cursor. For example: "between regions intro, verse 1".
+msgid "between regions {before}, {after}"
+msgstr ""
 
 msgid "Move stretch marker"
 msgstr "Verschiebe Stretch Marker"
@@ -2596,8 +2689,8 @@ msgstr "Osara: entferne Tracks / Items / Inhalt der Time Selektion / Marker / Au
 msgid "OSARA: Toggle shortcut help"
 msgstr "Osara: Tastenkombinationen Hilfe umschalten"
 
-msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: Report Position des Edit / Play Cursors und Transport Status"
+msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "Osara: Aktivieren der nicht zusammenhängenden Selektion  / Umschalten Selektion von Tracks / Items (abhängig vom Fokus)"
