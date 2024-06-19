@@ -1272,7 +1272,7 @@ if (added <= 0) {
 		return;
 	}
 	// Translators: Reported when pasting events in the MIDI editor. {} will be replaced with
-	// the number of events; e.g. "2 events pasted".
+	// the number of events; e.g. "2 events added".
 	outputMessage(format(
 		translate_plural("{} event added", "{} events added", added), added));
 }
