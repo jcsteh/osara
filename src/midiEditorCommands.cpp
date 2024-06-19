@@ -1424,6 +1424,37 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
+string describeCC(MidiControlChange cc, MediaItem_Take* take) {
+	if (cc.message1 == 0xA0) {
+		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
+		// name and {value} will be replaced with the aftertouch value; e.g.
+		// "Poly Aftertouch c sharp 4  96"
+		return format(translate("Poly Aftertouch {note}  {value}"),
+			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
+	}
+	if (cc.message1 == 0xB0) {
+		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+		return format(translate("Control {control}, {value}"),
+		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
+		"value"_a=cc.message3);
+	}
+	if (cc.message1 == 0xC0) {
+		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
+		return format(translate("Program {}"), cc.message2);
+	}
+	if (cc.message1 == 0xD0) {
+		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		return format(translate("Channel pressure {}"), cc.message2);
+	}
+	if (cc.message1 == 0xE0) {
+		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
+		return format(translate("Pitch Bend {}"), pitchBendValue);
+	}
+	return "";
+}
+
 void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -1451,33 +1482,31 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
-	if (cc.message1 == 0xA0) {
-		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
-		// name and {value} will be replaced with the aftertouch value; e.g.
-		// "Poly Aftertouch c sharp 4  96"
-		s << format(translate("Poly Aftertouch {note}  {value}"),
-			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
-			"value"_a=cc.message3);
-	} else if (cc.message1 == 0xB0) {
-		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
-		s << format(translate("Control {control}, {value}"),
-		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
-		"value"_a=cc.message3);
-	} else if (cc.message1 == 0xC0) {
-		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
-		s << format(translate("Program {}"), cc.message2);
-	} else if (cc.message1 == 0xD0) {
-		// Translators: Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
-		s << format(translate("Channel pressure {}"), cc.message2);
-	} else if (cc.message1 == 0xE0) {
-		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
-		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
-		s << format(translate("Pitch Bend {}"), pitchBendValue);
-	}
+	s << describeCC(cc, take);
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << " " << translate("unselected");
 	}
 	outputMessage(s);
+}
+
+void cmdMidiInsertCC(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	if (newCount <= oldCount) {
+		return; // Not inserted.
+	}
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int count = static_cast<int>(selectedCCs.size());
+	if (count != 1) {
+		return;
+	}
+	auto cc = *selectedCCs.cbegin();
+	fakeFocus = FOCUS_CC;
+	//Translators: Reported when inserting a MIDI CC. {} will be replaced with the description of that CC; e.g. "Control 1 (Mod Wheel MSB), 64, inserted and selected"
+	outputMessage(format(translate("{}, inserted and selected"), describeCC(cc, take)));
 }
 
 void cmdMidiMoveToNextCC(Command* command) {

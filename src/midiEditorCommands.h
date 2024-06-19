@@ -35,6 +35,7 @@ void cmdMidiMoveToPreviousNoteInChord(Command* command);
 void cmdMidiMoveToNextNoteInChordKeepSel(Command* command);
 void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command);
 void postMidiMovePitchCursor(int command);
+void cmdMidiInsertCC(Command* command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
 void postMidiSelectNotes(int command);
