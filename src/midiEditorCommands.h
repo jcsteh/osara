@@ -38,6 +38,8 @@ void postMidiMovePitchCursor(int command);
 void cmdMidiInsertCC(Command* command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
+void cmdMidiPasteEvents(Command* command);
+void postMidiCopyEvents(int command);
 void postMidiSelectNotes(int command);
 void postMidiSelectEvents(int command);
 void cmdMidiToggleSelCC (Command* command) ;
