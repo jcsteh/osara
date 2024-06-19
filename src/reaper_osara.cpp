@@ -2582,6 +2582,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40501, postMidiSelectEvents}, // Invert selection
 	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
 	{40668, postMidiSelectCCs, false}, // Select all CC events in last clicked lane
+	{40669, postMidiSelectCCs, false}, // Unselect all CC events in last clicked lane
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)
