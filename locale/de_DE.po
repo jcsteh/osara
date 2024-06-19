@@ -349,11 +349,6 @@ msgid_plural "{} events removed"
 msgstr[0] "{} Event entfernt"
 msgstr[1] "{} Events entfernt"
 
-#. Used when CCs are inserted in the MIDI editor. {} is
-#. replaced by the CC description. E.g. "Control 1 (Mod Wheel MSB), 64, inserted and selected"
-msgid "{}, inserted and selected"
-msgstr ""
-
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 #. used when notes are selected in the MIDI editor.
