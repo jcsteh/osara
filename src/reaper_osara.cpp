@@ -3575,31 +3575,27 @@ void cmdRemoveItems(Command* command) {
 }
 
 void cmdCropTakes(Command* command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
 	int itemCount = CountSelectedMediaItems(0);
-	int oldTakes = CountTakes(item);
-	int totalTakesRemoved = 0;
+	int preCrop = 0;
+		for (int i = 0; i < itemCount; i++) {
+				MediaItem* item = GetSelectedMediaItem(0, i);
+if (CountTakes(item) > 1)
+preCrop++;
+	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	if(CountSelectedMediaItems(0)>1){
-		for (int i =0  ; i < CountSelectedMediaItems (0); ++i){
-			MediaItem* item = GetSelectedMediaItem(0, i);
-			if (CountTakes(item) > 1){
-			totalTakesRemoved = (oldTakes - 1);}
-			}
+	int postCrop =0;
+	for (int i = 0; i < itemCount; i++) {
+		MediaItem* item = GetSelectedMediaItem(0, i);
+		if (CountTakes(item) > 1)
+			postCrop++;
+	}
+	if (preCrop - postCrop > 0){
 		// Translators: Reported when cropped to active take on  multiple items. {} will be replaced with the
-			// number of takes; e.g. "2 takes removed from selected items".
-			outputMessage(format(
-				translate_plural("{} take removed from selected items", "{} takes removed from selected items", totalTakesRemoved), totalTakesRemoved));
-			}else if (itemCount > 1 && totalTakesRemoved < 1){
-			outputMessage(translate("No takes to remove from selected items. "));
-		}else if (itemCount == 1 && oldTakes == 1){
-			outputMessage(translate("No takes to remove from selected item. "));
-		}else{
-			int removed = oldTakes - 1;
-			// Translators: Reported when cropped to active take on single item. {} will be replaced with the
-			// number of takes; e.g. "2 takes removed.".
-			outputMessage(format(
-				translate_plural("{} take removed ", "{} takes removed", removed), removed));
+		// number of items; e.g. "2 items cropped to active take".
+		outputMessage(format(
+		translate_plural("{} item cropped to active take", "{} items cropped to active take", preCrop - postCrop), preCrop - postCrop));
+	}else {
+		outputMessage(translate("No takes removed"));
 	}
 }
 
