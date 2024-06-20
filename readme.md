@@ -172,6 +172,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Take: Switch items to next take: T
 - Take: Switch items to previous take: Shift+T
 - Take: Paste as takes in items: Shift+V
+- Take: Crop to active take in items: Alt+Shift+T 
 - Item properties: Set take channel mode to normal: Control+F7
 - Item properties: Set take channel mode to mono (downmix): Control+F8
 - Item properties: Set take channel mode to mono (left): Control+F9
