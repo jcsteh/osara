@@ -2067,6 +2067,62 @@ void postMidiChangePitch(int command) {
 	outputMessage(s);
 }
 
+void postMidiMoveCCs(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int count = static_cast<int>(selectedCCs.size());
+	if (count == 0) {
+		return;
+	}
+	ostringstream s;
+	if (count > 1) {
+		switch (command) {
+			case 40672:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel left"
+				s << format(
+					translate_plural("{} CC event pixel left", "{} CC events pixel left", count), count);
+				break;
+			case 40673:
+			// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel right"
+				s << format(
+					translate_plural("{} CC event pixel right", "{} CC events pixel right", count), count);
+				break;
+			case 40674:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit left"
+				s << format(
+					translate_plural("{} CC event grid unit left", "{} CC events grid unit left", count), count);
+				break;
+			case 40675:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit right"
+				s << format(
+					translate_plural("{} CC event grid unit right", "{} CC events grid unit right", count), count);
+				break;				
+			default:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events moved"
+				s << format(
+					translate_plural("{} CC event moved", "{} CC events moved", count), count);
+				break;
+		}
+	} else{
+		auto cc = *selectedCCs.cbegin();
+		s << formatTime(cc.position) << " ";
+		s << describeCC(cc, take);
+	}
+	outputMessage(s);
+}
+
 void postMidiMoveStart(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
