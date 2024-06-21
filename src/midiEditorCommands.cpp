@@ -2076,10 +2076,10 @@ void postMidiMoveCCs(int command) {
 	if (count == 0) {
 		return;
 	}
-	auto firstStart = selectedCCs.cbegin()->position;
+	auto firstPosition = selectedCCs.cbegin()->position;
 	bool generalize = count >= 8 || any_of(
 		selectedCCs.begin(), selectedCCs.end(),
-		[firstStart](MidiControlChange c) { return firstStart != c.position; }
+		[firstPosition](MidiControlChange c) { return firstPosition != c.position; }
 		);
 	ostringstream s;
 	if (generalize) {
