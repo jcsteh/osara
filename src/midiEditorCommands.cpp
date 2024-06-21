@@ -2076,8 +2076,13 @@ void postMidiMoveCCs(int command) {
 	if (count == 0) {
 		return;
 	}
+	auto firstStart = selectedCCs.cbegin()->position;
+	bool generalize = count >= 8 || any_of(
+		selectedCCs.begin(), selectedCCs.end(),
+		[firstStart](MidiControlChange c) { return firstStart != c.position; }
+		);
 	ostringstream s;
-	if (count > 1) {
+	if (generalize) {
 		switch (command) {
 			case 40672:
 				// Translators: Used when moving CCs in the MIDI
