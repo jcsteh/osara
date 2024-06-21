@@ -3578,14 +3578,21 @@ void cmdHealSplitsInItems(Command* command) {
 	int preHealed = CountSelectedMediaItems(0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	int postHealed = CountSelectedMediaItems(0);
+	ostringstream s;
 	if (preHealed - postHealed > 0){
 		// Translators: Reported when splits in items are healed. {} will be replaced with the
-		// number of splits ; e.g. "2 splits healed".
-		outputMessage(format(
-		translate_plural("{} split healed", "{} splits healed",preHealed - postHealed),preHealed - postHealed));
+		// number of splits that have been successfully healed; e.g. "2 splits healed".
+		s << format(
+			translate_plural("{} split healed", "{} splits healed",preHealed - postHealed),preHealed - postHealed) << ", ";
+		// Translators: This reports selected items after healing. {} will be replaced with the
+		// number of selected items; e.g. "2 items selected".
+		s << format(
+			translate_plural("{} item selected", "{} items selected",postHealed),postHealed);
 	}else {
-		outputMessage(translate("no splits healed"));
+		// Translators: Reported when healing was not possible.
+		outputMessage(translate("nothing healed"));
 	}
+	outputMessage(s);
 }
 
 void cmdCut(Command* command) {
