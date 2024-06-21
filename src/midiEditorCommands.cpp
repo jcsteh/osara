@@ -2121,9 +2121,15 @@ void postMidiMoveCCs(int command) {
 				break;
 		}
 	} else{
-		auto cc = *selectedCCs.cbegin();
-		s << formatTime(cc.position) << " ";
-		s << describeCC(cc, take);
+		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
+			if (cc == selectedCCs.cbegin()) {
+				s << formatTime(cc->position) << " ";
+			}
+			s << getMidiControlName(take, cc->message2, cc->channel);
+			if (cc != selectedCCs.cend() - 1) {
+				s << ", ";
+			}
+		}
 	}
 	outputMessage(s);
 }
