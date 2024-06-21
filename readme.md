@@ -132,6 +132,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Select and move to next item: Control+RightArrow
 - Item: Split items at edit or play cursor: S
 - Item: Split items at time selection: Shift+S
+- Item: Heal splits in items: Control+H
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
 - Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6

@@ -3574,6 +3574,20 @@ void cmdRemoveItems(Command* command) {
 	cmdhRemoveItems(command->gaccel.accel.cmd);
 }
 
+void cmdHealSplitsInItems(Command* command) {
+	int preHealed = CountSelectedMediaItems(0);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int postHealed = CountSelectedMediaItems(0);
+	if (preHealed - postHealed > 0){
+		// Translators: Reported when splits in items are healed. {} will be replaced with the
+		// number of splits ; e.g. "2 splits healed".
+		outputMessage(format(
+		translate_plural("{} split healed", "{} splits healed",preHealed - postHealed),preHealed - postHealed));
+	}else {
+		outputMessage(translate("no splits healed"));
+	}
+}
+
 void cmdCut(Command* command) {
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
@@ -4929,6 +4943,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40699}, nullptr}, nullptr, cmdRemoveItems}, // Edit: Cut items
+	{MAIN_SECTION, {{0, 0, 40548}, nullptr}, nullptr, cmdHealSplitsInItems}, //Item: Heal splits in items 
 	{MAIN_SECTION, {{0, 0, 40333}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
 	{MAIN_SECTION, {{0, 0, 40089}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
 	{MAIN_SECTION, {{0, 0, 40336}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
