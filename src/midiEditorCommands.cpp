@@ -2067,7 +2067,7 @@ void postMidiChangePitch(int command) {
 	outputMessage(s);
 }
 
-void postMidiMoveCCs(int command) {
+void postMidiMovePosition(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected CCs.
