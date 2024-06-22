@@ -3575,15 +3575,16 @@ void cmdRemoveItems(Command* command) {
 }
 
 void cmdHealSplitsInItems(Command* command) {
-	int preHealed = CountSelectedMediaItems(0);
+	const int preHealed = CountSelectedMediaItems(nullptr);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	int postHealed = CountSelectedMediaItems(0);
+	int postHealed = CountSelectedMediaItems(nullptr);
 	ostringstream s;
-	if (preHealed - postHealed > 0){
+	const int healed = preHealed - postHealed;
+	if (healed > 0) {
 		// Translators: Reported when splits in items are healed. {} will be replaced with the
 		// number of splits that have been successfully healed; e.g. "2 splits healed".
 		s << format(
-			translate_plural("{} split healed", "{} splits healed",preHealed - postHealed),preHealed - postHealed) << ", ";
+			translate_plural("{} split healed", "{} splits healed",healed),healed) << ", ";
 		// Translators: This reports selected items after healing. {} will be replaced with the
 		// number of selected items; e.g. "2 items selected".
 		s << format(
