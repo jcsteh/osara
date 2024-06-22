@@ -3575,27 +3575,30 @@ void cmdRemoveItems(Command* command) {
 }
 
 void cmdCropTakes(Command* command) {
-	int itemCount = CountSelectedMediaItems(0);
+	const int itemCount = CountSelectedMediaItems(nullptr);
 	int preCrop = 0;
-		for (int i = 0; i < itemCount; i++) {
-				MediaItem* item = GetSelectedMediaItem(0, i);
-if (CountTakes(item) > 1)
-preCrop++;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		if (CountTakes(item) > 1) {
+			++preCrop;
+		}
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	int postCrop =0;
-	for (int i = 0; i < itemCount; i++) {
-		MediaItem* item = GetSelectedMediaItem(0, i);
-		if (CountTakes(item) > 1)
-			postCrop++;
+	int postCrop = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		if (CountTakes(item) > 1) {
+			++postCrop;
+		}
 	}
-	if (preCrop - postCrop > 0){
+	const int cropped = preCrop - postCrop;
+	if (cropped > 0){
 		// Translators: Reported when cropped to active take on  multiple items. {} will be replaced with the
 		// number of items; e.g. "2 items cropped to active take".
 		outputMessage(format(
-		translate_plural("{} item cropped to active take", "{} items cropped to active take", preCrop - postCrop), preCrop - postCrop));
+			translate_plural("{} item cropped to active take", "{} items cropped to active take", cropped), cropped));
 	}else {
-		outputMessage(translate("No takes removed"));
+		outputMessage(translate("no takes removed"));
 	}
 }
 
