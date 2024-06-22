@@ -2143,13 +2143,11 @@ void postMidiMovePosition(int command) {
 				break;
 		}
 	} else{
-		MidiControlChange curCc;
 		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
-			curCc = *cc;
 			if (cc == selectedCCs.cbegin()) {
-				s << formatTime(curCc.position) << " ";
+				s << formatTime(cc->position) << " ";
 			}
-			s << describeCC(take, curCc, false);
+			s << describeCC(take, *cc, false);
 			if (cc != selectedCCs.cend() - 1) {
 				s << ", ";
 			}
