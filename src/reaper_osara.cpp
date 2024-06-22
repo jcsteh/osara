@@ -3574,6 +3574,34 @@ void cmdRemoveItems(Command* command) {
 	cmdhRemoveItems(command->gaccel.accel.cmd);
 }
 
+void cmdCropTakes(Command* command) {
+	const int itemCount = CountSelectedMediaItems(nullptr);
+	int preCrop = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		if (CountTakes(item) > 1) {
+			++preCrop;
+		}
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int postCrop = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		if (CountTakes(item) > 1) {
+			++postCrop;
+		}
+	}
+	const int cropped = preCrop - postCrop;
+	if (cropped > 0){
+		// Translators: Reported when cropped to active take on  multiple items. {} will be replaced with the
+		// number of items; e.g. "2 items cropped to active take".
+		outputMessage(format(
+			translate_plural("{} item cropped to active take", "{} items cropped to active take", cropped), cropped));
+	}else {
+		outputMessage(translate("no takes removed"));
+	}
+}
+
 void cmdCut(Command* command) {
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
@@ -4929,6 +4957,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40699}, nullptr}, nullptr, cmdRemoveItems}, // Edit: Cut items
+	{MAIN_SECTION, {{0, 0, 40131}, nullptr}, nullptr, cmdCropTakes}, //Take: Crop to active take in items 
 	{MAIN_SECTION, {{0, 0, 40333}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
 	{MAIN_SECTION, {{0, 0, 40089}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
 	{MAIN_SECTION, {{0, 0, 40336}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
