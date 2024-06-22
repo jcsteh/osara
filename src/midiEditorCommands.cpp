@@ -1476,7 +1476,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-string describeCC(MidiControlChange cc, MediaItem_Take* take) {
+string describeCC(MediaItem_Take* take, MidiControlChange cc) {
 	if (cc.message1 == 0xA0) {
 		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
 		// name and {value} will be replaced with the aftertouch value; e.g.
@@ -1534,7 +1534,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
-	s << describeCC(cc, take);
+	s << describeCC(take, cc);
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << " " << translate("unselected");
 	}
@@ -1556,7 +1556,7 @@ void cmdMidiInsertCC(Command* command) {
 	}
 	auto cc = *selectedCCs.cbegin();
 	fakeFocus = FOCUS_CC;
-	outputMessage(describeCC(cc, take));
+	outputMessage(describeCC(take, cc));
 }
 
 void cmdMidiMoveToNextCC(Command* command) {
