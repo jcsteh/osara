@@ -3602,6 +3602,28 @@ void cmdCropTakes(Command* command) {
 	}
 }
 
+void cmdHealSplitsInItems(Command* command) {
+	const int preHealed = CountSelectedMediaItems(nullptr);
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	const int postHealed = CountSelectedMediaItems(nullptr);
+	const int healed = preHealed - postHealed;
+	if (healed == 0) {
+		// Translators: Reported when healing was not possible.
+		outputMessage(translate("nothing healed"));
+		return;
+	}
+	ostringstream s;
+	// Translators: Reported when splits in items are healed. {} will be replaced with the
+	// number of splits that have been successfully healed; e.g. "2 splits healed".
+	s << format(
+		translate_plural("{} split healed", "{} splits healed",healed),healed) << ", ";
+	// Translators: This reports selected items after healing. {} will be replaced with the
+	// number of selected items; e.g. "2 items selected".
+	s << format(
+		translate_plural("{} item selected", "{} items selected",postHealed),postHealed);
+	outputMessage(s);
+}
+
 void cmdCut(Command* command) {
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
@@ -4958,6 +4980,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40699}, nullptr}, nullptr, cmdRemoveItems}, // Edit: Cut items
 	{MAIN_SECTION, {{0, 0, 40131}, nullptr}, nullptr, cmdCropTakes}, //Take: Crop to active take in items 
+	{MAIN_SECTION, {{0, 0, 40548}, nullptr}, nullptr, cmdHealSplitsInItems}, //Item: Heal splits in items 
 	{MAIN_SECTION, {{0, 0, 40333}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
 	{MAIN_SECTION, {{0, 0, 40089}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
 	{MAIN_SECTION, {{0, 0, 40336}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
