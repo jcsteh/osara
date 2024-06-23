@@ -3535,6 +3535,18 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
 				break;
 			}
+			case 41296: { // Item: Duplicate selected area of items
+				if(selItems == 0) {
+					outputMessage(translate("no items selected"));
+					break;
+				}
+				int count = countAffected(GetSelectedMediaItem, selItems);
+				// Translators: used for  "Item: Duplicate selected area of items".
+				// {} is replaced by the number of items affected.
+				outputMessage(format(
+					translate_plural("selected area of {} item duplicated", "selected area of {} items duplicated", count), count));
+				break;
+			}
 			default: {
 				int count = 0;
 				if(selItems == 0) { // these commands treat no item selection as if all items are selected
@@ -4993,6 +5005,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40307}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Cut selected area of items
 	{MAIN_SECTION, {{0, 0, 40060}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Copy selected area of items
 	{MAIN_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
+	{MAIN_SECTION, {{0, 0, 41296}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Duplicate selected area of items
 	{MAIN_SECTION, {{0, 0, 40119}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
 	{MAIN_SECTION, {{0, 0, 40120}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
 	{MAIN_SECTION, {{0, 0, 40793}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
