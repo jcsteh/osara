@@ -3413,7 +3413,10 @@ void cmdSplitItems(Command* command) {
 void cmdPaste(Command* command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	int oldTakes = CountTakes(item);
-	int oldItems = CountMediaItems(0);
+	set<MediaItem*> oldItems;
+	for (int i = 0; i < CountMediaItems(0); i++) {
+		oldItems.insert(GetMediaItem(0, i));
+	}
 	int oldTracks = CountTracks(0);
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	int oldPoints = 0;
@@ -3433,7 +3436,7 @@ void cmdPaste(Command* command) {
 		// {} will be replaced with the number of tracks; e.g. "2 tracks".
 		s << format(translate_plural("{} track", "{} tracks", added), added);
 	}
-	if ((added = CountMediaItems(0) - oldItems) > 0) {
+	if ((added = CountMediaItems(0) - oldItems.size()) > 0) {
 		if (s.tellp() > 0) {
 			s << " ";
 		}
@@ -3446,6 +3449,15 @@ void cmdPaste(Command* command) {
 		// Translators: Reported after the number of tracks and/or items added.
 		s << " " << translate("added");
 		maybeAddRippleMessage(s, command->gaccel.accel.cmd);
+		int rateAdjusted = 0;
+		for (int i = 0; i < CountMediaItems(0); i++) {
+			MediaItem* item = GetMediaItem(0, i);
+			if (!oldItems.contains(item) &&
+					*(double*)GetSetMediaItemTakeInfo(GetActiveTake(item), "D_PLAYRATE", nullptr) != 1.0)
+				rateAdjusted++;
+		}
+		if (rateAdjusted > 0)
+			s << ", " << format(translate_plural("{} item rate adjusted", "{} items rate adjusted", rateAdjusted), rateAdjusted);
 		outputMessage(s);
 		return;
 	}
@@ -4975,6 +4987,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items
 	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
+	{MAIN_SECTION, {{0, 0, 40018}, nullptr}, nullptr, cmdPaste}, // Insert media files...
 	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
