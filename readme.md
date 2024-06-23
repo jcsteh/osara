@@ -168,6 +168,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Remove selected area of items: Control+Win+Delete
 - Item: Trim items to selected area: Control+Win+T
 - Xenakios/SWS: Play selected items once: Control+Alt+Space
+- Item: Duplicate items: Control+D
+- Take: Duplicate active take: Control+Alt+D
+- Item: Duplicate selected area of items: Control+Shift+D
 
 #### Takes
 - Take: Switch items to next take: T
