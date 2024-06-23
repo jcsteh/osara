@@ -4975,6 +4975,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items
 	{MAIN_SECTION, {{0, 0, 40062}, nullptr}, nullptr, cmdPaste}, // Track: Duplicate tracks
+	{MAIN_SECTION, {{0, 0, 41295}, nullptr}, nullptr, cmdPaste}, // Item: Duplicate items
+	{MAIN_SECTION, {{0, 0, 40639}, nullptr}, nullptr, cmdPaste}, // Take: Duplicate active take
 	{MAIN_SECTION, {{0, 0, 40005}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Remove tracks
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
