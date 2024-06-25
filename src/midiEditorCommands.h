@@ -63,6 +63,7 @@ void toggleListViewItemSelection(HWND list);
 void postMidiChangeVelocity(int command);
 void postMidiChangeLength(int command);
 void postMidiChangePitch(int command);
+void postMidiMovePosition(int command);
 void postMidiMoveStart(int command);
 void postMidiChangeCCValue(int command);
 void postMidiSwitchCCLane(int command);
