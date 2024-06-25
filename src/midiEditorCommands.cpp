@@ -2212,10 +2212,8 @@ void postMidiMoveStart(int command) {
 					break;
 			}
 		} else{ 
+			s << formatTime(firstStart) << " ";
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
-				if (note == selectedNotes.cbegin()) {
-					s << formatTime(note->start) << " ";
-				}
 				s << getMidiNoteName(take, note->pitch, note->channel);
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
