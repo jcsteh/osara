@@ -112,6 +112,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Track: Unsolo all tracks: alt+F6
 - Track: Unarm all tracks for recording: alt+F7
 - Track: Toggle track solo defeat: Control+Win+F6
+- Custom: Solo exclusive previous track: Win+PageUp
+- Custom: Solo exclusive next track: Win+PageDown
 
 #### Edit Cursor Movement
 - View: Move cursor left one pixel: LeftArrow
@@ -141,8 +143,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
-- Item edit: Trim left edge of item to edit cursor
-- Item edit: Trim right edge of item to edit cursor
+- Item edit: Trim left edge of item to edit cursor: Win+Shift+,
+- Item edit: Trim right edge of item to edit cursor: Win+Shift+.
 - Item: go to next stretch marker: Control+'
 - Item: go to previous stretch marker: Control+;
 - Item navigation: Move cursor to start of items: Control+Shift+,
@@ -165,12 +167,13 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Fade items in to cursor: Control+Alt+I
 - Item: Fade items out from cursor: Control+Alt+O
 - Item: Set item end to source media end: Control+L
-- Item: Remove selected area of items: Control+Win+Delete
-- Item: Trim items to selected area: Control+Win+T
+- Item: Remove selected area of items: Control+Shift+Delete
+- Item: Trim items to selected area: Control+Shift+T
 - Xenakios/SWS: Play selected items once: Control+Alt+Space
 - Item: Duplicate items: Control+D
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
+- Item: Copy loop of selected area of audio items: Control+Win+L
 
 #### Takes
 - Take: Switch items to next take: T
@@ -230,7 +233,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Insert region from time selection: Shift+R
 
 #### Time Signature/Tempo Markers
-- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: Shift+C
+- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
 
@@ -274,6 +277,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Transient detection threshold: Decrease: Control+Shift+PageDown
 - Options: Toggle snapping: Alt+N
 - Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins: F3
+- Reset all MIDI devices: Shift+F3
+- Reset all MIDI control surface devices: Control+F3
 
 #### Undo
 - Edit: Undo: Control+Z
@@ -310,14 +315,16 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Time selection: Extend time selection to next transient in items: Control+Shift+]
 
 #### Clipboard
-- Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
-- Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Control+Shift+X
-- Item: Copy selected area of items: Control+Win+C
-- Item: Cut selected area of items: Control+Win+X
-- Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
-- Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Control+Shift+C
-- Item: Paste items/tracks: Control+V
 - Select all items/tracks/envelope points (depending on focus): Control+A
+- Edit: Cut items/tracks/envelope points (depending on focus) ignoring time selection: Control+X
+- Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
+- Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Shift+X
+- Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Shift+C
+- Item: Cut selected area of items: Control+Shift+X
+- Item: Copy selected area of items: Control+Shift+C
+- Item: Paste items/tracks: Control+V
+- Time selection: Move contents of time selection to edit cursor (moving later items): X
+- Time selection: Copy contents of time selection to edit cursor (moving later items): C
 
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
@@ -398,18 +405,19 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Increase pitch cursor one octave: Alt+Shift+UpArrow
 - Edit: Decrease pitch cursor one octave: Alt+Shift+DownArrow
 - Edit: copy: Control+C
-- Edit: Copy events within time selection, if any (smart copy): Control+shift+C
+- Edit: Copy events within time selection, if any (smart copy): Shift+C
 - Edit: cut: Control+X
-- Edit: Cut events within time selection, if any (smart cut): Control+shift+X
+- Edit: Cut events within time selection, if any (smart cut): Shift+X
 - Edit: Delete events: Delete
 - Edit: paste: Control+V
 - Edit: Paste preserving position in measure: control+Shift+V
 - Edit: Insert note at edit cursor: I or NumPad5
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
 - Edit: Select all events: Control+A
+- Edit: Select all notes: Control+Alt+A
 - Edit: Select all notes starting in time selection: Control+Shift+A
-- Invert selection: Control+I
 - Select all notes with the same pitch: Shift+A
+- Invert selection: Alt+I
 - Grid: Set to 1: 1, Control+Shift+1
 - Grid: Set to 1/2: 2, Control+Shift+2
 - Grid: Set to 1/32: 3, Control+Shift+3
@@ -465,11 +473,16 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Note velocity -10: Alt+NumPad7 or Alt+Shift+V
 - Edit: Join notes: J
 - Edit: Split notes: S
-- Edit: Increase value a little bit for CC events: =
-- Edit: Decrease value a little bit for CC events: -
 - CC: Next CC lane: Control+Alt+=
 - CC: Previous CC lane: Control+Alt+-
+- Edit: Insert CC event at edit cursor in current lane: Control+I
+- Edit: Increase value a little bit for CC events: =
+- Edit: Decrease value a little bit for CC events: -
+- Select all CC events in last clicked lane: Control+Alt+C
+- Unselect all CC events in last clicked lane: Control+Alt+U
 - Edit: Toggle selection of all CC events under selected notes: C
+- Edit: Select all CC events in time selection (in last clicked CC lane): Control+Shift+C
+- Edit: Select all CC events in time selection (even if CC lane is hidden): Control+Alt+Shift+C
 - Navigate: Move edit cursor to start of selected events: Control+Shift+Home
 - Navigate: Move edit cursor to end of selected events: Control+Shift+End
 - View: Toggle snap to grid: Alt+S
@@ -846,7 +859,6 @@ This list is worth referencing when making your own key map additions, assigning
 - Grid: Set to 1/64
 - Grid: Set to 1/128
 - Item: Remove items
-- Item: Copy loop of selected area of audio items
 - Edit: Cut items
 - Item navigation: Move cursor to start of items
 - Item navigation: Move cursor to end of items
