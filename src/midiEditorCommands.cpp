@@ -2133,7 +2133,7 @@ void postMidiMovePosition(int command) {
 				// "3 CC events grid unit right"
 				s << format(
 					translate_plural("{} CC event grid unit right", "{} CC events grid unit right", count), count);
-				break;				
+				break;
 			default:
 				// Translators: Used when moving CCs in the MIDI
 				// editor. {} is replaced by the number of CCs, e.g. 
@@ -2143,10 +2143,8 @@ void postMidiMovePosition(int command) {
 				break;
 		}
 	} else{
+		s << formatTime(firstPosition) << " ";
 		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
-			if (cc == selectedCCs.cbegin()) {
-				s << formatTime(cc->position) << " ";
-			}
 			s << describeCC(take, *cc, false);
 			if (cc != selectedCCs.cend() - 1) {
 				s << ", ";
