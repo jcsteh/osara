@@ -371,7 +371,7 @@ void reportTransportState(int state);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);
-string gridDivisionToFriendlyName(double division);
+std::string gridDivisionToFriendlyName(double division);
 IReaperControlSurface* createSurface();
 // envelopeCommands.cpp
 extern bool selectedEnvelopeIsTake;
