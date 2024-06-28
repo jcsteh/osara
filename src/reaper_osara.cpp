@@ -1737,6 +1737,43 @@ void postSelectMultipleItems(int command) {
 	SetCursorContext(1, nullptr);
 }
 
+string gridDivisionToFriendlyName(double division) {
+if (division == 1.0) return translate("grid whole");
+	else if (division == 1.0/2.0) return translate("grid half");
+	else if (division == 1.0/4.0) return translate("grid quarter");
+	else if (division == 1.0/6.0) return translate("grid quarter triplet");
+	else if (division == 1.0/8.0) return translate("grid eighth");
+	else if (division == 1.0/12.0) return translate("grid eighth triplet");
+	else if (division == 1.0/16.0) return translate("grid sixteenth");
+	else if (division == 1.0/24.0) return translate("grid sixteenth triplet");
+	else if (division == 1.0/32.0) return translate("grid thirty second");
+	else if (division == 1.0/48.0) return translate("grid thirty second triplet");
+	else if (division == 1.0/64.0) return translate("grid sixty fourth");
+	else if (division == 1.0/128.0) return translate("grid one hundred twenty eighth");
+	else return translate("grid  unknown");
+}
+
+void postQuantize(int command) {
+	int selItems = CountSelectedMediaItems(0);
+	if (selItems == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	} else {
+		// Get the grid division
+		double division;
+		GetSetProjectGrid(nullptr, false, &division, nullptr, nullptr);
+		// Convert to friendly feedback
+		string friendlyGrid = gridDivisionToFriendlyName(division);
+		ostringstream s;
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items quantized".
+		s << format(translate_plural("{} item quantized", "{} items quantized",
+			selItems), selItems);
+		s << ", " << friendlyGrid;
+		outputMessage(s);
+	}
+}
+
 void postMoveItemOrEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
@@ -2622,6 +2659,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
 {"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
 {"_XENAKIOS_TIMERTEST1", postChangeTransportState}, // Xenakios/SWS: Play selected items once
+{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
 	{nullptr},
 };
 
@@ -2646,7 +2684,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40778, _t("grid eighth")}, // Grid: Set to 1/8
 	{40777, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
 	{41212, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
-	{40774, _t("grid sixty forth")}, // Grid: Set to 1/64
+	{40774, _t("grid sixty fourth")}, // Grid: Set to 1/64
 	{41047, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
 	{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks

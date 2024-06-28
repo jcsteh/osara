@@ -171,6 +171,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Duplicate items: Control+D
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
+- SWS/FNG: Quantize item positions and MIDI note positions to grid: Control+Shift+Q
 
 #### Takes
 - Take: Switch items to next take: T
