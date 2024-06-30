@@ -219,6 +219,7 @@
 #define REAPERAPI_WANT_format_timestr_len
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
+#define REAPERAPI_WANT_GetSetProjectGrid
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
@@ -370,6 +371,7 @@ void reportTransportState(int state);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);
+std::string gridDivisionToFriendlyName(double division);
 IReaperControlSurface* createSurface();
 // envelopeCommands.cpp
 extern bool selectedEnvelopeIsTake;
