@@ -4793,8 +4793,33 @@ void cmdInsertMarker(Command* command) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
+	if(CountSelectedMediaItems(0)>0) {
+		vector<int> preMarkers(CountSelectedMediaItems(nullptr));
+		for(int i = 0; i < preMarkers.size(); ++ i) {
+			MediaItem* item = GetSelectedMediaItem(nullptr, i);
+			MediaItem_Take* take = GetActiveTake(item);
+			preMarkers[i] = GetNumTakeMarkers(take);
+		}
+		Main_OnCommand(42390, 0); // Item: Quick add take marker at play position or edit cursor
+		int addedMarkers = 0;
+		for(int i = 0; i < preMarkers.size(); ++ i) {
+			MediaItem* item = GetSelectedMediaItem(nullptr, i);
+			MediaItem_Take* take = GetActiveTake(item);
+			if (preMarkers[i] < GetNumTakeMarkers(take)) {
+				++ addedMarkers;
+			}
+		}
+		if (addedMarkers == 0) {
+			return; // not inserted
+		} else {
+			// Translators: Reported when using REAPER's quick add take marker action. [] will be replaced with the number of take markers that have been inserted. E.G. "2 take markers inserted".
+			outputMessage(format(
+				translate_plural("{} take marker inserted", "{} take markers inserted", addedMarkers), addedMarkers));
+			return;
+		}
+	}
 	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(40157, 0);
 	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
 		return; // Not inserted.
 	}
@@ -5252,6 +5277,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Add project or take marker at cursor (depending on focus)")}, "OSARA_ADDPROJTAKEMARKER", cmdInsertMarker},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
