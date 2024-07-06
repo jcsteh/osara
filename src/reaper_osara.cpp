@@ -4812,9 +4812,9 @@ void cmdInsertMarker(Command* command) {
 		if (addedMarkers == 0) {
 			return; // not inserted
 		} else {
-			// Translators: Reported when using REAPER's quick add take marker action. [] will be replaced with the number of take markers that have been inserted. E.G. "2 take markers inserted".
+			// Translators: Reported when using REAPER's quick add take marker action. If more than one take marker is inserted, [] will be replaced with the number of markers. E.G. "2 take markers inserted".
 			outputMessage(format(
-				translate_plural("{} take marker inserted", "{} take markers inserted", addedMarkers), addedMarkers));
+				translate_plural("take marker inserted", "{} take markers inserted", addedMarkers), addedMarkers));
 			return;
 		}
 	}
@@ -4833,6 +4833,20 @@ void cmdInsertMarker(Command* command) {
 	// Translators: Reported when inserting a marker. {} will be replaced with the
 	// number of the new marker; e.g. "marker 2 inserted".
 	outputMessage(format(translate("marker {} inserted"), number));
+}
+
+void cmdInsertOrEditMarker(Command* command) {
+	double start, end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	if (start != end && CountSelectedMediaItems(nullptr)>0) {
+		Main_OnCommand(43181, 0); // Item: Add/edit take marker at time selection
+		return;
+	} else if(CountSelectedMediaItems(nullptr) > 0) {
+		Main_OnCommand(42385, 0); // Item: Add/edit take marker at play position or edit cursor
+	} else {
+		Main_OnCommand(40171, 0); // Markers: Insert and/or edit marker at current position
+		return;
+	}
 }
 
 void cmdInsertRegion(Command* command) {
@@ -5278,6 +5292,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Add project or take marker at cursor (depending on focus)")}, "OSARA_ADDPROJTAKEMARKER", cmdInsertMarker},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Add/edit project or take marker at cursor (depending on focus)")}, "OSARA_ADDEDITPROJTAKEMARKER", cmdInsertOrEditMarker},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
