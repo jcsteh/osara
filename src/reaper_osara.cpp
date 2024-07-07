@@ -2664,6 +2664,10 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40633, postMidiChangeLength, true, true}, // Edit: Set note lengths to grid size
 	{40668, postMidiSelectCCs, false}, // Select all CC events in last clicked lane
 	{40669, postMidiSelectCCs, false}, // Unselect all CC events in last clicked lane
+	{40672, postMidiMovePosition, false}, // Edit: Move CC events left 1 pixel
+	{40673, postMidiMovePosition, false}, // Edit: Move CC events right 1 pixel
+	{40674, postMidiMovePosition, false}, // Edit: Move CC events left by grid
+	{40675, postMidiMovePosition, false}, // Edit: Move CC events right by grid
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)

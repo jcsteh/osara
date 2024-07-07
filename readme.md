@@ -931,6 +931,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Edit: Select all CC events in time selection (even if CC lane is hidden)
 - Edit: Select all events in time selection (even if CC lane is hidden)
 - Edit: Select all notes in time selection
+- Edit: Move CC events left 1 pixel
+- Edit: Move CC events right 1 pixel
+- Edit: Move CC events left by grid
+- Edit: Move CC events right by grid
 - Options: MIDI inputs as step input mode
 - Options: F1-F12 as step input mode
 

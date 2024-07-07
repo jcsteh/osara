@@ -1476,7 +1476,7 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-string describeCC(MidiControlChange cc, MediaItem_Take* take) {
+string describeCC(MediaItem_Take* take, MidiControlChange cc) {
 	if (cc.message1 == 0xA0) {
 		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
 		// name and {value} will be replaced with the aftertouch value; e.g.
@@ -1488,15 +1488,15 @@ string describeCC(MidiControlChange cc, MediaItem_Take* take) {
 	if (cc.message1 == 0xB0) {
 		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 		return format(translate("Control {control}, {value}"),
-		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
-		"value"_a=cc.message3);
+			"control"_a=getMidiControlName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
 	}
 	if (cc.message1 == 0xC0) {
 		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
 		return format(translate("Program {}"), cc.message2);
 	}
 	if (cc.message1 == 0xD0) {
-		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		// Translators: MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 		return format(translate("Channel pressure {}"), cc.message2);
 	}
 	if (cc.message1 == 0xE0) {
@@ -1534,7 +1534,7 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
-	s << describeCC(cc, take);
+	s << describeCC(take, cc);
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << " " << translate("unselected");
 	}
@@ -1556,7 +1556,7 @@ void cmdMidiInsertCC(Command* command) {
 	}
 	auto cc = *selectedCCs.cbegin();
 	fakeFocus = FOCUS_CC;
-	outputMessage(describeCC(cc, take));
+	outputMessage(describeCC(take, cc));
 }
 
 void cmdMidiMoveToNextCC(Command* command) {
@@ -2067,6 +2067,71 @@ void postMidiChangePitch(int command) {
 	outputMessage(s);
 }
 
+void postMidiMovePosition(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int count = static_cast<int>(selectedCCs.size());
+	if (count == 0) {
+		return;
+	}
+	auto firstPosition = selectedCCs.cbegin()->position;
+	bool generalize = count >= 8 || any_of(
+		selectedCCs.begin(), selectedCCs.end(),
+		[firstPosition](MidiControlChange c) { return firstPosition != c.position; }
+		);
+	ostringstream s;
+	if (generalize) {
+		switch (command) {
+			case 40672:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel left"
+				s << format(
+					translate_plural("{} CC event pixel left", "{} CC events pixel left", count), count);
+				break;
+			case 40673:
+			// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel right"
+				s << format(
+					translate_plural("{} CC event pixel right", "{} CC events pixel right", count), count);
+				break;
+			case 40674:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit left"
+				s << format(
+					translate_plural("{} CC event grid unit left", "{} CC events grid unit left", count), count);
+				break;
+			case 40675:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit right"
+				s << format(
+					translate_plural("{} CC event grid unit right", "{} CC events grid unit right", count), count);
+				break;
+			default:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events moved"
+				s << format(
+					translate_plural("{} CC event moved", "{} CC events moved", count), count);
+				break;
+		}
+	} else{
+		s << formatTime(firstPosition) << " ";
+		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
+			s << describeCC(take, *cc);
+			if (cc != selectedCCs.cend() - 1) {
+				s << ", ";
+			}
+		}
+	}
+	outputMessage(s);
+}
+
 void postMidiMoveStart(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -2125,10 +2190,8 @@ void postMidiMoveStart(int command) {
 					break;
 			}
 		} else{ 
+			s << formatTime(firstStart) << " ";
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
-				if (note == selectedNotes.cbegin()) {
-					s << formatTime(note->start) << " ";
-				}
 				s << getMidiNoteName(take, note->pitch, note->channel);
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
