@@ -1476,14 +1476,8 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
-string describeCC(MediaItem_Take* take, MidiControlChange cc, bool reportVal=true) {
+string describeCC(MediaItem_Take* take, MidiControlChange cc) {
 	if (cc.message1 == 0xA0) {
-		if (!reportVal) {
-			// Translators: MIDI poly aftertouch. {} will be replaced with the note
-			// name; e.g.
-			// "Poly Aftertouch c sharp 4"
-			return format(translate("Poly Aftertouch {}"), getMidiNoteName(take, cc.message2, cc.channel));
-		}
 		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
 		// name and {value} will be replaced with the aftertouch value; e.g.
 		// "Poly Aftertouch c sharp 4  96"
@@ -1492,36 +1486,20 @@ string describeCC(MediaItem_Take* take, MidiControlChange cc, bool reportVal=tru
 			"value"_a=cc.message3);
 	}
 	if (cc.message1 == 0xB0 ) {
-		if (!reportVal) {
-			// Translators: A MIDI CC. {} will be replaced with the control number and name; e.g. "control 70 (Sound Variation)"
-			return format(translate("Control {}"), getMidiControlName(take, cc.message2, cc.channel));
-		}
 		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 		return format(translate("Control {control}, {value}"),
 			"control"_a=getMidiControlName(take, cc.message2, cc.channel),
 			"value"_a=cc.message3);
 	}
 	if (cc.message1 == 0xC0) {
-		if (!reportVal) {
-			//Translators: a MIDI program number.
-			return translate("Program");
-		}
 		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
 		return format(translate("Program {}"), cc.message2);
 	}
 	if (cc.message1 == 0xD0) {
-		if (!reportVal) {
-			// Translators: MIDI channel pressure.
-			return translate("Channel pressure");
-		}
 		// Translators: MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 		return format(translate("Channel pressure {}"), cc.message2);
 	}
 	if (cc.message1 == 0xE0) {
-		if (!reportVal) {
-			// Translators: MIDI pitch bend.
-			return translate("Pitch Bend");
-		}
 		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
 		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 		return format(translate("Pitch Bend {}"), pitchBendValue);
@@ -2145,7 +2123,7 @@ void postMidiMovePosition(int command) {
 	} else{
 		s << formatTime(firstPosition) << " ";
 		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
-			s << describeCC(take, *cc, false);
+			s << describeCC(take, *cc);
 			if (cc != selectedCCs.cend() - 1) {
 				s << ", ";
 			}
