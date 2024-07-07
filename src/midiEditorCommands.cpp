@@ -1485,7 +1485,7 @@ string describeCC(MediaItem_Take* take, MidiControlChange cc) {
 			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
 			"value"_a=cc.message3);
 	}
-	if (cc.message1 == 0xB0 ) {
+	if (cc.message1 == 0xB0) {
 		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 		return format(translate("Control {control}, {value}"),
 			"control"_a=getMidiControlName(take, cc.message2, cc.channel),
