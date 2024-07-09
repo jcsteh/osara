@@ -1530,7 +1530,9 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	SetEditCurPos(cc.position, true, false);
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
-	s << formatCursorPosition() << " ";
+	if (settings::reportPositionMIDI) {
+		s << formatCursorPosition() << " ";
+	}
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
