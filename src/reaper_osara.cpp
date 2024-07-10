@@ -809,6 +809,46 @@ string formatDouble(double d, int precision, bool plus) {
 	return stripped;
 }
 
+string gridDivisionToFriendlyName(double division) {
+	if (division == 1.0) {
+		return translate("grid whole");
+	}
+	if (division == 1.0/2.0) {
+		return translate("grid half");
+	}
+	if (division == 1.0/4.0) {
+		return translate("grid quarter");
+	}
+	if (division == 1.0/6.0) {
+		return translate("grid quarter triplet");
+	}
+	if (division == 1.0/8.0) {
+		return translate("grid eighth");
+	}
+	if (division == 1.0/12.0) {
+		return translate("grid eighth triplet");
+	}
+	if (division == 1.0/16.0) {
+		return translate("grid sixteenth");
+	}
+	if (division == 1.0/24.0) {
+		return translate("grid sixteenth triplet");
+	}
+	if (division == 1.0/32.0) {
+		return translate("grid thirty second");
+	}
+	if (division == 1.0/48.0) {
+		return translate("grid thirty second triplet");
+	}
+	if (division == 1.0/64.0) {
+		return translate("grid sixty fourth");
+	}
+	if (division == 1.0/128.0) {
+		return translate("grid one hundred twenty eighth");
+	}
+	return translate("grid  unknown");
+}
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -1595,6 +1635,25 @@ void postCopy(int command) {
 	}
 }
 
+void postCopyMoveTimeSelection(int command) {
+	fakeFocus = FOCUS_RULER;
+	double start, end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	if (start == end) {
+		outputMessage(translate("no time selection"));
+		return;
+	}
+	if (command == 40397) {
+		// Time selection: Copy contents of time selection to edit cursor (moving later items)
+		// Translators: Reported when copying the content of a time selection to the edit cursor.
+		outputMessage(translate("copied time selection to edit cursor"));
+	} else {
+		// Time selection: Move contents of time selection to edit cursor (moving later items)
+		// Translators: Reported when moving the content of a time selection to edit cursor.
+		outputMessage(translate("moved time selection to edit cursor"));
+	}
+}
+
 void postMoveToTimeSig(int command) {
 	double cursor = GetCursorPosition();
 	// FindTempoTimeSigMarker often returns the point before instead of right at the position.
@@ -1735,6 +1794,26 @@ void postSelectMultipleItems(int command) {
 	selectedEnvelopeIsTake = true;
 	shouldMoveToAutoItem = false;
 	SetCursorContext(1, nullptr);
+}
+
+void postQuantize(int command) {
+	int selItems = CountSelectedMediaItems(nullptr);
+	if (selItems == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	// Get the grid division
+	double division;
+	GetSetProjectGrid(nullptr, false, &division, nullptr, nullptr);
+	// Convert to friendly feedback
+	string friendlyGrid = gridDivisionToFriendlyName(division);
+	ostringstream s;
+	// Translators: {} will be replaced with the number of items; e.g.
+	// "2 items quantized".
+	s << format(translate_plural("{} item quantized", "{} items quantized",
+		selItems), selItems);
+	s << ", " << friendlyGrid;
+	outputMessage(s);
 }
 
 void postMoveItemOrEnvelopePoint(int command) {
@@ -2408,6 +2487,8 @@ PostCommand POST_COMMANDS[] = {
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
 	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
+	{40397, postCopyMoveTimeSelection}, // Time selection: Copy contents of time selection to edit cursor (moving later items)
+	{40396, postCopyMoveTimeSelection}, // Time selection: Move contents of time selection to edit cursor (moving later items)
 	{41820, postMoveToTimeSig}, // Move edit cursor to previous tempo or time signature change
 	{41821, postMoveToTimeSig}, // Move edit cursor to next tempo or time signature change
 	{41860, postGoToStretch}, // Item: go to next stretch marker
@@ -2585,6 +2666,10 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40669, postMidiSelectCCs, false}, // Unselect all CC events in last clicked lane
 	{40670, postMidiSelectCCs, true}, // Select all CC events
 	{40671, postMidiSelectCCs, true}, // Unselect all CC events
+	{40672, postMidiMovePosition, false}, // Edit: Move CC events left 1 pixel
+	{40673, postMidiMovePosition, false}, // Edit: Move CC events right 1 pixel
+	{40674, postMidiMovePosition, false}, // Edit: Move CC events left by grid
+	{40675, postMidiMovePosition, false}, // Edit: Move CC events right by grid
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)
@@ -2624,6 +2709,7 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
 {"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
 {"_XENAKIOS_TIMERTEST1", postChangeTransportState}, // Xenakios/SWS: Play selected items once
+{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
 	{nullptr},
 };
 
@@ -2648,7 +2734,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40778, _t("grid eighth")}, // Grid: Set to 1/8
 	{40777, _t("grid eighth triplet")}, // Grid: Set to 1/12 (1/8 triplet)
 	{41212, _t("grid thirty second triplet")}, // Grid: Set to 1/48 (1/32 triplet)
-	{40774, _t("grid sixty forth")}, // Grid: Set to 1/64
+	{40774, _t("grid sixty fourth")}, // Grid: Set to 1/64
 	{41047, _t("grid one hundred twenty eighth")}, // Grid: Set to 1/128
 	{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
