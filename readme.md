@@ -936,6 +936,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Edit: Move CC events right by grid
 - Options: MIDI inputs as step input mode
 - Options: F1-F12 as step input mode
+- Select all CC events
+- Unselect all CC events
 
 #### Unmapped OSARA actions
 - OSARA: Pause/resume Peak Watcher
