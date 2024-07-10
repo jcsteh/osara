@@ -928,7 +928,6 @@ This list is worth referencing when making your own key map additions, assigning
 - Reset all MIDI control surface devices
 
 #### Unmapped in MIDI Editor section
-- Edit: Select all CC events in time selection (even if CC lane is hidden)
 - Edit: Select all events in time selection (even if CC lane is hidden)
 - Edit: Select all notes in time selection
 - Edit: Move CC events left 1 pixel
