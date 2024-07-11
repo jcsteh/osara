@@ -208,8 +208,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - FX: Show/hide track envelope for last touched FX parameter: Control+Alt+L
 
 #### Markers and Regions
-- OSARA: Add project or take marker at cursor (depending on focus): M
-- OSARA: Add/edit project or take marker at cursor (depending on focus): Shift+M
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
 - Item: Set cursor to previous take marker in selected items: Control+Shift+;
@@ -237,7 +235,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Insert region from time selection: Shift+R
 
 #### Time Signature/Tempo Markers
-- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
 
@@ -807,6 +804,9 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): Delete
 - OSARA: Report edit/play cursor position, transport state and nearest markers and regions: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
+- OSARA: Add project or take marker at cursor (depending on focus): M
+- OSARA: Add/edit project or take marker at cursor (depending on focus): Shift+M
+- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - OSARA: Delete all time signature markers: Alt+Win+Delete
 - OSARA: Toggle track/take volume envelope visibility (depending on focus): Control+Alt+V
 - OSARA: Toggle track/take pan envelope visibility (depending on focus): Control+Alt+P
