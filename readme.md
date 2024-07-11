@@ -286,6 +286,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Redo: Control+Shift+Z
 
 #### Transport
+- Transport: Record: R, NumPadEnter
 - Transport: Toggle repeat: Control+R
 - Transport: Increase playrate by ~6% (one semitone): Control+Shift+=
 - Transport: Decrease playrate by ~6% (one semitone): Control+Shift+-
