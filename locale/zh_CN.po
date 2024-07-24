@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-06-19 12:34\n"
+"PO-Revision-Date: 2024-07-24 23:55\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -341,7 +341,7 @@ msgstr "无内容粘贴"
 #. the number of events; e.g. "2 events added".
 msgid "{} event added"
 msgid_plural "{} events added"
-msgstr[0] ""
+msgstr[0] "{} 事件已添加"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -353,7 +353,7 @@ msgstr[0] "{} 事件移除"
 #. the number of events; e.g. "2 events copied".
 msgid "{} event copied"
 msgid_plural "{} events copied"
-msgstr[0] ""
+msgstr[0] "{} 事件已复制"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -363,17 +363,19 @@ msgid "{} note selected"
 msgid_plural "{} notes selected"
 msgstr[0] "{} 音符选定"
 
-#. Reported when selecting events in the MIDI editor. {} will be replaced with
-#. the number of events; e.g. "2 events selected".
-msgid "{} event selected"
-msgid_plural "{} events selected"
-msgstr[0] "{} 事件选定"
-
+#. Reported when selecting CC events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 CC events selected".
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
 msgstr[0] "{} CC 事件选定"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} 事件选定"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
@@ -595,6 +597,7 @@ msgstr "控制 {control}, {value}"
 msgid "Program {}"
 msgstr "程序 {}"
 
+#. MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 msgid "Channel pressure {}"
 msgstr "通道压力 {}"
 
@@ -756,6 +759,41 @@ msgstr[0] "{} 音符下移半音忽略音阶"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
 msgstr[0] "{} 音符音高已更改"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel left"
+msgid "{} CC event pixel left"
+msgid_plural "{} CC events pixel left"
+msgstr[0] "{} CC 事件向左像素"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel right"
+msgid "{} CC event pixel right"
+msgid_plural "{} CC events pixel right"
+msgstr[0] "{} CC 事件向右像素"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit left"
+msgid "{} CC event grid unit left"
+msgid_plural "{} CC events grid unit left"
+msgstr[0] "{} CC 事件向左网格单位"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit right"
+msgid "{} CC event grid unit right"
+msgid_plural "{} CC events grid unit right"
+msgstr[0] "{} CC 事件向右网格单位"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events moved"
+msgid "{} CC event moved"
+msgid_plural "{} CC events moved"
+msgstr[0] "{} CC 事件移除"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -1340,6 +1378,45 @@ msgstr "跟随模式不主导"
 msgid "VCA pre-FX follow"
 msgstr "VCA FX-前跟随"
 
+msgid "grid whole"
+msgstr "整格"
+
+msgid "grid half"
+msgstr "半格"
+
+msgid "grid quarter"
+msgstr "4分网格"
+
+msgid "grid quarter triplet"
+msgstr "4分3连音网格"
+
+msgid "grid eighth"
+msgstr "8分网格"
+
+msgid "grid eighth triplet"
+msgstr "8分3连音网格"
+
+msgid "grid sixteenth"
+msgstr "16分网格"
+
+msgid "grid sixteenth triplet"
+msgstr "16分3连音网格"
+
+msgid "grid thirty second"
+msgstr "32分网格"
+
+msgid "grid thirty second triplet"
+msgstr "32分3连音网格"
+
+msgid "grid sixty fourth"
+msgstr "64分网格"
+
+msgid "grid one hundred twenty eighth"
+msgstr "128分网格"
+
+msgid "grid  unknown"
+msgstr "未知网格"
+
 msgid "defeating solo"
 msgstr "独奏失效"
 
@@ -1597,6 +1674,14 @@ msgid "{} item copied"
 msgid_plural "{} items copied"
 msgstr[0] "{} 对象已复制"
 
+#. Reported when copying the content of a time selection to the edit cursor.
+msgid "copied time selection to edit cursor"
+msgstr "复制时间选区到编辑光标"
+
+#. Reported when moving the content of a time selection to edit cursor.
+msgid "moved time selection to edit cursor"
+msgstr "移动时间选区到编辑光标"
+
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
 msgid "tempo {}"
@@ -1638,9 +1723,17 @@ msgstr "停止"
 
 #. Reported when items are selected. {} will be replaced with
 #. the number of items; e.g. "2 items selected".
+#. This reports selected items after healing. {} will be replaced with the
+#. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
 msgstr[0] "{} 对象已选定"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items quantized".
+msgid "{} item quantized"
+msgid_plural "{} items quantized"
+msgstr[0] "{} 对象已量化"
 
 msgid "no items selected"
 msgstr "未选择对象"
@@ -1934,42 +2027,6 @@ msgstr "设置loop开始"
 msgid "set loop end"
 msgstr "设置loop结束"
 
-msgid "grid whole"
-msgstr "整格"
-
-msgid "grid half"
-msgstr "半格"
-
-msgid "grid thirty second"
-msgstr "32分网格"
-
-msgid "grid quarter"
-msgstr "4分网格"
-
-msgid "grid quarter triplet"
-msgstr "4分3连音网格"
-
-msgid "grid sixteenth"
-msgstr "16分网格"
-
-msgid "grid sixteenth triplet"
-msgstr "16分3连音网格"
-
-msgid "grid eighth"
-msgstr "8分网格"
-
-msgid "grid eighth triplet"
-msgstr "8分3连音网格"
-
-msgid "grid thirty second triplet"
-msgstr "32分3连音网格"
-
-msgid "grid sixty forth"
-msgstr "64分网格"
-
-msgid "grid one hundred twenty eighth"
-msgstr "128分网格"
-
 msgid "all tracks unmuted"
 msgstr "全部轨道已取消静音"
 
@@ -1981,6 +2038,9 @@ msgstr "全部轨道已取消准备"
 
 msgid "all delta solos reset"
 msgstr "重制全部 delta 独奏"
+
+msgid "grid sixty forth"
+msgstr "64分网格"
 
 msgid "grid straight"
 msgstr "平直网格"
@@ -2263,6 +2323,12 @@ msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
 msgstr[0] "选区的 {} 对象已复制"
 
+#. used for  "Item: Duplicate selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item duplicated"
+msgid_plural "selected area of {} items duplicated"
+msgstr[0] "选区内 {} 对象已添加"
+
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
 #. affected.
@@ -2275,6 +2341,25 @@ msgstr[0] "选区的 {} 对象已移除"
 msgid "{} item removed"
 msgid_plural "{} items removed"
 msgstr[0] "{} 对象已移除"
+
+#. Reported when cropped to active take on  multiple items. {} will be replaced with the
+#. number of items; e.g. "2 items cropped to active take".
+msgid "{} item cropped to active take"
+msgid_plural "{} items cropped to active take"
+msgstr[0] "对象裁剪到活动片段"
+
+msgid "no takes removed"
+msgstr "无片段移除"
+
+#. Reported when healing was not possible.
+msgid "nothing healed"
+msgstr "无修复"
+
+#. Reported when splits in items are healed. {} will be replaced with the
+#. number of splits that have been successfully healed; e.g. "2 splits healed".
+msgid "{} split healed"
+msgid_plural "{} splits healed"
+msgstr[0] "{} 分割已修复"
 
 msgid "contents of time selection removed"
 msgstr "时间选区的内容已移除"
@@ -2962,8 +3047,8 @@ msgid "Report &FX when moving to tracks/takes"
 msgstr "移到轨道/片段时报告&FX"
 
 msgctxt "OSARA Configuration"
-msgid "Report &position when navigating chords in MIDI editor"
-msgstr "在MIDI编辑器中报告浏览和弦的位置(&P)"
+msgid "Report &position when navigating events in MIDI editor"
+msgstr "在MIDI编辑器中报告浏览事件的位置(&P)"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"

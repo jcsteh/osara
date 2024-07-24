@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-06-19 12:34\n"
+"PO-Revision-Date: 2024-07-24 23:55\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -375,19 +375,21 @@ msgid_plural "{} notes selected"
 msgstr[0] "[] nota seleccionada"
 msgstr[1] "[] notas seleccionadas"
 
-#. Reported when selecting events in the MIDI editor. {} will be replaced with
-#. the number of events; e.g. "2 events selected".
-msgid "{} event selected"
-msgid_plural "{} events selected"
-msgstr[0] "{} eventos seleccionados"
-msgstr[1] "{} eventos seleccionados"
-
+#. Reported when selecting CC events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 CC events selected".
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
 msgstr[0] "{} CC evento seleccionado"
 msgstr[1] "{} eventos CC seleccionados"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} eventos seleccionados"
+msgstr[1] "{} eventos seleccionados"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
@@ -610,6 +612,7 @@ msgstr "Control {control}, {value}"
 msgid "Program {}"
 msgstr "Programa {}"
 
+#. MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 msgid "Channel pressure {}"
 msgstr "Presión de canal"
 
@@ -787,6 +790,46 @@ msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
 msgstr[0] "{} nota cambiada el tono"
 msgstr[1] "{} notas cambiadas el tono"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel left"
+msgid "{} CC event pixel left"
+msgid_plural "{} CC events pixel left"
+msgstr[0] "{} CC evento pixel a la izquierda"
+msgstr[1] "{} CC eventos pixel a la izquierda"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel right"
+msgid "{} CC event pixel right"
+msgid_plural "{} CC events pixel right"
+msgstr[0] ""
+msgstr[1] "{} eventos CC pixel a la derecha"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit left"
+msgid "{} CC event grid unit left"
+msgid_plural "{} CC events grid unit left"
+msgstr[0] "{} evento CC unidad de rejilla a la izquierda"
+msgstr[1] "{} eventos CC unidad de rejilla a la derecha"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit right"
+msgid "{} CC event grid unit right"
+msgid_plural "{} CC events grid unit right"
+msgstr[0] "{} evento CC unidad de rejilla a la derecha"
+msgstr[1] "{} eventos CC unidad de rejilla a la derecha"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events moved"
+msgid "{} CC event moved"
+msgid_plural "{} CC events moved"
+msgstr[0] "{} evento CC movido"
+msgstr[1] "{} eventos CC movidos"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -1384,6 +1427,45 @@ msgstr "no manejar cuando seguimiento"
 msgid "VCA pre-FX follow"
 msgstr "Seguir VCA pre-fx"
 
+msgid "grid whole"
+msgstr "rejilla ajustar a 1"
+
+msgid "grid half"
+msgstr "rejilla> ajustar a 1/2"
+
+msgid "grid quarter"
+msgstr "rejilla: ajustar a 1/4"
+
+msgid "grid quarter triplet"
+msgstr "rejilla: ajustar a 1/4, triplete"
+
+msgid "grid eighth"
+msgstr "rejilla: ajustar a 1/8"
+
+msgid "grid eighth triplet"
+msgstr "rejilla: ajustar a 1/8, triplete"
+
+msgid "grid sixteenth"
+msgstr "rejilla: ajustar a 1/16"
+
+msgid "grid sixteenth triplet"
+msgstr "rejilla: ajustar a 1/16, triplete"
+
+msgid "grid thirty second"
+msgstr "rejilla: ajustar a 1/32"
+
+msgid "grid thirty second triplet"
+msgstr "rejilla: ajustar a 1/32, triplete"
+
+msgid "grid sixty fourth"
+msgstr "rejilla a 64"
+
+msgid "grid one hundred twenty eighth"
+msgstr "rejilla en ciento veinti ocho"
+
+msgid "grid  unknown"
+msgstr "rejilla a desconocido"
+
 msgid "defeating solo"
 msgstr "rechazar solo"
 
@@ -1654,6 +1736,14 @@ msgid_plural "{} items copied"
 msgstr[0] "{} ítem copiado"
 msgstr[1] "{} ítems copiados"
 
+#. Reported when copying the content of a time selection to the edit cursor.
+msgid "copied time selection to edit cursor"
+msgstr "copiada selección de tiempo a cursor de edición"
+
+#. Reported when moving the content of a time selection to edit cursor.
+msgid "moved time selection to edit cursor"
+msgstr "movida selección de tiempo a cursor de edición"
+
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
 msgid "tempo {}"
@@ -1695,10 +1785,19 @@ msgstr "parar"
 
 #. Reported when items are selected. {} will be replaced with
 #. the number of items; e.g. "2 items selected".
+#. This reports selected items after healing. {} will be replaced with the
+#. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
 msgstr[0] "{} ítem seleccionado"
 msgstr[1] "{} ítems seleccionados"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items quantized".
+msgid "{} item quantized"
+msgid_plural "{} items quantized"
+msgstr[0] "{} ítem cuantizado"
+msgstr[1] "{} ítems cuantizados"
 
 msgid "no items selected"
 msgstr "no hay ítems seleccionados"
@@ -2004,42 +2103,6 @@ msgstr "comienzo de loop fijado"
 msgid "set loop end"
 msgstr "fin de loop fijado"
 
-msgid "grid whole"
-msgstr "rejilla ajustar a 1"
-
-msgid "grid half"
-msgstr "rejilla> ajustar a 1/2"
-
-msgid "grid thirty second"
-msgstr "rejilla: ajustar a 1/32"
-
-msgid "grid quarter"
-msgstr "rejilla: ajustar a 1/4"
-
-msgid "grid quarter triplet"
-msgstr "rejilla: ajustar a 1/4, triplete"
-
-msgid "grid sixteenth"
-msgstr "rejilla: ajustar a 1/16"
-
-msgid "grid sixteenth triplet"
-msgstr "rejilla: ajustar a 1/16, triplete"
-
-msgid "grid eighth"
-msgstr "rejilla: ajustar a 1/8"
-
-msgid "grid eighth triplet"
-msgstr "rejilla: ajustar a 1/8, triplete"
-
-msgid "grid thirty second triplet"
-msgstr "rejilla: ajustar a 1/32, triplete"
-
-msgid "grid sixty forth"
-msgstr "rejilla: ajustar a 1/64"
-
-msgid "grid one hundred twenty eighth"
-msgstr "rejilla en ciento veinti ocho"
-
 msgid "all tracks unmuted"
 msgstr "ninguna pista silenciada"
 
@@ -2051,6 +2114,9 @@ msgstr "desarmadas todas las pistas"
 
 msgid "all delta solos reset"
 msgstr "reiniciado todo delta solos,"
+
+msgid "grid sixty forth"
+msgstr "rejilla: ajustar a 1/64"
 
 msgid "grid straight"
 msgstr "cuadrícula recta"
@@ -2340,6 +2406,13 @@ msgid_plural "selected area of {} items copied"
 msgstr[0] "área seleccionada de {} ítem copiada"
 msgstr[1] "área seleccionada de {} ítems copiados"
 
+#. used for  "Item: Duplicate selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item duplicated"
+msgid_plural "selected area of {} items duplicated"
+msgstr[0] "área seleccionada de {} ítem duplicada"
+msgstr[1] "área seleccionadas de {} ítems duplicadas"
+
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
 #. affected.
@@ -2354,6 +2427,27 @@ msgid "{} item removed"
 msgid_plural "{} items removed"
 msgstr[0] "{} ítem eliminado"
 msgstr[1] "{} ítems eliminados"
+
+#. Reported when cropped to active take on  multiple items. {} will be replaced with the
+#. number of items; e.g. "2 items cropped to active take".
+msgid "{} item cropped to active take"
+msgid_plural "{} items cropped to active take"
+msgstr[0] "{} ítem recortado a la toma activa"
+msgstr[1] "{} ítems recortados a la toma activa"
+
+msgid "no takes removed"
+msgstr "ninguna toma eliminada"
+
+#. Reported when healing was not possible.
+msgid "nothing healed"
+msgstr "nada reparado"
+
+#. Reported when splits in items are healed. {} will be replaced with the
+#. number of splits that have been successfully healed; e.g. "2 splits healed".
+msgid "{} split healed"
+msgid_plural "{} splits healed"
+msgstr[0] "{} división reparada"
+msgstr[1] "{} divisiones reparadas"
 
 msgid "contents of time selection removed"
 msgstr "contenido de selección de tiempo eliminado"
@@ -3044,8 +3138,8 @@ msgid "Report &FX when moving to tracks/takes"
 msgstr "Anuncia &FX cuando nos movemos a pista/toma"
 
 msgctxt "OSARA Configuration"
-msgid "Report &position when navigating chords in MIDI editor"
-msgstr "Anunciar &posición al moverse por acordes en editor midi"
+msgid "Report &position when navigating events in MIDI editor"
+msgstr "Anuncia posición al movernos por eventos en el editor midi"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2024-06-19 12:34\n"
+"PO-Revision-Date: 2024-07-24 23:55\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -375,17 +375,19 @@ msgid_plural "{} notes selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#. Reported when selecting events in the MIDI editor. {} will be replaced with
-#. the number of events; e.g. "2 events selected".
-msgid "{} event selected"
-msgid_plural "{} events selected"
-msgstr[0] ""
-msgstr[1] ""
-
+#. Reported when selecting CC events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 CC events selected".
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -610,6 +612,7 @@ msgstr ""
 msgid "Program {}"
 msgstr ""
 
+#. MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 msgid "Channel pressure {}"
 msgstr ""
 
@@ -785,6 +788,46 @@ msgstr[1] ""
 #. "3 notes pitch changed"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel left"
+msgid "{} CC event pixel left"
+msgid_plural "{} CC events pixel left"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel right"
+msgid "{} CC event pixel right"
+msgid_plural "{} CC events pixel right"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit left"
+msgid "{} CC event grid unit left"
+msgid_plural "{} CC events grid unit left"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit right"
+msgid "{} CC event grid unit right"
+msgid_plural "{} CC events grid unit right"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events moved"
+msgid "{} CC event moved"
+msgid_plural "{} CC events moved"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -1384,6 +1427,45 @@ msgstr ""
 msgid "VCA pre-FX follow"
 msgstr ""
 
+msgid "grid whole"
+msgstr ""
+
+msgid "grid half"
+msgstr ""
+
+msgid "grid quarter"
+msgstr ""
+
+msgid "grid quarter triplet"
+msgstr ""
+
+msgid "grid eighth"
+msgstr ""
+
+msgid "grid eighth triplet"
+msgstr ""
+
+msgid "grid sixteenth"
+msgstr ""
+
+msgid "grid sixteenth triplet"
+msgstr ""
+
+msgid "grid thirty second"
+msgstr ""
+
+msgid "grid thirty second triplet"
+msgstr ""
+
+msgid "grid sixty fourth"
+msgstr ""
+
+msgid "grid one hundred twenty eighth"
+msgstr ""
+
+msgid "grid  unknown"
+msgstr ""
+
 msgid "defeating solo"
 msgstr ""
 
@@ -1654,6 +1736,14 @@ msgid_plural "{} items copied"
 msgstr[0] ""
 msgstr[1] ""
 
+#. Reported when copying the content of a time selection to the edit cursor.
+msgid "copied time selection to edit cursor"
+msgstr ""
+
+#. Reported when moving the content of a time selection to edit cursor.
+msgid "moved time selection to edit cursor"
+msgstr ""
+
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
 msgid "tempo {}"
@@ -1695,8 +1785,17 @@ msgstr ""
 
 #. Reported when items are selected. {} will be replaced with
 #. the number of items; e.g. "2 items selected".
+#. This reports selected items after healing. {} will be replaced with the
+#. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
+msgstr[0] ""
+msgstr[1] ""
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items quantized".
+msgid "{} item quantized"
+msgid_plural "{} items quantized"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -2004,42 +2103,6 @@ msgstr ""
 msgid "set loop end"
 msgstr ""
 
-msgid "grid whole"
-msgstr ""
-
-msgid "grid half"
-msgstr ""
-
-msgid "grid thirty second"
-msgstr ""
-
-msgid "grid quarter"
-msgstr ""
-
-msgid "grid quarter triplet"
-msgstr ""
-
-msgid "grid sixteenth"
-msgstr ""
-
-msgid "grid sixteenth triplet"
-msgstr ""
-
-msgid "grid eighth"
-msgstr ""
-
-msgid "grid eighth triplet"
-msgstr ""
-
-msgid "grid thirty second triplet"
-msgstr ""
-
-msgid "grid sixty forth"
-msgstr ""
-
-msgid "grid one hundred twenty eighth"
-msgstr ""
-
 msgid "all tracks unmuted"
 msgstr ""
 
@@ -2050,6 +2113,9 @@ msgid "all tracks unarmed"
 msgstr ""
 
 msgid "all delta solos reset"
+msgstr ""
+
+msgid "grid sixty forth"
 msgstr ""
 
 msgid "grid straight"
@@ -2340,6 +2406,13 @@ msgid_plural "selected area of {} items copied"
 msgstr[0] ""
 msgstr[1] ""
 
+#. used for  "Item: Duplicate selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item duplicated"
+msgid_plural "selected area of {} items duplicated"
+msgstr[0] ""
+msgstr[1] ""
+
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
 #. affected.
@@ -2352,6 +2425,27 @@ msgstr[1] ""
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
 msgid_plural "{} items removed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when cropped to active take on  multiple items. {} will be replaced with the
+#. number of items; e.g. "2 items cropped to active take".
+msgid "{} item cropped to active take"
+msgid_plural "{} items cropped to active take"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "no takes removed"
+msgstr ""
+
+#. Reported when healing was not possible.
+msgid "nothing healed"
+msgstr ""
+
+#. Reported when splits in items are healed. {} will be replaced with the
+#. number of splits that have been successfully healed; e.g. "2 splits healed".
+msgid "{} split healed"
+msgid_plural "{} splits healed"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3044,7 +3138,7 @@ msgid "Report &FX when moving to tracks/takes"
 msgstr ""
 
 msgctxt "OSARA Configuration"
-msgid "Report &position when navigating chords in MIDI editor"
+msgid "Report &position when navigating events in MIDI editor"
 msgstr ""
 
 msgctxt "OSARA Configuration"
