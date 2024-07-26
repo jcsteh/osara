@@ -805,7 +805,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report edit/play cursor position, transport state and nearest markers and regions: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
 - OSARA: Add project or take marker at cursor (depending on focus): M
-- OSARA: Add/edit project or take marker at cursor (depending on focus): Shift+M
+- OSARA: Add/edit project or take marker at cursor (depending on focus) sets time selection as take marker length: Shift+M
 - OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - OSARA: Delete all time signature markers: Alt+Win+Delete
 - OSARA: Toggle track/take volume envelope visibility (depending on focus): Control+Alt+V
