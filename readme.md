@@ -161,6 +161,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item properties: Toggle lock
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
+- Item properties: Reset item take gain to +0dB (un-normalize): Control+Alt+0
 - Item: Open associated project in new tab: Alt+Shift+O
 - Xenakios/SWS: Nudge item volume down: Control+Shift+DownArrow
 - Xenakios/SWS: Nudge item volume up: Control+Shift+UpArrow
