@@ -1242,6 +1242,14 @@ void postItemNormalize(int command) {
 		outputMessage(format(
 			translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
 			selectedItemsCount));
+	}
+	else if (command == 40938) {
+		// Item properties: Reset item take gain to +0dB (un-normalize)
+		// Translators: {} will be replaced with the number of items; e.g.
+		// "2 items un-normalized".
+		outputMessage(format(
+			translate_plural("{} item un-normalized", "{} items un-normalized", selectedItemsCount),
+			selectedItemsCount));
 	} else {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items normalized".
@@ -2435,7 +2443,8 @@ PostCommand POST_COMMANDS[] = {
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
-	{40254, postItemNormalize}, // Item properties: Normalize multiple items to common gain
+	{40938, postItemNormalize}, // Item properties: Reset item take gain to +0dB (un-normalize)
+	{40254, postItemNormalize}, // Item properties: Normalize items together (common gain) to +0dB peak
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
 	{41173, postCursorMovement}, // Item navigation: Move cursor to start of items
