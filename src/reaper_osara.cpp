@@ -1551,10 +1551,15 @@ void postCycleRippleMode(int command) {
 }
 
 void maybeAddRippleMessage(ostringstream& s, int command) {
-	if (GetToggleCommandState(40310) || GetToggleCommandState(40311)) {
-		// Translators: This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
-		// "2 items removed ripple is on".
-		s << " " << translate("ripple is on");
+	if (GetToggleCommandState(40310)) {
+		// Translators: This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+		// "2 items removed ripple per track is on".
+		s << " " << translate("ripple per track is on");
+	}
+	if (GetToggleCommandState(40311)) {
+		// Translators: This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+		// "1 item added ripple all tracks is on".
+		s << " " << translate("ripple all tracks is on");
 	}
 }
 
