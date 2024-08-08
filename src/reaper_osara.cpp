@@ -2520,6 +2520,7 @@ PostCommand POST_COMMANDS[] = {
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
 	{40717, postSelectMultipleItems}, // Item: Select all items in current time selection
+	{41115, postSelectMultipleItems}, // Item: Invert selection
 	{40117, postMoveItemOrEnvelopePoint}, // Item edit: Move items/envelope points up one track/a bit
 	{40118, postMoveItemOrEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
@@ -2578,6 +2579,7 @@ PostCommand POST_COMMANDS[] = {
 	{42394, postGoToTakeMarker}, // Item: Set cursor to next take marker in selected items
 	{40296, postSelectMultipleTracks}, // Track: Select all tracks
 	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
+	{40334, postSelectMultipleEnvelopePoints}, // Envelope: Invert selected points
 	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
 	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
 	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
@@ -2711,6 +2713,8 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_ENVDOWN", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points down
 	{"_FNG_ENVUP", postMoveEnvelopePoint}, // SWS/FNG: Move selected envelope points up
 	{"_XENAKIOS_SELITEMSUNDEDCURSELTX", postSelectMultipleItems}, // Xenakios/SWS: Select items under edit cursor on selected tracks
+	{"_XENAKIOS_INVERTITEMSELECTION", postSelectMultipleItems}, // Xenakios/SWS: Invert item selection
+	{"_SWS_TOGTRACKSEL", postSelectMultipleTracks}, // SWS: Toggle (invert) track selection
 	{"_BR_CYCLE_RECORD_MODES", postCycleRecordMode}, // SWS/BR: Options - Cycle through record modes
 	{"_SWS_AWCOUNTRECTOG", postToggleCountIn}, // SWS/AW: Toggle count-in before recording
 	{"_SWS_SELNEARESTNEXTFOLDER", postGoToTrack}, //SWS: Select nearest next folder
