@@ -851,6 +851,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Envelope: Cut points within time selection
 - Envelope: Insert new point at current position (do not remove nearby points)
 - Envelope: Select all points
+- Envelope: Invert selected points
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode
@@ -861,8 +862,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Global automation override: No override (set automation modes per track)
 - Grid: Set to 1/64
 - Grid: Set to 1/128
-- Item: Remove items
+- Item: Invert selection
+- Xenakios/SWS: Invert item selection
 - Edit: Cut items
+- Item: Remove items
 - Item navigation: Move cursor to start of items
 - Item navigation: Move cursor to end of items
 - Item properties: Pitch item down one octave
@@ -898,6 +901,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Time selection: Remove contents of time selection (moving later items)
 - Track: Insert new track
 - Track: Select all tracks
+- SWS: Toggle (invert) track selection
 - Track: Toggle mute for selected tracks
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
