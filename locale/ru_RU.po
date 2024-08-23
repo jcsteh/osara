@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-07-24 23:55\n"
+"PO-Revision-Date: 2024-08-23 08:47\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -71,7 +71,7 @@ msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
 msgstr "REAPER завершит работу. Пожалуйста, перезапустите REAPER, чтобы применить изменения."
 
 msgid "Restart REAPER"
-msgstr "Перезапустить REAPER"
+msgstr "Перезапуск REAPER"
 
 msgid "volume"
 msgstr "громкость"
@@ -134,8 +134,8 @@ msgstr "регион {}"
 msgid "{} automation item removed"
 msgid_plural "{} automation items removed"
 msgstr[0] "{} объект автоматизации удалён"
-msgstr[1] "{} объекта автоматизации удалено"
-msgstr[2] "{} объектов автоматизации удалено"
+msgstr[1] "{} элемента автоматизации удалено"
+msgstr[2] "{} элементов автоматизации удалено"
 msgstr[3] "{} объектов автоматизации удалено"
 
 #. Reported when removing envelope points. {} will be
@@ -185,7 +185,7 @@ msgid "unselected"
 msgstr "не выделено"
 
 msgid "no take envelopes"
-msgstr "нет огибающих для дубля"
+msgstr "нет огибающих клипа"
 
 msgid "no track envelopes"
 msgstr "нет огибающих для трека"
@@ -1276,7 +1276,7 @@ msgid "resumed Peak Watcher"
 msgstr "возобновлён Просмотрщик пиков"
 
 msgid "Peak Watcher not enabled"
-msgstr "Просмотрщик пиков не включён"
+msgstr "Просмотрщик пиков выключен"
 
 #. Used when reporting a length of time in measures.
 #. {} will be replaced with the number of measures; e.g.
@@ -1608,10 +1608,10 @@ msgid "delta"
 msgstr "дельта"
 
 msgid "master muted"
-msgstr "мастер приглушён"
+msgstr "мастер-трек приглушён"
 
 msgid "master unmuted"
-msgstr "мастер не приглушён"
+msgstr "приглушение мастер-трека выключено"
 
 msgid "no selected tracks"
 msgstr "нет выделенных треков"
@@ -1635,10 +1635,10 @@ msgstr[2] "{} треков не приглушены"
 msgstr[3] ""
 
 msgid "master soloed"
-msgstr "мастер соло"
+msgstr "мастер-трек соло"
 
 msgid "master unsoloed"
-msgstr "мастер не соло"
+msgstr "соло мастер-трека выключено"
 
 #. Reported when multiple tracks are soloed. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks soloed".
@@ -1719,6 +1719,15 @@ msgstr[2] "{} элементов нормализованы к общему ус
 msgstr[3] ""
 
 #. {} will be replaced with the number of items; e.g.
+#. "2 items un-normalized".
+msgid "{} item un-normalized"
+msgid_plural "{} items un-normalized"
+msgstr[0] "Нормализация {} элемента выключена"
+msgstr[1] "Нормализация {} элементов выключена"
+msgstr[2] "Нормализация {} элементов выключена"
+msgstr[3] ""
+
+#. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
@@ -1776,7 +1785,7 @@ msgid "Track"
 msgstr "Трек"
 
 msgid "Master"
-msgstr "Мастер"
+msgstr "Мастер-трек"
 
 msgid "Item"
 msgstr "Элемент"
@@ -1817,18 +1826,23 @@ msgid "{:g}% right"
 msgstr "{:g}% справа"
 
 msgid "ripple per-track"
-msgstr "режим волны на один трек"
+msgstr "риппл на один трек"
 
 msgid "ripple all tracks"
-msgstr "режим волны на всех треков"
+msgstr "режим волны на всех треках"
 
 msgid "ripple off"
-msgstr "режим волны выключен"
+msgstr "риппл выключен"
 
-#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
-#. "2 items removed ripple is on".
-msgid "ripple is on"
-msgstr "режим волны включён"
+#. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+#. "2 items removed ripple per track is on".
+msgid "ripple per track is on"
+msgstr "включён режим волны на один трек"
+
+#. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+#. "1 item added ripple all tracks is on".
+msgid "ripple all tracks is on"
+msgstr "включён режим волны на всех треках"
 
 msgid "repeat on"
 msgstr "повтор включён"
@@ -1890,10 +1904,10 @@ msgid "metronome off"
 msgstr "метроном выключен"
 
 msgid "master track visible"
-msgstr "мастер трек показан"
+msgstr "мастер-трек показан"
 
 msgid "master track hidden"
-msgstr "мастер трек скрыт"
+msgstr "мастер-трек скрыт"
 
 msgid "pause"
 msgstr "приостановить"
@@ -2020,10 +2034,10 @@ msgid "set selection end"
 msgstr "установить конец выделения"
 
 msgid "master mono"
-msgstr "мастер моно"
+msgstr "мастер-трек моно"
 
 msgid "master stereo"
-msgstr "мастер стерео"
+msgstr "мастер-трек стерео"
 
 msgid "crossfade on"
 msgstr "перекрёстное затухание включено"
@@ -2186,10 +2200,10 @@ msgid "{:g} dB threshold"
 msgstr "{:g} dB порог"
 
 msgid "enabled envelope points move with media items"
-msgstr "включено движение точек огибающей с медиа-объектами"
+msgstr "движение точек огибающей с медиа-объектами включено"
 
 msgid "disabled envelope points move with media items"
-msgstr "отключено движение точек огибающей с медиа-объектами"
+msgstr "движение точек огибающей с медиа-объектами выключено"
 
 msgid "enabled free item positioning"
 msgstr "свободное позиционирование элементов включено"
@@ -2912,52 +2926,52 @@ msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: Просмотреть параметры FX текущего трека/клипа (в зависимости от фокуса)"
 
 msgid "OSARA: View FX parameters for master track"
-msgstr "OSARA: Просмотреть параметры FX для мастер трека"
+msgstr "OSARA: Просмотреть параметры FX для мастер-трека"
 
 msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
-msgstr "OSARA: Настроить Peak Watcher для текущего трека/трек FX (в зависимости от фокуса)"
+msgstr "OSARA: Настроить просмотрщик пиков для текущего трека/трека FX (в зависимости от фокуса)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
-msgstr "OSARA: Сообщить значение Peak Watcher для первого наблюдателя первого канала"
+msgstr "OSARA: Сообщать значение просмотрщика пиков для первого наблюдателя первого канала"
 
 msgid "OSARA: Report Peak Watcher value for first watcher second channel"
-msgstr "OSARA: Сообщить значение Peak Watcher для первого наблюдателя второго канала"
+msgstr "OSARA: Сообщать значение просмотрщика пиков для первого наблюдателя второго канала"
 
 msgid "OSARA: Report Peak Watcher value for second watcher first channel"
-msgstr "OSARA: Сообщить значение Peak Watcher для второго наблюдателя первого канала"
+msgstr "OSARA: Сообщать значение просмотрщика пиков для второго наблюдателя первого канала"
 
 msgid "OSARA: Report Peak Watcher value for second watcher second channel"
-msgstr "OSARA: Сообщить значение Peak Watcher для второго наблюдателя второго канала"
+msgstr "OSARA: Сообщать значение просмотрщика пиков для второго наблюдателя второго канала"
 
 msgid "OSARA: Reset Peak Watcher first watcher"
-msgstr "OSARA: Сбросить Peak Watcher первого наблюдателя"
+msgstr "OSARA: Сбросить просмотрщик пиков первого наблюдателя"
 
 msgid "OSARA: Reset Peak Watcher second watcher"
-msgstr "OSARA: Сбросить Peak Watcher второго наблюдателя"
+msgstr "OSARA: Сбросить просмотрщик пиков второго наблюдателя"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: Приостановить/возобновить Peak Watcher"
+msgstr "OSARA: Приостановить/возобновить просмотрщик пиков"
 
 msgid "OSARA: Report ripple editing mode"
-msgstr "OSARA: Сообщить режим редактирования Ripple"
+msgstr "OSARA: Сообщать режим волны во время редактирования"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: Сообщить приглушенных треках"
+msgstr "OSARA: Сообщать о приглушённых треках"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: Сообщить соло треки"
+msgstr "OSARA: Сообщать соло треки"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: Сообщить готовые к записи треки"
+msgstr "OSARA: Сообщать готовые к записи треки"
 
 msgid "OSARA: Report tracks with record monitor on"
-msgstr "OSARA: Сообщить треки с включённым мониторингом записи"
+msgstr "OSARA: Сообщать треки с включённым мониторингом записи"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: Сообщить треки с инверсией фазы"
+msgstr "OSARA: Сообщать треки с инверсией фазы"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
-msgstr "OSARA: Сообщить выделение трека/элемента/времени/MIDI (в зависимости от фокуса)"
+msgstr "OSARA: Сообщать выделение трека/элемента/времени/MIDI (в зависимости от фокуса)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: Удалить элементы/треки/содержимое выделенного времени/маркеры/точки огибающей (в зависимости от фокуса)"
@@ -2975,16 +2989,16 @@ msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: Переместить последний маркер растяжения в фокусе в текущее положение курсора редактирования"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Сообщить уровень в пиковых дБ в положении курсора воспроизведения для канала 1 текущего трека (сообщается уровень входного сигнала, если трек готов к записи)"
+msgstr "OSARA: Сообщать уровень в пиковых дБ в положении курсора воспроизведения для канала 1 текущего трека (сообщается уровень входного сигнала, если трек готов к записи)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Сообщить уровень в пиковых дБ в положении  курсора воспроизведения для канала 2 текущего трека (сообщается уровень входного сигнала, если трек готов к записи)"
+msgstr "OSARA: Сообщать уровень в пиковых дБ в положении  курсора воспроизведения для канала 2 текущего трека (сообщается уровень входного сигнала, если трек готов к записи)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: Сообщить уровень в пиковых дБ в положении  курсора воспроизведения для канала 1 мастер трека"
+msgstr "OSARA: Сообщать уровень в пиковых дБ в положении  курсора воспроизведения для канала 1 мастер-трека"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: Сообщить уровень в пиковых дБ в положении  курсора воспроизведения для канала 2 мастер трека"
+msgstr "OSARA: Сообщать уровень в пиковых дБ в положении  курсора воспроизведения для канала 2 мастер-трека"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: Удалить все маркеры размера"
@@ -3029,7 +3043,7 @@ msgid "OSARA: Configuration"
 msgstr "OSARA: Параметры"
 
 msgid "OSARA: Report global / Track Automation Mode"
-msgstr "OSARA: Сообщить глобальном / режиме автоматизации трека"
+msgstr "OSARA: Сообщать глобальном / режиме автоматизации трека"
 
 msgid "OSARA: Toggle global automation override between latch preview and off"
 msgstr "OSARA: Переключить глобальное переопределение автоматизации между предпросмотром удержания и выключением"
@@ -3047,7 +3061,7 @@ msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Приглушить следующее сообщение от OSARA"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: Сообщать о регионах, последнем маркере проекта и объектах на выбранных треках на текущей позиции"
+msgstr "OSARA: Сообщать о регионах, последнем маркере проекта и элементах на выбранных треках на текущей позиции"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: Перейти к первому треку"
@@ -3056,7 +3070,7 @@ msgid "OSARA: Go to last track"
 msgstr "OSARA: Перейти к последнему треку"
 
 msgid "OSARA: Go to master track"
-msgstr "OSARA: Перейти к мастер треку"
+msgstr "OSARA: Перейти к мастер-треку"
 
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr "OSARA: Переключить форму выбранных точек огибающей"
@@ -3325,7 +3339,7 @@ msgstr "Сообщать &позицию при навигации по собы
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr "Сообщать о &нотах в MIDI редакторе"
+msgstr "Сообщать &ноты в MIDI редакторе"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"

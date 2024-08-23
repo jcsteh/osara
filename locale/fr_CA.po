@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-07-24 23:55\n"
+"PO-Revision-Date: 2024-08-23 08:47\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1605,6 +1605,13 @@ msgstr[0] "{} objet normalisé au gain commun"
 msgstr[1] "{} objets normalisés au gain commun"
 
 #. {} will be replaced with the number of items; e.g.
+#. "2 items un-normalized".
+msgid "{} item un-normalized"
+msgid_plural "{} items un-normalized"
+msgstr[0] "{} objet non normalisé"
+msgstr[1] "{} objets non normalisés"
+
+#. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
@@ -1705,10 +1712,15 @@ msgstr "ripple toutes les pistes"
 msgid "ripple off"
 msgstr "ripple désactivé"
 
-#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
-#. "2 items removed ripple is on".
-msgid "ripple is on"
-msgstr "ripple est activé"
+#. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+#. "2 items removed ripple per track is on".
+msgid "ripple per track is on"
+msgstr "le mode Ripple par piste est activée"
+
+#. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+#. "1 item added ripple all tracks is on".
+msgid "ripple all tracks is on"
+msgstr "le mode ripple toutes les pistes est activé"
 
 msgid "repeat on"
 msgstr "répétition activée"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-07-24 23:55\n"
+"PO-Revision-Date: 2024-08-23 08:47\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -1605,6 +1605,13 @@ msgstr[0] "{} item normalizado para ganho comum"
 msgstr[1] "{} itens normalizados para ganho comum"
 
 #. {} will be replaced with the number of items; e.g.
+#. "2 items un-normalized".
+msgid "{} item un-normalized"
+msgid_plural "{} items un-normalized"
+msgstr[0] ""
+msgstr[1] ""
+
+#. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
@@ -1705,9 +1712,14 @@ msgstr "Editar onda em todas as pistas"
 msgid "ripple off"
 msgstr "Editar onda desativado"
 
-#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
-#. "2 items removed ripple is on".
-msgid "ripple is on"
+#. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+#. "2 items removed ripple per track is on".
+msgid "ripple per track is on"
+msgstr ""
+
+#. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+#. "1 item added ripple all tracks is on".
+msgid "ripple all tracks is on"
 msgstr ""
 
 msgid "repeat on"

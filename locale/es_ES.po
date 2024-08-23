@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-07-24 23:55\n"
+"PO-Revision-Date: 2024-08-23 08:47\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1605,6 +1605,13 @@ msgstr[0] "{} ítem normalizado a ganancia común"
 msgstr[1] "{} ítems normalizados a ganancia común"
 
 #. {} will be replaced with the number of items; e.g.
+#. "2 items un-normalized".
+msgid "{} item un-normalized"
+msgid_plural "{} items un-normalized"
+msgstr[0] "{} ítem desnormalizado"
+msgstr[1] "{} ítems desnormalizados"
+
+#. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
@@ -1705,10 +1712,15 @@ msgstr "todas las pistas> edición adaptativa"
 msgid "ripple off"
 msgstr "apagada: edición adaptativa"
 
-#. This message will be appended when removing or pasting items with ripple per-track or ripple all tracks enabled; E.G.
-#. "2 items removed ripple is on".
-msgid "ripple is on"
-msgstr "edición adaptativa activada"
+#. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+#. "2 items removed ripple per track is on".
+msgid "ripple per track is on"
+msgstr "activada edición adaptativa por pista"
+
+#. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+#. "1 item added ripple all tracks is on".
+msgid "ripple all tracks is on"
+msgstr "activada edición adaptativa en todas las pistas"
 
 msgid "repeat on"
 msgstr "repetir activado"
