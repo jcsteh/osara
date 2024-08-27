@@ -3835,11 +3835,13 @@ void cmdhAddOrRemoveStretch(int command) {
 	int difference = newCount - oldCount;
 	if (newCount >= oldCount) {
 		if (shouldReportTimeMovement()) {
+		// Translators: Reported when one or more stretch markers are added. {} will be replaced by the number of stretch markers, EG "2 stretch markers added".
 			outputMessage(format(
 				translate_plural("{} stretch marker added", "{} stretch markers added", difference),
 				difference));
 		}
 	} else {
+		// Translators: Reported when one or more stretch markers are removed. {} will be replaced by the number of stretch markers, EG "2 stretch markers removed".
 		outputMessage(format(
 			translate_plural("{} stretch marker removed", "{} stretch markers removed", -difference),
 			-difference));
