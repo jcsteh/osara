@@ -82,13 +82,18 @@ class Surface: public IReaperControlSurface {
 	}
 
 	void Run() final {
-		if (settings::reportMarkersWhilePlaying && GetPlayState() & 1) {
+		if (GetPlayState() & 1) {
 			double playPos = GetPlayPosition();
 			if (playPos == this->lastPlayPos) {
 				return;
 			}
 			this->lastPlayPos = playPos;
-			this->reportMarker(playPos);
+			if (settings::reportMarkersWhilePlaying) {
+				this->reportMarker(playPos);
+			}
+			if (settings::reportTimeMovementWhilePlaying) {
+				this->reportTimeSelectionWhilePlaying(playPos);
+			}
 		}
 		this->reportInputMidiNote();
 	}
@@ -354,6 +359,28 @@ class Surface: public IReaperControlSurface {
 		}
 	}
 
+	void reportTimeSelectionWhilePlaying(double playPos) {
+		double start, end;
+		GetSet_LoopTimeRange(false, false, &start, &end, false);
+		double startDiff = playPos - start;
+		double endDiff = playPos - end;
+		if (start == end)
+			return;
+		if (startDiff >= 0 && startDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection start"));
+			this -> hasReportedTimeSelection = true;
+		} else if (endDiff >= 0 && endDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection end"));
+			this -> hasReportedTimeSelection = true;
+		} else {
+			this -> hasReportedTimeSelection = false;
+		}
+	}
+
 	void reportInputMidiNote() {
 		if (!isShortcutHelpEnabled) {
 			return;
@@ -396,6 +423,7 @@ class Surface: public IReaperControlSurface {
 	double lastPlayPos = 0;
 	int lastMarker = -1;
 	int lastRegion = -1;
+bool hasReportedTimeSelection = false;
 };
 
 IReaperControlSurface* createSurface() {
