@@ -1770,17 +1770,17 @@ void reportTransportState(int state) {
 	if (!settings::reportTransport)
 		return;
 	if (state & 2) {
-		s << format(translate("pause"));
+		s << translate("pause");
 	} else if (state & 4 && repeat == true) {
-		s << format(translate("record")) << ", " << translate("repeat on");
+		s << translate("record") << ", " << translate("repeat on");
 	} else if (state & 4) {
-		s << format(translate("record"));
+		s << translate("record");
 	} else if (state & 1 && repeat == true) {
-		s << format(translate("play")) << ", " << translate("repeat on");
+		s << translate("play") << ", " << translate("repeat on");
 	} else if (state & 1) {
-		s << format(translate("play"));
+		s << translate("play");
 	} else {
-		s << format(translate("stop"));
+		s << translate("stop");
 	}
 	outputMessage(s);
 }
