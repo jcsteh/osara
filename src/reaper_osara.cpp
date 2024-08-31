@@ -1778,17 +1778,24 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 void reportTransportState(int state) {
+	bool repeat = GetToggleCommandState(1068); // Transport: Toggle repeat
+	ostringstream s;
 	if (!settings::reportTransport)
 		return;
 	if (state & 2) {
-		outputMessage(translate("pause"));
+		s << translate("pause");
+	} else if (state & 4 && repeat == true) {
+		s << translate("record") << ", " << translate("repeat on");
 	} else if (state & 4) {
-		outputMessage(translate("record"));
+		s << translate("record");
+	} else if (state & 1 && repeat == true) {
+		s << translate("play") << ", " << translate("repeat on");
 	} else if (state & 1) {
-		outputMessage(translate("play"));
+		s << translate("play");
 	} else {
-		outputMessage(translate("stop"));
+		s << translate("stop");
 	}
+	outputMessage(s);
 }
 
 void postChangeTransportState(int command) {
