@@ -957,6 +957,7 @@ This list is worth referencing when making your own key map additions, assigning
 - OSARA: Toggle Report position when scrubbing
 - OSARA: Toggle Report time movement during playback/recording
 - OSARA: Toggle Report track numbers
+- OSARA: Toggle Report time selection start and end while playing
 - OSARA: Toggle Report transport state (play, record, etc.)
 - OSARA: Configure REAPER for optimal screen reader accessibility
 - OSARA: Check for update

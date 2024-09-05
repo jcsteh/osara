@@ -91,7 +91,7 @@ class Surface: public IReaperControlSurface {
 			if (settings::reportMarkersWhilePlaying) {
 				this->reportMarker(playPos);
 			}
-			if (settings::reportTimeMovementWhilePlaying) {
+			if (settings::reportTimeSelectionWhilePlaying) {
 				this->reportTimeSelectionWhilePlaying(playPos);
 			}
 		}
@@ -423,7 +423,7 @@ class Surface: public IReaperControlSurface {
 	double lastPlayPos = 0;
 	int lastMarker = -1;
 	int lastRegion = -1;
-bool hasReportedTimeSelection = false;
+	bool hasReportedTimeSelection = false;
 };
 
 IReaperControlSurface* createSurface() {
