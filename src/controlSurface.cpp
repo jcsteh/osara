@@ -362,10 +362,11 @@ class Surface: public IReaperControlSurface {
 	void reportTimeSelectionWhilePlaying(double playPos) {
 		double start, end;
 		GetSet_LoopTimeRange(false, false, &start, &end, false);
+		if (start == end) {
+			return;
+		}
 		double startDiff = playPos - start;
 		double endDiff = playPos - end;
-		if (start == end)
-			return;
 		if (startDiff >= 0 && startDiff <= 0.1) {
 			if (this -> hasReportedTimeSelection)
 				return;
