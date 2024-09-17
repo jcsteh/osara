@@ -29,6 +29,9 @@ BoolSetting(moveFromPlayCursor,MAIN_SECTION,
 BoolSetting(reportMarkersWhilePlaying, MAIN_SECTION,
 	"Report mar&kers and regions during playback",
 	false)
+BoolSetting(reportTimeSelectionWhilePlaying, MAIN_SECTION,
+	"Report time se&lection start and end while playing",
+	false)
 BoolSetting(reportTransport, MAIN_SECTION,
 	"Report &transport state (play, record, etc.)",
 	true)
