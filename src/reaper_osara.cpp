@@ -1571,6 +1571,18 @@ void maybeAddRippleMessage(ostringstream& s, int command) {
 	}
 }
 
+void postCycleEditMode(int command) {
+	if (GetToggleCommandState(40041) && GetToggleCommandState (41117)) {
+		outputMessage(translate("crossfade on trimming on"));
+	}else if (GetToggleCommandState(40041)) {
+		outputMessage(translate("crossfade on trimming off"));
+	} else if (GetToggleCommandState (41117)) {
+		outputMessage(translate("crossfade off trimming on"));
+	} else {
+		outputMessage(translate("crossfade off trimming off"));
+	}
+}
+
 void reportRepeat(bool repeat) {
 	outputMessage(repeat ?
 		translate("repeat on") :
@@ -2503,6 +2515,7 @@ PostCommand POST_COMMANDS[] = {
 	{40283, postChangeTrackPan}, // Track: Nudge track pan left
 	{40284, postChangeTrackPan}, // Track: Nudge track pan right
 	{1155, postCycleRippleMode}, // Options: Cycle ripple editing mode
+	{41116, postCycleEditMode}, // Options: Cycle through editing modes: Auto-crossfade off, auto-crossfade on, trim content behind media items
 	{1068, postToggleRepeat}, // Transport: Toggle repeat
 	{40125, postSwitchToTake}, // Take: Switch items to next take
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
