@@ -323,6 +323,9 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
 - Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Shift+X
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Shift+C
+- SWS/S&M: Cut selected tracks (with routing)
+- SWS/S&M: Copy selected tracks (with routing)
+- SWS/S&M: Paste tracks (with routing) or items
 - Item: Cut selected area of items: Control+Shift+X
 - Item: Copy selected area of items: Control+Shift+C
 - Item: Paste items/tracks: Control+V
