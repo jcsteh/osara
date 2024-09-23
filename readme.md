@@ -323,9 +323,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection: Control+C
 - Edit: Cut items/tracks/envelope points (depending on focus) within time selection, if any (smart cut): Shift+X
 - Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy): Shift+C
-- SWS/S&M: Cut selected tracks (with routing)
-- SWS/S&M: Copy selected tracks (with routing)
-- SWS/S&M: Paste tracks (with routing) or items
 - Item: Cut selected area of items: Control+Shift+X
 - Item: Copy selected area of items: Control+Shift+C
 - Item: Paste items/tracks: Control+V
@@ -909,6 +906,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
 - Track: Cut tracks
+- Track: Copy tracks
+- SWS/S&M: Cut selected tracks (with routing)
+- SWS/S&M: Copy selected tracks (with routing)
+- SWS/S&M: Paste tracks (with routing) or items
 - Xenakios/SWS: Nudge master volume 1 dB up
 - Xenakios/SWS: Nudge master volume 1 dB down
 - Xenakios/SWS: Set master volume to 0 dB
