@@ -2537,7 +2537,7 @@ PostCommand POST_COMMANDS[] = {
 	{40687, postToggleItemLock}, // Item properties: Toggle lock
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
-	{40041, postToggleAutoCrossfade}, // Options: Toggle auto-crossfade on/off
+	{40041, postToggleAutoCrossfade}, // Options: Auto-crossfade media items when editing
 	{1135, postToggleLocking}, // Options: Toggle locking
 	{40745, postToggleSoloInFront}, // Options: Solo in front
 	{40522, postAdjustPlayRate}, // Transport: Increase playrate by ~6% (one semitone)
