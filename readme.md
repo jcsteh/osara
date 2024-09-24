@@ -890,6 +890,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Markers: Delete region near cursor
 - New project tab (ignore default template)
 - Options: Envelope points move with media items
+- Options: Cycle through editing modes: Auto-crossfade off, auto-crossfade on, trim content behind media items
 - Tempo: Decrease current project tempo 0.1 BPM
 - Tempo: Decrease current project tempo 10 BPM
 - Tempo: Decrease current project tempo 10 percent

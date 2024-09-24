@@ -1573,13 +1573,13 @@ void maybeAddRippleMessage(ostringstream& s, int command) {
 
 void postCycleEditMode(int command) {
 	if (GetToggleCommandState(40041) && GetToggleCommandState (41117)) {
-		outputMessage(translate("crossfade on trimming on"));
+		outputMessage(translate("enabled auto crossfading and trim"));
 	}else if (GetToggleCommandState(40041)) {
-		outputMessage(translate("crossfade on trimming off"));
+		outputMessage(translate("crossfading, not trimming"));
 	} else if (GetToggleCommandState (41117)) {
-		outputMessage(translate("crossfade off trimming on"));
+		outputMessage(translate("trimming, not crossfading"));
 	} else {
-		outputMessage(translate("crossfade off trimming off"));
+		outputMessage(translate("disabled auto crossfades and trim"));
 	}
 }
 
