@@ -1573,12 +1573,16 @@ void maybeAddRippleMessage(ostringstream& s, int command) {
 
 void postCycleEditMode(int command) {
 	if (GetToggleCommandState(40041) && GetToggleCommandState (41117)) {
-		outputMessage(translate("enabled auto crossfading and trim"));
+		// Translators: Reported when auto crossfade and trim content behind media items are both enabled.
+		outputMessage(translate("enabled auto crossfades and trim"));
 	}else if (GetToggleCommandState(40041)) {
+		// Translators: Reported when auto crossfade is enabled, trim behind media items is disabled.  
 		outputMessage(translate("crossfading, not trimming"));
 	} else if (GetToggleCommandState (41117)) {
+		// Translators: Reported when trim content behind media items is enabled, auto crossfade is disabled.
 		outputMessage(translate("trimming, not crossfading"));
 	} else {
+		// Translators: Reported when auto crosfade and trim content behind media items are both disabled.
 		outputMessage(translate("disabled auto crossfades and trim"));
 	}
 }
