@@ -2506,6 +2506,7 @@ PostCommand POST_COMMANDS[] = {
 	{1068, postToggleRepeat}, // Transport: Toggle repeat
 	{40125, postSwitchToTake}, // Take: Switch items to next take
 	{40126, postSwitchToTake}, // Take: Switch items to previous take
+	{40210, postCopy}, // Track: Copy tracks
 	{40057, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) ignoring time selection
 	{41383, postCopy}, // Edit: Copy items/tracks/envelope points (depending on focus) within time selection, if any (smart copy)
 	{40397, postCopyMoveTimeSelection}, // Time selection: Copy contents of time selection to edit cursor (moving later items)

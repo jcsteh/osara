@@ -906,6 +906,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
 - Track: Cut tracks
+- Track: Copy tracks
+- SWS/S&M: Cut selected tracks (with routing)
+- SWS/S&M: Copy selected tracks (with routing)
+- SWS/S&M: Paste tracks (with routing) or items
 - Xenakios/SWS: Nudge master volume 1 dB up
 - Xenakios/SWS: Nudge master volume 1 dB down
 - Xenakios/SWS: Set master volume to 0 dB
