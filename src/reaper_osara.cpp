@@ -2012,6 +2012,11 @@ void postToggleAutoCrossfade(int command) {
 		translate("crossfade on") : translate("crossfade off"));
 }
 
+void postToggleTrimContentBehindItems(int command) {
+	outputMessage(GetToggleCommandState(command) ?
+		translate("trim behind items on") : translate("trim behind items off"));
+}
+
 void postToggleLocking(int command) {
 	outputMessage(GetToggleCommandState(command) ?
 		translate("locking on") : translate("locking off"));
@@ -2538,6 +2543,7 @@ PostCommand POST_COMMANDS[] = {
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Auto-crossfade media items when editing
+	{41117, postToggleTrimContentBehindItems}, // Options: Trim content behind media items when editing
 	{1135, postToggleLocking}, // Options: Toggle locking
 	{40745, postToggleSoloInFront}, // Options: Solo in front
 	{40522, postAdjustPlayRate}, // Transport: Increase playrate by ~6% (one semitone)
