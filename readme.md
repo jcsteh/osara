@@ -890,6 +890,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Markers: Delete region near cursor
 - New project tab (ignore default template)
 - Options: Envelope points move with media items
+- Options: Trim content behind media items when editing
 - Options: Cycle through editing modes: Auto-crossfade off, auto-crossfade on, trim content behind media items
 - Tempo: Decrease current project tempo 0.1 BPM
 - Tempo: Decrease current project tempo 10 BPM
@@ -907,6 +908,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
 - Track: Cut tracks
+- Track: Copy tracks
+- SWS/S&M: Cut selected tracks (with routing)
+- SWS/S&M: Copy selected tracks (with routing)
+- SWS/S&M: Paste tracks (with routing) or items
 - Xenakios/SWS: Nudge master volume 1 dB up
 - Xenakios/SWS: Nudge master volume 1 dB down
 - Xenakios/SWS: Set master volume to 0 dB
