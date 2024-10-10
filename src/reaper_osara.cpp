@@ -4516,6 +4516,15 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(s);
 }
 
+void postReportCursorPositionPrimaryFormat() {
+	// This function is called when only reporting the primary ruler format is needed
+	TimeFormat tf = TF_RULER;
+	int state = GetPlayState();
+	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	if (shouldReportTimeMovement())
+		outputMessage(formatTime(pos, tf, FT_NO_CACHE));
+}
+
 void cmdToggleSelection(Command* command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
@@ -4627,6 +4636,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 }
 
 void moveToTransient(bool previous) {
+double cursorPos = GetCursorPosition();
 	bool wasPlaying = GetPlayState() & 1;
 	if (wasPlaying) {
 		// Moving to transients can be slow, so pause/stop playback so it doesn't drift
@@ -4648,6 +4658,10 @@ void moveToTransient(bool previous) {
 		Main_OnCommand(40375, 0); // Item navigation: Move cursor to next transient in items
 	if (wasPlaying)
 		OnPlayButton();
+	double newCursorPos = GetCursorPosition();
+if(cursorPos == newCursorPos)
+		return;
+	postReportCursorPositionPrimaryFormat();
 }
 
 void cmdMoveToNextTransient(Command* command) {
