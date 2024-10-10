@@ -4516,13 +4516,13 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(s);
 }
 
-void postReportCursorPositionPrimaryFormat() {
-	// This function is called when only reporting the primary ruler format is needed
+void reportCursorPositionPrimaryFormat() {
+	// This function can be called when only reporting the primary ruler format is needed.
 	TimeFormat tf = TF_RULER;
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	if (shouldReportTimeMovement())
-		outputMessage(formatTime(pos, tf, FT_NO_CACHE));
+		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
 }
 
 void cmdToggleSelection(Command* command) {
@@ -4661,7 +4661,7 @@ double cursorPos = GetCursorPosition();
 	double newCursorPos = GetCursorPosition();
 if(cursorPos == newCursorPos)
 		return;
-	postReportCursorPositionPrimaryFormat();
+	reportCursorPositionPrimaryFormat();
 }
 
 void cmdMoveToNextTransient(Command* command) {
