@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-08-23 08:47\n"
+"PO-Revision-Date: 2024-10-16 21:42\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -128,6 +128,12 @@ msgstr "{} Región"
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
 msgstr "región {}"
+
+msgid "time selection start"
+msgstr "comienzo de selección de tiempo"
+
+msgid "time selection end"
+msgstr "fin de selección de tiempo"
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
@@ -1722,6 +1728,22 @@ msgstr "activada edición adaptativa por pista"
 msgid "ripple all tracks is on"
 msgstr "activada edición adaptativa en todas las pistas"
 
+#. Reported when auto crossfade and trim content behind media items are both enabled.
+msgid "enabled auto crossfades and trim"
+msgstr ""
+
+#. Reported when auto crossfade is enabled, trim behind media items is disabled.  
+msgid "crossfading, not trimming"
+msgstr ""
+
+#. Reported when trim content behind media items is enabled, auto crossfade is disabled.
+msgid "trimming, not crossfading"
+msgstr ""
+
+#. Reported when auto crosfade and trim content behind media items are both disabled.
+msgid "disabled auto crossfades and trim"
+msgstr ""
+
 msgid "repeat on"
 msgstr "repetir activado"
 
@@ -1898,6 +1920,12 @@ msgstr "activado el fundido de cruce"
 
 msgid "crossfade off"
 msgstr "desactivado el fundido de cruce"
+
+msgid "trim behind items on"
+msgstr "recortar detrás de Items activado"
+
+msgid "trim behind items off"
+msgstr "recortar detrás de ítems desactivado"
 
 msgid "locking on"
 msgstr "activado el bloqueo"
@@ -2663,12 +2691,6 @@ msgstr "cerrada la previsualización de automatización global manual"
 msgid "{} automation mode for selected tracks"
 msgstr "{} modo de automatizaci'on para las pistas seleccionadas"
 
-msgid "time selection start"
-msgstr "comienzo de selección de tiempo"
-
-msgid "time selection end"
-msgstr "fin de selección de tiempo"
-
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
 msgstr "OSARA: Accesibilidad de código abierto paraReaper"
@@ -3136,6 +3158,10 @@ msgstr "&movimiento relativo al cursor de reproducción mientras ésta está act
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers and regions during playback"
 msgstr "Anunciar región y marc&ador En reproducción"
+
+msgctxt "OSARA Configuration"
+msgid "Report time se&lection start and end while playing"
+msgstr "Anunciar principio y fin de selección durante reproducción"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
