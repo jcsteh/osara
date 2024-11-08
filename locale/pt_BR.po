@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -2818,6 +2818,9 @@ msgid "OSARA: Toggle shortcut help"
 msgstr "Osara:  Alternar ajuda de atalhos"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
+msgstr ""
+
+msgid "OSARA: Report length of last touched item"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"

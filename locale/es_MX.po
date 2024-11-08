@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -2819,6 +2819,9 @@ msgstr "OSARA: Alterna la ayuda de teclado"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: Anuncia la posición del cursor de edición/reproducción, el estado del transporte, marcadores y regiones más cercanos"
+
+msgid "OSARA: Report length of last touched item"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Habilita la selección separada/alternar la selección de la pista/ítem actual (según el foco)"

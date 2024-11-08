@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -3003,6 +3003,9 @@ msgstr "OSARA: Переключить справку по горячим кла�
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: Сообщить о положении курсора при редактировании/воспроизведении, состоянии транспорта и ближайших маркерах и регионах"
+
+msgid "OSARA: Report length of last touched item"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Включить несмежное выделение/переключить выделение текущего трека/элемента (в зависимости от фокуса)"

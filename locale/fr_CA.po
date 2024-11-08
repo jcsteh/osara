@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2819,6 +2819,9 @@ msgstr "OSARA: Bascule l'aide des raccourcis clavier"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: Énoncer la position du curseur d'édition/lecture, l'état du transport et les marqueurs/régions les plus proches"
+
+msgid "OSARA: Report length of last touched item"
+msgstr "OSARA : Énoncer la longueur du dernier objet touché"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de la piste, de l'objet en cours (selon le focus)"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2727,6 +2727,9 @@ msgstr "OSARA: 切換熱鍵幫助"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: 報告編輯/播放遊標位置、走帶狀態以及最近的標記和區間"
+
+msgid "OSARA: Report length of last touched item"
+msgstr "OSARA: 報告最後觸碰對象的長度"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦點）"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2024-10-16 21:42\n"
+"PO-Revision-Date: 2024-11-08 10:43\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -2819,6 +2819,9 @@ msgstr "OSARA: cambia el modo de ayuda de atajos"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: anuncia posición de cursor de edición o reproducción estado de reproducción grabación y las región o marcador cercano"
+
+msgid "OSARA: Report length of last touched item"
+msgstr "OSARA: anuncia duración del último ítem seleccionado"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: activa el modo de selección no contiguo, o cambia la selección   de la pista/ítem, dependiendo del foco"
