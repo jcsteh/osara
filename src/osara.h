@@ -98,6 +98,7 @@
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
+#define REAPERAPI_WANT_GetProjectLength
 #define REAPERAPI_WANT_MIDIEditor_GetActive
 #define REAPERAPI_WANT_MIDIEditor_GetTake
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_str
@@ -329,7 +330,7 @@ std::string formatTime(double time, TimeFormat format=TF_RULER,
 	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
 std::string formatLength(double start, double end, TimeFormat format=TF_RULER,
-	FormatTimeCacheRequest cache=FT_NO_CACHE, bool includeZeros=true);
+	FormatTimeCacheRequest cache=FT_NO_CACHE, bool includeZeros=true, bool includeProjectStartOffset=false);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);

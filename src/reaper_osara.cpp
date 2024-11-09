@@ -449,12 +449,12 @@ string formatNoteLength(double start, double end) {
 }
 
 string formatLength(double start, double end, TimeFormat timeFormat,
-	FormatTimeCacheRequest cache, bool includeZeros) {
+	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// In all other cases, position and length reports are the same, so
 		// formatTime can handle them.
-		return formatTime(end - start, timeFormat, cache, includeZeros, false);
+		return formatTime(end - start, timeFormat, cache, includeZeros, includeProjectStartOffset);
 	}
 	int startMeasure, startMeasureLength, timeDenom, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure,
@@ -485,7 +485,7 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 	}
 	return formatTimeMeasure(measures, beats, measureLength, timeDenom,
 		timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros,
-		false);
+		includeProjectStartOffset);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
@@ -4528,6 +4528,28 @@ void cmdReportItemLength(Command* command) {
 	outputMessage(formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
 }
 
+void cmdReportProjectLength(Command* command) {
+	TimeFormat tf;
+	if (lastCommandRepeatCount == 0) {
+		// Use primary ruler unit.
+		tf = TF_RULER;
+	} else if (GetToggleCommandState(42361)) {
+		tf = TF_MINSEC;
+	} else if (GetToggleCommandState(42362)) {
+		tf = TF_SEC;
+	} else if (GetToggleCommandState(42363)) {
+		tf = TF_SAMPLE;
+	} else if (GetToggleCommandState(42364)) {
+		tf = TF_HMSF;
+	} else if (GetToggleCommandState(42365)) {
+		tf = TF_FRAME;
+	} else {
+		tf = TF_RULER;
+	}
+	double end = GetProjectLength(nullptr);
+	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false, false));
+}
+
 void reportCursorPositionPrimaryFormat() {
 	// This function can be called when only reporting the primary ruler format is needed.
 	TimeFormat tf = TF_RULER;
@@ -5291,6 +5313,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report length of last touched item")}, "OSARA_REPORTLENGTHSELITEM", cmdReportItemLength},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report project length")}, "OSARA_REPORTPROJLENGTH", cmdReportProjectLength},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},
