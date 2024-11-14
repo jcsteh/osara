@@ -849,6 +849,29 @@ string gridDivisionToFriendlyName(double division) {
 	return translate("grid  unknown");
 }
 
+TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
+	TimeFormat tf;
+	if (lastCommandRepeatCount == 0) {
+		// Use primary ruler unit.
+		tf = TF_RULER;
+	} else if (GetToggleCommandState(42361)) {
+		tf = TF_MINSEC;
+	} else if (GetToggleCommandState(42362)) {
+		tf = TF_SEC;
+	} else if (GetToggleCommandState(42363)) {
+		tf = TF_SAMPLE;
+	} else if (GetToggleCommandState(42364)) {
+		tf = TF_HMSF;
+	} else if (GetToggleCommandState(42365)) {
+		tf = TF_FRAME;
+	} else {
+		tf = TF_RULER;
+	}
+	return tf;
+}
+
+// End of utility/helper functions
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -4377,23 +4400,7 @@ void cmdShortcutHelp(Command* command) {
 }
 
 void cmdReportCursorPosition(Command* command) {
-	TimeFormat tf;
-	if (lastCommandRepeatCount == 0) {
-		// Use primary ruler unit.
-		tf = TF_RULER;
-	} else if (GetToggleCommandState(42361)) {
-		tf = TF_MINSEC;
-	} else if (GetToggleCommandState(42362)) {
-		tf = TF_SEC;
-	} else if (GetToggleCommandState(42363)) {
-		tf = TF_SAMPLE;
-	} else if (GetToggleCommandState(42364)) {
-		tf = TF_HMSF;
-	} else if (GetToggleCommandState(42365)) {
-		tf = TF_FRAME;
-	} else {
-		tf = TF_RULER;
-	}
+	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
@@ -4529,29 +4536,13 @@ void cmdReportItemLength(Command* command) {
 }
 
 void cmdReportProjectLength(Command* command) {
-	TimeFormat tf;
-	if (lastCommandRepeatCount == 0) {
-		// Use primary ruler unit.
-		tf = TF_RULER;
-	} else if (GetToggleCommandState(42361)) {
-		tf = TF_MINSEC;
-	} else if (GetToggleCommandState(42362)) {
-		tf = TF_SEC;
-	} else if (GetToggleCommandState(42363)) {
-		tf = TF_SAMPLE;
-	} else if (GetToggleCommandState(42364)) {
-		tf = TF_HMSF;
-	} else if (GetToggleCommandState(42365)) {
-		tf = TF_FRAME;
-	} else {
-		tf = TF_RULER;
-	}
+	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	double end = GetProjectLength(nullptr);
 	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false, false));
 }
 
 void reportCursorPositionPrimaryFormat() {
-	// This function can be called when only reporting the primary ruler format is needed.
+	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
 	TimeFormat tf = TF_RULER;
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
