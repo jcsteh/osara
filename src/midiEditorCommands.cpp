@@ -1108,18 +1108,23 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	if (cursorMoved && !select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (cursorMoved && settings::reportNotes && settings::reportPositionMIDI) {
+	if (cursorMoved && settings::reportNotes) {
 		int count = chord.second - chord.first;
-		// Translators: used when reporting the number of notes in a chord.
-		// {} will be replaced by the number of notes. E.g. "3 notes"
-		s << format(
-			translate_plural("{} note", "{} notes", count), count);
-		int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
-		if (mutedCount > 0) {
-			// Translators: used when reporting the number of muted notes in a chord.
-			// {} will be replaced by the number of muted notes. E.g. "3 muted"
-			s << format(
-				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+		if (count == 1) {
+			if (notes[0].muted)
+				s << translate("muted") << " ";
+			s << getMidiNoteName(take, notes[0].pitch, notes[0].channel);
+		} else {
+			// Translators: used when reporting the number of notes in a chord.
+			// {} will be replaced by the number of notes. E.g. "3 notes"
+			s << format(translate("{} notes"), count);
+			int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted notes in a chord.
+				// {} will be replaced by the number of muted notes. E.g. "3 muted"
+				s << " " << format(
+					translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+			}
 		}
 	}
 	if (s.tellp() > 0) {
