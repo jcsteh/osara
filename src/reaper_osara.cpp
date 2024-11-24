@@ -449,12 +449,12 @@ string formatNoteLength(double start, double end) {
 }
 
 string formatLength(double start, double end, TimeFormat timeFormat,
-	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset) {
+	FormatTimeCacheRequest cache, bool includeZeros) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// In all other cases, position and length reports are the same, so
 		// formatTime can handle them.
-		return formatTime(end - start, timeFormat, cache, includeZeros, includeProjectStartOffset);
+		return formatTime(end - start, timeFormat, cache, includeZeros, false);
 	}
 	int startMeasure, startMeasureLength, timeDenom, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure,
@@ -485,7 +485,7 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 	}
 	return formatTimeMeasure(measures, beats, measureLength, timeDenom,
 		timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros,
-		includeProjectStartOffset);
+		false);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
@@ -850,24 +850,27 @@ string gridDivisionToFriendlyName(double division) {
 }
 
 TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
-	TimeFormat tf;
 	if (lastCommandRepeatCount == 0) {
-		// Use primary ruler unit.
-		tf = TF_RULER;
-	} else if (GetToggleCommandState(42361)) {
-		tf = TF_MINSEC;
-	} else if (GetToggleCommandState(42362)) {
-		tf = TF_SEC;
-	} else if (GetToggleCommandState(42363)) {
-		tf = TF_SAMPLE;
-	} else if (GetToggleCommandState(42364)) {
-		tf = TF_HMSF;
-	} else if (GetToggleCommandState(42365)) {
-		tf = TF_FRAME;
-	} else {
-		tf = TF_RULER;
+		// This is a single press of the command. Use the primary ruler unit.
+		return TF_RULER;
 	}
-	return tf;
+	// There have been 2 or more presses of the command. Use the secondary unit.
+	if (GetToggleCommandState(42361)) {
+		return TF_MINSEC;
+	}
+	if (GetToggleCommandState(42362)) {
+		return TF_SEC;
+	}
+	if (GetToggleCommandState(42363)) {
+		return TF_SAMPLE;
+	}
+	if (GetToggleCommandState(42364)) {
+		return TF_HMSF;
+	}
+	if (GetToggleCommandState(42365)) {
+		return TF_FRAME;
+	}
+	return TF_RULER;
 }
 
 // End of utility/helper functions
@@ -4538,7 +4541,7 @@ void cmdReportItemLength(Command* command) {
 void cmdReportProjectLength(Command* command) {
 	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	double end = GetProjectLength(nullptr);
-	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false, false));
+	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false));
 }
 
 void reportCursorPositionPrimaryFormat() {
