@@ -849,6 +849,32 @@ string gridDivisionToFriendlyName(double division) {
 	return translate("grid  unknown");
 }
 
+TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
+	if (lastCommandRepeatCount == 0) {
+		// This is a single press of the command. Use the primary ruler unit.
+		return TF_RULER;
+	}
+	// There have been 2 or more presses of the command. Use the secondary unit.
+	if (GetToggleCommandState(42361)) {
+		return TF_MINSEC;
+	}
+	if (GetToggleCommandState(42362)) {
+		return TF_SEC;
+	}
+	if (GetToggleCommandState(42363)) {
+		return TF_SAMPLE;
+	}
+	if (GetToggleCommandState(42364)) {
+		return TF_HMSF;
+	}
+	if (GetToggleCommandState(42365)) {
+		return TF_FRAME;
+	}
+	return TF_RULER;
+}
+
+// End of utility/helper functions
+
 // Functions exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
@@ -4377,23 +4403,7 @@ void cmdShortcutHelp(Command* command) {
 }
 
 void cmdReportCursorPosition(Command* command) {
-	TimeFormat tf;
-	if (lastCommandRepeatCount == 0) {
-		// Use primary ruler unit.
-		tf = TF_RULER;
-	} else if (GetToggleCommandState(42361)) {
-		tf = TF_MINSEC;
-	} else if (GetToggleCommandState(42362)) {
-		tf = TF_SEC;
-	} else if (GetToggleCommandState(42363)) {
-		tf = TF_SAMPLE;
-	} else if (GetToggleCommandState(42364)) {
-		tf = TF_HMSF;
-	} else if (GetToggleCommandState(42365)) {
-		tf = TF_FRAME;
-	} else {
-		tf = TF_RULER;
-	}
+	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
 	ostringstream s;
@@ -4528,8 +4538,14 @@ void cmdReportItemLength(Command* command) {
 	outputMessage(formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
 }
 
+void cmdReportProjectLength(Command* command) {
+	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
+	double end = GetProjectLength(nullptr);
+	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false));
+}
+
 void reportCursorPositionPrimaryFormat() {
-	// This function can be called when only reporting the primary ruler format is needed.
+	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
 	TimeFormat tf = TF_RULER;
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
@@ -5291,6 +5307,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report length of last touched item")}, "OSARA_REPORTLENGTHSELITEM", cmdReportItemLength},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report project length")}, "OSARA_REPORTPROJLENGTH", cmdReportProjectLength},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move last focused stretch marker to current edit cursor position")}, "OSARA_MOVESTRETCH", cmdMoveStretch},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)")}, "OSARA_REPORTPEAKCURRENTC1", cmdReportPeakCurrentC1},

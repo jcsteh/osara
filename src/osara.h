@@ -98,6 +98,7 @@
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
+#define REAPERAPI_WANT_GetProjectLength
 #define REAPERAPI_WANT_MIDIEditor_GetActive
 #define REAPERAPI_WANT_MIDIEditor_GetTake
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_str

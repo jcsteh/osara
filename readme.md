@@ -828,7 +828,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report length of last touched item
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
-- OSARA: About: Control+F1
+- OSARA: Report project length
+- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 
 #### Midi Editor section of actions list
 - OSARA: Move to next midi item on track: Control+RightArrow
