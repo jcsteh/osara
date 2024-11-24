@@ -449,12 +449,12 @@ string formatNoteLength(double start, double end) {
 }
 
 string formatLength(double start, double end, TimeFormat timeFormat,
-	FormatTimeCacheRequest cache, bool includeZeros) {
+	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset) {
 	timeFormat = getTimeFormat(timeFormat);
 	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// In all other cases, position and length reports are the same, so
 		// formatTime can handle them.
-		return formatTime(end - start, timeFormat, cache, includeZeros, false);
+		return formatTime(end - start, timeFormat, cache, includeZeros, includeProjectStartOffset);
 	}
 	int startMeasure, startMeasureLength, timeDenom, endMeasure, endMeasureLength;
 	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure,
@@ -485,7 +485,7 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 	}
 	return formatTimeMeasure(measures, beats, measureLength, timeDenom,
 		timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros,
-		false);
+		includeProjectStartOffset);
 } 
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
