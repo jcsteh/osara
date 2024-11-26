@@ -4885,13 +4885,13 @@ void cmdTransientDetectionSettings(Command* command) {
 	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
 }
 
-void cmdInsertMarker(Command* command) {
+void cmdhInsertProjectMarker(int command) {
 	if (!shouldReportTimeMovement()) {
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		Main_OnCommand(command, 0);
 		return;
 	}
 	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
 		return; // Not inserted.
 	}
@@ -4905,6 +4905,56 @@ void cmdInsertMarker(Command* command) {
 	// Translators: Reported when inserting a marker. {} will be replaced with the
 	// number of the new marker; e.g. "marker 2 inserted".
 	outputMessage(format(translate("marker {} inserted"), number));
+}
+
+void cmdInsertProjectMarker(Command* command) {
+	cmdhInsertProjectMarker(command->gaccel.accel.cmd);
+}
+
+void cmdhInsertTakeMarker(int command) {
+	int preMarkers = 0;
+	for(int i = 0; i < CountSelectedMediaItems(nullptr); ++ i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		preMarkers += GetNumTakeMarkers(take);
+	}
+	Main_OnCommand(command, 0);
+	int postMarkers = 0;
+	for(int i = 0; i < CountSelectedMediaItems(nullptr); ++ i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		postMarkers += GetNumTakeMarkers(take);
+	}
+	int addedMarkers = postMarkers - preMarkers;
+	if (addedMarkers == 0) {
+		return; // not inserted
+	}
+	// Translators: Reported when using REAPER's quick add take marker action. If more than one take marker is inserted, {} will be replaced with the number of markers. E.G. "2 take markers inserted".
+	outputMessage(format(
+		translate_plural("take marker inserted", "{} take markers inserted", addedMarkers), addedMarkers));
+}
+
+void cmdInsertTakeMarker(Command* command) {
+	cmdhInsertTakeMarker(command->gaccel.accel.cmd);
+}
+
+void cmdInsertProjectOrTakeMarker(Command* command) {
+	if  (fakeFocus == FOCUS_ITEM && CountSelectedMediaItems(nullptr) > 0)
+		cmdhInsertTakeMarker(42390); // Item: Quick add take marker at play position or edit cursor
+	else
+		cmdhInsertProjectMarker(40157); // Markers: Insert marker at current position
+}
+
+void cmdInsertOrEditMarker(Command* command) {
+	double start, end;
+	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	if (start != end && fakeFocus == FOCUS_ITEM && CountSelectedMediaItems(nullptr) > 0) {
+		Main_OnCommand(43181, 0); // Item: Add/edit take marker at time selection
+	} else if (fakeFocus == FOCUS_ITEM && CountSelectedMediaItems(nullptr) > 0) {
+		Main_OnCommand(42385, 0); // Item: Add/edit take marker at play position or edit cursor
+	} else {
+		Main_OnCommand(40171, 0); // Markers: Insert and/or edit marker at current position
+	}
 }
 
 void cmdInsertRegion(Command* command) {
@@ -5229,10 +5279,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40694}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
 	{MAIN_SECTION, {{0, 0, 41612}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
 	{MAIN_SECTION, {{0, 0, 40695}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
+	{MAIN_SECTION, {{0, 0, 42390}, nullptr}, nullptr, cmdInsertTakeMarker}, // Item: Quick add take marker at play position or edit cursor
 	{MAIN_SECTION, {{0, 0, 42386}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete all take markers
 	{MAIN_SECTION, {{0, 0, 41208}, nullptr}, nullptr, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
-	{MAIN_SECTION, {{0, 0, 40157}, nullptr}, nullptr, cmdInsertMarker}, // Markers: Insert marker at current position
+	{MAIN_SECTION, {{0, 0, 40157}, nullptr}, nullptr, cmdInsertProjectMarker}, // Markers: Insert marker at current position
 	{MAIN_SECTION, {{0, 0, 40174}, nullptr}, nullptr, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MAIN_SECTION, {{0, 0, 40032}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Group items
 	{MAIN_SECTION, {{0, 0, 40033}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Remove items from group
@@ -5351,6 +5402,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Add project or take marker at cursor (depending on focus)")}, "OSARA_ADDPROJTAKEMARKER", cmdInsertProjectOrTakeMarker},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Add/edit project or take marker at cursor (depending on focus) sets time selection as take marker length")}, "OSARA_ADDEDITPROJTAKEMARKER", cmdInsertOrEditMarker},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
