@@ -2499,6 +2499,8 @@ PostCommand POST_COMMANDS[] = {
 	{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
+	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
+	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -2819,6 +2821,8 @@ map<int, string> POST_COMMAND_MESSAGES = {
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
 	40105, // View: Move cursor right one pixel
+	40102, // Time selection: Move cursor left, creating time selection
+	40103, // Time selection: Move cursor right, creating time selection
 	41042, // Go forward one measure
 	41043, // Go back one measure
 	41044, // Go forward one beat
