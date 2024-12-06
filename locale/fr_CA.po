@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-11-08 10:43\n"
+"PO-Revision-Date: 2024-12-06 10:35\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -326,8 +326,6 @@ msgstr "la#"
 msgid "b"
 msgstr "si"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} note"
@@ -344,6 +342,11 @@ msgstr[1] "{} muté"
 
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} notes"
+msgstr "{} notes"
 
 msgid "velocity"
 msgstr "vélocité"
@@ -2822,6 +2825,9 @@ msgstr "OSARA: Énoncer la position du curseur d'édition/lecture, l'état du tr
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA : Énoncer la longueur du dernier objet touché"
+
+msgid "OSARA: Report project length"
+msgstr "OSARA : Énoncer la durée du projet"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de la piste, de l'objet en cours (selon le focus)"

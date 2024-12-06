@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2024-11-08 10:43\n"
+"PO-Revision-Date: 2024-12-06 10:35\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -326,8 +326,6 @@ msgstr "Lá sustenido"
 msgid "b"
 msgstr "Si"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} nota"
@@ -344,6 +342,11 @@ msgstr[1] "{} notas silenciadas"
 
 msgid "noncontiguous selection"
 msgstr "Seleção não contígua"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} notes"
+msgstr ""
 
 msgid "velocity"
 msgstr "intensidade"
@@ -2821,6 +2824,9 @@ msgid "OSARA: Report edit/play cursor position, transport state and nearest mark
 msgstr ""
 
 msgid "OSARA: Report length of last touched item"
+msgstr ""
+
+msgid "OSARA: Report project length"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-11-08 10:43\n"
+"PO-Revision-Date: 2024-12-06 10:35\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -338,8 +338,6 @@ msgstr "ля диез"
 msgid "b"
 msgstr "си"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} нота"
@@ -360,6 +358,11 @@ msgstr[3] "{} приглушено"
 
 msgid "noncontiguous selection"
 msgstr "несмежное выделение"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} notes"
+msgstr ""
 
 msgid "velocity"
 msgstr "громкость"
@@ -3005,6 +3008,9 @@ msgid "OSARA: Report edit/play cursor position, transport state and nearest mark
 msgstr "OSARA: Сообщить о положении курсора при редактировании/воспроизведении, состоянии транспорта и ближайших маркерах и регионах"
 
 msgid "OSARA: Report length of last touched item"
+msgstr ""
+
+msgid "OSARA: Report project length"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"

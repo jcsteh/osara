@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2024-11-08 10:43\n"
+"PO-Revision-Date: 2024-12-06 10:35\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -320,8 +320,6 @@ msgstr "升 A"
 msgid "b"
 msgstr "B"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} 音符"
@@ -336,6 +334,11 @@ msgstr[0] "{} 靜音"
 
 msgid "noncontiguous selection"
 msgstr "不連續選擇"
+
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} notes"
+msgstr "{} 音符"
 
 msgid "velocity"
 msgstr "力度"
@@ -2730,6 +2733,9 @@ msgstr "OSARA: 報告編輯/播放遊標位置、走帶狀態以及最近的標�
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA: 報告最後觸碰對象的長度"
+
+msgid "OSARA: Report project length"
+msgstr "OSARA: 報告工程長度"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: 切換當前軌道或對象的不連續選則，（取決於焦點）"
