@@ -476,6 +476,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Note velocity -10: Alt+NumPad7 or Alt+Shift+V
 - Edit: Join notes: J
 - Edit: Split notes: S
+- Split notes on grid: Alt+Shift+S
 - CC: Next CC lane: Control+Alt+=
 - CC: Previous CC lane: Control+Alt+-
 - Edit: Insert CC event at edit cursor in current lane: Control+I
