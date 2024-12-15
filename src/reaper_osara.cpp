@@ -5259,6 +5259,7 @@ Command COMMANDS[] = {
 	{MIDI_EDITOR_SECTION, {{0, 0, 40011}, nullptr}, nullptr, cmdMidiPasteEvents}, // Edit: Paste
 	{MIDI_EDITOR_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdMidiDeleteEvents}, // Edit: Cut
 	{MIDI_EDITOR_SECTION, {{0, 0, 40046}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Edit: Split notes
+	{MIDI_EDITOR_SECTION, {{0, 0, 40641}, nullptr}, nullptr, cmdMidiNoteSplitOrJoin}, // Split notes on grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40047}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor left by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40048}, nullptr}, nullptr, cmdMidiMoveCursor}, // Navigate: Move edit cursor right by grid
 	{MIDI_EDITOR_SECTION, {{0, 0, 40185}, nullptr}, nullptr, cmdMidiMoveCursor}, // Edit: Move edit cursor left one pixel

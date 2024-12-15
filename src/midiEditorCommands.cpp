@@ -1701,6 +1701,7 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 	}
 	switch (cmdId) {
 		case 40046:
+		case 40641:
 			// Translators: used when splitting notes in the midi editor.
 			// {oldCount} is replaced by the number of notes that were selected
 			// before the command.  This is the number the plural form is based
