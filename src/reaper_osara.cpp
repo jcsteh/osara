@@ -5602,7 +5602,7 @@ void delayedInit() {
 		"NF_GetSWSTrackNotes");
 
 	for (int i = 0; COMMANDS[i].execute; ++i) {
-		if (COMMANDS[i].id) {
+		if (COMMANDS[i].id && COMMANDS[i].gaccel.desc) {
 			// This is our own command.
 			if (COMMANDS[i].section == MAIN_SECTION) {
 				COMMANDS[i].gaccel.accel.cmd = plugin_register("command_id", (void*)COMMANDS[i].id);
@@ -5615,6 +5615,9 @@ void delayedInit() {
 				action.name = translate(COMMANDS[i].gaccel.desc);
 				COMMANDS[i].gaccel.accel.cmd = plugin_register("custom_action", &action);
 			}
+		} else if (COMMANDS[i].id) {
+			// This command is provided by an extension.
+			COMMANDS[i].gaccel.accel.cmd = NamedCommandLookup(COMMANDS[i].id);
 		}
 		commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 	}
