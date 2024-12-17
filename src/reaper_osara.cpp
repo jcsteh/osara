@@ -5600,11 +5600,31 @@ void delayedInit() {
 	plugin_register("csurf_inst", (void*)surface);
 	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
 		"NF_GetSWSTrackNotes");
+
+	for (int i = 0; COMMANDS[i].execute; ++i) {
+		if (COMMANDS[i].id) {
+			// This is our own command.
+			if (COMMANDS[i].section == MAIN_SECTION) {
+				COMMANDS[i].gaccel.accel.cmd = plugin_register("command_id", (void*)COMMANDS[i].id);
+				COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
+				plugin_register("gaccel", &COMMANDS[i].gaccel);
+			} else {
+				custom_action_register_t action;
+				action.uniqueSectionId = COMMANDS[i].section;
+				action.idStr = COMMANDS[i].id;
+				action.name = translate(COMMANDS[i].gaccel.desc);
+				COMMANDS[i].gaccel.accel.cmd = plugin_register("custom_action", &action);
+			}
+		}
+		commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
+	}
+
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
 		if (cmd)
 			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
+
 	maybeAutoConfigReaperOptimal();
 	startUpdateCheck();
 }
@@ -5825,23 +5845,6 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 		}
 
-		for (int i = 0; COMMANDS[i].execute; ++i) {
-			if (COMMANDS[i].id) {
-				// This is our own command.
-				if (COMMANDS[i].section == MAIN_SECTION) {
-					COMMANDS[i].gaccel.accel.cmd = rec->Register("command_id", (void*)COMMANDS[i].id);
-					COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
-					rec->Register("gaccel", &COMMANDS[i].gaccel);
-				} else {
-					custom_action_register_t action;
-					action.uniqueSectionId = COMMANDS[i].section;
-					action.idStr = COMMANDS[i].id;
-					action.name = translate(COMMANDS[i].gaccel.desc);
-					COMMANDS[i].gaccel.accel.cmd = rec->Register("custom_action", &action);
-				}
-			}
-			commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
-		}
 		registerSettingCommands();
 		// hookcommand can only handle actions for the main section, so we need hookcommand2.
 		// According to SWS, hookcommand2 must be registered before hookcommand.
