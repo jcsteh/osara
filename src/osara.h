@@ -352,6 +352,7 @@ extern IAccPropServices* accPropServices;
 
 // uia.cpp
 bool initializeUia();
+bool hasTriedToInitializeUia();
 bool terminateUia();
 bool shouldUseUiaNotifications();
 bool sendUiaNotification(const std::string& message, bool interrupt = true);
