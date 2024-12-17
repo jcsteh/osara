@@ -93,6 +93,12 @@ string narrow(const wstring& text) {
 string lastMessage;
 HWND lastMessageHwnd = nullptr;
 void _outputMessage(const string& message, bool interrupt) {
+	if (!hasTriedToInitializeUia()) {
+		// #1173: This is very early in startup and we haven't called initializeUia()
+		// yet. We can't call it now, but we also don't want to fall back to MSAA.
+		// A message this early isn't useful anyway, so just ignore it.
+		return;
+	}
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;

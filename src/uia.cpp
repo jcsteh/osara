@@ -159,9 +159,11 @@ WNDCLASSEX getWindowClass() {
 	return windowClass;
 }
 
+bool hasTriedToInitialize = false;
 WNDCLASSEX windowClass;
 
 bool initializeUia() {
+	hasTriedToInitialize = true;
 	uiaCore = make_unique<UiaCore>();
 	// If UiaRaiseNotificationEvent is available, UiaDisconnectProvider and
 	// UiaDisconnectAllProviders will also be available, so we don't need to
@@ -198,6 +200,10 @@ bool initializeUia() {
 	// takes it to 1.
 	uiaProvider = new UiaProvider(uiaWnd);
 	return true;
+}
+
+bool hasTriedToInitializeUia() {
+	return hasTriedToInitialize;
 }
 
 bool terminateUia() {
