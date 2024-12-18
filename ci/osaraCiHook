@@ -48,7 +48,7 @@ def writeSnapshotIndex(winData, macData):
 			if not data:
 				continue
 			f.write(
-				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/installer/{data[installer]}">Download OSARA {data[version]} for {data[osName]}</a> ({data[date]})</li>\n'
+				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/installer/{data[installer]}">Download OSARA for {data[osName]}, version {data[version]}</a> ({data[date]})</li>\n'
 				.format(data=data))
 		if winData.get("pot"):
 			f.write(
