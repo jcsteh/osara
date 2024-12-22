@@ -925,6 +925,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle track mute envelope visible
 - Transport: Toggle preserve pitch in audio items when changing master playrate
 - Transport: Play/stop (move edit cursor on stop)
+- Move edit cursor to start of next beat
+- Move edit cursor to start of current/previous beat
 - View: Set horizontal zoom to default project setting
 - View: Time unit for ruler: Absolute frames
 - View: Time unit for ruler: Hours:Minutes:Seconds:Frames
