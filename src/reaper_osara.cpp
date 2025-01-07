@@ -2520,6 +2520,8 @@ PostCommand POST_COMMANDS[] = {
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
 	{41040, postCursorMovement}, // Move edit cursor to start of next measure
 	{41041, postCursorMovement}, // Move edit cursor to start of current measure
+	{40231, postCursorMovement}, // Move edit cursor to start of next beat
+	{40230, postCursorMovement}, // Move edit cursor to start of current/previous beat
 	{41042, postCursorMovement}, // Go forward one measure
 	{41043, postCursorMovement}, // Go back one measure
 	{41044, postCursorMovement}, // Go forward one beat
