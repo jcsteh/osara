@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2024-12-06 10:35\n"
+"PO-Revision-Date: 2025-01-09 10:43\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -62,7 +62,7 @@ msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjus
 msgstr "Примечание: если сейчас не самое подходящее время для настройки REAPER, вы можете применить эти настройки позже, перейдя в меню расширений в строке меню, а затем в подменю OSARA."
 
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr "Настройте REAPER для оптимальной работы с программами чтения с экрана"
+msgstr "Настроить REAPER для оптимальной работы с программами чтения с экрана"
 
 msgid "Error writing configuration changes."
 msgstr "Ошибка при записи изменений параметров."
@@ -362,7 +362,7 @@ msgstr "несмежное выделение"
 #. used when reporting the number of notes in a chord.
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} notes"
-msgstr ""
+msgstr "нот в аккорде: {}"
 
 msgid "velocity"
 msgstr "громкость"
@@ -1855,19 +1855,19 @@ msgstr "включён режим волны на всех треках"
 
 #. Reported when auto crossfade and trim content behind media items are both enabled.
 msgid "enabled auto crossfades and trim"
-msgstr ""
+msgstr "автоматические перекрёстные переходы и обрезка включены"
 
 #. Reported when auto crossfade is enabled, trim behind media items is disabled.  
 msgid "crossfading, not trimming"
-msgstr ""
+msgstr "перекрёстные переходы без обрезки"
 
 #. Reported when trim content behind media items is enabled, auto crossfade is disabled.
 msgid "trimming, not crossfading"
-msgstr ""
+msgstr "обрезка без перекрёстных переходов"
 
 #. Reported when auto crosfade and trim content behind media items are both disabled.
 msgid "disabled auto crossfades and trim"
-msgstr ""
+msgstr "автоматические перекрёстные переходы и обрезка отключены"
 
 msgid "repeat on"
 msgstr "повтор включён"
@@ -2071,10 +2071,10 @@ msgid "crossfade off"
 msgstr "перекрёстное затухание выключено"
 
 msgid "trim behind items on"
-msgstr ""
+msgstr "обрезка элементов сзади включена"
 
 msgid "trim behind items off"
-msgstr ""
+msgstr "обрезка элементов сзади выключена"
 
 msgid "locking on"
 msgstr "блокировка включена"
@@ -3008,10 +3008,10 @@ msgid "OSARA: Report edit/play cursor position, transport state and nearest mark
 msgstr "OSARA: Сообщить о положении курсора при редактировании/воспроизведении, состоянии транспорта и ближайших маркерах и регионах"
 
 msgid "OSARA: Report length of last touched item"
-msgstr ""
+msgstr "OSARA: Сообщить продолжительность последнего элемента"
 
 msgid "OSARA: Report project length"
-msgstr ""
+msgstr "OSARA: Сообщить продолжительность проекта"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Включить несмежное выделение/переключить выделение текущего трека/элемента (в зависимости от фокуса)"
@@ -3354,7 +3354,7 @@ msgstr "Сообщать о мар&керах и регионах во врем�
 
 msgctxt "OSARA Configuration"
 msgid "Report time se&lection start and end while playing"
-msgstr ""
+msgstr "Сообщать при воспроизведении начало и конец вы&деления времени"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
