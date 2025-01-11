@@ -2295,16 +2295,16 @@ void postToggleFunctionKeysAsStepInput(int command) {
 void postMidiToggleMute(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int eventCount = countSelectedEvents(take);
+	if (eventCount == 0) {
+		return;
+	}
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	int totalNoteCount = selectedNotes.size();
+	int noteCount = selectedNotes.size();
 	int CCCount = selectedCCs.size();
-	int eventCount = selectedNotes.size() + selectedCCs.size();
-	if (eventCount == 0) {
-		return;
-	}
 	ostringstream s;
 	if (CCCount == 0) { // If only notes are selected
 		auto chord = findChord(take, 0, {
@@ -2318,50 +2318,58 @@ void postMidiToggleMute(int command) {
 		});
 		// Select and play the current chord.
 		vector<MidiNote> notes(chord.first, chord.second);
-		int chordNoteCount = chord.second - chord.first;
 		previewNotes(take, notes);
 		fakeFocus = FOCUS_NOTE;
 		if (settings::reportNotes) {
-			 if (totalNoteCount > chordNoteCount) {
-				// Translators: used when reporting the number of notes.
-				// {} will be replaced by the number of notes. E.g. "toggled mute for 3 notes"
-				s << " " << format(
-			translate_plural("toggled mute for {} note", "toggled mute for {} notes", eventCount), eventCount);
-			} else if (totalNoteCount == 1) {
+			if (noteCount == 1) {
 				if (selectedNotes[0].muted)
 				s << translate("muted") << " ";
 				s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
 			} else {
-				// Translators: used when reporting the number of notes in a chord.
+				// Translators: used when reporting the number of notes.
 				// {} will be replaced by the number of notes. E.g. "3 notes"
-			s << format(translate("{} notes"), chordNoteCount);
-				int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+			s << format(translate("{} notes"), noteCount);
+				int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
 				if (mutedCount > 0) {
-					// Translators: used when reporting the number of muted notes in a chord.
+					// Translators: used when reporting the number of muted notes.
 					// {} will be replaced by the number of muted notes. E.g. "3 muted"
 					s << " " << format(
 					translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
 				}
 			}
 		}
-	} else if (totalNoteCount == 0) { // If only CCs are selected
-		auto cc = findCC(take, 0);
+	} else if (noteCount == 0) { // If only CCs are selected
 		fakeFocus = FOCUS_CC;
 		if (CCCount == 1) {
+			auto cc = findCC(take, 0);
 			if (cc.muted)
 			s << translate("muted") << " ";
 			s << describeCC(take, cc);
 		} else {
 			// Translators: used when reporting the number of CCs.
-			// {} will be replaced by the number of CCs. E.g. "toggled mute for 3 CCs"
-			s << " " << format(
-				translate_plural("toggled mute for {} CC", "toggled mute for {} CCs", CCCount), CCCount);
+			// {} will be replaced by the number of CCs. E.g. "3 CCs"
+			s << format(translate("{} CCs"), CCCount);
+			int mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted CCs.
+				// {} will be replaced by the number of muted CCs. E.g. "3 muted"
+				s << " " << format(
+				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+			}
 		}
 	} else { // If both notes and CCs are selected
 		// Translators: used when reporting the number of events.
-		// {} will be replaced by the number of events. E.g. "toggled mute for 3 events"
-		s << " " << format(
-			translate_plural("toggled mute for {} event", "toggled mute for {} events", eventCount), eventCount);
+		// {} will be replaced by the number of events. E.g. "3 events"
+		s << format(translate("{} events"), eventCount);
+		int mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+		int mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+		int mutedCount = mutedNoteCount + mutedCCCount;
+		if (mutedCount > 0) {
+			// Translators: used when reporting the number of muted events.
+			// {} will be replaced by the number of muted events. E.g. "3 muted"
+			s << " " << format(
+			translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+		}
 	}
 	if (s.tellp() > 0) {
 		outputMessage(s);
