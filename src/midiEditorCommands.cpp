@@ -2292,6 +2292,82 @@ void postToggleFunctionKeysAsStepInput(int command) {
 	}
 }
 
+void postMidiToggleMute(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int totalNoteCount = selectedNotes.size();
+	int CCCount = selectedCCs.size();
+	int eventCount = selectedNotes.size() + selectedCCs.size();
+	if (eventCount == 0) {
+		return;
+	}
+	ostringstream s;
+	if (CCCount == 0) { // If only notes are selected
+		auto chord = findChord(take, 0, {
+			true,  // start
+			true,  // end
+			true,  // channel
+			true,  // pitch
+			true,  // velocity
+			false,  // selected
+			true  // muted
+		});
+		// Select and play the current chord.
+		vector<MidiNote> notes(chord.first, chord.second);
+		int chordNoteCount = chord.second - chord.first;
+		previewNotes(take, notes);
+		fakeFocus = FOCUS_NOTE;
+		if (settings::reportNotes) {
+			 if (totalNoteCount > chordNoteCount) {
+				// Translators: used when reporting the number of notes.
+				// {} will be replaced by the number of notes. E.g. "toggled mute for 3 notes"
+				s << " " << format(
+			translate_plural("toggled mute for {} note", "toggled mute for {} notes", eventCount), eventCount);
+			} else if (totalNoteCount == 1) {
+				if (selectedNotes[0].muted)
+				s << translate("muted") << " ";
+				s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
+			} else {
+				// Translators: used when reporting the number of notes in a chord.
+				// {} will be replaced by the number of notes. E.g. "3 notes"
+			s << format(translate("{} notes"), chordNoteCount);
+				int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+				if (mutedCount > 0) {
+					// Translators: used when reporting the number of muted notes in a chord.
+					// {} will be replaced by the number of muted notes. E.g. "3 muted"
+					s << " " << format(
+					translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+				}
+			}
+		}
+	} else if (totalNoteCount == 0) { // If only CCs are selected
+		auto cc = findCC(take, 0);
+		fakeFocus = FOCUS_CC;
+		if (CCCount == 1) {
+			if (cc.muted)
+			s << translate("muted") << " ";
+			s << describeCC(take, cc);
+		} else {
+			// Translators: used when reporting the number of CCs.
+			// {} will be replaced by the number of CCs. E.g. "toggled mute for 3 CCs"
+			s << " " << format(
+				translate_plural("toggled mute for {} CC", "toggled mute for {} CCs", CCCount), CCCount);
+		}
+	} else { // If both notes and CCs are selected
+		// Translators: used when reporting the number of events.
+		// {} will be replaced by the number of events. E.g. "toggled mute for 3 events"
+		s << " " << format(
+			translate_plural("toggled mute for {} event", "toggled mute for {} events", eventCount), eventCount);
+	}
+	if (s.tellp() > 0) {
+		outputMessage(s);
+	}
+}
+
 void postMidiToggleSnap(int command) {
 	if(GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command)) {
 		outputMessage(translate("enabled snap to grid"));

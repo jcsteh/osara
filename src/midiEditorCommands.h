@@ -69,6 +69,7 @@ void postMidiChangeCCValue(int command);
 void postMidiSwitchCCLane(int command);
 void postToggleMidiInputsAsStepInput(int command);
 void postToggleFunctionKeysAsStepInput(int command);
+void postMidiToggleMute(int command);
 void postMidiToggleSnap(int command);
 void postMidiChangeZoom(int command);
 int countSelectedEvents(MediaItem_Take* take);
