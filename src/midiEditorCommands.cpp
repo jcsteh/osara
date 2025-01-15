@@ -998,11 +998,12 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		if (ccIndex == -1) {
 			break;
 		}
+		bool muted;
 		double position;
 		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, nullptr, nullptr, &position, &msg1, &chan, &msg2, &msg3);
+		MIDI_GetCC(take, ccIndex, nullptr, &muted, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
+		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position, true, muted});
 	}
 	return ccs;
 }
@@ -2341,7 +2342,7 @@ void postMidiToggleMute(int command) {
 	} else if (noteCount == 0) { // If only CCs are selected
 		fakeFocus = FOCUS_CC;
 		if (CCCount == 1) {
-			auto cc = findCC(take, 0);
+			auto cc = selectedCCs[0];
 			if (cc.muted)
 			s << translate("muted") << " ";
 			s << describeCC(take, cc);
