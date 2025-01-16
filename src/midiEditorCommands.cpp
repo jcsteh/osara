@@ -2325,6 +2325,8 @@ void postMidiToggleMute(int command) {
 			if (noteCount == 1) {
 				if (selectedNotes[0].muted)
 				s << translate("muted") << " ";
+				else
+				s << translate("unmuted") << " ";
 				s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
 			} else {
 				// Translators: used when reporting the number of notes.
@@ -2345,6 +2347,8 @@ void postMidiToggleMute(int command) {
 			auto cc = selectedCCs[0];
 			if (cc.muted)
 			s << translate("muted") << " ";
+			else
+			s << translate("unmuted") << " ";
 			s << describeCC(take, cc);
 		} else {
 			// Translators: used when reporting the number of CCs.
