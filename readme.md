@@ -1038,7 +1038,7 @@ To build OSARA, you will need:
 
 	Whether installing Build Tools or Visual Studio, you must enable the following:
 
-	* In the list on the Workloads tab, in the Windows grouping: Desktop development with C++
+	* In the list on the Workloads tab, in the Desktop & Mobile grouping: Desktop development with C++
 	* Then in the Installation details tree view, under Desktop development with C++ > Optional:
 		- C++ ATL for latest v143 build tools (x86 & x64)
 		- C++ Clang tools for Windows
