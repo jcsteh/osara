@@ -5172,8 +5172,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40030}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
 	{MIDI_EDITOR_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
-	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor
-	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
+	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor (select right)
+	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection or razor edit
+	{MAIN_SECTION, {{0, 0, 40932}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at timeline grid
 	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items

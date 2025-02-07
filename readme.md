@@ -867,6 +867,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Grid: Set to 1/128
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Item: Split items at timeline grid
 - Edit: Cut items
 - Item: Remove items
 - Item navigation: Move cursor to start of items
