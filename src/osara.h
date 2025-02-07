@@ -121,6 +121,9 @@
 #define REAPERAPI_WANT_TakeFX_SetParam
 #define REAPERAPI_WANT_TakeFX_FormatParamValue
 #define REAPERAPI_WANT_plugin_getapi
+#define REAPERAPI_WANT_PreventUIRefresh
+#define REAPERAPI_WANT_UpdateArrange
+#define REAPERAPI_WANT_Undo_OnStateChangeEx2
 #define REAPERAPI_WANT_Envelope_FormatValue
 #define REAPERAPI_WANT_CountTrackEnvelopes
 #define REAPERAPI_WANT_GetTrackEnvelope
