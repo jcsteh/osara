@@ -2308,18 +2308,6 @@ void postMidiToggleMute(int command) {
 	int CCCount = selectedCCs.size();
 	ostringstream s;
 	if (CCCount == 0) { // If only notes are selected
-		auto chord = findChord(take, 0, {
-			true,  // start
-			true,  // end
-			true,  // channel
-			true,  // pitch
-			true,  // velocity
-			false,  // selected
-			true  // muted
-		});
-		// Select and play the current chord.
-		vector<MidiNote> notes(chord.first, chord.second);
-		previewNotes(take, notes);
 		fakeFocus = FOCUS_NOTE;
 		if (settings::reportNotes) {
 			if (noteCount == 1) {
