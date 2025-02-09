@@ -3753,9 +3753,8 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	// the command might show an error, so we need to avoid speaking if the focus changes
 	HWND oldFocus = GetFocus();
 	bool focusChanged = false;
-	auto guard = make_shared<bool>(true); // guard against the lambda accessing out of scope variables
-	auto later = CallLater([&focusChanged, &oldFocus, guard] {
-		if(*guard && GetFocus() != oldFocus) {
+	auto later = CallLater([&focusChanged, &oldFocus] {
+		if(GetFocus() != oldFocus) {
 			focusChanged = true;
 		}
 	}, 100);
@@ -3763,7 +3762,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	if(!focusChanged) {
 		outputMessage(s);
 	}
-	*guard = false;
+	later.cancel();
 }
 
 void cmdhRemoveItems(int command) {
