@@ -416,6 +416,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Edit: Paste preserving position in measure: control+Shift+V
 - Edit: Insert note at edit cursor: I or NumPad5
 - Edit: Insert note at edit cursor (no advance edit cursor): Shift+I or Shift+NumPad5
+- Edit: Mute events (toggle): Alt+M
 - Edit: Select all events: Control+A
 - Edit: Select all notes: Control+Alt+A
 - Edit: Select all notes starting in time selection: Control+Shift+A
