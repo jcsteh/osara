@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2024-12-06 10:35\n"
+"PO-Revision-Date: 2025-02-10 12:15\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -2446,6 +2446,13 @@ msgstr[1] ""
 #. {} is replaced by the number of items affected.
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
+msgstr[0] ""
+msgstr[1] ""
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
 msgstr[0] ""
 msgstr[1] ""
 

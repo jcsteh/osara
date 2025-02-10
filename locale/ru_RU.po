@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-01-09 10:43\n"
+"PO-Revision-Date: 2025-02-10 12:15\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2616,6 +2616,15 @@ msgstr[0] "выделенная область {} элемента скопир�
 msgstr[1] "выделенные области {} элементов скопированы"
 msgstr[2] "выделенные области {} элементов скопированы"
 msgstr[3] "выделенных областей {} объектов скопировано"
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.
