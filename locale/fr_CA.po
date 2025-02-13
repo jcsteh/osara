@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2024-12-06 10:35\n"
+"PO-Revision-Date: 2025-02-10 12:15\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2448,6 +2448,13 @@ msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
 msgstr[0] "{} zone d'objet sélectionnée copié"
 msgstr[1] "{} zones d'objets sélectionnées copiées"
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
+msgstr[0] "boucle de zone sélectionnée de {} objet copié"
+msgstr[1] "boucle de zone sélectionnée de {} objets copiés"
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.

@@ -3693,33 +3693,45 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 		}
 		return count;
 	};
+	ostringstream s;
 	if(start == end) {
-		outputMessage(translate("no time selection"));
+		s << translate("no time selection");
 	} else {
 		switch (command->gaccel.accel.cmd) {
-			case 40060: // Item: Copy selected area of items
-			case 40014: { // Item: Copy loop of selected area of audio items
+			case 40060:{ // Item: Copy selected area of items
 				if(selItems == 0) {
-					outputMessage(translate("no items selected"));
+					s << translate("no items selected");
 					break;
 				}
 				int count = countAffected(GetSelectedMediaItem, selItems);
 				// Translators: used for  "Item: Copy selected area of items".
 				// {} is replaced by the number of items affected.
-				outputMessage(format(
-					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count));
+				s << format(
+					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count);
+				break;
+			}
+			case 40014: { // Item: Copy loop of selected area of audio items
+				if(selItems == 0) {
+					s << translate("no items selected");
+					break;
+				}
+				int count = countAffected(GetSelectedMediaItem, selItems);
+				// Translators: used for  "Item: Copy loop of selected area of audio items".
+				// {} is replaced by the number of items affected.
+				s << format(
+					translate_plural("loop of selected area of {} item copied", "loop of selected area of {} items copied", count), count);
 				break;
 			}
 			case 41296: { // Item: Duplicate selected area of items
 				if(selItems == 0) {
-					outputMessage(translate("no items selected"));
+					s << translate("no items selected");
 					break;
 				}
 				int count = countAffected(GetSelectedMediaItem, selItems);
 				// Translators: used for  "Item: Duplicate selected area of items".
 				// {} is replaced by the number of items affected.
-				outputMessage(format(
-					translate_plural("selected area of {} item duplicated", "selected area of {} items duplicated", count), count));
+				s << format(
+					translate_plural("selected area of {} item duplicated", "selected area of {} items duplicated", count), count);
 				break;
 			}
 			default: {
@@ -3729,18 +3741,28 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
 				}
-				ostringstream s;
 				// Translators: used for  "Item: Cut selected area of items" and "Item:
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
 				s << format(
 					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
 				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
-				outputMessage(s);
 			}
 		}
 	}
+	// the command might show an error, so we need to avoid speaking if the focus changes
+	HWND oldFocus = GetFocus();
+	bool focusChanged = false;
+	auto later = CallLater([&focusChanged, &oldFocus] {
+		if(GetFocus() != oldFocus) {
+			focusChanged = true;
+		}
+	}, 100);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	if(!focusChanged) {
+		outputMessage(s);
+	}
+	later.cancel();
 }
 
 void cmdhRemoveItems(int command) {
@@ -5203,8 +5225,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40030}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
 	{MIDI_EDITOR_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRedo}, // Edit: Redo
-	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor
-	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection
+	{MAIN_SECTION, {{0, 0, 40012}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at edit or play cursor (select right)
+	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection or razor edit
+	{MAIN_SECTION, {{0, 0, 40932}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at timeline grid
 	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items

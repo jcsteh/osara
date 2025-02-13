@@ -868,6 +868,7 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Item: Split items at timeline grid
 - Edit: Cut items
 - Item: Remove items
 - Item navigation: Move cursor to start of items

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2024-12-06 10:35\n"
+"PO-Revision-Date: 2025-02-10 12:15\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -858,10 +858,10 @@ msgid_plural "{} values changed"
 msgstr[0] "{} 值变化"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "启用全部 MIDI 输入进行步进录制 "
+msgstr "启用全部 MIDI 输入进行步进录制"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "禁用全部 MIDI 输入进行步进录制 "
+msgstr "禁用全部 MIDI 输入进行步进录制"
 
 msgid "Enabled  f1-f12 as step input"
 msgstr "启用 F1-F12 进行步进录制"
@@ -2364,6 +2364,12 @@ msgstr[0] "{} 轨道已移除"
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
 msgstr[0] "选区的 {} 对象已复制"
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
+msgstr[0] "选区循环的 {} 对象已复制"
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.

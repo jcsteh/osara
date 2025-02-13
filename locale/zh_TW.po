@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-01-09 10:43\n"
+"PO-Revision-Date: 2025-02-10 12:15\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2364,6 +2364,12 @@ msgstr[0] "{} 軌道移除"
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
 msgstr[0] "{} 對象中的選取區域已複製"
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
+msgstr[0] "複製 {} 對象選取區域的循環"
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.
