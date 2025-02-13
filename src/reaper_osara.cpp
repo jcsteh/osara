@@ -3980,27 +3980,24 @@ void cmdManageTempoTimeSigMarkers(Command* command) {
 
 void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
 	vector<MediaItem*> items;
-	for (int i = 0; i < CountTracks(nullptr); ++i) {
-		MediaTrack* track = GetTrack(nullptr, i);
-		for (int j = 0; j < CountTrackMediaItems(track); ++j) {
-			MediaItem* item = GetTrackMediaItem(track, j);
+	for (int t = 0; t < CountSelectedTracks(nullptr); ++t) {
+		MediaTrack* track = GetSelectedTrack2(nullptr, t, false);
+		for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+			MediaItem* item = GetTrackMediaItem(track, i);
 			items.push_back(item);
 		}
 	}
-	PreventUIRefresh(1); // SWS use this
+	PreventUIRefresh(1); // Bringing this line in from SWS...
+	// API isn't clear waht this does, best guess is it's more efficient to redraw UI once for the entire operation
+	// instead of redrawing for every item we select.
 	Main_OnCommand(40289,0); // unselect all items
-	int i;
 	double cursorPosition=GetCursorPosition();
-	for (i=0;i<(int)items.size();++i) {
-		MediaTrack* track = (MediaTrack*)GetSetMediaItemInfo(items[i],"P_TRACK", 0);
-		if (isTrackSelected(track)) {
-			double itemStart = *(double*)GetSetMediaItemInfo(items[i], "D_POSITION", 0);
-			double itemLength = *(double*)GetSetMediaItemInfo(items[i], "D_LENGTH", 0);
-			double itemEnd = itemStart + itemLength;
-			if (cursorPosition >= itemStart && cursorPosition <= itemEnd) {
-				bool makeSelected = true;
-				GetSetMediaItemInfo(items[i], "B_UISEL", &makeSelected);
-			}
+	for (MediaItem* item: items) {
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", 0);
+		double itemLength = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", 0);
+		double itemEnd = itemStart + itemLength;
+		if (cursorPosition >= itemStart && cursorPosition <= itemEnd) {
+			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
 		}
 	}
 	PreventUIRefresh(-1);
@@ -5417,7 +5414,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to previous chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
