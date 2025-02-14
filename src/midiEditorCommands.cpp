@@ -998,11 +998,12 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		if (ccIndex == -1) {
 			break;
 		}
+		bool muted;
 		double position;
 		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, nullptr, nullptr, &position, &msg1, &chan, &msg2, &msg3);
+		MIDI_GetCC(take, ccIndex, nullptr, &muted, &position, &msg1, &chan, &msg2, &msg3);
 		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
+		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position, true, muted});
 	}
 	return ccs;
 }
@@ -2289,6 +2290,94 @@ void postToggleFunctionKeysAsStepInput(int command) {
 		outputMessage(translate("Enabled  f1-f12 as step input"));
 	} else {
 		outputMessage(translate("Disabled  f1-f12 as step input"));
+	}
+}
+
+void postMidiToggleMute(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int noteCount = selectedNotes.size();
+	int CCCount = selectedCCs.size();
+	int eventCount = noteCount + CCCount;
+	if (eventCount == 0) {
+		return;
+	}
+	ostringstream s;
+	if (CCCount == 0) { // If only notes are selected
+		fakeFocus = FOCUS_NOTE;
+		if (noteCount == 1) {
+			if (selectedNotes[0].muted) {
+				s << translate("muted") << " ";
+			} else {
+				s << translate("unmuted") << " ";
+			}
+			s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
+		} else {
+			int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+			int unmutedCount = noteCount - mutedCount;
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted notes.
+				// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+				s << " " << format(
+					translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
+			}
+			if (unmutedCount > 0) {
+				// Translators: used when reporting the number of unmuted notes.
+				// {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+				s << " " << format(
+					translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
+			}
+		}
+	} else if (noteCount == 0) { // If only CCs are selected
+		fakeFocus = FOCUS_CC;
+		if (CCCount == 1) {
+			auto cc = selectedCCs[0];
+			if (cc.muted) {
+				s << translate("muted") << " ";
+			} else {
+				s << translate("unmuted") << " ";
+			}
+			s << describeCC(take, cc);
+		} else {
+			int mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+			int unmutedCount = CCCount - mutedCount;
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted CCs.
+				// {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
+				s << " " << format(
+					translate_plural("{} CC muted", "{} CCs muted", mutedCount), mutedCount);
+			}
+			if (unmutedCount > 0) {
+				// Translators: used when reporting the number of unmuted CCs.
+				// {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
+				s << " " << format(
+					translate_plural("{} CC unmuted", "{} CCs unmuted", unmutedCount), unmutedCount);
+			}
+		}
+	} else { // If both notes and CCs are selected
+		int mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+		int mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+		int mutedCount = mutedNoteCount + mutedCCCount;
+		int unmutedCount = eventCount - mutedCount;
+		if (mutedCount > 0) {
+			// Translators: used when reporting the number of muted events.
+			// {} will be replaced by the number of muted events. E.g. "3 events muted"
+			s << " " << format(
+				translate_plural("{} event muted", "{} events muted", mutedCount), mutedCount);
+		}
+		if (unmutedCount > 0) {
+			// Translators: used when reporting the number of unmuted events.
+			// {} will be replaced by the number of events. E.g. "3 events unmuted"
+			s << " " << format(
+				translate_plural("{} event unmuted", "{} events unmuted", unmutedCount), unmutedCount);
+		}
+}
+	if (s.tellp() > 0) {
+		outputMessage(s);
 	}
 }
 

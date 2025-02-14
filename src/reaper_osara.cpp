@@ -2722,6 +2722,7 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40010, postMidiCopyEvents, true}, // Edit: Copy
 	{40049, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one semitone
 	{40050, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one semitone
+	{40055, postMidiToggleMute, true}, // Edit: Mute events (toggle)
 	{40177, postMidiChangePitch, true, true}, // Edit: Move notes up one semitone
 	{40178, postMidiChangePitch, true, true}, // Edit: Move notes down one semitone
 	{40179, postMidiChangePitch, true, true}, // Edit: Move notes up one octave
