@@ -2296,16 +2296,16 @@ void postToggleFunctionKeysAsStepInput(int command) {
 void postMidiToggleMute(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int eventCount = countSelectedEvents(take);
-	if (eventCount == 0) {
-		return;
-	}
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
 	int noteCount = selectedNotes.size();
 	int CCCount = selectedCCs.size();
+	int eventCount = noteCount + CCCount;
+	if (eventCount == 0) {
+		return;
+	}
 	ostringstream s;
 	if (CCCount == 0) { // If only notes are selected
 		fakeFocus = FOCUS_NOTE;
