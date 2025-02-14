@@ -2309,29 +2309,27 @@ void postMidiToggleMute(int command) {
 	ostringstream s;
 	if (CCCount == 0) { // If only notes are selected
 		fakeFocus = FOCUS_NOTE;
-		if (settings::reportNotes) {
-			if (noteCount == 1) {
-				if (selectedNotes[0].muted) {
-					s << translate("muted") << " ";
-				} else {
-					s << translate("unmuted") << " ";
-				}
-				s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
+		if (noteCount == 1) {
+			if (selectedNotes[0].muted) {
+				s << translate("muted") << " ";
 			} else {
-				int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
-				int unmutedCount = noteCount - mutedCount;
-				if (mutedCount > 0) {
-					// Translators: used when reporting the number of muted notes.
-					// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
-					s << " " << format(
-					translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
-				}
-				if (unmutedCount > 0) {
-					// Translators: used when reporting the number of unmuted notes.
-					// {} will be replaced by the number of notes. E.g. "3 notes unmuted"
-					s << " " << format(
-					translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
-				}
+				s << translate("unmuted") << " ";
+			}
+			s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
+		} else {
+			int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+			int unmutedCount = noteCount - mutedCount;
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted notes.
+				// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+				s << " " << format(
+				translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
+			}
+			if (unmutedCount > 0) {
+				// Translators: used when reporting the number of unmuted notes.
+				// {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+				s << " " << format(
+				translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
 			}
 		}
 	} else if (noteCount == 0) { // If only CCs are selected
