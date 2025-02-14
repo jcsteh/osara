@@ -2323,13 +2323,13 @@ void postMidiToggleMute(int command) {
 				// Translators: used when reporting the number of muted notes.
 				// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
 				s << " " << format(
-				translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
+					translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
 			}
 			if (unmutedCount > 0) {
 				// Translators: used when reporting the number of unmuted notes.
 				// {} will be replaced by the number of notes. E.g. "3 notes unmuted"
 				s << " " << format(
-				translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
+					translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
 			}
 		}
 	} else if (noteCount == 0) { // If only CCs are selected
@@ -2349,13 +2349,13 @@ void postMidiToggleMute(int command) {
 				// Translators: used when reporting the number of muted CCs.
 				// {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
 				s << " " << format(
-				translate_plural("{} CC muted", "{} CCs muted", mutedCount), mutedCount);
+					translate_plural("{} CC muted", "{} CCs muted", mutedCount), mutedCount);
 			}
 			if (unmutedCount > 0) {
 				// Translators: used when reporting the number of unmuted CCs.
 				// {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
 				s << " " << format(
-				translate_plural("{} CC unmuted", "{} CCs unmuted", unmutedCount), unmutedCount);
+					translate_plural("{} CC unmuted", "{} CCs unmuted", unmutedCount), unmutedCount);
 			}
 		}
 	} else { // If both notes and CCs are selected
@@ -2367,13 +2367,13 @@ void postMidiToggleMute(int command) {
 			// Translators: used when reporting the number of muted events.
 			// {} will be replaced by the number of muted events. E.g. "3 events muted"
 			s << " " << format(
-			translate_plural("{} event muted", "{} events muted", mutedCount), mutedCount);
+				translate_plural("{} event muted", "{} events muted", mutedCount), mutedCount);
 		}
 		if (unmutedCount > 0) {
 			// Translators: used when reporting the number of unmuted events.
 			// {} will be replaced by the number of events. E.g. "3 events unmuted"
 			s << " " << format(
-			translate_plural("{} event unmuted", "{} events unmuted", unmutedCount), unmutedCount);
+				translate_plural("{} event unmuted", "{} events unmuted", unmutedCount), unmutedCount);
 		}
 }
 	if (s.tellp() > 0) {
