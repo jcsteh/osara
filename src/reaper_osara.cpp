@@ -3978,6 +3978,34 @@ void cmdManageTempoTimeSigMarkers(Command* command) {
 	Main_OnCommand(40256, 0); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
 }
 
+void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
+	vector<MediaItem*> items;
+	for (int t = 0; t < CountSelectedTracks(nullptr); ++t) {
+		MediaTrack* track = GetSelectedTrack2(nullptr, t, false);
+		for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+			MediaItem* item = GetTrackMediaItem(track, i);
+			items.push_back(item);
+		}
+	}
+	// We might select multiple items. To improve performance, only refresh the UI
+	// after the entire operation is complete.
+	PreventUIRefresh(1);
+	Main_OnCommand(40289,0); // unselect all items
+	double cursorPosition=GetCursorPosition();
+	for (MediaItem* item: items) {
+		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", 0);
+		double itemLength = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", 0);
+		double itemEnd = itemStart + itemLength;
+		if (cursorPosition >= itemStart && cursorPosition <= itemEnd) {
+			GetSetMediaItemInfo(item, "B_UISEL", &bTrue);
+		}
+	}
+	PreventUIRefresh(-1);
+	UpdateArrange();
+	Undo_OnStateChangeEx2(nullptr, command->gaccel.desc, UNDO_STATE_ALL, -1);
+	postSelectMultipleItems(command->gaccel.accel.cmd);
+}
+
 void cmdSwitchProjectTab(Command* command) {
 	ReaProject* oldProj = EnumProjects(-1, nullptr, 0);
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -5386,6 +5414,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move to next chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},

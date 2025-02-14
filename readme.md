@@ -155,7 +155,6 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item grouping: Remove items from group: Control+Shift+G
 - Item grouping: Select all items in groups: Shift+G
 - Item: Select all items in current time selection: Control+Shift+A
-- (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks: Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
 - Item properties: Toggle lock
@@ -784,6 +783,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
 - OSARA: go to master track: Control+Alt+Shift+Home
+- OSARA: Select items under edit cursor on selected tracks: Shift+A
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
@@ -865,6 +865,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Global automation override: No override (set automation modes per track)
 - Grid: Set to 1/64
 - Grid: Set to 1/128
+- (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
 - Item: Split items at timeline grid
