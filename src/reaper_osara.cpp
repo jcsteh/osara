@@ -3987,9 +3987,9 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
 			items.push_back(item);
 		}
 	}
-	PreventUIRefresh(1); // Bringing this line in from SWS...
-	// API isn't clear waht this does, best guess is it's more efficient to redraw UI once for the entire operation
-	// instead of redrawing for every item we select.
+	// We might select multiple items. To improve performance, only refresh the UI
+	// after the entire operation is complete.
+	PreventUIRefresh(1);
 	Main_OnCommand(40289,0); // unselect all items
 	double cursorPosition=GetCursorPosition();
 	for (MediaItem* item: items) {
