@@ -79,6 +79,7 @@ if env["PLATFORM"] == "win32":
 		"Advapi32",
 		"UIAutomationCore",
 		"ws2_32",
+		"Comctl32",
 	]
 
 else: # Mac
