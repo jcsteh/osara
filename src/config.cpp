@@ -17,6 +17,10 @@
 #include "resource.h"
 #include "translation.h"
 
+#ifdef _WIN32
+#include <commctrl.h>
+#endif
+
 using namespace std;
 
 namespace settings {
@@ -218,6 +222,25 @@ struct ReaperSetting {
 constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 2;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
+#ifdef _WIN32
+// Prevent an Edit control from selecting all its text when it gets focus. See:
+// https://devblogs.microsoft.com/oldnewthing/20031114-00/?p=41823
+// Swell doesn't support this. Hopefully, it isn't needed there.
+LRESULT CALLBACK removeHasSetSelSubclassProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclass,
+	DWORD_PTR data
+) {
+	switch (msg) {
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hwnd, removeHasSetSelSubclassProc, subclass);
+			break;
+		case WM_GETDLGCODE:
+			return DefSubclassProc(hwnd, msg, wParam, lParam) & ~DLGC_HASSETSEL;
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+#endif // _WIN32
+
 INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 	WPARAM wParam, LPARAM lParam
 ) {
@@ -236,7 +259,11 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 				<< nl << translate_ctxt("optimal REAPER configuration", "Uses a standard, accessible edit control for the video code editor.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
 				<< nl;
-			SetDlgItemText(dialog, ID_CFGOPT_TEXT, s.str().c_str());
+			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
+			SetWindowText(text, s.str().c_str());
+#ifdef _WIN32
+			SetWindowSubclass(text, removeHasSetSelSubclassProc, 0, 0);
+#endif
 			return TRUE;
 		}
 		case WM_COMMAND: {
