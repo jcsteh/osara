@@ -210,6 +210,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 #### Markers and Regions
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
+- Item: Set cursor to previous take marker in selected items: Control+Shift+;
+- Item: Set cursor to next take marker in selected items: Control+Shift+'
 - Markers: Go to marker 01: 1
 - Markers: Go to marker 02: 2
 - Markers: Go to marker 03: 3
@@ -220,7 +222,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Go to marker 08: 8
 - Markers: Go to marker 09: 9
 - Markers: Go to marker 10: 0
-- Markers: Insert marker at current position: M
 - Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
 - Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
 - Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
@@ -234,7 +235,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Markers: Insert region from time selection: Shift+R
 
 #### Time Signature/Tempo Markers
-- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - Move edit cursor to previous tempo or time signature change: Shift+;
 - Move edit cursor to next tempo or time signature change: Shift+'
 
@@ -808,6 +808,9 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus): Delete
 - OSARA: Report edit/play cursor position, transport state and nearest markers and regions: Control+Shift+J
  - If the ruler unit is set to Measures.Beats / Minutes:Seconds, Pressing this once will report the time in measures.beats, while pressing it twice will report the time in minutes:seconds .
+- OSARA: Add project or take marker at cursor (depending on focus): M
+- OSARA: Add/edit project or take marker at cursor (depending on focus) sets time selection as take marker length: Shift+M
+- OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers: O
 - OSARA: Delete all time signature markers: Alt+Win+Delete
 - OSARA: Toggle track/take volume envelope visibility (depending on focus): Control+Alt+V
 - OSARA: Toggle track/take pan envelope visibility (depending on focus): Control+Alt+P
@@ -887,8 +890,6 @@ This list is worth referencing when making your own key map additions, assigning
 - Item: Nudge items volume +1dB
 - Item: Nudge items volume -1dB
 - Item: remove stretch marker at current position
-- Item: Set cursor to next take marker in selected items
-- Item: Set cursor to previous take marker in selected items
 - Item: Delete take marker at cursor
 - Item: Delete all take markers
 - Markers: Delete time signature marker near cursor
