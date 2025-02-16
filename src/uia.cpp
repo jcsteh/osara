@@ -7,7 +7,7 @@
 
 #include <ole2.h>
 #include <tlhelp32.h>
-#include <atlcomcli.h>
+#include <commctrl.h>
 #include <memory>
 #include <utility>
 #include "osara.h"
@@ -46,6 +46,7 @@ class UiaCore {
 
 unique_ptr<UiaCore> uiaCore;
 
+// UiaProvider implementation
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
 
 ULONG STDMETHODCALLTYPE UiaProvider::AddRef() {
@@ -63,7 +64,7 @@ ULONG STDMETHODCALLTYPE UiaProvider::Release() {
 HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
 	_Outptr_ void** ppInterface
 ) {
-	if (ppInterface) {
+	if (!ppInterface) {
 		return E_INVALIDARG;
 	}
 	if (riid == __uuidof(IUnknown)) {
@@ -121,6 +122,93 @@ HRESULT STDMETHODCALLTYPE UiaProvider::get_HostRawElementProvider(
 	IRawElementProviderSimple** pRetVal
 ) {
 	return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
+}
+
+// TextSliderUiaProvider implementation
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::QueryInterface(
+	_In_ REFIID riid, _Outptr_ void** ppInterface
+) {
+	if (!ppInterface) {
+		return E_INVALIDARG;
+	}
+	if (riid == __uuidof(IValueProvider)) {
+		*ppInterface =static_cast<IValueProvider*>(this);
+	} else {
+		return UiaProvider::QueryInterface(riid, ppInterface);
+	}
+	(static_cast<IUnknown*>(*ppInterface))->AddRef();
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::GetPatternProvider(
+	PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
+) {
+	if (patternId == UIA_ValuePatternId) {
+		*pRetVal = static_cast<IValueProvider*>(this);
+		AddRef();
+	} else {
+		*pRetVal = nullptr;
+	}
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::SetValue(__RPC__in LPCWSTR val) {
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::get_Value(
+	__RPC__deref_out_opt BSTR* pRetVal
+) {
+	*pRetVal = SysAllocString(widen(sliderValue).c_str());
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::get_IsReadOnly(
+	__RPC__out BOOL* pRetVal
+) {
+	*pRetVal = false;
+	return S_OK;
+}
+
+CComPtr<TextSliderUiaProvider> TextSliderUiaProvider::create(HWND hwnd) {
+	auto provider = new TextSliderUiaProvider(hwnd);
+	SetWindowSubclass(hwnd, subclassProc, 0, (DWORD_PTR)provider);
+	return provider;
+}
+
+LRESULT CALLBACK TextSliderUiaProvider::subclassProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR subclass, DWORD_PTR data
+) {
+	auto provider = (TextSliderUiaProvider*)data;
+	switch (msg) {
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hwnd, subclassProc, subclass);
+			break;
+		case WM_GETOBJECT:
+			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId) && provider) {
+				return UiaReturnRawElementProvider(hwnd, wParam, lParam, provider);
+			}
+			break;
+		case WM_SETFOCUS:
+			if (provider) {
+				UiaRaiseAutomationEvent(provider, UIA_AutomationFocusChangedEventId);
+			}
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void TextSliderUiaProvider::setValue(string value) {
+	sliderValue = value;
+	accPropServices->SetHwndPropStr(controlHWnd, OBJID_CLIENT, CHILDID_SELF,
+		PROPID_ACC_VALUE, widen(value).c_str());
+}
+
+void TextSliderUiaProvider::fireValueChange() {
+	UiaRaiseAutomationPropertyChangedEvent(this, UIA_ValueValuePropertyId,
+		CComVariant(), CComVariant(widen(sliderValue).c_str()));
+	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, controlHWnd,
+		OBJID_CLIENT, CHILDID_SELF);
 }
 
 CComPtr<IRawElementProviderSimple> uiaProvider;
