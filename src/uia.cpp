@@ -5,7 +5,6 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <uiautomation.h>
 #include <ole2.h>
 #include <tlhelp32.h>
 #include <atlcomcli.h>
@@ -13,6 +12,7 @@
 #include <utility>
 #include "osara.h"
 #include "config.h"
+#include "uia.h"
 
 using namespace std;
 
@@ -47,94 +47,81 @@ class UiaCore {
 unique_ptr<UiaCore> uiaCore;
 
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
-class UiaProvider : public IRawElementProviderSimple {
-	public:
-	UiaProvider(_In_ HWND hwnd): refCount(0), controlHWnd(hwnd) {}
 
-	// IUnknown methods
-	ULONG STDMETHODCALLTYPE AddRef() final {
-		return InterlockedIncrement(&refCount);
+ULONG STDMETHODCALLTYPE UiaProvider::AddRef() {
+	return InterlockedIncrement(&refCount);
+}
+
+ULONG STDMETHODCALLTYPE UiaProvider::Release() {
+	long val = InterlockedDecrement(&refCount);
+	if (val == 0) {
+		delete this;
 	}
+	return val;
+}
 
-	ULONG STDMETHODCALLTYPE Release() final {
-		long val = InterlockedDecrement(&refCount);
-		if (val == 0) {
-			delete this;
-		}
-		return val;
+HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
+	_Outptr_ void** ppInterface
+) {
+	if (ppInterface) {
+		return E_INVALIDARG;
 	}
-
-	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid,
-		_Outptr_ void** ppInterface
-	) final {
-		if (ppInterface) {
-			return E_INVALIDARG;
-		}
-		if (riid == __uuidof(IUnknown)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
-		} else if (riid == __uuidof(IRawElementProviderSimple)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
-		} else {
-			*ppInterface = nullptr;
-			return E_NOINTERFACE;
-		}
-		(static_cast<IUnknown*>(*ppInterface))->AddRef();
-		return S_OK;
+	if (riid == __uuidof(IUnknown)) {
+		*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+	} else if (riid == __uuidof(IRawElementProviderSimple)) {
+		*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+	} else {
+		*ppInterface = nullptr;
+		return E_NOINTERFACE;
 	}
+	(static_cast<IUnknown*>(*ppInterface))->AddRef();
+	return S_OK;
+}
 
-	// IRawElementProviderSimple methods
-	HRESULT STDMETHODCALLTYPE get_ProviderOptions(_Out_ ProviderOptions* pRetVal
-	) final {
-		*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
-		return S_OK;
+HRESULT STDMETHODCALLTYPE UiaProvider::get_ProviderOptions(
+	_Out_ ProviderOptions* pRetVal
+) {
+	*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPatternProvider(PATTERNID patternId,
+	_Outptr_result_maybenull_ IUnknown** pRetVal
+) {
+	// We do not support any pattern.
+	*pRetVal = nullptr;
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPropertyValue(PROPERTYID propertyId,
+	_Out_ VARIANT* pRetVal
+) {
+	switch (propertyId) {
+		case UIA_ControlTypePropertyId:
+			pRetVal->vt = VT_I4;
+			pRetVal->lVal = getControlType();
+			break;
+		case UIA_IsControlElementPropertyId:
+		case UIA_IsContentElementPropertyId:
+		case UIA_IsKeyboardFocusablePropertyId:
+			pRetVal->vt = VT_BOOL;
+			pRetVal->boolVal = isFocusable() ? VARIANT_TRUE : VARIANT_FALSE;
+			break;
+		case UIA_ProviderDescriptionPropertyId:
+			pRetVal->vt = VT_BSTR;
+			pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
+			break;
+		default:
+			pRetVal->vt = VT_EMPTY;
 	}
+	return S_OK;
+}
 
-	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId,
-		_Outptr_result_maybenull_ IUnknown** pRetVal
-	) final {
-		// We do not support any pattern.
-		*pRetVal = nullptr;
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId,
-		_Out_ VARIANT* pRetVal
-	) final {
-		switch (propertyId) {
-			case UIA_ControlTypePropertyId:
-				// Stop Narrator from ever speaking this as a window
-				pRetVal->vt = VT_I4;
-				pRetVal->lVal = UIA_CustomControlTypeId;
-				break;
-			case UIA_IsControlElementPropertyId:
-			case UIA_IsContentElementPropertyId:
-			case UIA_IsKeyboardFocusablePropertyId:
-				pRetVal->vt = VT_BOOL;
-				pRetVal->boolVal = VARIANT_FALSE;
-				break;
-			case UIA_ProviderDescriptionPropertyId:
-				pRetVal->vt = VT_BSTR;
-				pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
-				break;
-			default:
-				pRetVal->vt = VT_EMPTY;
-		}
-		return S_OK;
-	}
-
-	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(
-		IRawElementProviderSimple** pRetVal
-	) final {
-		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
-	}
-
-	private:
-	virtual ~UiaProvider() {
-	}
-
-	ULONG refCount; // Ref Count for this COM object
-	HWND controlHWnd; // The HWND for the control.
-};
+HRESULT STDMETHODCALLTYPE UiaProvider::get_HostRawElementProvider(
+	IRawElementProviderSimple** pRetVal
+) {
+	return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
+}
 
 CComPtr<IRawElementProviderSimple> uiaProvider;
 

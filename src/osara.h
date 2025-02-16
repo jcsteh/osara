@@ -353,14 +353,6 @@ std::string narrow(const std::wstring& text);
 
 extern IAccPropServices* accPropServices;
 
-// uia.cpp
-bool initializeUia();
-bool hasTriedToInitializeUia();
-bool terminateUia();
-bool shouldUseUiaNotifications();
-bool sendUiaNotification(const std::string& message, bool interrupt = true);
-void resetUia();
-
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
 #define ComboBox_GetCurSel(hwnd) (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0)
