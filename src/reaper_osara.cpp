@@ -13,7 +13,6 @@
 #include <oleacc.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
-#include <atlcomcli.h>
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
 #include "uia.h"
@@ -50,7 +49,7 @@ HINSTANCE pluginHInstance;
 HWND mainHwnd;
 #ifdef _WIN32
 DWORD guiThread;
-IAccPropServices* accPropServices = nullptr;
+CComPtr<IAccPropServices> accPropServices;
 #endif
 
 // We cache the last reported time so we can report just the components which have changed.
@@ -5883,7 +5882,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		peakWatcher::initialize();
 
 #ifdef _WIN32
-		if (CoCreateInstance(CLSID_AccPropServices, nullptr, CLSCTX_SERVER, IID_IAccPropServices, (void**)&accPropServices) != S_OK) {
+		if (accPropServices.CoCreateInstance(CLSID_AccPropServices) != S_OK) {
 			return 0;
 		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, nullptr);
@@ -5929,7 +5928,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		UnhookWindowsHookEx(keyboardHook);
 		UnhookWinEvent(winEventHook);
 		terminateUia();
-		accPropServices->Release();
+		accPropServices = nullptr;
 #else
 		NSA11yWrapper::destroy();
 #endif
