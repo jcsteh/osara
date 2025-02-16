@@ -16,6 +16,7 @@
 #include <atlcomcli.h>
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
+#include "uia.h"
 #else
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif

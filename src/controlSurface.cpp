@@ -17,6 +17,9 @@
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
+#ifdef _WIN32
+# include "uia.h"
+#endif
 
 using namespace std;
 
