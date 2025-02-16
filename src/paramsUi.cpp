@@ -20,6 +20,7 @@
 #include <initguid.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
+#include "uia.h"
 #endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
@@ -296,6 +297,9 @@ class ParamsDialog {
 	HWND dialog;
 	HWND paramCombo;
 	HWND slider;
+#ifdef _WIN32
+	CComPtr<TextSliderUiaProvider> sliderUiaProvider;
+#endif
 	HWND valueEdit;
 	HWND valueLabel;
 	HWND moreButton;
@@ -320,11 +324,9 @@ class ParamsDialog {
 		}
 #ifdef _WIN32
 		// Set the slider's accessible value to this text.
-		accPropServices->SetHwndPropStr(this->slider, OBJID_CLIENT, CHILDID_SELF,
-			PROPID_ACC_VALUE, widen(this->valText).c_str());
+		this->sliderUiaProvider->setValue(this->valText);
 		if (!this->suppressValueChangeReport) {
-			NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, this->slider,
-				OBJID_CLIENT, CHILDID_SELF);
+			this->sliderUiaProvider->fireValueChange();
 		}
 #else // _WIN32
 		// We can't set the slider's accessible value on Mac.
@@ -705,6 +707,9 @@ class ParamsDialog {
 			(LONG_PTR)ParamsDialog::contextWndProc);
 		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+#ifdef _WIN32
+		this->sliderUiaProvider = TextSliderUiaProvider::create(this->slider);
+#endif
 		origProc = SetWindowLongPtr(this->slider, GWLP_WNDPROC,
 			(LONG_PTR)ParamsDialog::contextWndProc);
 		SetWindowLongPtr(this->slider, GWLP_USERDATA, origProc);
