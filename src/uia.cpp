@@ -108,6 +108,21 @@ HRESULT STDMETHODCALLTYPE UiaProvider::GetPropertyValue(PROPERTYID propertyId,
 			pRetVal->vt = VT_BOOL;
 			pRetVal->boolVal = isFocusable() ? VARIANT_TRUE : VARIANT_FALSE;
 			break;
+		case UIA_NamePropertyId: {
+			if (!isFocusable()) {
+				break;
+			}
+			// Use the previous Static as a label like the default provider does.
+			HWND prev = GetWindow(controlHWnd, GW_HWNDPREV);
+			if (isClassName(prev, "Static")) {
+				wchar_t text[50];
+				if (GetWindowTextW(prev, text, _countof(text)) != 0) {
+					pRetVal->vt = VT_BSTR;
+					pRetVal->bstrVal = SysAllocString(text);
+				}
+			}
+			break;
+		}
 		case UIA_ProviderDescriptionPropertyId:
 			pRetVal->vt = VT_BSTR;
 			pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
