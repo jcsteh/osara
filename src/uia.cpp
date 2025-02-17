@@ -67,15 +67,12 @@ HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
 	if (!ppInterface) {
 		return E_INVALIDARG;
 	}
-	if (riid == __uuidof(IUnknown)) {
-		*ppInterface =static_cast<IRawElementProviderSimple*>(this);
-	} else if (riid == __uuidof(IRawElementProviderSimple)) {
-		*ppInterface =static_cast<IRawElementProviderSimple*>(this);
+	if (riid == __uuidof(IUnknown) || riid == __uuidof(IRawElementProviderSimple)) {
+		*ppInterface = CComPtr<IRawElementProviderSimple>(this).Detach();
 	} else {
 		*ppInterface = nullptr;
 		return E_NOINTERFACE;
 	}
-	(static_cast<IUnknown*>(*ppInterface))->AddRef();
 	return S_OK;
 }
 
@@ -133,11 +130,10 @@ HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::QueryInterface(
 		return E_INVALIDARG;
 	}
 	if (riid == __uuidof(IValueProvider)) {
-		*ppInterface =static_cast<IValueProvider*>(this);
+		*ppInterface = CComPtr<IValueProvider>(this).Detach();
 	} else {
 		return UiaProvider::QueryInterface(riid, ppInterface);
 	}
-	(static_cast<IUnknown*>(*ppInterface))->AddRef();
 	return S_OK;
 }
 
@@ -145,8 +141,7 @@ HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::GetPatternProvider(
 	PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
 ) {
 	if (patternId == UIA_ValuePatternId) {
-		*pRetVal = static_cast<IValueProvider*>(this);
-		AddRef();
+		*pRetVal = CComPtr<IValueProvider>(this).Detach();
 	} else {
 		*pRetVal = nullptr;
 	}
