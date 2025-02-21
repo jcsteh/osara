@@ -17,6 +17,10 @@
 #include "resource.h"
 #include "translation.h"
 
+#ifdef _WIN32
+#include <commctrl.h>
+#endif
+
 using namespace std;
 
 namespace settings {
@@ -218,29 +222,74 @@ struct ReaperSetting {
 constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 2;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
+#ifdef _WIN32
+// Prevent an Edit control from selecting all its text when it gets focus. See:
+// https://devblogs.microsoft.com/oldnewthing/20031114-00/?p=41823
+// Swell doesn't support this. Hopefully, it isn't needed there.
+LRESULT CALLBACK removeHasSetSelSubclassProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclass,
+	DWORD_PTR data
+) {
+	switch (msg) {
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hwnd, removeHasSetSelSubclassProc, subclass);
+			break;
+		case WM_GETDLGCODE:
+			return DefSubclassProc(hwnd, msg, wParam, lParam) & ~DLGC_HASSETSEL;
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+#endif // _WIN32
+
+INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
+	WPARAM wParam, LPARAM lParam
+) {
+	switch (msg) {
+		case WM_INITDIALOG: {
+			translateDialog(dialog);
+			ostringstream s;
+			const char nl[] = "\r\n";
+			s <<
+				translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
+				<< nl << translate_ctxt("optimal REAPER configuration", "1. Undock the Media Explorer so that it gets focus when opened.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "2. Enable closing Media Explorer using the escape key.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "5. Show text labels to indicate parallel, offline and bypassed in the FX list.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "6. Use a standard, accessible edit control for the video code editor.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
+				<< nl;
+			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
+			SetWindowText(text, s.str().c_str());
+#ifdef _WIN32
+			SetWindowSubclass(text, removeHasSetSelSubclassProc, 0, 0);
+#endif
+			return TRUE;
+		}
+		case WM_COMMAND: {
+			const WORD cid = LOWORD(wParam);
+			if (cid == IDYES || cid == IDNO) {
+				EndDialog(dialog, cid);
+				return TRUE;
+			}
+			break;
+		}
+		case WM_CLOSE:
+			EndDialog(dialog, IDNO);
+			return TRUE;
+	}
+	return FALSE;
+}
+
 void cmdConfigReaperOptimal(Command* command) {
 	// Even if the user chooses not to apply the configuration, we don't want to
 	// ask them again at startup until the optimal settings are updated.
 	string version = format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
 	SetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(),
 		true);
-	ostringstream s;
-	const char nl[] = "\r\n";
-	s <<
-		translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Undocks the Media Explorer by default so that it gets focus when opened.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables closing Media Explorer using the escape key.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Uses a standard, accessible edit control for the video code editor.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
-		<< nl;
-	if (MessageBox(
-		GetForegroundWindow(),
-		s.str().c_str(),
-		translate("Configure REAPER for Optimal Screen Reader Accessibility"),
-		MB_YESNO | MB_ICONQUESTION
+	if (DialogBox(
+		pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_REAPER_OPTIMAL_DLG),
+		GetForegroundWindow(), configReaperOptimal_dialogProc
 	) != IDYES) {
 		return;
 	}
