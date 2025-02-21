@@ -5668,14 +5668,25 @@ void delayedInit() {
 		} else if (COMMANDS[i].id) {
 			// This command is provided by an extension.
 			COMMANDS[i].gaccel.accel.cmd = NamedCommandLookup(COMMANDS[i].id);
+			KbdSectionInfo* section = SectionFromUniqueID(COMMANDS[i].section);
+			if (!kbd_getTextFromCmd(COMMANDS[i].gaccel.accel.cmd, section)[0]) {
+				// This action hasn't been registered by an extension. The extension
+				// probably isn't installed.
+				continue;
+			}
 		}
 		commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
 	}
 
+	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
 	for (int i = 0; POST_CUSTOM_COMMANDS[i].id; ++i) {
 		int cmd = NamedCommandLookup(POST_CUSTOM_COMMANDS[i].id);
-		if (cmd)
-			postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
+		if (!kbd_getTextFromCmd(cmd, section)[0]) {
+			// This action hasn't been registered by an extension. The extension
+			// probably isn't installed.
+			continue;
+		}
+		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
 
 	maybeAutoConfigReaperOptimal();
