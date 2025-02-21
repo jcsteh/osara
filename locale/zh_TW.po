@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-02-10 12:15\n"
+"PO-Revision-Date: 2025-02-21 11:57\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -34,35 +34,32 @@ msgid "Would you like to adjust REAPER preferences for optimal compatibility wit
 msgstr "您想調整 REAPER 偏好設定以獲得與螢幕閱讀器的最佳相容性嗎？選擇是將進行以下更改："
 
 msgctxt "optimal REAPER configuration"
-msgid "Undocks the Media Explorer by default so that it gets focus when opened."
-msgstr "預設取消停靠媒體資源管理器，以便它在開啟時獲得焦點。"
+msgid "1. Undock the Media Explorer so that it gets focus when opened."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables closing Media Explorer using the escape key."
-msgstr "啟用退出鍵關閉媒體總管"
+msgid "2. Enable closing Media Explorer using the escape key."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr "啟用舊檔案瀏覽對話框，以便可以使用 Tab 鍵存取「開啟」和「另存為」對話框中的 REAPER 特定選項。"
+msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables the space key to be used for check boxes, etc. in various windows."
-msgstr "啟用空白鍵可用於各種視窗中的複選框等。"
+msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
-msgstr "顯示文字以指示 FX 列表中的並行、離線和旁通。"
+msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Uses a standard, accessible edit control for the video code editor."
-msgstr "使用標準的、可存取的影片程式碼編輯器編輯控制項。"
+msgid "6. Use a standard, accessible edit control for the video code editor."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
 msgstr "注意：如果現在不是調整 REAPER 的好時機，您可以稍後透過前往功能表列中的「擴充功能」選單，然後前往「OSARA」子選單來套用這些調整。"
-
-msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr "配置 REAPER 以獲得最佳螢幕閱讀器輔助功能"
 
 msgid "Error writing configuration changes."
 msgstr "寫入配置變更時發生錯誤。"
@@ -868,6 +865,42 @@ msgstr "啟用 f1-f12 作為步進輸入"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "停用 f1-f12 作為步進輸入"
+
+#. used when reporting the number of muted notes.
+#. {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+msgid "{} note muted"
+msgid_plural "{} notes muted"
+msgstr[0] "{} 音符靜音"
+
+#. used when reporting the number of unmuted notes.
+#. {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+msgid "{} note unmuted"
+msgid_plural "{} notes unmuted"
+msgstr[0] "{} 音符取消靜音"
+
+#. used when reporting the number of muted CCs.
+#. {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
+msgid "{} CC muted"
+msgid_plural "{} CCs muted"
+msgstr[0] "{} CC 靜音"
+
+#. used when reporting the number of unmuted CCs.
+#. {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
+msgid "{} CC unmuted"
+msgid_plural "{} CCs unmuted"
+msgstr[0] "{} CC 取消靜音"
+
+#. used when reporting the number of muted events.
+#. {} will be replaced by the number of muted events. E.g. "3 events muted"
+msgid "{} event muted"
+msgid_plural "{} events muted"
+msgstr[0] "{} 事件靜音"
+
+#. used when reporting the number of unmuted events.
+#. {} will be replaced by the number of events. E.g. "3 events unmuted"
+msgid "{} event unmuted"
+msgid_plural "{} events unmuted"
+msgstr[0] "{} 事件取消靜音"
 
 msgid "enabled snap to grid"
 msgstr "啟用吸附網格"
@@ -2869,6 +2902,9 @@ msgstr "OSARA:  檢查更新"
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: 開啟線上說明文件"
 
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: 在選取軌道上選擇“編輯游標”下的對象 "
+
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: 報告播放游標位置的速度與拍號，按兩次開啟添加/編輯速度標記"
 
@@ -3057,6 +3093,18 @@ msgstr "轉到下載頁面(&D)"
 msgctxt "OSARA Update"
 msgid "&Close"
 msgstr "關閉(&C)"
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr ""
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&Yes"
+msgstr ""
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&No"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

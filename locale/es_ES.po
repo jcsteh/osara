@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-02-10 12:15\n"
+"PO-Revision-Date: 2025-02-21 11:57\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -34,35 +34,32 @@ msgid "Would you like to adjust REAPER preferences for optimal compatibility wit
 msgstr "¿quieres configurar las preferencias de Reaper para una óptima compatibilidad con lectores de pantalla? Choosing yes will make the following changes:"
 
 msgctxt "optimal REAPER configuration"
-msgid "Undocks the Media Explorer by default so that it gets focus when opened."
-msgstr "Eliminar del dock el explorador de medios por defecto, éste obtendrá el foco cuando sea abierto."
+msgid "1. Undock the Media Explorer so that it gets focus when opened."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables closing Media Explorer using the escape key."
-msgstr "Activar el cierre del explorador media con tecla escape."
+msgid "2. Enable closing Media Explorer using the escape key."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr "Habilita los diálogos de exploración de archivos heredados de Windows, para que las opciones específicas de REAPER en los diálogos Abrir y Guardar como, puedan alcanzarse con la tecla de tabulación."
+msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Enables the space key to be used for check boxes, etc. in various windows."
-msgstr "Habilita la barra espaciadora para que pueda ser usada en casillas de verificaciones etc. en varias ventanas."
+msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Shows text to indicate parallel, offline and bypassed in the FX list."
-msgstr "Muestra texto para indicar paralelo, fuera de línea y con by pass aplicado. en la lista de Fx."
+msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
-msgid "Uses a standard, accessible edit control for the video code editor."
-msgstr "Uso de controles estandar de edición accesible en el editor de vídeo."
+msgid "6. Use a standard, accessible edit control for the video code editor."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
 msgstr "Nota: Si prefieres no hacerlo ahora, Puedes aplicar los cambios más tarde iendo al menu extensión en la barra de menú en el submenú de Osara."
-
-msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr "Configura REAPER para optimizar la accesibilidad con lectores de pantalla"
 
 msgid "Error writing configuration changes."
 msgstr "Error escribiendo cambios en la configuración."
@@ -912,6 +909,48 @@ msgstr "Activado f1-f12 para entrada por pasos"
 
 msgid "Disabled  f1-f12 as step input"
 msgstr "Desactivado f1-f12 como entrada por pasos"
+
+#. used when reporting the number of muted notes.
+#. {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+msgid "{} note muted"
+msgid_plural "{} notes muted"
+msgstr[0] "{} nota silenciada"
+msgstr[1] "{} notas silenciadas"
+
+#. used when reporting the number of unmuted notes.
+#. {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+msgid "{} note unmuted"
+msgid_plural "{} notes unmuted"
+msgstr[0] "{} nota no silenciada"
+msgstr[1] "{} notas no silenciadas"
+
+#. used when reporting the number of muted CCs.
+#. {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
+msgid "{} CC muted"
+msgid_plural "{} CCs muted"
+msgstr[0] "{} CC silenciado"
+msgstr[1] "{} CCs silenciados"
+
+#. used when reporting the number of unmuted CCs.
+#. {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
+msgid "{} CC unmuted"
+msgid_plural "{} CCs unmuted"
+msgstr[0] "{} CC no silenciado"
+msgstr[1] "{} CCs no silenciados"
+
+#. used when reporting the number of muted events.
+#. {} will be replaced by the number of muted events. E.g. "3 events muted"
+msgid "{} event muted"
+msgid_plural "{} events muted"
+msgstr[0] "{} evento silenciado"
+msgstr[1] "{} eventos silenciados"
+
+#. used when reporting the number of unmuted events.
+#. {} will be replaced by the number of events. E.g. "3 events unmuted"
+msgid "{} event unmuted"
+msgid_plural "{} events unmuted"
+msgstr[0] "{} evento no silenciado"
+msgstr[1] "{} eventos no silenciados"
 
 msgid "enabled snap to grid"
 msgstr "activada snap a la rejilla"
@@ -2453,8 +2492,8 @@ msgstr[1] "área seleccionada de {} ítems copiados"
 #. {} is replaced by the number of items affected.
 msgid "loop of selected area of {} item copied"
 msgid_plural "loop of selected area of {} items copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "loop, del area seleccionada de {} ítem copiado"
+msgstr[1] "loop del área seleccionada de {} ítems copiados"
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.
@@ -2962,6 +3001,9 @@ msgstr "OSARA: Comprobar actualización"
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: abrir documentación en línea"
 
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: seleccionar ítems bajo el cursor de edición en pistas seleccionadas"
+
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Anuncia tempo and compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"
 
@@ -3150,6 +3192,18 @@ msgstr "Ir a la Página de descarga"
 msgctxt "OSARA Update"
 msgid "&Close"
 msgstr "&Cerrar"
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr ""
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&Yes"
+msgstr ""
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&No"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
