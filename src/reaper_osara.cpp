@@ -4584,6 +4584,26 @@ void cmdReportCursorPosition(Command* command) {
 	outputMessage(s);
 }
 
+void reportCursorPositionPrimaryFormat() {
+	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
+	TimeFormat tf = TF_RULER;
+	int state = GetPlayState();
+	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	if (shouldReportTimeMovement())
+		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
+}
+
+void cmdReportNumberOfTakesInItem(Command* command) {
+	MediaItem* item = getItemWithFocus();
+	if (!item)
+		return;
+	int takeCount = CountTakes(item);
+	// Translators: Reports the number of takes contained within the last touched item.
+	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
+	outputMessage(format(translate_plural("{} take", "{} takes", takeCount),
+		takeCount));
+}
+
 void cmdReportItemLength(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
@@ -4600,15 +4620,6 @@ void cmdReportProjectLength(Command* command) {
 	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	double end = GetProjectLength(nullptr);
 	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false));
-}
-
-void reportCursorPositionPrimaryFormat() {
-	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
-	TimeFormat tf = TF_RULER;
-	int state = GetPlayState();
-	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
-	if (shouldReportTimeMovement())
-		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
 }
 
 void cmdToggleSelection(Command* command) {
@@ -5366,6 +5377,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report number of takes in last touched item")}, "OSARA_REPORTNUMTAKESINSELITEM", cmdReportNumberOfTakesInItem},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report length of last touched item")}, "OSARA_REPORTLENGTHSELITEM", cmdReportItemLength},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report project length")}, "OSARA_REPORTPROJLENGTH", cmdReportProjectLength},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)")}, "OSARA_TOGGLESEL", cmdToggleSelection},
