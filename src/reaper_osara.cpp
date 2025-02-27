@@ -4108,7 +4108,7 @@ string formatTracksWithState(const char* prefix, Func checkState,
 		MediaTrack* master = GetMasterTrack(nullptr);
 		if (checkState(master)) {
 			++count;
-			s << translate("master") << separator;
+			s << translate("master");
 		}
 	}
 
