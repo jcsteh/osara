@@ -98,7 +98,7 @@ def updateReadme():
 
 def main():
 	data = json.loads(sys.stdin.readline())
-	data["date"] = datetime.datetime.utcnow().ctime()
+	data["date"] = datetime.datetime.now(datetime.UTC).ctime()
 	buildOs = data["os"]
 	if not buildOs.isalpha():
 		raise ValueError
