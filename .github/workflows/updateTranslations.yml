@@ -1,0 +1,19 @@
+name: Sync Translations
+on:
+  schedule:
+    - cron: "28 18 1,15 * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  syncTranslations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: crowdinSync
+        env:
+          crowdinAuthToken: ${{ secrets.CROWDIN_AUTH_TOKEN }}
+        run: |
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            python3 ci/crowdinSync syncTranslations

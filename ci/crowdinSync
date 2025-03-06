@@ -57,8 +57,6 @@ def downloadTranslations():
 	shutil.copyfileobj(r.raw, open(TMP_DOWNLOAD_PATH, "wb"))
 
 def syncTranslations():
-	print("Pulling from GitHub")
-	subprocess.check_call(("git", "pull"))
 	downloadTranslations()
 	print("Extracting translations")
 	with zipfile.ZipFile(TMP_DOWNLOAD_PATH) as zf:
