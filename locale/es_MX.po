@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2025-02-21 11:57\n"
+"PO-Revision-Date: 2025-03-06 17:03\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -2705,6 +2705,13 @@ msgstr "después de la región {}"
 msgid "between regions {before}, {after}"
 msgstr "entre las regiones {before}, {after}"
 
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Move stretch marker"
 msgstr "Movimiento de marcador elástico"
 
@@ -2868,6 +2875,9 @@ msgstr "OSARA: Alterna la ayuda de teclado"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: Anuncia la posición del cursor de edición/reproducción, el estado del transporte, marcadores y regiones más cercanos"
+
+msgid "OSARA: Report number of takes in last touched item"
+msgstr ""
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA: Anuncia la duración del último ítem enfocado"

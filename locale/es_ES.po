@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-02-21 11:57\n"
+"PO-Revision-Date: 2025-03-06 17:03\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -35,27 +35,27 @@ msgstr "¿quieres configurar las preferencias de Reaper para una óptima compati
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr ""
+msgstr "1. quitar del dock el explorador de medios para que se enfoque cuando se abra."
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr ""
+msgstr "2. activar cierre del explorador de medios con tecla escape."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "3. permitir alcanzar los botones en diálogos de apertura y guardado con tecla tabulador."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr ""
+msgstr "4. habilitar la barra espaciadora para botones y casillas de verificación en ventanas donde no sea necesario invocar la reproducción."
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "5. mostrar etiquetas de texto para indicar parallelo, fuera de línea y desactivado en la lista de fx."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr ""
+msgstr "6. usar control de edición accesible para el editor de código de vídeo."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2705,6 +2705,13 @@ msgstr "tras la región {}"
 msgid "between regions {before}, {after}"
 msgstr "entre las regiones {before}, {after}"
 
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] "{} toma"
+msgstr[1] "{} tomas"
+
 msgid "Move stretch marker"
 msgstr "Mover marcador elástico"
 
@@ -2868,6 +2875,9 @@ msgstr "OSARA: cambia el modo de ayuda de atajos"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: anuncia posición de cursor de edición o reproducción estado de reproducción grabación y las región o marcador cercano"
+
+msgid "OSARA: Report number of takes in last touched item"
+msgstr "OSARA: anuncia número de tomas en el último ítem seleccionado"
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA: anuncia duración del último ítem seleccionado"
@@ -3195,15 +3205,15 @@ msgstr "&Cerrar"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr ""
+msgstr "Configurar Reaper para óptima accesibilidad con lectores de pantalla"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
-msgstr ""
+msgstr "&Sí"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
-msgstr ""
+msgstr "&No"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

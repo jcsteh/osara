@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-02-21 11:57\n"
+"PO-Revision-Date: 2025-03-06 17:03\n"
 
 msgid "enabled"
 msgstr ""
@@ -2705,6 +2705,13 @@ msgstr ""
 msgid "between regions {before}, {after}"
 msgstr ""
 
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Move stretch marker"
 msgstr ""
 
@@ -2867,6 +2874,9 @@ msgid "OSARA: Toggle shortcut help"
 msgstr ""
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
+msgstr ""
+
+msgid "OSARA: Report number of takes in last touched item"
 msgstr ""
 
 msgid "OSARA: Report length of last touched item"

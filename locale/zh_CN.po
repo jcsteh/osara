@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-02-21 11:57\n"
+"PO-Revision-Date: 2025-03-06 17:03\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -31,35 +31,35 @@ msgstr "OSARA: 禁用"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr "您想调整 REAPER 首选项以获得与屏幕阅读器的最佳兼容性吗？选择是将进行以下更改："
+msgstr "您想调整 REAPER 首选项以实现屏幕阅读器的最佳兼容性吗？选择是将进行以下更改："
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr ""
+msgstr "1. 取消停靠媒体资源管理器，确保打开时自动获得焦点."
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr ""
+msgstr "2. 启用ESC键关闭媒体资源管理器."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "3. 启用旧版文件浏览对话框，确保可通过Tab键访问打开/另存对话框中的REAPER特定选项."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr ""
+msgstr "4. 在各窗口中将空格键设为复选框和按钮的确认键（优先于工程播放功能）"
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "5. 在FX列表中显示\"并行\"、\"离线\"、\"旁路\"等状态文本标签."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr ""
+msgstr "6. 在视频代码编辑器中采用标准无障碍编辑控件。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr "注意: 如果现在不是调整 REAPER 的好时机,您可以稍后通过转到菜单栏中的扩展菜单,然后转到 OSARA 来应用这些调整."
+msgstr "注： 若当前不便调整REAPER设置，后续仍可通过菜单栏\"扩展\"菜单中的\"OSARA\"子菜单进行配置。"
 
 msgid "Error writing configuration changes."
 msgstr "写入配置更改时出错."
@@ -2608,6 +2608,12 @@ msgstr "在区域 {} 右边"
 msgid "between regions {before}, {after}"
 msgstr "在区域 {before}, {after}之间"
 
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] "{} 片段"
+
 msgid "Move stretch marker"
 msgstr "移动拉伸标记"
 
@@ -2769,6 +2775,9 @@ msgstr "OSARA: 切换快捷方式帮助"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: 报告编辑/播放光标位置,走带状态,以及附近的标记和区域"
+
+msgid "OSARA: Report number of takes in last touched item"
+msgstr "OSARA: 报告最后触碰对象的片段数量"
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA: 报告最后触碰对象的时长"
@@ -3096,15 +3105,15 @@ msgstr "关闭(&C)"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr ""
+msgstr "配置 REAPER 实现屏幕阅读器最佳无障碍访问"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
-msgstr ""
+msgstr "是(&y)"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
-msgstr ""
+msgstr "否(&N)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

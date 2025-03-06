@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-02-21 11:57\n"
+"PO-Revision-Date: 2025-03-06 17:03\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -35,27 +35,27 @@ msgstr "您想調整 REAPER 偏好設定以獲得與螢幕閱讀器的最佳相�
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr ""
+msgstr "1. 預設取消停靠媒體資源管理器，以便它在開啟時獲得焦點。"
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr ""
+msgstr "2. 啟用ESC退出鍵關閉媒體總管"
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "3. 啟用舊檔案瀏覽對話框，以便可以使用 Tab 鍵存取「開啟」和「另存為」對話框中的 REAPER 特定選項。"
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr ""
+msgstr "4. 啟用空格鍵可用於各種視窗中的複選框和按鈕，"
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "5. 顯示文字以指示 FX 列表中的並行、離線和旁通。"
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr ""
+msgstr "6. 為視訊編碼編輯器使用標準的，可訪問的編輯控制向。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2608,6 +2608,12 @@ msgstr "在區間{}之後"
 msgid "between regions {before}, {after}"
 msgstr "在區間{}、{}之間"
 
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] "{} 片段"
+
 msgid "Move stretch marker"
 msgstr "移除拉伸標記"
 
@@ -2769,6 +2775,9 @@ msgstr "OSARA: 切換熱鍵幫助"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
 msgstr "OSARA: 報告編輯/播放遊標位置、走帶狀態以及最近的標記和區間"
+
+msgid "OSARA: Report number of takes in last touched item"
+msgstr "OSARA: 報告最後觸碰對象的片段數量"
 
 msgid "OSARA: Report length of last touched item"
 msgstr "OSARA: 報告最後觸碰對象的長度"
@@ -3096,15 +3105,15 @@ msgstr "關閉(&C)"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr ""
+msgstr "配置 REAPER 以獲得最佳螢幕閱讀器輔助功能"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
-msgstr ""
+msgstr "&Y是"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
-msgstr ""
+msgstr "&N不"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
