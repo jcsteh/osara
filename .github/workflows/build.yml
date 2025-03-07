@@ -1,0 +1,122 @@
+name: build
+on:
+  push:
+    branches:
+      - action
+  pull_request:
+    types: [opened, synchronize]
+defaults:
+  run:
+    shell: bash
+env:
+  publisher: James Teh
+concurrency:
+  # There's no point continuing to run a build if it's already outdated by
+  # another commit.
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: set env
+        run: |
+            if [ $GITHUB_EVENT_NAME == push ]; then
+              # For example: 2025.3.7.2011,23631c6e
+              # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
+              # starting number and we were already past 1700 on AppVeyor.
+              echo version=`date +%Y.%-m.%-d`.$((GITHUB_RUN_NUMBER + 1800)),${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+            else
+              # For example: pr1234-101,23631c6e
+              echo version=pr${{ github.event.number }}-$GITHUB_RUN_NUMBER,${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+            fi
+            if [ ${{ matrix.os }} == windows-latest ]; then
+              echo os=windows >> "$GITHUB_ENV"
+            else
+              echo os=mac >> "$GITHUB_ENV"
+            fi
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      # There's no point in building if we're going to fail the build because of
+      # an unsorted key map, so we do this as early as we can.
+      - name: check key map
+        run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
+      - name: setup
+        run: pip install scons
+      # On Mac, we need php for swell_resgen.
+      - uses: shivammathur/setup-php@v2
+        if: ${{ matrix.os == 'macos-latest' }}
+        with:
+          php-version: 8.4
+      - name: build
+        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+      # We only need to upload the pot on one OS. We arbitrarily pick Windows.
+      - name: pot
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        env:
+          crowdinAuthToken: ${{ secrets.CROWDIN_AUTH_TOKEN }}
+        run: |
+            scons version=${{ env.version }} pot
+            pip install requests
+            python ci/crowdinSync uploadPot
+      # Normal artifacts are always zipped. We upload snapshot builds to GitHub
+      # Releases so they can be downloaded directly.
+      - id: uploadBuild
+        name: upload build
+        if: ${{ github.event_name == 'push' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/osara_*
+          # We have a hacky release we reuse for snapshots, rather than
+          # creating a tag and a release for every snapshot.
+          tag_name: snapshots
+      - id: getBuildUrl
+        name: get build URL
+        if: ${{ github.event_name == 'push' }}
+        run: |
+            echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
+      # We upload pull request builds as normal artifacts.
+      - name: upload PR build
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: osara_${{ env.os }}_${{ env.version }}
+          path: installer/osara_*
+          # The installer is already compressed. Don't try to compress it again.
+          compression-level: 0
+    outputs:
+      version: ${{ env.version }}
+      # These will only be set for snapshot builds. Furthermore, each OS job
+      # will only set the output relevant to that OS. This is possible because
+      # outputs won't be set if the value is empty.
+      winInstallerUrl: ${{ steps.getBuildUrl.outputs.windowsUrl }}
+      macInstallerUrl: ${{ steps.getBuildUrl.outputs.macUrl }}
+  publish:
+    # This job updates the website with the new readme and snapshots.
+    if: ${{ github.event_name == 'push' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: setup
+        run: pip install markdown
+      - uses: actions/checkout@v4
+      - name: build
+        env:
+          version: ${{ needs.build.outputs.version }}
+          winUrl: ${{ needs.build.outputs.winInstallerUrl }}
+          macUrl: ${{ needs.build.outputs.macInstallerUrl }}
+        run: python ci/buildSite
+      - name: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # ci/buildSite built the site in _site/.
+          path: _site/
+      - name: deploy
+        uses: actions/deploy-pages@v4
