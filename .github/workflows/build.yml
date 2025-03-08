@@ -2,7 +2,7 @@ name: build
 on:
   push:
     branches:
-      - action
+      - master
   pull_request:
     types: [opened, synchronize]
 defaults:
