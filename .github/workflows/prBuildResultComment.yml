@@ -1,0 +1,76 @@
+name: pull request build result comment
+on:
+  workflow_run:
+    workflows: [build]
+    types: [completed]   
+jobs:
+  success:
+    if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      # The pull request number isn't readily available, so get it using the
+      # branch.
+      # https://github.com/orgs/community/discussions/25220#discussioncomment-11300118
+      - id: getPr
+        name: get PR number
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # For a PR submitted from a fork, this will be someUser:someBranch.
+          # This doesn't work for a PR from the main repo, so this will be just
+          # someBranch in that case.
+          prBranch: |-
+            ${{
+              (github.event.workflow_run.head_repository.owner.login != github.event.workflow_run.repository.owner.login)
+                && format('{0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch)
+                || github.event.workflow_run.head_branch
+            }}
+        run: gh pr view --repo ${{ github.repository }} $prBranch --json 'number' --jq '"number=\(.number)"' >> "${GITHUB_OUTPUT}"
+      # Get the URLs to the Windows and mac artifacts.
+      - id: getUrls
+        name: get URLs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = {};
+            const resp = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            for (const artifact of resp.data.artifacts) {
+              if (artifact.name.startsWith("osara_windows")) {
+                result.windows = artifact.url;
+              } else if (artifact.name.startsWith("osara_mac")) {
+                result.mac = artifact.url;
+              }
+            }
+            return result;
+      - name: comment
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.getPr.outputs.number }}
+          message: |
+            [Build ${{ github.event.workflow_run.run_number }} succeeded!](https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }})
+            - [Download for Windows](${{ fromJSON(steps.getUrls.outputs.result).windows }})
+            - [Download for Mac](${{ fromJSON(steps.getUrls.outputs.result).mac }})
+  failure:
+    if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: getPr
+        name: get PR number
+        env:
+          GH_TOKEN: ${{ github.token }}
+          prBranch: |-
+            ${{
+              (github.event.workflow_run.head_repository.owner.login != github.event.workflow_run.repository.owner.login)
+                && format('{0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch)
+                || github.event.workflow_run.head_branch
+            }}
+        run: gh pr view --repo ${{ github.repository }} $prBranch --json 'number' --jq '"number=\(.number)"' >> "${GITHUB_OUTPUT}"
+      - name: comment
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.getPr.outputs.number }}
+          message: |
+            [Build ${{ github.event.workflow_run.run_number }} failed!](https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }})
