@@ -1,3 +1,4 @@
+# Comment on a pull request with the status of the build and links to builds.
 name: pull request build result comment
 on:
   workflow_run:

@@ -1,3 +1,4 @@
+# Build and upload OSARA for pushes or pull requests.
 name: build
 on:
   push:
@@ -24,20 +25,20 @@ jobs:
     steps:
       - name: set env
         run: |
-            if [ $GITHUB_EVENT_NAME == push ]; then
-              # For example: 2025.3.7.2011,23631c6e
-              # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
-              # starting number and we were already past 1700 on AppVeyor.
-              echo version=`date +%Y.%-m.%-d`.$((GITHUB_RUN_NUMBER + 1800)),${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
-            else
-              # For example: pr1234-101,23631c6e
-              echo version=pr${{ github.event.number }}-$GITHUB_RUN_NUMBER,${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
-            fi
-            if [ ${{ matrix.os }} == windows-latest ]; then
-              echo os=windows >> "$GITHUB_ENV"
-            else
-              echo os=mac >> "$GITHUB_ENV"
-            fi
+          if [ $GITHUB_EVENT_NAME == push ]; then
+            # For example: 2025.3.7.2011,23631c6e
+            # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
+            # starting number and we were already past 1700 on AppVeyor.
+            echo version=`date +%Y.%-m.%-d`.$((GITHUB_RUN_NUMBER + 1800)),${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+          else
+            # For example: pr1234-101,23631c6e
+            echo version=pr${{ github.event.number }}-$GITHUB_RUN_NUMBER,${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+          fi
+          if [ ${{ matrix.os }} == windows-latest ]; then
+            echo os=windows >> "$GITHUB_ENV"
+          else
+            echo os=mac >> "$GITHUB_ENV"
+          fi
       - uses: actions/checkout@v4
         with:
           submodules: true
@@ -71,9 +72,9 @@ jobs:
         env:
           crowdinAuthToken: ${{ secrets.CROWDIN_AUTH_TOKEN }}
         run: |
-            scons version=${{ env.version }} pot
-            pip install requests
-            python ci/crowdinSync uploadPot
+          scons version=${{ env.version }} pot
+          pip install requests
+          python ci/crowdinSync uploadPot
       # Normal artifacts are always zipped. We upload snapshot builds to GitHub
       # Releases so they can be downloaded directly.
       - id: uploadBuild
@@ -89,7 +90,7 @@ jobs:
         name: get build URL
         if: ${{ github.event_name == 'push' }}
         run: |
-            echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
+          echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
       # We upload pull request builds as normal artifacts.
       - name: upload PR build
         if: ${{ github.event_name == 'pull_request' }}
