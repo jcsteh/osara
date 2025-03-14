@@ -1,6 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConstruct
-# Copyright 2015-2024 NV Access Limited, James Teh
+# Copyright 2015-2025 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
 import os
@@ -12,7 +12,7 @@ vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
 env = DefaultEnvironment(tools=[],
 	variables=vars,
-	copyright="Copyright (C) 2014-2024 NV Access Limited, James Teh & other contributors",
+	copyright="Copyright (C) 2014-2025 NV Access Limited, James Teh & other contributors",
 )
 
 # Make sure to run the build on multiple threads so it runs faster
