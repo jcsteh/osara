@@ -48,9 +48,15 @@ jobs:
         run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
       - name: setup
         run: pip install scons
-      # On Mac, we need php for swell_resgen.
+      - name: Windows setup
+        if: ${{ matrix.os == 'windows-latest' }}
+        # Use NSIS 2.46 to reduce AV false positives.
+        run: |
+          choco uninstall -y nsis
+          choco install -y nsis-unicode
       - name: Mac setup
         if: ${{ matrix.os == 'macos-latest' }}
+        # We need php for swell_resgen.
         run: brew install php
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
