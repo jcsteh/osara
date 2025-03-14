@@ -52,8 +52,8 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         # Use NSIS 2.46 to reduce AV false positives.
         run: |
-          choco uninstall -y nsis
-          choco install -y nsis-unicode
+          choco uninstall nsis nsis.install -y
+          choco install nsis-unicode -y
       - name: Mac setup
         if: ${{ matrix.os == 'macos-latest' }}
         # We need php for swell_resgen.
