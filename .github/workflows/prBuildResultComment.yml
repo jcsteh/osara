@@ -4,6 +4,8 @@ on:
   workflow_run:
     workflows: [build]
     types: [completed]   
+env:
+  runUrl: https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }}
 jobs:
   success:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
@@ -26,9 +28,11 @@ jobs:
                 || github.event.workflow_run.head_branch
             }}
         run: gh pr view --repo ${{ github.repository }} $prBranch --json 'number' --jq '"number=\(.number)"' >> "${GITHUB_OUTPUT}"
-      # Get the URLs to the Windows and mac artifacts.
-      - id: getUrls
-        name: get URLs
+      # Get the ids for the Windows and mac artifacts. The download URLs here
+      # are for the API and aren't useful in a browser, so we construct the
+      # browser URL ourselves using the id.
+      - id: getArtifactIds
+        name: get artifact ids
         uses: actions/github-script@v7
         with:
           script: |
@@ -40,9 +44,9 @@ jobs:
             });
             for (const artifact of resp.data.artifacts) {
               if (artifact.name.startsWith("osara_windows")) {
-                result.windows = artifact.url;
+                result.windows = artifact.id;
               } else if (artifact.name.startsWith("osara_mac")) {
-                result.mac = artifact.url;
+                result.mac = artifact.id;
               }
             }
             return result;
@@ -51,9 +55,9 @@ jobs:
         with:
           pr-number: ${{ steps.getPr.outputs.number }}
           message: |
-            [Build ${{ github.event.workflow_run.run_number }} succeeded!](https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }})
-            - [Download for Windows](${{ fromJSON(steps.getUrls.outputs.result).windows }})
-            - [Download for Mac](${{ fromJSON(steps.getUrls.outputs.result).mac }})
+            [Build ${{ github.event.workflow_run.run_number }} succeeded!](${{ env.runUrl }})
+            - [Download for Windows](${{ env.runUrl }}/artifacts/${{ fromJSON(steps.getArtifactIds.outputs.result).windows }})
+            - [Download for Mac](${{ env.runUrl }}/artifacts/${{ fromJSON(steps.getArtifactIds.outputs.result).mac }})
   failure:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
@@ -74,4 +78,4 @@ jobs:
         with:
           pr-number: ${{ steps.getPr.outputs.number }}
           message: |
-            [Build ${{ github.event.workflow_run.run_number }} failed!](https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }})
+            [Build ${{ github.event.workflow_run.run_number }} failed!](${{ env.runUrl }})
