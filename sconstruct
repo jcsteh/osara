@@ -31,10 +31,7 @@ if env["PLATFORM"] == "win32":
 			variant_dir="build/%s" % arch, duplicate=False)
 	configRc = "build/x86_64/config.rc"
 
-	try:
-		import winreg
-	except ImportError:
-		import _winreg as winreg
+	import winreg
 	def getMakensis():
 		"""Get the path to makensis."""
 		try:
