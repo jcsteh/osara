@@ -48,10 +48,9 @@ jobs:
       - name: setup
         run: pip install scons
       # On Mac, we need php for swell_resgen.
-      - uses: shivammathur/setup-php@v2
+      - name: Mac setup
         if: ${{ matrix.os == 'macos-latest' }}
-        with:
-          php-version: 8.4
+        run: brew install php
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
       - name: sign
