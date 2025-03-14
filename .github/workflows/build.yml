@@ -54,6 +54,18 @@ jobs:
           php-version: 8.4
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: sign
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ vars.AZURE_SIGNING_NAME }}
+          certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
+          files-folder: ${{ github.workspace }}\installer
+          files-folder-filter: exe
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
