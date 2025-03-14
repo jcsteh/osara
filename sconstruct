@@ -63,8 +63,8 @@ else: # Mac
 		[["$SOURCE", "$version"]])
 	configRc = "build/config.rc"
 
-	env.Alias("installer", installer)
-	env.Default(installer)
+env.Alias("installer", installer)
+env.Default(installer)
 
 pot = env.Command("locale/osara_${version}.pot",
 	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
