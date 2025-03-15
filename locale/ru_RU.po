@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-03-06 17:03\n"
+"PO-Revision-Date: 2025-03-15 18:40\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2945,7 +2945,7 @@ msgstr "режим автоматизации {} для выделенных т�
 
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
-msgstr "OSARA: Доступность с открытым исходным кодом для приложения REAPER"
+msgstr "OSARA: Open Source Accessibility for the REAPER Application"
 
 #. osara version. {} is replaced with the version; e.g.
 #. "Version: 2021.1pre-588,0531135a"
@@ -3203,7 +3203,7 @@ msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA: Отключить мониторинг всех треков"
 
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
-msgstr "OSARA: Настроить REAPER для оптимальной доступности для программ экранного доступа"
+msgstr "OSARA: Настроить REAPER для оптимальной совместимости с программами экранного доступа"
 
 msgid "OSARA: Check for update"
 msgstr "OSARA: Проверить обновления"
@@ -3272,10 +3272,10 @@ msgid "Check for &update"
 msgstr "Проверить &обновления"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
-msgstr "Настроить REAPER для &оптимальной доступности  с помощью программ чтения с экрана"
+msgstr "Настроить REAPER для оптимальной совместимости с программами экранного доступа"
 
 msgid "No OSARA update available."
-msgstr "Обновление OSARA недоступно."
+msgstr "Нет доступных обновлений OSARA."
 
 msgctxt "OSARA Update"
 msgid "OSARA Update"
@@ -3405,7 +3405,7 @@ msgstr "&Закрыть"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr "Настроить REAPER для оптимальной совместимости с программами экраннного доступа"
+msgstr "Настроить REAPER для оптимальной совместимости с программами экранного доступа"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
@@ -3469,7 +3469,7 @@ msgstr "Сообщать изменения, внесённые с помощь�
 
 msgctxt "OSARA Configuration"
 msgid "OK"
-msgstr "ОК"
+msgstr "OK"
 
 msgctxt "OSARA Configuration"
 msgid "Cancel"
