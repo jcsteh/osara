@@ -5214,18 +5214,25 @@ void cmdJumpToTime(Command* command) {
 }
 
 void cmdVirtualMidiKeyboard(Command* command) {
-	static accelerator_register_t accelReg;
+	static accelerator_register_t accelReg = {0};
 	if (GetToggleCommandState(command->gaccel.accel.cmd)) {
 		// The virtual keyboard is showing. Run the command to hide it.
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
-		plugin_register("-accelerator", &accelReg);
 		return;
 	}
+	const bool isRegistered = !!accelReg.translateAccel;
 	accelReg.translateAccel = [](MSG* msg, accelerator_register_t* accelReg) -> int {
 		HWND keys = (HWND)accelReg->user;
+		if (keys && !IsWindow(keys)) {
+			// The keys HWND is dead. Ideally, we would unregister. However, if we do,
+			// subsequent registrations of our hook never intercept key presses in the
+			// virtual keyboard. So, we just have to leave this registered.
+			accelReg->user = nullptr;
+			return 0; // Normal handling.
+		}
 		if (msg->message != WM_KEYDOWN || msg->hwnd != keys) {
 			// This key isn't for us.
-			return 0; // Normal handling.
+			return 0;
 		}
 		if (isShortcutHelpEnabled) {
 			switch (msg->wParam) {
@@ -5275,8 +5282,11 @@ void cmdVirtualMidiKeyboard(Command* command) {
 		return 0;
 	};
 	accelReg.isLocal = true;
-	// We must register the hook before the window appears or it won't work.
-	plugin_register("accelerator", &accelReg);
+	accelReg.user = nullptr;
+	if (!isRegistered) {
+		// We must register the hook before the window appears or it won't work.
+		plugin_register("accelerator", &accelReg);
+	}
 	// Show the window.
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	accelReg.user = GetFocus(); // The keys window.
