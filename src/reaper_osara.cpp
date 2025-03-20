@@ -5213,6 +5213,77 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void cmdVirtualMidiKeyboard(Command* command) {
+	static accelerator_register_t accelReg;
+	if (GetToggleCommandState(command->gaccel.accel.cmd)) {
+		// The virtual keyboard is showing. Run the command to hide it.
+		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		plugin_register("-accelerator", &accelReg);
+		return;
+	}
+	accelReg.translateAccel = [](MSG* msg, accelerator_register_t* accelReg) -> int {
+		HWND keys = (HWND)accelReg->user;
+		if (msg->message != WM_KEYDOWN || msg->hwnd != keys) {
+			// This key isn't for us.
+			return 0; // Normal handling.
+		}
+		if (isShortcutHelpEnabled) {
+			switch (msg->wParam) {
+				case VK_RIGHT:
+					outputMessage(translate("Octave up"));
+					return 1; // Eat the key.
+				case VK_LEFT:
+					outputMessage(translate("Octave down"));
+					return 1;
+				case VK_UP:
+					outputMessage(translate("Increase MIDI channel"));
+					return 1;
+				case VK_DOWN:
+					outputMessage(translate("Decrease MIDI channel"));
+					return 1;
+			default:
+				break;
+			}
+			return 0;
+		}
+		HWND dialog = GetParent(keys);
+		switch (msg->wParam) {
+			case VK_RIGHT:
+			case VK_LEFT: {
+				// We need to wait until this executes before we can report the new value.
+				CallLater([dialog] {
+					constexpr long WCID_CENTER_NOTE = 1239;
+					char note[10];
+					if (GetDlgItemText(dialog, WCID_CENTER_NOTE, note, sizeof(note)) != 0) {
+						outputMessage(note);
+					}
+				}, 0);
+				return 0; // Normal handling.
+			}
+			case VK_UP:
+			case VK_DOWN: {
+				CallLater([dialog] {
+					constexpr long WCID_CHANNEL = 1377;
+					char channel[10];
+					if (GetDlgItemText(dialog, WCID_CHANNEL, channel, sizeof(channel)) != 0) {
+						outputMessage(channel);
+					}
+				}, 0);
+				return 0; // Normal handling.
+			}
+			default:
+				break;
+		}
+		return 0; // Normal handling.
+	};
+	accelReg.isLocal = true;
+	// We must register the hook before the window appears or it won't work.
+	plugin_register("accelerator", &accelReg);
+	// Show the window.
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	accelReg.user = GetFocus(); // The keys window.
+}
+
 #define DEFACCEL {0, 0, 0}
 
 Command COMMANDS[] = {
@@ -5316,6 +5387,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 40377}, nullptr}, nullptr, cmdVirtualMidiKeyboard}, // View: Show virtual MIDI keyboard
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
