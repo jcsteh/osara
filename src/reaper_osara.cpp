@@ -5249,7 +5249,7 @@ void cmdVirtualMidiKeyboard(Command* command) {
 		HWND dialog = GetParent(keys);
 		switch (msg->wParam) {
 			case VK_RIGHT:
-			case VK_LEFT: {
+			case VK_LEFT:
 				// We need to wait until this executes before we can report the new value.
 				CallLater([dialog] {
 					constexpr long WCID_CENTER_NOTE = 1239;
@@ -5258,10 +5258,9 @@ void cmdVirtualMidiKeyboard(Command* command) {
 						outputMessage(note);
 					}
 				}, 0);
-				return 0; // Normal handling.
-			}
+				return 0;
 			case VK_UP:
-			case VK_DOWN: {
+			case VK_DOWN:
 				CallLater([dialog] {
 					constexpr long WCID_CHANNEL = 1377;
 					char channel[10];
@@ -5269,12 +5268,11 @@ void cmdVirtualMidiKeyboard(Command* command) {
 						outputMessage(channel);
 					}
 				}, 0);
-				return 0; // Normal handling.
-			}
+				return 0;
 			default:
 				break;
 		}
-		return 0; // Normal handling.
+		return 0;
 	};
 	accelReg.isLocal = true;
 	// We must register the hook before the window appears or it won't work.
