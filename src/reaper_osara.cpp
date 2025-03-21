@@ -5222,16 +5222,20 @@ void cmdVirtualMidiKeyboard(Command* command) {
 	}
 	const bool isRegistered = !!accelReg.translateAccel;
 	accelReg.translateAccel = [](MSG* msg, accelerator_register_t* accelReg) -> int {
-		HWND keys = (HWND)accelReg->user;
-		if (keys && !IsWindow(keys)) {
-			// The keys HWND is dead. Ideally, we would unregister. However, if we do,
+		HWND dialog = (HWND)accelReg->user;
+		if (dialog && !IsWindow(dialog)) {
+			// The dialog is dead. Ideally, we would unregister. However, if we do,
 			// subsequent registrations of our hook never intercept key presses in the
 			// virtual keyboard. So, we just have to leave this registered.
 			accelReg->user = nullptr;
 			return 0; // Normal handling.
 		}
-		if (msg->message != WM_KEYDOWN || msg->hwnd != keys) {
+		if (msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != dialog) {
 			// This key isn't for us.
+			return 0;
+		}
+		if (isClassName(msg->hwnd, "Edit") || isClassName(msg->hwnd, "ComboBox")) {
+			// Don't trap arrow keys in these controls.
 			return 0;
 		}
 		if (isShortcutHelpEnabled) {
@@ -5253,7 +5257,6 @@ void cmdVirtualMidiKeyboard(Command* command) {
 			}
 			return 0;
 		}
-		HWND dialog = GetParent(keys);
 		switch (msg->wParam) {
 			case VK_RIGHT:
 			case VK_LEFT:
@@ -5289,7 +5292,7 @@ void cmdVirtualMidiKeyboard(Command* command) {
 	}
 	// Show the window.
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	accelReg.user = GetFocus(); // The keys window.
+	accelReg.user = GetForegroundWindow(); // The dialog.
 }
 
 #define DEFACCEL {0, 0, 0}
