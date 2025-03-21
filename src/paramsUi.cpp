@@ -685,7 +685,7 @@ class ParamsDialog {
 		} else if (after == Param::AfterOption::invalidateParams) {
 			this->source->rebuildParams();
 			this->updateParamList();
-		} else {
+		} else if (after == Param::AfterOption::dismiss) {
 			SendMessage(this->dialog, WM_CLOSE, 0, 0);
 		}
 	}
@@ -835,11 +835,16 @@ class FxParam: public Param {
 	FxParams<ReaperObj>& source;
 	int fx;
 	int param;
+	double unrestrictedMin = 0;
+	double unrestrictedMax = 0;
 
 	public:
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
-		source._GetParam(source.obj, fx, param, &this->min, &this->max);
+		source._GetParam(source.obj, fx, param, &this->unrestrictedMin,
+			&this->unrestrictedMax);
+		this->min = this->unrestrictedMin;
+		this->max = this->unrestrictedMax;
 		// *FX_GetParameterStepSizes doesn't set these to 0 if it can't fetch them,
 		// even if it returns true.
 		this->step = 0;
@@ -894,6 +899,46 @@ class FxParam: public Param {
 
 	void setValueFromEdited(const string& text) final {
 		this->setValue(atof(text.c_str()));
+	}
+
+	Param::MoreOptions getMoreOptions() final {
+		Param::MoreOptions options;
+		double val = this->getValue();
+		if (val == this->min) {
+			options.push_back({
+				translate("Unrestrict minimum"),
+				[this] {
+					this->min = this->unrestrictedMin;
+					return Param::AfterOption::nothing;
+				}
+			});
+		} else {
+			options.push_back({
+				translate("Restrict minimum to current value"),
+				[this] {
+					this->min = this->getValue();
+					return Param::AfterOption::nothing;
+				}
+			});
+		}
+		if (val == this->max) {
+			options.push_back({
+				translate("Unrestrict maximum"),
+				[this] {
+					this->max = this->unrestrictedMax;
+					return Param::AfterOption::nothing;
+				}
+			});
+		} else {
+			options.push_back({
+				translate("Restrict maximum to current value"),
+				[this] {
+					this->max = this->getValue();
+					return Param::AfterOption::nothing;
+				}
+			});
+		}
+		return options;
 	}
 };
 
