@@ -2472,9 +2472,6 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		return 0; // Normal handling.
 	}
 	if (!IsWindow(vkbHwnd)) {
-		// The dialog is dead. Ideally, we would unregister. However, if we do,
-		// subsequent registrations of our hook never intercept key presses in the
-		// virtual keyboard. So, we just have to leave this registered.
 		vkbHwnd = nullptr;
 		return 0;
 	}
