@@ -219,7 +219,7 @@ struct ReaperSetting {
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
-constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 2;
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 3;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
 #ifdef _WIN32
@@ -257,6 +257,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 				<< nl << translate_ctxt("optimal REAPER configuration", "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "5. Show text labels to indicate parallel, offline and bypassed in the FX list.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "6. Use a standard, accessible edit control for the video code editor.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
 				<< nl;
 			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
@@ -306,6 +307,8 @@ void cmdConfigReaperOptimal(Command* command) {
 		{"REAPER", "fxfloat_focus", 1 << 20, 1048579},
 		// Prefs -> Video: Use standard edit control for video code editor (for accessibility, lacks many features)
 		{"REAPER", "video_colorspace", 1 << 11, 789507},
+		// Disable FX browser -> Options menu -> Show in FX list -> Plug-in type prefixes
+		{"REAPER-fxadd", "uiflags", 1 << 24, 16777216},
 	};
 	for (const auto& setting: settings) {
 		int newVal = setting.value;
