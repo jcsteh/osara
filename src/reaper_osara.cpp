@@ -5230,7 +5230,8 @@ void cmdVirtualMidiKeyboard(Command* command) {
 			accelReg->user = nullptr;
 			return 0; // Normal handling.
 		}
-		if (msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != dialog) {
+		if (msg->message != WM_KEYDOWN ||
+				(msg->hwnd != dialog && GetParent(msg->hwnd) != dialog)) {
 			// This key isn't for us.
 			return 0;
 		}
