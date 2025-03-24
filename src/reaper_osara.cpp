@@ -5295,8 +5295,8 @@ void cmdJumpToTime(Command* command) {
 
 #define DEFACCEL {0, 0, 0}
 
+// REAPER or extension commands that we want to intercept.
 Command COMMANDS[] = {
-	// Commands we want to intercept.
 	{MAIN_SECTION, {{0, 0, 40285}, nullptr}, nullptr, cmdGoToNextTrack}, // Track: Go to next track
 	{MAIN_SECTION, {{0, 0, 40286}, nullptr}, nullptr, cmdGoToPrevTrack}, // Track: Go to previous track
 	{MAIN_SECTION, {{0, 0, 40287}, nullptr}, nullptr, cmdGoToNextTrackKeepSel}, // Track: Go to next track (leaving other tracks selected)
@@ -5432,7 +5432,10 @@ Command COMMANDS[] = {
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40762}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Show/hide filter window...
 	{MIDI_EVENT_LIST_SECTION, {{ 0, 0, 40471}, nullptr}, nullptr, cmdMidiFilterWindow}, // Filter: Enable/disable event filter and show/hide filter window...
 #endif
-	// Our own commands.
+};
+
+// Our own commands.
+Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to next item (leaving other items selected)")}, "OSARA_NEXTITEMKEEPSEL", cmdMoveToNextItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Move to previous item (leaving other items selected)")}, "OSARA_PREVITEMKEEPSEL", cmdMoveToPrevItemKeepSel},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View properties for current media item/take/automation item (depending on focus)")}, "OSARA_PROPERTIES", cmdPropertiesFocus},
@@ -5526,8 +5529,8 @@ Command COMMANDS[] = {
 #endif
 	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
-	{0, {}, nullptr, nullptr},
 };
+
 map<pair<int, int>, Command*> commandsMap;
 
 /*** Initialisation, termination and inner workings. */
@@ -5743,31 +5746,19 @@ void delayedInit() {
 	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
 		"NF_GetSWSTrackNotes");
 
-	for (int i = 0; COMMANDS[i].execute; ++i) {
-		if (COMMANDS[i].id && COMMANDS[i].gaccel.desc) {
-			// This is our own command.
-			if (COMMANDS[i].section == MAIN_SECTION) {
-				COMMANDS[i].gaccel.accel.cmd = plugin_register("command_id", (void*)COMMANDS[i].id);
-				COMMANDS[i].gaccel.desc = translate(COMMANDS[i].gaccel.desc);
-				plugin_register("gaccel", &COMMANDS[i].gaccel);
-			} else {
-				custom_action_register_t action;
-				action.uniqueSectionId = COMMANDS[i].section;
-				action.idStr = COMMANDS[i].id;
-				action.name = translate(COMMANDS[i].gaccel.desc);
-				COMMANDS[i].gaccel.accel.cmd = plugin_register("custom_action", &action);
-			}
-		} else if (COMMANDS[i].id) {
+	for (Command& command: COMMANDS) {
+		if (command.id) {
 			// This command is provided by an extension.
-			COMMANDS[i].gaccel.accel.cmd = NamedCommandLookup(COMMANDS[i].id);
-			KbdSectionInfo* section = SectionFromUniqueID(COMMANDS[i].section);
-			if (!kbd_getTextFromCmd(COMMANDS[i].gaccel.accel.cmd, section)[0]) {
+			command.gaccel.accel.cmd = NamedCommandLookup(command.id);
+			KbdSectionInfo* section = SectionFromUniqueID(command.section);
+			if (!kbd_getTextFromCmd(command.gaccel.accel.cmd, section)[0]) {
 				// This action hasn't been registered by an extension. The extension
 				// probably isn't installed.
 				continue;
 			}
 		}
-		commandsMap.insert(make_pair(make_pair(COMMANDS[i].section, COMMANDS[i].gaccel.accel.cmd), &COMMANDS[i]));
+		commandsMap.insert(make_pair(make_pair(command.section,
+			command.gaccel.accel.cmd), &command));
 	}
 
 	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
@@ -6005,6 +5996,22 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			if (midiPostCommand.supportedInMidiEventList) {
 				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
 			}
+		}
+
+		for (Command& command: OSARA_COMMANDS) {
+			if (command.section == MAIN_SECTION) {
+				command.gaccel.accel.cmd = rec->Register("command_id", (void*)command.id);
+				command.gaccel.desc = translate(command.gaccel.desc);
+				rec->Register("gaccel", &command.gaccel);
+			} else {
+				custom_action_register_t action;
+				action.uniqueSectionId = command.section;
+				action.idStr = command.id;
+				action.name = translate(command.gaccel.desc);
+				command.gaccel.accel.cmd = rec->Register("custom_action", &action);
+			}
+			commandsMap.insert(make_pair(make_pair(command.section,
+				command.gaccel.accel.cmd), &command));
 		}
 
 		registerSettingCommands();
