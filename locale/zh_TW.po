@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-03-06 17:03\n"
+"PO-Revision-Date: 2025-04-01 18:44\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -56,6 +56,10 @@ msgstr "5. 顯示文字以指示 FX 列表中的並行、離線和旁通。"
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
 msgstr "6. 為視訊編碼編輯器使用標準的，可訪問的編輯控制向。"
+
+msgctxt "optimal REAPER configuration"
+msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+msgstr "7. 在FX瀏覽器中隱藏類型的前綴，因此通過FX瀏覽更有效。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -929,6 +933,18 @@ msgstr "開"
 #. which is off.
 msgid "off"
 msgstr "關"
+
+msgid "Unrestrict minimum"
+msgstr "取消最小值限制"
+
+msgid "Restrict minimum to current value"
+msgstr "當前值設為最小值"
+
+msgid "Unrestrict maximum"
+msgstr "取消最大值限制"
+
+msgid "Restrict maximum to current value"
+msgstr "當前值設為最大值"
 
 msgid "low shelf"
 msgstr "低架"
@@ -2092,6 +2108,18 @@ msgstr "控制面重置"
 #. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
 msgid "all notes off"
 msgstr "全部音符關"
+
+msgid "Octave up"
+msgstr "上移八度"
+
+msgid "Octave down"
+msgstr "下移八度"
+
+msgid "Increase MIDI channel"
+msgstr "增加MIDI通道"
+
+msgid "Decrease MIDI channel"
+msgstr "減少MIDI通道"
 
 msgid "set selection start"
 msgstr "設置選區開始"

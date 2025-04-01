@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-03-15 18:40\n"
+"PO-Revision-Date: 2025-04-01 18:44\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -31,7 +31,7 @@ msgstr "OSARA: Выключить"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr "Хотите ли вы изменить настройки REAPER для оптимальной совместимости с программами экраннного доступа? Выбрав \"да\", вы внесёте следующие изменения:"
+msgstr "Хотите ли вы изменить настройки REAPER для оптимальной совместимости с программами экранного доступа? Выбрав \"да\", вы внесёте следующие изменения:"
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
@@ -56,6 +56,10 @@ msgstr "5. Отображает текст для обозначения пар�
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
 msgstr "6. Использует стандартный, доступный элемент управления редактированием для редактора видео."
+
+msgctxt "optimal REAPER configuration"
+msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+msgstr "7. Скрывает префиксы типов в браузере FX, чтобы повысить эффективность работы с FX."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1080,6 +1084,18 @@ msgstr "включено"
 msgid "off"
 msgstr "выключено"
 
+msgid "Unrestrict minimum"
+msgstr "Снять ограничение с минимального значения"
+
+msgid "Restrict minimum to current value"
+msgstr "Ограничить минимум текущим значением"
+
+msgid "Unrestrict maximum"
+msgstr "Снять ограничение с максимального значения"
+
+msgid "Restrict maximum to current value"
+msgstr "Ограничить максимум текущим значением"
+
 msgid "low shelf"
 msgstr "низкочастотный шельфовый"
 
@@ -1172,10 +1188,10 @@ msgid "post-fader"
 msgstr "пост-фейдер"
 
 msgid "pre-fx"
-msgstr "пре-фx"
+msgstr "пре-fx"
 
 msgid "post-fx"
-msgstr "пост-фx"
+msgstr "пост-fx"
 
 msgid "mute"
 msgstr "приглушить"
@@ -1897,12 +1913,12 @@ msgstr "риппл выключен"
 #. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
 #. "2 items removed ripple per track is on".
 msgid "ripple per track is on"
-msgstr "включён режим волны на один трек"
+msgstr "риппл на один трек включён"
 
 #. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
 #. "1 item added ripple all tracks is on".
 msgid "ripple all tracks is on"
-msgstr "включён режим волны на всех треках"
+msgstr "риппл на всех треках включён"
 
 #. Reported when auto crossfade and trim content behind media items are both enabled.
 msgid "enabled auto crossfades and trim"
@@ -2282,10 +2298,10 @@ msgid "{:g} dB threshold"
 msgstr "{:g} dB порог"
 
 msgid "enabled envelope points move with media items"
-msgstr "движение точек огибающей с медиа-объектами включено"
+msgstr "движение точек огибающей с медиа-элементами включено"
 
 msgid "disabled envelope points move with media items"
-msgstr "движение точек огибающей с медиа-объектами выключено"
+msgstr "движение точек огибающей с медиа-элементами выключено"
 
 msgid "enabled free item positioning"
 msgstr "свободное позиционирование элементов включено"
@@ -2342,6 +2358,18 @@ msgstr "Сброс параметров панелей управления midi
 msgid "all notes off"
 msgstr "все ноты выключены"
 
+msgid "Octave up"
+msgstr "На октаву выше"
+
+msgid "Octave down"
+msgstr "На октаву ниже"
+
+msgid "Increase MIDI channel"
+msgstr "Увеличить MIDI-канал"
+
+msgid "Decrease MIDI channel"
+msgstr "Уменьшить MIDI-канал"
+
 msgid "set selection start"
 msgstr "установить начало выделения"
 
@@ -2397,7 +2425,7 @@ msgid "length sixteenth triplet"
 msgstr "длительность шестнадцатая триоль"
 
 msgid "length eighth"
-msgstr "восьмая длительность"
+msgstr "длительность восьмая"
 
 msgid "length eighth triplet"
 msgstr "длительность восьмая триоль"
@@ -2484,7 +2512,7 @@ msgid "default momentary"
 msgstr "моментальный по умолчанию"
 
 msgid "recording key map momentary"
-msgstr "моментальная карта записи"
+msgstr "моментальная запись раскладки клавиатуры"
 
 msgid "auto playing"
 msgstr "автоматическое воспроизведение"
@@ -2831,13 +2859,13 @@ msgid "shortcut help off"
 msgstr "справка по горячим клавишам выключена"
 
 msgid "resumed MIDI step input"
-msgstr "возобновлен поэтапный ввод MIDI"
+msgstr "возобновлён пошаговый ввод MIDI"
 
 msgid "shortcut help on"
 msgstr "справка по горячим клавишам включена"
 
 msgid "paused MIDI step input"
-msgstr "поэтапный ввод MIDI приостановлен"
+msgstr "пошаговый ввод MIDI приостановлен"
 
 msgid "paused"
 msgstr "приостановлено"
@@ -2970,7 +2998,7 @@ msgstr "регион {} вставлен"
 #. group number. For example: "2 items added to group 1".
 msgid "item added to group {group}"
 msgid_plural "{count} items added to group {group}"
-msgstr[0] "элементт добавлен в группу {group}"
+msgstr[0] "элемент добавлен в группу {group}"
 msgstr[1] "{count} элемента добавлены в группу {group}"
 msgstr[2] "{count} элементов добавлены в группу {group}"
 msgstr[3] "{count} объектов добавлено в группу {group}"
@@ -3047,7 +3075,7 @@ msgid "OSARA: Pause/resume Peak Watcher"
 msgstr "OSARA: Приостановить/возобновить просмотрщик пиков"
 
 msgid "OSARA: Report ripple editing mode"
-msgstr "OSARA: Сообщать режим волны во время редактирования"
+msgstr "OSARA: Сообщать режим риппл во время редактирования"
 
 msgid "OSARA: Report muted tracks"
 msgstr "OSARA: Сообщать о приглушённых треках"

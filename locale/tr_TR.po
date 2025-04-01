@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2025-03-06 17:03\n"
+"PO-Revision-Date: 2025-04-01 18:44\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -55,6 +55,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -978,6 +982,18 @@ msgstr ""
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is off.
 msgid "off"
+msgstr ""
+
+msgid "Unrestrict minimum"
+msgstr ""
+
+msgid "Restrict minimum to current value"
+msgstr ""
+
+msgid "Unrestrict maximum"
+msgstr ""
+
+msgid "Restrict maximum to current value"
 msgstr ""
 
 msgid "low shelf"
@@ -2174,6 +2190,18 @@ msgstr ""
 
 #. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
 msgid "all notes off"
+msgstr ""
+
+msgid "Octave up"
+msgstr ""
+
+msgid "Octave down"
+msgstr ""
+
+msgid "Increase MIDI channel"
+msgstr ""
+
+msgid "Decrease MIDI channel"
 msgstr ""
 
 msgid "set selection start"

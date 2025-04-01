@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-03-06 17:03\n"
+"PO-Revision-Date: 2025-04-01 18:44\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -56,6 +56,10 @@ msgstr "5. Afficher des étiquettes textuelles pour indiquer Parallèle, Hors li
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
 msgstr "6. Utiliser un contrôle d'édition standard et accessible pour l'éditeur de code vidéo."
+
+msgctxt "optimal REAPER configuration"
+msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+msgstr "7. Masquer les préfixes du type d'FX dans le navigateur d'FX afin que la navigation à travers des FX soit plus efficace."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -979,6 +983,18 @@ msgstr "actif"
 #. which is off.
 msgid "off"
 msgstr "inactif"
+
+msgid "Unrestrict minimum"
+msgstr "Sans restriction minimal"
+
+msgid "Restrict minimum to current value"
+msgstr "Restreindre le minimum à la valeur actuelle"
+
+msgid "Unrestrict maximum"
+msgstr "Sans restriction maximal"
+
+msgid "Restrict maximum to current value"
+msgstr "Restreindre le maximum à la valeur actuelle"
 
 msgid "low shelf"
 msgstr "plateau bas"
@@ -2175,6 +2191,18 @@ msgstr "Réinitialisation des Surfaces de contrôle"
 #. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
 msgid "all notes off"
 msgstr "toutes les notes désactivées"
+
+msgid "Octave up"
+msgstr "Octave vers le haut"
+
+msgid "Octave down"
+msgstr "Octave vers le bas"
+
+msgid "Increase MIDI channel"
+msgstr "Augmenter le canal MIDI"
+
+msgid "Decrease MIDI channel"
+msgstr "Diminuer le canal MIDI"
 
 msgid "set selection start"
 msgstr "début de la sélection définie"
