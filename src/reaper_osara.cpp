@@ -5293,6 +5293,41 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void cmdMoveAndFitItemsToTimeSelection(Command* command) {
+	int selectedItemsCount = CountSelectedMediaItems(nullptr);
+	if (selectedItemsCount == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	vector<pair<double, double>> itemStartsAndRates(selectedItemsCount);
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		itemStartsAndRates[i] = make_pair(position, rate);
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int itemsChanged = 0;
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		if (position != itemStartsAndRates[i].first || rate != itemStartsAndRates[i].second)
+			++ itemsChanged;
+	}
+	// Translators: {} will be replaced with the number of items; e.g.
+	// "2 items fit to time selection".
+	outputMessage(format(
+		translate_plural("{} item fit to time selection", "{} items fit to time selection", itemsChanged),
+		itemsChanged));
+}
+
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
@@ -5396,6 +5431,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 41206}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move and stretch items to fit time selection
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
