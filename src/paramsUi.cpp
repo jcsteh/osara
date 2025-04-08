@@ -861,8 +861,8 @@ class FxParam: public Param {
 				}
 			}
 		} else {
-			this->step = (this->max - this->min) / 1000;
-			this->largeStep = this->step * 20;
+			this->step = (this->max - this->min) / 50;
+			this->largeStep = this->step * 5;
 		}
 		this->isEditable = true;
 		// Set this as the last touched FX and FX parameter, as well as the last
