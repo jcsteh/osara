@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2025-04-01 18:44\n"
+"PO-Revision-Date: 2025-04-15 18:43\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -35,31 +35,31 @@ msgstr "Te gustaría optimizar REAPER para su uso con lectores de pantalla? Al e
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr ""
+msgstr "1. Se desacoplará el Explorador de Medios para que obtenga el foco al abrirse."
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr ""
+msgstr "2. Se habilitará el cierre del Explorador de Medios con la tecla Escape."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "3. Se habilitará la compatibilidad con los cuadros de diálogo antiguos de archivos, para que la tecla tab permita navegar las funciones de REAPER en los cuadros de diálogo de abrir y guardar."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr ""
+msgstr "4. Se permitirá usar la barra espaciadora para casillas de verificación y botones en diversas ventanas, siempre que sea más práctico que utilizarla para reproducir el proyecto."
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "5. En la lista de efectos (FX), se mostrarán etiquetas de texto para señalar los estados de paralelo, fuera de línea y omitido."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr ""
+msgstr "6. Se utilizará un control de edición estándar y accesible en el editor de código de video."
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
-msgstr ""
+msgstr "7. Se ocultarán los prefijos de tipo en la ventana de FX para mejorar la eficiencia al navegar por los efectos."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -254,7 +254,7 @@ msgid "no change"
 msgstr "no hay cambios"
 
 msgid "inserted automation item"
-msgstr ""
+msgstr "ítem de automatización insertado"
 
 #. Reported when adding automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items added".
@@ -266,10 +266,10 @@ msgstr[0] "{} ítem de automatización agregado"
 msgstr[1] "{} ítems de automatización agregados"
 
 msgid "no automation items glued"
-msgstr ""
+msgstr "no hay ítems de automatización pegados"
 
 msgid "glued automation items"
-msgstr ""
+msgstr "ítems de automatización pegados"
 
 msgid "active"
 msgstr "{} activo"
@@ -347,7 +347,7 @@ msgstr "selección separada"
 #. used when reporting the number of notes in a chord.
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} notes"
-msgstr ""
+msgstr "{} notas"
 
 msgid "velocity"
 msgstr "velócity"
@@ -918,43 +918,43 @@ msgstr "Deshabilitar f1-f12 como entrada escalonada"
 #. {} will be replaced by the number of muted notes. E.g. "3 notes muted"
 msgid "{} note muted"
 msgid_plural "{} notes muted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} nota muteada"
+msgstr[1] "{} notas muteadas"
 
 #. used when reporting the number of unmuted notes.
 #. {} will be replaced by the number of notes. E.g. "3 notes unmuted"
 msgid "{} note unmuted"
 msgid_plural "{} notes unmuted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} nota desmuteada"
+msgstr[1] "{} notas desmuteadas"
 
 #. used when reporting the number of muted CCs.
 #. {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
 msgid "{} CC muted"
 msgid_plural "{} CCs muted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} CC muteado"
+msgstr[1] "{} CCS desmuteados"
 
 #. used when reporting the number of unmuted CCs.
 #. {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
 msgid "{} CC unmuted"
 msgid_plural "{} CCs unmuted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} CC desmuteado"
+msgstr[1] "{} CCS desmuteados"
 
 #. used when reporting the number of muted events.
 #. {} will be replaced by the number of muted events. E.g. "3 events muted"
 msgid "{} event muted"
 msgid_plural "{} events muted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento muteado"
+msgstr[1] "{} eventos muteados"
 
 #. used when reporting the number of unmuted events.
 #. {} will be replaced by the number of events. E.g. "3 events unmuted"
 msgid "{} event unmuted"
 msgid_plural "{} events unmuted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} evento desmuteado"
+msgstr[1] "{} eventos desmuteados"
 
 msgid "enabled snap to grid"
 msgstr "ajuste a la cuadrícula habilitado"
@@ -965,7 +965,7 @@ msgstr "ajuste a la cuadrícula deshabililtado"
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
 msgid "{} pixels/beat"
-msgstr ""
+msgstr "{} píxeles/pulso"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -985,16 +985,16 @@ msgid "off"
 msgstr "apagado"
 
 msgid "Unrestrict minimum"
-msgstr ""
+msgstr "Quitar mínimo"
 
 msgid "Restrict minimum to current value"
-msgstr ""
+msgstr "Fijar mínimo al valor actual"
 
 msgid "Unrestrict maximum"
-msgstr ""
+msgstr "Quitar máximo"
 
 msgid "Restrict maximum to current value"
-msgstr ""
+msgstr "Fijar máximo al valor actual"
 
 msgid "low shelf"
 msgstr "filtro de shelving bajo"
@@ -2193,10 +2193,10 @@ msgid "all notes off"
 msgstr "todas las notas apagadas"
 
 msgid "Octave up"
-msgstr ""
+msgstr "Subiendo octava"
 
 msgid "Octave down"
-msgstr ""
+msgstr "Bajando octava"
 
 msgid "Increase MIDI channel"
 msgstr ""
@@ -3233,11 +3233,11 @@ msgstr "&Cerrar"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr ""
+msgstr "Optimización de REAPER para uso con lectores de pantalla"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
-msgstr ""
+msgstr "&Si"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"

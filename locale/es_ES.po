@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-04-01 18:44\n"
+"PO-Revision-Date: 2025-04-15 18:43\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -366,8 +366,8 @@ msgstr[1] "{} eventos añadidos"
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
-msgstr[0] "[] evento eliminado"
-msgstr[1] ".[] eventos eliminados"
+msgstr[0] "{} evento eliminado"
+msgstr[1] "{} eventos eliminados"
 
 #. Reported when copying events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events copied".
@@ -382,8 +382,8 @@ msgstr[1] "{} eventos copiados"
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] "[] nota seleccionada"
-msgstr[1] "[] notas seleccionadas"
+msgstr[0] "{} nota seleccionada"
+msgstr[1] "{} notas seleccionadas"
 
 #. Reported when selecting CC events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 CC events selected".
@@ -862,23 +862,23 @@ msgstr[1] "{} notas pixel a la derecha"
 #. "3 notes grid unit left"
 msgid "{} note grid unit left"
 msgid_plural "{} notes grid unit left"
-msgstr[0] "[] notas unidades de rejilla a la derecha"
-msgstr[1] "[] notas unidades de rejillas a la izquierda"
+msgstr[0] "{} notas unidades de rejilla a la derecha"
+msgstr[1] "{} notas unidades de rejillas a la izquierda"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes grid unit right"
 msgid "{} note grid unit right"
 msgid_plural "{} notes grid unit right"
-msgstr[0] "[] nota unidades de rejillas a la derecha"
-msgstr[1] "[] notas unidades de rejillas a la derecha"
+msgstr[0] "{} nota unidades de rejillas a la derecha"
+msgstr[1] "{} notas unidades de rejillas a la derecha"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pixel left"
 msgid "{} note start moved"
 msgid_plural "{} notes start moved"
-msgstr[0] "[] nota de comienzo desplazada"
+msgstr[0] "{} nota de comienzo desplazada"
 msgstr[1] "{} notas de comienzo desplazadas"
 
 #. Used when MIDI CCs change. {} is replaced by the
@@ -2421,7 +2421,7 @@ msgid "showed velocity numbers on notes"
 msgstr "mostrada velocidad en notas"
 
 msgid "hid velocity numbers on notes"
-msgstr "mostrar velocidad en notas"
+msgstr "ocultada velocidad en notas"
 
 msgid "showed note names"
 msgstr "mostrado nombre de notas"
@@ -2430,7 +2430,7 @@ msgid "hid note names"
 msgstr "ocultar nombre de notas"
 
 msgid "length matching grid"
-msgstr "longutud de la cuadrícula"
+msgstr "longitud de la cuadrícula"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
