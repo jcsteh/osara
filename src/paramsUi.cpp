@@ -5,6 +5,8 @@
  * License: GNU General Public License version 2.0
  */
 
+#include <chrono>
+#include <thread>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -338,6 +340,7 @@ class ParamsDialog {
 	}
 
 	void updateValue() {
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));	
 		this->valText = this->param->getValueText(this->val);
 		this->updateValueText();
 		if (this->param->isEditable) {
@@ -861,8 +864,8 @@ class FxParam: public Param {
 				}
 			}
 		} else {
-			this->step = (this->max - this->min) / 50;
-			this->largeStep = this->step * 5;
+			this->step = (this->max - this->min) / 1000;
+			this->largeStep = this->step * 20;
 		}
 		this->isEditable = true;
 		// Set this as the last touched FX and FX parameter, as well as the last
