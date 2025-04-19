@@ -159,6 +159,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
 - Item properties: Toggle lock
+- Item properties: Loop item source
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
 - Item properties: Reset item take gain to +0dB (un-normalize): Control+Alt+0
