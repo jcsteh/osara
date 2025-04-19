@@ -2044,6 +2044,53 @@ void postToggleItemLock(int command) {
 	outputMessage(s);
 }
 
+bool isItemLoopedSource(MediaItem* item) {
+	return *(bool*)GetSetMediaItemInfo(item, "B_LOOPSRC", nullptr);
+}
+
+void postToggleItemLoopSource(int command) {
+	int count = CountSelectedMediaItems(0);
+	if(count==0) {
+		outputMessage(translate("no items selected"));
+		return;
+	}
+	if(count==1)  {
+		outputMessage(isItemLoopedSource(GetSelectedMediaItem(0,0)) ?
+			// Translators: Reported when an action is used to enable loop source for an item.
+			translate("enabled loop source")
+			// Translators: Reported when an action is used to disable loopp source for an item.
+			: translate("disabled loop source"));
+		return;
+	}
+	int loopingCount=0;
+	int notLoopingCount=0;
+	for (int i=0; i<count; ++i) {
+		if(isItemLoopedSource(GetSelectedMediaItem(0, i))) {
+			++loopingCount;
+		} else {
+			++notLoopingCount;
+		}
+	}
+	ostringstream s;
+	if(loopingCount>0){
+		// Translators: Reported when loop source is enabled for multiple items. {} will be replaced
+		// with the number of items; e.g. "2 items enabled lloop source".
+		s << format(translate_plural("{} item enabled loop source", "{} items enabled loop source", loopingCount),
+			loopingCount);
+		if (notLoopingCount > 0) {
+			s << ", ";
+		}
+	}
+	if(notLoopingCount>0)  {
+		// Translators: Reported when loop source is disabled for multiple items. {} will be
+		// replaced with the number of items; e.g. "2 items disabled loop source".
+		s << format(
+			translate_plural("{} item disabled loop source", "{} items disabled loop source", notLoopingCount),
+			notLoopingCount);
+	}
+	outputMessage(s);
+}
+
 void postSetSelectionEnd(int command) {
 	outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
@@ -2671,6 +2718,7 @@ PostCommand POST_COMMANDS[] = {
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
 	{41561, postToggleItemSolo}, // Item properties: Toggle solo
 	{40687, postToggleItemLock}, // Item properties: Toggle lock
+	{40636, postToggleItemLoopSource}, // Item properties: Loop item source
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
 	{40917, postToggleMasterMono}, // Master track: Toggle stereo/mono (L+R)
 	{40041, postToggleAutoCrossfade}, // Options: Auto-crossfade media items when editing
