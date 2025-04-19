@@ -5,6 +5,8 @@
  * License: GNU General Public License version 2.0
  */
 
+#include <chrono>
+#include <thread>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -338,11 +340,14 @@ class ParamsDialog {
 	}
 
 	void updateValue() {
-		this->valText = this->param->getValueText(this->val);
-		this->updateValueText();
-		if (this->param->isEditable) {
-			SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
-		}
+		// Testing callLater to delay operations.
+		CallLater([this]() {
+			this->valText = this->param->getValueText(this->val);
+			this->updateValueText();
+			if (this->param->isEditable) {
+				SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
+			}
+		}, 5); // 5 milliseconds delay
 	}
 
 	void onParamChange() {
