@@ -134,6 +134,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Select and move to next item: Control+RightArrow
 - Item: Split items at edit or play cursor: S
 - Item: Split items at time selection: Shift+S
+- Item: Split at previous zero crossing: Alt+Z
 - Item: Heal splits in items: Control+H
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
@@ -873,8 +874,6 @@ This list is worth referencing when making your own key map additions, assigning
 - Item: Split items at timeline grid
 - Edit: Cut items
 - Item: Remove items
-- Item navigation: Move cursor to start of items
-- Item navigation: Move cursor to end of items
 - Item properties: Pitch item down one octave
 - Item properties: Pitch item up one octave
 - Item properties: Toggle take preserve pitch
