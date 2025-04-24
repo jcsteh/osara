@@ -347,7 +347,7 @@ class ParamsDialog {
 			if (this->param->isEditable) {
 				SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
 			}
-		}, 5); // 5 milliseconds delay
+		}, 50); // 50 milliseconds delay
 	}
 
 	void onParamChange() {
