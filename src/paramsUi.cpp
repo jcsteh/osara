@@ -340,14 +340,11 @@ class ParamsDialog {
 	}
 
 	void updateValue() {
-		// Testing callLater to delay operations.
-		CallLater([this]() {
-			this->valText = this->param->getValueText(this->val);
-			this->updateValueText();
-			if (this->param->isEditable) {
-				SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
-			}
-		}, 50); // 50 milliseconds delay
+		this->valText = this->param->getValueText(this->val);
+		this->updateValueText();
+		if (this->param->isEditable) {
+			SetWindowText(this->valueEdit, this->param->getValueForEditing().c_str());
+		}
 	}
 
 	void onParamChange() {
@@ -360,6 +357,8 @@ class ParamsDialog {
 	}
 
 	void onSliderChange(double newVal) {
+		static CallLater later;
+		later.cancel();
 		if (newVal == this->val
 				|| newVal < this->param->min || newVal > this->param->max) {
 			return;
@@ -389,7 +388,9 @@ class ParamsDialog {
 			}
 		}
 		this->param->setValue(this->val);
-		this->updateValue();
+		later = CallLater([this]() {
+			this->updateValue();
+		}, 50);
 	}
 
 	void onValueEdited() {
