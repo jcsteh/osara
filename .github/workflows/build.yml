@@ -20,7 +20,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-2025, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: set env
