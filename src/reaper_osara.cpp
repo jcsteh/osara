@@ -4107,6 +4107,8 @@ void cmdManageTempoTimeSigMarkers(Command* command) {
 }
 
 void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
+	unsigned int undoMask = getConfigUndoMask();
+	bool makeUndoPoint = undoMask & 1;
 	vector<MediaItem*> items;
 	for (int t = 0; t < CountSelectedTracks(nullptr); ++t) {
 		MediaTrack* track = GetSelectedTrack2(nullptr, t, false);
@@ -4114,6 +4116,9 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
 			MediaItem* item = GetTrackMediaItem(track, i);
 			items.push_back(item);
 		}
+	}
+	if (makeUndoPoint) {
+		Undo_BeginBlock();
 	}
 	// We might select multiple items. To improve performance, only refresh the UI
 	// after the entire operation is complete.
@@ -4130,7 +4135,9 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
 	}
 	PreventUIRefresh(-1);
 	UpdateArrange();
-	Undo_OnStateChangeEx2(nullptr, command->gaccel.desc, UNDO_STATE_ALL, -1);
+	if (makeUndoPoint) {
+		Undo_EndBlock(command->gaccel.desc, UNDO_STATE_ITEMS);
+	}
 	postSelectMultipleItems(command->gaccel.accel.cmd);
 }
 
