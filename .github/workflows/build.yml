@@ -11,6 +11,7 @@ defaults:
     shell: bash
 env:
   publisher: James Teh
+  VSCMD_SKIP_SENDTELEMETRY: 1
 concurrency:
   # There's no point continuing to run a build if it's already outdated by
   # another commit.
