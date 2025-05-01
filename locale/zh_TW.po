@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-04-01 18:44\n"
+"PO-Revision-Date: 2025-05-01 18:45\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1884,6 +1884,26 @@ msgstr[0] "{} 對象鎖定"
 msgid "{} item unlocked"
 msgid_plural "{} items unlocked"
 msgstr[0] "{} 對象解鎖"
+
+#. Reported when an action is used to enable loop source for an item.
+msgid "enabled loop source"
+msgstr "啟用循環源"
+
+#. Reported when an action is used to disable loopp source for an item.
+msgid "disabled loop source"
+msgstr "停用循環源"
+
+#. Reported when loop source is enabled for multiple items. {} will be replaced
+#. with the number of items; e.g. "2 items enabled lloop source".
+msgid "{} item enabled loop source"
+msgid_plural "{} items enabled loop source"
+msgstr[0] "{} 對象起用循環源"
+
+#. Reported when loop source is disabled for multiple items. {} will be
+#. replaced with the number of items; e.g. "2 items disabled loop source".
+msgid "{} item disabled loop source"
+msgid_plural "{} items disabled loop source"
+msgstr[0] "{} 對象停用循環源"
 
 msgid "set selection end"
 msgstr "設置選區結束"
