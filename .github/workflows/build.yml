@@ -53,7 +53,7 @@ jobs:
         run: pip install scons
       - id: get-scons-msvc-cache
         name: Get SCons MSVC Cache
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ env.CACHE_KEY != '' }}
         uses: actions/cache/restore@v4
         with:
           path: ~\scons_msvc_cache.json
