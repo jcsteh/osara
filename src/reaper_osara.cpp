@@ -1699,7 +1699,7 @@ void postCopy(int command) {
 void postCopyMoveTimeSelection(int command) {
 	fakeFocus = FOCUS_RULER;
 	double start, end;
-	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	if (start == end) {
 		outputMessage(translate("no time selection"));
 		return;
@@ -3807,7 +3807,7 @@ void cmdRemoveTracks(Command* command) {
 
 void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	double start, end;
-	GetSet_LoopTimeRange(false, true, &start, &end, false);
+	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
 	auto countAffected = [start, end](auto getFunc, int totalCount) {
 		int count = 0;
