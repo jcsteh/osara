@@ -72,7 +72,7 @@ jobs:
       - name: build
         run: scons --debug=time "publisher=${{ env.publisher }}" version=${{ env.version }}
       - name: Set SCons MSVC Cache
-        if: steps.get-scons-msvc-cache.outputs.cache-hit != 'true'
+        if: ${{ steps.get-scons-msvc-cache.outputs.cache-hit != 'true' && matrix.os == 'windows-latest' }}
         uses: actions/cache/save@v4
         with:
           path: ~\scons_msvc_cache.json
