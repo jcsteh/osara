@@ -12,6 +12,7 @@ defaults:
 env:
   publisher: James Teh
   VSCMD_SKIP_SENDTELEMETRY: 1
+  SCONS_CACHE_MSVC_CONFIG: 1
 concurrency:
   # There's no point continuing to run a build if it's already outdated by
   # another commit.
@@ -37,6 +38,7 @@ jobs:
           fi
           if [ ${{ matrix.os }} == windows-latest ]; then
             echo os=windows >> "$GITHUB_ENV"
+            echo "CACHE_KEY=${RUNNER_OS}-${ImageVersion}" >> $GITHUB_ENV
           else
             echo os=mac >> "$GITHUB_ENV"
           fi
@@ -49,6 +51,13 @@ jobs:
         run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
       - name: setup
         run: pip install scons
+      - id: get-scons-msvc-cache
+        name: Get SCons MSVC Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ~\scons_msvc_cache.json
+          key: ${{ env.CACHE_KEY }}
+          fail-on-cache-miss: false
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
         # Use NSIS 2.46 to reduce AV false positives.
@@ -61,6 +70,12 @@ jobs:
         run: brew install php
       - name: build
         run: scons --debug=time "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: Get SCons MSVC Cache
+        if: steps.get-scons-msvc-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~\scons_msvc_cache.json
+          key: ${{ env.CACHE_KEY }}
       - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
