@@ -4027,9 +4027,9 @@ void cmdMoveItemsOrEnvPoint(Command* command) {
 
 void cmdInsertOrMoveSpecificMarker(Command* command) {
 	int cmd = command->gaccel.accel.cmd;
-	int count = CountProjectMarkers(0, nullptr, nullptr);
+	int beforeCount = CountProjectMarkers(0, nullptr, nullptr);
 	int wantNum;
-	// Work out the desired marker based on the command id.
+	// Work out the desired marker based on the command ID.
 	if (cmd == 40656)
 		wantNum = 10;
 	else if (40657 <= cmd && cmd <= 40665)
@@ -4037,7 +4037,8 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 	else
 		return; // Shouldn't happen.
 	double beforePos = -1;
-	for (int i = 0; i < count; ++i) {
+	bool markerExistsBefore = false;
+	for (int i = 0; i < beforeCount; ++i) {
 		double pos;
 		bool reg;
 		int num;
@@ -4045,10 +4046,12 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 		if (reg || wantNum != num)
 			continue;
 		beforePos = pos;
+		markerExistsBefore = true;
 		break;
 	}
 	Main_OnCommand(cmd, 0);
-	for (int i = 0; i < count; ++i) {
+	int afterCount = CountProjectMarkers(0, nullptr, nullptr);
+	for (int i = 0; i < afterCount; ++i) {
 		bool reg;
 		int num;
 		const char* name;
@@ -4061,9 +4064,11 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 			// Translators: used when reporting a named marker has been moved. {} will be
 			// replaced with the name of the marker; e.g. "v2 marker moved"
 			s << format(translate("{} marker moved"), name);
-		} else{ // unnamed
-			if (beforePos == -1) {
-				// Translators: used to report an unnamed marker has been inserted. {} is replaced with the marker number.  
+		} else{
+			if (!markerExistsBefore) {
+				// Translators: Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+				s << format(translate("marker {} inserted"), num);
+			} else if (beforePos == -1) {
 				s << format(translate("marker {} inserted"), num);
 			} else {
 				// Translators: used to report an unnamed marker has been moved. {} is replaced with the marker number.  
