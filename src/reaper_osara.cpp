@@ -2092,7 +2092,12 @@ void postToggleItemLoopSource(int command) {
 }
 
 void postSetSelectionEnd(int command) {
-	outputMessage(translate("set selection end"));
+	double start;
+	GetSet_LoopTimeRange(false, false, &start, nullptr, false);
+	if(start == 0)
+		outputMessage(translate("selected to start of project"));
+	else
+		outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
 }
 
