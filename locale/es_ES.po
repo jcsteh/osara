@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-04-15 18:43\n"
+"PO-Revision-Date: 2025-05-01 18:45\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1964,6 +1964,28 @@ msgid_plural "{} items unlocked"
 msgstr[0] "{} ítem desbloqueado"
 msgstr[1] "{} ítems desbloqueados"
 
+#. Reported when an action is used to enable loop source for an item.
+msgid "enabled loop source"
+msgstr "activado fuente de loop"
+
+#. Reported when an action is used to disable loopp source for an item.
+msgid "disabled loop source"
+msgstr "desactivado fuente de loop"
+
+#. Reported when loop source is enabled for multiple items. {} will be replaced
+#. with the number of items; e.g. "2 items enabled lloop source".
+msgid "{} item enabled loop source"
+msgid_plural "{} items enabled loop source"
+msgstr[0] "{} ítem activado de fuente loop"
+msgstr[1] "{} ítems activado de fuente de loop"
+
+#. Reported when loop source is disabled for multiple items. {} will be
+#. replaced with the number of items; e.g. "2 items disabled loop source".
+msgid "{} item disabled loop source"
+msgid_plural "{} items disabled loop source"
+msgstr[0] "{} ítem desactivado de fuente de loop"
+msgstr[1] "{} ítems desactivado de fuente de loop"
+
 msgid "set selection end"
 msgstr "fin de selección fijado"
 
@@ -2427,7 +2449,7 @@ msgid "showed note names"
 msgstr "mostrado nombre de notas"
 
 msgid "hid note names"
-msgstr "ocultar nombre de notas"
+msgstr "ocultado nombre de notas"
 
 msgid "length matching grid"
 msgstr "longitud de la cuadrícula"

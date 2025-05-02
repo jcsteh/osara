@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-04-01 18:44\n"
+"PO-Revision-Date: 2025-05-01 18:45\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2120,6 +2120,32 @@ msgid_plural "{} items unlocked"
 msgstr[0] "{} элемент разблокирован"
 msgstr[1] "{} элемента разблокированы"
 msgstr[2] "{} элементов разблокированы"
+msgstr[3] ""
+
+#. Reported when an action is used to enable loop source for an item.
+msgid "enabled loop source"
+msgstr ""
+
+#. Reported when an action is used to disable loopp source for an item.
+msgid "disabled loop source"
+msgstr ""
+
+#. Reported when loop source is enabled for multiple items. {} will be replaced
+#. with the number of items; e.g. "2 items enabled lloop source".
+msgid "{} item enabled loop source"
+msgid_plural "{} items enabled loop source"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Reported when loop source is disabled for multiple items. {} will be
+#. replaced with the number of items; e.g. "2 items disabled loop source".
+msgid "{} item disabled loop source"
+msgid_plural "{} items disabled loop source"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 msgstr[3] ""
 
 msgid "set selection end"
