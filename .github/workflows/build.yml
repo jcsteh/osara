@@ -27,6 +27,7 @@ jobs:
     steps:
       - name: set env
         run: |
+          echo "CACHE_KEY=${RUNNER_OS}-${ImageVersion}" >> $GITHUB_ENV
           if [ $GITHUB_EVENT_NAME == push ]; then
             # For example: 2025.3.7.2011,23631c6e
             # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
@@ -38,7 +39,6 @@ jobs:
           fi
           if [ ${{ matrix.os }} == windows-latest ]; then
             echo os=windows >> "$GITHUB_ENV"
-            echo "CACHE_KEY=${RUNNER_OS}-${ImageVersion}" >> $GITHUB_ENV
           else
             echo os=mac >> "$GITHUB_ENV"
           fi
@@ -51,14 +51,12 @@ jobs:
         run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
       - name: setup
         run: pip install scons
-      - id: get-scons-msvc-cache
-        name: Get SCons MSVC Cache
-        if: ${{ env.CACHE_KEY != '' }}
-        uses: actions/cache/restore@v4
+      - name: SCons MSVC Cache
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/cache@v4
         with:
           path: ~\scons_msvc_cache.json
           key: ${{ env.CACHE_KEY }}
-          fail-on-cache-miss: false
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
         # Use NSIS 2.46 to reduce AV false positives.
@@ -71,12 +69,6 @@ jobs:
         run: brew install php
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
-      - name: Set SCons MSVC Cache
-        if: ${{ steps.get-scons-msvc-cache.outputs.cache-hit != 'true' && matrix.os == 'windows-latest' }}
-        uses: actions/cache/save@v4
-        with:
-          path: ~\scons_msvc_cache.json
-          key: ${{ env.CACHE_KEY }}
       - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
