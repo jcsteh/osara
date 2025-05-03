@@ -11,6 +11,8 @@ defaults:
     shell: bash
 env:
   publisher: James Teh
+  VSCMD_SKIP_SENDTELEMETRY: 1
+  SCONS_CACHE_MSVC_CONFIG: 1
 concurrency:
   # There's no point continuing to run a build if it's already outdated by
   # another commit.
@@ -25,6 +27,7 @@ jobs:
     steps:
       - name: set env
         run: |
+          echo "CACHE_KEY=${RUNNER_OS}-${ImageVersion}" >> $GITHUB_ENV
           if [ $GITHUB_EVENT_NAME == push ]; then
             # For example: 2025.3.7.2011,23631c6e
             # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
@@ -48,6 +51,12 @@ jobs:
         run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
       - name: setup
         run: pip install scons
+      - name: SCons MSVC Cache
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/cache@v4
+        with:
+          path: ~\scons_msvc_cache.json
+          key: ${{ env.CACHE_KEY }}
       - name: Windows setup
         if: ${{ matrix.os == 'windows-latest' }}
         # Use NSIS 2.46 to reduce AV false positives.
