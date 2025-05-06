@@ -132,7 +132,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
 - Item navigation: Select and move to next item: Control+RightArrow
-- Item: Split items at edit or play cursor: S
+- Custom: Select and split item under edit or play cursor: A
+- Item: Split items at edit or play cursor (select right): S
 - Item: Split items at time selection: Shift+S
 - Item: Split at previous zero crossing: Alt+Z
 - Item: Heal splits in items: Control+H
@@ -151,11 +152,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Move cursor to start of items: Control+Shift+,
 - Item navigation: Move cursor to end of items: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
-- Item: Select all items on selected tracks in current time selection: Alt+Shift+A
 - Item grouping: Group items: Control+G
 - Item grouping: Remove items from group: Control+Shift+G
 - Item grouping: Select all items in groups: Shift+G
 - Item: Select all items in current time selection: Control+Shift+A
+- Custom: Select items on selected tracks in current time selection (clears prior item selection): Alt+Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
 - Item properties: Toggle lock
@@ -872,6 +873,7 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
 - Edit: Cut items
 - Item: Remove items
