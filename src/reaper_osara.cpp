@@ -4037,16 +4037,13 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 	else
 		return; // Shouldn't happen.
 	double beforePos = -1;
-	bool markerExistsBefore = false;
 	for (int i = 0; i < beforeCount; ++i) {
 		double pos;
 		bool reg;
 		int num;
 		EnumProjectMarkers(i, &reg, &pos, nullptr, nullptr, &num);
-		if (reg || wantNum != num)
-			continue;
+		if (reg || wantNum != num) continue;
 		beforePos = pos;
-		markerExistsBefore = true;
 		break;
 	}
 	Main_OnCommand(cmd, 0);
@@ -4056,26 +4053,21 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 		int num;
 		const char* name;
 		EnumProjectMarkers(i, &reg, nullptr, nullptr, &name, &num);
-		if (num != wantNum || reg)
-			continue;
+		if (num != wantNum || reg) continue;
 		fakeFocus =FOCUS_MARKER;
-		ostringstream s;
 		if (name[0]) {
 			// Translators: used when reporting a named marker has been moved. {} will be
 			// replaced with the name of the marker; e.g. "v2 marker moved"
-			s << format(translate("{} marker moved"), name);
+			outputMessage(format(translate("{} marker moved"), name));
 		} else{
-			if (!markerExistsBefore) {
+			if (beforePos == -1) {
 				// Translators: Reports an unnamed marker has been inserted. {} is replaced with the marker number.
-				s << format(translate("marker {} inserted"), num);
-			} else if (beforePos == -1) {
-				s << format(translate("marker {} inserted"), num);
+				outputMessage(format(translate("marker {} inserted"), num));
 			} else {
 				// Translators: used to report an unnamed marker has been moved. {} is replaced with the marker number.  
-				s << format(translate("marker {} moved"), num);
+				outputMessage(format(translate("marker {} moved"), num));
 			}
 		}
-		outputMessage(s);
 		return;
 	}
 }
