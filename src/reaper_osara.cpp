@@ -2680,7 +2680,7 @@ PostCommand POST_COMMANDS[] = {
 	{41768, postGoToSpecificMarker}, // Regions: Go to region 08 after current region finishes playing (smooth seek)
 	{41769, postGoToSpecificMarker}, // Regions: Go to region 09 after current region finishes playing (smooth seek)
 	{41760, postGoToSpecificMarker}, // Regions: Go to region 10 after current region finishes playing (smooth seek)
-	{40115, postChangeTrackVolume}, // Track: Nudge track volume up
+		{40115, postChangeTrackVolume}, // Track: Nudge track volume up
 	{40116, postChangeTrackVolume}, // Track: Nudge track volume down
 	{40743, postChangeMasterTrackVolume}, // Track: Nudge master track volume up
 	{40744, postChangeMasterTrackVolume}, // Track: Nudge master track volume down
@@ -4027,6 +4027,53 @@ void cmdMoveItemsOrEnvPoint(Command* command) {
 	cmdMoveSelEnvelopePoints(command);
 	} else {
 		cmdMoveItemEdge(command);
+	}
+}
+
+void cmdInsertOrMoveSpecificMarker(Command* command) {
+	int cmd = command->gaccel.accel.cmd;
+	int beforeCount = CountProjectMarkers(0, nullptr, nullptr);
+	int wantNum;
+	// Work out the desired marker based on the command ID.
+	if (cmd == 40656)
+		wantNum = 10;
+	else if (40657 <= cmd && cmd <= 40665)
+		wantNum = cmd - 40656;
+	else
+		return; // Shouldn't happen.
+	double beforePos = -1;
+	for (int i = 0; i < beforeCount; ++i) {
+		double pos;
+		bool reg;
+		int num;
+		EnumProjectMarkers(i, &reg, &pos, nullptr, nullptr, &num);
+		if (reg || wantNum != num) continue;
+		beforePos = pos;
+		break;
+	}
+	Main_OnCommand(cmd, 0);
+	int afterCount = CountProjectMarkers(0, nullptr, nullptr);
+	for (int i = 0; i < afterCount; ++i) {
+		bool reg;
+		int num;
+		const char* name;
+		EnumProjectMarkers(i, &reg, nullptr, nullptr, &name, &num);
+		if (num != wantNum || reg) continue;
+		fakeFocus =FOCUS_MARKER;
+		if (name[0]) {
+			// Translators: used when reporting a named marker has been moved. {} will be
+			// replaced with the name of the marker; e.g. "v2 marker moved"
+			outputMessage(format(translate("{} marker moved"), name));
+		} else{
+			if (beforePos == -1) {
+				// Translators: Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+				outputMessage(format(translate("marker {} inserted"), num));
+			} else {
+				// Translators: used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+				outputMessage(format(translate("marker {} moved"), num));
+			}
+		}
+		return;
 	}
 }
 
@@ -5406,6 +5453,16 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim left edge of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 40657}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 1 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40658}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 2 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40659}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 3 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40660}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 4 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40661}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 5 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40662}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 6 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40663}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 7 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40664}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 8 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40665}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 9 to play/edit cursor
+	{MAIN_SECTION, {{0, 0, 40656}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 10 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40613}, nullptr}, nullptr, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, nullptr}, nullptr, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, nullptr}, nullptr, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor

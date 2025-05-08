@@ -211,19 +211,29 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - FX: Show/hide track envelope for last touched FX parameter: Control+Alt+L
 
 #### Markers and Regions
+- Markers: Insert marker at current position: M
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
 - Markers: Go to marker 01: 1
+- Markers: Add/move marker 1 to play/edit cursor: Control+1
 - Markers: Go to marker 02: 2
+- Markers: Add/move marker 2 to play/edit cursor: Control+2
 - Markers: Go to marker 03: 3
+- Markers: Add/move marker 3 to play/edit cursor: Control+3
 - Markers: Go to marker 04: 4
+- Markers: Add/move marker 4 to play/edit cursor: Control+4
 - Markers: Go to marker 05: 5 
+- Markers: Add/move marker 5 to play/edit cursor: Control+5
 - Markers: Go to marker 06:6
+- Markers: Add/move marker 6 to play/edit cursor: Control+6
 - Markers: Go to marker 07: 7
+- Markers: Add/move marker 7 to play/edit cursor: Control+7
 - Markers: Go to marker 08: 8
+- Markers: Add/move marker 8 to play/edit cursor: Control+8
 - Markers: Go to marker 09: 9
+- Markers: Add/move marker 9 to play/edit cursor: Control+9
 - Markers: Go to marker 10: 0
-- Markers: Insert marker at current position: M
+- Markers: Add/move marker 10 to play/edit cursor: Control+0
 - Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
 - Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
 - Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
