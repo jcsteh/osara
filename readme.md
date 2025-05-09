@@ -716,31 +716,33 @@ The points within an automation item can only be accessed after moving to that a
 To return to the points in the underlying envelope, simply move focus back to the envelope by selecting it again with Alt+L or Alt+Shift+L (OSARA: Select next track/take envelope (depending on focus), OSARA: Select previous track/take envelope (depending on focus)).
 
 ### Notes and Chords in the MIDI Editor
-In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.
-In this context, a chord is any number of notes that are placed at the exact same position.
-If there is only one note at a given position, it will be treated as a chord.
+In the MIDI Editor, OSARA provides actions to move backward and forward between single notes and chords. In this context, a chord is any number of notes that are placed at the exact same position.
+When positioned on a chord, actions are also available to move through individual notes of it.
 
-You move between chords using the Left and Right arrow keys (OSARA: Move to previous chord, OSARA: Move to next chord).
-When you move to a chord, the edit cursor will be placed at the chord and the new position will be reported.
-The notes of the chord will be previewed and the number of notes will be reported.
-The notes in the chord are also selected so you can manipulate the entire chord.
+Use the Left and Right arrow keys to navigate backward and forward through MIDI note data (OSARA: Move backward to previous single note or chord, OSARA: Move forward to next single note or chord).
+When you move to a note or chord, the edit cursor will be placed at that position and the new cursor position will be reported.
+The note, or notes making up a chord will be previewed, and the number of notes will be reported.
+All notes in a chord are automatically selected, so you can manipulate the entire chord.
 For example, pressing Delete will delete the chord.
 
-Once you have moved to a chord, you can move to individual notes using the Up and Down arrow keys (OSARA: Move to previous note in chord, OSARA: Move to next note in chord).
-When you move to a note, that note will be previewed and its name will be reported.
+When you've moved to a chord, you can move through individual notes using the Up and Down arrow keys (OSARA: Move to previous note in chord, OSARA: Move to next note in chord).
+When you move to a note, that note will be previewed, its name and length will be reported.
 The single note will also be selected so you can manipulate just that note.
-For example, pressing Delete will delete only that note.
+For example, moving to the third note in a chord then pressing Delete will delete only that note.
 
-When a chord or a note within a chord is being previewed, you can cancel the note preview by pressing the Control key.
+When a note or chord is being previewed, you can cancel the note preview by pressing the Control key.
 
-You can select multiple chords or multiple notes in a chord.
-To do this, first move to the first chord or note you want to select.
-Then, use Shift+DownArrow or Shift+UpArrow to add the next or previous chord or note to the selection.
-For example, if you've moved to a chord and also want to add the next chord to the selection, you would press Shift+RightArrow.
+You can select multiple notes and multiple notes within a chord, either contiguously or noncontiguously.
 
-Noncontiguous selection is also possible.
-You do this in the same way described above for tracks and items.
-That is, press Shift+Space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to switch to noncontiguous selection, move to other chords/notes with Shift+Arrows and press Shift+Space to select/unselect the current chord/note.
+To make a contiguous selection:
+1. Move to the first chord or note you want to select. Remember, when moving to a chord, all notes of it are automatically selected.
+2. To add the previous note or chord to selection, use Shift+LeftArrow.
+3. To add the next note or chord to selection, use Shift+RightArrow.
+
+Noncontiguous selection is also possible in the MIDI Editor. You do this in the same way described above for tracks and items. That is:
+1. Move to the first note or chord you want to select.
+2. Press Shift+Space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to start a noncontiguous selection.
+3. Navigate other chords/notes with Shift+Arrows, pressing Shift+Space to toggle selection of those.
 
 ### Note Preview in the MIDI Event List (Windows Only)
 When the MIDI Editor is set to Event List mode, REAPER presents a list with all the events in the current MIDI item.
