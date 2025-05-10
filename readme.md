@@ -89,9 +89,9 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Track: Duplicate tracks: Alt+D
 
 #### Adjusting Track Parameters
-- Track: Mute/unmute tracks: F5
+- Track: Toggle mute for selected tracks
 - Track: Toggle mute for master track: Shift+F5
-- Track: Solo/unsolo tracks: F6
+- Track: Toggle solo for selected tracks
 - Toggle record arming for current (last touched) track: F7
 - Track: Cycle track record monitor: F8
 - Track: Invert track phase: F9
@@ -925,7 +925,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Insert new track
 - Track: Select all tracks
 - SWS: Toggle (invert) track selection
-- Track: Toggle mute for selected tracks
+- Track: Mute/unmute tracks
+- Track: Solo/unsolo tracks
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
 - Track: Cut tracks
