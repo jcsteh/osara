@@ -246,37 +246,65 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 		return;
 	}
 	double now = GetCursorPosition();
-	int point = getEnvelopePointAtCursor();
-	if (point < 0) {
-		if (direction != 1)
-			return;
-		++point;
-	}
 	double time, value;
 	int shape;
 	bool selected;
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
-		&shape, nullptr, &selected);
-	time = envelopeTimeToProjectTime(time);
-	if ((direction == 1 && time < now)
-		// If this point is at the cursor, skip it only if it's the current point.
-		// This allows you to easily get to a point at the cursor
-		// while still allowing you to move beyond it once you do.
-		|| (direction == 1 && point == currentEnvelopePoint && time == now)
-		// Moving backward should skip the point at the cursor.
-		|| (direction == -1 && time >= now)
-	) {
-		// This isn't the point we want. Try the next.
-		int newPoint = point + direction;
-		if (0 <= newPoint && newPoint < count) {
-			point = newPoint;
+	int point = -1;
+	bool skip = false;
+	if (currentEnvelopePoint) {
+		GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint,
+			&time, &value, &shape, nullptr, &selected);
+		time = envelopeTimeToProjectTime(time);
+		if (time == now) {
+			// The last envelope point we moved to is at the cursor. Use that as our
+			// starting point and skip to the next/previous point if possible. This
+			// makes it possible to reliably move between points at the same position.
+			point = *currentEnvelopePoint;
+			skip = true;
+		}
+	}
+	if (point == -1) {
+		// We haven't previously moved to an envelope point or it's not at the cursor.
+		point = getEnvelopePointAtCursor();
+		if (point < 0) {
+			// There's no point at or before the cursor.
+			if (direction == -1) {
+				// We can't move further backward.
+				return;
+			}
+			// Skip to the next point if possible.
+			skip = true;
+		} else {
+			GetEnvelopePointEx(envelope, currentAutomationItem, point,
+				&time, &value, &shape, nullptr, &selected);
+			time = envelopeTimeToProjectTime(time);
+			// This point is at or before the cursor. If we're moving backward, this is
+			// the point we want. Similarly, if we're moving forward and this point is
+			// at the cursor, this is where we want to be, since moving forward or
+			// backward should reach a point that is right at the cursor.
+			if (time != now && direction == 1) {
+				// We're moving forward and this point is before the cursor. Skip to the
+				// next if possible.
+				skip = true;
+			}
+		}
+	}
+	if (skip) {
+		point += direction;
+		if (0 <= point && point < count) {
+			// There is a point in this direction.
 			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
 				&shape, nullptr, &selected);
 			time = envelopeTimeToProjectTime(time);
+		} else {
+			// There is no point in this direction.
+			if (time != now) {
+				return;
+			}
+			// The point where we started is at the cursor, so use that.
+			point -= direction;
 		}
 	}
-	if (direction != 0 && direction == 1 ? time < now : time > now)
-		return; // No point in this direction.
 	fakeFocus = FOCUS_ENVELOPE;
 	currentEnvelopePoint.emplace(point);
 	if (clearSelection) {
