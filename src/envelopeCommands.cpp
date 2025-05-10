@@ -291,7 +291,12 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 	}
 	if (skip) {
 		point += direction;
-		if (point < 0 || point >= count) {
+		if (0 <= point && point < count) {
+			// There is a point in this direction.
+			GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
+				&shape, nullptr, &selected);
+			time = envelopeTimeToProjectTime(time);
+		} else {
 			// There is no point in this direction.
 			if (time != now) {
 				return;
@@ -300,9 +305,6 @@ void moveToEnvelopePoint(int direction, bool clearSelection=true, bool select = 
 			point -= direction;
 		}
 	}
-	GetEnvelopePointEx(envelope, currentAutomationItem, point, &time, &value,
-		&shape, nullptr, &selected);
-	time = envelopeTimeToProjectTime(time);
 	fakeFocus = FOCUS_ENVELOPE;
 	currentEnvelopePoint.emplace(point);
 	if (clearSelection) {
