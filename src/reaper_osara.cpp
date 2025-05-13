@@ -2708,10 +2708,12 @@ PostCommand POST_COMMANDS[] = {
 	{40293, postTrackIo}, // Track: View I/O for current track
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
+	{1007, postChangeTransportState}, // Transport: Play
 	{40044, postChangeTransportState}, // Transport: Play/stop
 	{40073, postChangeTransportState}, // Transport: Play/pause
 	{40328, postChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
 	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
+	{1016, postChangeTransportState}, // Transport: Stop
 	{1013, postChangeTransportState}, // Transport: Record
 	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
