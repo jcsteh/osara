@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2025-05-01 18:45\n"
+"PO-Revision-Date: 2025-05-15 18:46\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -1986,6 +1986,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "selected to start of project"
+msgstr ""
+
 msgid "set selection end"
 msgstr "Setze Time Selektion Ende"
 
@@ -2591,6 +2594,21 @@ msgstr[1] ""
 msgid "contents of time selection removed"
 msgstr "Inhalt der Time Selektion entfernt"
 
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr ""
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "Marker {} eingefügt"
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr ""
+
 msgid "marker deleted"
 msgstr "Marker gelöscht"
 
@@ -2809,11 +2827,6 @@ msgstr "Version: {}"
 msgid "About OSARA"
 msgstr "Über OSARA"
 
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr "Marker {} eingefügt"
-
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
@@ -2841,9 +2854,6 @@ msgstr "track nicht grupiert"
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "An aktueller Position"
-
-msgid "selected to start of project"
-msgstr ""
 
 msgid "selected to end of project"
 msgstr ""
@@ -3070,17 +3080,17 @@ msgstr ""
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "Osara: Aktivieren nicht zusammenhängender Selektion / Umschalten der Selektion von Noten und Akkorden"
 
-msgid "OSARA: Move to next chord"
-msgstr "Osara: Gehe zum nächsten Akkord"
+msgid "OSARA: Move forward to next single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to previous chord"
-msgstr "Osara: gehe zum vorherigen Akkord"
+msgid "OSARA: Move backward to previous single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to next chord and add to selection"
-msgstr "Osara: gehe zum nächsten Akkord und füge diesen der Selektion hinzu"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
+msgstr ""
 
-msgid "OSARA: Move to previous chord and add to selection"
-msgstr "Osara: gehe zum vorherigen Akkord und füge diesen der Selektion hinzu"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
+msgstr ""
 
 msgid "OSARA: Move to next note in chord"
 msgstr "Osara: gehe zur nächsten Note im Akkord"

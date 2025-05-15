@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-05-01 18:45\n"
+"PO-Revision-Date: 2025-05-15 18:46\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1905,6 +1905,9 @@ msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
 msgstr[0] "{} 對象停用循環源"
 
+msgid "selected to start of project"
+msgstr "選擇到工程開始"
+
 msgid "set selection end"
 msgstr "設置選區結束"
 
@@ -2493,6 +2496,21 @@ msgstr[0] "{} 分割被癒合"
 msgid "contents of time selection removed"
 msgstr "時間選區的內容已移除"
 
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr "{} 標記被移動"
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "標記 {} 插入"
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr "標記 {} 被移動"
+
 msgid "marker deleted"
 msgstr "標記刪除"
 
@@ -2709,11 +2727,6 @@ msgstr "版本: {}"
 msgid "About OSARA"
 msgstr "關於 OSARA"
 
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr "標記 {} 插入"
-
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
@@ -2739,9 +2752,6 @@ msgstr "軌道未分組"
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "在當前位置"
-
-msgid "selected to start of project"
-msgstr "選擇到工程開始"
 
 msgid "selected to end of project"
 msgstr "選擇到工程結束"
@@ -2968,17 +2978,17 @@ msgstr "OSARA: 報告播放游標位置的速度與拍號，按兩次開啟添�
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
 
-msgid "OSARA: Move to next chord"
-msgstr "OSARA: 移至下一個和弦"
+msgid "OSARA: Move forward to next single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to previous chord"
-msgstr "OSARA: 移至上一個和弦"
+msgid "OSARA: Move backward to previous single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: 移至下一個和弦並添加至選區"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
+msgstr ""
 
-msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: 移至上一個和弦並添加至選區"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
+msgstr ""
 
 msgid "OSARA: Move to next note in chord"
 msgstr "OSARA: 移至和弦中的下一個音符"

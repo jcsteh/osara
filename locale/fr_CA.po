@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-05-01 18:45\n"
+"PO-Revision-Date: 2025-05-15 18:46\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1986,6 +1986,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] "{} Source de boucle d'objet désactivée"
 msgstr[1] "{} Sources de boucle d'objet désactivée"
 
+msgid "selected to start of project"
+msgstr "sélectionné à partir du début du projet"
+
 msgid "set selection end"
 msgstr "fin de la sélection définie"
 
@@ -2591,6 +2594,21 @@ msgstr[1] "{} scissions réparées"
 msgid "contents of time selection removed"
 msgstr "contenu de la sélection temporelle supprimé"
 
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr "{} marqueur déplacé"
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "marqueur {} inséré"
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr "le marqueur {} a été déplacé"
+
 msgid "marker deleted"
 msgstr "marqueur supprimé"
 
@@ -2809,11 +2827,6 @@ msgstr "Version: {}"
 msgid "About OSARA"
 msgstr "À propos d'OSARA"
 
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr "marqueur {} inséré"
-
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
@@ -2841,9 +2854,6 @@ msgstr "piste non groupéepiste non groupée"
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "À la position actuelle"
-
-msgid "selected to start of project"
-msgstr "sélectionné à partir du début du projet"
 
 msgid "selected to end of project"
 msgstr "sélectionné jusqu'à la fin du projet"
@@ -3070,17 +3080,17 @@ msgstr "OSARA: Énoncer le tempo et la signature rythmique au curseur de lecture
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
 
-msgid "OSARA: Move to next chord"
-msgstr "OSARA: Sélectionne la note ou l'accord suivant"
+msgid "OSARA: Move forward to next single note or chord"
+msgstr "OSARA: Passez à la note ou accord suivant"
 
-msgid "OSARA: Move to previous chord"
-msgstr "OSARA: Sélectionne la note ou l'accord précédent"
+msgid "OSARA: Move backward to previous single note or chord"
+msgstr "OSARA: Passez à la note ou accord précédent"
 
-msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: Sélectionne l'accord suivant et ajoute à la sélection"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
+msgstr "OSARA: Passez à la note ou accord suivant et ajouter à la sélection"
 
-msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: Sélectionne l'accord précédent et ajoute à la sélection"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
+msgstr "OSARA: Passez à la note ou accord précédent et ajouter à la sélection"
 
 msgid "OSARA: Move to next note in chord"
 msgstr "OSARA: Sélectionne la note suivante de l'accord"

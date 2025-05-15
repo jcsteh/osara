@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2025-05-01 18:45\n"
+"PO-Revision-Date: 2025-05-15 18:46\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -1986,6 +1986,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "selected to start of project"
+msgstr ""
+
 msgid "set selection end"
 msgstr ""
 
@@ -2591,6 +2594,21 @@ msgstr[1] ""
 msgid "contents of time selection removed"
 msgstr ""
 
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr ""
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr ""
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr ""
+
 msgid "marker deleted"
 msgstr ""
 
@@ -2809,11 +2827,6 @@ msgstr ""
 msgid "About OSARA"
 msgstr ""
 
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr ""
-
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
@@ -2840,9 +2853,6 @@ msgstr ""
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
-msgstr ""
-
-msgid "selected to start of project"
 msgstr ""
 
 msgid "selected to end of project"
@@ -3070,16 +3080,16 @@ msgstr ""
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr ""
 
-msgid "OSARA: Move to next chord"
+msgid "OSARA: Move forward to next single note or chord"
 msgstr ""
 
-msgid "OSARA: Move to previous chord"
+msgid "OSARA: Move backward to previous single note or chord"
 msgstr ""
 
-msgid "OSARA: Move to next chord and add to selection"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
 msgstr ""
 
-msgid "OSARA: Move to previous chord and add to selection"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
 msgstr ""
 
 msgid "OSARA: Move to next note in chord"

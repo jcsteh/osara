@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-05-01 18:45\n"
+"PO-Revision-Date: 2025-05-15 18:46\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -229,13 +229,13 @@ msgid "showed track {} envelope"
 msgstr "显示轨道 {} 包络"
 
 msgid "hid track {} envelope"
-msgstr "影藏轨道 {} 包络"
+msgstr "隐藏轨道 {} 包络"
 
 msgid "showed take {} envelope"
 msgstr "显示片段 {} 包络"
 
 msgid "hid take {} envelope"
-msgstr "影藏片段 {} 包络"
+msgstr "隐藏片段 {} 包络"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
@@ -257,7 +257,7 @@ msgstr "插入自动化对象"
 #. replaced with the number of items; e.g. "2 automation items added".
 msgid "{} automation item added"
 msgid_plural "{} automation items added"
-msgstr[0] "{} 自动化对象已添加"
+msgstr[0] "{} 自动化对象添加"
 
 msgid "no automation items glued"
 msgstr "无自动化对象粘合"
@@ -351,7 +351,7 @@ msgstr "无内容粘贴"
 #. the number of events; e.g. "2 events added".
 msgid "{} event added"
 msgid_plural "{} events added"
-msgstr[0] "{} 事件已添加"
+msgstr[0] "{} 事件添加"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -363,7 +363,7 @@ msgstr[0] "{} 事件移除"
 #. the number of events; e.g. "2 events copied".
 msgid "{} event copied"
 msgid_plural "{} events copied"
-msgstr[0] "{} 事件已复制"
+msgstr[0] "{} 事件复制"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -719,7 +719,7 @@ msgstr[0] "{} 音符连奏"
 #. "3 notes length changed"
 msgid "{} note length changed"
 msgid_plural "{} notes length changed"
-msgstr[0] "{} 音符长度已更改"
+msgstr[0] "{} 音符长度更改"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -768,7 +768,7 @@ msgstr[0] "{} 音符下移半音忽略音阶"
 #. "3 notes pitch changed"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
-msgstr[0] "{} 音符音高已更改"
+msgstr[0] "{} 音符音高更改"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
@@ -935,16 +935,16 @@ msgid "off"
 msgstr "关"
 
 msgid "Unrestrict minimum"
-msgstr ""
+msgstr "取消最小值的限制"
 
 msgid "Restrict minimum to current value"
-msgstr ""
+msgstr "将最小值限制为当前值"
 
 msgid "Unrestrict maximum"
-msgstr ""
+msgstr "取消最大值的限制"
 
 msgid "Restrict maximum to current value"
-msgstr ""
+msgstr "将最大值限制为当前值"
 
 msgid "low shelf"
 msgstr "低架"
@@ -1284,7 +1284,7 @@ msgstr "文件夹尾"
 
 #. An open track folder.
 msgid "open"
-msgstr "打开"
+msgstr "展开"
 
 #. An open (but small visually) track folder.
 msgid "small"
@@ -1292,7 +1292,7 @@ msgstr "小"
 
 #. A closed track folder.
 msgid "closed"
-msgstr "已关闭"
+msgstr "折叠"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1812,13 +1812,13 @@ msgstr "停止"
 #. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
-msgstr[0] "{} 对象已选定"
+msgstr[0] "{} 对象选定"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items quantized".
 msgid "{} item quantized"
 msgid_plural "{} items quantized"
-msgstr[0] "{} 对象已量化"
+msgstr[0] "{} 对象量化"
 
 msgid "no items selected"
 msgstr "未选择对象"
@@ -1843,25 +1843,25 @@ msgstr "轨道名称"
 #. with the number of items; e.g. "2 items muted".
 msgid "{} item muted"
 msgid_plural "{} items muted"
-msgstr[0] "{} 对象已静音"
+msgstr[0] "{} 对象静音"
 
 #. Reported when multiple items are unmuted. {} will be
 #. replaced with the number of items; e.g. "2 items unmuted".
 msgid "{} item unmuted"
 msgid_plural "{} items unmuted"
-msgstr[0] "{} 对象已取消静音"
+msgstr[0] "{} 对象取消静音"
 
 #. Reported when multiple items are soloed. {} will be replaced
 #. with the number of items; e.g. "2 items soloed".
 msgid "{} item soloed"
 msgid_plural "{} items soloed"
-msgstr[0] "{} 对象已独奏"
+msgstr[0] "{} 对象独奏"
 
 #. Reported when multiple items are unsoloed. {} will be
 #. replaced with the number of items; e.g. "2 items unsoloed".
 msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
-msgstr[0] "{} 对象已取消独奏"
+msgstr[0] "{} 对象取消独奏"
 
 #. Reported when an action is used to lock an item.
 #. Used when navigating items to indicate that an item is
@@ -1887,23 +1887,26 @@ msgstr[0] "{} 对象解锁"
 
 #. Reported when an action is used to enable loop source for an item.
 msgid "enabled loop source"
-msgstr ""
+msgstr "启用循环源"
 
 #. Reported when an action is used to disable loopp source for an item.
 msgid "disabled loop source"
-msgstr ""
+msgstr "禁用循环源("
 
 #. Reported when loop source is enabled for multiple items. {} will be replaced
 #. with the number of items; e.g. "2 items enabled lloop source".
 msgid "{} item enabled loop source"
 msgid_plural "{} items enabled loop source"
-msgstr[0] ""
+msgstr[0] "{} 对象启用循环源("
 
 #. Reported when loop source is disabled for multiple items. {} will be
 #. replaced with the number of items; e.g. "2 items disabled loop source".
 msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
-msgstr[0] ""
+msgstr[0] "{} 对象禁用循环源("
+
+msgid "selected to start of project"
+msgstr "选区到工程开始"
 
 msgid "set selection end"
 msgstr "设置选区结束"
@@ -2130,16 +2133,16 @@ msgid "all notes off"
 msgstr "关闭所有音符"
 
 msgid "Octave up"
-msgstr ""
+msgstr "向上八度"
 
 msgid "Octave down"
-msgstr ""
+msgstr "向下八度"
 
 msgid "Increase MIDI channel"
-msgstr ""
+msgstr "选择上一个 midi 通道"
 
 msgid "Decrease MIDI channel"
-msgstr ""
+msgstr "选择下一个 midi 通道"
 
 msgid "set selection start"
 msgstr "设置选区开始"
@@ -2229,7 +2232,7 @@ msgid "showed Media Explorer"
 msgstr "显示媒体资源管理器"
 
 msgid "hid Media Explorer"
-msgstr "影藏媒体资源管理器"
+msgstr "隐藏媒体资源管理器"
 
 msgid "absolute frames"
 msgstr "绝对帧"
@@ -2364,7 +2367,7 @@ msgid "showed note names"
 msgstr "显示音符名称"
 
 msgid "hid note names"
-msgstr "影藏音符名称"
+msgstr "隐藏音符名称"
 
 msgid "length matching grid"
 msgstr "长度匹配网格"
@@ -2403,7 +2406,7 @@ msgstr "{} 重做"
 #. number of items; e.g. "2 items added".
 msgid "{} item added"
 msgid_plural "{} items added"
-msgstr[0] "{} 对象已添加"
+msgstr[0] "{} 对象添加"
 
 #. Reported when tracks are added. Other things might be added
 #. at the same time (e.g. items), so other messages may surround this.
@@ -2492,6 +2495,21 @@ msgstr[0] "{} 分割已修复"
 
 msgid "contents of time selection removed"
 msgstr "时间选区的内容已移除"
+
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr "{} 标记移动"
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "标记 {} 已插入"
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr "标记 {} 移动"
 
 msgid "marker deleted"
 msgstr "标记已删除"
@@ -2709,11 +2727,6 @@ msgstr "版本: {}"
 msgid "About OSARA"
 msgstr "关于 OSARA"
 
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr "标记 {} 已插入"
-
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
@@ -2739,9 +2752,6 @@ msgstr "轨道未分组"
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "光标位置"
-
-msgid "selected to start of project"
-msgstr "选区到工程开始"
 
 msgid "selected to end of project"
 msgstr "选区到工程结束"
@@ -2968,17 +2978,17 @@ msgstr "OSARA: 报告播放光标处的速度和拍号； 双击添加/编辑速
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"
 
-msgid "OSARA: Move to next chord"
-msgstr "OSARA: 转到下一和弦"
+msgid "OSARA: Move forward to next single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to previous chord"
-msgstr "OSARA: 转到上一和弦"
+msgid "OSARA: Move backward to previous single note or chord"
+msgstr ""
 
-msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: 转到下一和弦并加入选择"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
+msgstr ""
 
-msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: 转到上一和弦并加入选择"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
+msgstr ""
 
 msgid "OSARA: Move to next note in chord"
 msgstr "OSARA: 转到和弦中下一音符"
