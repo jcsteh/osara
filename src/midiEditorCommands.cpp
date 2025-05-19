@@ -2436,7 +2436,7 @@ int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	const int relativeNote = msg->wParam - VK_F1;
 	// If the shift key is being held, the cursor is not advancing, so we should
 	// not report the new position.
-	const bool reportNewPos = !(GetKeyState(VK_SHIFT) & 0x8000);
+	const bool reportNewPos = !(GetAsyncKeyState(VK_SHIFT) & 0x8000);
 	// We need to let the hook return so REAPER can handle the key and insert the
 	// note. We use CallLater to report the result.
 	CallLater([oldCount, relativeNote, reportNewPos] {
