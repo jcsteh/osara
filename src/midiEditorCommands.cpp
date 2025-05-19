@@ -1223,18 +1223,15 @@ void postMidiMovePitchCursor(int command) {
 	}
 }
 
-void cmdMidiInsertNote(Command* command) {
+void cmdhInsertNote(int oldCount, int relativeNote, bool reportNewPos) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount;
-	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int newCount;
 	MIDI_CountEvts(take, &newCount, nullptr, nullptr);
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
-	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
+	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row") + relativeNote;
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Find the just inserted note based on its pitch, as that makes it unique.
@@ -1250,9 +1247,6 @@ void cmdMidiInsertNote(Command* command) {
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	// If we're advancing the cursor position, we should report the new position.
-	const bool reportNewPos = command->gaccel.accel.cmd ==
-		40051; // Edit: Insert note at edit cursor
 	if (settings::reportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
 		s << formatNoteLength(note.start, note.end);
@@ -1264,6 +1258,18 @@ void cmdMidiInsertNote(Command* command) {
 		s << formatCursorPosition();
 	}
 	outputMessage(s);
+}
+
+void cmdMidiInsertNote(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	// If we're advancing the cursor position, we should report the new position.
+	const bool reportNewPos = command->gaccel.accel.cmd ==
+		40051; // Edit: Insert note at edit cursor
+	cmdhInsertNote(oldCount, 0, reportNewPos);
 }
 
 void cmdMidiPasteEvents(Command* command) {
@@ -2412,4 +2418,29 @@ void postMidiChangeZoom(int command) {
 		// replaced with the number of pixels per second; e.g. 100 pixels/second.
 		outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 	}
+}
+
+// F1-f12 step input doesn't use actions, so we need to hook the key presses.
+int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	HWND editor = MIDIEditor_GetActive();
+	if (!editor || msg->message != WM_KEYDOWN || msg->wParam < VK_F1 ||
+			msg->wParam > VK_F12 ||
+			!GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40053)) {
+		// This isn't for us.
+		return 0; // Normal handling.
+	}
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	// F1 is the note at the pitch cursor, f2 is 1 semitone above, etc.
+	const int relativeNote = msg->wParam - VK_F1;
+	// If the shift key is being held, the cursor is not advancing, so we should
+	// not report the new position.
+	const bool reportNewPos = !(GetKeyState(VK_SHIFT) & 0x8000);
+	// We need to let the hook return so REAPER can handle the key and insert the
+	// note. We use CallLater to report the result.
+	CallLater([oldCount, relativeNote, reportNewPos] {
+		cmdhInsertNote(oldCount, relativeNote, reportNewPos);
+	}, 0);
+	return 0;
 }
