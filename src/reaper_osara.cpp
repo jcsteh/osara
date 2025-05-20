@@ -6079,7 +6079,11 @@ HWINEVENTHOOK winEventHook = nullptr;
 // This accelerator hook is registered at startup and remains registered until
 // REAPER exits.
 int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-	return vkbTranslateAccel(msg, accelReg);
+	int res = vkbTranslateAccel(msg, accelReg);
+	if (res != 0) {
+		return res;
+	}
+	return midiStepTranslateAccel(msg, accelReg);
 }
 
 extern "C" {
@@ -6156,7 +6160,9 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		accelReg.translateAccel = translateAccel;
 		accelReg.isLocal = true;
 		accelReg.user = nullptr;
-		plugin_register("accelerator", &accelReg);
+		// Using "<accelerator" causes this to be placed at the front of the
+		// accelerator list, giving it the first chance to sniff keystrokes.
+		plugin_register("<accelerator", &accelReg);
 		return 1;
 
 	} else {

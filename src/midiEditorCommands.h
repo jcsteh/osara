@@ -74,3 +74,4 @@ void postMidiToggleSnap(int command);
 void postMidiChangeZoom(int command);
 int countSelectedEvents(MediaItem_Take* take);
 const std::string getMidiNoteName(MediaTrack* track, int pitch, int channel);
+int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg);
