@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-05-15 18:46\n"
+"PO-Revision-Date: 2025-06-01 18:43\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -60,6 +60,10 @@ msgstr "6. Utiliser un contrôle d'édition standard et accessible pour l'édite
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
 msgstr "7. Masquer les préfixes du type d'FX dans le navigateur d'FX afin que la navigation à travers des FX soit plus efficace."
+
+msgctxt "optimal REAPER configuration"
+msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr "8. Désactiver l'option magnétiser à la grille visible dans l'éditeur MIDI, afin que le déplacement sur la grille ne dépend pas du réglage du zoom horizontal."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."

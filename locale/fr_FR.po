@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2025-05-15 18:46\n"
+"PO-Revision-Date: 2025-06-01 18:43\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -59,6 +59,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
 msgstr ""
 
 msgctxt "optimal REAPER configuration"

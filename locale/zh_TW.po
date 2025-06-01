@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-05-15 18:46\n"
+"PO-Revision-Date: 2025-06-01 18:43\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -60,6 +60,10 @@ msgstr "6. 為視訊編碼編輯器使用標準的，可訪問的編輯控制向
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
 msgstr "7. 在FX瀏覽器中隱藏類型的前綴，因此通過FX瀏覽更有效。"
+
+msgctxt "optimal REAPER configuration"
+msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr "8. 停用MIDI編輯器中可見網格的快照，因此網格的移動不取決於水平大小變化"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2979,16 +2983,16 @@ msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/n
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
 
 msgid "OSARA: Move forward to next single note or chord"
-msgstr ""
+msgstr "OSARA: 向前轉到下一個音符或和弦"
 
 msgid "OSARA: Move backward to previous single note or chord"
-msgstr ""
+msgstr "OSARA: 向後轉到上一個音符或和弦"
 
 msgid "OSARA: Move forward to next single note or chord and add to selection"
-msgstr ""
+msgstr "OSARA: 向前轉到下一個音符或和弦並加入選區"
 
 msgid "OSARA: Move backward to previous single note or chord and add to selection"
-msgstr ""
+msgstr "OSARA: 向後轉到上一個音符或和弦並加入選區"
 
 msgid "OSARA: Move to next note in chord"
 msgstr "OSARA: 移至和弦中的下一個音符"

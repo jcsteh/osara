@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-05-15 18:46\n"
+"PO-Revision-Date: 2025-06-01 18:43\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -60,6 +60,10 @@ msgstr "6. usar control de edición accesible para el editor de código de víde
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
 msgstr "7. ocultar prefijo de tipo en visor de fx de forma que sea más eficiente."
+
+msgctxt "optimal REAPER configuration"
+msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr "8. Deshabilitar instantánea en la rejilla visible en editor midi para que el movimiento por la rejilla no depehnda del zoom horizontal."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2160,7 +2164,7 @@ msgid "enabled envelope points move with media items"
 msgstr "activado los puntos de envolventes se mueven con los ítems"
 
 msgid "disabled envelope points move with media items"
-msgstr "desActivado: los puntos de envolventes se mueven con los ítems"
+msgstr "desactivado: los puntos de envolventes se mueven con los ítems"
 
 msgid "enabled free item positioning"
 msgstr "posición libre de items activado"
@@ -2377,7 +2381,7 @@ msgid "auto playing"
 msgstr "auto reproduciendo"
 
 msgid "not auto playing"
-msgstr ""
+msgstr "no auto reproduciendo"
 
 msgid "repeating previews"
 msgstr "repitiendo previsualización"
@@ -2871,7 +2875,7 @@ msgid "OSARA: Move to previous item (leaving other items selected)"
 msgstr "OSARA: mover al ítem anterior, dejando los otros seleccionados"
 
 msgid "OSARA: View properties for current media item/take/automation item (depending on focus)"
-msgstr "OSARA: ver propiedades de media item/toma/automatización ítem actual, dependiendo del foco"
+msgstr "OSARA: ver propiedades de toma/automatización ítem actual, (dependiendo del foco)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
 msgstr "OSARA: Ver parámetros para la pista/ítem/FX actual (dependiendo del foco)"
@@ -3075,7 +3079,7 @@ msgid "OSARA: Select items under edit cursor on selected tracks"
 msgstr "OSARA: seleccionar ítems bajo el cursor de edición en pistas seleccionadas"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
-msgstr "OSARA: Anuncia tempo and compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"
+msgstr "OSARA: Anuncia tempo y compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
