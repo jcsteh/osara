@@ -139,6 +139,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Heal splits in items: Control+H
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
+- Item edit: Move contents of items left: Shift+,
+- Item edit: Move contents of items right: Shift+.
 - Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6
 - Item edit: Move items/envelope points left by grid size: Alt+Shift+, or Control+Alt+NumPad4
 - Item edit: Grow left edge of items: Control+, or Control+NumPad4
