@@ -3992,7 +3992,7 @@ void cmdRemoveTimeSelection(Command* command) {
 	}
 }
 
-void cmdMoveItemEdge(Command* command) {
+void cmdMoveItemEdgeOrSource(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
 		outputMessage(translate("no items selected"));
@@ -4007,17 +4007,22 @@ void cmdMoveItemEdge(Command* command) {
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	double oldSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
 	if(newStart!=oldStart)
 		s<<formatTime(newStart, TF_RULER, cache);
 	else if(newEnd!=oldEnd)
 		s<<formatTime(newEnd, TF_RULER, cache);
+	else if(newSourceOffset!=oldSourceOffset)
+		s<<formatTime(newSourceOffset, TF_RULER, cache);
 	else {
+		s.str("");
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
 		s << translate("no change");
@@ -4029,7 +4034,7 @@ void cmdMoveItemsOrEnvPoint(Command* command) {
 	if(GetCursorContext2(true) == 2 ) {// Envelope
 	cmdMoveSelEnvelopePoints(command);
 	} else {
-		cmdMoveItemEdge(command);
+		cmdMoveItemEdgeOrSource(command);
 	}
 }
 
@@ -5447,15 +5452,17 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40014}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Copy loop of selected area of audio items
 	{MAIN_SECTION, {{0, 0, 41296}, nullptr}, nullptr, cmdRemoveOrCopyAreaOfItems}, // Item: Duplicate selected area of items
 	{MAIN_SECTION, {{0, 0, 40119}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right
+	{MAIN_SECTION, {{0, 0, 40123}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move contents of items left
+	{MAIN_SECTION, {{0, 0, 40124}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move contents of items right
 	{MAIN_SECTION, {{0, 0, 40120}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
 	{MAIN_SECTION, {{0, 0, 40793}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
 	{MAIN_SECTION, {{0, 0, 40794}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
-	{MAIN_SECTION, {{0, 0, 40225}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow left edge of items
-	{MAIN_SECTION, {{0, 0, 40226}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink left edge of items
-	{MAIN_SECTION, {{0, 0, 40227}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Shrink right edge of items
-	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Grow right edge of items
-	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim left edge of item to edit cursor
-	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdge}, // Item edit: Trim right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 40225}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Grow left edge of items
+	{MAIN_SECTION, {{0, 0, 40226}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Shrink left edge of items
+	{MAIN_SECTION, {{0, 0, 40227}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Shrink right edge of items
+	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Grow right edge of items
+	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim left edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim right edge of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 40657}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 1 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40658}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 2 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40659}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 3 to play/edit cursor
