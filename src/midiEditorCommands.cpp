@@ -1187,19 +1187,19 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	outputMessage(s);
 }
 
-void cmdMidiMoveToNextNoteInChord(Command* command) {
+void cmdMidiMoveToHigherNoteInChord(Command* command) {
 	moveToNoteInChord(1);
 }
 
-void cmdMidiMoveToPreviousNoteInChord(Command* command) {
+void cmdMidiMoveToLowerNoteInChord(Command* command) {
 	moveToNoteInChord(-1);
 }
 
-void cmdMidiMoveToNextNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToHigherNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(1, false, isSelectionContiguous);
 }
 
-void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToLowerNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
