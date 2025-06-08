@@ -727,7 +727,7 @@ The note, or notes making up a chord will be previewed, and the number of notes 
 All notes in a chord are automatically selected, so you can manipulate the entire chord.
 For example, pressing Delete will delete the chord.
 
-When you've moved to a chord, you can move through individual notes using the Up and Down arrow keys (OSARA: Move to previous note in chord, OSARA: Move to next note in chord).
+When you've moved to a chord, you can move through individual notes using the Up and Down arrow keys (OSARA: Move to higher note in chord, OSARA: Move to lower note in chord).
 When you move to a note, that note will be previewed, its name and length will be reported.
 The single note will also be selected so you can manipulate just that note.
 For example, moving to the third note in a chord then pressing Delete will delete only that note.
@@ -852,6 +852,14 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 
 #### Midi Editor section of actions list
+- OSARA: Move forward to next single note or chord: RightArrow
+- OSARA: Move backward to previous single note or chord: LeftArrow
+- OSARA: Move forward to next single note or chord and add to selection: Shift+RightArrow
+- OSARA: Move backward to previous single note or chord and add to selection: Shift+LeftArrow
+- OSARA: Move to higher note in chord: UpArrow
+- OSARA: Move to lower note in chord: DownArrow
+- OSARA: Move to higher note in chord and add to selection: Shift+UpArrow
+- OSARA: Move to lower note in chord and add to selection: Shift+DownArrow
 - OSARA: Move to next midi item on track: Control+RightArrow
 - OSARA: Move to previous midi item on track: Control+LeftArrow
 - OSARA: Move to next CC: Control+=
