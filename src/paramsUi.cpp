@@ -304,6 +304,8 @@ class ParamsDialog {
 	HWND valueLabel;
 	HWND moreButton;
 	string filter;
+	HWND unnamedParamsCheckbox;
+	HWND closeButton;
 	vector<int> visibleParams;
 	int paramNum;
 	unique_ptr<Param> param;
@@ -549,8 +551,12 @@ class ParamsDialog {
 			}
 			return 1; // Eat the keystroke.
 		}
-		if (msg->wParam == VK_SPACE) {
-			// Let REAPER handle the space key so control+space works.
+		if (msg->wParam == VK_SPACE && (
+			msg->hwnd == dialog->moreButton ||
+			msg->hwnd == dialog->unnamedParamsCheckbox ||
+			msg->hwnd == dialog->closeButton
+		)) {
+			// Let REAPER handle the space key when the More button, the Include unnamed parameters check box and the Close button have focus, so users can audition results on the fly.
 			return 0; // Not interested.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
@@ -562,7 +568,9 @@ class ParamsDialog {
 				// A function key.
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
-				(alt && shift)
+				(alt && shift) ||
+				// Or Space.
+				(msg->wParam == VK_SPACE)
 			) {
 				return -666; // Force to main window.
 			}
@@ -707,6 +715,8 @@ class ParamsDialog {
 			(LONG_PTR)ParamsDialog::contextWndProc);
 		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+		this->unnamedParamsCheckbox = GetDlgItem(this->dialog, ID_PARAM_UNNAMED);
+		this->closeButton = GetDlgItem(this->dialog, IDCANCEL);
 #ifdef _WIN32
 		this->sliderUiaProvider = TextSliderUiaProvider::create(this->slider);
 #endif
