@@ -582,9 +582,10 @@ Clearing the text in the Filter field shows the entire list.
 
 As an alternative to using the Parameter combo box, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
 
-Space can be used to play/stop the project when focused in the Parameter combo box or on sliders.
+Space can be used to play/stop the project when focused on sliders.
+Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
 
-Some effects expose a lot of unnamed parameters which can make finding useful parameters challenging.
+Some effects expose a lot of unnamed parameters, which can make finding the useful ones challenging.
 The Include unnamed parameters check box may help with this.
 When unchecked, unnamed parameters are excluded from the parameter list.
 Currently, this means parameters with completely empty names, the single character "-", a name like #001 or a name like P001.
