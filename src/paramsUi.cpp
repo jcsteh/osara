@@ -564,6 +564,8 @@ class ParamsDialog {
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
 				(alt && shift) ||
+				// Space.
+				(msg->wParam == VK_SPACE) ||
 				// Modified space.
 				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
