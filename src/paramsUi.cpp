@@ -564,11 +564,13 @@ class ParamsDialog {
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
 				(alt && shift) ||
-				// Space.
-				(msg->wParam == VK_SPACE) ||
 				// Modified space.
 				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
+				return -666; // Force to main window.
+			}
+			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
+				// In the combo box, we also pass space to the main section.
 				return -666; // Force to main window.
 			}
 			// Anything else must go to our window so the user can interact with the
