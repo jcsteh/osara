@@ -549,9 +549,10 @@ class ParamsDialog {
 			}
 			return 1; // Eat the keystroke.
 		}
-		if (msg->wParam == VK_SPACE) {
-			// Let REAPER handle the space key so control+space works.
-			return 0; // Not interested.
+		if (msg->wParam == VK_SPACE && isClassName(GetFocus(), "Button")) {
+			// Pass the space key to our window for buttons and check boxes so they can
+			// be activated as expected.
+			return -1; // Pass to our window.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
 		if (msg->hwnd == dialog->paramCombo ||
@@ -562,7 +563,9 @@ class ParamsDialog {
 				// A function key.
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
-				(alt && shift)
+				(alt && shift) ||
+				// Modified space.
+				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
 				return -666; // Force to main window.
 			}
