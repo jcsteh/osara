@@ -569,6 +569,10 @@ class ParamsDialog {
 			) {
 				return -666; // Force to main window.
 			}
+			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
+				// In the combo box, we also pass space to the main section.
+				return -666; // Force to main window.
+			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
 			return -1; // Pass to our window.

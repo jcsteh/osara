@@ -582,7 +582,7 @@ Clearing the text in the Filter field shows the entire list.
 
 As an alternative to using the Parameter combo box, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
 
-Space can be used to play/stop the project when focused on sliders.
+Space can be used to play/stop the project when focused on sliders or the Parameters combo box.
 Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
 
 Some effects expose a lot of unnamed parameters, which can make finding the useful ones challenging.
