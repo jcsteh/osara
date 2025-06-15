@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-06-01 18:43\n"
+"PO-Revision-Date: 2025-06-15 18:43\n"
 
 msgid "enabled"
 msgstr ""
@@ -3096,16 +3096,16 @@ msgstr ""
 msgid "OSARA: Move backward to previous single note or chord and add to selection"
 msgstr ""
 
-msgid "OSARA: Move to next note in chord"
+msgid "OSARA: Move to higher note in chord"
 msgstr ""
 
-msgid "OSARA: Move to previous note in chord"
+msgid "OSARA: Move to lower note in chord"
 msgstr ""
 
-msgid "OSARA: Move to next note in chord and add to selection"
+msgid "OSARA: Move to higher note in chord and add to selection"
 msgstr ""
 
-msgid "OSARA: Move to previous note in chord and add to selection"
+msgid "OSARA: Move to lower note in chord and add to selection"
 msgstr ""
 
 msgid "OSARA: Move to next CC"
