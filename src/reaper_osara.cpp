@@ -2595,22 +2595,20 @@ void postVirtualMidiKeyboard(int command) {
 // navigate. To work around this, when these dialogs are open, we take note of
 // the window and use our global accelerator hook to pass tab, arrow keys, etc.
 // to the dialog.
-// The HWND of a dialog which overrides normal dialog keys.
-HWND dialogOverridingDialogKeys = nullptr;
+// The HWND of a dialog which needs dialog keys restored.
+HWND restoreDialogKeysHwnd = nullptr;
 // Called from translateAccel.
-int dialogOverridingDialogKeysTranslateAccel(MSG* msg,
-	accelerator_register_t* accelReg
-) {
-	if (!dialogOverridingDialogKeys) {
+int restoreDialogKeysTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	if (!restoreDialogKeysHwnd) {
 		return 0; // Normal handling.
 	}
-	if (!IsWindow(dialogOverridingDialogKeys)) {
+	if (!IsWindow(restoreDialogKeysHwnd)) {
 		// Dialog was closed.
-		dialogOverridingDialogKeys = nullptr;
+		restoreDialogKeysHwnd = nullptr;
 		return 0; // Normal handling.
 	}
 	if (msg->message != WM_KEYDOWN ||
-			GetParent(msg->hwnd) != dialogOverridingDialogKeys) {
+			GetParent(msg->hwnd) != restoreDialogKeysHwnd) {
 		return 0; // Normal handling.
 	}
 	switch (msg->wParam) {
@@ -2631,11 +2629,11 @@ int dialogOverridingDialogKeysTranslateAccel(MSG* msg,
 	return 0; // Normal handling.
 }
 
-void postDialogOverridingDialogKeys(int command) {
+void postDialogThatNeedsKeysRestored(int command) {
 	if (GetToggleCommandState(command)) {
 		// The window has just been shown. Store its HWND for
-		// dialogOverridingDialogKeysTranslateAccel.
-		dialogOverridingDialogKeys = GetForegroundWindow();
+		// restoreDialogKeysTranslateAccel.
+		restoreDialogKeysHwnd = GetForegroundWindow();
 	}
 }
 
@@ -2898,7 +2896,7 @@ PostCommand POST_COMMANDS[] = {
 	{42348, postMidiResets}, // Reset all MIDI control surface devices
 	{40345, postMidiResets}, // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
 	{40377, postVirtualMidiKeyboard}, // View: Show virtual MIDI keyboard
-	{41208, postDialogOverridingDialogKeys}, // Transient detection sensitivity/threshold: Adjust...
+	{41208, postDialogThatNeedsKeysRestored}, // Transient detection sensitivity/threshold: Adjust...
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
@@ -6090,7 +6088,7 @@ int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	if (res != 0) {
 		return res;
 	}
-	res = dialogOverridingDialogKeysTranslateAccel(msg, accelReg);
+	res = restoreDialogKeysTranslateAccel(msg, accelReg);
 	if (res != 0) {
 		return res;
 	}
