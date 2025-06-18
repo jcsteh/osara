@@ -2897,6 +2897,7 @@ PostCommand POST_COMMANDS[] = {
 	{40345, postMidiResets}, // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
 	{40377, postVirtualMidiKeyboard}, // View: Show virtual MIDI keyboard
 	{41208, postDialogThatNeedsKeysRestored}, // Transient detection sensitivity/threshold: Adjust...
+	{43466, postDialogThatNeedsKeysRestored}, // Item edit: Phase alignment...
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
