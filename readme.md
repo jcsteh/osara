@@ -128,6 +128,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Go back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
+- Scrub: Toggle looped-segment scrub at edit cursor: /
 
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
@@ -926,6 +927,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Options: Envelope points move with media items
 - Options: Trim content behind media items when editing
 - Options: Cycle through editing modes: Auto-crossfade off, auto-crossfade on, trim content behind media items
+- Scrub: Enable looped-segment scrub at edit cursor
+- Scrub: Enable one-shot segment scrub at edit cursor
+- Scrub: Toggle one-shot segment scrub at edit cursor
+-Scrub: Disable looped-segment/one-shot scrub at edit cursor
 - Tempo: Decrease current project tempo 0.1 BPM
 - Tempo: Decrease current project tempo 10 BPM
 - Tempo: Decrease current project tempo 10 percent

@@ -5288,11 +5288,23 @@ void cmdMuteNextMessage(Command* command){
 	muteNextMessage = true;
 }
 
-void cmdToggleLoopSegScrub(Command* command) {
-	if(settings::moveFromPlayCursor && (GetPlayState() & 1) ) {
+void cmdReportScrubStyle(Command* command) {
+	if (settings::moveFromPlayCursor && (GetPlayState() & 1)) {
 		SetEditCurPos(GetPlayPosition(), false, false);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int loopedSegmentState = GetToggleCommandState(41187); // Toggle looped-segment scrub
+	int oneShotState = GetToggleCommandState(43593);       // Toggle one-shot scrub
+	if (loopedSegmentState == 1) {
+		// Translators: Reported when switching to looped segment scrub style.
+		outputMessage(translate("looped segment"));
+	} else if (oneShotState == 1) {
+		// Translators: Reported when switching to one-shot scrub style.
+		outputMessage(translate("one shot"));
+	} else {
+		// Translators: Reported when using REAPER's default scrub style.
+		outputMessage(translate("scrub"));
+	}
 }
 
 void cmdReportRegionMarkerItems(Command* command) {
@@ -5513,7 +5525,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40174}, nullptr}, nullptr, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MAIN_SECTION, {{0, 0, 40032}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Group items
 	{MAIN_SECTION, {{0, 0, 40033}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Remove items from group
-	{MAIN_SECTION, {{0, 0, 41187}, nullptr}, nullptr, cmdToggleLoopSegScrub}, // Scrub: Toggle looped-segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 41187}, nullptr}, nullptr, cmdReportScrubStyle}, // Scrub: Toggle looped-segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 41188}, nullptr}, nullptr, cmdReportScrubStyle}, // Scrub: Enable looped-segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 43593}, nullptr}, nullptr, cmdReportScrubStyle}, // Scrub: Toggle one-shot segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 43594}, nullptr}, nullptr, cmdReportScrubStyle}, // Scrub: Enable one-shot segment scrub at edit cursor
+	{MAIN_SECTION, {{0, 0, 41189}, nullptr}, nullptr, cmdReportScrubStyle}, // Scrub: Disable looped-segment/one-shot scrub at edit cursor
 	{MAIN_SECTION, {{0, 0, 42082}, nullptr}, nullptr, cmdInsertAutoItem}, // Envelope: Insert automation item
 	{MAIN_SECTION, {{0, 0, 42086}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items
 	{MAIN_SECTION, {{0, 0, 42088}, nullptr}, nullptr, cmdDeleteAutoItems}, // Envelope: Delete automation items, preserve points
