@@ -2590,6 +2590,53 @@ void postVirtualMidiKeyboard(int command) {
 	}
 }
 
+// Certain dialogs (e.g. Transient Detection Settings) deliberately pass most
+// keys to the main section. This makes it impossible for keyboard users to
+// navigate. To work around this, when these dialogs are open, we take note of
+// the window and use our global accelerator hook to pass tab, arrow keys, etc.
+// to the dialog.
+// The HWND of a dialog which needs dialog keys restored.
+HWND restoreDialogKeysHwnd = nullptr;
+// Called from translateAccel.
+int restoreDialogKeysTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	if (!restoreDialogKeysHwnd) {
+		return 0; // Normal handling.
+	}
+	if (!IsWindow(restoreDialogKeysHwnd)) {
+		// Dialog was closed.
+		restoreDialogKeysHwnd = nullptr;
+		return 0; // Normal handling.
+	}
+	if (msg->message != WM_KEYDOWN ||
+			GetParent(msg->hwnd) != restoreDialogKeysHwnd) {
+		return 0; // Normal handling.
+	}
+	switch (msg->wParam) {
+		case VK_TAB:
+		case VK_RIGHT:
+		case VK_LEFT:
+		case VK_UP:
+		case VK_DOWN:
+		case VK_PRIOR:
+		case VK_NEXT:
+		case VK_HOME:
+		case VK_END:
+		case VK_SPACE:
+			return -1; // pass to window.
+		default:
+			break;
+	}
+	return 0; // Normal handling.
+}
+
+void postDialogThatNeedsKeysRestored(int command) {
+	if (GetToggleCommandState(command)) {
+		// The window has just been shown. Store its HWND for
+		// restoreDialogKeysTranslateAccel.
+		restoreDialogKeysHwnd = GetForegroundWindow();
+	}
+}
+
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
 	if(!w) {// support Reaper versions before 6.65
@@ -2849,6 +2896,7 @@ PostCommand POST_COMMANDS[] = {
 	{42348, postMidiResets}, // Reset all MIDI control surface devices
 	{40345, postMidiResets}, // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
 	{40377, postVirtualMidiKeyboard}, // View: Show virtual MIDI keyboard
+	{41208, postDialogThatNeedsKeysRestored}, // Transient detection sensitivity/threshold: Adjust...
 	{0},
 };
 MidiPostCommand MIDI_POST_COMMANDS[] = {
@@ -5100,55 +5148,6 @@ void cmdAbout(Command* command) {
 	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
-// The Transient Detection Settings dialog deliberately passes most keys to the
-// main section. This makes it impossible for keyboard users to navigate.
-// To work around this, when this dialog is opened, we register an accelerator
-// hook which passes tab, arrow keys, etc. to the dialog.
-accelerator_register_t transDetect_accelReg;
-int transDetect_translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-	HWND transDialog = (HWND)accelReg->user;
-	if (!IsWindow(transDialog)) {
-		// Dialog was closed. We don't need this hook any more.
-		plugin_register("-accelerator", accelReg);
-		return 0; // Normal handling.
-	}
-	if (msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != transDialog) {
-		return 0; // Normal handling.
-	}
-	switch (msg->wParam) {
-		case VK_TAB:
-		case VK_RIGHT:
-		case VK_LEFT:
-		case VK_UP:
-		case VK_DOWN:
-		case VK_PRIOR:
-		case VK_NEXT:
-		case VK_HOME:
-		case VK_END:
-		case VK_SPACE:
-			return -1; // pass to window.
-		default:
-			break;
-	}
-	return 0; // Normal handling.
-}
-
-void cmdTransientDetectionSettings(Command* command) {
-	if (GetToggleCommandState(command->gaccel.accel.cmd)) {
-		// Dialog is showing. Just run the command to dismiss it.
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
-		plugin_register("-accelerator", &transDetect_accelReg);
-		return;
-	}
-	transDetect_accelReg.translateAccel = &transDetect_translateAccel;
-	transDetect_accelReg.isLocal = true;
-	// We must register the hook before the dialog appears or it won't work.
-	plugin_register("accelerator", &transDetect_accelReg);
-	// Open the dialog.
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	transDetect_accelReg.user = GetForegroundWindow(); // The dialog.
-}
-
 void cmdInsertMarker(Command* command) {
 	if (!shouldReportTimeMovement()) {
 		Main_OnCommand(command->gaccel.accel.cmd, 0);
@@ -5509,7 +5508,6 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40695}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
 	{MAIN_SECTION, {{0, 0, 42386}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
 	{MAIN_SECTION, {{0, 0, 42387}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete all take markers
-	{MAIN_SECTION, {{0, 0, 41208}, nullptr}, nullptr, cmdTransientDetectionSettings}, // Transient detection sensitivity/threshold: Adjust...
 	{MAIN_SECTION, {{0, 0, 40157}, nullptr}, nullptr, cmdInsertMarker}, // Markers: Insert marker at current position
 	{MAIN_SECTION, {{0, 0, 40174}, nullptr}, nullptr, cmdInsertRegion}, // Markers: Insert region from time selection
 	{MAIN_SECTION, {{0, 0, 40032}, nullptr}, nullptr, cmdChangeItemGroup}, // Item grouping: Group items
@@ -6087,6 +6085,10 @@ HWINEVENTHOOK winEventHook = nullptr;
 // REAPER exits.
 int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	int res = vkbTranslateAccel(msg, accelReg);
+	if (res != 0) {
+		return res;
+	}
+	res = restoreDialogKeysTranslateAccel(msg, accelReg);
 	if (res != 0) {
 		return res;
 	}
