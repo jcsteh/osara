@@ -5302,7 +5302,7 @@ void cmdReportScrubStyle(Command* command) {
 		// Translators: Reported when switching to one-shot scrub style.
 		outputMessage(translate("one shot"));
 	} else {
-		// Translators: Reported when using REAPER's default scrub style.
+		// Translators: Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
 		outputMessage(translate("scrub"));
 	}
 }
