@@ -2683,6 +2683,8 @@ PostCommand POST_COMMANDS[] = {
 	{42455, postToggleLastFocusedFxDeltaSolo}, // FX: Toggle delta solo for last focused FX
 	{40104, postCursorMovementScrub}, // View: Move cursor left one pixel
 	{40105, postCursorMovementScrub}, // View: Move cursor right one pixel
+	{41666, postCursorMovementScrub}, // View: Move cursor left 8 pixels
+	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
 	{40042, postCursorMovement}, // Transport: Go to start of project
@@ -2980,6 +2982,14 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 {"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
 {"_XENAKIOS_TIMERTEST1", postChangeTransportState}, // Xenakios/SWS: Play selected items once
 {"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
+{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
+{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
+{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
+{"_XENAKIOS_MOVECUR10PIX_RIGHTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels, creating time selection
+{"_XENAKIOS_MOVECURRLEFTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels
+{"_XENAKIOS_MOVECURRIGHTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels
+{"_XENAKIOS_MOVECURRLEFTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels, creating time selection
+{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
 	{nullptr},
 };
 
