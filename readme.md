@@ -966,6 +966,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Transport: Stop
 - Move edit cursor to start of next beat
 - Move edit cursor to start of current/previous beat
+- View: Move cursor left 8 pixels
+- View: Move cursor right 8 pixels
 - View: Set horizontal zoom to default project setting
 - View: Time unit for ruler: Absolute frames
 - View: Time unit for ruler: Hours:Minutes:Seconds:Frames
@@ -982,6 +984,14 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Secondary time unit for ruler: Seconds
 - Reset all MIDI devices
 - Reset all MIDI control surface devices
+- Xenakios/SWS: Move cursor left 10 pixels
+- Xenakios/SWS: Move cursor right 10 pixels
+- Xenakios/SWS: Move cursor left 10 pixels, creating time selection
+- Xenakios/SWS: Move cursor right 10 pixels, creating time selection
+- Xenakios/SWS: Move cursor left configured pixels
+- Xenakios/SWS: Move cursor right configured pixels
+- Xenakios/SWS: Move cursor left configured pixels, creating time selection
+Xenakios/SWS: Move cursor right configured pixels, creating time selection
 
 #### Unmapped in MIDI Editor section
 - Edit: Select all events in time selection (even if CC lane is hidden)
