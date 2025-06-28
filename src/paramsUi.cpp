@@ -616,6 +616,12 @@ class ParamsDialog {
 				return false;
 			}
 		}
+		// Hide parameters starting with specific MIDI-related prefixes
+		for (const string& prefix : {"MIDI CC", "MIDI Controller", "MIDI Program Change", "CC"}) {
+			if (name.rfind(prefix, 0) == 0) { // prefix match
+				return false;
+			}
+		}
 		if (filter.empty())
 			return true;
 		// Convert param name to lower case for match.
