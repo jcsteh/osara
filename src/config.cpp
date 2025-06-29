@@ -219,7 +219,7 @@ struct ReaperSetting {
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
-constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 4;
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 5;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
 #ifdef _WIN32
@@ -259,6 +259,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 				<< nl << translate_ctxt("optimal REAPER configuration", "6. Use a standard, accessible edit control for the video code editor.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
 				<< nl;
 			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
@@ -312,6 +313,8 @@ void cmdConfigReaperOptimal(Command* command) {
 		{"REAPER-fxadd", "uiflags", 1 << 24, 16777216},
 		// Disable MIDI Editor -> Options -> Snap settings -> Snap to visible grid
 		{"midiedit", "snapflags", 1 << 5, 32},
+		// Enable hardcoded keybind for Control+Space in REAPER dialogs, needed in REAPER 7.41 or newer
+		{"REAPER", "mousemovemod", 1 << 5, 32},
 	};
 	for (const auto& setting: settings) {
 		int newVal = setting.value;
