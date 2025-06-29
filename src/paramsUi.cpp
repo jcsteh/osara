@@ -616,6 +616,12 @@ class ParamsDialog {
 				return false;
 			}
 		}
+		// Testing: MIDI utility parameters that are often exposed but not useful. Hoping hiding these will speed up navigation on Mac
+		for (const string& prefix : {"MIDI CC", "MIDI Controller", "Program Change", "CC", "Pitch Bend", "Pitchbend", "Aftertouch", "Channel Pressure", "MIDI State", "Poly", "Omni", "All Notes", "All Sound", "Data", "Local Control", "X (Reserved)", "Internal", "Registered Parameter Number", "Non - Registered Parameter Number", "Reset All Controllers"}) {
+			if (name.rfind(prefix, 0) == 0) { // prefix match
+				return false;
+			}
+		}
 		if (filter.empty())
 			return true;
 		// Convert param name to lower case for match.
