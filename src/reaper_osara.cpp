@@ -2698,6 +2698,8 @@ PostCommand POST_COMMANDS[] = {
 	{41174, postCursorMovement}, // Item navigation: Move cursor to end of items
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
+	{43614, postCursorMovement}, // View: Move cursor left by grid division
+	{43615, postCursorMovement}, // View: Move cursor right by grid division
 	{41040, postCursorMovement}, // Move edit cursor to start of next measure
 	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{40231, postCursorMovement}, // Move edit cursor to start of next beat

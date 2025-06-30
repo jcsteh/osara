@@ -966,6 +966,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Transport: Stop
 - Move edit cursor to start of next beat
 - Move edit cursor to start of current/previous beat
+- View: Move cursor left by grid division
+- View: Move cursor right by grid division
 - View: Move cursor left 8 pixels
 - View: Move cursor right 8 pixels
 - View: Set horizontal zoom to default project setting
