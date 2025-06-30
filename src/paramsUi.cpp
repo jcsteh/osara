@@ -486,6 +486,12 @@ class ParamsDialog {
 		if (msg->message != WM_KEYDOWN && msg->message != WM_SYSKEYDOWN) {
 			return 0; // Not interested.
 		}
+		// Pass Ctrl+Alt+L through to main window regardless of focus, useful to show the last touched param as a track/take envelope.
+		if ((GetAsyncKeyState(VK_CONTROL) & 0x8000) &&
+				(GetAsyncKeyState(VK_MENU) & 0x8000) &&
+				msg->wParam == 'L') {
+			return -666; // Force to main window
+		}
 		if (msg->hwnd == dialog->slider) {
 			// We handle key presses for the slider ourselves.
 			double newVal = dialog->val;
@@ -564,6 +570,8 @@ class ParamsDialog {
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
 				(alt && shift) ||
+				// Anything with both control and alt.
+				(control && alt) ||
 				// Modified space.
 				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
