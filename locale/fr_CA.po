@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-07-01 18:47\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -51,7 +51,7 @@ msgstr "4. Activer l'utilisation de la barre d'espace pour les cases à cocher e
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr "5. Afficher des étiquettes textuelles pour indiquer Parallèle, Hors ligne et Contourné dans la liste des FX."
+msgstr "5. Afficher des étiquettes textuelles pour indiquer Parallèle, Hors ligne ou Contourné dans la liste des FX."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
@@ -59,11 +59,15 @@ msgstr "6. Utiliser un contrôle d'édition standard et accessible pour l'édite
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
-msgstr "7. Masquer les préfixes du type d'FX dans le navigateur d'FX afin que la navigation à travers des FX soit plus efficace."
+msgstr "7. Masquer les préfixes du type d'FX dans le navigateur d'FX afin que la navigation à travers les FX soit plus efficace."
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
 msgstr "8. Désactiver l'option magnétiser à la grille visible dans l'éditeur MIDI, afin que le déplacement sur la grille ne dépend pas du réglage du zoom horizontal."
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+msgstr "9. Lire/arrêt avec Ctrl+Espace quand le focus du clavier est dans une boîte de dialogue, nécessaire avec Reaper 7.41 ou plus récent."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2854,6 +2858,18 @@ msgstr[1] "{count} Objets supprimés du groupe {group}"
 
 msgid "track not grouped"
 msgstr "piste non groupéepiste non groupée"
+
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr "segment en boucle"
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr "lecture unique"
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "scrub"
+msgstr "scrub"
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"

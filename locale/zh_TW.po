@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-07-01 18:47\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -64,6 +64,10 @@ msgstr "7. 在FX瀏覽器中隱藏類型的前綴，因此通過FX瀏覽更有�
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
 msgstr "8. 停用MIDI編輯器中可見網格的快照，因此網格的移動不取決於水平大小變化"
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+msgstr "9。當鍵盤焦點在對話框中時，進行 ctrl+space 播放/停止，需要 REAPER7.41或更高版本。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2752,6 +2756,18 @@ msgstr[0] "對象從分組 {group} 移除"
 
 msgid "track not grouped"
 msgstr "軌道未分組"
+
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr "循環部分"
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr "一擊"
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "scrub"
+msgstr "擦帶"
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
