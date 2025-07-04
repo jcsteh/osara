@@ -255,8 +255,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Move edit cursor to next tempo or time signature change: Shift+'
 
 #### Automation
-- Item edit: Move items/envelope points up one track/a bit: NumPad8
-- Item edit: Move items/envelope points down one track/a bit: NumPad2
+- Item edit: Move items/envelope points up one track/a bit: Control+Alt+Shift+UpArrow or NumPad8
+- Item edit: Move items/envelope points down one track/a bit: Control+Alt+Shift+DownArrow or NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
 - (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
 - Envelope: Delete all selected points: Control+Shift+Delete
