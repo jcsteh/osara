@@ -645,9 +645,9 @@ At any time, you can report or reset the levels for either of the watchers using
 - OSARA: Reset Peak Watcher first watcher: Alt+F10
 - OSARA: Reset Peak Watcher second watcher: Alt+Shift+F10
 
-You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher.
+You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher: Control+Alt+F10.
 While paused, Peak Watcher won't notify you of any level changes.
-You can later use the same action again to resume automatic reporting.
+Use the same action again to resume automatic reporting.
 
 Peak Watcher settings are saved with the project.
 To configure default settings to use for new projects, you can save them in a project template and configure this template to be used as the template for new projects in the Project section of REAPER Preferences.
@@ -1008,7 +1008,6 @@ Xenakios/SWS: Move cursor right configured pixels, creating time selection
 - Unselect all CC events
 
 #### Unmapped OSARA actions
-- OSARA: Pause/resume Peak Watcher
 - OSARA: Toggle Move relative to the play cursor for time movement commands during playback
 - OSARA: Toggle Report FX when moving to tracks/takes
 - OSARA: Toggle Report MIDI notes in MIDI editor
