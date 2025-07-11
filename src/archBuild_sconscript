@@ -39,9 +39,9 @@ sources = [
 ]
 
 if env["PLATFORM"] == "win32":
-	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
-	useClangCl = env["TARGET_ARCH"] != "arm64"
-	if useClangCl:
+	# On non ARM64EC Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
+	useClang = env["TARGET_ARCH"] != "arm64"
+	if useClang:
 		env["CC"] = "clang-cl"
 		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
@@ -52,16 +52,19 @@ if env["PLATFORM"] == "win32":
 		"/std:c++20",
 		"/EHsc",
 	])
-	if useClangCl:
+	if useClang:
 		env.Append(CCFLAGS=[
-			# Clang warns about unused functions and declarations in WDL
+			# Clang warns about unused functions in WDL
 			"/clang:-Wno-unused-function",
-			"/clang:-Wno-deprecated-declarations",
-			"/clang:-Wno-unused-variable",
 		])
 		env.Append(CXXFLAGS=[
 			# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
 			"/clang:-Wno-missing-braces",
+		])
+		env.Append(CFLAGS=[
+			# Ignore warnings in WDL/win32_utf8.c, not our code
+			"/clang:-Wno-deprecated-declarations",
+			"/clang:-Wno-unused-variable"
 		])
 	else:
 		env.Append(CPPDEFINES=[
@@ -150,16 +153,17 @@ addExternalSources("#include/tinygettext/src", (
 	"po_parser.cpp",
 	"tinygettext.cpp",
 ))
-addExternalSources(
-	"#include/fmt/src",
-	("format.cc", "os.cc"),
-)
+addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="$CCFLAGS /clang:-Wno-unused-variable"
+	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
 )
-addExternalSources("#include/simpleson", ("json.cpp",))
+addExternalSources(
+	"#include/simpleson",
+	("json.cpp",),
+	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
+)
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],
