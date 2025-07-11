@@ -63,10 +63,9 @@ if env["PLATFORM"] == "win32":
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
-	match env["TARGET_ARCH"]:
-		case "arm64":
-			env.Append(CCFLAGS="--target=arm64-pc-windows-msvc")
-			env.Append(LINKFLAGS="/machine:arm64")
+	if env["TARGET_ARCH"] == "arm64":
+		env.Append(CCFLAGS="--target=arm64-pc-windows-msvc")
+		env.Append(LINKFLAGS="/machine:arm64")
 	sources.extend((
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
