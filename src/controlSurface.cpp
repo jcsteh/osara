@@ -13,9 +13,13 @@
 #include <cstdint>
 #include "osara.h"
 #include "config.h"
+#include "fxChain.h"
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
+#ifdef _WIN32
+# include "uia.h"
+#endif
 
 using namespace std;
 
@@ -68,30 +72,36 @@ class TrackCacheState {
  */
 class Surface: public IReaperControlSurface {
 	public:
-	virtual const char* GetTypeString() override {
+	const char* GetTypeString() final {
 		return "OSARA";
 	}
 
-	virtual const char* GetDescString() override {
+	const char* GetDescString() final {
 		return "OSARA";
 	}
 
-	virtual const char* GetConfigString() override {
+	const char* GetConfigString() final {
 		return "";
 	}
 
-	virtual void Run() override {
-		if (settings::reportMarkersWhilePlaying && GetPlayState() & 1) {
+	void Run() final {
+		if (GetPlayState() & 1) {
 			double playPos = GetPlayPosition();
 			if (playPos == this->lastPlayPos) {
 				return;
 			}
 			this->lastPlayPos = playPos;
-			this->reportMarker(playPos);
+			if (settings::reportMarkersWhilePlaying) {
+				this->reportMarker(playPos);
+			}
+			if (settings::reportTimeSelectionWhilePlaying) {
+				this->reportTimeSelectionWhilePlaying(playPos);
+			}
 		}
+		this->reportInputMidiNote();
 	}
 
-	virtual void SetPlayState(bool play, bool pause, bool rec) override {
+	void SetPlayState(bool play, bool pause, bool rec) final {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
@@ -103,14 +113,14 @@ class Surface: public IReaperControlSurface {
 		reportTransportState(TransportState);
 	}
 
-	virtual void SetRepeatState(bool repeat) override {
+	void SetRepeatState(bool repeat) final {
 		if (!settings::reportSurfaceChanges || this->wasCausedByCommand()) {
 			return;
 		}
 		reportRepeat(repeat);
 	}
 
-	virtual void SetSurfaceVolume(MediaTrack* track, double volume) override {
+	void SetSurfaceVolume(MediaTrack* track, double volume) final {
 		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
@@ -126,7 +136,7 @@ class Surface: public IReaperControlSurface {
 		outputMessage(s);
 	}
 
-	virtual void SetSurfacePan(MediaTrack* track, double pan) override {
+	void SetSurfacePan(MediaTrack* track, double pan) final {
 		if (isParamsDialogOpen || !this->shouldHandleParamChange()) {
 			return;
 		}
@@ -141,7 +151,7 @@ class Surface: public IReaperControlSurface {
 		outputMessage(s);
 	}
 
-	virtual void SetSurfaceMute(MediaTrack* track, bool mute) override {
+	void SetSurfaceMute(MediaTrack* track, bool mute) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -156,7 +166,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(mute);
 	}
 
-	virtual void SetSurfaceSolo(MediaTrack* track, bool solo) override {
+	void SetSurfaceSolo(MediaTrack* track, bool solo) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -176,7 +186,7 @@ class Surface: public IReaperControlSurface {
 		cache.update(solo);
 	}
 
-	virtual void SetSurfaceRecArm(MediaTrack* track, bool arm) override {
+	void SetSurfaceRecArm(MediaTrack* track, bool arm) final {
 		if (!settings::reportSurfaceChanges) {
 			return;
 		}
@@ -194,7 +204,7 @@ class Surface: public IReaperControlSurface {
 		this->lastParamChangeTime = GetTickCount();
 	}
 
-	virtual void SetSurfaceSelected(MediaTrack* track, bool selected) override {
+	void SetSurfaceSelected(MediaTrack* track, bool selected) final {
 		if (!selected || !settings::reportSurfaceChanges ||
 			// REAPER calls this a *lot*, even if the track was already selected; e.g.
 			// for mute, arm, solo, etc. Ignore this if we were already told about
@@ -214,7 +224,7 @@ class Surface: public IReaperControlSurface {
 		postGoToTrack(0, track);
 	}
 
-	virtual int Extended(int call, void* parm1, void* parm2, void* parm3) override {
+	int Extended(int call, void* parm1, void* parm2, void* parm3) final {
 		if (call == CSURF_EXT_SETFXPARAM) {
 			if (!this->shouldHandleParamChange()) {
 				return 0; // Unsupported.
@@ -223,7 +233,8 @@ class Surface: public IReaperControlSurface {
 			int fx = *(int*)parm2 >> 16;
 			// Don't report parameter changes where they might already be reported by
 			// the UI.
-			if (isParamsDialogOpen || TrackFX_GetChainVisible(track) == fx) {
+			if (isParamsDialogOpen ||
+					(TrackFX_GetChainVisible(track) == fx && !isFxListFocused())) {
 				return 0; // Unsupported.
 			}
 			int param = *(int*)parm2 & 0xFFFF;
@@ -255,7 +266,7 @@ class Surface: public IReaperControlSurface {
 		return 0; // Unsupported.
 	}
 
-	virtual void SetTrackListChange() override {
+	void SetTrackListChange() final {
 #ifdef _WIN32
 		// hack: A bug in earlier versions of JUCE breaks OSARA UIA events when
 		// a JUCE plugin is removed, which can happen when a track is removed. Hiding
@@ -351,6 +362,60 @@ class Surface: public IReaperControlSurface {
 		}
 	}
 
+	void reportTimeSelectionWhilePlaying(double playPos) {
+		double start, end;
+		GetSet_LoopTimeRange(false, false, &start, &end, false);
+		if (start == end) {
+			return;
+		}
+		double startDiff = playPos - start;
+		double endDiff = playPos - end;
+		if (startDiff >= 0 && startDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection start"));
+			this -> hasReportedTimeSelection = true;
+		} else if (endDiff >= 0 && endDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection end"));
+			this -> hasReportedTimeSelection = true;
+		} else {
+			this -> hasReportedTimeSelection = false;
+		}
+	}
+
+	void reportInputMidiNote() {
+		if (!isShortcutHelpEnabled) {
+			return;
+		}
+		constexpr unsigned char MIDI_NOTE_ON_C0 = 0x90;
+		constexpr unsigned char MIDI_NOTE_ON_C15 = MIDI_NOTE_ON_C0 + 15;
+		static int lastIndex = 0;
+		unsigned char event[3];
+		int eventSize = sizeof(event);
+		int device;
+		int index = MIDI_GetRecentInputEvent(0, (char*)event, &eventSize, nullptr,
+			&device, nullptr, nullptr);
+		unsigned char status = event[0];
+		if (index == lastIndex || status < MIDI_NOTE_ON_C0 ||
+				status > MIDI_NOTE_ON_C15 || event[2] == 0) {
+			// Already reported this note, not a MIDI note on or MIDI note on with
+			// 0 velocity (which is equivalent to note off).
+			return;
+		}
+		lastIndex = index;
+		MediaTrack* track = GetLastTouchedTrack();
+		if (!track || !isTrackArmed(track)) {
+			return;
+		}
+		int channel = status - MIDI_NOTE_ON_C0;
+		const string noteName = getMidiNoteName(track, event[1], channel);
+		if (!noteName.empty()) {
+			outputMessage(noteName);
+		}
+	}
+
 	MediaTrack* lastSelectedTrack = nullptr;
 	MediaTrack* lastChangedTrack = nullptr;
 	int lastFx = 0;
@@ -362,6 +427,7 @@ class Surface: public IReaperControlSurface {
 	double lastPlayPos = 0;
 	int lastMarker = -1;
 	int lastRegion = -1;
+	bool hasReportedTimeSelection = false;
 };
 
 IReaperControlSurface* createSurface() {

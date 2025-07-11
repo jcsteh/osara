@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+# OSARA: Open Source Accessibility for the REAPER Application
+# Script to sync with Crowdin
+# Copyright 2021-2024 James Teh
+# License: GNU General Public License version 2.0
+
 import time
 import os
 import glob
@@ -52,8 +57,6 @@ def downloadTranslations():
 	shutil.copyfileobj(r.raw, open(TMP_DOWNLOAD_PATH, "wb"))
 
 def syncTranslations():
-	print("Pulling from GitHub")
-	subprocess.check_call(("git", "pull"))
 	downloadTranslations()
 	print("Extracting translations")
 	with zipfile.ZipFile(TMP_DOWNLOAD_PATH) as zf:

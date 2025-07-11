@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Setting definitions
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2022-2023 James Teh
  * License: GNU General Public License version 2.0
  */
@@ -30,6 +29,9 @@ BoolSetting(moveFromPlayCursor,MAIN_SECTION,
 BoolSetting(reportMarkersWhilePlaying, MAIN_SECTION,
 	"Report mar&kers and regions during playback",
 	false)
+BoolSetting(reportTimeSelectionWhilePlaying, MAIN_SECTION,
+	"Report time se&lection start and end while playing",
+	false)
 BoolSetting(reportTransport, MAIN_SECTION,
 	"Report &transport state (play, record, etc.)",
 	true)
@@ -40,7 +42,7 @@ BoolSetting(reportFx, MAIN_SECTION,
 	"Report &FX when moving to tracks/takes",
 	false)
 BoolSetting(reportPositionMIDI, MIDI_EDITOR_SECTION,
-	"Report &position when navigating chords in MIDI editor",
+	"Report &position when navigating events in MIDI editor",
 	true)
 BoolSetting(reportNotes, MIDI_EDITOR_SECTION,
 	"Report MIDI &notes in MIDI editor",

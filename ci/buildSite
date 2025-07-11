@@ -1,0 +1,97 @@
+#!/usr/bin/python3
+
+# OSARA: Open Source Accessibility for the REAPER Application
+# CI script to build the OSARA website, including the snapshots page and update
+# data.
+# Copyright 2016-2025 NV Access Limited, James Teh
+# License: GNU General Public License version 2.0
+
+import sys
+import os.path
+import json
+import datetime
+import urllib.request
+import markdown
+
+SITE_DIR = "_site"
+SNAPSHOTS_DIR = os.path.join(SITE_DIR, "snapshots")
+SNAPSHOT_INDEX_FILE = os.path.join(SNAPSHOTS_DIR, "index.html")
+UPDATE_FILE = os.path.join(SNAPSHOTS_DIR, "update.json")
+README_FILE = os.path.join(SITE_DIR, "index.html")
+
+def writeSnapshotIndex(data):
+	print("Writing snapshot index")
+	with open(SNAPSHOT_INDEX_FILE, "w") as f:
+		f.write("<html>\n"
+			"<head>\n"
+			"<title>OSARA Development Snapshots</title>\n"
+			"</head>\n"
+			"<body>\n"
+			"<h1>OSARA Development Snapshots</h1>\n"
+"<p>This page contains the latest snapshots of OSARA in its current state of development for Windows and Mac. OSARA is an open source extension under ongoing development, so we encourage you to check back here every so often to ensure that you're running the latest release (note the date after each build number).</p>\n"
+'<p>Be aware that technically, OSARA has not yet had an official release. That said, the extension can safely be considered stable. At this point, OSARA is being used every day in production by people all over the world.</p>\n'
+'<p>If you find a bug, please <a href="https://github.com/jcsteh/osara/issues/new">open a new issue on GitHub</a> and describe the problem, preferably with thorough steps to reproduce the issue, what happened and what you expected to happen instead.</p>\n'
+'<p>Support requests should be posted on the <a href="https://groups.io/g/rwp">Reapers Without Peepers (RWP) group</a>.</p>\n'
+			"<ul>\n"
+			'<li>Version {data[version]}, {data[date]}</li>\n'
+			'<li><a href="{data[winUrl]}">Download for Windows</a></li>\n'
+			'<li><a href="{data[macUrl]}">Download for Mac</a></li>\n'
+			'<li><a href="https://github.com/jcsteh/osara/commits/{data[commit]}">Change log</a></li>\n'
+			"</ul>\n"
+			"</body>\n"
+			"</html>\n"
+			.format(data=data))
+
+def getCommits():
+	with urllib.request.urlopen(
+		f"https://api.github.com/repos/jcsteh/osara/commits?per_page=30"
+	) as req:
+		commits = json.load(req)
+	out = []
+	for commit in commits:
+		out.append([
+			commit["sha"][:8],
+			# We always want crlf line endings to make Windows happy. However, some
+			# commit messages might already have crlf. Therefore, normalise to lf first
+			# and then convert to crlf.
+			commit["commit"]["message"].replace("\r\n", "\n").replace("\n", "\r\n")
+		])
+	return out
+
+def writeUpdateData(data):
+	print("Writing update check data")
+	out = {"version": data["version"], "commits": getCommits()}
+	with open(UPDATE_FILE, "w") as f:
+		json.dump(out, f)
+
+def updateReadme():
+	print("Rendering readme")
+	bodyMd = open("readme.md", "rt", encoding="utf-8").read()
+	bodyHtml = markdown.markdown(bodyMd)
+	print("Writing readme")
+	with open(README_FILE, "w") as f:
+		f.write('<html>\n'
+			'<head>\n'
+			'<meta charset="UTF-8">\n'
+			'<title>OSARA: Open Source Accessibility for the REAPER Application</title>\n'
+			'</head>\n'
+			'<body>\n')
+		f.write(bodyHtml)
+		f.write('\n</body>\n</html>\n')
+
+def main():
+	os.makedirs(SNAPSHOTS_DIR)
+	data = {
+		"commit": os.getenv("GITHUB_SHA"),
+		"version": os.getenv("version"),
+		"winUrl": os.getenv("winUrl"),
+		"macUrl": os.getenv("macUrl"),
+		"date": datetime.datetime.now(datetime.UTC).ctime(),
+	}
+	print("Publishing snapshots for {data[version]}".format(data=data))
+	writeSnapshotIndex(data)
+	writeUpdateData(data)
+	updateReadme()
+
+if __name__ == "__main__":
+	main()

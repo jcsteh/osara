@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Header for code related to FX chain windows
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2020-2023 James Teh
  * License: GNU General Public License version 2.0
  */
@@ -13,7 +12,6 @@ bool getFocusedFx(MediaTrack** track = nullptr, MediaItem_Take** take = nullptr,
 bool isFxListFocused();
 void shortenFxName(const char* name, std::ostringstream& s);
 bool maybeSwitchToFxPluginWindow();
-bool maybeReportFxChainBypass(bool aboutToToggle=false);
-bool maybeReportFxChainBypassDelayed();
+bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle=false);
 bool maybeOpenFxPresetDialog();
 bool maybeSwitchFxTab(bool previous);

@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Code related to FX chain windows
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2016-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -74,8 +73,9 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 	return true;
 }
 
+constexpr long WCID_FX_LIST = 1076;
 bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == 1076 &&
+	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST &&
 		getFocusedFx();
 }
 
@@ -101,23 +101,50 @@ void shortenFxName(const char* name, ostringstream& s) {
 #ifdef _WIN32
 
 bool maybeSwitchToFxPluginWindow() {
-	HWND window = GetForegroundWindow();
-	if (!getFocusedFx()) {
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (!getFocusedFx(&track, &take, &fx)) {
+		return false;
+	}
+	// Find the nearest ancestor FX chain parent window. This might be the top
+	// level FX chain or it might be a container. This allows f6 to focus FX
+	// inside a focused container.
+	HWND window = GetFocus();
+	do {
+		window = GetParent(window);
+		if (isClassName(window, WCS_DIALOG)) {
+			break;
+		}
+	} while (window);
+	if (!window) {
 		return false;
 	}
 	// Descend. Observed as the first or as the last.
-	if (!(window = FindWindowExA(window, nullptr, "#32770", nullptr))) {
+	if (!(window = FindWindowExA(window, nullptr, WCS_DIALOG, nullptr))) {
 		return false;
+	}
+	// Check whether this is an FX container.
+	char type[10];
+	type[0] = '\0';
+	if (take) {
+		TakeFX_GetNamedConfigParm(take, fx, "fx_type", type, sizeof(type));
+	} else {
+		TrackFX_GetNamedConfigParm(track, fx, "fx_type", type, sizeof(type));
+	}
+	if (strcmp(type, "Container") == 0) {
+		// An FX container is focused. Focus its FX list.
+		window = GetDlgItem(window, WCID_FX_LIST);
+		if (window) {
+			SetFocus(window);
+		}
+		return true;
 	}
 	// Descend. Observed as the first or as the last. 
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
-	char classname[16];
-	if (!GetClassName(window, classname, sizeof(classname))) {
-		return false;
-	}
-	if (!strcmp(classname, "ComboBox")) {
+	if (isClassName(window, "ComboBox")) {
 		// Plugin window should be the last.
 		if (!(window = GetWindow(window, GW_HWNDLAST))) {
 			return false;
@@ -147,7 +174,12 @@ bool maybeSwitchToFxPluginWindow() {
 
 // If the FX list in an FX chain dialog is focused, report active/bypassed for
 // the selected effect.
-bool maybeReportFxChainBypass(bool aboutToToggle) {
+bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle) {
+	string version = string(GetAppVersion(), 0, 4);
+	if (stod(version) >= 7.06) {
+		// REAPER >= 7.06 made this properly accessible.
+		return false;
+	}
 	if (!isFxListFocused()) {
 		return false;
 	}
@@ -156,6 +188,19 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	int fx;
 	if (!getFocusedFx(&track, &take, &fx)) {
 		return false; // No FX chain focused.
+	}
+	if (delayed) {
+		// When focusing a new effect, we delay reporting of bypass for three reasons:
+		// 1. The value returned by GetFocusedFX might not be updated immediately.
+		// 2. We want the bypass state to be consistently reported after the effect.
+		// 3. We want to give braille users a chance to read the effect name before
+		// the message with the bypass state clobbers it.
+		static CallLater later;
+		later.cancel();
+		later = CallLater([] {
+			maybeReportFxChainBypass(false, false);
+		}, 1000);
+		return true;
 	}
 	bool enabled;
 	if (take) {
@@ -168,28 +213,6 @@ bool maybeReportFxChainBypass(bool aboutToToggle) {
 	}
 	outputMessage(enabled ? translate("active") : translate("bypassed"),
 		/* interrupt */ false);
-	return true;
-}
-
-// When focusing a new effect, we delay reporting of bypass for three reasons:
-// 1. The value returned by GetFocusedFX might not be updated immediately.
-// 2. We want the bypass state to be consistently reported after the effect.
-// 3. We want to give braille users a chance to read the effect name before
-// the message with the bypass state clobbers it.
-UINT_PTR reportFxChainBypassTimer = 0;
-bool maybeReportFxChainBypassDelayed() {
-	if (reportFxChainBypassTimer) {
-		KillTimer(nullptr, reportFxChainBypassTimer);
-	}
-	if (!isFxListFocused()) {
-		return false;
-	}
-	auto callback = [](HWND hwnd, UINT msg, UINT_PTR event, DWORD time) -> void {
-		KillTimer(nullptr, event);
-		reportFxChainBypassTimer = 0;
-		maybeReportFxChainBypass(/* aboutToToggle */ false);
-	};
-	reportFxChainBypassTimer = SetTimer(nullptr, 0, 1000, callback);
 	return true;
 }
 
@@ -337,14 +360,6 @@ bool maybeOpenFxPresetDialog() {
 	return true;
 }
 
-void CALLBACK fireValueChangeOnFocus(HWND hwnd, UINT msg, UINT_PTR event,
-	DWORD time
-) {
-	KillTimer(nullptr, event);
-	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
-		CHILDID_SELF);
-}
-
 bool maybeSwitchFxTab(bool previous) {
 	if (!getFocusedFx()) {
 		// No FX focused.
@@ -392,7 +407,10 @@ bool maybeSwitchFxTab(bool previous) {
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this
 	// because these ComboBox controls take a while to update.
-	SetTimer(nullptr, 0, 30, fireValueChangeOnFocus);
+	CallLater([] {
+		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
+			CHILDID_SELF);
+	}, 30);
 	return true;
 }
 

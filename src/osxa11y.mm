@@ -26,7 +26,7 @@ namespace NSA11yWrapper {
 
   void destroy()
   {
-    if (impl != NULL)
+    if (impl != nullptr)
       delete impl;
   }    
 }

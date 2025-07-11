@@ -1,7 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # SConstruct
-# Author: James Teh <jamie@jantrid.net>
-# Copyright 2015-2023 NV Access Limited, James Teh
+# Copyright 2015-2025 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
 import os
@@ -11,9 +10,9 @@ import multiprocessing
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
-env = Environment(tools = ["default", "textfile"],
+env = DefaultEnvironment(tools=[],
 	variables=vars,
-	copyright="Copyright (C) 2014-2023 NV Access Limited, James Teh & other contributors",
+	copyright="Copyright (C) 2014-2025 NV Access Limited, James Teh & other contributors",
 )
 
 # Make sure to run the build on multiple threads so it runs faster
@@ -22,7 +21,7 @@ print("Building using {} jobs".format(env.GetOption('num_jobs')))
 
 if env["PLATFORM"] == "win32":
 	for arch, suffix in (("x86", "32"), ("x86_64", "64")):
-		archEnv = Environment(tools = ["default", "textfile"],
+		archEnv = Environment(tools=["msvc", "mslink", "textfile"],
 			TARGET_ARCH=arch, HOST_ARCH=arch, libSuffix=suffix,
 			version=env["version"], copyright=env["copyright"],
 			# Hack around an odd bug where some tool after msvc states that static and shared objects are different.
@@ -32,34 +31,40 @@ if env["PLATFORM"] == "win32":
 			variant_dir="build/%s" % arch, duplicate=False)
 	configRc = "build/x86_64/config.rc"
 
-	try:
-		import winreg
-	except ImportError:
-		import _winreg as winreg
-	# Get the path to makensis.
-	try:
-		with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS",
-				0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
-			makensis = os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
-	except WindowsError:
-		makensis = "makensis"
+	import winreg
+	def getMakensis():
+		"""Get the path to makensis."""
+		try:
+			with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS\Unicode",
+					0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
+				return os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
+		except WindowsError:
+			pass
+		try:
+			with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\NSIS",
+					0, winreg.KEY_READ | winreg.KEY_WOW64_32KEY) as nsisKey:
+				return os.path.join(winreg.QueryValueEx(nsisKey, None)[0], "makensis.exe")
+		except WindowsError:
+			pass
+		return "makensis.exe"
 	installer = env.Command("installer/osara_${version}.exe", ["installer/osara.nsi", "build"],
-		[[makensis, "/V2",
+		[[getMakensis(), "/V2",
 		"/DVERSION=$version", '/DPUBLISHER="$publisher"','/DCOPYRIGHT="$copyright"',
 		"/DOUTFILE=${TARGET.abspath}",
 		"$SOURCE"]])
 
 else: # Mac
-	env["libSuffix"] = ""
-	env.SConscript("src/archBuild_sconscript",
-		exports={"env": env},
+	archEnv = Environment(tools=["clangxx", "applelink", "textfile"],
+		libSuffix="", version=env["version"], copyright=env["copyright"])
+	archEnv.SConscript("src/archBuild_sconscript",
+		exports={"env": archEnv},
 		variant_dir="build", duplicate=False)
 	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
 		[["$SOURCE", "$version"]])
-	configRc = "build/x86_64/config.rc"
+	configRc = "build/config.rc"
 
-	env.Alias("installer", installer)
-	env.Default(installer)
+env.Alias("installer", installer)
+env.Default(installer)
 
 pot = env.Command("locale/osara_${version}.pot",
 	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],

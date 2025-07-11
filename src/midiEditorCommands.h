@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * MIDI Editor commands header
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2015-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -31,14 +30,18 @@ void cmdMidiMoveToNextChord(Command* command);
 void cmdMidiMoveToPreviousChord(Command* command);
 void cmdMidiMoveToNextChordKeepSel(Command* command);
 void cmdMidiMoveToPreviousChordKeepSel(Command* command);
-void cmdMidiMoveToNextNoteInChord(Command* command);
-void cmdMidiMoveToPreviousNoteInChord(Command* command);
-void cmdMidiMoveToNextNoteInChordKeepSel(Command* command);
-void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command);
+void cmdMidiMoveToHigherNoteInChord(Command* command);
+void cmdMidiMoveToLowerNoteInChord(Command* command);
+void cmdMidiMoveToHigherNoteInChordKeepSel(Command* command);
+void cmdMidiMoveToLowerNoteInChordKeepSel(Command* command);
 void postMidiMovePitchCursor(int command);
+void cmdMidiInsertCC(Command* command);
 void cmdMidiInsertNote(Command* command);
 void cmdMidiDeleteEvents(Command* command);
+void cmdMidiPasteEvents(Command* command);
+void postMidiCopyEvents(int command);
 void postMidiSelectNotes(int command);
+void postMidiSelectCCs(int command);
 void postMidiSelectEvents(int command);
 void cmdMidiToggleSelCC (Command* command) ;
 void cmdMidiMoveToNextCC(Command* command);
@@ -54,15 +57,21 @@ void cmdMidiNoteSplitOrJoin(Command* command);
 void cmdFocusNearestMidiEvent(Command* command);
 void cmdMidiFilterWindow(Command* command);
 void maybeHandleEventListItemFocus(HWND hwnd, long childId);
+void toggleListViewItemSelection(HWND list);
 #endif
 
 void postMidiChangeVelocity(int command);
 void postMidiChangeLength(int command);
 void postMidiChangePitch(int command);
+void postMidiMovePosition(int command);
 void postMidiMoveStart(int command);
 void postMidiChangeCCValue(int command);
 void postMidiSwitchCCLane(int command);
 void postToggleMidiInputsAsStepInput(int command);
 void postToggleFunctionKeysAsStepInput(int command);
+void postMidiToggleMute(int command);
 void postMidiToggleSnap(int command);
 void postMidiChangeZoom(int command);
+int countSelectedEvents(MediaItem_Take* take);
+const std::string getMidiNoteName(MediaTrack* track, int pitch, int channel);
+int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg);

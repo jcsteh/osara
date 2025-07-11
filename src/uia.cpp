@@ -5,14 +5,14 @@
  * License: GNU General Public License version 2.0
  */
 
-#include <uiautomation.h>
 #include <ole2.h>
 #include <tlhelp32.h>
-#include <atlcomcli.h>
+#include <commctrl.h>
 #include <memory>
 #include <utility>
 #include "osara.h"
 #include "config.h"
+#include "uia.h"
 
 using namespace std;
 
@@ -46,86 +46,180 @@ class UiaCore {
 
 unique_ptr<UiaCore> uiaCore;
 
+// UiaProvider implementation
 // Provider code based on Microsoft's uiautomationSimpleProvider example.
-class UiaProvider : public IRawElementProviderSimple {
-	public:
-	UiaProvider(_In_ HWND hwnd): refCount(0), controlHWnd(hwnd) {}
 
-	// IUnknown methods
-	ULONG STDMETHODCALLTYPE AddRef() {
-		return InterlockedIncrement(&refCount);
+ULONG STDMETHODCALLTYPE UiaProvider::AddRef() {
+	return InterlockedIncrement(&refCount);
+}
+
+ULONG STDMETHODCALLTYPE UiaProvider::Release() {
+	long val = InterlockedDecrement(&refCount);
+	if (val == 0) {
+		delete this;
 	}
+	return val;
+}
 
-	ULONG STDMETHODCALLTYPE Release() {
-		long val = InterlockedDecrement(&refCount);
-		if (val == 0) {
-			delete this;
-		}
-		return val;
+HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
+	_Outptr_ void** ppInterface
+) {
+	if (!ppInterface) {
+		return E_INVALIDARG;
 	}
-
-	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid, _Outptr_ void** ppInterface) {
-		if (ppInterface) {
-			return E_INVALIDARG;
-		}
-		if (riid == __uuidof(IUnknown)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
-		} else if (riid == __uuidof(IRawElementProviderSimple)) {
-			*ppInterface =static_cast<IRawElementProviderSimple*>(this);
-		} else {
-			*ppInterface = nullptr;
-			return E_NOINTERFACE;
-		}
-		(static_cast<IUnknown*>(*ppInterface))->AddRef();
-		return S_OK;
+	if (riid == __uuidof(IUnknown) || riid == __uuidof(IRawElementProviderSimple)) {
+		*ppInterface = CComPtr<IRawElementProviderSimple>(this).Detach();
+	} else {
+		*ppInterface = nullptr;
+		return E_NOINTERFACE;
 	}
+	return S_OK;
+}
 
-	// IRawElementProviderSimple methods
-	HRESULT STDMETHODCALLTYPE get_ProviderOptions(_Out_ ProviderOptions* pRetVal) {
-		*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
-		return S_OK;
-	}
+HRESULT STDMETHODCALLTYPE UiaProvider::get_ProviderOptions(
+	_Out_ ProviderOptions* pRetVal
+) {
+	*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
+	return S_OK;
+}
 
-	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal) {
-		// We do not support any pattern.
-		*pRetVal = NULL;
-		return S_OK;
-	}
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPatternProvider(PATTERNID patternId,
+	_Outptr_result_maybenull_ IUnknown** pRetVal
+) {
+	// We do not support any pattern.
+	*pRetVal = nullptr;
+	return S_OK;
+}
 
-	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId, _Out_ VARIANT* pRetVal) {
-		switch (propertyId) {
-			case UIA_ControlTypePropertyId:
-				// Stop Narrator from ever speaking this as a window
-				pRetVal->vt = VT_I4;
-				pRetVal->lVal = UIA_CustomControlTypeId;
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPropertyValue(PROPERTYID propertyId,
+	_Out_ VARIANT* pRetVal
+) {
+	switch (propertyId) {
+		case UIA_ControlTypePropertyId:
+			pRetVal->vt = VT_I4;
+			pRetVal->lVal = getControlType();
+			break;
+		case UIA_IsControlElementPropertyId:
+		case UIA_IsContentElementPropertyId:
+		case UIA_IsKeyboardFocusablePropertyId:
+			pRetVal->vt = VT_BOOL;
+			pRetVal->boolVal = isFocusable() ? VARIANT_TRUE : VARIANT_FALSE;
+			break;
+		case UIA_NamePropertyId: {
+			if (!isFocusable()) {
 				break;
-			case UIA_IsControlElementPropertyId:
-			case UIA_IsContentElementPropertyId:
-			case UIA_IsKeyboardFocusablePropertyId:
-				pRetVal->vt = VT_BOOL;
-				pRetVal->boolVal = VARIANT_FALSE;
-				break;
-			case UIA_ProviderDescriptionPropertyId:
-				pRetVal->vt = VT_BSTR;
-				pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
-				break;
-			default:
-				pRetVal->vt = VT_EMPTY;
+			}
+			// Use the previous Static as a label like the default provider does.
+			HWND prev = GetWindow(controlHWnd, GW_HWNDPREV);
+			if (isClassName(prev, "Static")) {
+				wchar_t text[50];
+				if (GetWindowTextW(prev, text, _countof(text)) != 0) {
+					pRetVal->vt = VT_BSTR;
+					pRetVal->bstrVal = SysAllocString(text);
+				}
+			}
+			break;
 		}
-		return S_OK;
+		case UIA_ProviderDescriptionPropertyId:
+			pRetVal->vt = VT_BSTR;
+			pRetVal->bstrVal = SysAllocString(L"REAPER OSARA");
+			break;
+		default:
+			pRetVal->vt = VT_EMPTY;
 	}
+	return S_OK;
+}
 
-	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(IRawElementProviderSimple** pRetVal) {
-		return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
+HRESULT STDMETHODCALLTYPE UiaProvider::get_HostRawElementProvider(
+	IRawElementProviderSimple** pRetVal
+) {
+	return UiaHostProviderFromHwnd(controlHWnd, pRetVal);
+}
+
+// TextSliderUiaProvider implementation
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::QueryInterface(
+	_In_ REFIID riid, _Outptr_ void** ppInterface
+) {
+	if (!ppInterface) {
+		return E_INVALIDARG;
 	}
-
-	private:
-	virtual ~UiaProvider() {
+	if (riid == __uuidof(IValueProvider)) {
+		*ppInterface = CComPtr<IValueProvider>(this).Detach();
+	} else {
+		return UiaProvider::QueryInterface(riid, ppInterface);
 	}
+	return S_OK;
+}
 
-	ULONG refCount; // Ref Count for this COM object
-	HWND controlHWnd; // The HWND for the control.
-};
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::GetPatternProvider(
+	PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
+) {
+	if (patternId == UIA_ValuePatternId) {
+		*pRetVal = CComPtr<IValueProvider>(this).Detach();
+	} else {
+		*pRetVal = nullptr;
+	}
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::SetValue(__RPC__in LPCWSTR val) {
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::get_Value(
+	__RPC__deref_out_opt BSTR* pRetVal
+) {
+	*pRetVal = SysAllocString(widen(sliderValue).c_str());
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::get_IsReadOnly(
+	__RPC__out BOOL* pRetVal
+) {
+	*pRetVal = false;
+	return S_OK;
+}
+
+CComPtr<TextSliderUiaProvider> TextSliderUiaProvider::create(HWND hwnd) {
+	auto provider = new TextSliderUiaProvider(hwnd);
+	SetWindowSubclass(hwnd, subclassProc, 0, (DWORD_PTR)provider);
+	return provider;
+}
+
+LRESULT CALLBACK TextSliderUiaProvider::subclassProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR subclass, DWORD_PTR data
+) {
+	auto provider = (TextSliderUiaProvider*)data;
+	switch (msg) {
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hwnd, subclassProc, subclass);
+			break;
+		case WM_GETOBJECT:
+			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId) && provider) {
+				return UiaReturnRawElementProvider(hwnd, wParam, lParam, provider);
+			}
+			break;
+		case WM_SETFOCUS:
+			if (provider) {
+				UiaRaiseAutomationEvent(provider, UIA_AutomationFocusChangedEventId);
+			}
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+void TextSliderUiaProvider::setValue(string value) {
+	sliderValue = value;
+	accPropServices->SetHwndPropStr(controlHWnd, OBJID_CLIENT, CHILDID_SELF,
+		PROPID_ACC_VALUE, widen(value).c_str());
+}
+
+void TextSliderUiaProvider::fireValueChange() {
+	UiaRaiseAutomationPropertyChangedEvent(this, UIA_ValueValuePropertyId,
+		CComVariant(), CComVariant(widen(sliderValue).c_str()));
+	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, controlHWnd,
+		OBJID_CLIENT, CHILDID_SELF);
+}
 
 CComPtr<IRawElementProviderSimple> uiaProvider;
 
@@ -150,9 +244,11 @@ WNDCLASSEX getWindowClass() {
 	return windowClass;
 }
 
+bool hasTriedToInitialize = false;
 WNDCLASSEX windowClass;
 
 bool initializeUia() {
+	hasTriedToInitialize = true;
 	uiaCore = make_unique<UiaCore>();
 	// If UiaRaiseNotificationEvent is available, UiaDisconnectProvider and
 	// UiaDisconnectAllProviders will also be available, so we don't need to
@@ -189,6 +285,10 @@ bool initializeUia() {
 	// takes it to 1.
 	uiaProvider = new UiaProvider(uiaWnd);
 	return true;
+}
+
+bool hasTriedToInitializeUia() {
+	return hasTriedToInitialize;
 }
 
 bool terminateUia() {

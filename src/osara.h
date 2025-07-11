@@ -1,7 +1,6 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Main header
- * Author: James Teh <jamie@jantrid.net>
  * Copyright 2014-2023 NV Access Limited, James Teh
  * License: GNU General Public License version 2.0
  */
@@ -18,6 +17,8 @@
 # include <windows.h>
 # pragma clang diagnostic pop
 #endif
+#include <functional>
+#include <memory>
 #include <string>
 #include <sstream>
 
@@ -97,6 +98,7 @@
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
+#define REAPERAPI_WANT_GetProjectLength
 #define REAPERAPI_WANT_MIDIEditor_GetActive
 #define REAPERAPI_WANT_MIDIEditor_GetTake
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_str
@@ -119,6 +121,9 @@
 #define REAPERAPI_WANT_TakeFX_SetParam
 #define REAPERAPI_WANT_TakeFX_FormatParamValue
 #define REAPERAPI_WANT_plugin_getapi
+#define REAPERAPI_WANT_PreventUIRefresh
+#define REAPERAPI_WANT_UpdateArrange
+#define REAPERAPI_WANT_Undo_OnStateChangeEx2
 #define REAPERAPI_WANT_Envelope_FormatValue
 #define REAPERAPI_WANT_CountTrackEnvelopes
 #define REAPERAPI_WANT_GetTrackEnvelope
@@ -198,6 +203,7 @@
 #define REAPERAPI_WANT_TrackFX_GetParamFromIdent
 #define REAPERAPI_WANT_TrackFX_GetNamedConfigParm
 #define REAPERAPI_WANT_GetItemStateChunk
+#define REAPERAPI_WANT_MIDI_GetRecentInputEvent
 #define REAPERAPI_WANT_GetTrackGUID
 #define REAPERAPI_WANT_guidToString
 #define REAPERAPI_WANT_stringToGuid
@@ -209,6 +215,16 @@
 #define REAPERAPI_WANT_MIDI_GetGrid
 #define REAPERAPI_WANT_GetParentTrack
 #define REAPERAPI_WANT_LocalizeString
+#define REAPERAPI_WANT_TakeFX_GetNamedConfigParm
+#define REAPERAPI_WANT_GetTrackSendName
+#define REAPERAPI_WANT_AddExtensionsMainMenu
+#define REAPERAPI_WANT_GetAppVersion
+#define REAPERAPI_WANT_RemoveTrackSend
+#define REAPERAPI_WANT_format_timestr_len
+#define REAPERAPI_WANT_parse_timestr_len
+#define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
+#define REAPERAPI_WANT_GetSetProjectGrid
+
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -219,6 +235,8 @@ const int MEDIA_EXPLORER_SECTION = 32063;
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
 static bool bTrue = true;
+
+extern const char* WCS_DIALOG;
 
 typedef struct Command {
 	int section;
@@ -259,6 +277,41 @@ bool shouldReportTimeMovement() ;
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
 
+// Call a function or lambda (even a lambda with capture) asynchronously after
+// the specified number of ms. The function must take no parameters and return
+// nothing. You must ensure any captured objects remain alive until the lambda
+// is called, remembering that the outer function will have returned before
+// the lambda runs.
+// You can cancel() the call before it runs. If you will never need to do this,
+// you can discard the CallLater object and the call will still run.
+class CallLater {
+	public:
+	CallLater() = default;
+
+	CallLater(auto func, UINT ms) {
+		// The caller might discard this CallLater, so use another object to hold
+		// the function.
+		auto holder = std::make_shared<Holder>(func);
+		this->holder = holder;
+		// Ensure holder stays alive until the function runs.
+		holder->self = holder;
+		SetTimer(mainHwnd, (UINT_PTR)holder.get(), ms, timerProc);
+	}
+
+	bool cancel();
+
+	private:
+	struct Holder {
+		Holder(auto func): func(func) {}
+		std::function<void()> func;
+		std::shared_ptr<Holder> self;
+	};
+
+	static void CALLBACK timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time);
+
+	std::weak_ptr<Holder> holder;
+};
+
 typedef enum {
 	TF_NONE,
 	TF_MEASURE,
@@ -276,33 +329,30 @@ enum FormatTimeCacheRequest {
 	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
 };
 std::string formatTime(double time, TimeFormat format=TF_RULER,
-	bool isLength=false, FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
+	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
 	bool includeZeros=true, bool includeProjectStartOffset=true);
 void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
+std::string formatLength(double start, double end, TimeFormat format=TF_RULER,
+	FormatTimeCacheRequest cache=FT_NO_CACHE, bool includeZeros=true);
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
+bool isTrackArmed(MediaTrack* track);
 std::string formatDouble(double d, int precision, bool plus=false);
 MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
 #include <string>
+#include <atlcomcli.h>
 #include <oleacc.h>
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 
-extern IAccPropServices* accPropServices;
-
-// uia.cpp
-bool initializeUia();
-bool terminateUia();
-bool shouldUseUiaNotifications();
-bool sendUiaNotification(const std::string& message, bool interrupt = true);
-void resetUia();
+extern CComPtr<IAccPropServices> accPropServices;
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
@@ -319,6 +369,7 @@ void reportTransportState(int state);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);
+std::string gridDivisionToFriendlyName(double division);
 IReaperControlSurface* createSurface();
 // envelopeCommands.cpp
 extern bool selectedEnvelopeIsTake;

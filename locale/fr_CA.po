@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2023-09-28 05:18\n"
+"PO-Revision-Date: 2025-07-01 18:47\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -23,6 +23,65 @@ msgstr "désactivé"
 msgid "OSARA: Toggle"
 msgstr "OSARA: Basculer"
 
+msgid "OSARA: Enable"
+msgstr "OSARA : Activer"
+
+msgid "OSARA: Disable"
+msgstr "OSARA : Désactiver"
+
+msgctxt "optimal REAPER configuration"
+msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+msgstr "Souhaitez-vous ajuster les préférences de REAPER pour une compatibilité optimale avec les lecteurs d'écran :"
+
+msgctxt "optimal REAPER configuration"
+msgid "1. Undock the Media Explorer so that it gets focus when opened."
+msgstr "1. Désancrer l'explorateur de médias pour qu'il soit focussable lorsqu'il est ouvert."
+
+msgctxt "optimal REAPER configuration"
+msgid "2. Enable closing Media Explorer using the escape key."
+msgstr "2. Activer fermer l'explorateur de médias à l'aide de la touche Escape."
+
+msgctxt "optimal REAPER configuration"
+msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+msgstr "3. Activer les anciennes boîtes de dialogue de parcours de fichiers, afin que les options spécifiques à REAPER dans les boîtes de dialogue Ouvrir et Enregistrer sous soient accessibles avec la touche Tab."
+
+msgctxt "optimal REAPER configuration"
+msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
+msgstr "4. Activer l'utilisation de la barre d'espace pour les cases à cocher et les boutons dans diverses fenêtres, lorsque cela est plus pratique que d'utiliser la barre d'espace pour lire le projet."
+
+msgctxt "optimal REAPER configuration"
+msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
+msgstr "5. Afficher des étiquettes textuelles pour indiquer Parallèle, Hors ligne ou Contourné dans la liste des FX."
+
+msgctxt "optimal REAPER configuration"
+msgid "6. Use a standard, accessible edit control for the video code editor."
+msgstr "6. Utiliser un contrôle d'édition standard et accessible pour l'éditeur de code vidéo."
+
+msgctxt "optimal REAPER configuration"
+msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+msgstr "7. Masquer les préfixes du type d'FX dans le navigateur d'FX afin que la navigation à travers les FX soit plus efficace."
+
+msgctxt "optimal REAPER configuration"
+msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr "8. Désactiver l'option magnétiser à la grille visible dans l'éditeur MIDI, afin que le déplacement sur la grille ne dépend pas du réglage du zoom horizontal."
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+msgstr "9. Lire/arrêt avec Ctrl+Espace quand le focus du clavier est dans une boîte de dialogue, nécessaire avec Reaper 7.41 ou plus récent."
+
+msgctxt "optimal REAPER configuration"
+msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
+msgstr "Remarque : si ce n'est pas le bon moment pour peaufiner REAPER, vous pouvez appliquer ces ajustements plus tard en allant dans le menu Extensions dans la barre de menus puis dans le sous-menu OSARA."
+
+msgid "Error writing configuration changes."
+msgstr "Erreur lors de l'écriture des changements de configuration."
+
+msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
+msgstr "REAPER va maintenant se fermer. Veuillez redémarrer REAPER pour appliquer les modifications."
+
+msgid "Restart REAPER"
+msgstr "Redémarrer REAPPER"
+
 msgid "volume"
 msgstr "volume"
 
@@ -30,16 +89,16 @@ msgid "pan"
 msgstr "panoramique"
 
 msgid "muted"
-msgstr "sourdine activée"
+msgstr "muté"
 
 msgid "unmuted"
-msgstr "sourdine désactivée"
+msgstr "démuté"
 
 msgid "soloed"
-msgstr "solo activé"
+msgstr "soloté"
 
 msgid "unsoloed"
-msgstr "solo désactivé"
+msgstr "désoloté"
 
 msgid "armed"
 msgstr "armé"
@@ -79,6 +138,12 @@ msgstr "région {}"
 msgid "region {}"
 msgstr "région {}"
 
+msgid "time selection start"
+msgstr "début de la sélection temporelle"
+
+msgid "time selection end"
+msgstr "fin de la sélection temporelle"
+
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
 msgid "{} automation item removed"
@@ -103,7 +168,7 @@ msgstr "carrée"
 
 #. A shape for an envelope point.
 msgid "slow start/end"
-msgstr "départ, fin lente"
+msgstr "départ/fin lente"
 
 #. A shape for an envelope point.
 msgid "fast start"
@@ -196,6 +261,24 @@ msgstr[1] "{} points sélectionnés"
 msgid "no change"
 msgstr "aucun changement"
 
+msgid "inserted automation item"
+msgstr "objet d'automatisation inséré"
+
+#. Reported when adding automation items. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+#. Reported when automation items are added. {} will be
+#. replaced with the number of items; e.g. "2 automation items added".
+msgid "{} automation item added"
+msgid_plural "{} automation items added"
+msgstr[0] "{} objet d'automatisation ajouté"
+msgstr[1] "{} objets d'automatisation ajoutés"
+
+msgid "no automation items glued"
+msgstr "aucun objet d'automatisation fusionné"
+
+msgid "glued automation items"
+msgstr "objets d'automatisation fusionnés"
+
 msgid "active"
 msgstr "active"
 
@@ -252,8 +335,6 @@ msgstr "la#"
 msgid "b"
 msgstr "si"
 
-#. used when reporting the number of notes in a chord.
-#. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} note"
 msgid_plural "{} notes"
 msgstr[0] "{} note"
@@ -265,14 +346,29 @@ msgstr[1] "{} notes"
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
 msgid_plural "{} muted"
-msgstr[0] "{} en sourdine"
-msgstr[1] "{} en sourdine"
+msgstr[0] "{} muté"
+msgstr[1] "{} muté"
 
 msgid "noncontiguous selection"
 msgstr "sélection non contigu"
 
+#. used when reporting the number of notes in a chord.
+#. {} will be replaced by the number of notes. E.g. "3 notes"
+msgid "{} notes"
+msgstr "{} notes"
+
 msgid "velocity"
 msgstr "vélocité"
+
+msgid "nothing pasted"
+msgstr "il ni a rien à coller"
+
+#. Reported when pasting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events added".
+msgid "{} event added"
+msgid_plural "{} events added"
+msgstr[0] "{} événement ajouté"
+msgstr[1] "{} événements ajoutés"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
@@ -280,6 +376,13 @@ msgid "{} event removed"
 msgid_plural "{} events removed"
 msgstr[0] "{} événement supprimé"
 msgstr[1] "{} événements supprimés"
+
+#. Reported when copying events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events copied".
+msgid "{} event copied"
+msgid_plural "{} events copied"
+msgstr[0] "{} événement copié"
+msgstr[1] "{} événements copiés"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -290,19 +393,21 @@ msgid_plural "{} notes selected"
 msgstr[0] "{} note sélectionnée"
 msgstr[1] "{} notes sélectionnées"
 
-#. Reported when selecting events in the MIDI editor. {} will be replaced with
-#. the number of events; e.g. "2 events selected".
-msgid "{} event selected"
-msgid_plural "{} events selected"
-msgstr[0] "{} événement sélectionné"
-msgstr[1] "{} évènements sélectionnés"
-
+#. Reported when selecting CC events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 CC events selected".
 #. Used in the MIDI editor when CC events are selected.  {}
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
 msgstr[0] "{} événement CC sélectionné"
 msgstr[1] "{} événements CC sélectionnés"
+
+#. Reported when selecting events in the MIDI editor. {} will be replaced with
+#. the number of events; e.g. "2 events selected".
+msgid "{} event selected"
+msgid_plural "{} events selected"
+msgstr[0] "{} événement sélectionné"
+msgstr[1] "{} évènements sélectionnés"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
@@ -327,7 +432,7 @@ msgid "Portamento MSB"
 msgstr "Portamento MSB"
 
 msgid "Data Entry MSB"
-msgstr "Saisie des données MSB"
+msgstr "Saisie de données MSB"
 
 msgid "Volume MSB"
 msgstr "Volume MSB"
@@ -375,7 +480,7 @@ msgid "Portamento LSB"
 msgstr "Portamento LSB"
 
 msgid "Data Entry LSB"
-msgstr "Saisie des données LSB"
+msgstr "Saisie de données LSB"
 
 msgid "Volume LSB"
 msgstr "Volume LSB"
@@ -384,7 +489,7 @@ msgid "Balance LSB"
 msgstr "Balance LSB"
 
 msgid "Pan Position LSB"
-msgstr "Position de panoramique LSB"
+msgstr "Position du panoramique LSB"
 
 msgid "Expression LSB"
 msgstr "Expression LSB"
@@ -512,14 +617,11 @@ msgstr "Mono activé"
 msgid "Poly On"
 msgstr "Poly activé"
 
-msgid "Change CC Selection"
-msgstr "Changer la sélection de CC"
-
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
 msgid "Poly Aftertouch {note}  {value}"
-msgstr "Aftertouch polyphonique {note}  {value}"
+msgstr "Poly Aftertouch {note} {value}"
 
 #. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 msgid "Control {control}, {value}"
@@ -528,12 +630,16 @@ msgstr "Contrôle {control}, {value}"
 msgid "Program {}"
 msgstr "Programme {}"
 
+#. MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 msgid "Channel pressure {}"
 msgstr "Pression du canal {}"
 
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
 msgstr "Hauteur tonale {}"
+
+msgid "Change CC Selection"
+msgstr "Changer la sélection de CC"
 
 msgid "OSARA: Move to next midi item on track"
 msgstr "OSARA: Sélectionne l'objet MIDI suivant de la piste"
@@ -703,6 +809,46 @@ msgid_plural "{} notes pitch changed"
 msgstr[0] "{} hauteur tonale de note modifiée"
 msgstr[1] "{} hauteur tonale de notes modifiées"
 
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel left"
+msgid "{} CC event pixel left"
+msgid_plural "{} CC events pixel left"
+msgstr[0] "événement MIDI CC déplacé vers la gauche de {} pixel"
+msgstr[1] "événements MIDI CC déplacés vers la gauche de {} pixels"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events pixel right"
+msgid "{} CC event pixel right"
+msgid_plural "{} CC events pixel right"
+msgstr[0] "événement MIDI CC déplacé vers la droite de {} pixel"
+msgstr[1] "événements MIDI CC déplacés vers la droite de {} pixels"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit left"
+msgid "{} CC event grid unit left"
+msgid_plural "{} CC events grid unit left"
+msgstr[0] "événement MIDI CC déplacé vers la gauche de {} unité de grille"
+msgstr[1] "{} événements CC déplacé vers la gauche d'une unité de grille"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events grid unit right"
+msgid "{} CC event grid unit right"
+msgid_plural "{} CC events grid unit right"
+msgstr[0] "événement MIDI CC déplacé vers la droite de {} unité de grille"
+msgstr[1] "événements MIDI CC déplacés vers la droite de {} unité de grille"
+
+#. Used when moving CCs in the MIDI
+#. editor. {} is replaced by the number of CCs, e.g. 
+#. "3 CC events moved"
+msgid "{} CC event moved"
+msgid_plural "{} CC events moved"
+msgstr[0] "{} événement MIDI CC déplacé"
+msgstr[1] "{} événements MIDI CC déplacés"
+
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pixel left"
@@ -776,11 +922,58 @@ msgstr "Activé F1 à F12 comme entrée pas à pas"
 msgid "Disabled  f1-f12 as step input"
 msgstr "Désactivé F1 à F12 comme entrée pas à pas"
 
+#. used when reporting the number of muted notes.
+#. {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+msgid "{} note muted"
+msgid_plural "{} notes muted"
+msgstr[0] "{} note démutée"
+msgstr[1] "{} notes mutées"
+
+#. used when reporting the number of unmuted notes.
+#. {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+msgid "{} note unmuted"
+msgid_plural "{} notes unmuted"
+msgstr[0] "{} note démutée"
+msgstr[1] "{} notes démutées"
+
+#. used when reporting the number of muted CCs.
+#. {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
+msgid "{} CC muted"
+msgid_plural "{} CCs muted"
+msgstr[0] "{} CC muté"
+msgstr[1] "{} CC mutés"
+
+#. used when reporting the number of unmuted CCs.
+#. {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
+msgid "{} CC unmuted"
+msgid_plural "{} CCs unmuted"
+msgstr[0] "{} CC démuté"
+msgstr[1] "{} CC démutés"
+
+#. used when reporting the number of muted events.
+#. {} will be replaced by the number of muted events. E.g. "3 events muted"
+msgid "{} event muted"
+msgid_plural "{} events muted"
+msgstr[0] "{} événement muté"
+msgstr[1] "{} événements mutés"
+
+#. used when reporting the number of unmuted events.
+#. {} will be replaced by the number of events. E.g. "3 events unmuted"
+msgid "{} event unmuted"
+msgid_plural "{} events unmuted"
+msgstr[0] "{} événement démuté"
+msgstr[1] "{} événements démutés"
+
 msgid "enabled snap to grid"
 msgstr "magnétiser sur la grille, activé"
 
 msgid "disabled snap to grid"
 msgstr "magnétiser sur la grille, désactivé"
+
+#. Reported when zooming in or out horizontally. {} will be
+#. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
+msgid "{} pixels/beat"
+msgstr "{} pixels/battements"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -799,8 +992,17 @@ msgstr "actif"
 msgid "off"
 msgstr "inactif"
 
-msgid "FX Parameters"
-msgstr "Paramètre d'FX"
+msgid "Unrestrict minimum"
+msgstr "Sans restriction minimal"
+
+msgid "Restrict minimum to current value"
+msgstr "Restreindre le minimum à la valeur actuelle"
+
+msgid "Unrestrict maximum"
+msgstr "Sans restriction maximal"
+
+msgid "Restrict maximum to current value"
+msgstr "Restreindre le maximum à la valeur actuelle"
 
 msgid "low shelf"
 msgstr "plateau bas"
@@ -847,11 +1049,78 @@ msgstr "Bande {} activée"
 msgid "Band {} type"
 msgstr "Bande {} type"
 
+msgid "FX Parameters"
+msgstr "Paramètre d'FX"
+
+msgid "Go to send destination track"
+msgstr "Aller sur l'envoi de la piste de destination"
+
+msgid "Delete send"
+msgstr "Supprimer l'envoi"
+
+msgid "Go to receive source track"
+msgstr "Aller sur le retour de la piste source"
+
+msgid "Delete receive"
+msgstr "Supprimer le retour"
+
+msgid "Delete hardware output"
+msgstr "Supprimer la sortie matérielle"
+
+#. Indicates no MIDI channels for a send in the Track
+#. Parameters dialog.
+#. An automation mode.
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgid "none"
+msgstr "aucun"
+
+#. Indicates all MIDI channels for a send in the Track
+#. Parameters dialog.
+msgid "all"
+msgstr "tout"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &2 new channels"
+msgstr "Ajouter &2 nouveaux canaux"
+
+#. An option in the context menu for the source and
+#. destination audio channel parameters in the OSARA Track Parameters
+#. dialog.
+msgid "Add &4 new channels"
+msgstr "Ajouter &4 nouveaux canaux"
+
+msgid "post-fader"
+msgstr "post-fader"
+
+msgid "pre-fx"
+msgstr "pré-Fx"
+
+msgid "post-fx"
+msgstr "post-fx"
+
 msgid "mute"
-msgstr "sourdine"
+msgstr "muter"
 
 msgid "mono"
 msgstr "mono"
+
+msgid "source MIDI channel"
+msgstr "canal MIDI source"
+
+msgid "destination MIDI channel"
+msgstr "destination du canal MIDI"
+
+msgid "source audio channel"
+msgstr "canal audio source"
+
+msgid "destination audio channel"
+msgstr "canal audio de destination"
+
+msgid "send type"
+msgstr "type d'envoi"
 
 #. Indicates a parameter for a track send in the Track Parameters
 #. dialog.
@@ -862,6 +1131,11 @@ msgstr "envoi"
 #. Parameters dialog.
 msgid "receive"
 msgstr "retour"
+
+#. Indicates a parameter for a hardware audio output in the
+#.  Track Parameters dialog.
+msgid "hardware"
+msgstr "matériel"
 
 msgid "Track Parameters"
 msgstr "Paramètre de Piste"
@@ -893,6 +1167,9 @@ msgstr "Moniteur"
 #. dialog, this is presented after effects which are input FX.
 msgid "[input]"
 msgstr "Entrée"
+
+msgid "(Container Parameters)"
+msgstr "(Paramètres du conteneur)"
 
 msgid "no FX"
 msgstr "Pas d'FX"
@@ -946,6 +1223,9 @@ msgstr "pas encore configuré"
 msgid "following last touched track"
 msgstr "suivre la dernière piste touchée"
 
+msgid "threshold"
+msgstr "seuil"
+
 #. Reported when the user tries to reset a Peak Watcher
 #. value, but that watcher is disabled.
 #. Reported when the user tries to report a Peak Watcher
@@ -974,13 +1254,13 @@ msgstr "L'observateur de crête ne prend pas en charge le focus actuel"
 #. After this, information about the existing configuration for the value
 #. will be appended.
 msgid "paused Peak Watcher"
-msgstr "observateur de crête, en pause"
+msgstr "observateur de crête en pause"
 
 msgid "resumed Peak Watcher"
-msgstr "observateur de crête, relancé"
+msgstr "observateur de crête relancé"
 
 msgid "Peak Watcher not enabled"
-msgstr "Observateur de crête, désactivé"
+msgstr "Observateur de crête désactivé"
 
 #. Used when reporting a length of time in measures.
 #. {} will be replaced with the number of measures; e.g.
@@ -1024,6 +1304,8 @@ msgstr "{} minutes"
 msgid "{:#.3f} sec"
 msgstr "{:#.3f} seconde"
 
+#. Used when reporting a time in seconds. {:.3f} will be
+#. replaced with the number of seconds; e.g. "2 sec".
 msgid "{:.3f} sec"
 msgstr "{:.3f} seconde"
 
@@ -1074,12 +1356,6 @@ msgstr "réduit"
 #. A closed track folder.
 msgid "closed"
 msgstr "fermé"
-
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
-msgid "none"
-msgstr "aucun"
 
 #. An automation mode.
 msgid "trim/read"
@@ -1158,55 +1434,55 @@ msgid "volume lead"
 msgstr "volume maître"
 
 msgid "volume follow"
-msgstr "volume esclave"
+msgstr "volume suiveur"
 
 msgid "VCA lead"
-msgstr "VCA maître"
+msgstr "VCA meneur"
 
 msgid "VCA follow"
-msgstr "VCA esclave"
+msgstr "VCA suiveur"
 
 msgid "pan lead"
-msgstr "panoramique maître"
+msgstr "panoramique meneur"
 
 msgid "pan follow"
-msgstr "panoramique esclave"
+msgstr "panoramique suiveur"
 
 msgid "width lead"
-msgstr "largeur maître"
+msgstr "largeur meneur"
 
 msgid "width follow"
-msgstr "largeur esclave"
+msgstr "largeur suiveur"
 
 msgid "mute lead"
-msgstr "sourdine maître"
+msgstr "mutage meneur"
 
 msgid "mute follow"
-msgstr "sourdine esclave"
+msgstr "mutage suiveur"
 
 msgid "solo lead"
-msgstr "solo maître"
+msgstr "solo meneur"
 
 msgid "solo follow"
-msgstr "solo esclave"
+msgstr "solo suiveur"
 
 msgid "record arm lead"
-msgstr "armer pour l'enregistrement maître"
+msgstr "armer pour l'enregistrement meneur"
 
 msgid "record arm follow"
-msgstr "armer pour l'enregistrement esclave"
+msgstr "armer pour l'enregistrement suiveur"
 
 msgid "polarity lead"
-msgstr "polarité maître"
+msgstr "polarité meneur"
 
 msgid "polarity follow"
-msgstr "polarité esclave"
+msgstr "polarité suiveur"
 
 msgid "automation mode lead"
-msgstr "mode d'automatisation maître"
+msgstr "mode d'automatisation meneur"
 
 msgid "automation mode follow"
-msgstr "mode d'automatisation esclave"
+msgstr "mode d'automatisation suiveur"
 
 msgid "reverse volume"
 msgstr "volume inversé"
@@ -1218,10 +1494,49 @@ msgid "reverse width"
 msgstr "largeur inversée"
 
 msgid "do not lead when following"
-msgstr "ne peut être maître si esclave"
+msgstr "ne peut être meneur si suiveur"
 
 msgid "VCA pre-FX follow"
-msgstr "VCA pré-FX esclave"
+msgstr "VCA pré-FX suiveur"
+
+msgid "grid whole"
+msgstr "grille sur ronde, une mesure"
+
+msgid "grid half"
+msgstr "grille sur blanche, 1/2"
+
+msgid "grid quarter"
+msgstr "grille sur noire, 1/4"
+
+msgid "grid quarter triplet"
+msgstr "grille sur triolet de noire, 1/6"
+
+msgid "grid eighth"
+msgstr "grille sur croche, 1/8"
+
+msgid "grid eighth triplet"
+msgstr "grille sur triolet de croche, 1/12"
+
+msgid "grid sixteenth"
+msgstr "grille sur double croche, 1/16"
+
+msgid "grid sixteenth triplet"
+msgstr "grille sur triolet de double croche, 1/24"
+
+msgid "grid thirty second"
+msgstr "grille sur triple croche, 1/32"
+
+msgid "grid thirty second triplet"
+msgstr "grille sur triolet de triple croche, 1/48"
+
+msgid "grid sixty fourth"
+msgstr "grille soixante quatrième"
+
+msgid "grid one hundred twenty eighth"
+msgstr "grille sur quintuple croche, 1/128"
+
+msgid "grid  unknown"
+msgstr "grille inconnue"
 
 msgid "defeating solo"
 msgstr "solo défait"
@@ -1264,13 +1579,56 @@ msgstr "FX:"
 msgid "delta"
 msgstr "delta"
 
+msgid "master muted"
+msgstr "master muté"
+
+msgid "master unmuted"
+msgstr "master démuté"
+
+msgid "no selected tracks"
+msgstr "aucune piste n'est sélectionné"
+
+#. Reported when multiple tracks are muted. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks muted".
+msgid "{} track muted"
+msgid_plural "{} tracks muted"
+msgstr[0] "{} piste mutée"
+msgstr[1] "{} pistes mutées"
+
+#. Reported when multiple tracks are unmuted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unmuted".
+msgid "{} track unmuted"
+msgid_plural "{} tracks unmuted"
+msgstr[0] "{} piste démutée"
+msgstr[1] "{} pistes démutées"
+
+msgid "master soloed"
+msgstr "master soloté"
+
+msgid "master unsoloed"
+msgstr "master désoloté"
+
+#. Reported when multiple tracks are soloed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks soloed".
+msgid "{} track soloed"
+msgid_plural "{} tracks soloed"
+msgstr[0] "{} piste solotée"
+msgstr[1] "{} pistes solotées"
+
+#. Reported when multiple tracks are unsoloed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unsoloed".
+msgid "{} track unsoloed"
+msgid_plural "{} tracks unsoloed"
+msgstr[0] "{} piste désolotée"
+msgstr[1] "{} pistes désolotées"
+
 msgid "record monitor off"
-msgstr "moniteur d'entrée, désactivé"
+msgstr "moniteur d'entrée désactivé"
 
 #. Record monitor set to normal.
 msgctxt "record monitor"
 msgid "normal"
-msgstr "moniteur d'entrée, activé"
+msgstr "moniteur d'entrée activé"
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
@@ -1279,20 +1637,34 @@ msgstr "moniteur d'entrée, mode magnéto à bandes"
 msgid "phase normal"
 msgstr "phase normal"
 
+#. Reported when multiple tracks have phase inverted. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase inverted".
+msgid "{} track phase inverted"
+msgid_plural "{} tracks phase inverted"
+msgstr[0] "{} phase de piste, inversée"
+msgstr[1] "{} phases de pistes, inversées"
+
+#. Reported when multiple tracks have phase normal. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks phase normal".
+msgid "{} track phase normal"
+msgid_plural "{} tracks phase normal"
+msgstr[0] "{} phase de piste, normale"
+msgstr[1] "{} phases de pistes, normale"
+
 msgid "FX active"
 msgstr "FX actif"
 
 msgid "all tracks FX bypassed"
-msgstr "fX de toutes les pistes, contournées"
+msgstr "fX de toutes les pistes contournées"
 
 msgid "all tracks FX active"
-msgstr "fX de toutes les pistes, activées"
+msgstr "fX de toutes les pistes activées"
 
 msgid "enabled delta solo"
-msgstr "delta solo, activé"
+msgstr "delta solo activé"
 
 msgid "disabled delta solo"
-msgstr "delta solo, désactivé"
+msgstr "delta solo désactivé"
 
 msgid "no selected items"
 msgstr "aucun objets n'est sélectionné"
@@ -1303,6 +1675,13 @@ msgid "{} item normalized to common gain"
 msgid_plural "{} items normalized to common gain"
 msgstr[0] "{} objet normalisé au gain commun"
 msgstr[1] "{} objets normalisés au gain commun"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items un-normalized".
+msgid "{} item un-normalized"
+msgid_plural "{} items un-normalized"
+msgstr[0] "{} objet non normalisé"
+msgstr[1] "{} objets non normalisés"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
@@ -1368,6 +1747,20 @@ msgstr "Objet"
 msgid "Take"
 msgstr "Prise"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded in to cursor".
+msgid "{} item faded in to cursor"
+msgid_plural "{} items faded in to cursor"
+msgstr[0] "{} fondu entrant d'objet au curseur effectué"
+msgstr[1] "{} fondus d'objet entrant au curseur effectué"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items faded out from cursor".
+msgid "{} item faded out from cursor"
+msgid_plural "{} items faded out from cursor"
+msgstr[0] "{} fondu d'objet sortant au curseur effectué"
+msgstr[1] "{} fondus d'objet sortant au curseur effectués"
+
 #. Panned to the center.
 msgid "center"
 msgstr "centre"
@@ -1390,6 +1783,32 @@ msgstr "ripple toutes les pistes"
 
 msgid "ripple off"
 msgstr "ripple désactivé"
+
+#. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
+#. "2 items removed ripple per track is on".
+msgid "ripple per track is on"
+msgstr "le mode Ripple par piste est activée"
+
+#. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
+#. "1 item added ripple all tracks is on".
+msgid "ripple all tracks is on"
+msgstr "le mode ripple toutes les pistes est activé"
+
+#. Reported when auto crossfade and trim content behind media items are both enabled.
+msgid "enabled auto crossfades and trim"
+msgstr "fondus enchaînés automatiques et redimensionnement activés"
+
+#. Reported when auto crossfade is enabled, trim behind media items is disabled.  
+msgid "crossfading, not trimming"
+msgstr "fondu enchaîné, sans redimensionnement"
+
+#. Reported when trim content behind media items is enabled, auto crossfade is disabled.
+msgid "trimming, not crossfading"
+msgstr "redimentionnement, sans fondu enchaîné"
+
+#. Reported when auto crosfade and trim content behind media items are both disabled.
+msgid "disabled auto crossfades and trim"
+msgstr "fondus enchaînés automatiques et redimentionnement désactivés"
 
 msgid "repeat on"
 msgstr "répétition activée"
@@ -1416,6 +1835,14 @@ msgid "{} item copied"
 msgid_plural "{} items copied"
 msgstr[0] "{} objet copié"
 msgstr[1] "{} objets copiés"
+
+#. Reported when copying the content of a time selection to the edit cursor.
+msgid "copied time selection to edit cursor"
+msgstr "sélection temporelle au curseur d'édition copiée"
+
+#. Reported when moving the content of a time selection to edit cursor.
+msgid "moved time selection to edit cursor"
+msgstr "sélection temporelle déplacée au curseur d'édition"
 
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
@@ -1458,10 +1885,36 @@ msgstr "arrêt"
 
 #. Reported when items are selected. {} will be replaced with
 #. the number of items; e.g. "2 items selected".
+#. This reports selected items after healing. {} will be replaced with the
+#. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
 msgstr[0] "{} objet sélectionné"
 msgstr[1] "{} objets sélectionnés"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items quantized".
+msgid "{} item quantized"
+msgid_plural "{} items quantized"
+msgstr[0] "{} objet quantifié"
+msgstr[1] "{} objets quantifiés"
+
+msgid "no items selected"
+msgstr "aucun objet n'est sélectionné"
+
+#. Reported when moving items up. {} will be replaced by the
+#. number of items; e.g. "2 items moved up".
+msgid "{} item moved up"
+msgid_plural "{} items moved up"
+msgstr[0] "{} objet déplacé vers le haut"
+msgstr[1] "{} objets déplacés vers le haut"
+
+#. Reported when moving items down. {} will be replaced by the
+#. number of items; e.g. "2 items moved".
+msgid "{} item moved down"
+msgid_plural "{} items moved down"
+msgstr[0] "{} objet déplacé vers le bas"
+msgstr[1] "{} objets déplacés vers le bas"
 
 #. Reported when prompting for the name of a track.
 msgid "Track name"
@@ -1471,29 +1924,78 @@ msgstr "Nom de la piste"
 #. with the number of items; e.g. "2 items muted".
 msgid "{} item muted"
 msgid_plural "{} items muted"
-msgstr[0] "{} sourdine d'objet activée"
-msgstr[1] "{} sourdines d'objet activées"
+msgstr[0] "{} objet muté"
+msgstr[1] "{} objets mutés"
 
 #. Reported when multiple items are unmuted. {} will be
 #. replaced with the number of items; e.g. "2 items unmuted".
 msgid "{} item unmuted"
 msgid_plural "{} items unmuted"
-msgstr[0] "{} sourdine d'objet désactivée"
-msgstr[1] "{} sourdines d'objets désactivées"
+msgstr[0] "{} objet démuté"
+msgstr[1] "{} objets démuté"
 
 #. Reported when multiple items are soloed. {} will be replaced
 #. with the number of items; e.g. "2 items soloed".
 msgid "{} item soloed"
 msgid_plural "{} items soloed"
-msgstr[0] "{} Solo d'objet activé"
-msgstr[1] "{} Solos d'objet activés"
+msgstr[0] "{} objet soloté"
+msgstr[1] "{} objets solotés"
 
 #. Reported when multiple items are unsoloed. {} will be
 #. replaced with the number of items; e.g. "2 items unsoloed".
 msgid "{} item unsoloed"
 msgid_plural "{} items unsoloed"
-msgstr[0] "{} solo d'objet désactivé"
-msgstr[1] "{} Solos d'objet désactivés"
+msgstr[0] "{} objet désoloté"
+msgstr[1] "{} objets désolotés"
+
+#. Reported when an action is used to lock an item.
+#. Used when navigating items to indicate that an item is
+#. locked.
+msgid "locked"
+msgstr "verrouillé"
+
+#. Reported when an action is used to unlock an item.
+msgid "unlocked"
+msgstr "déverrouillé"
+
+#. Reported when multiple items are locked. {} will be replaced
+#. with the number of items; e.g. "2 items locked".
+msgid "{} item locked"
+msgid_plural "{} items locked"
+msgstr[0] "{} objet verrouillé"
+msgstr[1] "{} objets verrouillé"
+
+#. Reported when multiple items are unlocked. {} will be
+#. replaced with the number of items; e.g. "2 items unlocked".
+msgid "{} item unlocked"
+msgid_plural "{} items unlocked"
+msgstr[0] "{} objet déverrouillé"
+msgstr[1] "{} objets déverrouillé"
+
+#. Reported when an action is used to enable loop source for an item.
+msgid "enabled loop source"
+msgstr "source de boucle activée"
+
+#. Reported when an action is used to disable loopp source for an item.
+msgid "disabled loop source"
+msgstr "source de la boucle désactivée"
+
+#. Reported when loop source is enabled for multiple items. {} will be replaced
+#. with the number of items; e.g. "2 items enabled lloop source".
+msgid "{} item enabled loop source"
+msgid_plural "{} items enabled loop source"
+msgstr[0] "{} Source de boucle d'objet activée"
+msgstr[1] "{} Sources de boucle d'objet activée"
+
+#. Reported when loop source is disabled for multiple items. {} will be
+#. replaced with the number of items; e.g. "2 items disabled loop source".
+msgid "{} item disabled loop source"
+msgid_plural "{} items disabled loop source"
+msgstr[0] "{} Source de boucle d'objet désactivée"
+msgstr[1] "{} Sources de boucle d'objet désactivée"
+
+msgid "selected to start of project"
+msgstr "sélectionné à partir du début du projet"
 
 msgid "set selection end"
 msgstr "fin de la sélection définie"
@@ -1509,6 +2011,12 @@ msgstr "fondu enchaîné activé"
 
 msgid "crossfade off"
 msgstr "fondu enchaîné désactivé"
+
+msgid "trim behind items on"
+msgstr "redimensionner le contenu derrière les objets activé"
+
+msgid "trim behind items off"
+msgstr "redimensionner le contenu derrière les objets désactivé"
 
 msgid "locking on"
 msgstr "verrouillage activée"
@@ -1536,18 +2044,15 @@ msgid "normal record"
 msgstr "mode d'enregistrement: normal"
 
 msgid "selected item auto-punch"
-msgstr "mode d'enregistrement: auto-punch sur la sélection d'objet"
+msgstr "mode d'enregistrement: à la volée automatique sur la sélection d'objet"
 
 msgid "time selection auto-punch"
-msgstr "mode d'enregistrement: auto-punch sur la sélection temporelle"
+msgstr "mode d'enregistrement: à la volée automatique sur la sélection temporelle"
 
 #. When changing the global automation override, reported prior
 #. to the chosen automation mode.
 msgid "override"
 msgstr "passer outre"
-
-msgid "no items selected"
-msgstr "aucun objet n'est sélectionné"
 
 #. Reported when reversing takes. {} will be replaced by the
 #. number of takes; e.g. "2 takes reversed".
@@ -1619,13 +2124,20 @@ msgstr "ne pas préserver la hauteur tonale quand la vitesse de lecture change"
 #. of their source media. {} will be replaced with the number of items; e.g.
 #. "2 item ends set to source media end"
 msgid "{} item ends set to source media end"
-msgstr "{} fin de l'objet réglé sur la fin du média source"
+msgstr "{} fin d'objet réglé sur la fin du média source"
 
 #. Reported when setting the end of a single item to its source
 #. media end. {} will be replaced with the end time; e.g.
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
-msgstr "fin de l'objet réglé sur la fin du média source {}"
+msgstr "fin d'objet réglé sur la fin du média source {}"
+
+#. Reported when trimming items to selected area. {} will be replaced by the
+#. number of items; e.g. "2 items trimmed".
+msgid "{} item trimmed"
+msgid_plural "{} items trimmed"
+msgstr[0] "{} objet redimensionné"
+msgstr[1] "{} objet redimensionnés"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -1659,10 +2171,10 @@ msgid "disabled envelope points move with media items"
 msgstr "les points d'enveloppe se déplacent avec les objets média, désactivé"
 
 msgid "enabled free item positioning"
-msgstr "positionnement libre d'objet, activés"
+msgstr "positionnement libre d'objet activé"
 
 msgid "disabled free item positioning"
-msgstr "positionnement libre d'objet, désactivé"
+msgstr "positionnement libre d'objet désactivé"
 
 #. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
 msgid "{} item rate"
@@ -1695,104 +2207,119 @@ msgstr "zoom vertical maximal"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+#. Reported when using "Main action section: Momentarily set
+#. override to alt-1", etc. {} is replaced with the shortened section name;
+#. e.g. "alt-1 momentary".
+msgid "{} momentary"
+msgstr "momentané"
+
+#. Reported when users run the "Reset all MIDI devices" action.
+msgid "midi devices reset"
+msgstr "réinitialisation des appareils midi"
+
+#. Reported when users run the "Reset all MIDI control surface devices" action.
+msgid "Control surfaces reset"
+msgstr "Réinitialisation des Surfaces de contrôle"
+
+#. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
+msgid "all notes off"
+msgstr "toutes les notes désactivées"
+
+msgid "Octave up"
+msgstr "Octave vers le haut"
+
+msgid "Octave down"
+msgstr "Octave vers le bas"
+
+msgid "Increase MIDI channel"
+msgstr "Augmenter le canal MIDI"
+
+msgid "Decrease MIDI channel"
+msgstr "Diminuer le canal MIDI"
+
 msgid "set selection start"
-msgstr "début de la sélection, définie"
+msgstr "début de la sélection définie"
 
 msgid "set loop start"
-msgstr "début de la boucle, définie"
+msgstr "début de la boucle définie"
 
 msgid "set loop end"
-msgstr "fin de la boucle, définie"
+msgstr "fin de la boucle définie"
 
-msgid "grid whole"
-msgstr "grille sur ronde, une mesure"
+msgid "all tracks unmuted"
+msgstr "toutes les pistes sont démutées"
 
-msgid "grid half"
-msgstr "grille sur blanche, 1/2"
+msgid "all tracks unsoloed"
+msgstr "toutes les pistes sont désolotées"
 
-msgid "grid thirty second"
-msgstr "grille sur triple croche, 1/32"
+msgid "all tracks unarmed"
+msgstr "toutes les pistes sont désarmées"
 
-msgid "grid quarter"
-msgstr "grille sur noire, 1/4"
-
-msgid "grid quarter triplet"
-msgstr "grille sur triolet de noire, 1/6"
-
-msgid "grid sixteenth"
-msgstr "grille sur double croche, 1/16"
-
-msgid "grid sixteenth triplet"
-msgstr "grille sur triolet de double croche, 1/24"
-
-msgid "grid eighth"
-msgstr "grille sur croche, 1/8"
-
-msgid "grid eighth triplet"
-msgstr "grille sur triolet de croche, 1/12"
-
-msgid "grid thirty second triplet"
-msgstr "grille sur triolet de triple croche, 1/48"
+msgid "all delta solos reset"
+msgstr "tous les delta solos sont réinitialisés"
 
 msgid "grid sixty forth"
 msgstr "grille sur quadruple croche, 1/64"
 
-msgid "grid one hundred twenty eighth"
-msgstr "grille sur quintuple croche, 1/128"
+msgid "grid straight"
+msgstr "grille droit"
 
-msgid "all tracks unmuted"
-msgstr "sourdine de toutes les pistes désactivé"
+msgid "grid dotted"
+msgstr "grille pointée"
 
-msgid "all tracks unsoloed"
-msgstr "solo de toutes les pistes désactivé"
-
-msgid "all tracks unarmed"
-msgstr "désarmer toutes les pistes"
-
-msgid "all delta solos reset"
-msgstr "tous les delta solos réinitialisés"
+msgid "grid triplet"
+msgstr "grille en triolet"
 
 msgid "length whole"
-msgstr "longueur, ronde, une mesure"
+msgstr "longueur ronde, une mesure"
 
 msgid "length half"
-msgstr "longueur, blanche, 1/2"
+msgstr "longueur blanche, 1/2"
 
 msgid "length thirty second"
-msgstr "longueur, triple croche, 1/32"
+msgstr "longueur triple croche, 1/32"
 
 msgid "length quarter"
-msgstr "longueur, noire, 1/4"
+msgstr "longueur noire, 1/4"
 
 msgid "length quarter triplet"
-msgstr "longueur, triolet de noire, 1/6"
+msgstr "longueur triolet de noire, 1/6"
 
 msgid "length sixteenth"
-msgstr "longueur, double croche, 1/16"
+msgstr "longueur double croche, 1/16"
 
 msgid "length sixteenth triplet"
-msgstr "longueur, triolet de double croche, 1/24"
+msgstr "longueur triolet de double croche, 1/24"
 
 msgid "length eighth"
-msgstr "longueur, croche, 1/8"
+msgstr "longueur croche, 1/8"
 
 msgid "length eighth triplet"
-msgstr "longueur, triolet de croche, 1/12"
+msgstr "longueur triolet de croche, 1/12"
 
 msgid "length thirty second triplet"
-msgstr "longueur, triolet de triple croche, 1/48"
+msgstr "longueur triolet de triple croche, 1/48"
 
 msgid "length sixty forth"
-msgstr "longueur, quadruple croche, 1/64"
+msgstr "longueur quadruple croche, 1/64"
 
 msgid "length one hundred twenty eighth"
-msgstr "longueur, quintuple croche, 1/128"
+msgstr "longueur quintuple croche, 1/128"
+
+msgid "length straight"
+msgstr "longueur droit"
+
+msgid "length dotted"
+msgstr "longueur pointée"
+
+msgid "length triplet"
+msgstr "longueur triolet"
 
 msgid "full screen"
 msgstr "pleine écran"
 
 msgid "normal screen"
-msgstr "écran réduit"
+msgstr "écran normal"
 
 msgid "showed Media Explorer"
 msgstr "afficher l'explorateur de média"
@@ -1836,11 +2363,23 @@ msgstr "échantillons secondaires"
 msgid "seconds secondary"
 msgstr "secondes secondaire"
 
-msgid "master muted"
-msgstr "mise en sourdine du master activé"
+msgid "enabled snap"
+msgstr "magnétisme activé"
 
-msgid "master unmuted"
-msgstr "mise en sourdine du master désactivé"
+msgid "disabled snap"
+msgstr "magnétisme désactivé"
+
+msgid "default key map"
+msgstr "keyMap par défaut"
+
+msgid "recording key map"
+msgstr "enregistrement du KeyMap"
+
+msgid "default momentary"
+msgstr "momentané par défaut"
+
+msgid "recording key map momentary"
+msgstr "enregistrement du KeyMap momentanément"
 
 msgid "auto playing"
 msgstr "lecture automatique activé"
@@ -1855,34 +2394,34 @@ msgid "not repeating previews"
 msgstr "répétition des aperçus désactivés"
 
 msgid "starting on bar"
-msgstr "démarrer sur la mesure, activé"
+msgstr "démarrer sur la mesure activé"
 
 msgid "not starting on bar"
-msgstr "démarrer sur la mesure, désactivé"
+msgstr "démarrer sur la mesure désactivé"
 
 msgid "preserving pitch"
-msgstr "préserver la hauteur tonale, activé"
+msgstr "préserver la hauteur tonale activé"
 
 msgid "not preserving pitch"
-msgstr "préserver la hauteur tonale, désactivé"
+msgstr "préserver la hauteur tonale désactivé"
 
 msgid "reset pitch"
 msgstr "hauteur tonale réinitialisé"
 
 msgid "tempo matching"
-msgstr "harmonisation du tempo, activé"
+msgstr "harmonisation du tempo activé"
 
 msgid "not tempo  matching"
-msgstr "harmonisation du tempo, désactivé"
+msgstr "harmonisation du tempo désactivé"
 
 msgid "half time"
-msgstr "harmoniser le tempo, vitesse /2"
+msgstr "harmoniser le tempo vitesse /2"
 
 msgid "normal time"
-msgstr "harmoniser le tempo, vitesse normal"
+msgstr "harmoniser le tempo vitesse normal"
 
 msgid "double time"
-msgstr "harmoniser le tempo, vitesse X2"
+msgstr "harmoniser le tempo vitesse X2"
 
 msgid "docked Media Explorer"
 msgstr "explorateur de média ancré dans le docker"
@@ -1890,41 +2429,41 @@ msgstr "explorateur de média ancré dans le docker"
 msgid "removed Media Explorer from dock"
 msgstr "explorateur de média désancré du docker"
 
-msgid "Piano roll view"
-msgstr "Afficher le rouleau à piano"
+msgid "piano roll view"
+msgstr "vue piano à rouleau"
 
-msgid "Named notes view"
-msgstr "Afficher les notes nommées"
+msgid "named notes view"
+msgstr "vue en notes nommées"
 
-msgid "Event list view"
-msgstr "Afficher la liste des événements"
+msgid "event list view"
+msgstr "vue en liste d'événements"
 
-msgid "Notation view"
-msgstr "Vue Partition"
+msgid "notation view"
+msgstr "vue en notation"
 
-msgid "Rectangle notes"
-msgstr "Notes rectangulaires"
+msgid "rectangle notes (normal)"
+msgstr "notes rectangulaires (normales)"
 
-msgid "Triangle notes"
-msgstr "Notes triangulaires"
+msgid "triangle notes"
+msgstr "notes triangulaires"
 
-msgid "Diamond notes"
-msgstr "Notes en losange"
+msgid "diamond notes"
+msgstr "notes en diamant"
 
-msgid "Showed velocity numbers on notes"
-msgstr "Afficher les valeurs de vélocité sur les notes"
+msgid "showed velocity numbers on notes"
+msgstr "valeurs de vélocité sur les notes affichées"
 
-msgid "Hid velocity numbers on notes"
-msgstr "Masquer les valeurs de vélocité sur les notes"
+msgid "hid velocity numbers on notes"
+msgstr "valeurs de vélocité sur les notes masqué"
 
-msgid "Showed note names"
-msgstr "Afficher les noms des notes"
+msgid "showed note names"
+msgstr "nom des notes affichées"
 
-msgid "Hid note names"
-msgstr "Masquer les noms des notes"
+msgid "hid note names"
+msgstr "nom des notes masquées"
 
-msgid "Inserted notes matching grid"
-msgstr "Notes insérées correspondant à la grille"
+msgid "length matching grid"
+msgstr "faire correspondre selon la longueur de la grille"
 
 #. Reported when there are no tracks to navigate to.
 msgid "no tracks"
@@ -1935,11 +2474,6 @@ msgstr "Changer la sélection de piste"
 
 msgid "Change Item Selection"
 msgstr "Changer la sélection d'Objet"
-
-#. Used when navigating items to indicate that an item is
-#. locked.
-msgid "locked"
-msgstr "verrouillé"
 
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
@@ -1987,15 +2521,19 @@ msgid_plural "{} points added"
 msgstr[0] "{} point ajouté"
 msgstr[1] "{} points ajoutés"
 
-#. Reported when automation items are added. {} will be
-#. replaced with the number of items; e.g. "2 automation items added".
-msgid "{} automation item added"
-msgid_plural "{} automation items added"
-msgstr[0] "{} objet d'automatisation ajouté"
-msgstr[1] "{} objets d'automatisation ajoutés"
+#. Reported when takes are added to multiple items. {} will be replaced with the
+#. number of takes; e.g. "2 takes added to selected items".
+msgid "{} take added to selected items"
+msgid_plural "{} takes added to selected items"
+msgstr[0] "{} prise ajouté à l'objet sélectionné"
+msgstr[1] "{} prise ajouté aux objets sélectionnés"
 
-msgid "nothing pasted"
-msgstr "il ni a rien à coller"
+#. Reported when takes are added. {} will be replaced with the
+#. number of takes; e.g. "2 takes added".
+msgid "{} take added"
+msgid_plural "{} takes added"
+msgstr[0] "{} prise ajouté"
+msgstr[1] "{} prises ajoutés"
 
 #. Reported when tracks are removed. {} will be replaced with the
 #. number of tracks; e.g. "2 tracks removed".
@@ -2010,6 +2548,20 @@ msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
 msgstr[0] "{} zone d'objet sélectionnée copié"
 msgstr[1] "{} zones d'objets sélectionnées copiées"
+
+#. used for  "Item: Copy loop of selected area of audio items".
+#. {} is replaced by the number of items affected.
+msgid "loop of selected area of {} item copied"
+msgid_plural "loop of selected area of {} items copied"
+msgstr[0] "boucle de zone sélectionnée de {} objet copié"
+msgstr[1] "boucle de zone sélectionnée de {} objets copiés"
+
+#. used for  "Item: Duplicate selected area of items".
+#. {} is replaced by the number of items affected.
+msgid "selected area of {} item duplicated"
+msgid_plural "selected area of {} items duplicated"
+msgstr[0] "zone sélectionnée de {} objet dupliqué"
+msgstr[1] "zone sélectionnée de {} objets dupliqués"
 
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
@@ -2026,8 +2578,44 @@ msgid_plural "{} items removed"
 msgstr[0] "{} objet supprimé"
 msgstr[1] "{} objets supprimés"
 
+#. Reported when cropped to active take on  multiple items. {} will be replaced with the
+#. number of items; e.g. "2 items cropped to active take".
+msgid "{} item cropped to active take"
+msgid_plural "{} items cropped to active take"
+msgstr[0] "{} objet rogné à la prise active"
+msgstr[1] "{} objets rognés à la prise active"
+
+msgid "no takes removed"
+msgstr "aucune prise supprimée"
+
+#. Reported when healing was not possible.
+msgid "nothing healed"
+msgstr "rien n'a été réparé"
+
+#. Reported when splits in items are healed. {} will be replaced with the
+#. number of splits that have been successfully healed; e.g. "2 splits healed".
+msgid "{} split healed"
+msgid_plural "{} splits healed"
+msgstr[0] "{} scission réparée"
+msgstr[1] "{} scissions réparées"
+
 msgid "contents of time selection removed"
 msgstr "contenu de la sélection temporelle supprimé"
+
+#. used when reporting a named marker has been moved. {} will be
+#. replaced with the name of the marker; e.g. "v2 marker moved"
+msgid "{} marker moved"
+msgstr "{} marqueur déplacé"
+
+#. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
+#. Reported when inserting a marker. {} will be replaced with the
+#. number of the new marker; e.g. "marker 2 inserted".
+msgid "marker {} inserted"
+msgstr "marqueur {} inséré"
+
+#. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+msgid "marker {} moved"
+msgstr "le marqueur {} a été déplacé"
 
 msgid "marker deleted"
 msgstr "marqueur supprimé"
@@ -2056,13 +2644,13 @@ msgstr "[Pas sauvegardé]"
 #. replaced with the first track. {end} will be replaced with the last track
 #. in the range. For example: "1 drums through 5 piano"
 msgid "{start} through {end}"
-msgstr "jusqu'à"
+msgstr "{start} jusqu'à {end}"
 
 msgid "Muted"
-msgstr "En sourdine"
+msgstr "Muté"
 
 msgid "Soloed"
-msgstr "En solo"
+msgstr "Soloté"
 
 msgid "Armed"
 msgstr "Armée"
@@ -2094,14 +2682,25 @@ msgstr "longueur {}"
 msgid "Selected tracks:"
 msgstr "Pistes Sélectionnées:"
 
-msgid "no selected tracks"
-msgstr "aucune piste n'est sélectionné"
-
 msgid "Selected items:"
 msgstr "Objets Sélectionnés:"
 
+#. Placed before the information about the selection that has
+#. been made in the MIDI Editor when pressing OSARA's report selection
+#. action twice.
+msgid "MIDI Editor selection:"
+msgstr "Sélection de l'éditeur MIDI :"
+
+msgid "no MIDI selection"
+msgstr "aucune sélection MIDI"
+
 msgid "no selection"
 msgstr "aucune sélection"
+
+#. The title of the message dialog that appears when OSARA's
+#. report selection action is pressed twice.
+msgid "Selection"
+msgstr "Sélection"
 
 #. Reported when deleting take markers. {} will be replaced with
 #. the number of markers; e.g. "2 take markers deleted".
@@ -2110,11 +2709,17 @@ msgid_plural "{} take markers deleted"
 msgstr[0] "marqueur de prise supprimé"
 msgstr[1] "{} marqueurs de prise supprimés"
 
+msgid "shortcut help off"
+msgstr "aide raccourcis clavier désactivée"
+
+msgid "resumed MIDI step input"
+msgstr "relancement de l'entrée pas à pas MIDI"
+
 msgid "shortcut help on"
 msgstr "aide raccourcis clavier activée"
 
-msgid "shortcut help off"
-msgstr "aide raccourcis clavier désactivée"
+msgid "paused MIDI step input"
+msgstr "entrée pas à pas MIDI en pause"
 
 msgid "paused"
 msgstr "en pause"
@@ -2127,6 +2732,61 @@ msgstr "en lecture"
 
 msgid "stopped"
 msgstr "à l'arrêt"
+
+#. Reported when the cursor is before the first marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "before marker intro".
+msgid "before marker {}"
+msgstr "avant le marqueur {}"
+
+#. Reported when the cursor is right at a marker. {} will be
+#. replaced with the marker's name or number; e.g. "at marker intro".
+msgid "at marker {}"
+msgstr "au marqueur {}"
+
+#. Reported when the cursor is between two markers. {before}
+#. will be replaced with the name or number of the marker before the
+#. cursor. {after} will be replaced with the name or number of the marker
+#. after the cursor. For example: "between markers intro, verse 1".
+msgid "between markers {before}, {after}"
+msgstr "entre les marqueurs {before}, {after}"
+
+#. Reported when the cursor is after the last marker in the
+#. project. {} will be replaced with the marker's name or number; e.g.
+#. "after marker outro".
+msgid "after marker {}"
+msgstr "après le marqueur {}"
+
+#. Reported when the cursor is inside a region. {} will be
+#. replaced with the region's name or number; e.g. "in region intro".
+msgid "in region {}"
+msgstr "dans la région {}"
+
+#. Reported when the cursor is before the first region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "before region {}"
+msgstr "avant la région {}"
+
+#. Reported when the cursor is after the last region in the
+#. project. {} will be replaced with the region's name or number; e.g.
+#. "before region intro".
+msgid "after region {}"
+msgstr "après la région {}"
+
+#. Reported when the cursor is between two regions. {before}
+#. will be replaced with the name or number of the region before the
+#. cursor. {after} will be replaced with the name or number of the region
+#. after the cursor. For example: "between regions intro, verse 1".
+msgid "between regions {before}, {after}"
+msgstr "entre les régions {before}, {after}"
+
+#. Reports the number of takes contained within the last touched item.
+#. {} will be replaced with the number; e.g. "1 take", or "2 takes".
+msgid "{} take"
+msgid_plural "{} takes"
+msgstr[0] "{} prise"
+msgstr[1] "{} prises"
 
 msgid "Move stretch marker"
 msgstr "Déplacer le marqueur d'étirement"
@@ -2163,12 +2823,6 @@ msgstr "passer outre l'automatisation globale, surpasser aperçu"
 msgid "{} automation mode for selected tracks"
 msgstr "mode d'automatisation {} pour les pistes sélectionnées"
 
-msgid "time selection start"
-msgstr "début de la sélection temporelle"
-
-msgid "time selection end"
-msgstr "fin de la sélection temporelle"
-
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
 msgstr "OSARA : Accessibilité Open Source pour l'application REAPER"
@@ -2180,11 +2834,6 @@ msgstr "Version: {}"
 
 msgid "About OSARA"
 msgstr "À propos d'OSARA"
-
-#. Reported when inserting a marker. {} will be replaced with the
-#. number of the new marker; e.g. "marker 2 inserted".
-msgid "marker {} inserted"
-msgstr "marqueur {} inséré"
 
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
@@ -2210,9 +2859,30 @@ msgstr[1] "{count} Objets supprimés du groupe {group}"
 msgid "track not grouped"
 msgstr "piste non groupéepiste non groupée"
 
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr "segment en boucle"
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr "lecture unique"
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "scrub"
+msgstr "scrub"
+
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "À la position actuelle"
+
+msgid "selected to end of project"
+msgstr "sélectionné jusqu'à la fin du projet"
+
+msgid "phase normal all tracks"
+msgstr "phase normale pour toutes les pistes"
+
+msgid "unmonitored all tracks"
+msgstr "moniteur de toutes les pistes désactivés"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Sélectionne l'objet suivant (en laissant les autres objets sélectionnés)"
@@ -2236,16 +2906,16 @@ msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on fo
 msgstr "OSARA: Configurer L'observateur de crête pour la piste/FX de piste en cours (selon le focus)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
-msgstr "OSARA: Énonce la valeur du canal 1 de l'observateur de crête 1"
+msgstr "OSARA: Énoncer la valeur du canal 1 de l'observateur de crête 1"
 
 msgid "OSARA: Report Peak Watcher value for first watcher second channel"
-msgstr "OSARA: Énonce la valeur du canal 2 de l'observateur de crête 1"
+msgstr "OSARA: Énoncer la valeur du canal 2 de l'observateur de crête 1"
 
 msgid "OSARA: Report Peak Watcher value for second watcher first channel"
-msgstr "OSARA: Énonce la valeur du canal 1 de l'observateur de crête 2"
+msgstr "OSARA: Énoncer la valeur du canal 1 de l'observateur de crête 2"
 
 msgid "OSARA: Report Peak Watcher value for second watcher second channel"
-msgstr "OSARA: Énonce la valeur du canal 2 de l'observateur de crête 2"
+msgstr "OSARA: Énoncer la valeur du canal 2 de l'observateur de crête 2"
 
 msgid "OSARA: Reset Peak Watcher first watcher"
 msgstr "OSARA: Réinitialiser l'observateur de crête 1"
@@ -2254,28 +2924,28 @@ msgid "OSARA: Reset Peak Watcher second watcher"
 msgstr "OSARA: Réinitialiser l'observateur de crête 2"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: met en pause, ou relance l'observateur de crête\""
+msgstr "OSARA: met en pause ou relance l'observateur de crête\""
 
 msgid "OSARA: Report ripple editing mode"
-msgstr "OSARA: Énonce le mode d'édition ripple"
+msgstr "OSARA: Énoncer le mode d'édition ripple"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: Énonce les pistes en sourdine"
+msgstr "OSARA: Énoncer les pistes mutées"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: Énonce les piste en solo"
+msgstr "OSARA: Énoncer les piste solotées"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: Énonce les piste armée en enregistrement"
+msgstr "OSARA: Énoncer les piste armée pour l'enregistrement"
 
 msgid "OSARA: Report tracks with record monitor on"
-msgstr "OSARA: Énonce les pistes avec le moniteur d'enregistrement activé"
+msgstr "OSARA: Énoncer les pistes avec le moniteur d'enregistrement activé"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: Énonce les piste avec la phase inversée"
+msgstr "OSARA: Énoncer les piste avec la phase inversée"
 
-msgid "OSARA: Report track/item/time selection (depending on focus)"
-msgstr "OSARA: Énonce la piste, objet, sélection temporelle (selon le focus)"
+msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
+msgstr "OSARA : Énoncer la sélection de piste/objet/sélection MIDI (selon le focus)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: Supprime l'objet, piste, le contenu de la sélection temporelle, marqueur, point d'enveloppe (selon le focus)"
@@ -2283,8 +2953,17 @@ msgstr "OSARA: Supprime l'objet, piste, le contenu de la sélection temporelle, 
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: Bascule l'aide des raccourcis clavier"
 
-msgid "OSARA: Report edit/play cursor position and transport state"
-msgstr "OSARA: Énonce la position du curseur d'édition, de lecture et l'état du transport"
+msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
+msgstr "OSARA: Énoncer la position du curseur d'édition/lecture, l'état du transport et les marqueurs/régions les plus proches"
+
+msgid "OSARA: Report number of takes in last touched item"
+msgstr "OSARA : Énoncer le nombre de prises du dernier objet touché"
+
+msgid "OSARA: Report length of last touched item"
+msgstr "OSARA : Énoncer la longueur du dernier objet touché"
+
+msgid "OSARA: Report project length"
+msgstr "OSARA : Énoncer la durée du projet"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de la piste, de l'objet en cours (selon le focus)"
@@ -2293,16 +2972,16 @@ msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: Déplace le dernier marqueur d'étirement focalisé à la position actuelle du curseur d'édition"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Énonce le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 1 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
+msgstr "OSARA: Énoncer le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 1 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: Énonce le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 2 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
+msgstr "OSARA: Énoncer le niveau en dB crête à l'emplacement du curseur de lecture pour le canal 2 de la piste actuelle (énonce le niveau d'entrée à la place lorsque la piste est armée)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: Énonce le niveau en dB crête au niveau du curseur de lecture pour le canal 1 de la piste master"
+msgstr "OSARA: Énoncer le niveau en dB crête au niveau du curseur de lecture pour le canal 1 de la piste master"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: Énonce le niveau en dB crête au niveau du curseur de lecture pour le canal 2 de la piste master"
+msgstr "OSARA: Énoncer le niveau en dB crête au niveau du curseur de lecture pour le canal 2 de la piste master"
 
 msgid "OSARA: Delete all time signature markers"
 msgstr "OSARA: Supprime tous les marqueurs de tempo"
@@ -2347,7 +3026,7 @@ msgid "OSARA: Configuration"
 msgstr "OSARA: Configuration"
 
 msgid "OSARA: Report global / Track Automation Mode"
-msgstr "OSARA: Énonce le mode d'automatisation global pour la piste"
+msgstr "OSARA: Énoncer le mode d'automatisation global pour la piste"
 
 msgid "OSARA: Toggle global automation override between latch preview and off"
 msgstr "OSARA: Basculer entre surpasser et désactivé, passer outre l'automatisation globale"
@@ -2359,19 +3038,22 @@ msgid "OSARA: About"
 msgstr "OSARA: À propos"
 
 msgid "OSARA: Report groups for current track"
-msgstr "OSARA: Énonce le groupe de la piste actuelle"
+msgstr "OSARA: Énoncer le groupe de la piste actuelle"
 
 msgid "OSARA: Mute next message from OSARA"
 msgstr "OSARA: Ignorer le prochain message d'OSARA"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: Énonce les régions, le dernier marqueur de projet et les Objets sur les pistes sélectionnées à la position actuelle"
+msgstr "OSARA: Énoncer les régions, le dernier marqueur de projet et les Objets sur les pistes sélectionnées à la position actuelle"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: Aller à la première piste"
 
 msgid "OSARA: Go to last track"
 msgstr "OSARA: Aller à la dernière piste"
+
+msgid "OSARA: Go to master track"
+msgstr "OSARA: Aller à la piste master"
 
 msgid "OSARA: Cycle shape of selected envelope points"
 msgstr "OSARA: Alterne entre les formes de point d'enveloppe pour les points sélectionnés"
@@ -2383,36 +3065,63 @@ msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
 msgstr "OSARA: Basculer l'affichage de l'enveloppe de panoramique de piste/prise (selon le focus)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
-msgstr "OSARA: Basculer l'affichage de l'enveloppe de sourdine de piste/prise (selon le focus)"
+msgstr "OSARA: Basculer l'affichage de l'enveloppe de mutage de piste/prise (selon le focus)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
 msgstr "OSARA: Basculer l'affichage de l'enveloppe de panoramique Pré-FX de piste ou de auteur tonale de prise (selon le focus)"
 
+msgid "OSARA: Select from cursor to start of project"
+msgstr "OSARA: Sélectionner du curseur jusqu'au début du projet"
+
+msgid "OSARA: Select from cursor to end of project"
+msgstr "OSARA: Sélectionner du curseur jusqu'à la fin du projet"
+
+msgid "OSARA: Set phase normal for all tracks"
+msgstr "OSARA: Définir la phase normale pour toutes les pistes"
+
+msgid "OSARA: Unmonitor all tracks"
+msgstr "OSARA: Désactive tous les monitoring de toutes les pistes"
+
+msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
+msgstr "OSARA: Configurer REAPER pour une accessibilité optimale pour les lecteurs d'écran"
+
+msgid "OSARA: Check for update"
+msgstr "OSARA: Rechercher une mise à jour"
+
+msgid "OSARA: Open online documentation"
+msgstr "OSARA: Ouvrir la documentation en ligne"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: Sélectionner les objets sous le curseur d'édition sur les pistes sélectionnées"
+
+msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
+msgstr "OSARA: Énoncer le tempo et la signature rythmique au curseur de lecture, appuyez deux fois pour ajouter/éditer des marqueurs de tempo"
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Active la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
 
-msgid "OSARA: Move to next chord"
-msgstr "OSARA: Sélectionne la note ou l'accord suivant"
+msgid "OSARA: Move forward to next single note or chord"
+msgstr "OSARA: Passez à la note ou accord suivant"
 
-msgid "OSARA: Move to previous chord"
-msgstr "OSARA: Sélectionne la note ou l'accord précédent"
+msgid "OSARA: Move backward to previous single note or chord"
+msgstr "OSARA: Passez à la note ou accord précédent"
 
-msgid "OSARA: Move to next chord and add to selection"
-msgstr "OSARA: Sélectionne l'accord suivant et ajoute à la sélection"
+msgid "OSARA: Move forward to next single note or chord and add to selection"
+msgstr "OSARA: Passez à la note ou accord suivant et ajouter à la sélection"
 
-msgid "OSARA: Move to previous chord and add to selection"
-msgstr "OSARA: Sélectionne l'accord précédent et ajoute à la sélection"
+msgid "OSARA: Move backward to previous single note or chord and add to selection"
+msgstr "OSARA: Passez à la note ou accord précédent et ajouter à la sélection"
 
-msgid "OSARA: Move to next note in chord"
+msgid "OSARA: Move to higher note in chord"
 msgstr "OSARA: Sélectionne la note suivante de l'accord"
 
-msgid "OSARA: Move to previous note in chord"
+msgid "OSARA: Move to lower note in chord"
 msgstr "OSARA: Sélectionne la note précédente de l'accord"
 
-msgid "OSARA: Move to next note in chord and add to selection"
+msgid "OSARA: Move to higher note in chord and add to selection"
 msgstr "OSARA: Sélectionne la note suivante de l'accord et ajoute à la sélection"
 
-msgid "OSARA: Move to previous note in chord and add to selection"
+msgid "OSARA: Move to lower note in chord and add to selection"
 msgstr "OSARA: Sélectionne la note précédente de l'accord et ajoute à la sélection"
 
 msgid "OSARA: Move to next CC"
@@ -2433,6 +3142,31 @@ msgstr "OSARA: Sélectionne toutes les notes de même hauteur tonale dans la sé
 msgid "OSARA: Focus event nearest edit cursor"
 msgstr "OSARA: Sélectionne l'événement le plus proche du curseur d'édition"
 
+msgid "Configuration..."
+msgstr "Configuration..."
+
+msgid "Online &documentation"
+msgstr "Documentation &en ligne"
+
+msgid "Check for &update"
+msgstr "Vérifier pour une &mise à jour"
+
+msgid "Configure REAPER for &optimal screen reader accessibility"
+msgstr "Configurez REAPER pour une accessibilité optimale avec les lecteurs d'écran"
+
+msgid "No OSARA update available."
+msgstr "Aucune mise à jour d'OSARA disponible."
+
+msgctxt "OSARA Update"
+msgid "OSARA Update"
+msgstr "Mise à jour d'OSARA"
+
+msgid "OSARA version {} is available. Changes:"
+msgstr "OSARA version {} est disponible. Changements:"
+
+msgid "Error checking for OSARA update."
+msgstr "Erreur lors de la vérification de la mise à jour d'OSARA."
+
 msgctxt "Parameters"
 msgid "Parameters"
 msgstr "Paramètres"
@@ -2444,6 +3178,10 @@ msgstr "&Paramètre:"
 msgctxt "Parameters"
 msgid "Value:"
 msgstr "Valeur:"
+
+msgctxt "Parameters"
+msgid "&More"
+msgstr "&Plus"
 
 msgctxt "Parameters"
 msgid "&Filter:"
@@ -2537,6 +3275,26 @@ msgctxt "FX Preset"
 msgid "&Cancel"
 msgstr "&Annuler"
 
+msgctxt "OSARA Update"
+msgid "Go to &download page"
+msgstr "Aller à la page de &téléchargement"
+
+msgctxt "OSARA Update"
+msgid "&Close"
+msgstr "&Fermer"
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "Configure REAPER for Optimal Screen Reader Accessibility"
+msgstr "Configurer REAPER pour une accessibilité optimale avec un lecteur d'écran"
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&Yes"
+msgstr "&Oui"
+
+msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
+msgid "&No"
+msgstr "&Non"
+
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
 msgstr "Configuration d'OSARA"
@@ -2562,6 +3320,10 @@ msgid "Report mar&kers and regions during playback"
 msgstr "Énnoncer les mar&queurs et les régions pendant la lecture"
 
 msgctxt "OSARA Configuration"
+msgid "Report time se&lection start and end while playing"
+msgstr "Énoncer le début et la fin de la sélection temporelle pendant la lecture"
+
+msgctxt "OSARA Configuration"
 msgid "Report &transport state (play, record, etc.)"
 msgstr "Énoncer l'état du &transport (lecture, enregistrement, etc)"
 
@@ -2574,8 +3336,8 @@ msgid "Report &FX when moving to tracks/takes"
 msgstr "Énoncer &l'FX lors de la sélection des pistes et des prises"
 
 msgctxt "OSARA Configuration"
-msgid "Report &position when navigating chords in MIDI editor"
-msgstr "Énnoncer& la position lors de la sélection des accords dans l'éditeur MIDI"
+msgid "Report &position when navigating events in MIDI editor"
+msgstr "Énoncer les événements et la position lors de la navigation dans l'éditeur MIDI"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
