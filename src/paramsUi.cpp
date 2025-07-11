@@ -532,7 +532,7 @@ class ParamsDialog {
 			int newParam = ComboBox_GetCurSel(dialog->paramCombo) +
 				(shift ? -1 : 1);
 			if (newParam < 0) {
-				newParam = dialog->visibleParams.size() - 1;
+				newParam = (int)dialog->visibleParams.size() - 1;
 			} else if (newParam == dialog->visibleParams.size()) {
 				newParam = 0;
 			}
@@ -678,7 +678,7 @@ class ParamsDialog {
 		int count = 0;
 		for (auto& [name, func]: options) {
 			itemInfo.dwTypeData = (char*)name.c_str();
-			itemInfo.cch = name.length();
+			itemInfo.cch = (int)name.length();
 			itemInfo.wID = count + 1;
 			InsertMenuItem(menu, (UINT)count, true, &itemInfo);
 			++count;
@@ -1315,7 +1315,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	}
 
 	void finishOptions() {
-		this->max = this->options.size() - 1;
+		this->max = (int)this->options.size() - 1;
 	}
 
 	virtual MediaTrack* getTargetTrack() = 0;
@@ -1479,7 +1479,7 @@ class SendTypeParam:  public ReaperObjParam {
 	}
 
 	void setValue(double value) final {
-		int newVal = value;
+		int newVal = (int)value;
 		if (newVal == 2) {
 			// OSARA value 2 maps to raw value 3.
 			newVal = 3;
@@ -1934,7 +1934,7 @@ class FxIterator {
 	}
 
 	int getLevel() {
-		return this->stack.size();
+		return (int)this->stack.size();
 	}
 
 	private:
@@ -2004,7 +2004,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	int count = 0;
 	while (iter.next()) {
 		// If we've exited containers, move to the appropriate ancestor menu.
-		for (int level = menus.size(); level > iter.getLevel(); --level) {
+		for (int level = (int)menus.size(); level > iter.getLevel(); --level) {
 			menus.pop_back();
 		}
 		itemInfo.fMask = MIIM_TYPE;
@@ -2012,7 +2012,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 		// Make sure this stays around until the InsertMenuItem call.
 		const string name = iter.getName();
 		itemInfo.dwTypeData = (char*)name.c_str();
-		itemInfo.cch = name.length();
+		itemInfo.cch = (UINT)name.length();
 		fx = iter.getFxIndex();
 		if (iter.isContainer()) {
 			// Create a sub-menu for this container.
@@ -2026,7 +2026,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 			itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 			itemInfo.fType = MFT_STRING;
 			itemInfo.dwTypeData = (char*)translate("(Container Parameters)");
-			itemInfo.cch = strlen(itemInfo.dwTypeData);
+			itemInfo.cch = (UINT)strlen(itemInfo.dwTypeData);
 			// We add 1 to wID because 0 means cancelled.
 			itemInfo.wID = fx + 1;
 			InsertMenuItem(subMenu, 0, true, &itemInfo);

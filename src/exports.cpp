@@ -25,7 +25,7 @@ bool osara_isShortcutHelpEnabled() {
 	return isShortcutHelpEnabled;
 }
 
-void osara_getVersion(char* versionOut, int versionOut_sz) {
+void osara_getVersion(char* versionOut, uintptr_t versionOut_sz) {
 	strncpy(versionOut, OSARA_VERSION, versionOut_sz);
 }
 void* _vararg_osara_getVersion(void** args, int nArgs) {
