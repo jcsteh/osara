@@ -4,7 +4,7 @@
 # Copyright 2023 Leonard de Ruijter
 # License: GNU General Public License version 2.0
 
-# Style based on Microsofts' C++ style conventions.
+# Style based on Microsoft's C++ style conventions.
 BasedOnStyle: Microsoft
 # Offset for access modifiers (public, protected, private).
 AccessModifierOffset: 0
