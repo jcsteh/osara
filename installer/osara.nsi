@@ -87,6 +87,7 @@ Section "OSARA plug-in" SecPlugin
 	; However, it's fine on a 64 bit system even with 32 bit REAPER.
 	${If} ${RunningX64}
 		File "..\build\x86_64\reaper_osara64.dll"
+		File "..\build\arm64\reaper_osara_arm64ec.dll"
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
 	File /oname=OSARA.ReaperKeyMap "..\config\windows\reaper-kb.ini"
