@@ -45,6 +45,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       # There's no point in building if we're going to fail the build because of
       # an unsorted key map, so we do this as early as we can.
       - name: check key map
