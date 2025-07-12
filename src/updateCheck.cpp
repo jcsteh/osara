@@ -9,19 +9,27 @@
 #include <string>
 #include <sstream>
 // simpleson uses sscanf. We don't have any control over that.
+#ifdef __clang__
 #pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <simpleson/json.h>
+#ifdef __clang__
 #pragma clang diagnostic pop
+#endif
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
 // Disable warnings for WDL, since we don't have any control over those.
+#ifdef __clang__
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Weverything"
+#endif
 #include <WDL/jnetlib/httpGet.h>
 #include <WDL/jnetlib/util.h>
+#ifdef __clang__
 # pragma clang diagnostic pop
+#endif
 #include <WDL/win32_utf8.h>
 #include "buildVersion.h"
 #include "config.h"
@@ -87,7 +95,7 @@ void startUpdateCheck(bool manual) {
 		const char* lastCheckStr = GetExtState(CONFIG_SECTION, LAST_CHECK_KEY);
 		uint64_t lastCheck = atoll(lastCheckStr);
 		constexpr uint64_t ONE_DAY = 24 * 60 * 60;
-		if (lastCheck + ONE_DAY > curTime) {
+		if (lastCheck + ONE_DAY > static_cast<uint64_t>(curTime)) {
 			return;
 		}
 	}
