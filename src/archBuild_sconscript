@@ -38,10 +38,10 @@ sources = [
 	"updateCheck.cpp",
 ]
 
+useMsVC = env["PLATFORM"] == "win32" and env["TARGET_ARCH"] == "arm64"
 if env["PLATFORM"] == "win32":
 	# On non ARM64EC Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
-	useClang = env["TARGET_ARCH"] != "arm64"
-	if useClang:
+	if not useMsVC:
 		env["CC"] = "clang-cl"
 		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
@@ -52,7 +52,7 @@ if env["PLATFORM"] == "win32":
 		"/std:c++20",
 		"/EHsc",
 	])
-	if useClang:
+	if not useMsVC:
 		env.Append(CCFLAGS=[
 			# Clang warns about unused functions in WDL
 			"/clang:-Wno-unused-function",
@@ -145,6 +145,10 @@ def addExternalSources(dir, files, **kwargs):
 		env.SharedObject(os.path.splitext(f)[0], dir.File(f), **kwargs)
 		for f in files)
 
+externalSourcesKwargs = {}
+if not useMsVC:
+	externalSourcesKwargs["CCFLAGS"] = "$CCFLAGS -Wno-deprecated-declarations"
+
 addExternalSources("#include/tinygettext/src", (
 	"dictionary.cpp",
 	"language.cpp",
@@ -157,12 +161,12 @@ addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
+	**externalSourcesKwargs
 )
 addExternalSources(
 	"#include/simpleson",
 	("json.cpp",),
-	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
+	**externalSourcesKwargs
 )
 
 env.SharedLibrary(
