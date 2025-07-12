@@ -95,7 +95,7 @@ void startUpdateCheck(bool manual) {
 		const char* lastCheckStr = GetExtState(CONFIG_SECTION, LAST_CHECK_KEY);
 		uint64_t lastCheck = atoll(lastCheckStr);
 		constexpr uint64_t ONE_DAY = 24 * 60 * 60;
-		if (lastCheck + ONE_DAY > (uint64_t)curTime) {
+		if (lastCheck + ONE_DAY > static_cast<uint64_t>(curTime)) {
 			return;
 		}
 	}
