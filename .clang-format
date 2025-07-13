@@ -36,8 +36,8 @@ AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
 # Do not allow short loops on a single line.
 AllowShortLoopsOnASingleLine: false
-# Add a space after the colon in bit fields.
-BitFieldColonSpacing: After
+# Add a space before and after the colon in bit fields.
+BitFieldColonSpacing: Both
 # Don't break before binary operators.
 BreakBeforeBinaryOperators: None
 # Keep template declaration lines together with concept.
@@ -45,13 +45,15 @@ BreakBeforeConceptDeclarations: Never
 # Attach opening braces to the same line as the statement or declaration it belongs to.
 BreakBeforeBraces: Attach
 # Ternary operators will be placed after line breaks.
-BreakBeforeTernaryOperators: true
+BreakBeforeTernaryOperators: false
 # Don't break string literals if they are too long.
 BreakStringLiterals: false
+# Limit lines to 80 characters long.
+ColumnLimit: 80
 # Indentation width for constructor initializers.
 ConstructorInitializerIndentWidth: 2
 # Indentation width for continuation lines.
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 2
 # Format braced lists as best suited for C++11 braced lists.
 Cpp11BracedListStyle: true
 # Use a fixed alignment for all pointers.
@@ -60,6 +62,8 @@ DerivePointerAlignment: false
 IndentCaseBlocks: false
 # Indent case labels in switch statements.
 IndentCaseLabels: true
+# Indent preprocessor directives before the hash.
+IndentPPDirectives: BeforeHash
 # Standard indentation width.
 IndentWidth: 2
 # Do not indent if a function definition or declaration is wrapped after the type.
