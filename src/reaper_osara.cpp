@@ -1261,11 +1261,6 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
-void postInvertSegmentScrubRange(int command) {
-	// Translators: Reported when users invert the looped or one shot segment offsets.
-	outputMessage(translate("inverted segment offsets"));
-}
-
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	if (selectedItemsCount == 0) {
@@ -2692,7 +2687,6 @@ PostCommand POST_COMMANDS[] = {
 	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
-	{43617, postInvertSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -3026,6 +3020,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
+	{43617, _t("inverted segment scrub offsets")}, // Scrub: Invert looped-segment scrub range
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
