@@ -1261,6 +1261,11 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
+void postInvertSegmentScrubRange(int command) {
+	// Translators: Reported when users invert the looped or one shot scrub range.
+	outputMessage(translate("inverted segment offsets"));
+}
+
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	if (selectedItemsCount == 0) {
@@ -2687,6 +2692,7 @@ PostCommand POST_COMMANDS[] = {
 	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
+	{43617, postInvertSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -5313,7 +5319,7 @@ void cmdReportScrubStyle(Command* command) {
 		outputMessage(translate("one shot"));
 	} else {
 		// Translators: Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-		outputMessage(translate("scrub"));
+		outputMessage(translate("tape scrub"));
 	}
 }
 
@@ -5430,17 +5436,20 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
-void cmdManageSegmentScrubBoundaries(Command* command) {
+void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
 	int *start = (int *)get_config_var("scrubloopstart",&sizeStart);
 	int *end = (int *)get_config_var("scrubloopend",&sizeEnd);
 	if (!start || sizeStart != sizeof(int)
-			|| !end || sizeEnd != sizeof(int))
+			|| !end || sizeEnd != sizeof(int)) { // We didn't get an expected value from the API
 		return;
-	if (lastCommandRepeatCount == 0) {
-		outputMessage(format(translate("scrub segment start {} MS, end {} MS"), *start, *end));
 	}
+	if (lastCommandRepeatCount == 0) {
+		outputMessage(format(translate("start offset {} MS, end offset {} MS"), *start, *end));
+		return;
+	}
+	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
 #define DEFACCEL {0, 0, 0}
@@ -5673,7 +5682,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment start and end; press twice to do something else, we're not sure what yet")}, "OSARA_MANAGESCRUBSEGMENT", cmdManageSegmentScrubBoundaries},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
