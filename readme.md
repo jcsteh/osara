@@ -128,7 +128,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Go back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
+
+#### Scrub
 - Scrub: Toggle looped-segment scrub at edit cursor: /
+- Scrub: Toggle preference for one-shot segment scrub when moving edit cursor: Control+/
+- Scrub: Invert looped-segment scrub range: Shift+/
 
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
@@ -854,6 +858,7 @@ OSARA also includes some other miscellaneous actions.
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
 - OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
+- OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
 
 #### Midi Editor section of actions list
 - OSARA: Move forward to next single note or chord: RightArrow
