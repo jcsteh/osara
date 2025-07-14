@@ -1262,7 +1262,7 @@ void postCursorMovementScrub(int command) {
 }
 
 void postInvertSegmentScrubRange(int command) {
-	// Translators: Reported when users invert the looped or one shot scrub range.
+	// Translators: Reported when users invert the looped or one shot segment offsets.
 	outputMessage(translate("inverted segment offsets"));
 }
 
@@ -5446,9 +5446,28 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 		return;
 	}
 	if (lastCommandRepeatCount == 0) {
-		outputMessage(format(translate("start offset {} MS, end offset {} MS"), *start, *end));
+		ostringstream s;
+		if (*start == 0) {
+			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+			s << translate("start from cursor");
+		} else {
+			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+					// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+			s << format(translate("start offset {} MS"), *start);
+		}
+		s << ", ";
+		if (*end == 0) {
+			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+			s << translate("end at cursor");
+		} else {
+			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+					// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+			s << format(translate("end offset {} MS"), *end);
+		}
+		outputMessage(s);
 		return;
 	}
+	// When users press more than once, run this action instead
 	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
