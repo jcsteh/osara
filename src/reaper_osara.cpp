@@ -5434,10 +5434,11 @@ void cmdJumpToTime(Command* command) {
 void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
-	int *start = (int *)get_config_var("scrubloopstart",&sizeStart);
-	int *end = (int *)get_config_var("scrubloopend",&sizeEnd);
+	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
+	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
 	if (!start || sizeStart != sizeof(int)
-			|| !end || sizeEnd != sizeof(int)) { // We didn't get an expected value from the API
+			|| !end || sizeEnd != sizeof(int)) {
+		// We didn't get an expected value from the API
 		return;
 	}
 	if (lastCommandRepeatCount == 0) {
@@ -5447,7 +5448,7 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 			s << translate("start from cursor");
 		} else {
 			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-					// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
 			s << format(translate("start offset {} MS"), *start);
 		}
 		s << ", ";
@@ -5456,7 +5457,7 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 			s << translate("end at cursor");
 		} else {
 			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-					// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 			s << format(translate("end offset {} MS"), *end);
 		}
 		outputMessage(s);
