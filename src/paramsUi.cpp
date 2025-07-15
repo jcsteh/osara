@@ -2004,7 +2004,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	int count = 0;
 	while (iter.next()) {
 		// If we've exited containers, move to the appropriate ancestor menu.
-		for (int level = (int)menus.size(); level > iter.getLevel(); --level) {
+		for (auto level = menus.size(); level > iter.getLevel(); --level) {
 			menus.pop_back();
 		}
 		itemInfo.fMask = MIIM_TYPE;
