@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2025-07-01 18:47\n"
+"PO-Revision-Date: 2025-07-15 18:51\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -2258,6 +2258,9 @@ msgstr "todas las pistas desarmadas"
 msgid "all delta solos reset"
 msgstr "todos los solos en delta reseteados"
 
+msgid "inverted segment scrub offsets"
+msgstr ""
+
 msgid "grid sixty forth"
 msgstr "cuadrícula en semifusas"
 
@@ -2868,7 +2871,7 @@ msgid "one shot"
 msgstr ""
 
 #. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-msgid "scrub"
+msgid "tape scrub"
 msgstr ""
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
@@ -2883,6 +2886,24 @@ msgstr "todas las pistas a fase normal"
 
 msgid "unmonitored all tracks"
 msgstr "todas las pistas se han desmonitoreado"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr ""
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr ""
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr ""
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr ""
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: se Mueve al siguiente ítem (dejando otros ítems seleccionados)"
@@ -3096,6 +3117,9 @@ msgstr "OSARA: Selecciona ítems en el cursor de edición en pistas seleccionada
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Anuncia el tempo y el compás en el cursor de reproducción; presione dos veces para agregar/editar marcadores de tempo"
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Habilita/deshabilita la selección separada en el acorde/nota actual"

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-07-01 18:47\n"
+"PO-Revision-Date: 2025-07-15 18:51\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -67,7 +67,7 @@ msgstr "8. 停用MIDI編輯器中可見網格的快照，因此網格的移動�
 
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
-msgstr "9。當鍵盤焦點在對話框中時，進行 ctrl+space 播放/停止，需要 REAPER7.41或更高版本。"
+msgstr "9. 當鍵盤焦點在對話框中時，進行 ctrl+space 播放/停止，需要 REAPER7.41或更高版本。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -2173,6 +2173,9 @@ msgstr "全部軌道取消待錄"
 msgid "all delta solos reset"
 msgstr "重設全部效果差異獨奏"
 
+msgid "inverted segment scrub offsets"
+msgstr "反轉部分偏移"
+
 msgid "grid sixty forth"
 msgstr "64分網格"
 
@@ -2763,11 +2766,11 @@ msgstr "循環部分"
 
 #. Reported when switching to one-shot scrub style.
 msgid "one shot"
-msgstr "一擊"
+msgstr "單擊"
 
 #. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-msgid "scrub"
-msgstr "擦帶"
+msgid "tape scrub"
+msgstr "磁帶擦帶"
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
@@ -2781,6 +2784,24 @@ msgstr "全不軌到相位正常"
 
 msgid "unmonitored all tracks"
 msgstr "取消監聽全部軌道"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "從游標處開始"
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "開始偏移 {} MS"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "在游標處結束"
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "結束偏移{} MS"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一個對象（離開的對象保留被選取）"
@@ -2994,6 +3015,9 @@ msgstr "OSARA: 在選取軌道上選擇“編輯游標”下的對象 "
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: 報告播放游標位置的速度與拍號，按兩次開啟添加/編輯速度標記"
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr "OSARA: 報告擦帶部分偏移；按兩次編輯"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
