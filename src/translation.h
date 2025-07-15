@@ -27,7 +27,7 @@ auto translate_ctxt(S context, S msg) {
 }
 template<typename S, typename N>
 auto translate_plural(S msg, S msgPlural, N num) {
-	return translationDict.translate_plural(msg, msgPlural, num);
+	return translationDict.translate_plural(msg, msgPlural, (int)num);
 }
 
 // This function is used to mark a string as translatable without actually

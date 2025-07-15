@@ -740,7 +740,7 @@ void cmdMidiMoveCursor(Command* command) {
 		fakeFocus = FOCUS_NOTE;
 		s << " " << format(
 			translate_plural("{} note", "{} notes", count), count);
-		int mutedCount = (int)count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+		auto mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
 		if (mutedCount > 0) {
 			// Translators: used when reporting the number of muted notes in a chord.
 			// {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -1119,7 +1119,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			// Translators: used when reporting the number of notes in a chord.
 			// {} will be replaced by the number of notes. E.g. "3 notes"
 			s << format(translate("{} notes"), count);
-			int mutedCount = (int)count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+			auto mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted notes in a chord.
 				// {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -2087,7 +2087,7 @@ void postMidiMovePosition(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	int count = static_cast<int>(selectedCCs.size());
+	auto count = selectedCCs.size();
 	if (count == 0) {
 		return;
 	}
@@ -2222,7 +2222,7 @@ void postMidiChangeCCValue(int command) {
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	int count = static_cast<int>(selectedCCs.size());
+	auto count = selectedCCs.size();
 	if (count == 0) {
 		return;
 	}
@@ -2306,9 +2306,9 @@ void postMidiToggleMute(int command) {
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Get selected CCs.
 	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
-	int noteCount = (int)selectedNotes.size();
-	int CCCount = (int)selectedCCs.size();
-	int eventCount = noteCount + CCCount;
+	auto noteCount = selectedNotes.size();
+	auto CCCount = selectedCCs.size();
+	auto eventCount = noteCount + CCCount;
 	if (eventCount == 0) {
 		return;
 	}
@@ -2323,8 +2323,8 @@ void postMidiToggleMute(int command) {
 			}
 			s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
 		} else {
-			int mutedCount = (int)count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
-			int unmutedCount = (int)noteCount - mutedCount;
+			auto mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+			auto unmutedCount = noteCount - mutedCount;
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted notes.
 				// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
@@ -2349,8 +2349,8 @@ void postMidiToggleMute(int command) {
 			}
 			s << describeCC(take, cc);
 		} else {
-			int mutedCount = (int)count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
-			int unmutedCount = CCCount - mutedCount;
+			auto mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+			auto unmutedCount = CCCount - mutedCount;
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted CCs.
 				// {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
@@ -2365,10 +2365,10 @@ void postMidiToggleMute(int command) {
 			}
 		}
 	} else { // If both notes and CCs are selected
-		int mutedNoteCount = (int)count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
-		int mutedCCCount = (int)count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
-		int mutedCount = mutedNoteCount + mutedCCCount;
-		int unmutedCount = eventCount - mutedCount;
+		auto mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+		auto mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+		auto mutedCount = mutedNoteCount + mutedCCCount;
+		auto unmutedCount = eventCount - mutedCount;
 		if (mutedCount > 0) {
 			// Translators: used when reporting the number of muted events.
 			// {} will be replaced by the number of muted events. E.g. "3 events muted"
@@ -2433,7 +2433,7 @@ int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	int oldCount;
 	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
 	// F1 is the note at the pitch cursor, f2 is 1 semitone above, etc.
-	const int relativeNote = (int)msg->wParam - VK_F1;
+	const auto relativeNote = (int)msg->wParam - VK_F1;
 	// If the shift key is being held, the cursor is not advancing, so we should
 	// not report the new position.
 	const bool reportNewPos = !(GetAsyncKeyState(VK_SHIFT) & 0x8000);
