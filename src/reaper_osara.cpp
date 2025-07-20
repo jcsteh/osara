@@ -4541,6 +4541,11 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 		/* includeMaster */ false);
 }
 
+void cmdReportFrozenTracks(Command* command) {
+	reportTracksWithState(translate("Frozen"), isTrackFrozen,
+		/* includeMaster */ false);
+}
+
 template <typename Func>
 string formatItemsWithState(Func stateCheck, bool multiLine) {
 	const char* separator = multiLine ? "\r\n" : ", ";
@@ -5695,6 +5700,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report frozen tracks")}, "OSARA_REPORTFROZEN", cmdReportFrozenTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
