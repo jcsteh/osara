@@ -603,46 +603,9 @@ bool isTrackSelected(MediaTrack* track) {
 }
 
 bool isTrackFrozen(MediaTrack* track) {
-	if (!track)
-		return false;
-	// Retrieve the track state chunk (REAPER project format for one track).
-	// Passing an empty string as the second parameter returns a heap-allocated copy.
-	char* stateChunk = GetSetObjectState(track, "");
-	if (!stateChunk)
-		return false; // Safety: If we fail to get a chunk, return false (not frozen).
-	// Copy the raw C-style chunk into a C++ string for easier line parsing.
-	string chunk(stateChunk);
-	// Free the heap memory allocated by REAPER after copying it.
-	FreeHeapPtr(stateChunk);
-	// Create a stream to read the chunk line by line.
-	istringstream stream(chunk);
-	string line;
-	// Track how many <FREEZE blocks we find (usually 1 if frozen).
-	int freezeCount = 0;
-	// Track the current nesting level of <...> tags.
-	// We only care about <FREEZE blocks inside the first main block of the track chunk.
-	int blockDepth = 0;
-	// Iterate through each line of the track state chunk.
-	while (getline(stream, line)) {
-		if (!line.empty()) {
-			// If the line starts with '<', we're entering a new block.
-			if (line[0] == '<') {
-				++blockDepth;
-				// If we’re in the second block level and the line begins with "<FREEZE",
-				// then this track is (at least partially) frozen.
-				// rfind with position 0 ensures it’s a true prefix match.
-				if (blockDepth == 2 && line.rfind("<FREEZE", 0) == 0) {
-					++freezeCount;
-				}
-			}
-			// If the line starts with '>', it means we’re closing a block.
-			else if (line[0] == '>') {
-				--blockDepth;
-			}
-		}
-	}
-	// Return true if any <FREEZE block was found inside the correct context.
-	return freezeCount > 0;
+	auto frozen = (int*)GetSetMediaTrackInfo(track, "I_FREEZECOUNT", nullptr);
+	// This will be null in REAPER < 7.43.
+	return frozen ? *frozen : false;
 }
 
 bool isItemSelected(MediaItem* item) {
