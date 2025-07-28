@@ -68,7 +68,14 @@ jobs:
         # We need php for swell_resgen.
         run: brew install php
       - name: build
-        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+        run: |
+          if [ ${{ matrix.os }} == macos-latest ]; then
+            echo "Building native Mac installer..."
+            scons mac_signing_mode=none "publisher=${{ env.publisher }}" version=${{ env.version }}
+          else
+            echo "Building Windows installer..."
+            scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+          fi
       - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
@@ -81,6 +88,62 @@ jobs:
           certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
           files-folder: ${{ github.workspace }}\installer
           files-folder-filter: exe
+      - name: sign Mac
+        if: ${{ github.event_name == 'push' && matrix.os == 'macos-latest' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # Import certificate to keychain
+          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          security create-keychain -p temp_password build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp_password build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp_password build.keychain
+          
+          # Sign the app bundle with Developer ID
+          IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | sed 's/.*) \([^"]*\).*/\1/')
+          echo "Signing with identity: $IDENTITY"
+          codesign --force --options runtime --entitlements installer/OSARAInstaller/OSARAInstaller.entitlements --sign "$IDENTITY" build/installer/OSARAInstaller.app/Contents/MacOS/OSARAInstaller
+          codesign --force --options runtime --entitlements installer/OSARAInstaller/OSARAInstaller.entitlements --sign "$IDENTITY" build/installer/OSARAInstaller.app
+
+          # Verify signing
+          codesign --verify --verbose=2 build/installer/OSARAInstaller.app
+
+          # Create zip for notarization
+          cd build/installer
+          zip -r "../../installer/osara_temp.zip" "OSARAInstaller.app"
+          cd ../..
+          
+          # Submit for notarization
+          echo "Submitting for notarization..."
+          xcrun notarytool submit installer/osara_temp.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$TEAM_ID" \
+            --wait
+          
+          # Staple notarization to app
+          echo "Stapling notarization..."
+          xcrun stapler staple build/installer/OSARAInstaller.app
+
+          # Verify stapling
+          xcrun stapler validate build/installer/OSARAInstaller.app
+
+          # Create final signed and notarized zip
+          cd build/installer
+          zip -r "../../installer/osara_${{ env.version }}.zip" "OSARAInstaller.app"
+          cd ../..
+          
+          # Cleanup
+          rm installer/osara_temp.zip certificate.p12
+          security delete-keychain build.keychain
+          
+          echo "✅ Mac app signed and notarized successfully!"
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
