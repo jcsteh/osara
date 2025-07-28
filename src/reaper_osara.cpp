@@ -4990,7 +4990,7 @@ void cmdDeleteAllTimeSigs(Command* command) {
 }
 
 void moveToTransient(bool previous) {
-double cursorPos = GetCursorPosition();
+	double cursorPos = GetCursorPosition();
 	bool wasPlaying = GetPlayState() & 1;
 	if (wasPlaying) {
 		// Moving to transients can be slow, so pause/stop playback so it doesn't drift
@@ -5010,10 +5010,25 @@ double cursorPos = GetCursorPosition();
 		Main_OnCommand(40376, 0); // Item navigation: Move cursor to previous transient in items
 	else
 		Main_OnCommand(40375, 0); // Item navigation: Move cursor to next transient in items
+	int size = 0;
+	auto* transFlags = (int*)get_config_var("tabtotransflag", &size);
+	if (transFlags && size == sizeof(int) && *transFlags & 1) {
+		// Preferences -> Editing Behavior -> Tab through MIDI notes is enabled.
+		if (MediaItem* item = getItemWithFocus()) {
+			if (MediaItem_Take* take = GetActiveTake(item)) {
+				if (auto* source = (PCM_source*)GetSetMediaItemTakeInfo(take, "P_SOURCE", nullptr)) {
+					const char*type = source->GetType();
+					if (type && strcmp(type, "MIDI") == 0) {
+						previewChordForMoveToTransient(take);
+					}
+				}
+			}
+		}
+	}
 	if (wasPlaying)
 		OnPlayButton();
 	double newCursorPos = GetCursorPosition();
-if(cursorPos == newCursorPos)
+	if(cursorPos == newCursorPos)
 		return;
 	reportCursorPositionPrimaryFormat();
 }
