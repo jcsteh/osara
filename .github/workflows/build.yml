@@ -13,6 +13,7 @@ env:
   publisher: James Teh
   VSCMD_SKIP_SENDTELEMETRY: 1
   SCONS_CACHE_MSVC_CONFIG: 1
+  USE_MAC_NATIVE_INSTALLER: false  # Set to true when ready to use the native Mac installer with signing
 concurrency:
   # There's no point continuing to run a build if it's already outdated by
   # another commit.
@@ -68,7 +69,14 @@ jobs:
         # We need php for swell_resgen.
         run: brew install php
       - name: build
-        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+        run: |
+          if [ "${{ env.USE_MAC_NATIVE_INSTALLER }}" == "true" ]; then
+            echo "Building native Mac installer with signing support..."
+            scons "publisher=${{ env.publisher }}" version=${{ env.version }} mac-native-installer
+          else
+            echo "Building legacy Mac DMG installer..."
+            scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+          fi
       - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
@@ -81,6 +89,62 @@ jobs:
           certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
           files-folder: ${{ github.workspace }}\installer
           files-folder-filter: exe
+      - name: sign Mac
+        if: ${{ github.event_name == 'push' && matrix.os == 'macos-latest' && env.USE_MAC_NATIVE_INSTALLER == 'true' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # Import certificate to keychain
+          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          security create-keychain -p temp_password build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp_password build.keychain
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp_password build.keychain
+          
+          # Sign the app bundle with Developer ID
+          IDENTITY=$(security find-identity -v -p codesigning | grep "Developer ID Application" | head -1 | sed 's/.*) \([^"]*\).*/\1/')
+          echo "Signing with identity: $IDENTITY"
+          codesign --force --options runtime --entitlements installer/OSARAInstaller/OSARAInstaller.entitlements --sign "$IDENTITY" installer/build/OSARAInstaller.app/Contents/MacOS/OSARAInstaller
+          codesign --force --options runtime --entitlements installer/OSARAInstaller/OSARAInstaller.entitlements --sign "$IDENTITY" installer/build/OSARAInstaller.app
+          
+          # Verify signing
+          codesign --verify --verbose=2 installer/build/OSARAInstaller.app
+          
+          # Create zip for notarization
+          cd installer/build
+          zip -r "../osara_temp.zip" "OSARAInstaller.app"
+          cd ../..
+          
+          # Submit for notarization
+          echo "Submitting for notarization..."
+          xcrun notarytool submit installer/osara_temp.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$TEAM_ID" \
+            --wait
+          
+          # Staple notarization to app
+          echo "Stapling notarization..."
+          xcrun stapler staple installer/build/OSARAInstaller.app
+          
+          # Verify stapling
+          xcrun stapler validate installer/build/OSARAInstaller.app
+          
+          # Create final signed and notarized zip
+          cd installer/build
+          zip -r "../osara_${{ env.version }}.zip" "OSARAInstaller.app"
+          cd ../..
+          
+          # Cleanup
+          rm installer/osara_temp.zip certificate.p12
+          security delete-keychain build.keychain
+          
+          echo "✅ Mac app signed and notarized successfully!"
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}

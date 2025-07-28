@@ -1,0 +1,137 @@
+#include "resource.h"
+
+// Application icon
+IDI_MAIN_ICON ICON "osara_icon.ico"
+
+// Welcome Dialog
+IDD_WELCOME DIALOG 0, 0, 400, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "OSARA Installer"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "Welcome to the OSARA Installer", IDC_WELCOME_TITLE, 20, 20, 360, 20, SS_CENTER
+    LTEXT "This installer will install OSARA into a standard or portable Reaper installation.\n\nOSARA is a REAPER extension which aims to make REAPER accessible to screen reader users.", IDC_WELCOME_TEXT, 20, 60, 360, 80
+    LTEXT "Press Continue to begin the installation process.", IDC_STATIC, 20, 160, 360, 20
+    DEFPUSHBUTTON "Continue", IDC_CONTINUE, 250, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Cancel", IDCANCEL, 320, 270, 60, 20, WS_TABSTOP
+END
+
+// License Dialog
+IDD_LICENSE DIALOG 0, 0, 400, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "License Agreement"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "Please read and accept the license agreement:", IDC_STATIC, 20, 20, 360, 15
+    EDITTEXT IDC_LICENSE_TEXT, 20, 40, 360, 180, ES_MULTILINE | ES_READONLY | WS_VSCROLL | WS_TABSTOP
+    CONTROL "I accept the license agreement", IDC_ACCEPT_LICENSE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 20, 230, 200, 15
+    DEFPUSHBUTTON "Continue", IDC_CONTINUE, 250, 270, 60, 20, WS_DISABLED | WS_TABSTOP
+    PUSHBUTTON "Back", IDC_BACK, 180, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Cancel", IDCANCEL, 320, 270, 60, 20, WS_TABSTOP
+END
+
+// Installation Type Dialog
+IDD_INSTALL_TYPE DIALOG 0, 0, 400, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Installation Type"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "Choose installation type:", IDC_STATIC, 20, 20, 360, 15
+    GROUPBOX "Installation Type", IDC_STATIC, 20, 35, 360, 100
+    CONTROL "Standard Installation", IDC_STANDARD_INSTALL, "Button", BS_AUTORADIOBUTTON, 30, 50, 150, 15
+    LTEXT "Install to the default REAPER location in your user library.", IDC_STATIC, 50, 70, 320, 15
+    LTEXT "This is recommended for most users.", IDC_STATIC, 50, 85, 320, 15
+    CONTROL "Portable Installation", IDC_PORTABLE_INSTALL, "Button", BS_AUTORADIOBUTTON, 30, 120, 150, 15
+    LTEXT "Install to a custom REAPER folder location.", IDC_STATIC, 50, 140, 320, 15
+    LTEXT "Choose this if you have a portable REAPER installation.", IDC_STATIC, 50, 155, 320, 15
+    LTEXT "REAPER folder path:", IDC_PORTABLE_PATH_LABEL, 50, 180, 100, 15
+    EDITTEXT IDC_PORTABLE_PATH, 50, 195, 250, 20, ES_AUTOHSCROLL | WS_TABSTOP
+    PUSHBUTTON "Browse...", IDC_BROWSE_PATH, 310, 195, 60, 20, WS_TABSTOP
+    DEFPUSHBUTTON "Continue", IDC_CONTINUE, 250, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Back", IDC_BACK, 180, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Cancel", IDCANCEL, 320, 270, 60, 20, WS_TABSTOP
+END
+
+// Keymap Dialog
+IDD_KEYMAP DIALOG 0, 0, 400, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Keymap Installation"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "Choose keymap installation option:", IDC_STATIC, 20, 20, 360, 15
+    GROUPBOX "Keymap Options", IDC_STATIC, 20, 35, 360, 180
+    CONTROL "Keep existing keymap", IDC_KEEP_KEYMAP, "Button", BS_AUTORADIOBUTTON | WS_GROUP, 30, 50, 200, 15
+    LTEXT "Don't modify your existing keymap (recommended).", IDC_STATIC, 50, 70, 320, 15
+    LTEXT "You can manually import OSARA shortcuts later if desired.", IDC_STATIC, 50, 85, 320, 15
+    CONTROL "Install OSARA keymap", IDC_INSTALL_KEYMAP, "Button", BS_AUTORADIOBUTTON, 30, 120, 200, 15
+    LTEXT "Replace your existing keymap with the OSARA keymap.", IDC_STATIC, 50, 140, 320, 15
+    LTEXT "Your current keymap will be backed up first.", IDC_STATIC, 50, 155, 320, 15
+    DEFPUSHBUTTON "Continue", IDC_CONTINUE, 250, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Back", IDC_BACK, 180, 270, 60, 20, WS_TABSTOP
+    PUSHBUTTON "Cancel", IDCANCEL, 320, 270, 60, 20, WS_TABSTOP
+END
+
+// Progress Dialog
+IDD_PROGRESS DIALOG 0, 0, 400, 200
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Installing OSARA"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "Installing OSARA...", IDC_PROGRESS_TEXT, 20, 20, 360, 15
+    CONTROL "", IDC_PROGRESS_BAR, "msctls_progress32", WS_CHILD | WS_VISIBLE, 20, 50, 360, 20
+    LTEXT "Preparing installation...", IDC_STATUS_TEXT, 20, 80, 360, 15
+    PUSHBUTTON "Cancel", IDCANCEL, 320, 170, 60, 20, WS_TABSTOP
+END
+
+// Completion Dialog
+IDD_COMPLETION DIALOG 0, 0, 400, 300
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Installation Complete"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT "OSARA has been successfully installed!", IDC_SUCCESS_TEXT, 20, 20, 360, 20, SS_CENTER
+    LTEXT "Installation details:", IDC_STATIC, 20, 50, 360, 15
+    EDITTEXT IDC_INSTALL_LOG, 20, 70, 360, 150, ES_MULTILINE | ES_READONLY | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON "Finish", IDOK, 320, 270, 60, 20, WS_TABSTOP
+END
+
+// String Table
+STRINGTABLE
+BEGIN
+    IDS_APP_TITLE       "OSARA Installer"
+    IDS_WELCOME_TITLE   "Welcome to OSARA"
+    IDS_WELCOME_TEXT    "This installer will install the OSARA accessibility plugin for REAPER."
+    IDS_LICENSE_TITLE   "License Agreement"
+    IDS_INSTALL_SUCCESS "Installation completed successfully"
+    IDS_INSTALL_FAILED  "Installation failed"
+END
+
+// Version Information
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "OSARA Project"
+            VALUE "FileDescription", "OSARA Installer"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "OSARAInstaller"
+            VALUE "LegalCopyright", "Copyright (C) 2024 OSARA Project"
+            VALUE "OriginalFilename", "OSARAInstaller.exe"
+            VALUE "ProductName", "OSARA Installer"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
