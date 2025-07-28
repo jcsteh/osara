@@ -59,14 +59,31 @@ else: # Mac
 	archEnv.SConscript("src/archBuild_sconscript",
 		exports={"env": archEnv},
 		variant_dir="build", duplicate=False)
-	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
-		[["$SOURCE", "$version"]])
+	# Set CI environment variable for the build script
+	buildEnv = os.environ.copy()
+	if os.environ.get("CI") == "true":
+		buildEnv["CI"] = "true"
+	
+	# Mac Legacy installer (DMG) - default for backward compatibility
+	mac_legacy_installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
+		[["$SOURCE", "$version"]], ENV=buildEnv)
+	
+	# Mac Native installer (App bundle)
+	mac_native_installer = env.Command("installer/osara_${version}.zip", ["installer/mac/build_native_installer.sh", "build"],
+		[["$SOURCE", "$version"]], ENV=buildEnv)
+	
+	# Set up aliases
+	env.Alias("mac-native-installer", mac_native_installer)  # New native
+
+	installer = mac_legacy_installer  # Keep for compatibility
 	configRc = "build/config.rc"
 
 env.Alias("installer", installer)
 env.Default(installer)
 
 pot = env.Command("locale/osara_${version}.pot",
-	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc, 
+	 env.Glob("installer/OSARAInstaller/*.cpp"), env.Glob("installer/OSARAInstaller/*.mm"), 
+	 "installer/OSARAInstaller/installer.rc"],
 	makePot)
 env.Alias("pot", pot)
