@@ -851,6 +851,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report global / Track Automation Mode: Control+Shift+L
 - OSARA: Toggle global automation override between latch preview and off: Control+Alt+Shift+L
 - OSARA: Cycle through midi recording modes of selected tracks: Alt+Shift+\
+- OSARA: Report frozen tracks
 - OSARA: Report groups for current track
 - OSARA: Report length of last touched item
 - OSARA: Report number of takes in last touched item
