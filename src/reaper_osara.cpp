@@ -2105,7 +2105,8 @@ void postSetSelectionEnd(int command) {
 	double start;
 	GetSet_LoopTimeRange(false, false, &start, nullptr, false);
 	if(start == 0)
-		outputMessage(translate("selected to start of project"));
+	// Translators: This is reported when users or REAPER automatically selects from the start of project to the cursor.
+		outputMessage(translate("selected from start of project to cursor"));
 	else
 		outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
@@ -5391,6 +5392,7 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 	Main_OnCommand(40042, 0); // Transport: Go to start of project
 	Main_OnCommand(40625, 0); // Time selection: Set start point
 	fakeFocus = FOCUS_RULER;
+	// Translators: This is reported when users select from cursor to the start of project.
 	outputMessage(translate("selected to start of project"));
 }
 
