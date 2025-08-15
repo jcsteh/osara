@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-07-15 18:51\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -1648,6 +1648,9 @@ msgstr "сетка сто двадцать восьмыми"
 msgid "grid  unknown"
 msgstr "без привязки к сетке"
 
+msgid "frozen"
+msgstr ""
+
 msgid "defeating solo"
 msgstr "соло на переднем плане"
 
@@ -2156,8 +2159,9 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-msgid "selected to start of project"
-msgstr "выделено до начала проекта"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr ""
 
 msgid "set selection end"
 msgstr "установить конец выделения"
@@ -2860,6 +2864,9 @@ msgstr "Мониторинг"
 msgid "Phase inverted"
 msgstr "Фаза инвертирована"
 
+msgid "Frozen"
+msgstr ""
+
 msgid "Time selection:"
 msgstr "Выделение времени:"
 
@@ -3082,6 +3089,10 @@ msgstr ""
 msgid "At Current Position"
 msgstr "На текущей позиции"
 
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "выделено до начала проекта"
+
 msgid "selected to end of project"
 msgstr "выделено до конца проекта"
 
@@ -3168,6 +3179,9 @@ msgstr "OSARA: Сообщать треки с включённым монито�
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: Сообщать треки с инверсией фазы"
+
+msgid "OSARA: Report frozen tracks"
+msgstr ""
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: Сообщать выделение трека/элемента/времени/MIDI (в зависимости от фокуса)"

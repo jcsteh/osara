@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-07-15 18:51\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1538,6 +1538,9 @@ msgstr "grille sur quintuple croche, 1/128"
 msgid "grid  unknown"
 msgstr "grille inconnue"
 
+msgid "frozen"
+msgstr "gelé"
+
 msgid "defeating solo"
 msgstr "solo défait"
 
@@ -1994,8 +1997,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] "{} Source de boucle d'objet désactivée"
 msgstr[1] "{} Sources de boucle d'objet désactivée"
 
-msgid "selected to start of project"
-msgstr "sélectionné à partir du début du projet"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr "sélectionné du début du projet au curseur"
 
 msgid "set selection end"
 msgstr "fin de la sélection définie"
@@ -2664,6 +2668,9 @@ msgstr "Monitoré"
 msgid "Phase inverted"
 msgstr "Phase inversée"
 
+msgid "Frozen"
+msgstr "Gelé"
+
 msgid "Time selection:"
 msgstr "Sélection temporelle:"
 
@@ -2878,6 +2885,10 @@ msgstr "scrub genre bande magnétique"
 msgid "At Current Position"
 msgstr "À la position actuelle"
 
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "sélectionné à partir du début du projet"
+
 msgid "selected to end of project"
 msgstr "sélectionné jusqu'à la fin du projet"
 
@@ -2964,6 +2975,9 @@ msgstr "OSARA: Énoncer les pistes avec le moniteur d'enregistrement activé"
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: Énoncer les piste avec la phase inversée"
+
+msgid "OSARA: Report frozen tracks"
+msgstr "OSARA: Énoncer les pistes gelées"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA : Énoncer la sélection de piste/objet/sélection MIDI (selon le focus)"

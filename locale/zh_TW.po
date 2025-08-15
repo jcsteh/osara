@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-07-15 18:51\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1483,6 +1483,9 @@ msgstr "128分網格"
 msgid "grid  unknown"
 msgstr "網格未知"
 
+msgid "frozen"
+msgstr "凍結"
+
 msgid "defeating solo"
 msgstr "獨奏失效"
 
@@ -1913,8 +1916,9 @@ msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
 msgstr[0] "{} 對象停用循環源"
 
-msgid "selected to start of project"
-msgstr "選擇到工程開始"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr "選擇從工程開始到游標"
 
 msgid "set selection end"
 msgstr "設置選區結束"
@@ -2566,6 +2570,9 @@ msgstr "監聽"
 msgid "Phase inverted"
 msgstr "翻轉相位"
 
+msgid "Frozen"
+msgstr "凍結"
+
 msgid "Time selection:"
 msgstr "時間選區"
 
@@ -2728,7 +2735,7 @@ msgstr "{} 選定軌道的自動化模式"
 
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
-msgstr "OSARA: REAPER 開源可訪問性的應用程序"
+msgstr "OSARA: REAPER 開源可訪問性的應用程式"
 
 #. osara version. {} is replaced with the version; e.g.
 #. "Version: 2021.1pre-588,0531135a"
@@ -2775,6 +2782,10 @@ msgstr "磁帶擦帶"
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "在當前位置"
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "選擇到工程開始"
 
 msgid "selected to end of project"
 msgstr "選擇到工程結束"
@@ -2862,6 +2873,9 @@ msgstr "OSARA: 報告監聽的軌道"
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: 報告翻轉相位的軌道"
+
+msgid "OSARA: Report frozen tracks"
+msgstr "OSARA: 報告凍結的軌道"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: 報告軌道、對象、MIDI 選取 （取決於焦點）"
@@ -3008,7 +3022,7 @@ msgid "OSARA: Check for update"
 msgstr "OSARA:  檢查更新"
 
 msgid "OSARA: Open online documentation"
-msgstr "OSARA: 開啟線上說明文件"
+msgstr "OSARA: 開啟線上說明檔"
 
 msgid "OSARA: Select items under edit cursor on selected tracks"
 msgstr "OSARA: 在選取軌道上選擇“編輯游標”下的對象 "
@@ -3068,7 +3082,7 @@ msgid "Configuration..."
 msgstr "配置..."
 
 msgid "Online &documentation"
-msgstr "線上說明文件(&d)"
+msgstr "線上說明檔&d)"
 
 msgid "Check for &update"
 msgstr "檢查更新(&u)"
