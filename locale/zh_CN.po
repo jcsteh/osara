@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -63,7 +63,11 @@ msgstr "7.在FX浏览器中隐藏类型前缀,便通过FX浏览更有效."
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
-msgstr ""
+msgstr "8. 在 MIDI 编辑器中禁用“对齐可视网格”功能，确保按网格移动时不受水平缩放设置的影响。"
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+msgstr "9. 在对话框获得键盘焦点时，启用 Ctrl+空格键  作为播放/停止快捷键（适用于 REAPER 7.41 或更高版本）。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1479,6 +1483,9 @@ msgstr "128分网格"
 msgid "grid  unknown"
 msgstr "未知网格"
 
+msgid "frozen"
+msgstr "冻结"
+
 msgid "defeating solo"
 msgstr "独奏失效"
 
@@ -1909,8 +1916,9 @@ msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
 msgstr[0] "{} 对象禁用循环源("
 
-msgid "selected to start of project"
-msgstr "选区到工程开始"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr ""
 
 msgid "set selection end"
 msgstr "设置选区结束"
@@ -2168,6 +2176,9 @@ msgstr "全部轨道已取消准备"
 
 msgid "all delta solos reset"
 msgstr "重制全部 delta 独奏"
+
+msgid "inverted segment scrub offsets"
+msgstr "反转偏移分段擦洗"
 
 msgid "grid sixty forth"
 msgstr "64分网格"
@@ -2559,6 +2570,9 @@ msgstr "监听"
 msgid "Phase inverted"
 msgstr "相位倒置"
 
+msgid "Frozen"
+msgstr "冻结"
+
 msgid "Time selection:"
 msgstr "时间选区:"
 
@@ -2753,9 +2767,25 @@ msgstr[0] "对象已从组移除 {group}"
 msgid "track not grouped"
 msgstr "轨道未分组"
 
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr "循环分段"
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr "触发一次"
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "tape scrub"
+msgstr "磁带擦洗"
+
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "光标位置"
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "选区到工程开始"
 
 msgid "selected to end of project"
 msgstr "选区到工程结束"
@@ -2765,6 +2795,24 @@ msgstr "全部轨道相位正常"
 
 msgid "unmonitored all tracks"
 msgstr "取消监听全部轨道"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "从光标开始"
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "开始偏移 {} 毫秒"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "在光标处结束"
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "结束偏移 {} 毫秒"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
@@ -2825,6 +2873,9 @@ msgstr "OSARA: 报告录音监听轨"
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: 报告相位反转轨"
+
+msgid "OSARA: Report frozen tracks"
+msgstr "OSARA: 报告冻结轨道"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA：报告轨道/对象/时间/MIDI 选择（取决于焦点）"
@@ -2979,32 +3030,35 @@ msgstr "OSARA: 选择选定轨道上编辑光标下方的对象"
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: 报告播放光标处的速度和拍号； 双击添加/编辑速度标记"
 
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr "OSARA: 报告擦洗分段偏移值;双击编辑值"
+
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"
 
 msgid "OSARA: Move forward to next single note or chord"
-msgstr ""
+msgstr "OSARA：向前移动到下一个单音或和弦"
 
 msgid "OSARA: Move backward to previous single note or chord"
-msgstr ""
+msgstr "OSARA：向后移动到上一个单音或和弦"
 
 msgid "OSARA: Move forward to next single note or chord and add to selection"
-msgstr ""
+msgstr "OSARA：向前移动到下一个单音或和弦并加入选择"
 
 msgid "OSARA: Move backward to previous single note or chord and add to selection"
-msgstr ""
+msgstr "OSARA：向后移动到上一个单音或和弦并加入选择"
 
 msgid "OSARA: Move to higher note in chord"
-msgstr ""
+msgstr "OSARA：移动到和弦中的更高音符"
 
 msgid "OSARA: Move to lower note in chord"
-msgstr ""
+msgstr "OSARA：移动到和弦中的更低音符"
 
 msgid "OSARA: Move to higher note in chord and add to selection"
-msgstr ""
+msgstr "OSARA：移动到和弦中的更高音符并加入选择"
 
 msgid "OSARA: Move to lower note in chord and add to selection"
-msgstr ""
+msgstr "OSARA：移动到和弦中的更低音符并加入选择"
 
 msgid "OSARA: Move to next CC"
 msgstr "OSARA: 转到下一个CC"

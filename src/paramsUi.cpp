@@ -564,6 +564,8 @@ class ParamsDialog {
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
 				(alt && shift) ||
+				// Anything with both alt and control.
+				(alt && control) ||
 				// Modified space.
 				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
@@ -577,7 +579,7 @@ class ParamsDialog {
 			// control.
 			return -1; // Pass to our window.
 		}
-		if (alt && 'A' <= msg->wParam && msg->wParam <= 'Z') {
+		if (alt && !shift && !control && 'A' <= msg->wParam && msg->wParam <= 'Z') {
 			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
 			// the Parameter combo box.
 			return -1; // Pass to our window.

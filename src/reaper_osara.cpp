@@ -602,6 +602,12 @@ bool isTrackSelected(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", nullptr);
 }
 
+bool isTrackFrozen(MediaTrack* track) {
+	auto frozen = (int*)GetSetMediaTrackInfo(track, "I_FREEZECOUNT", nullptr);
+	// This will be null in REAPER < 7.43.
+	return frozen ? *frozen : false;
+}
+
 bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", nullptr);
 }
@@ -929,6 +935,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (armed && !autoArm) {
 		separate();
 		s << translate("armed");
+	}
+	if (isTrackFrozen(track)) {
+		separate();
+		s << translate("frozen");
 	}
 	if (isTrackMuted(track)) {
 		separate();
@@ -2095,7 +2105,8 @@ void postSetSelectionEnd(int command) {
 	double start;
 	GetSet_LoopTimeRange(false, false, &start, nullptr, false);
 	if(start == 0)
-		outputMessage(translate("selected to start of project"));
+	// Translators: This is reported when users or REAPER automatically selects from the start of project to the cursor.
+		outputMessage(translate("selected from start of project to cursor"));
 	else
 		outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
@@ -2698,6 +2709,8 @@ PostCommand POST_COMMANDS[] = {
 	{41174, postCursorMovement}, // Item navigation: Move cursor to end of items
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
+	{43614, postCursorMovement}, // View: Move cursor left by grid division
+	{43615, postCursorMovement}, // View: Move cursor right by grid division
 	{41040, postCursorMovement}, // Move edit cursor to start of next measure
 	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{40231, postCursorMovement}, // Move edit cursor to start of next beat
@@ -3020,6 +3033,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
+	{43617, _t("inverted segment scrub offsets")}, // Scrub: Invert looped-segment scrub range
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -4491,6 +4505,11 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 		/* includeMaster */ false);
 }
 
+void cmdReportFrozenTracks(Command* command) {
+	reportTracksWithState(translate("Frozen"), isTrackFrozen,
+		/* includeMaster */ false);
+}
+
 template <typename Func>
 string formatItemsWithState(Func stateCheck, bool multiLine) {
 	const char* separator = multiLine ? "\r\n" : ", ";
@@ -5313,7 +5332,7 @@ void cmdReportScrubStyle(Command* command) {
 		outputMessage(translate("one shot"));
 	} else {
 		// Translators: Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-		outputMessage(translate("scrub"));
+		outputMessage(translate("tape scrub"));
 	}
 }
 
@@ -5373,6 +5392,7 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 	Main_OnCommand(40042, 0); // Transport: Go to start of project
 	Main_OnCommand(40625, 0); // Time selection: Set start point
 	fakeFocus = FOCUS_RULER;
+	// Translators: This is reported when users select from cursor to the start of project.
 	outputMessage(translate("selected to start of project"));
 }
 
@@ -5428,6 +5448,42 @@ void cmdJumpToTime(Command* command) {
 	CallLater([] {
 		outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE));
 	}, 50);
+}
+
+void cmdReportAndEditScrubSegmentOffsets(Command* command) {
+	int sizeStart = 0;
+	int sizeEnd = 0;
+	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
+	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
+	if (!start || sizeStart != sizeof(int)
+			|| !end || sizeEnd != sizeof(int)) {
+		// We didn't get an expected value from the API
+		return;
+	}
+	if (lastCommandRepeatCount == 0) {
+		ostringstream s;
+		if (*start == 0) {
+			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+			s << translate("start from cursor");
+		} else {
+			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+			s << format(translate("start offset {} MS"), *start);
+		}
+		s << ", ";
+		if (*end == 0) {
+			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+			s << translate("end at cursor");
+		} else {
+			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+			s << format(translate("end offset {} MS"), *end);
+		}
+		outputMessage(s);
+		return;
+	}
+	// When users press more than once, run this action instead
+	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
 #define DEFACCEL {0, 0, 0}
@@ -5609,6 +5665,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report frozen tracks")}, "OSARA_REPORTFROZEN", cmdReportFrozenTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
@@ -5660,6 +5717,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},

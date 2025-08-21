@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "habilitar"
@@ -64,6 +64,10 @@ msgstr "7. Se ocultarán los prefijos de tipo en la ventana de FX para mejorar l
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
 msgstr "8. Desactivar ajuste a la cuadrícula visible en el editor MIDI para que el movimiento por cuadrícula no dependa del ajuste de zoom horizontal."
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1534,6 +1538,9 @@ msgstr "cuadrícula en garrapateas"
 msgid "grid  unknown"
 msgstr "cuadrícula desconocida"
 
+msgid "frozen"
+msgstr ""
+
 msgid "defeating solo"
 msgstr "solo defeating"
 
@@ -1990,8 +1997,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] "{} ítem con bucle de fuente desactivado"
 msgstr[1] "{} ítems con bucle de fuente desactivado"
 
-msgid "selected to start of project"
-msgstr "se ha seleccionado desde el cursor hasta el inicio del proyecto"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr ""
 
 msgid "set selection end"
 msgstr "fin de selección establecido"
@@ -2253,6 +2261,9 @@ msgstr "todas las pistas desarmadas"
 
 msgid "all delta solos reset"
 msgstr "todos los solos en delta reseteados"
+
+msgid "inverted segment scrub offsets"
+msgstr ""
 
 msgid "grid sixty forth"
 msgstr "cuadrícula en semifusas"
@@ -2657,6 +2668,9 @@ msgstr "Con monitoreo activo"
 msgid "Phase inverted"
 msgstr "Con la Fase Invertida"
 
+msgid "Frozen"
+msgstr ""
+
 msgid "Time selection:"
 msgstr "Selección de tiempo:"
 
@@ -2855,9 +2869,25 @@ msgstr[1] "{count} ítems removidos del grupo {group}"
 msgid "track not grouped"
 msgstr "pista no agrupada"
 
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr ""
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr ""
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "tape scrub"
+msgstr ""
+
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "En la posición actual"
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "se ha seleccionado desde el cursor hasta el inicio del proyecto"
 
 msgid "selected to end of project"
 msgstr "se ha seleccionado desde el cursor hasta el final del proyecto"
@@ -2867,6 +2897,24 @@ msgstr "todas las pistas a fase normal"
 
 msgid "unmonitored all tracks"
 msgstr "todas las pistas se han desmonitoreado"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr ""
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr ""
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr ""
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr ""
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: se Mueve al siguiente ítem (dejando otros ítems seleccionados)"
@@ -2927,6 +2975,9 @@ msgstr "OSARA: Anuncia las pistas con el monitor encendido"
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: Anunciar las pistas con la fase invertida"
+
+msgid "OSARA: Report frozen tracks"
+msgstr ""
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: Anunciar la selección de pista/ítem/tiempo/MIDI (según el foco)"
@@ -3080,6 +3131,9 @@ msgstr "OSARA: Selecciona ítems en el cursor de edición en pistas seleccionada
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Anuncia el tempo y el compás en el cursor de reproducción; presione dos veces para agregar/editar marcadores de tempo"
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Habilita/deshabilita la selección separada en el acorde/nota actual"

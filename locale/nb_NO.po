@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr ""
@@ -63,6 +63,10 @@ msgstr ""
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -1534,6 +1538,9 @@ msgstr ""
 msgid "grid  unknown"
 msgstr ""
 
+msgid "frozen"
+msgstr ""
+
 msgid "defeating solo"
 msgstr ""
 
@@ -1990,7 +1997,8 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "selected to start of project"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
 msgstr ""
 
 msgid "set selection end"
@@ -2252,6 +2260,9 @@ msgid "all tracks unarmed"
 msgstr ""
 
 msgid "all delta solos reset"
+msgstr ""
+
+msgid "inverted segment scrub offsets"
 msgstr ""
 
 msgid "grid sixty forth"
@@ -2657,6 +2668,9 @@ msgstr ""
 msgid "Phase inverted"
 msgstr ""
 
+msgid "Frozen"
+msgstr ""
+
 msgid "Time selection:"
 msgstr ""
 
@@ -2855,8 +2869,24 @@ msgstr[1] ""
 msgid "track not grouped"
 msgstr ""
 
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr ""
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr ""
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "tape scrub"
+msgstr ""
+
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
+msgstr ""
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
 msgstr ""
 
 msgid "selected to end of project"
@@ -2866,6 +2896,24 @@ msgid "phase normal all tracks"
 msgstr ""
 
 msgid "unmonitored all tracks"
+msgstr ""
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr ""
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr ""
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr ""
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
 msgstr ""
 
 msgid "OSARA: Move to next item (leaving other items selected)"
@@ -2926,6 +2974,9 @@ msgid "OSARA: Report tracks with record monitor on"
 msgstr ""
 
 msgid "OSARA: Report tracks with phase inverted"
+msgstr ""
+
+msgid "OSARA: Report frozen tracks"
 msgstr ""
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
@@ -3079,6 +3130,9 @@ msgid "OSARA: Select items under edit cursor on selected tracks"
 msgstr ""
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
+msgstr ""
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

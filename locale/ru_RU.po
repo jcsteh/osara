@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-06-15 18:43\n"
+"PO-Revision-Date: 2025-08-15 18:48\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -63,6 +63,10 @@ msgstr "7. Скрывает префиксы типов в браузере FX, 
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+msgstr ""
+
+msgctxt "optimal REAPER configuration"
+msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
 msgstr ""
 
 msgctxt "optimal REAPER configuration"
@@ -1644,6 +1648,9 @@ msgstr "сетка сто двадцать восьмыми"
 msgid "grid  unknown"
 msgstr "без привязки к сетке"
 
+msgid "frozen"
+msgstr ""
+
 msgid "defeating solo"
 msgstr "соло на переднем плане"
 
@@ -2152,8 +2159,9 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-msgid "selected to start of project"
-msgstr "выделено до начала проекта"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr ""
 
 msgid "set selection end"
 msgstr "установить конец выделения"
@@ -2423,6 +2431,9 @@ msgstr "все треки не готовы к записи"
 
 msgid "all delta solos reset"
 msgstr "все дельта соло сброшены"
+
+msgid "inverted segment scrub offsets"
+msgstr ""
 
 msgid "grid sixty forth"
 msgstr "сетка шестьдесят четвёртыми"
@@ -2853,6 +2864,9 @@ msgstr "Мониторинг"
 msgid "Phase inverted"
 msgstr "Фаза инвертирована"
 
+msgid "Frozen"
+msgstr ""
+
 msgid "Time selection:"
 msgstr "Выделение времени:"
 
@@ -3059,9 +3073,25 @@ msgstr[3] "{count} объектов удалено из группы {group}"
 msgid "track not grouped"
 msgstr "трек не сгруппирован"
 
+#. Reported when switching to looped segment scrub style.
+msgid "looped segment"
+msgstr ""
+
+#. Reported when switching to one-shot scrub style.
+msgid "one shot"
+msgstr ""
+
+#. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
+msgid "tape scrub"
+msgstr ""
+
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "На текущей позиции"
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "выделено до начала проекта"
 
 msgid "selected to end of project"
 msgstr "выделено до конца проекта"
@@ -3071,6 +3101,24 @@ msgstr "нормальная фаза для всех треков"
 
 msgid "unmonitored all tracks"
 msgstr "мониторинг всех треков отменён"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr ""
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr ""
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr ""
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr ""
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Перейти к следующему элементу (оставив другие элементы выделенными)"
@@ -3131,6 +3179,9 @@ msgstr "OSARA: Сообщать треки с включённым монито�
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: Сообщать треки с инверсией фазы"
+
+msgid "OSARA: Report frozen tracks"
+msgstr ""
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: Сообщать выделение трека/элемента/времени/MIDI (в зависимости от фокуса)"
@@ -3284,6 +3335,9 @@ msgstr "OSARA: Выделить элементы под курсором ред�
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Сообщить темп и тактовый размер в текущей позиции курсора воспроизведения; нажмите дважды, чтобы добавить/отредактировать маркеры темпа"
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Включить несмежное выделение/переключить выделение текущего аккорда/ноты"

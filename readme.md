@@ -128,7 +128,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Go back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
+
+#### Scrub
 - Scrub: Toggle looped-segment scrub at edit cursor: /
+- Scrub: Toggle preference for one-shot segment scrub when moving edit cursor: Control+/
+- Scrub: Invert looped-segment scrub range: Shift+/
 
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
@@ -255,8 +259,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Move edit cursor to next tempo or time signature change: Shift+'
 
 #### Automation
-- Item edit: Move items/envelope points up one track/a bit: NumPad8
-- Item edit: Move items/envelope points down one track/a bit: NumPad2
+- Item edit: Move items/envelope points up one track/a bit: Control+Alt+Shift+UpArrow or NumPad8
+- Item edit: Move items/envelope points down one track/a bit: Control+Alt+Shift+DownArrow or NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
 - (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
 - Envelope: Delete all selected points: Control+Shift+Delete
@@ -645,9 +649,9 @@ At any time, you can report or reset the levels for either of the watchers using
 - OSARA: Reset Peak Watcher first watcher: Alt+F10
 - OSARA: Reset Peak Watcher second watcher: Alt+Shift+F10
 
-You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher.
+You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher: Control+Alt+F10.
 While paused, Peak Watcher won't notify you of any level changes.
-You can later use the same action again to resume automatic reporting.
+Use the same action again to resume automatic reporting.
 
 Peak Watcher settings are saved with the project.
 To configure default settings to use for new projects, you can save them in a project template and configure this template to be used as the template for new projects in the Project section of REAPER Preferences.
@@ -847,6 +851,7 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report global / Track Automation Mode: Control+Shift+L
 - OSARA: Toggle global automation override between latch preview and off: Control+Alt+Shift+L
 - OSARA: Cycle through midi recording modes of selected tracks: Alt+Shift+\
+- OSARA: Report frozen tracks
 - OSARA: Report groups for current track
 - OSARA: Report length of last touched item
 - OSARA: Report number of takes in last touched item
@@ -854,6 +859,7 @@ OSARA also includes some other miscellaneous actions.
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
 - OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
+- OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
 
 #### Midi Editor section of actions list
 - OSARA: Move forward to next single note or chord: RightArrow
@@ -966,6 +972,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Transport: Stop
 - Move edit cursor to start of next beat
 - Move edit cursor to start of current/previous beat
+- View: Move cursor left by grid division
+- View: Move cursor right by grid division
 - View: Move cursor left 8 pixels
 - View: Move cursor right 8 pixels
 - View: Set horizontal zoom to default project setting
@@ -1006,7 +1014,6 @@ Xenakios/SWS: Move cursor right configured pixels, creating time selection
 - Unselect all CC events
 
 #### Unmapped OSARA actions
-- OSARA: Pause/resume Peak Watcher
 - OSARA: Toggle Move relative to the play cursor for time movement commands during playback
 - OSARA: Toggle Report FX when moving to tracks/takes
 - OSARA: Toggle Report MIDI notes in MIDI editor
