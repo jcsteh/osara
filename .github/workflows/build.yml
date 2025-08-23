@@ -81,6 +81,168 @@ jobs:
           certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
           files-folder: ${{ github.workspace }}\installer
           files-folder-filter: exe
+      - name: sign Mac
+        if: ${{ github.event_name == 'push' && matrix.os == 'macos-latest' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          set -euxo pipefail
+
+          # Create and configure keychain
+          security create-keychain -p temp_password build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp_password build.keychain
+          security list-keychains -d user -s build.keychain
+
+          # Decode and save the certificate from the environment variable
+          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          
+          # Import certificate 
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+
+          # Set key partition list for codesign access with specific certificate targeting
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp_password -D "Developer ID Application" -t private build.keychain
+
+          # Extract identity from build.keychain only
+          IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed 's/.*) \([^"]*\).*/\1/' | xargs)
+          echo "Signing with identity: $IDENTITY"
+          if [[ -z "$IDENTITY" ]]; then
+            echo "No codesigning identity found in build.keychain!"
+            exit 1
+          fi
+
+          cd installer/mac
+
+          # Set up app bundle and entitlements
+          APP_BUNDLE="OSARAInstaller.app"
+          
+          # Create a temporary entitlements file for runtime (consistent with local build.sh)
+          runtime_entitlements="$APP_BUNDLE/Contents/Resources/runtime.entitlements"
+          cp OSARAInstaller.entitlements "$runtime_entitlements"
+          
+          # Deep sign all components in the app bundle with entitlements
+          echo "=== Deep signing app bundle with entitlements ==="
+          find $APP_BUNDLE -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
+
+          # Sign the main executable with timestamp and entitlements
+          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/applet"
+          
+          # Sign the app bundle with timestamp and entitlements
+          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" $APP_BUNDLE
+
+          # Verify signing with detailed output
+          echo "=== Verifying code signature ==="
+          codesign --verify --verbose=4 $APP_BUNDLE
+          codesign --display --verbose=4 $APP_BUNDLE
+
+          # Pre-flight validation using spctl
+          echo "=== Pre-flight validation with spctl ==="
+          spctl --assess --verbose=4 --type execute $APP_BUNDLE || echo "spctl assessment failed - this is expected before notarization"
+
+          # Validate bundle structure
+          echo "=== Validating bundle structure ==="
+          if [[ ! -f "$APP_BUNDLE/Contents/Info.plist" ]]; then
+            echo "ERROR: Missing Info.plist"
+            exit 1
+          fi
+          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/applet" ]]; then
+            echo "ERROR: Missing main executable"
+            exit 1
+          fi
+          echo "Bundle structure validation passed"
+
+          # Create zip for notarization (just the app bundle)
+          zip -r "osara_temp.zip" $APP_BUNDLE
+
+          # Submit for notarization
+          echo "=== Submit for notarization ==="
+          
+          # Submit without verbose to get clean JSON output
+          if xcrun notarytool submit osara_temp.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$TEAM_ID" \
+            --wait \
+            --output-format json > notarization_output.json 2>&1; then
+            
+            echo "=== Notarization submission completed ==="
+            cat notarization_output.json
+            
+            # Check if notarization was successful
+            if command -v jq >/dev/null 2>&1; then
+              STATUS=$(jq -r '.status // "Unknown"' notarization_output.json)
+              echo "Notarization status: $STATUS"
+              
+              if [[ "$STATUS" == "Accepted" ]]; then
+                echo "✅ Notarization successful!"
+              else
+                echo "❌ Notarization failed with status: $STATUS"
+                
+                # Try to get detailed log
+                SUBMISSION_ID=$(jq -r '.id // empty' notarization_output.json)
+                if [[ -n "$SUBMISSION_ID" ]]; then
+                  echo "=== Fetching detailed notarization log for submission $SUBMISSION_ID ==="
+                  if xcrun notarytool log "$SUBMISSION_ID" \
+                    --apple-id "$APPLE_ID" \
+                    --password "$APPLE_ID_PASSWORD" \
+                    --team-id "$TEAM_ID" > notarization_log.txt 2>&1; then
+                    echo "=== Notarization Log ==="
+                    cat notarization_log.txt
+                  else
+                    echo "Failed to fetch notarization log"
+                  fi
+                fi
+                exit 1
+              fi
+            else
+              echo "jq not available - cannot parse notarization response"
+              exit 1
+            fi
+          else
+            echo "❌ Notarization submission failed"
+            cat notarization_output.json || echo "No output file generated"
+            exit 1
+          fi
+
+          # Staple notarization to app
+          echo "=== Stapling notarization ticket ==="
+          if xcrun stapler staple $APP_BUNDLE; then
+            echo "✅ Stapling successful"
+          else
+            echo "❌ Stapling failed - but continuing as this might be a timing issue"
+            # Don't exit here as stapling can sometimes fail due to timing
+          fi
+
+          # Verify stapling
+          echo "=== Verifying stapled notarization ==="
+          if xcrun stapler validate $APP_BUNDLE; then
+            echo "✅ Stapling validation successful"
+          else
+            echo "⚠️ Stapling validation failed"
+          fi
+
+          # Final validation with spctl
+          echo "=== Final validation with spctl ==="
+          if spctl --assess --verbose=4 --type execute $APP_BUNDLE; then
+            echo "✅ Final spctl validation passed"
+          else
+            echo "⚠️ Final spctl validation failed"
+          fi
+
+          # Create final signed and notarized zip with app bundle and license
+          rm -f ../osara_${{ env.version }}.zip
+          zip -r ../osara_${{ env.version }}.zip $APP_BUNDLE
+          cd ../..
+
+          # Cleanup
+          rm installer/mac/osara_temp.zip certificate.p12
+          security delete-keychain build.keychain
+
+          echo "Mac app signed and notarized successfully!"
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
