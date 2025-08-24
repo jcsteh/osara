@@ -10,6 +10,7 @@ import multiprocessing
 vars = Variables()
 vars.Add("version", "The version of this build", "unknown")
 vars.Add("publisher", "The publisher of this build", "unknown")
+vars.Add("mac_signing_mode", "Mac signing mode: 'ad-hoc' (default) or 'none'", "ad-hoc")
 env = DefaultEnvironment(tools=[],
 	variables=vars,
 	copyright="Copyright (C) 2014-2025 NV Access Limited, James Teh & other contributors",
@@ -54,19 +55,26 @@ if env["PLATFORM"] == "win32":
 		"$SOURCE"]])
 
 else: # Mac
+	# Build main plugin
 	archEnv = Environment(tools=["clangxx", "applelink", "textfile"],
 		libSuffix="", version=env["version"], copyright=env["copyright"])
 	archEnv.SConscript("src/archBuild_sconscript",
 		exports={"env": archEnv},
 		variant_dir="build", duplicate=False)
-	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
-		[["$SOURCE", "$version"]])
+
+	# Build Mac installer
+	installerEnv = archEnv.Clone()
+	installerEnv["mac_signing_mode"] = env["mac_signing_mode"]
+	installer = installerEnv.SConscript("installer/mac/SConscript", 
+		exports={"env": installerEnv}, 
+		variant_dir="build/installer", 
+		duplicate=False)
+
 	configRc = "build/config.rc"
 
-env.Alias("installer", installer)
-env.Default(installer)
-
 pot = env.Command("locale/osara_${version}.pot",
-	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc, 
+	 env.Glob("installer/OSARAInstaller/*.cpp"), env.Glob("installer/OSARAInstaller/*.mm"), 
+	 "installer/OSARAInstaller/installer.rc"],
 	makePot)
 env.Alias("pot", pot)
