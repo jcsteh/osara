@@ -86,7 +86,7 @@ jobs:
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
         run: |
@@ -165,7 +165,7 @@ jobs:
           if xcrun notarytool submit osara_temp.zip \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_PASSWORD" \
-            --team-id "$TEAM_ID" \
+            --team-id "$APPLE_TEAM_ID" \
             --wait \
             --output-format json > notarization_output.json 2>&1; then
             
@@ -189,7 +189,7 @@ jobs:
                   if xcrun notarytool log "$SUBMISSION_ID" \
                     --apple-id "$APPLE_ID" \
                     --password "$APPLE_ID_PASSWORD" \
-                    --team-id "$TEAM_ID" > notarization_log.txt 2>&1; then
+                    --team-id "$APPLE_TEAM_ID" > notarization_log.txt 2>&1; then
                     echo "=== Notarization Log ==="
                     cat notarization_log.txt
                   else
