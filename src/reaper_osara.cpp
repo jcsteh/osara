@@ -1671,7 +1671,7 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << " "
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << ", "
 		<< GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
@@ -3713,11 +3713,18 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (take) {
 			s << " " << GetTakeName(take);
 		}
-		int takeCount = CountTakes(item);
-		if (takeCount > 1) {
+		int totalTakes = CountTakes(item);
+		int nonEmptyTakes = 0;
+		for (int i = 0; i < totalTakes; ++i) {
+			MediaItem_Take* take = GetTake(item, i);
+			if (take) {
+				nonEmptyTakes++;
+			}
+		}
+		if (nonEmptyTakes > 1) {
 			// Translators: Used when navigating items to indicate the number of
 			// takes. {} will be replaced with the number; e.g. "2 takes".
-			s << " " << format(translate("{} takes"), takeCount);
+			s << " " << format(translate("{} takes"), nonEmptyTakes);
 		}
 		s << " " << formatCursorPosition();
 		addTakeFxNames(take, s);
@@ -4870,11 +4877,18 @@ void cmdReportNumberOfTakesInItem(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item)
 		return;
-	int takeCount = CountTakes(item);
+	int totalTakes = CountTakes(item);
+	int nonEmptyTakes = 0;
+	for (int i = 0; i < totalTakes; ++i) {
+		MediaItem_Take* take = GetTake(item, i);
+		if (take) {
+			nonEmptyTakes++;
+		}
+	}
 	// Translators: Reports the number of takes contained within the last touched item.
 	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
-	outputMessage(format(translate_plural("{} take", "{} takes", takeCount),
-		takeCount));
+	outputMessage(format(translate_plural("{} take", "{} takes", nonEmptyTakes),
+		nonEmptyTakes));
 }
 
 void cmdReportItemLength(Command* command) {
