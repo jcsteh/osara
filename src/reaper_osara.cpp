@@ -885,6 +885,19 @@ TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
 	return TF_RULER;
 }
 
+int countNonEmptyTakes(MediaItem* item) {
+	if (!item)
+		return 0;
+	int totalTakes = CountTakes(item);
+	int nonEmptyTakes = 0;
+	for (int t = 0; t < totalTakes; ++t) {
+		if (GetTake(item, t)) {
+			nonEmptyTakes++;
+		}
+	}
+    	return nonEmptyTakes;
+}
+
 // End of utility/helper functions
 
 // Functions exported from SWS
@@ -3713,17 +3726,10 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (take) {
 			s << " " << GetTakeName(take);
 		}
-		int totalTakes = CountTakes(item);
-		int nonEmptyTakes = 0;
-		for (int i = 0; i < totalTakes; ++i) {
-			MediaItem_Take* take = GetTake(item, i);
-			if (take) {
-				nonEmptyTakes++;
-			}
-		}
+		int nonEmptyTakes = countNonEmptyTakes(item);
 		if (nonEmptyTakes > 1) {
-			// Translators: Used when navigating items to indicate the number of
-			// takes. {} will be replaced with the number; e.g. "2 takes".
+			// Translators: Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+			// {} will be replaced with the number of takes; e.g. "2 takes".
 			s << " " << format(translate("{} takes"), nonEmptyTakes);
 		}
 		s << " " << formatCursorPosition();
@@ -4877,14 +4883,7 @@ void cmdReportNumberOfTakesInItem(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item)
 		return;
-	int totalTakes = CountTakes(item);
-	int nonEmptyTakes = 0;
-	for (int i = 0; i < totalTakes; ++i) {
-		MediaItem_Take* take = GetTake(item, i);
-		if (take) {
-			nonEmptyTakes++;
-		}
-	}
+	int nonEmptyTakes = countNonEmptyTakes(item);
 	// Translators: Reports the number of takes contained within the last touched item.
 	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
 	outputMessage(format(translate_plural("{} take", "{} takes", nonEmptyTakes),
