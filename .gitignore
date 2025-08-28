@@ -8,6 +8,7 @@ build
 *.exe
 .DS_Store
 *.dmg
+*.zip
 *.rc_mac_*
 __pycache__
 locale/*.pot
