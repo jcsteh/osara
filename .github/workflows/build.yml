@@ -67,8 +67,15 @@ jobs:
         # We need php for swell_resgen.
         run: brew install php
       - name: build
-        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
-      - name: sign Windows
+        run: |
+          if [ ${{ matrix.os }} == macos-latest ]; then
+            echo "Building native Mac installer..."
+            scons mac_signing_mode=none "publisher=${{ env.publisher }}" version=${{ env.version }}
+          else
+            echo "Building Windows installer..."
+            scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+          fi
+      - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
         with:
@@ -114,24 +121,25 @@ jobs:
             exit 1
           fi
 
-          cd installer/mac
+          cd build/installer
 
           # Set up app bundle and entitlements
           APP_BUNDLE="OSARAInstaller.app"
           
           # Create a temporary entitlements file for runtime (consistent with local build.sh)
+          entitlements=../../installer/OSARAInstaller/OSARAInstaller.entitlements
           runtime_entitlements="$APP_BUNDLE/Contents/Resources/runtime.entitlements"
-          cp OSARAInstaller.entitlements "$runtime_entitlements"
+          cp $entitlements "$runtime_entitlements"
           
           # Deep sign all components in the app bundle with entitlements
           echo "=== Deep signing app bundle with entitlements ==="
-          find $APP_BUNDLE -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
+          find $APP_BUNDLE -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements $entitlements --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
 
           # Sign the main executable with timestamp and entitlements
-          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/applet"
+          codesign --force --options runtime --timestamp --entitlements $entitlements --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/OSARAInstaller"
           
           # Sign the app bundle with timestamp and entitlements
-          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" $APP_BUNDLE
+          codesign --force --options runtime --timestamp --entitlements $entitlements --sign "$IDENTITY" $APP_BUNDLE
 
           # Verify signing with detailed output
           echo "=== Verifying code signature ==="
@@ -148,7 +156,7 @@ jobs:
             echo "ERROR: Missing Info.plist"
             exit 1
           fi
-          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/applet" ]]; then
+          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/OSARAInstaller" ]]; then
             echo "ERROR: Missing main executable"
             exit 1
           fi
@@ -232,13 +240,13 @@ jobs:
             echo "⚠️ Final spctl validation failed"
           fi
 
-          # Create final signed and notarized zip with app bundle and license
-          rm -f ../osara_${{ env.version }}.zip
-          zip -r ../osara_${{ env.version }}.zip $APP_BUNDLE
+          # Create final signed and notarized zip with app bundle
+          rm -f ../../installer/osara_${{ env.version }}.zip
+          zip -r ../../installer/osara_${{ env.version }}.zip $APP_BUNDLE
           cd ../..
 
           # Cleanup
-          rm installer/mac/osara_temp.zip certificate.p12
+          rm build/installer/osara_temp.zip certificate.p12
           security delete-keychain build.keychain
 
           echo "Mac app signed and notarized successfully!"

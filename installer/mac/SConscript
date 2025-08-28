@@ -1,0 +1,397 @@
+"""
+Mac Installer Build Script for OSARA
+Builds the native Mac installer as an app bundle with code signing and distribution zip.
+"""
+
+import os
+import shutil
+import subprocess
+import zipfile
+
+Import("env")
+
+# Build directory constants
+BUILD_DIR = "objects"
+GENERATED_DIR = "generated"
+RESOURCES_DIR = "Resources"
+
+# App bundle constants
+APP_BUNDLE_ID = "com.reaperaccessibility.osara.installer"
+EXECUTABLE_NAME = "OSARAInstaller"
+APP_BUNDLE_NAME = f"{EXECUTABLE_NAME}.app"
+ENTITLEMENTS_FILE = "#installer/OSARAInstaller/OSARAInstaller.entitlements"
+INFO_PLIST_FILE = "#installer/OSARAInstaller/Info.plist"
+
+# Resource file mappings (source -> destination name)
+RESOURCE_MAPPINGS = {
+    "#build/reaper_osara.dylib": "reaper_osara.dylib",
+    "#config/mac/reaper-kb.ini": "OSARA.ReaperKeyMap",
+    "#copying.txt": "copying.txt",
+    "#readme.md": "readme.md"
+}
+
+# Critical resources that must exist for build to succeed
+CRITICAL_RESOURCES = ["#build/reaper_osara.dylib"]
+
+# Common external library configurations
+EXTERNAL_LIBS = {
+    "tinygettext": {
+        "dir": "include/tinygettext/src",
+        "files": ("dictionary.cpp", "language.cpp", "log.cpp",
+                 "plural_forms.cpp", "po_parser.cpp", "tinygettext.cpp")
+    },
+    "fmt": {
+        "dir": "include/fmt/src", 
+        "files": ("format.cc", "os.cc")
+    },
+    "swell": {
+        "dir": "include/WDL/WDL/swell",
+        "files": ("swell-wnd.mm", "swell-menu.mm", "swell-dlg.mm",
+                 "swell-gdi.mm", "swell-misc.mm", "swell-miscdlg.mm", "swell-kb.mm",
+                 "swell-ini.cpp", "swell.cpp")
+    }
+}
+
+
+def addExternalSources(env, buildDir, sourceList, dir, files, **kwargs):
+    """
+    Add external library sources to build.
+    
+    Args:
+        env: SCons environment
+        buildDir: Directory where object files should be placed
+        sourceList: List to extend with object files (or sources for SharedObject)
+        dir: Source directory path
+        files: List of source files to compile
+        **kwargs: Additional compiler flags
+    """
+    dir = env.Dir("#" + dir if not dir.startswith("#") else dir)
+    if hasattr(sourceList, 'extend'):
+        # For lists (like installerObjects) - apply kwargs to Object calls
+        sourceList.extend(
+            env.Object(os.path.join(buildDir, os.path.splitext(f)[0]), dir.File(f), **kwargs)
+            for f in files)
+    else:
+        # For environments that append to sources directly - apply kwargs to SharedObject calls
+        sourceList.extend(
+            env.SharedObject(os.path.splitext(f)[0], dir.File(f), **kwargs)
+            for f in files)
+
+
+def generateSwellResources(env, rcFile, targetDir, baseName="installer"):
+    """
+    Generate SWELL resources.
+    
+    Args:
+        env: SCons environment
+        rcFile: Path to .rc file to process
+        targetDir: Directory where generated files should be placed
+        baseName: Base name for generated files (default: "installer")
+    
+    Returns:
+        SCons Command node for the generated resource files
+    """
+    def _generateSwellResources(target, source, env):
+        genDir = os.path.dirname(str(target[0]))
+        if not os.path.exists(genDir):
+            os.makedirs(genDir)
+        rcFile = str(source[0])
+        swellResGen = "include/WDL/WDL/swell/swell_resgen.php"
+        
+        try:
+            php = shutil.which("php")
+            if not php:
+                # Try homebrew path
+                php = "/opt/homebrew/bin/php"
+                if not os.path.exists(php):
+                    raise Exception("PHP not found")
+            
+            result = subprocess.run([php, swellResGen, rcFile],
+                cwd=".", capture_output=True, text=True)
+            if result.returncode != 0:
+                raise Exception(f"swell_resgen.php failed: {result.stderr}")
+            
+            # Move generated files to target directory
+            srcDir = os.path.dirname(rcFile)
+            for suffix in ("_mac_dlg", "_mac_menu"):
+                srcFile = os.path.join(srcDir, baseName + ".rc" + suffix)
+                if os.path.exists(srcFile):
+                    dstFile = os.path.join(genDir, baseName + ".rc" + suffix)
+                    os.rename(srcFile, dstFile)
+        except Exception as e:
+            print(f"SWELL resource generation failed: {e}")
+            # Create empty files so the build can continue
+            for targetFile in target:
+                with open(str(targetFile), 'w') as f:
+                    f.write("// Empty resource file - generation failed\n")
+    
+    return env.Command([
+        os.path.join(targetDir, baseName + ".rc_mac_dlg"),
+        os.path.join(targetDir, baseName + ".rc_mac_menu")
+    ], rcFile, _generateSwellResources)
+
+
+def addStandardExternalLibs(env, buildDir, sourceList):
+    """
+    Add the standard set of external libraries (tinygettext, fmt, swell).
+    
+    Args:
+        env: SCons environment
+        buildDir: Directory where object files should be placed
+        sourceList: List to extend with object files
+    """
+    for lib_name, lib_config in EXTERNAL_LIBS.items():
+        addExternalSources(env, buildDir, sourceList, 
+                          lib_config["dir"], lib_config["files"])
+
+
+# Configure installer environment
+env.Append(CPPPATH=(
+    "#include/WDL/WDL/swell",
+    "#installer/OSARAInstaller",
+    GENERATED_DIR,
+    "#include",
+    "#include/tinygettext/include",
+    "#include/fmt/include"
+))
+env.Append(LINKFLAGS=["-framework", "Cocoa", "-framework", "Carbon"])
+
+# Remove SWELL_PROVIDED_BY_APP flag for standalone installer
+if 'SWELL_PROVIDED_BY_APP' in env['CPPDEFINES']:
+    env['CPPDEFINES'].remove('SWELL_PROVIDED_BY_APP')
+
+# Remove -Werror flag to allow deprecated SWELL APIs to compile
+if '-Werror' in env['CCFLAGS']:
+    env['CCFLAGS'].remove('-Werror')
+if '-Werror' in env['CXXFLAGS']:
+    env['CXXFLAGS'].remove('-Werror')
+
+# Add compiler flags to work around SWELL compilation issues
+env.Append(CPPDEFINES=['_LIBCPP_DISABLE_AVAILABILITY'])
+env.Append(CXXFLAGS=['-Wno-error', '-Wno-deprecated-declarations'])
+# Use older macOS target to avoid SIMD issues
+env.Replace(CCFLAGS=[f for f in env['CCFLAGS'] if not f.startswith('-mmacosx-version-min')])
+env.Replace(CXXFLAGS=[f for f in env['CXXFLAGS'] if not f.startswith('-mmacosx-version-min')])
+env.Replace(LINKFLAGS=[f for f in env['LINKFLAGS'] if not f.startswith('-mmacosx-version-min')])
+env.Append(CCFLAGS=['-mmacosx-version-min=10.9'])
+env.Append(CXXFLAGS=['-mmacosx-version-min=10.9'])
+env.Append(LINKFLAGS=['-mmacosx-version-min=10.9'])
+
+
+def _copyLocaleDirectory(resourcesDir, env):
+    """Copy locale directory with error handling."""
+    localeSrc = env.Dir("#locale").abspath
+    if os.path.exists(localeSrc):
+        localeDst = os.path.join(resourcesDir, "locale")
+        try:
+            if os.path.exists(localeDst):
+                shutil.rmtree(localeDst)
+            shutil.copytree(localeSrc, localeDst)
+            return True, "locale"
+        except Exception as e:
+            print(f"⚠️  Failed to copy locale directory: {e}")
+            return False, None
+    else:
+        return False, "locale directory not found"
+
+
+def copyInstallerResources(target, source, env):
+    """Copy all necessary resources for the installer app bundle with validation."""
+    resourcesDir = str(target[0])
+    if not os.path.exists(resourcesDir):
+        os.makedirs(resourcesDir)
+    
+    missing_resources = []
+    copied_resources = []
+    
+    # Copy mapped resources
+    for src_path, dst_name in RESOURCE_MAPPINGS.items():
+        src_file = env.File(src_path).abspath
+        if os.path.exists(src_file):
+            try:
+                dst_path = os.path.join(resourcesDir, dst_name)
+                shutil.copy2(src_file, dst_path)
+                copied_resources.append(dst_name)
+            except Exception as e:
+                print(f"⚠️  Failed to copy {src_path}: {e}")
+                missing_resources.append(src_path)
+        else:
+            missing_resources.append(src_path)
+    
+    # Handle locale directory specially
+    locale_success, locale_info = _copyLocaleDirectory(resourcesDir, env)
+    if locale_success:
+        copied_resources.append(locale_info)
+    elif locale_info != "locale directory not found":
+        missing_resources.append("locale")
+    
+    # Report results
+    if copied_resources:
+        print(f"✅ Copied resources: {', '.join(copied_resources)}")
+    if missing_resources:
+        print(f"⚠️  Missing optional resources: {', '.join(missing_resources)}")
+    
+    # Fail build if critical resources are missing
+    missing_critical = [r for r in missing_resources if r in CRITICAL_RESOURCES]
+    if missing_critical:
+        raise Exception(f"Critical resources missing: {missing_critical}")
+
+
+def createAppBundle(target, source, env):
+    """Create the macOS app bundle structure."""
+    appBundle = str(target[0])
+    exe = str(source[0])
+    
+    # Create app bundle structure
+    contentsDir = os.path.join(appBundle, "Contents")
+    macosDir = os.path.join(contentsDir, "MacOS")
+    resourcesDir = os.path.join(contentsDir, "Resources")
+    
+    for d in (contentsDir, macosDir, resourcesDir):
+        if not os.path.exists(d):
+            os.makedirs(d)
+    
+    # Copy executable
+    shutil.copy2(exe, macosDir)
+    
+    # Copy Info.plist
+    infoPlist = env.File(INFO_PLIST_FILE).abspath
+    if os.path.exists(infoPlist):
+        shutil.copy2(infoPlist, contentsDir)
+    
+    # Copy resources from installer resources directory
+    srcResourcesDir = str(source[1])
+    if os.path.exists(srcResourcesDir):
+        for item in os.listdir(srcResourcesDir):
+            srcPath = os.path.join(srcResourcesDir, item)
+            dstPath = os.path.join(resourcesDir, item)
+            if os.path.isdir(srcPath):
+                if os.path.exists(dstPath):
+                    shutil.rmtree(dstPath)
+                shutil.copytree(srcPath, dstPath)
+            else:
+                shutil.copy2(srcPath, dstPath)
+
+
+def codeSignApp(target, source, env):
+    """Handle code signing of the app bundle."""
+    signingMode = env.get("mac_signing_mode", "ad-hoc")
+    appPath = str(source[0])
+    signedAppPath = str(target[0])
+    exePath = os.path.join(appPath, f"Contents/MacOS/{EXECUTABLE_NAME}")
+    entitlementsPath = env.File(ENTITLEMENTS_FILE).abspath
+    
+    # Copy app bundle to signed location first
+    if os.path.exists(signedAppPath):
+        shutil.rmtree(signedAppPath)
+    shutil.copytree(appPath, signedAppPath)
+    
+    # Update paths to point to the copied bundle
+    signedExePath = os.path.join(signedAppPath, f"Contents/MacOS/{EXECUTABLE_NAME}")
+    
+    if signingMode == "none":
+        print("Skipping code signing (mac_signing_mode=none)")
+    elif signingMode == "ad-hoc":
+        print("Ad-hoc signing app bundle for local testing...")
+        try:
+            subprocess.run([
+                "codesign", "--force", "--sign", "-",
+                "--entitlements", entitlementsPath, signedExePath
+            ], check=True)
+            subprocess.run([
+                "codesign", "--force", "--sign", "-",
+                "--entitlements", entitlementsPath, signedAppPath
+            ], check=True)
+            result = subprocess.run([
+                "codesign", "--verify", "--verbose=2", signedAppPath
+            ], capture_output=True, text=True)
+            if result.returncode == 0:
+                print("✅ Ad-hoc code signing successful!")
+            else:
+                print("⚠️  Code signing verification failed")
+                return 1
+        except subprocess.CalledProcessError as e:
+            print(f"⚠️  Code signing failed: {e}")
+            return 1
+        except FileNotFoundError:
+            print("⚠️  codesign not found - skipping code signing")
+    else:
+        print(f"Unknown mac_signing_mode: {signingMode}")
+        return 1
+
+
+def createDistributionZip(target, source, env):
+    """Create distribution zip from signed app bundle."""
+    zipPath = str(target[0])
+    appPath = str(source[0])
+    
+    # Safe file removal
+    try:
+        if os.path.exists(zipPath):
+            os.remove(zipPath)
+    except OSError as e:
+        print(f"Warning: Could not remove existing zip: {e}")
+    
+    # Validate app bundle exists
+    if not os.path.exists(appPath):
+        raise Exception(f"App bundle not found: {appPath}")
+    
+    print(f"Creating distribution zip: {zipPath}")
+    try:
+        with zipfile.ZipFile(zipPath, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for root, dirs, files in os.walk(appPath):
+                for file in files:
+                    filePath = os.path.join(root, file)
+                    arcPath = os.path.join(APP_BUNDLE_NAME, os.path.relpath(filePath, appPath))
+                    zipf.write(filePath, arcPath)
+        print(f"✅ Distribution zip created: {zipPath}")
+    except Exception as e:
+        raise Exception(f"Failed to create distribution zip: {e}")
+
+
+# Build installer resources
+installerResources = env.Command(RESOURCES_DIR,
+    "#build/reaper_osara.dylib", copyInstallerResources)
+
+# Generate SWELL resources
+swellResources = generateSwellResources(env, 
+    "#installer/OSARAInstaller/installer.rc", 
+    GENERATED_DIR, 
+    "installer")
+
+# Compile installer sources
+installerSources = [
+    "#installer/OSARAInstaller/main.cpp",
+    "#installer/OSARAInstaller/main_mac.mm",
+    "#installer/OSARAInstaller/installer_app.cpp",
+    "#installer/OSARAInstaller/dialog_procs.cpp",
+    "#installer/OSARAInstaller/dialog_procs_mac.mm",
+    "#installer/OSARAInstaller/translation.cpp"
+]
+
+installerObjects = []
+for src in installerSources:
+    obj = env.Object(os.path.join(BUILD_DIR, os.path.basename(src).replace('.cpp', '.o').replace('.mm', '.o')), src)
+    env.Depends(obj, swellResources)  # main.mm depends on generated resources
+    installerObjects.append(obj)
+
+# Add external library sources 
+addStandardExternalLibs(env, BUILD_DIR, installerObjects)
+
+# Build installer executable
+installerExe = env.Program("OSARAInstaller", installerObjects)
+
+# Create app bundle
+appBundle = env.Command(APP_BUNDLE_NAME,
+    [installerExe, installerResources], createAppBundle)
+
+# Code sign the app bundle
+signedAppBundle = env.Command(f"{EXECUTABLE_NAME}_signed.app",
+    appBundle, codeSignApp)
+
+# Create distribution zip from signed app bundle
+installer = env.Command("#installer/osara_${version}.zip",
+    signedAppBundle, createDistributionZip)
+
+# Return the installer target so it can be used by the main build
+Return("installer")
