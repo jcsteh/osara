@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-01 18:43\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -2291,11 +2291,14 @@ msgstr "启用捕捉"
 msgid "disabled snap"
 msgstr "禁用捕捉"
 
+msgid "main key map"
+msgstr "主要案件映射"
+
 msgid "default key map"
-msgstr "默认键映射"
+msgstr "默认案件映射"
 
 msgid "recording key map"
-msgstr "录音键映射"
+msgstr "录音案件映射"
 
 msgid "default momentary"
 msgstr "默认瞬时"
@@ -2402,8 +2405,8 @@ msgstr "更改对象选择"
 msgid "group {}"
 msgstr "组 {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} 片段"
 

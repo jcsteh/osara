@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-01 18:43\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -2376,6 +2376,9 @@ msgstr ""
 msgid "disabled snap"
 msgstr ""
 
+msgid "main key map"
+msgstr ""
+
 msgid "default key map"
 msgstr ""
 
@@ -2487,8 +2490,8 @@ msgstr "Item Selektion ändern"
 msgid "group {}"
 msgstr "Gruppe {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} Takes"
 

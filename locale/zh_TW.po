@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-01 18:43\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1918,7 +1918,7 @@ msgstr[0] "{} 對象停用循環源"
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
-msgstr "選擇從工程開始到游標"
+msgstr "從工程開始選擇到游標處"
 
 msgid "set selection end"
 msgstr "設置選區結束"
@@ -2291,6 +2291,9 @@ msgstr "啟用吸附"
 msgid "disabled snap"
 msgstr "停用吸附"
 
+msgid "main key map"
+msgstr "主要鍵盤映射"
+
 msgid "default key map"
 msgstr "預設鍵映射"
 
@@ -2402,8 +2405,8 @@ msgstr "更改選取的對象"
 msgid "group {}"
 msgstr "分組 {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} 片段"
 

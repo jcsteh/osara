@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-01 18:43\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1999,7 +1999,7 @@ msgstr[1] "{} ítems desactivado de fuente de loop"
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
-msgstr ""
+msgstr "seleccionado desde principio de proyecto hasta cursor"
 
 msgid "set selection end"
 msgstr "fin de selección fijado"
@@ -2376,6 +2376,9 @@ msgstr "instantánea activada"
 msgid "disabled snap"
 msgstr "instantánea desactivada"
 
+msgid "main key map"
+msgstr "mapa de teclado principal"
+
 msgid "default key map"
 msgstr "mapa de teclado por defecto"
 
@@ -2487,8 +2490,8 @@ msgstr "Cambiar Selección de Ítem"
 msgid "group {}"
 msgstr "grupo {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} tomas"
 
