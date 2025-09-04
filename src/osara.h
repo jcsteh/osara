@@ -324,10 +324,12 @@ typedef enum {
 	TF_MEASURE,
 	TF_MINSEC,
 	TF_SEC,
+	TF_ROUNDSEC,
 	TF_FRAME,
 	TF_HMSF,
 	TF_SAMPLE,
-	TF_MEASURETICK
+	TF_MEASURETICK,
+	TF_MILSEC
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
 enum FormatTimeCacheRequest {

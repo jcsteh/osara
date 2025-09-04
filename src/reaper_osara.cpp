@@ -277,6 +277,12 @@ string formatTimeSec (double time) {
 	return format(translate("{:.3f} sec"), time);
 }
 
+string formatTimeRoundSec (double time) {
+	// Translators: Used when reporting a time in whole seconds. {} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), static_cast<int> (round(time)));
+}
+
 string formatTimeFrame(double time, bool useCache) {
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
@@ -330,6 +336,12 @@ string formatTimeSample(double time) {
 	// Translators: Used when reporting a time in samples. {} will be replaced
 	// with the number of samples; e.g. "2 samples".
 	return format(translate("{} samples"), buf);
+}
+
+string formatTimeMilSec (double time) {
+	// Translators: Used when reporting a time in milliseconds. {} will be
+	// replaced with the number of ms; e.g. "2 ms".
+	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -397,7 +409,12 @@ string formatTime(double time, TimeFormat timeFormat,
 			break;
 		}
 		case TF_FRAME: {
-			// Frames
+		case TF_ROUNDSEC: {
+			// Rounded seconds
+			s = formatTimeRoundSec(time);
+			break;
+		}
+		// Frames
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
@@ -409,6 +426,11 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_SAMPLE: {
 			// Samples
 			s = formatTimeSample(time);
+			break;
+		}
+		case TF_MILSEC: {
+			// Milliseconds
+			s = formatTimeMilSec(time);
 			break;
 		}
 		default:
@@ -3757,8 +3779,9 @@ void cmdMoveToPrevItem(Command* command) {
 }
 
 void reportNudgeTime(double nudgeTime) {
-	TimeFormat tf = TF_SEC; // Force seconds for clarity when reporting zoom
-	outputMessage(formatTime(nudgeTime, tf, FT_USE_CACHE));
+	TimeFormat tf = TF_MILSEC;
+	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
+	outputMessage(formatTime(nudgeTime, tf));
 }
 
 void nudgeZoomTime(int direction) {
