@@ -233,6 +233,12 @@ const int MAIN_SECTION = 0;
 const int MIDI_EVENT_LIST_SECTION = 32061;
 const int MEDIA_EXPLORER_SECTION = 32063;
 
+// Provide stepped choices for horizontal zoom, report equivalent nudge values in time instead of pixels for easier understanding
+static const double NUDGE_VALUES[] = {
+	0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
+	1, 2, 5, 10, 30, 60};
+static const int NUDGE_COUNT = sizeof(NUDGE_VALUES) / sizeof(NUDGE_VALUES[0]);
+
 // Needed for REAPER API functions which take a bool as an input pointer.
 static bool bFalse = false;
 static bool bTrue = true;

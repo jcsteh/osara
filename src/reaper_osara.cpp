@@ -3756,12 +3756,6 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
-// Provide stepped choices for horizontal zoom, report equivalent nudge values in time instead of pixels for easier understanding
-static const double NUDGE_VALUES[] = {
-	0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
-	1, 2, 5, 10, 30, 60};
-static const int NUDGE_COUNT = sizeof(NUDGE_VALUES) / sizeof(NUDGE_VALUES[0]);
-
 void reportNudgeTime(double nudgeTime) {
 	TimeFormat tf = TF_SEC; // Force seconds for clarity when reporting zoom
 	outputMessage(formatTime(nudgeTime, tf, FT_USE_CACHE));
