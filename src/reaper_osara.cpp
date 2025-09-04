@@ -3756,6 +3756,58 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
+// Provide stepped choices for horizontal zoom, report equivalent nudge values in time instead of pixels for easier understanding
+static const double NUDGE_VALUES[] = {
+	0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
+	1, 2, 5, 10, 30, 60};
+static const int NUDGE_COUNT = sizeof(NUDGE_VALUES) / sizeof(NUDGE_VALUES[0]);
+
+void reportNudgeTime(double nudgeTime) {
+	TimeFormat tf = TF_SEC; // Force seconds for clarity when reporting zoom
+	outputMessage(formatTime(nudgeTime, tf, FT_USE_CACHE));
+}
+
+void nudgeZoomTime(int direction) {
+	// direction = +1 → zoom out (increase nudge time), -1 → zoom in (decrease nudge time)
+	double currentPPS = GetHZoomLevel();
+	if (currentPPS <= 0.0) {
+		outputMessage(translate("invalid zoom level"));
+		return;
+	}
+	double currentNudgeTime = 1.0 / currentPPS;
+	double nextNudgeTime = currentNudgeTime;
+	if (direction > 0) {
+		// Find next larger nudge
+		for (int i = 0; i < NUDGE_COUNT; ++i) {
+			if (currentNudgeTime < NUDGE_VALUES[i]) {
+				nextNudgeTime = NUDGE_VALUES[i];
+				break;
+			}
+		}
+	} else {
+		// Find next smaller nudge
+		for (int i = NUDGE_COUNT - 1; i >= 0; --i) {
+			if (currentNudgeTime > NUDGE_VALUES[i]) {
+				nextNudgeTime = NUDGE_VALUES[i];
+				break;
+			}
+		}
+	}
+	if (nextNudgeTime != currentNudgeTime) {
+		double newPPS = 1.0 / nextNudgeTime;
+	adjustZoom(newPPS, 1, true, -1);
+	}
+	reportNudgeTime(nextNudgeTime);
+}
+
+void cmdIncreaseZoomTime(Command* command) {
+	nudgeZoomTime(+1);
+}
+
+void cmdDecreaseZoomTime(Command* command) {
+	nudgeZoomTime(-1);
+}
+
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(40029, 0); // Edit: Undo
@@ -5732,6 +5784,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (adjusts horizontal zoom)")}, "OSARA_INCREASENUDGE", cmdIncreaseZoomTime},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (adjusts horizontal zoom)")}, "OSARA_DECREASENUDGE", cmdDecreaseZoomTime},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
