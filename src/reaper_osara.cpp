@@ -277,6 +277,12 @@ string formatTimeSec (double time) {
 	return format(translate("{:.3f} sec"), time);
 }
 
+string formatTimeRoundSec (double time) {
+	// Translators: Used when reporting a time in whole seconds. {} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), static_cast<int> (round(time)));
+}
+
 string formatTimeFrame(double time, bool useCache) {
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
@@ -330,6 +336,12 @@ string formatTimeSample(double time) {
 	// Translators: Used when reporting a time in samples. {} will be replaced
 	// with the number of samples; e.g. "2 samples".
 	return format(translate("{} samples"), buf);
+}
+
+string formatTimeMilSec (double time) {
+	// Translators: Used when reporting a time in milliseconds. {} will be
+	// replaced with the number of ms; e.g. "2 ms".
+	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -397,7 +409,12 @@ string formatTime(double time, TimeFormat timeFormat,
 			break;
 		}
 		case TF_FRAME: {
-			// Frames
+		case TF_ROUNDSEC: {
+			// Rounded seconds
+			s = formatTimeRoundSec(time);
+			break;
+		}
+		// Frames
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
@@ -409,6 +426,11 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_SAMPLE: {
 			// Samples
 			s = formatTimeSample(time);
+			break;
+		}
+		case TF_MILSEC: {
+			// Milliseconds
+			s = formatTimeMilSec(time);
 			break;
 		}
 		default:
@@ -3756,6 +3778,53 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
+void reportNudgeAndZoomStep(double nudgeTime) {
+	TimeFormat tf = TF_MILSEC;
+	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
+	outputMessage(formatTime(nudgeTime, tf));
+}
+
+void nudgeAndZoomStep(int direction) {
+	// direction = +1 → zoom out (increase nudge time), -1 → zoom in (decrease nudge time)
+	double currentPPS = GetHZoomLevel();
+	if (currentPPS <= 0.0) {
+		outputMessage(translate("invalid zoom level"));
+		return;
+	}
+	double currentNudgeTime = 1.0 / currentPPS;
+	double nextNudgeTime = currentNudgeTime;
+	if (direction > 0) {
+		// Find next larger nudge
+		for (int i = 0; i < NUDGE_COUNT; ++i) {
+			if (currentNudgeTime < NUDGE_VALUES[i]) {
+				nextNudgeTime = NUDGE_VALUES[i];
+				break;
+			}
+		}
+	} else {
+		// Find next smaller nudge
+		for (int i = NUDGE_COUNT - 1; i >= 0; --i) {
+			if (currentNudgeTime > NUDGE_VALUES[i]) {
+				nextNudgeTime = NUDGE_VALUES[i];
+				break;
+			}
+		}
+	}
+	if (nextNudgeTime != currentNudgeTime) {
+		double newPPS = 1.0 / nextNudgeTime;
+	adjustZoom(newPPS, 1, true, -1);
+	}
+	reportNudgeAndZoomStep(nextNudgeTime);
+}
+
+void cmdIncreaseNudgeAndZoomStep(Command* command) {
+	nudgeAndZoomStep(+1);
+}
+
+void cmdDecreaseNudgeAndZoomStep(Command* command) {
+	nudgeAndZoomStep(-1);
+}
+
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(40029, 0); // Edit: Undo
@@ -5732,6 +5801,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (zoom out)")}, "OSARA_INCREASENUDGEANDZOOMSTEP", cmdIncreaseNudgeAndZoomStep},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (zoom in)")}, "OSARA_DECREASENUDGEANDZOOMSTEP", cmdDecreaseNudgeAndZoomStep},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
