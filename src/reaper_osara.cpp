@@ -3778,13 +3778,13 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
-void reportNudgeTime(double nudgeTime) {
+void reportNudgeAndZoomStep(double nudgeTime) {
 	TimeFormat tf = TF_MILSEC;
 	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
 	outputMessage(formatTime(nudgeTime, tf));
 }
 
-void nudgeZoomTime(int direction) {
+void nudgeAndZoomStep(int direction) {
 	// direction = +1 → zoom out (increase nudge time), -1 → zoom in (decrease nudge time)
 	double currentPPS = GetHZoomLevel();
 	if (currentPPS <= 0.0) {
@@ -3814,15 +3814,15 @@ void nudgeZoomTime(int direction) {
 		double newPPS = 1.0 / nextNudgeTime;
 	adjustZoom(newPPS, 1, true, -1);
 	}
-	reportNudgeTime(nextNudgeTime);
+	reportNudgeAndZoomStep(nextNudgeTime);
 }
 
-void cmdIncreaseZoomTime(Command* command) {
-	nudgeZoomTime(+1);
+void cmdIncreaseNudgeAndZoomStep(Command* command) {
+	nudgeAndZoomStep(+1);
 }
 
-void cmdDecreaseZoomTime(Command* command) {
-	nudgeZoomTime(-1);
+void cmdDecreaseNudgeAndZoomStep(Command* command) {
+	nudgeAndZoomStep(-1);
 }
 
 void cmdUndo(Command* command) {
@@ -5801,8 +5801,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (adjusts horizontal zoom)")}, "OSARA_INCREASENUDGE", cmdIncreaseZoomTime},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (adjusts horizontal zoom)")}, "OSARA_DECREASENUDGE", cmdDecreaseZoomTime},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (zoom out)")}, "OSARA_INCREASENUDGEANDZOOMSTEP", cmdIncreaseNudgeAndZoomStep},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (zoom in)")}, "OSARA_DECREASENUDGEANDZOOMSTEP", cmdDecreaseNudgeAndZoomStep},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
