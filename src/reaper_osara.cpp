@@ -24,6 +24,7 @@
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <array>
 #include <ranges>
 #include <math.h>
 #include <optional>
@@ -3780,7 +3781,7 @@ void cmdMoveToPrevItem(Command* command) {
 }
 
 // Report adjusting horizontal zoom as time per keypress instead of pixels per second.
-	void reportZoomStepsAsTime(double nudgeTime) {
+void reportZoomStepsAsTime(double nudgeTime) {
 	TimeFormat tf = TF_MILSEC;
 	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
 	outputMessage(formatTime(nudgeTime, tf));
@@ -3790,10 +3791,9 @@ void cmdMoveToPrevItem(Command* command) {
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead, that's easier to understand non-visually.
 void zoomSteps(int direction) {
 	// direction = +1 to zoom out, -1 to zoom in
-	static const double STEPPED_ZOOM_SETTINGS[] = {
+	static constexpr std::array<double, 13> STEPPED_ZOOM_SETTINGS = {
 		0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
 		1, 5, 10, 30, 60};
-	static const int NUDGE_COUNT = sizeof(STEPPED_ZOOM_SETTINGS) / sizeof(STEPPED_ZOOM_SETTINGS[0]);
 	double currentPPS = GetHZoomLevel();
 	// currentPPS should always be positive
 	assert(currentPPS > 0.0);
@@ -3801,17 +3801,17 @@ void zoomSteps(int direction) {
 	double nextZoomStep = currentZoomStep;
 	if (direction > 0) {
 		// Find next step zooming out
-		for (int i = 0; i < NUDGE_COUNT; ++i) {
-			if (currentZoomStep < STEPPED_ZOOM_SETTINGS[i]) {
-				nextZoomStep = STEPPED_ZOOM_SETTINGS[i];
+		for (double value : STEPPED_ZOOM_SETTINGS) {
+			if (currentZoomStep < value) {
+				nextZoomStep = value;
 				break;
 			}
 		}
 	} else {
 		// Find next step zooming in
-		for (int i = NUDGE_COUNT - 1; i >= 0; --i) {
-			if (currentZoomStep > STEPPED_ZOOM_SETTINGS[i]) {
-				nextZoomStep = STEPPED_ZOOM_SETTINGS[i];
+		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
+			if (currentZoomStep > value) {
+				nextZoomStep = value;
 				break;
 			}
 		}
