@@ -3780,15 +3780,16 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
-// Report adjusting horizontal zoom as time per keypress instead of pixels per second.
-void reportZoomStepsAsTime(double nudgeTime) {
+// REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
+// We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
+void reportZoomStepsAsTime(double time) {
 	TimeFormat tf = TF_MILSEC;
-	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
-	outputMessage(formatTime(nudgeTime, tf));
+	if (time >= 1.0) tf = TF_ROUNDSEC;
+	// TRANSLATORS: Reported when users change horizontal zoom in steps.
+	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
+	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
 }
 
-// REAPER's stock actions for adjusting horizontal zoom move in increments of 20%, returning pixels per second.
-// We provide stepped zoom settings and report expected behaviour in time per keypress instead, that's easier to understand non-visually.
 void zoomSteps(bool zoomOut) {
 	// direction = +1 to zoom out, -1 to zoom in
 	static constexpr std::array<double, 13> STEPPED_ZOOM_SETTINGS = {
