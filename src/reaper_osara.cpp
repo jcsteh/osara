@@ -3789,7 +3789,7 @@ void reportZoomStepsAsTime(double nudgeTime) {
 
 // REAPER's stock actions for adjusting horizontal zoom move in increments of 20%, returning pixels per second.
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead, that's easier to understand non-visually.
-void zoomSteps(int direction) {
+void zoomSteps(bool zoomOut) {
 	// direction = +1 to zoom out, -1 to zoom in
 	static constexpr std::array<double, 13> STEPPED_ZOOM_SETTINGS = {
 		0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
@@ -3799,7 +3799,7 @@ void zoomSteps(int direction) {
 	assert(currentPPS > 0.0);
 	double currentZoomStep = 1.0 / currentPPS;
 	double nextZoomStep = currentZoomStep;
-	if (direction > 0) {
+	if (zoomOut) {
 		// Find next step zooming out
 		for (double value : STEPPED_ZOOM_SETTINGS) {
 			if (currentZoomStep < value) {
@@ -3824,11 +3824,11 @@ void zoomSteps(int direction) {
 }
 
 void cmdZoomOutStepped(Command* command) {
-	zoomSteps(+1);
+	zoomSteps(true);
 }
 
 void cmdZoomInStepped(Command* command) {
-	zoomSteps(-1);
+	zoomSteps(false);
 }
 
 void cmdUndo(Command* command) {
