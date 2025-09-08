@@ -24,6 +24,7 @@
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <ranges>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -338,7 +339,7 @@ string formatTimeSample(double time) {
 	return format(translate("{} samples"), buf);
 }
 
-string formatTimeMilSec (double time) {
+string formatTimeMs (double time) {
 	// Translators: Used when reporting a time in milliseconds. {} will be
 	// replaced with the number of ms; e.g. "2 ms".
 	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
@@ -409,13 +410,13 @@ string formatTime(double time, TimeFormat timeFormat,
 			break;
 		}
 		case TF_FRAME: {
+		// Frames
+			s = formatTimeFrame(time, useCache);
+			break;
+		}
 		case TF_ROUNDSEC: {
 			// Rounded seconds
 			s = formatTimeRoundSec(time);
-			break;
-		}
-		// Frames
-			s = formatTimeFrame(time, useCache);
 			break;
 		}
 		case TF_HMSF: {
@@ -430,7 +431,7 @@ string formatTime(double time, TimeFormat timeFormat,
 		}
 		case TF_MILSEC: {
 			// Milliseconds
-			s = formatTimeMilSec(time);
+			s = formatTimeMs(time);
 			break;
 		}
 		default:
@@ -3778,51 +3779,56 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
-void reportNudgeAndZoomStep(double nudgeTime) {
+// Report adjusting horizontal zoom as time per keypress instead of pixels per second.
+	void reportZoomStepsAsTime(double nudgeTime) {
 	TimeFormat tf = TF_MILSEC;
 	if (nudgeTime >= 1.0) tf = TF_ROUNDSEC;
 	outputMessage(formatTime(nudgeTime, tf));
 }
 
-void nudgeAndZoomStep(int direction) {
-	// direction = +1 → zoom out (increase nudge time), -1 → zoom in (decrease nudge time)
+// REAPER's stock actions for adjusting horizontal zoom move in increments of 20%, returning pixels per second.
+// We provide stepped zoom settings and report expected behaviour in time per keypress instead, that's easier to understand non-visually.
+void zoomSteps(int direction) {
+	// direction = +1 to zoom out, -1 to zoom in
+	static const double STEPPED_ZOOM_SETTINGS[] = {
+		0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
+		1, 5, 10, 30, 60};
+	static const int NUDGE_COUNT = sizeof(STEPPED_ZOOM_SETTINGS) / sizeof(STEPPED_ZOOM_SETTINGS[0]);
 	double currentPPS = GetHZoomLevel();
-	if (currentPPS <= 0.0) {
-		outputMessage(translate("invalid zoom level"));
-		return;
-	}
-	double currentNudgeTime = 1.0 / currentPPS;
-	double nextNudgeTime = currentNudgeTime;
+	// currentPPS should always be positive
+	assert(currentPPS > 0.0);
+	double currentZoomStep = 1.0 / currentPPS;
+	double nextZoomStep = currentZoomStep;
 	if (direction > 0) {
-		// Find next larger nudge
+		// Find next step zooming out
 		for (int i = 0; i < NUDGE_COUNT; ++i) {
-			if (currentNudgeTime < NUDGE_VALUES[i]) {
-				nextNudgeTime = NUDGE_VALUES[i];
+			if (currentZoomStep < STEPPED_ZOOM_SETTINGS[i]) {
+				nextZoomStep = STEPPED_ZOOM_SETTINGS[i];
 				break;
 			}
 		}
 	} else {
-		// Find next smaller nudge
+		// Find next step zooming in
 		for (int i = NUDGE_COUNT - 1; i >= 0; --i) {
-			if (currentNudgeTime > NUDGE_VALUES[i]) {
-				nextNudgeTime = NUDGE_VALUES[i];
+			if (currentZoomStep > STEPPED_ZOOM_SETTINGS[i]) {
+				nextZoomStep = STEPPED_ZOOM_SETTINGS[i];
 				break;
 			}
 		}
 	}
-	if (nextNudgeTime != currentNudgeTime) {
-		double newPPS = 1.0 / nextNudgeTime;
+	if (nextZoomStep != currentZoomStep) {
+		double newPPS = 1.0 / nextZoomStep;
 	adjustZoom(newPPS, 1, true, -1);
 	}
-	reportNudgeAndZoomStep(nextNudgeTime);
+	reportZoomStepsAsTime(nextZoomStep);
 }
 
-void cmdIncreaseNudgeAndZoomStep(Command* command) {
-	nudgeAndZoomStep(+1);
+void cmdZoomOutStepped(Command* command) {
+	zoomSteps(+1);
 }
 
-void cmdDecreaseNudgeAndZoomStep(Command* command) {
-	nudgeAndZoomStep(-1);
+void cmdZoomInStepped(Command* command) {
+	zoomSteps(-1);
 }
 
 void cmdUndo(Command* command) {
@@ -5801,8 +5807,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (zoom out)")}, "OSARA_INCREASENUDGEANDZOOMSTEP", cmdIncreaseNudgeAndZoomStep},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (zoom in)")}, "OSARA_DECREASENUDGEANDZOOMSTEP", cmdDecreaseNudgeAndZoomStep},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Increase nudge and scrub faster (zoom out)")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Decrease nudge and scrub slower (zoom in)")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
