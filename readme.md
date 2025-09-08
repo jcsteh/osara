@@ -804,8 +804,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
-- OSARA: Increase nudge and scrub faster (zoom out): =
-- OSARA: Decrease nudge and scrub slower (zoom in): -
+- OSARA: Scrub faster, nudge and adjust item edges in larger increments (zoom out): =
+- OSARA: Scrub slower, nudge and adjust item edges in smaller increments (zoom in): -
 - OSARA: Report ripple editing mode: Control+Shift+P
 - OSARA: Report muted tracks: Alt+Shift+F5
  - Pressing this twice will display the information in a dialog with a text box for easy review.
