@@ -411,7 +411,7 @@ string formatTime(double time, TimeFormat timeFormat,
 			break;
 		}
 		case TF_FRAME: {
-		// Frames
+			// Frames
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
@@ -430,7 +430,7 @@ string formatTime(double time, TimeFormat timeFormat,
 			s = formatTimeSample(time);
 			break;
 		}
-		case TF_MILSEC: {
+		case TF_MS: {
 			// Milliseconds
 			s = formatTimeMs(time);
 			break;
@@ -3783,15 +3783,14 @@ void cmdMoveToPrevItem(Command* command) {
 // REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
 void reportZoomStepsAsTime(double time) {
-	TimeFormat tf = TF_MILSEC;
+	TimeFormat tf = TF_MS;
 	if (time >= 1.0) tf = TF_ROUNDSEC;
 	// TRANSLATORS: Reported when users change horizontal zoom in steps.
 	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
 	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
 }
 
-void zoomSteps(bool zoomOut) {
-	// direction = +1 to zoom out, -1 to zoom in
+void adjustZoomByStep(bool zoomOut) {
 	static constexpr std::array<double, 13> STEPPED_ZOOM_SETTINGS = {
 		0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
 		1, 5, 10, 30, 60};
@@ -3825,11 +3824,11 @@ void zoomSteps(bool zoomOut) {
 }
 
 void cmdZoomOutStepped(Command* command) {
-	zoomSteps(true);
+	adjustZoomByStep(true);
 }
 
 void cmdZoomInStepped(Command* command) {
-	zoomSteps(false);
+	adjustZoomByStep(false);
 }
 
 void cmdUndo(Command* command) {
