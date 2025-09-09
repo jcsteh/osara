@@ -3791,9 +3791,9 @@ void reportZoomStepsAsTime(double time) {
 }
 
 void adjustZoomByStep(bool zoomOut) {
-	static constexpr std::array<double, 13> STEPPED_ZOOM_SETTINGS = {
+	static constexpr std::array STEPPED_ZOOM_SETTINGS = {
 		0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
-		1, 5, 10, 30, 60};
+		1.0, 5.0, 10.0, 30.0, 60.0};
 	double currentPPS = GetHZoomLevel();
 	// currentPPS should always be positive
 	assert(currentPPS > 0.0);
