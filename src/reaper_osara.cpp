@@ -24,6 +24,8 @@
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <array>
+#include <ranges>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -277,6 +279,12 @@ string formatTimeSec (double time) {
 	return format(translate("{:.3f} sec"), time);
 }
 
+string formatTimeRoundSec (double time) {
+	// Translators: Used when reporting a time in whole seconds. {} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), static_cast<int> (round(time)));
+}
+
 string formatTimeFrame(double time, bool useCache) {
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
@@ -330,6 +338,12 @@ string formatTimeSample(double time) {
 	// Translators: Used when reporting a time in samples. {} will be replaced
 	// with the number of samples; e.g. "2 samples".
 	return format(translate("{} samples"), buf);
+}
+
+string formatTimeMs (double time) {
+	// Translators: Used when reporting a time in milliseconds. {} will be
+	// replaced with the number of ms; e.g. "2 ms".
+	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -401,6 +415,11 @@ string formatTime(double time, TimeFormat timeFormat,
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
+		case TF_ROUNDSEC: {
+			// Rounded seconds
+			s = formatTimeRoundSec(time);
+			break;
+		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
 			s = formatTimeHMSF(time, useCache);
@@ -409,6 +428,11 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_SAMPLE: {
 			// Samples
 			s = formatTimeSample(time);
+			break;
+		}
+		case TF_MS: {
+			// Milliseconds
+			s = formatTimeMs(time);
 			break;
 		}
 		default:
@@ -3756,6 +3780,58 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
+// REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
+// We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
+void reportZoomStepsAsTime(double time) {
+	TimeFormat tf = TF_MS;
+	if (time >= 1.0) tf = TF_ROUNDSEC;
+	// TRANSLATORS: Reported when users change horizontal zoom in steps.
+	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
+	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
+}
+
+void adjustZoomByStep(bool zoomOut) {
+	static constexpr std::array STEPPED_ZOOM_SETTINGS = {
+		0.001, 0.003, 0.005, 0.007, 0.01,
+		0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75,
+		1.0, 5.0, 10.0, 30.0, 60.0};
+	double currentPPS = GetHZoomLevel();
+	// currentPPS should always be positive
+	assert(currentPPS > 0.0);
+	double currentZoomStep = 1.0 / currentPPS;
+	double nextZoomStep = currentZoomStep;
+	if (zoomOut) {
+		// Find next step zooming out
+		for (double value : STEPPED_ZOOM_SETTINGS) {
+			if (currentZoomStep < value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	} else {
+		// Find next step zooming in
+		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
+			if (currentZoomStep > value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	}
+	if (nextZoomStep != currentZoomStep) {
+		double newPPS = 1.0 / nextZoomStep;
+	adjustZoom(newPPS, 1, true, -1);
+	}
+	reportZoomStepsAsTime(nextZoomStep);
+}
+
+void cmdZoomOutStepped(Command* command) {
+	adjustZoomByStep(true);
+}
+
+void cmdZoomInStepped(Command* command) {
+	adjustZoomByStep(false);
+}
+
 void cmdUndo(Command* command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(40029, 0); // Edit: Undo
@@ -5732,6 +5808,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},

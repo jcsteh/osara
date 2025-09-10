@@ -50,6 +50,7 @@
 #define REAPERAPI_WANT_GetMasterTrack
 #define REAPERAPI_WANT_Track_GetPeakInfo
 #define REAPERAPI_WANT_GetHZoomLevel
+#define REAPERAPI_WANT_adjustZoom
 #define REAPERAPI_WANT_GetToggleCommandState
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_Undo_CanUndo2
@@ -317,10 +318,12 @@ typedef enum {
 	TF_MEASURE,
 	TF_MINSEC,
 	TF_SEC,
+	TF_ROUNDSEC,
 	TF_FRAME,
 	TF_HMSF,
 	TF_SAMPLE,
-	TF_MEASURETICK
+	TF_MEASURETICK,
+	TF_MS
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
 enum FormatTimeCacheRequest {

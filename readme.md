@@ -270,12 +270,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Envelope: Glue automation items
 
 #### Zoom
-- View: Zoom out horizontal: - or NumPad-
-- View: Zoom in horizontal: = or NumPad+
-- View: Zoom out vertical
-- View: Zoom in vertical
-- View: Toggle track zoom to minimum height
-- View: Toggle track zoom to maximum height
+- View: Zoom out horizontal: NumPad-
+- View: Zoom in horizontal: NumPad+
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
@@ -800,6 +796,7 @@ You can configure this via the "Automatically check for new versions of REAPER o
 OSARA also includes some other miscellaneous actions.
 
 #### Main section of actions list
+- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
 - OSARA: go to master track: Control+Alt+Shift+Home
@@ -807,6 +804,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
+- OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out: =
+- OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in: -
 - OSARA: Report ripple editing mode: Control+Shift+P
 - OSARA: Report muted tracks: Alt+Shift+F5
  - Pressing this twice will display the information in a dialog with a text box for easy review.
@@ -852,7 +851,6 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
-- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 - OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
 
 #### Midi Editor section of actions list
@@ -971,6 +969,10 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Move cursor left 8 pixels
 - View: Move cursor right 8 pixels
 - View: Set horizontal zoom to default project setting
+- View: Zoom out vertical
+- View: Zoom in vertical
+- View: Toggle track zoom to maximum height
+- View: Toggle track zoom to minimum height
 - View: Time unit for ruler: Absolute frames
 - View: Time unit for ruler: Hours:Minutes:Seconds:Frames
 - View: Time unit for ruler: Measures.Beats
