@@ -69,7 +69,7 @@ jobs:
         run: brew install php
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
-      - name: sign
+      - name: sign Windows
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
         with:
@@ -269,14 +269,20 @@ jobs:
         run: |
           echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
       # We upload pull request builds as normal artifacts.
-      - name: upload PR build
-        if: ${{ github.event_name == 'pull_request' }}
+      - name: upload PR build Win
+        if: ${{ github.event_name == 'pull_request' && matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
         with:
-          name: osara_${{ env.os }}_${{ env.version }}
-          path: installer/osara_*
+          name: osara_windows_${{ env.version }}
+          path: installer/osara_*.exe
           # The installer is already compressed. Don't try to compress it again.
           compression-level: 0
+      - name: upload PR build Mac
+        if: ${{ github.event_name == 'pull_request' && matrix.os == 'macos-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: osara_mac_${{ env.version }}
+          path: installer/mac/*.app
     outputs:
       version: ${{ env.version }}
       # These will only be set for snapshot builds. Furthermore, each OS job
