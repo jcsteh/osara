@@ -282,6 +282,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: osara_mac_${{ env.version }}
+          # This wildcard is necessary to make the upload-artifact action 
+          # include the app folder in the zip archive. If we specified
+          # OSARAInstaller.app directly, the action would include its
+          # contents, but not the app folder, breaking the app. This wildcard
+          # behaviour is explained in the documentation:
+          # "If a wildcard pattern is used, the path hierarchy will be preserved
+          # after the first wildcard pattern"
+          # See also https://github.com/actions/upload-artifact/issues/248
           path: installer/mac/*.app
     outputs:
       version: ${{ env.version }}
