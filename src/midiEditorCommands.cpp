@@ -2444,3 +2444,27 @@ int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 	}, 0);
 	return 0;
 }
+
+void previewChordForMoveToTransient(MediaItem_Take* take) {
+	// We specify direction as -1 because REAPER usually positions the cursor
+	// just slightly after the note, so we need the chord just before the cursor.
+	auto chord = findChord(take, -1, {
+		true,  // start
+		true,  // end
+		true,  // channel
+		true,  // pitch
+		true,  // velocity
+		false,  // selected
+		true  // muted
+	});
+	if (chord.first == chord.second) {
+		return;
+	}
+	if (chord.first->start < GetCursorPosition() - 0.0002) {
+		// This chord is too far before the cursor; i.e. this isn't just cursor
+		// movement inaccuracy. This can happen when moving to the end of an item.
+		return;
+	}
+	vector<MidiNote> notes(chord.first, chord.second);
+	previewNotes(take, notes);
+}
