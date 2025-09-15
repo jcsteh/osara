@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-09-01 18:43\n"
+"PO-Revision-Date: 2025-09-15 18:44\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1309,6 +1309,13 @@ msgstr "{:#.3f} seconde"
 msgid "{:.3f} sec"
 msgstr "{:.3f} seconde"
 
+#. Used when reporting a time in whole seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} seconde"
+
 #. Used when reporting a time in frames. {} will be
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
@@ -1323,15 +1330,15 @@ msgid_plural "{} hours"
 msgstr[0] "{} heure"
 msgstr[1] "{} heures"
 
-#. Used when reporting a time in seconds. {} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{} sec"
-msgstr "{} seconde"
-
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
 msgstr "{} échantillon"
+
+#. Used when reporting a time in milliseconds. {} will be
+#. replaced with the number of ms; e.g. "2 ms".
+msgid "{} ms"
+msgstr "{} milliseconde"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -2495,6 +2502,9 @@ msgstr "groupe {}"
 msgid "{} takes"
 msgstr "{} Prises"
 
+msgid "{} per keypress"
+msgstr "{} par touche appuyé"
+
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
 msgid "undo {}"
@@ -3137,6 +3147,12 @@ msgstr "OSARA: Énoncer le tempo et la signature rythmique au curseur de lecture
 
 msgid "OSARA: Report scrub segment offsets; press twice to edit"
 msgstr ""
+
+msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
+msgstr "OSARA: Scrub plus rapide, pousser et ajuster les bords des objets par des incréments plus grands, zoom arrière horizontal"
+
+msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
+msgstr "OSARA: Scrub plus lent, pousser et ajuster les bords d'objets par des incréments plus petits, zoom avant horizontal"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activer la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
