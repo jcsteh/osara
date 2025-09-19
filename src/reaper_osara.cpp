@@ -933,6 +933,20 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
 bool shouldMoveToAutoItem = false;
 
+string getTrackNameOrNumber(MediaTrack* track, bool reportTrackNumber) {
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+	ostringstream s;
+	if (trackName && trackName[0]) {
+		s << trackName;
+	} else if (reportTrackNumber) {
+		// There's no name and track number reporting is disabled. We report the
+		// number in lieu of the name.
+		int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+		s << trackNum;
+	}
+	return s.str();
+	}
+
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
@@ -1006,14 +1020,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			s << formatFolderState(track);
 		}
 		separate();
-		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
-		if (trackName && trackName[0]) {
-			s << trackName;
-		} else if (!settings::reportTrackNumbers) {
-			// There's no name and track number reporting is disabled. We report the
-			// number in lieu of the name.
-			s << trackNum;
-		}
+		s << getTrackNameOrNumber(track, !settings::reportTrackNumbers);
 		if (folderDepth <0){ //end of folder
 			separate();
 			s << formatFolderState(track);
@@ -5540,6 +5547,31 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void moveTracks(bool up) {
+	if (CountSelectedTracks(nullptr) == 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	MediaTrack* track = GetLastTouchedTrack();
+	MediaTrack* oldParent = GetParentTrack(track);
+	if (up) Main_OnCommand(43647, 0); // Track: Move tracks up
+	else Main_OnCommand(43648, 0); // Track: Move tracks down
+	MediaTrack* newParent = GetParentTrack(track);
+	ostringstream s;
+	if (oldParent != newParent && newParent != nullptr) {
+	s << format(translate("entered {} folder"), getTrackNameOrNumber(newParent, true));
+	}
+	outputMessage(s);
+}
+
+void cmdMoveTracksUp(Command* command) {
+	moveTracks(true);
+}
+
+void cmdMoveTracksDown(Command* command) {
+	moveTracks(false);
+}
+
 void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
@@ -5695,6 +5727,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracksUp}, // Track: Move tracks up
+	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracksDown}, // Track: Move tracks down
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
