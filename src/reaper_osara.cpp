@@ -5557,9 +5557,47 @@ void moveTracks(bool up) {
 	if (up) Main_OnCommand(43647, 0); // Track: Move tracks up
 	else Main_OnCommand(43648, 0); // Track: Move tracks down
 	MediaTrack* newParent = GetParentTrack(track);
+	int trackNum = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER");
 	ostringstream s;
 	if (oldParent != newParent && newParent != nullptr) {
-	s << format(translate("entered {} folder"), getTrackNameOrNumber(newParent, true));
+		// Translators: Reported when a track you are moving enters a folder.
+		// {} will be replaced with the name of the folder.
+		// E.G, "entered drums folder"
+		s << format(translate("entered {} folder"),
+			getTrackNameOrNumber(newParent, true));
+	}
+	else if (oldParent != newParent && newParent == nullptr) {
+		// Translators: Reported when a track you are moving leaves a folder.
+		// {} will be replaced with the name of the folder.
+		// E.G, "left drums folder"
+		s << format(translate("left {} folder"),
+			getTrackNameOrNumber(oldParent, true));
+	}
+	else if (newParent == nullptr && up) {
+		// Translators: Reported when moving a track upward.
+		// {} will be replaced with the name or number of the track below.
+		// E.G, "above vocal" or "above 3"
+		s << format(translate("above {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackNum), true));
+	}
+	else if (newParent == nullptr && !up) {
+		// Translators: Reported when moving a track downward.
+		// {} will be replaced with the name or number of the track above.
+		// E.G, "below vocal" or "below 3"
+		s << format(translate("below {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackNum - 2), true));
+	}
+	else if (newParent != nullptr && up) {
+		s << format(translate("above {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackNum), true)) << " "
+			// Translators: Appended after the new position when moving a track inside of a folder.
+			// E.G, "inside guitars folder" or "inside 3 folder"
+			<< format(translate("inside {} folder"), getTrackNameOrNumber(newParent, true));
+	}
+	else if (newParent != nullptr && !up) {
+		s << format(translate("below {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackNum - 2), true)) << " "
+			<< format(translate("inside {} folder"), getTrackNameOrNumber(newParent, true));
 	}
 	outputMessage(s);
 }
