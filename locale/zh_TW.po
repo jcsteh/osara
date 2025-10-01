@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-09-15 18:44\n"
+"PO-Revision-Date: 2025-10-01 18:45\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2894,7 +2894,7 @@ msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: 報告軌道、對象、MIDI 選取 （取決於焦點）"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
-msgstr "OSARA: 移除對象、軌道、時間選區、包絡點 （取決於焦點）"
+msgstr "OSARA: 移除對象/軌道/時間選須的內容/標記/包絡點（取決於焦點）"
 
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切換熱鍵幫助"
