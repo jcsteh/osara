@@ -222,8 +222,18 @@ class PresetDialog {
 	HWND dialog;
 	HWND list; // Our preset ListView.
 	string filter;
+	accelerator_register_t accelReg;
+
+static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	PresetDialog*dialog = (PresetDialog*)accelReg->user;
+	if (msg->hwnd == dialog->list && msg->wParam == VK_SPACE) {
+		return -666;
+	}
+	return -1;
+}
 
 	void close() {
+		plugin_register("-accelerator", &this->accelReg);
 		DestroyWindow(this->dialog);
 		SetFocus(this->combo);
 		delete this;
@@ -239,7 +249,6 @@ class PresetDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == IDOK) {
 					dialog->applyPreset();
-					dialog->close();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->close();
@@ -344,6 +353,10 @@ class PresetDialog {
 		col.cx = 150;
 		ListView_InsertColumn(this->list, 0, &col);
 		this->updateList();
+		this->accelReg.translateAccel = &this->translateAccel;
+		this->accelReg.isLocal = true;
+		this->accelReg.user = (void*)this;
+		plugin_register("accelerator", &this->accelReg);
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 	}
 
