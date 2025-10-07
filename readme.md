@@ -83,10 +83,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Track: Duplicate tracks: Alt+D
 
 #### Adjusting Track Parameters
-- Track: Toggle mute for selected tracks
+- Track: Toggle mute for selected tracks: F5
 - Track: Toggle mute for master track: Shift+F5
-- Track: Toggle solo for selected tracks
+- Track: Toggle solo for selected tracks: F6
 - Toggle record arming for current (last touched) track: F7
+- Track: Toggle record arm for selected tracks: Shift+F7
 - Track: Cycle track record monitor: F8
 - Track: Invert track phase: F9
 - Track: Toggle FX bypass for current track: B
