@@ -1178,6 +1178,17 @@ void postToggleTrackSolo(int command) {
 	outputMessage(s);
 }
 
+void postToggleLastTouchedTrackArm(int command) {
+	MediaTrack* track = GetLastTouchedTrack();
+	if (!track) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	outputMessage(isTrackArmed(track) ?
+		translate("armed") :
+		translate("unarmed"));
+}
+
 void postToggleTrackArm(int command) {
 	int armedCount=0;
 	int unarmedCount=0;
@@ -2751,7 +2762,7 @@ PostCommand POST_COMMANDS[] = {
 	{7, postToggleTrackSolo}, // Track: Toggle solo for selected tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
 	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
-	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+	{40294, postToggleLastTouchedTrackArm}, // Track: Toggle record arming for current/last touched track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
