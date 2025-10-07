@@ -1179,14 +1179,43 @@ void postToggleTrackSolo(int command) {
 }
 
 void postToggleTrackArm(int command) {
-	MediaTrack* track = GetLastTouchedTrack();
-	if (!track) {
+	int armedCount=0;
+	int unarmedCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	if(selCount== 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	outputMessage(isTrackArmed(track) ?
-		translate("armed") :
-		translate("unarmed"));
+	if(selCount==1) {
+		outputMessage(isTrackArmed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("armed") : translate("unarmed"));
+		return;
+	}
+	ostringstream s;
+	for (int i=0; i<selCount; ++i) {
+		if(isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
+			++armedCount;
+		} else {
+			++unarmedCount;
+		}
+	}
+	if(armedCount>0) {
+		// Translators: Reported when multiple tracks are armed. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks armed".
+		s << format(translate_plural("{} track armed", "{} tracks armed", armedCount),
+			armedCount);
+		if (unarmedCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unarmedCount>0) {
+		// Translators: Reported when multiple tracks are unarmed. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unarmed".
+		s << format(
+			translate_plural("{} track unarmed", "{} tracks unarmed", unarmedCount),
+			unarmedCount);
+	}
+	outputMessage(s);
 }
 
 void postCycleTrackMonitor(int command) {
