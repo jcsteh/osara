@@ -224,13 +224,13 @@ class PresetDialog {
 	string filter;
 	accelerator_register_t accelReg;
 
-static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-	PresetDialog*dialog = (PresetDialog*)accelReg->user;
-	if (msg->hwnd == dialog->list && msg->wParam == VK_SPACE) {
-		return -666;
+	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+		PresetDialog*dialog = (PresetDialog*)accelReg->user;
+		if (msg->hwnd == dialog->list && msg->wParam == VK_SPACE) {
+			return -666;
+		}
+		return -1;
 	}
-	return -1;
-}
 
 	void close() {
 		plugin_register("-accelerator", &this->accelReg);
