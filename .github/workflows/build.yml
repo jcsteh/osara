@@ -22,7 +22,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-2022, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: set env
@@ -37,7 +37,7 @@ jobs:
             # For example: pr1234-101,23631c6e
             echo version=pr${{ github.event.number }}-$GITHUB_RUN_NUMBER,${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
           fi
-          if [ ${{ matrix.os }} == windows-latest ]; then
+          if [ ${{ matrix.os }} == windows-2022 ]; then
             echo os=windows >> "$GITHUB_ENV"
           else
             echo os=mac >> "$GITHUB_ENV"
@@ -52,13 +52,13 @@ jobs:
       - name: setup
         run: pip install scons
       - name: SCons MSVC Cache
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-2022' }}
         uses: actions/cache@v4
         with:
           path: ~\scons_msvc_cache.json
           key: ${{ env.CACHE_KEY }}
       - name: Windows setup
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows-2022' }}
         # Use NSIS 2.46 to reduce AV false positives.
         run: |
           choco uninstall nsis nsis.install -y
@@ -70,7 +70,7 @@ jobs:
       - name: build
         run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
       - name: sign Windows
-        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-2022' }}
         uses: azure/trusted-signing-action@v0
         with:
           azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -245,7 +245,7 @@ jobs:
           echo "Mac app signed and notarized successfully!"
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
-        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-2022' }}
         env:
           crowdinAuthToken: ${{ secrets.CROWDIN_AUTH_TOKEN }}
         run: |
@@ -270,7 +270,7 @@ jobs:
           echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
       # We upload pull request builds as normal artifacts.
       - name: upload PR build Win
-        if: ${{ github.event_name == 'pull_request' && matrix.os == 'windows-latest' }}
+        if: ${{ github.event_name == 'pull_request' && matrix.os == 'windows-2022' }}
         uses: actions/upload-artifact@v4
         with:
           name: osara_windows_${{ env.version }}

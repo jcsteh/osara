@@ -1185,7 +1185,7 @@ void postToggleTrackSolo(int command) {
 	outputMessage(s);
 }
 
-void postToggleTrackArm(int command) {
+void postToggleLastTouchedTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		outputMessage(translate("no selected tracks"));
@@ -1194,6 +1194,46 @@ void postToggleTrackArm(int command) {
 	outputMessage(isTrackArmed(track) ?
 		translate("armed") :
 		translate("unarmed"));
+}
+
+void postToggleTrackArm(int command) {
+	int armedCount=0;
+	int unarmedCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	if(selCount== 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if(selCount==1) {
+		outputMessage(isTrackArmed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("armed") : translate("unarmed"));
+		return;
+	}
+	ostringstream s;
+	for (int i=0; i<selCount; ++i) {
+		if(isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
+			++armedCount;
+		} else {
+			++unarmedCount;
+		}
+	}
+	if(armedCount>0) {
+		// Translators: Reported when multiple tracks are armed. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks armed".
+		s << format(translate_plural("{} track armed", "{} tracks armed", armedCount),
+			armedCount);
+		if (unarmedCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unarmedCount>0) {
+		// Translators: Reported when multiple tracks are unarmed. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unarmed".
+		s << format(
+			translate_plural("{} track unarmed", "{} tracks unarmed", unarmedCount),
+			unarmedCount);
+	}
+	outputMessage(s);
 }
 
 void postCycleTrackMonitor(int command) {
@@ -2729,7 +2769,7 @@ PostCommand POST_COMMANDS[] = {
 	{7, postToggleTrackSolo}, // Track: Toggle solo for selected tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
 	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
-	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+	{40294, postToggleLastTouchedTrackArm}, // Track: Toggle record arming for current/last touched track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
