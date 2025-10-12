@@ -758,8 +758,8 @@ OSARA provides a dialog to facilitate this.
 You activate this dialog by pressing Alt+DownArrow when focused on REAPER's FX preset combo box.
 The dialog displays the preset list and allows you to navigate without presets being automatically activated.
 The Filter field (Alt+F) allows you to filter the list to show only presets containing the entered text.
-Pressing Enter while focus is in the list box or Alt+A to click the Apply button loads the selected preset.
-Pressing Escape or Alt+C to click the Close button closes the dialog, clears the filter and returns keyboard focus to REAPER's FX preset combo box.
+Pressing Enter while focus is in the list box or Alt+A to activate the Apply button loads the selected preset.
+Pressing Escape or Alt+C to activate the Close button closes the dialog, clears the filter and returns keyboard focus to REAPER's FX preset combo box.
 
 ### Configuration
 OSARA provides a Configuration dialog to adjust various settings.
