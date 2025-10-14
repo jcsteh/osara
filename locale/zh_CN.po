@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-15 18:44\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1256,6 +1256,13 @@ msgstr "{:#.3f} 秒"
 msgid "{:.3f} sec"
 msgstr "{:.3f} 秒"
 
+#. Used when reporting a time in whole seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} 秒"
+
 #. Used when reporting a time in frames. {} will be
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
@@ -1268,15 +1275,15 @@ msgid "{} hour"
 msgid_plural "{} hours"
 msgstr[0] "{} 时"
 
-#. Used when reporting a time in seconds. {} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{} sec"
-msgstr "{} 秒"
-
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
 msgstr "{} 采样点"
+
+#. Used when reporting a time in milliseconds. {} will be
+#. replaced with the number of ms; e.g. "2 ms".
+msgid "{} ms"
+msgstr "{} 毫秒"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1918,7 +1925,7 @@ msgstr[0] "{} 对象禁用循环源("
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
-msgstr ""
+msgstr "从工程开始处选择到光标位置"
 
 msgid "set selection end"
 msgstr "设置选区结束"
@@ -2057,7 +2064,7 @@ msgstr "对象结束设置为源媒体结束: {}"
 #. number of items; e.g. "2 items trimmed".
 msgid "{} item trimmed"
 msgid_plural "{} items trimmed"
-msgstr[0] "{} 对象被修剪"
+msgstr[0] "{} 对象已修剪"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -2291,11 +2298,14 @@ msgstr "启用捕捉"
 msgid "disabled snap"
 msgstr "禁用捕捉"
 
+msgid "main key map"
+msgstr "主要案件映射"
+
 msgid "default key map"
-msgstr "默认键映射"
+msgstr "默认案件映射"
 
 msgid "recording key map"
-msgstr "录音键映射"
+msgstr "录音案件映射"
 
 msgid "default momentary"
 msgstr "默认瞬时"
@@ -2402,10 +2412,13 @@ msgstr "更改对象选择"
 msgid "group {}"
 msgstr "组 {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} 片段"
+
+msgid "{} per keypress"
+msgstr "{} 每次案件"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -3032,6 +3045,12 @@ msgstr "OSARA: 报告播放光标处的速度和拍号； 双击添加/编辑速
 
 msgid "OSARA: Report scrub segment offsets; press twice to edit"
 msgstr "OSARA: 报告擦洗分段偏移值;双击编辑值"
+
+msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
+msgstr "OSARA: 更快地擦洗,以更大增量微移和调整对象块边缘,缩小"
+
+msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
+msgstr "OSARA: 更慢地擦洗,以更小增量微移和调整对象块边缘,放大"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"

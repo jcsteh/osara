@@ -1,9 +1,21 @@
-#!/bin/bash
-osascript -l JavaScript - "`dirname \"$0\"`/.data/" << 'EOF'
 "use strict";
 var app = Application.currentApplication();
 app.includeStandardAdditions = true;
 var finder = Application("Finder");
+
+function getResourcesDir() {
+	var bundleURL = $.NSBundle.mainBundle.bundleURL;
+	if (bundleURL) {
+		var bundlePath = bundleURL.path.js;
+		return bundlePath + "/Contents/Resources";
+	}
+	
+	var processPath = $.NSProcessInfo.processInfo.processName.js;
+	var argCount = $.NSProcessInfo.processInfo.arguments.count;
+	throw new Error("Could not determine Resources directory. Process: " + processPath + 
+					", Args count: " + argCount + 
+					", Bundle path: " + (bundleURL ? bundleURL.path.js : "null"));
+}
 
 function isPortableReaper ( dir ) {
 	return (
@@ -14,7 +26,7 @@ function isPortableReaper ( dir ) {
 }
 
 function run(argv) {
-	var source = argv[0];
+	var source = getResourcesDir();
 	 var res = app.displayDialog("Choose weather to install Osara into a standard or a portable Reaper", {
 		buttons: ["Standard Reaper Installation", "Portable Reaper Installation", "Cancel"],
 		defaultButton: "Standard Reaper Installation",
@@ -58,5 +70,8 @@ function run(argv) {
 		} catch(ignore) {} // there might not be a keymap to backup
 		s(`cp '${target}/KeyMaps/OSARA.ReaperKeyMap' '${target}/reaper-kb.ini'`);
 	}
+	app.displayDialog("Installation Complete", {
+		buttons: ["OK"],
+		defaultButton: "OK"
+	});
 }
-EOF

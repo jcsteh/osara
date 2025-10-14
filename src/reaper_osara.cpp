@@ -24,6 +24,8 @@
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <array>
+#include <ranges>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -277,6 +279,12 @@ string formatTimeSec (double time) {
 	return format(translate("{:.3f} sec"), time);
 }
 
+string formatTimeRoundSec (double time) {
+	// Translators: Used when reporting a time in whole seconds. {} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), static_cast<int> (round(time)));
+}
+
 string formatTimeFrame(double time, bool useCache) {
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
@@ -330,6 +338,12 @@ string formatTimeSample(double time) {
 	// Translators: Used when reporting a time in samples. {} will be replaced
 	// with the number of samples; e.g. "2 samples".
 	return format(translate("{} samples"), buf);
+}
+
+string formatTimeMs (double time) {
+	// Translators: Used when reporting a time in milliseconds. {} will be
+	// replaced with the number of ms; e.g. "2 ms".
+	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -401,6 +415,11 @@ string formatTime(double time, TimeFormat timeFormat,
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
+		case TF_ROUNDSEC: {
+			// Rounded seconds
+			s = formatTimeRoundSec(time);
+			break;
+		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
 			s = formatTimeHMSF(time, useCache);
@@ -409,6 +428,11 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_SAMPLE: {
 			// Samples
 			s = formatTimeSample(time);
+			break;
+		}
+		case TF_MS: {
+			// Milliseconds
+			s = formatTimeMs(time);
 			break;
 		}
 		default:
@@ -885,6 +909,19 @@ TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
 	return TF_RULER;
 }
 
+int countNonEmptyTakes(MediaItem* item) {
+	if (!item)
+		return 0;
+	int totalTakes = CountTakes(item);
+	int nonEmptyTakes = 0;
+	for (int t = 0; t < totalTakes; ++t) {
+		if (GetTake(item, t)) {
+			nonEmptyTakes++;
+		}
+	}
+    	return nonEmptyTakes;
+}
+
 // End of utility/helper functions
 
 // Functions exported from SWS
@@ -1141,7 +1178,7 @@ void postToggleTrackSolo(int command) {
 	outputMessage(s);
 }
 
-void postToggleTrackArm(int command) {
+void postToggleLastTouchedTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		outputMessage(translate("no selected tracks"));
@@ -1150,6 +1187,46 @@ void postToggleTrackArm(int command) {
 	outputMessage(isTrackArmed(track) ?
 		translate("armed") :
 		translate("unarmed"));
+}
+
+void postToggleTrackArm(int command) {
+	int armedCount=0;
+	int unarmedCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	if(selCount== 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if(selCount==1) {
+		outputMessage(isTrackArmed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("armed") : translate("unarmed"));
+		return;
+	}
+	ostringstream s;
+	for (int i=0; i<selCount; ++i) {
+		if(isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
+			++armedCount;
+		} else {
+			++unarmedCount;
+		}
+	}
+	if(armedCount>0) {
+		// Translators: Reported when multiple tracks are armed. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks armed".
+		s << format(translate_plural("{} track armed", "{} tracks armed", armedCount),
+			armedCount);
+		if (unarmedCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unarmedCount>0) {
+		// Translators: Reported when multiple tracks are unarmed. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unarmed".
+		s << format(
+			translate_plural("{} track unarmed", "{} tracks unarmed", unarmedCount),
+			unarmedCount);
+	}
+	outputMessage(s);
 }
 
 void postCycleTrackMonitor(int command) {
@@ -1671,7 +1748,7 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << " "
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << ", "
 		<< GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
@@ -2685,7 +2762,7 @@ PostCommand POST_COMMANDS[] = {
 	{7, postToggleTrackSolo}, // Track: Toggle solo for selected tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
 	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
-	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+	{40294, postToggleLastTouchedTrackArm}, // Track: Toggle record arming for current/last touched track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
@@ -3114,6 +3191,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
 	{{MAIN_SECTION, 1157}, {_t("enabled snap"), _t("disabled snap")}}, // Options: Toggle snapping
 	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
+	{{MAIN_SECTION, 24800}, {_t("main key map"), nullptr}}, // Main action section: Clear any override
 	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
 	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
 	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
@@ -3713,11 +3791,11 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (take) {
 			s << " " << GetTakeName(take);
 		}
-		int takeCount = CountTakes(item);
-		if (takeCount > 1) {
-			// Translators: Used when navigating items to indicate the number of
-			// takes. {} will be replaced with the number; e.g. "2 takes".
-			s << " " << format(translate("{} takes"), takeCount);
+		int nonEmptyTakes = countNonEmptyTakes(item);
+		if (nonEmptyTakes > 1) {
+			// Translators: Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+			// {} will be replaced with the number of takes; e.g. "2 takes".
+			s << " " << format(translate("{} takes"), nonEmptyTakes);
 		}
 		s << " " << formatCursorPosition();
 		addTakeFxNames(take, s);
@@ -3740,6 +3818,58 @@ void cmdMoveToPrevItem(Command* command) {
 	} else {
 		moveToItem(-1);
 	}
+}
+
+// REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
+// We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
+void reportZoomStepsAsTime(double time) {
+	TimeFormat tf = TF_MS;
+	if (time >= 1.0) tf = TF_ROUNDSEC;
+	// TRANSLATORS: Reported when users change horizontal zoom in steps.
+	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
+	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
+}
+
+void adjustZoomByStep(bool zoomOut) {
+	static constexpr std::array STEPPED_ZOOM_SETTINGS = {
+		0.001, 0.003, 0.005, 0.007, 0.01,
+		0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75,
+		1.0, 5.0, 10.0, 30.0, 60.0};
+	double currentPPS = GetHZoomLevel();
+	// currentPPS should always be positive
+	assert(currentPPS > 0.0);
+	double currentZoomStep = 1.0 / currentPPS;
+	double nextZoomStep = currentZoomStep;
+	if (zoomOut) {
+		// Find next step zooming out
+		for (double value : STEPPED_ZOOM_SETTINGS) {
+			if (currentZoomStep < value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	} else {
+		// Find next step zooming in
+		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
+			if (currentZoomStep > value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	}
+	if (nextZoomStep != currentZoomStep) {
+		double newPPS = 1.0 / nextZoomStep;
+	adjustZoom(newPPS, 1, true, -1);
+	}
+	reportZoomStepsAsTime(nextZoomStep);
+}
+
+void cmdZoomOutStepped(Command* command) {
+	adjustZoomByStep(true);
+}
+
+void cmdZoomInStepped(Command* command) {
+	adjustZoomByStep(false);
 }
 
 void cmdUndo(Command* command) {
@@ -4870,11 +5000,11 @@ void cmdReportNumberOfTakesInItem(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item)
 		return;
-	int takeCount = CountTakes(item);
+	int nonEmptyTakes = countNonEmptyTakes(item);
 	// Translators: Reports the number of takes contained within the last touched item.
 	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
-	outputMessage(format(translate_plural("{} take", "{} takes", takeCount),
-		takeCount));
+	outputMessage(format(translate_plural("{} take", "{} takes", nonEmptyTakes),
+		nonEmptyTakes));
 }
 
 void cmdReportItemLength(Command* command) {
@@ -5718,6 +5848,8 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},

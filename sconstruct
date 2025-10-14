@@ -59,7 +59,7 @@ else: # Mac
 	archEnv.SConscript("src/archBuild_sconscript",
 		exports={"env": archEnv},
 		variant_dir="build", duplicate=False)
-	installer = env.Command("installer/osara_${version}.dmg", ["installer/mac/build.sh", "build"],
+	installer = env.Command("installer/osara_${version}.zip", ["installer/mac/build.sh", "build"],
 		[["$SOURCE", "$version"]])
 	configRc = "build/config.rc"
 

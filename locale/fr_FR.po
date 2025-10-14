@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-09-15 18:44\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1309,6 +1309,13 @@ msgstr "{:#.3f} sec"
 msgid "{:.3f} sec"
 msgstr "{:.3f} sec"
 
+#. Used when reporting a time in whole seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} sec"
+
 #. Used when reporting a time in frames. {} will be
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
@@ -1323,15 +1330,15 @@ msgid_plural "{} hours"
 msgstr[0] "{} heure"
 msgstr[1] "{} heures"
 
-#. Used when reporting a time in seconds. {} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{} sec"
-msgstr "{} sec"
-
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
 msgstr "{} échantillon"
+
+#. Used when reporting a time in milliseconds. {} will be
+#. replaced with the number of ms; e.g. "2 ms".
+msgid "{} ms"
+msgstr ""
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -2376,6 +2383,9 @@ msgstr ""
 msgid "disabled snap"
 msgstr ""
 
+msgid "main key map"
+msgstr ""
+
 msgid "default key map"
 msgstr ""
 
@@ -2487,10 +2497,13 @@ msgstr "Changement d'objet sélectionné"
 msgid "group {}"
 msgstr "groupe {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} Prise"
+
+msgid "{} per keypress"
+msgstr ""
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -3133,6 +3146,12 @@ msgid "OSARA: Report tempo and time signature at play cursor; press twice to add
 msgstr ""
 
 msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr ""
+
+msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
+msgstr ""
+
+msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
 msgstr ""
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"

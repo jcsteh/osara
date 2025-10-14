@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-08-15 18:48\n"
+"PO-Revision-Date: 2025-10-01 18:45\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1256,6 +1256,13 @@ msgstr "{:#.3f} 秒"
 msgid "{:.3f} sec"
 msgstr "{:.3f} 秒"
 
+#. Used when reporting a time in whole seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} 秒"
+
 #. Used when reporting a time in frames. {} will be
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
@@ -1268,15 +1275,15 @@ msgid "{} hour"
 msgid_plural "{} hours"
 msgstr[0] "{} 時"
 
-#. Used when reporting a time in seconds. {} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{} sec"
-msgstr "{} 秒"
-
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
 msgstr "{} 採樣點"
+
+#. Used when reporting a time in milliseconds. {} will be
+#. replaced with the number of ms; e.g. "2 ms".
+msgid "{} ms"
+msgstr "{} ms 毫秒"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1918,7 +1925,7 @@ msgstr[0] "{} 對象停用循環源"
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
-msgstr "選擇從工程開始到游標"
+msgstr "從工程開始選擇到游標處"
 
 msgid "set selection end"
 msgstr "設置選區結束"
@@ -2291,6 +2298,9 @@ msgstr "啟用吸附"
 msgid "disabled snap"
 msgstr "停用吸附"
 
+msgid "main key map"
+msgstr "主要鍵盤映射"
+
 msgid "default key map"
 msgstr "預設鍵映射"
 
@@ -2402,10 +2412,13 @@ msgstr "更改選取的對象"
 msgid "group {}"
 msgstr "分組 {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} 片段"
+
+msgid "{} per keypress"
+msgstr "{} 單一按鍵"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -2881,7 +2894,7 @@ msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: 報告軌道、對象、MIDI 選取 （取決於焦點）"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
-msgstr "OSARA: 移除對象、軌道、時間選區、包絡點 （取決於焦點）"
+msgstr "OSARA: 移除對象/軌道/時間選須的內容/標記/包絡點（取決於焦點）"
 
 msgid "OSARA: Toggle shortcut help"
 msgstr "OSARA: 切換熱鍵幫助"
@@ -3032,6 +3045,12 @@ msgstr "OSARA: 報告播放游標位置的速度與拍號，按兩次開啟添�
 
 msgid "OSARA: Report scrub segment offsets; press twice to edit"
 msgstr "OSARA: 報告擦帶部分偏移；按兩次編輯"
+
+msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
+msgstr "OSARA: 更快地擦帶，輕推和調整對象邊緣以更大的增量縮小"
+
+msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
+msgstr "OSARA: 擦帶較慢，輕推和調整對象邊緣以較小的增量，放大"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"
