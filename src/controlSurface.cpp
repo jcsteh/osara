@@ -430,22 +430,13 @@ class Surface: public IReaperControlSurface {
 		const char* ccName = GetTrackMIDINoteNameEx(nullptr, track, cc + 128,
 			channel);
 		const int value = event[2];
+		ostringstream ccText;
+		ccText << cc;
 		if (ccName) {
-			// Translators: Reported for a named MIDI CC in shortcut help. {cc} will be
-			// replaced with the CC number. {name} will be replaced with the CC name.
-			// {value} will be replaced with the value. For example:
-			// "1 mod wheel value 127"
-			outputMessage(format(
-				translate("{cc} {name} value {value}"),
-				"cc"_a=cc, "name"_a=ccName, "value"_a=value));
-		} else {
-			// Translators: Reported for an unnamed MIDI CC in shortcut help. {cc} will
-			// be replaced with the CC number. {value} will be replaced with the value.
-			// For example: "1 value 127"
-			outputMessage(format(
-				translate("{cc} value {value}"),
-				"cc"_a=cc, "value"_a=value));
+			ccText << " " << ccName;
 		}
+		outputMessage(format(translate("Control {control}, {value}"),
+			"control"_a=ccText.str(), "value"_a=value));
 	}
 
 	MediaTrack* lastSelectedTrack = nullptr;
