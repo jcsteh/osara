@@ -998,12 +998,17 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		if (ccIndex == -1) {
 			break;
 		}
-		bool muted;
-		double position;
-		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, nullptr, &muted, &position, &msg1, &chan, &msg2, &msg3);
-		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position, true, muted});
+		auto cc = MidiControlChange::get(take, ccIndex, {
+			true,  // position
+			true,  // message1
+			true,  // channel
+			true,  // message2
+			true,  // message3,
+			true,  // selected
+			true  // muted
+		});
+		cc.position = MIDI_GetProjTimeFromPPQPos(take, cc.position);
+		ccs.push_back(cc);
 	}
 	return ccs;
 }
