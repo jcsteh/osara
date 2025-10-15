@@ -998,7 +998,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		if (ccIndex == -1) {
 			break;
 		}
-		auto cc = MidiControlChange::get(take, ccIndex, {
+		ccs.push_back(MidiControlChange::get(take, ccIndex, {
 			true,  // position
 			true,  // message1
 			true,  // channel
@@ -1006,9 +1006,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 			true,  // message3,
 			true,  // selected
 			true  // muted
-		});
-		cc.position = MIDI_GetProjTimeFromPPQPos(take, cc.position);
-		ccs.push_back(cc);
+		}));
 	}
 	return ccs;
 }
