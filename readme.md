@@ -853,6 +853,7 @@ OSARA also includes some other miscellaneous actions.
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
 - OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
+- OSARA: Analyze and show peak and loudness statistics for selected tracks/items: Control+Shift+U
 
 #### Midi Editor section of actions list
 - OSARA: Move forward to next single note or chord: RightArrow
