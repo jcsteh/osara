@@ -5616,6 +5616,166 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
+void cmdShowPeakAndLoudnessMenu(Command* command) {
+	double startTS, endTS;
+		GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
+	int selTracks = CountSelectedTracks2(nullptr, true);
+	int selItems = CountSelectedMediaItems(nullptr);
+	HMENU menu = CreatePopupMenu();
+	HMENU subMenu;
+	MENUITEMINFO itemInfo;
+	itemInfo.cbSize = sizeof(MENUITEMINFO);
+	// Master submenu
+	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU;
+	subMenu = CreatePopupMenu();
+	itemInfo.hSubMenu = subMenu;
+	itemInfo.fType = MFT_STRING;
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	itemInfo.dwTypeData = (char*)translate("Master");
+	itemInfo.cch = strlen(itemInfo.dwTypeData);
+	InsertMenuItem(menu, 0, true, &itemInfo);
+	// Master -> Master mix (ID 1)
+	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+	itemInfo.fType = MFT_STRING;
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	itemInfo.dwTypeData = (char*)translate("Master mix");
+	itemInfo.cch = strlen(itemInfo.dwTypeData);
+	itemInfo.wID = 1;
+	InsertMenuItem(subMenu, 0, true, &itemInfo);
+	// Master -> Time selection (ID 2)
+	itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+	itemInfo.fType = MFT_STRING;
+	if (startTS == endTS) {
+		itemInfo.fState = MFS_DISABLED;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("No time selection");
+	} else {
+		itemInfo.fState = MFS_ENABLED;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Time &selection");
+	}
+	itemInfo.cch = strlen(itemInfo.dwTypeData);
+	itemInfo.wID = 2;
+	InsertMenuItem(subMenu, 1, true, &itemInfo);
+	// Tracks submenu
+	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
+	subMenu = CreatePopupMenu();
+	itemInfo.hSubMenu = subMenu;
+	itemInfo.fType = MFT_STRING;
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	itemInfo.dwTypeData = (char*)translate("Tracks");
+	itemInfo.cch = strlen(itemInfo.dwTypeData);
+	if(selTracks > 0) itemInfo.fState = MFS_ENABLED;
+	else itemInfo.fState = MFS_DISABLED;
+	InsertMenuItem(menu, 1, true, &itemInfo);
+	if (selTracks > 0) {
+		// Tracks -> Selected tracks (ID 3)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		itemInfo.fType = MFT_STRING;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Selected &tracks");
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 3;
+		InsertMenuItem(subMenu, 0, true, &itemInfo);
+		// Tracks -> Time selection (ID 4)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+		itemInfo.fType = MFT_STRING;
+	if (startTS == endTS) {
+			itemInfo.fState = MFS_DISABLED;
+			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+			itemInfo.dwTypeData = (char*)translate("No time selection");
+		} else {
+			itemInfo.fState = MFS_ENABLED;
+			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+			itemInfo.dwTypeData = (char*)translate("Time &selection");
+		}
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 4;
+		InsertMenuItem(subMenu, 1, true, &itemInfo);
+		// Tracks -> Selected tracks mono summed (ID 5)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		itemInfo.fType = MFT_STRING;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("&Mono summed selected tracks");
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 5;
+		InsertMenuItem(subMenu, 2, true, &itemInfo);
+		// Tracks -> Mono summed time selection (ID 6)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+		itemInfo.fType = MFT_STRING;
+	if (startTS == endTS) {
+			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+			itemInfo.fState = MFS_DISABLED;
+			itemInfo.dwTypeData = (char*)translate("No time selection");
+		} else {
+			itemInfo.fState = MFS_ENABLED;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+			itemInfo.dwTypeData = (char*)translate("Mono summed time selection");
+		}
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 6;
+		InsertMenuItem(subMenu, 3, true, &itemInfo);
+	}
+	// Items submenu
+	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
+	subMenu = CreatePopupMenu();
+	itemInfo.hSubMenu = subMenu;
+	itemInfo.fType = MFT_STRING;
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	itemInfo.dwTypeData = (char*)translate("Items");
+	itemInfo.cch = strlen(itemInfo.dwTypeData);
+	if(selItems > 0) itemInfo.fState = MFS_ENABLED;
+	else itemInfo.fState = MFS_DISABLED;
+	InsertMenuItem(menu, 2, true, &itemInfo);
+	if (selItems > 0) {
+		// Items -> Selected items (ID 7)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		itemInfo.fType = MFT_STRING;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Selected &items");
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 7;
+		InsertMenuItem(subMenu, 0, true, &itemInfo);
+		// Items -> Include track/take FX and settings (ID 8)
+		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
+		itemInfo.fType = MFT_STRING;
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Include track/take &FX and settings");
+		itemInfo.cch = strlen(itemInfo.dwTypeData);
+		itemInfo.wID = 8;
+		InsertMenuItem(subMenu, 1, true, &itemInfo);
+	}
+	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0,
+		mainHwnd, nullptr);
+	switch(id) {
+		case 0: return; // canceled
+		case 1: 
+			Main_OnCommand(42440, 0); // Calculate loudness of master mix via dry run render
+			break;
+		case 2:
+			Main_OnCommand(42441, 0); // Calculate loudness of master mix within time selection via dry run render
+			break;
+		case 3: 
+			Main_OnCommand(42438, 0); // Calculate loudness of selected tracks via dry run render
+			break;
+		case 4:
+			Main_OnCommand(42439, 0); // Calculate loudness of selected tracks within time selection via dry run render
+			break;
+		case 5:
+			Main_OnCommand(42447, 0); // Calculate mono loudness of selected tracks via dry run render
+			break;
+		case 6:
+			Main_OnCommand(42448, 0); // Calculate mono loudness of selected tracks within time selection via dry run render
+			break;
+		case 7:
+			Main_OnCommand(42468, 0); // Calculate loudness of selected items via dry run render
+			break;
+		case 8:
+			Main_OnCommand(42437, 0); // Calculate loudness of selected items, including take and track FX and settings, via dry run render
+			break;
+	}
+}
+
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
@@ -5850,6 +6010,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Analyze and show peak and loudness statistics for selected tracks/items")}, "OSARA_SHOWPEAKANDLOUDNESSMENU", cmdShowPeakAndLoudnessMenu},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
