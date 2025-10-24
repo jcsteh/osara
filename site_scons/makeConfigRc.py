@@ -15,7 +15,7 @@ def makeConfigRc(target, source, env):
 			break
 	out.write(
 """#include <windows.h>
-{cid} DIALOGEX 250, 125, 500, 500
+{cid} DIALOGEX 250, 125, 400, 400
 	CAPTION "OSARA Configuration"
 BEGIN
 """.format(cid=cid))
@@ -34,7 +34,7 @@ BEGIN
 		m = RE_BOOL_SETTING.match(setting)
 		cid += 1
 		out.write(
-			'\tCONTROL {displayName}, {cid}, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, {y}, 490, 14\n'
+			'\tCONTROL {displayName}, {cid}, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, {y}, 390, 14\n'
 			.format(displayName=m.group("displayName"), cid=cid, y=y))
 		y += 20
 	out.write('\tDEFPUSHBUTTON "OK", IDOK, 10, {y}, 30, 14\n'
