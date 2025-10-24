@@ -179,6 +179,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
 - Item: Copy loop of selected area of audio items: Control+Win+L
+- Move edit cursor to next zero crossing in items: Z
+- Move edit cursor to previous zero crossing in items: Shift+Z
 - SWS/FNG: Quantize item positions and MIDI note positions to grid: Control+Shift+Q
 
 #### Takes
@@ -910,6 +912,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Item properties: Decrease item rate by ~6% (one semitone)
 - Item properties: Increase item rate by ~6% (one semitone)
 - Item properties: Set item rate from user-supplied source media tempo/bpm...
+- Move edit cursor to nearest zero crossing in items
 - Take: Nudge active takes volume +1dB
 - Take: Nudge active takes volume -1dB
 - Item: Nudge items volume +1dB
