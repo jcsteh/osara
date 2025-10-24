@@ -17,7 +17,11 @@
 #include "paramsUi.h"
 #include "midiEditorCommands.h"
 #include "translation.h"
+#ifdef _WIN32
+# include "uia.h"
+#endif
 
+using namespace fmt::literals;
 using namespace std;
 
 // REAPER often notifies us about track states even if they haven't changed.
@@ -82,15 +86,20 @@ class Surface: public IReaperControlSurface {
 	}
 
 	void Run() final {
-		if (settings::reportMarkersWhilePlaying && GetPlayState() & 1) {
+		if (GetPlayState() & 1) {
 			double playPos = GetPlayPosition();
 			if (playPos == this->lastPlayPos) {
 				return;
 			}
 			this->lastPlayPos = playPos;
-			this->reportMarker(playPos);
+			if (settings::reportMarkersWhilePlaying) {
+				this->reportMarker(playPos);
+			}
+			if (settings::reportTimeSelectionWhilePlaying) {
+				this->reportTimeSelectionWhilePlaying(playPos);
+			}
 		}
-		this->reportInputMidiNote();
+		this->reportInputMidiEvent();
 	}
 
 	void SetPlayState(bool play, bool pause, bool rec) final {
@@ -354,35 +363,80 @@ class Surface: public IReaperControlSurface {
 		}
 	}
 
-	void reportInputMidiNote() {
+	void reportTimeSelectionWhilePlaying(double playPos) {
+		double start, end;
+		GetSet_LoopTimeRange(false, false, &start, &end, false);
+		if (start == end) {
+			return;
+		}
+		double startDiff = playPos - start;
+		double endDiff = playPos - end;
+		if (startDiff >= 0 && startDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection start"));
+			this -> hasReportedTimeSelection = true;
+		} else if (endDiff >= 0 && endDiff <= 0.1) {
+			if (this -> hasReportedTimeSelection)
+				return;
+			outputMessage(translate("time selection end"));
+			this -> hasReportedTimeSelection = true;
+		} else {
+			this -> hasReportedTimeSelection = false;
+		}
+	}
+
+	void reportInputMidiEvent() {
 		if (!isShortcutHelpEnabled) {
 			return;
 		}
 		constexpr unsigned char MIDI_NOTE_ON_C0 = 0x90;
 		constexpr unsigned char MIDI_NOTE_ON_C15 = MIDI_NOTE_ON_C0 + 15;
+		constexpr unsigned char MIDI_CC_C0 = 0xB0;
+		constexpr unsigned char MIDI_CC_C15 = MIDI_CC_C0 + 15;
 		static int lastIndex = 0;
 		unsigned char event[3];
 		int eventSize = sizeof(event);
 		int device;
 		int index = MIDI_GetRecentInputEvent(0, (char*)event, &eventSize, nullptr,
 			&device, nullptr, nullptr);
-		unsigned char status = event[0];
-		if (index == lastIndex || status < MIDI_NOTE_ON_C0 ||
-				status > MIDI_NOTE_ON_C15 || event[2] == 0) {
-			// Already reported this note, not a MIDI note on or MIDI note on with
-			// 0 velocity (which is equivalent to note off).
+		if (index == lastIndex) {
+			// We already reported this note.
 			return;
 		}
 		lastIndex = index;
+		unsigned char status = event[0];
+		// MIDI note on with velocity 0 is equivalent to note off.
+		const bool isNoteOn = status >= MIDI_NOTE_ON_C0 &&
+			status <= MIDI_NOTE_ON_C15 && event[2] != 0;
+		const bool isCc = status >= MIDI_CC_C0 && status <= MIDI_CC_C15;
+		if (!isNoteOn && !isCc) {
+			return;
+		}
 		MediaTrack* track = GetLastTouchedTrack();
 		if (!track || !isTrackArmed(track)) {
 			return;
 		}
-		int channel = status - MIDI_NOTE_ON_C0;
-		const string noteName = getMidiNoteName(track, event[1], channel);
-		if (!noteName.empty()) {
-			outputMessage(noteName);
+		if (isNoteOn) {
+			const int channel = status - MIDI_NOTE_ON_C0;
+			const string noteName = getMidiNoteName(track, event[1], channel);
+			if (!noteName.empty()) {
+				outputMessage(noteName);
+			}
+			return;
 		}
+		const int channel = status - MIDI_CC_C0;
+		const int cc = event[1];
+		const char* ccName = GetTrackMIDINoteNameEx(nullptr, track, cc + 128,
+			channel);
+		const int value = event[2];
+		ostringstream ccText;
+		ccText << cc;
+		if (ccName) {
+			ccText << " " << ccName;
+		}
+		outputMessage(format(translate("Control {control}, {value}"),
+			"control"_a=ccText.str(), "value"_a=value));
 	}
 
 	MediaTrack* lastSelectedTrack = nullptr;
@@ -396,6 +450,7 @@ class Surface: public IReaperControlSurface {
 	double lastPlayPos = 0;
 	int lastMarker = -1;
 	int lastRegion = -1;
+	bool hasReportedTimeSelection = false;
 };
 
 IReaperControlSurface* createSurface() {

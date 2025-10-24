@@ -90,6 +90,10 @@ struct MidiControlChange {
 	bool selected;
 	bool muted;
 
+	operator bool() const {
+		return this->index != -1;
+	}
+
 	struct ReqParams {
 		bool position = true;
 		bool message1 = false;
@@ -793,10 +797,15 @@ vector<MidiNote> getSelectedNotes(MediaItem_Take* take, int offset=-1) {
 
 using MidiControlChangeIterator = MidiEventIterator<MidiControlChange, MediaItem_Take*>;
 
-// Finds a single CC at the cursor in a given direction and returns its info.
-// This updates currentCC.
-MidiControlChange findCC(MediaItem_Take* take, int direction) {
-	MidiControlChangeIterator begin(take, {
+// #434: CC events are ordered arbitrarily and, unlike notes, order can change
+// when interacting with them. Therefore, when we are searching for the next
+// or previous CC, we need to sort CCs at the same position. This class
+// iterates CCs, sorting as necessary. Note that this is not a proper C++
+// iterator.
+class SortedMidiControlChangeIterator {
+	public:
+	SortedMidiControlChangeIterator(MediaItem_Take* take):
+	begin(MidiControlChangeIterator(take, {
 		true,  // position
 		true,  // message1
 		true,  // channel
@@ -804,88 +813,171 @@ MidiControlChange findCC(MediaItem_Take* take, int direction) {
 		true,  // message3,
 		true,  // selected
 		true  // muted
-	});
-	MidiControlChangeIterator end = begin;
-	end.moveToEnd();
-	if (begin == end) {
-		// No CCs.
-		currentCC = {-1, -1};
-		return {-1};
+	})),
+	// We'll set these properly below, but there's no default constructor, so we
+	// must initialise them to something here.
+	end(begin), firstAtPos(begin), firstAfterPos(begin) {
+		this->end.moveToEnd();
+		if (begin == end) {
+			// No CCs.
+			return;
+		}
+		double now = GetCursorPosition();
+		// Find all CCs at the current position.
+		tie(this->firstAtPos, this->firstAfterPos) = equal_range(begin, end, now,
+			MidiControlChange::CompareByPosition{});
+		this->sortCCsAtPos();
+		auto [position, curCC] = currentCC;
+		int count = this->firstAfterPos - this->firstAtPos;
+		if (curCC!= -1 && position == now && count >0) {
+			// In this case, we have a cached CC at the current position
+			// and the range of CCs at the current position contains at least one CC.
+			this->sortedIndexAtPos = curCC;
+		} else {
+			// We don't have a cached CC at the current position, so the first call to
+			// next() should move to the first CC at the current position.
+			this->sortedIndexAtPos = -1;
+		}
 	}
-	double now = GetCursorPosition();
-	// Find all CCs at the current position.
-	auto range = equal_range(begin, end, now, MidiControlChange::CompareByPosition{});
-	int count = range.second - range.first;
-	double position = currentCC.first;
-	int curCC= currentCC.second;
-	if (curCC!= -1 && position == now && count >0) {
-		// In this case, we have a cached CC at the current position
-		// and the range of CCs at the current position contains at least one CC.
-		// We can simmply move to the adjacent CC in the range,
-		// unless curCC is at the edge of the range.
-		// In that case, we skip this block entirely and behave as if there was nothing cached.
-		auto newCC = curCC+ direction;
-		if (direction == -1 ? newCC >= 0 : newCC < count) {
-			// #434: CC events are ordered arbitrarily and, unlike notes, order can change when interacting with them.
-			// Create a vector of CCs in order to sort them in a stable way.
-			vector<MidiControlChange> ccs(range.first, range.second);
-			stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
-			currentCC.second = newCC;
-			return ccs.at(newCC);
+
+	MidiControlChange next() {
+		// Try moving to the next CC at the current position.
+		++this->sortedIndexAtPos;
+		if (auto current = this->current()) {
+			return current;
+		}
+		// There are no more at this position, so move forward to a CC at another
+		// position.
+		if (this->firstAfterPos == this->end) {
+			return {};
+		}
+		this->firstAtPos = this->firstAfterPos;
+		// Find the first CC after this new position.
+		double newPos = this->firstAtPos->position;
+		for (this->firstAfterPos = this->firstAtPos; this->firstAfterPos != this->end;
+				++this->firstAfterPos) {
+			if (this->firstAfterPos->position != newPos) {
+				break;
+			}
+		}
+		// Finally, return the last sorted CC at this new position.
+		this->sortCCsAtPos();
+		this->sortedIndexAtPos = 0;
+		return this->current();
+	}
+
+	MidiControlChange previous() {
+		// Try moving to the previous CC at the current position.
+		--this->sortedIndexAtPos;
+		if (auto current = this->current()) {
+			return current;
+		}
+		// There are no more at this position, so move backward to a CC at another
+		// position.
+		if (this->firstAtPos == this->begin) {
+			return {};
+		}
+		this->firstAfterPos = this->firstAtPos;
+		this->firstAtPos = this->firstAfterPos - 1;
+		// Find the first unsorted CC at this new position.
+		double newPos = this->firstAtPos->position;
+		for (; this->firstAtPos != this->begin; --this->firstAtPos) {
+			if (this->firstAtPos->position != newPos) {
+				++this->firstAtPos;
+				break;
+			}
+		}
+		// Finally, return the last sorted CC at this new position.
+		this->sortCCsAtPos();
+		this->sortedIndexAtPos = this->sortedCCsAtPos.size() - 1;
+		return this->current();
+	}
+
+	MidiControlChange current() {
+		if (this->sortedIndexAtPos >= 0 &&
+				this->sortedIndexAtPos < this->sortedCCsAtPos.size()) {
+			return this->sortedCCsAtPos[this->sortedIndexAtPos];
+		}
+		return {};
+	}
+
+	void updateCurrentCC() {
+		currentCC = {this->firstAtPos->position, this->sortedIndexAtPos};
+	}
+
+	private:
+	void sortCCsAtPos() {
+		this->sortedCCsAtPos.assign(this->firstAtPos, this->firstAfterPos);
+		stable_sort(this->sortedCCsAtPos.begin(), this->sortedCCsAtPos.end(),
+			MidiControlChange::compareForSortAtPosition);
+	}
+
+	MidiControlChangeIterator begin;
+	MidiControlChangeIterator end;
+	// Points to the first CC at the current time position of this iterator.
+	MidiControlChangeIterator firstAtPos;
+	// Points to the first CC after the current time position of this iterator.
+	// That is, this is the exclusive end for a range containing all CCs at the
+	// current position.
+	MidiControlChangeIterator firstAfterPos;
+	vector<MidiControlChange> sortedCCsAtPos;
+	// The current index into sortedCCsAtPos.
+	int sortedIndexAtPos = -1;
+};
+
+bool isCCInLane(const MidiControlChange& cc, int lane) {
+	if (lane <= 127) {
+		// CC.
+		return cc.message1 == 0xB0 && cc.message2 == lane;
+	}
+	if (lane & 0x100) {
+		// We don't support 14-bit CC properly yet. For now, at least match both MSB
+		// and LSB CCs.
+		int ccNum = lane - 0x100;
+		return cc.message1 == 0xB0 &&
+			(cc.message2 == ccNum || cc.message2 == ccNum + 32);
+	}
+	if (lane == 0x201) {
+		// Pitch.
+		return cc.message1 == 0xE0;
+	}
+	if (lane == 0x202) {
+		// Program.
+		return cc.message1 == 0xC0;
+	}
+	if (lane == 0x203) {
+		// Channel pressure.
+		return cc.message1 == 0xD0;
+	}
+	return false;
+}
+
+// Finds a single CC at the cursor in a given direction and returns its info.
+// This updates currentCC.
+MidiControlChange findCC(MediaItem_Take* take, int direction) {
+	HWND editor = MIDIEditor_GetActive();
+	int lane = MIDIEditor_GetSetting_int(editor, "last_clicked_cc_lane");
+	SortedMidiControlChangeIterator iter(take);
+	MidiControlChange cc;
+	if (direction == -1) {
+		while ((cc = iter.previous())) {
+			if (isCCInLane(cc, lane)) {
+				break;
+			}
 		}
 	} else if (direction == 1) {
-		// Direction is forward, but we want to ensure that focus lands on the first CC at or after the cursor.
-		// Sticking to direction == 1 would mean we'd focus a CC after the cursor, even if there was a CC at the cursor.
-		direction = 0;
-	}
-	MidiControlChangeIterator firstCC = end;
-	if (direction == 1 && range.second != end) {
-		// We want a CC after the cursor
-		// range.second is the first CC after now.
-		firstCC = range.second;
-	} else if (direction == -1 && range.first != begin) {
-		// We want a CC before the cursor
-		// range.First is the first CC at or after now, so one before that is
-		// the first CC before now.
-		firstCC = range.first;
-		--firstCC;
-	} else if (direction == 0 && range.first != end) {
-		// We want a CC at or after the cursor
-		// range.First is the first CC at or after now.
-		firstCC = range.first;
-	} else {
-		// Nothing in the requested direction or at the cursor.
-		return {-1};
-	}
-	// Find the last CC at the position of the first.
-	double firstPos = firstCC->position;
-	MidiControlChangeIterator lastCC = firstCC;
-	MidiControlChangeIterator cc = firstCC;
-	int movement = direction != -1 ? 1 : -1;
-	for (cc += movement; begin <= cc && cc < end; cc += movement) {
-		if (cc->position != firstPos) {
-			break;
+		while ((cc = iter.next())) {
+			if (isCCInLane(cc, lane)) {
+				break;
+			}
 		}
-		lastCC = cc;
-	}
-	int index = 0;
-	MidiControlChange ret;
-	if (firstCC == lastCC) {
-		// There is only one CC at this position.
-		ret = *firstCC;
 	} else {
-		// #434: CC events are ordered arbitrarily.
-		// To sort them in a stable way, create a vector containing all the CCs at the position we're navigating to.
-		// Note that the constructor of vector expects an exclusive end, but our range is inclusive.
-		vector<MidiControlChange> ccs(movement != -1 ? firstCC : lastCC, movement != -1 ? lastCC + 1 : firstCC + 1);
-		stable_sort(ccs.begin(), ccs.end(), MidiControlChange::compareForSortAtPosition);
-		// Focus the first or last note in the vector, depending on direction being forward or backward, respectively.
-		index = movement != -1 ? 0 : (static_cast<int>(ccs.size()) -1);
-		ret = ccs.at(index);
+		cc = iter.current();
 	}
-	// Save the new CC for future invocations of findCC.
-	currentCC = {ret.position, index};
-	return ret;
+	if (cc) {
+		iter.updateCurrentCC();
+	}
+	return cc;
 }
 
 void selectCC(MediaItem_Take* take, const int cc, bool select=true) {
@@ -906,11 +998,15 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 		if (ccIndex == -1) {
 			break;
 		}
-		double position;
-		int chan, msg1, msg2, msg3;
-		MIDI_GetCC(take, ccIndex, nullptr, nullptr, &position, &msg1, &chan, &msg2, &msg3);
-		position = MIDI_GetProjTimeFromPPQPos(take, position);
-		ccs.push_back({chan, ccIndex, msg1, msg2, msg3, position});
+		ccs.push_back(MidiControlChange::get(take, ccIndex, {
+			true,  // position
+			true,  // message1
+			true,  // channel
+			true,  // message2
+			true,  // message3,
+			true,  // selected
+			true  // muted
+		}));
 	}
 	return ccs;
 }
@@ -954,15 +1050,14 @@ void cmdMidiToggleSelection(Command* command) {
 			}
 			break;
 		}
-		case FOCUS_CC: {
-			if (currentCC.first == -1 || currentCC.second == -1) {
+		case FOCUS_CC:
+			if (auto curCC= findCC(take, 0)) {
+				select = !curCC.selected;
+				selectCC(take, curCC.index, select);
+			} else {
 				return;
 			}
-			auto curCC= findCC(take, 0);
-			select = !curCC.selected;
-			selectCC(take, curCC.index, select);
 			break;
-		}
 		default:
 			return;
 	}
@@ -1017,18 +1112,23 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	if (cursorMoved && !select && !isNoteSelected(take, chord.first.getIndex())) {
 		s << translate("unselected") << " ";
 	}
-	if (cursorMoved && settings::reportNotes && settings::reportPositionMIDI) {
+	if (cursorMoved && settings::reportNotes) {
 		int count = chord.second - chord.first;
-		// Translators: used when reporting the number of notes in a chord.
-		// {} will be replaced by the number of notes. E.g. "3 notes"
-		s << format(
-			translate_plural("{} note", "{} notes", count), count);
-		int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
-		if (mutedCount > 0) {
-			// Translators: used when reporting the number of muted notes in a chord.
-			// {} will be replaced by the number of muted notes. E.g. "3 muted"
-			s << format(
-				translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+		if (count == 1) {
+			if (notes[0].muted)
+				s << translate("muted") << " ";
+			s << getMidiNoteName(take, notes[0].pitch, notes[0].channel);
+		} else {
+			// Translators: used when reporting the number of notes in a chord.
+			// {} will be replaced by the number of notes. E.g. "3 notes"
+			s << format(translate("{} notes"), count);
+			int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted notes in a chord.
+				// {} will be replaced by the number of muted notes. E.g. "3 muted"
+				s << " " << format(
+					translate_plural("{} muted", "{} muted", mutedCount), mutedCount);
+			}
 		}
 	}
 	if (s.tellp() > 0) {
@@ -1090,19 +1190,19 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	outputMessage(s);
 }
 
-void cmdMidiMoveToNextNoteInChord(Command* command) {
+void cmdMidiMoveToHigherNoteInChord(Command* command) {
 	moveToNoteInChord(1);
 }
 
-void cmdMidiMoveToPreviousNoteInChord(Command* command) {
+void cmdMidiMoveToLowerNoteInChord(Command* command) {
 	moveToNoteInChord(-1);
 }
 
-void cmdMidiMoveToNextNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToHigherNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(1, false, isSelectionContiguous);
 }
 
-void cmdMidiMoveToPreviousNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToLowerNoteInChordKeepSel(Command* command) {
 	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
@@ -1126,18 +1226,15 @@ void postMidiMovePitchCursor(int command) {
 	}
 }
 
-void cmdMidiInsertNote(Command* command) {
+void cmdhInsertNote(int oldCount, int relativeNote, bool reportNewPos) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
-	int oldCount;
-	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
 	int newCount;
 	MIDI_CountEvts(take, &newCount, nullptr, nullptr);
 	if (newCount <= oldCount) {
 		return; // Not inserted.
 	}
-	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row");
+	int pitch = MIDIEditor_GetSetting_int(editor, "active_note_row") + relativeNote;
 	// Get selected notes.
 	vector<MidiNote> selectedNotes = getSelectedNotes(take);
 	// Find the just inserted note based on its pitch, as that makes it unique.
@@ -1153,9 +1250,6 @@ void cmdMidiInsertNote(Command* command) {
 	previewNotes(take, {note});
 	fakeFocus = FOCUS_NOTE;
 	ostringstream s;
-	// If we're advancing the cursor position, we should report the new position.
-	const bool reportNewPos = command->gaccel.accel.cmd ==
-		40051; // Edit: Insert note at edit cursor
 	if (settings::reportNotes) {
 		s << getMidiNoteName(take, note.pitch, note.channel) << " ";
 		s << formatNoteLength(note.start, note.end);
@@ -1167,6 +1261,35 @@ void cmdMidiInsertNote(Command* command) {
 		s << formatCursorPosition();
 	}
 	outputMessage(s);
+}
+
+void cmdMidiInsertNote(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	// If we're advancing the cursor position, we should report the new position.
+	const bool reportNewPos = command->gaccel.accel.cmd ==
+		40051; // Edit: Insert note at edit cursor
+	cmdhInsertNote(oldCount, 0, reportNewPos);
+}
+
+void cmdMidiPasteEvents(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	int added = newCount - oldCount;
+if (added <= 0) {
+		outputMessage(translate("nothing pasted"));
+		return;
+	}
+	// Translators: Reported when pasting events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 events added".
+	outputMessage(format(
+		translate_plural("{} event added", "{} events added", added), added));
 }
 
 void cmdMidiDeleteEvents(Command* command) {
@@ -1181,6 +1304,16 @@ void cmdMidiDeleteEvents(Command* command) {
 		translate_plural("{} event removed", "{} events removed", removed), removed));
 }
 
+void postMidiCopyEvents(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count = countSelectedEvents (take);
+	// Translators: Reported when copying events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 events copied".
+	outputMessage(format(
+		translate_plural("{} event copied", "{} events copied", count), count));
+}
+
 void postMidiSelectNotes(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -1191,6 +1324,31 @@ void postMidiSelectNotes(int command) {
 	outputMessage(format(
 		translate_plural("{} note selected", "{} notes selected", count ),
 		count ));
+}
+
+int countSelectedCCs(MediaItem_Take* take) {
+	int evtIndex=-1;
+	int count=0;
+	for(;;){
+		evtIndex = MIDI_EnumSelCC(take, evtIndex);
+		if (evtIndex == -1) {
+			break;
+		}
+		++count;
+	}
+	return count;
+}
+
+void postMidiSelectCCs(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int count = countSelectedCCs (take);
+	fakeFocus = FOCUS_CC;
+	// Translators: Reported when selecting CC events in the MIDI editor. {} will be replaced with
+	// the number of events; e.g. "2 CC events selected".
+	outputMessage(format(
+		translate_plural("{} CC event selected", "{} CC events selected", count),
+		count));
 }
 
 int countSelectedEvents(MediaItem_Take* take) {
@@ -1333,11 +1491,42 @@ const string getMidiControlName(MediaItem_Take *take, int control, int channel) 
 	return s.str();
 }
 
+string describeCC(MediaItem_Take* take, MidiControlChange cc) {
+	if (cc.message1 == 0xA0) {
+		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
+		// name and {value} will be replaced with the aftertouch value; e.g.
+		// "Poly Aftertouch c sharp 4  96"
+		return format(translate("Poly Aftertouch {note}  {value}"),
+			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
+	}
+	if (cc.message1 == 0xB0) {
+		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+		return format(translate("Control {control}, {value}"),
+			"control"_a=getMidiControlName(take, cc.message2, cc.channel),
+			"value"_a=cc.message3);
+	}
+	if (cc.message1 == 0xC0) {
+		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
+		return format(translate("Program {}"), cc.message2);
+	}
+	if (cc.message1 == 0xD0) {
+		// Translators: MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
+		return format(translate("Channel pressure {}"), cc.message2);
+	}
+	if (cc.message1 == 0xE0) {
+		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
+		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
+		return format(translate("Pitch Bend {}"), pitchBendValue);
+	}
+	return "";
+}
+
 void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	auto cc = findCC(take, direction);
-	if (cc.channel == -1) {
+	if (!cc) {
 		return;
 	}
 	if (clearSelection || select) {
@@ -1356,37 +1545,35 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	SetEditCurPos(cc.position, true, false);
 	fakeFocus = FOCUS_CC;
 	ostringstream s;
-	s << formatCursorPosition() << " ";
+	if (settings::reportPositionMIDI) {
+		s << formatCursorPosition() << " ";
+	}
 	if (cc.muted) {
 		s << translate("muted") << " ";
 	}
-	if (cc.message1 == 0xA0) {
-		// Translators: MIDI poly aftertouch. {note} will be replaced with the note
-		// name and {value} will be replaced with the aftertouch value; e.g.
-		// "Poly Aftertouch c sharp 4  96"
-		s << format(translate("Poly Aftertouch {note}  {value}"),
-			"note"_a=getMidiNoteName(take, cc.message2, cc.channel),
-			"value"_a=cc.message3);
-	} else if (cc.message1 == 0xB0) {
-		// Translators: A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
-		s << format(translate("Control {control}, {value}"),
-		"control"_a=getMidiControlName(take, cc.message2, cc.channel),
-		"value"_a=cc.message3);
-	} else if (cc.message1 == 0xC0) {
-		//Translators: a MIDI program number.  {} will be replaced with the program number; e.g. "Program 5"
-		s << format(translate("Program {}"), cc.message2);
-	} else if (cc.message1 == 0xD0) {
-		// Midi channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
-		s << format(translate("Channel pressure {}"), cc.message2);
-	} else if (cc.message1 == 0xE0) {
-		auto pitchBendValue = (cc.message3 << 7) | cc.message2;
-		// Translators: MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
-		s << format(translate("Pitch Bend {}"), pitchBendValue);
-	}
+	s << describeCC(take, cc);
 	if (!select && !isCCSelected(take, cc.index)) {
 		s << " " << translate("unselected");
 	}
 	outputMessage(s);
+}
+
+void cmdMidiInsertCC(Command* command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
+	if (newCount <= oldCount) {
+		return; // Not inserted.
+	}
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	if (selectedCCs.size() != 1) {
+		return;
+	}
+	auto cc = *selectedCCs.cbegin();
+	fakeFocus = FOCUS_CC;
+	outputMessage(describeCC(take, cc));
 }
 
 void cmdMidiMoveToNextCC(Command* command) {
@@ -1524,6 +1711,7 @@ void cmdMidiNoteSplitOrJoin(Command* command) {
 	}
 	switch (cmdId) {
 		case 40046:
+		case 40641:
 			// Translators: used when splitting notes in the midi editor.
 			// {oldCount} is replaced by the number of notes that were selected
 			// before the command.  This is the number the plural form is based
@@ -1897,6 +2085,71 @@ void postMidiChangePitch(int command) {
 	outputMessage(s);
 }
 
+void postMidiMovePosition(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int count = static_cast<int>(selectedCCs.size());
+	if (count == 0) {
+		return;
+	}
+	auto firstPosition = selectedCCs.cbegin()->position;
+	bool generalize = count >= 8 || any_of(
+		selectedCCs.begin(), selectedCCs.end(),
+		[firstPosition](MidiControlChange c) { return firstPosition != c.position; }
+		);
+	ostringstream s;
+	if (generalize) {
+		switch (command) {
+			case 40672:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel left"
+				s << format(
+					translate_plural("{} CC event pixel left", "{} CC events pixel left", count), count);
+				break;
+			case 40673:
+			// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events pixel right"
+				s << format(
+					translate_plural("{} CC event pixel right", "{} CC events pixel right", count), count);
+				break;
+			case 40674:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit left"
+				s << format(
+					translate_plural("{} CC event grid unit left", "{} CC events grid unit left", count), count);
+				break;
+			case 40675:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events grid unit right"
+				s << format(
+					translate_plural("{} CC event grid unit right", "{} CC events grid unit right", count), count);
+				break;
+			default:
+				// Translators: Used when moving CCs in the MIDI
+				// editor. {} is replaced by the number of CCs, e.g. 
+				// "3 CC events moved"
+				s << format(
+					translate_plural("{} CC event moved", "{} CC events moved", count), count);
+				break;
+		}
+	} else{
+		s << formatTime(firstPosition) << " ";
+		for (auto cc = selectedCCs.cbegin(); cc != selectedCCs.cend(); ++cc) {
+			s << describeCC(take, *cc);
+			if (cc != selectedCCs.cend() - 1) {
+				s << ", ";
+			}
+		}
+	}
+	outputMessage(s);
+}
+
 void postMidiMoveStart(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -1955,10 +2208,8 @@ void postMidiMoveStart(int command) {
 					break;
 			}
 		} else{ 
+			s << formatTime(firstStart) << " ";
 			for (auto note = selectedNotes.cbegin(); note != selectedNotes.cend(); ++note) {
-				if (note == selectedNotes.cbegin()) {
-					s << formatTime(note->start) << " ";
-				}
 				s << getMidiNoteName(take, note->pitch, note->channel);
 				if (note != selectedNotes.cend() - 1) {
 					s << ", ";
@@ -2051,6 +2302,94 @@ void postToggleFunctionKeysAsStepInput(int command) {
 	}
 }
 
+void postMidiToggleMute(int command) {
+	HWND editor = MIDIEditor_GetActive();
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	// Get selected notes.
+	vector<MidiNote> selectedNotes = getSelectedNotes(take);
+	// Get selected CCs.
+	vector<MidiControlChange> selectedCCs = getSelectedCCs(take);
+	int noteCount = selectedNotes.size();
+	int CCCount = selectedCCs.size();
+	int eventCount = noteCount + CCCount;
+	if (eventCount == 0) {
+		return;
+	}
+	ostringstream s;
+	if (CCCount == 0) { // If only notes are selected
+		fakeFocus = FOCUS_NOTE;
+		if (noteCount == 1) {
+			if (selectedNotes[0].muted) {
+				s << translate("muted") << " ";
+			} else {
+				s << translate("unmuted") << " ";
+			}
+			s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
+		} else {
+			int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+			int unmutedCount = noteCount - mutedCount;
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted notes.
+				// {} will be replaced by the number of muted notes. E.g. "3 notes muted"
+				s << " " << format(
+					translate_plural("{} note muted", "{} notes muted", mutedCount), mutedCount);
+			}
+			if (unmutedCount > 0) {
+				// Translators: used when reporting the number of unmuted notes.
+				// {} will be replaced by the number of notes. E.g. "3 notes unmuted"
+				s << " " << format(
+					translate_plural("{} note unmuted", "{} notes unmuted", unmutedCount), unmutedCount);
+			}
+		}
+	} else if (noteCount == 0) { // If only CCs are selected
+		fakeFocus = FOCUS_CC;
+		if (CCCount == 1) {
+			auto cc = selectedCCs[0];
+			if (cc.muted) {
+				s << translate("muted") << " ";
+			} else {
+				s << translate("unmuted") << " ";
+			}
+			s << describeCC(take, cc);
+		} else {
+			int mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+			int unmutedCount = CCCount - mutedCount;
+			if (mutedCount > 0) {
+				// Translators: used when reporting the number of muted CCs.
+				// {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
+				s << " " << format(
+					translate_plural("{} CC muted", "{} CCs muted", mutedCount), mutedCount);
+			}
+			if (unmutedCount > 0) {
+				// Translators: used when reporting the number of unmuted CCs.
+				// {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
+				s << " " << format(
+					translate_plural("{} CC unmuted", "{} CCs unmuted", unmutedCount), unmutedCount);
+			}
+		}
+	} else { // If both notes and CCs are selected
+		int mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+		int mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+		int mutedCount = mutedNoteCount + mutedCCCount;
+		int unmutedCount = eventCount - mutedCount;
+		if (mutedCount > 0) {
+			// Translators: used when reporting the number of muted events.
+			// {} will be replaced by the number of muted events. E.g. "3 events muted"
+			s << " " << format(
+				translate_plural("{} event muted", "{} events muted", mutedCount), mutedCount);
+		}
+		if (unmutedCount > 0) {
+			// Translators: used when reporting the number of unmuted events.
+			// {} will be replaced by the number of events. E.g. "3 events unmuted"
+			s << " " << format(
+				translate_plural("{} event unmuted", "{} events unmuted", unmutedCount), unmutedCount);
+		}
+}
+	if (s.tellp() > 0) {
+		outputMessage(s);
+	}
+}
+
 void postMidiToggleSnap(int command) {
 	if(GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), command)) {
 		outputMessage(translate("enabled snap to grid"));
@@ -2082,4 +2421,29 @@ void postMidiChangeZoom(int command) {
 		// replaced with the number of pixels per second; e.g. 100 pixels/second.
 		outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 	}
+}
+
+// F1-f12 step input doesn't use actions, so we need to hook the key presses.
+int midiStepTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
+	HWND editor = MIDIEditor_GetActive();
+	if (!editor || msg->message != WM_KEYDOWN || msg->wParam < VK_F1 ||
+			msg->wParam > VK_F12 ||
+			!GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40053)) {
+		// This isn't for us.
+		return 0; // Normal handling.
+	}
+	MediaItem_Take* take = MIDIEditor_GetTake(editor);
+	int oldCount;
+	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
+	// F1 is the note at the pitch cursor, f2 is 1 semitone above, etc.
+	const int relativeNote = msg->wParam - VK_F1;
+	// If the shift key is being held, the cursor is not advancing, so we should
+	// not report the new position.
+	const bool reportNewPos = !(GetAsyncKeyState(VK_SHIFT) & 0x8000);
+	// We need to let the hook return so REAPER can handle the key and insert the
+	// note. We use CallLater to report the result.
+	CallLater([oldCount, relativeNote, reportNewPos] {
+		cmdhInsertNote(oldCount, relativeNote, reportNewPos);
+	}, 0);
+	return 0;
 }

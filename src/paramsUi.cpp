@@ -20,6 +20,7 @@
 #include <initguid.h>
 #include <Windowsx.h>
 #include <Commctrl.h>
+#include "uia.h"
 #endif
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
@@ -296,6 +297,9 @@ class ParamsDialog {
 	HWND dialog;
 	HWND paramCombo;
 	HWND slider;
+#ifdef _WIN32
+	CComPtr<TextSliderUiaProvider> sliderUiaProvider;
+#endif
 	HWND valueEdit;
 	HWND valueLabel;
 	HWND moreButton;
@@ -320,11 +324,9 @@ class ParamsDialog {
 		}
 #ifdef _WIN32
 		// Set the slider's accessible value to this text.
-		accPropServices->SetHwndPropStr(this->slider, OBJID_CLIENT, CHILDID_SELF,
-			PROPID_ACC_VALUE, widen(this->valText).c_str());
+		this->sliderUiaProvider->setValue(this->valText);
 		if (!this->suppressValueChangeReport) {
-			NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, this->slider,
-				OBJID_CLIENT, CHILDID_SELF);
+			this->sliderUiaProvider->fireValueChange();
 		}
 #else // _WIN32
 		// We can't set the slider's accessible value on Mac.
@@ -547,9 +549,10 @@ class ParamsDialog {
 			}
 			return 1; // Eat the keystroke.
 		}
-		if (msg->wParam == VK_SPACE) {
-			// Let REAPER handle the space key so control+space works.
-			return 0; // Not interested.
+		if (msg->wParam == VK_SPACE && isClassName(GetFocus(), "Button")) {
+			// Pass the space key to our window for buttons and check boxes so they can
+			// be activated as expected.
+			return -1; // Pass to our window.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
 		if (msg->hwnd == dialog->paramCombo ||
@@ -560,15 +563,23 @@ class ParamsDialog {
 				// A function key.
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
-				(alt && shift)
+				(alt && shift) ||
+				// Anything with both alt and control.
+				(alt && control) ||
+				// Modified space.
+				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
+				return -666; // Force to main window.
+			}
+			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
+				// In the combo box, we also pass space to the main section.
 				return -666; // Force to main window.
 			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
 			return -1; // Pass to our window.
 		}
-		if (alt && 'A' <= msg->wParam && msg->wParam <= 'Z') {
+		if (alt && !shift && !control && 'A' <= msg->wParam && msg->wParam <= 'Z') {
 			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
 			// the Parameter combo box.
 			return -1; // Pass to our window.
@@ -683,7 +694,7 @@ class ParamsDialog {
 		} else if (after == Param::AfterOption::invalidateParams) {
 			this->source->rebuildParams();
 			this->updateParamList();
-		} else {
+		} else if (after == Param::AfterOption::dismiss) {
 			SendMessage(this->dialog, WM_CLOSE, 0, 0);
 		}
 	}
@@ -705,6 +716,9 @@ class ParamsDialog {
 			(LONG_PTR)ParamsDialog::contextWndProc);
 		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
+#ifdef _WIN32
+		this->sliderUiaProvider = TextSliderUiaProvider::create(this->slider);
+#endif
 		origProc = SetWindowLongPtr(this->slider, GWLP_WNDPROC,
 			(LONG_PTR)ParamsDialog::contextWndProc);
 		SetWindowLongPtr(this->slider, GWLP_USERDATA, origProc);
@@ -830,11 +844,16 @@ class FxParam: public Param {
 	FxParams<ReaperObj>& source;
 	int fx;
 	int param;
+	double unrestrictedMin = 0;
+	double unrestrictedMax = 0;
 
 	public:
 	FxParam(FxParams<ReaperObj>& source, int fx, int param):
 			Param(), source(source), fx(fx), param(param) {
-		source._GetParam(source.obj, fx, param, &this->min, &this->max);
+		source._GetParam(source.obj, fx, param, &this->unrestrictedMin,
+			&this->unrestrictedMax);
+		this->min = this->unrestrictedMin;
+		this->max = this->unrestrictedMax;
 		// *FX_GetParameterStepSizes doesn't set these to 0 if it can't fetch them,
 		// even if it returns true.
 		this->step = 0;
@@ -889,6 +908,46 @@ class FxParam: public Param {
 
 	void setValueFromEdited(const string& text) final {
 		this->setValue(atof(text.c_str()));
+	}
+
+	Param::MoreOptions getMoreOptions() final {
+		Param::MoreOptions options;
+		double val = this->getValue();
+		if (val == this->min) {
+			options.push_back({
+				translate("Unrestrict minimum"),
+				[this] {
+					this->min = this->unrestrictedMin;
+					return Param::AfterOption::nothing;
+				}
+			});
+		} else {
+			options.push_back({
+				translate("Restrict minimum to current value"),
+				[this] {
+					this->min = this->getValue();
+					return Param::AfterOption::nothing;
+				}
+			});
+		}
+		if (val == this->max) {
+			options.push_back({
+				translate("Unrestrict maximum"),
+				[this] {
+					this->max = this->unrestrictedMax;
+					return Param::AfterOption::nothing;
+				}
+			});
+		} else {
+			options.push_back({
+				translate("Restrict maximum to current value"),
+				[this] {
+					this->max = this->getValue();
+					return Param::AfterOption::nothing;
+				}
+			});
+		}
+		return options;
 	}
 };
 

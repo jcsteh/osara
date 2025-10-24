@@ -17,6 +17,10 @@
 #include "resource.h"
 #include "translation.h"
 
+#ifdef _WIN32
+#include <commctrl.h>
+#endif
+
 using namespace std;
 
 namespace settings {
@@ -215,8 +219,70 @@ struct ReaperSetting {
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
-constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 2;
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 5;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
+
+#ifdef _WIN32
+// Prevent an Edit control from selecting all its text when it gets focus. See:
+// https://devblogs.microsoft.com/oldnewthing/20031114-00/?p=41823
+// Swell doesn't support this. Hopefully, it isn't needed there.
+LRESULT CALLBACK removeHasSetSelSubclassProc(
+	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclass,
+	DWORD_PTR data
+) {
+	switch (msg) {
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(hwnd, removeHasSetSelSubclassProc, subclass);
+			break;
+		case WM_GETDLGCODE:
+			return DefSubclassProc(hwnd, msg, wParam, lParam) & ~DLGC_HASSETSEL;
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+#endif // _WIN32
+
+INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
+	WPARAM wParam, LPARAM lParam
+) {
+	switch (msg) {
+		case WM_INITDIALOG: {
+			translateDialog(dialog);
+			ostringstream s;
+			const char nl[] = "\r\n";
+			s <<
+				translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
+				<< nl << translate_ctxt("optimal REAPER configuration", "1. Undock the Media Explorer so that it gets focus when opened.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "2. Enable closing Media Explorer using the escape key.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "5. Show text labels to indicate parallel, offline and bypassed in the FX list.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "6. Use a standard, accessible edit control for the video code editor.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
+				<< nl;
+			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
+			SetWindowText(text, s.str().c_str());
+#ifdef _WIN32
+			SetWindowSubclass(text, removeHasSetSelSubclassProc, 0, 0);
+#endif
+			return TRUE;
+		}
+		case WM_COMMAND: {
+			const WORD cid = LOWORD(wParam);
+			if (cid == IDYES || cid == IDNO) {
+				EndDialog(dialog, cid);
+				return TRUE;
+			}
+			break;
+		}
+		case WM_CLOSE:
+			EndDialog(dialog, IDNO);
+			return TRUE;
+	}
+	return FALSE;
+}
 
 void cmdConfigReaperOptimal(Command* command) {
 	// Even if the user chooses not to apply the configuration, we don't want to
@@ -224,23 +290,9 @@ void cmdConfigReaperOptimal(Command* command) {
 	string version = format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
 	SetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(),
 		true);
-	ostringstream s;
-	const char nl[] = "\r\n";
-	s <<
-		translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Undocks the Media Explorer by default so that it gets focus when opened.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables closing Media Explorer using the escape key.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables legacy file browse dialogs so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Enables the space key to be used for check boxes, etc. in various windows.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Shows text to indicate parallel, offline and bypassed in the FX list.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Uses a standard, accessible edit control for the video code editor.")
-		<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
-		<< nl;
-	if (MessageBox(
-		GetForegroundWindow(),
-		s.str().c_str(),
-		translate("Configure REAPER for Optimal Screen Reader Accessibility"),
-		MB_YESNO | MB_ICONQUESTION
+	if (DialogBox(
+		pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_REAPER_OPTIMAL_DLG),
+		GetForegroundWindow(), configReaperOptimal_dialogProc
 	) != IDYES) {
 		return;
 	}
@@ -257,6 +309,12 @@ void cmdConfigReaperOptimal(Command* command) {
 		{"REAPER", "fxfloat_focus", 1 << 20, 1048579},
 		// Prefs -> Video: Use standard edit control for video code editor (for accessibility, lacks many features)
 		{"REAPER", "video_colorspace", 1 << 11, 789507},
+		// Disable FX browser -> Options menu -> Show in FX list -> Plug-in type prefixes
+		{"REAPER-fxadd", "uiflags", 1 << 24, 16777216},
+		// Disable MIDI Editor -> Options -> Snap settings -> Snap to visible grid
+		{"midiedit", "snapflags", 1 << 5, 32},
+		// Enable hardcoded keybind for Control+Space in REAPER dialogs, needed in REAPER 7.41 or newer
+		{"REAPER", "mousemovemod", 1 << 5, 32},
 	};
 	for (const auto& setting: settings) {
 		int newVal = setting.value;

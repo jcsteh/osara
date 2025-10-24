@@ -1,0 +1,324 @@
+# Build and upload OSARA for pushes or pull requests.
+name: build
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+defaults:
+  run:
+    shell: bash
+env:
+  publisher: James Teh
+  VSCMD_SKIP_SENDTELEMETRY: 1
+  SCONS_CACHE_MSVC_CONFIG: 1
+concurrency:
+  # There's no point continuing to run a build if it's already outdated by
+  # another commit.
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: set env
+        run: |
+          echo "CACHE_KEY=${RUNNER_OS}-${ImageVersion}" >> $GITHUB_ENV
+          if [ $GITHUB_EVENT_NAME == push ]; then
+            # For example: 2025.3.7.2011,23631c6e
+            # We add 1800 to GITHUB_RUN_NUMBER because we can't set the
+            # starting number and we were already past 1700 on AppVeyor.
+            echo version=`date +%Y.%-m.%-d`.$((GITHUB_RUN_NUMBER + 1800)),${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+          else
+            # For example: pr1234-101,23631c6e
+            echo version=pr${{ github.event.number }}-$GITHUB_RUN_NUMBER,${GITHUB_SHA:0:8} >> "$GITHUB_ENV"
+          fi
+          if [ ${{ matrix.os }} == windows-latest ]; then
+            echo os=windows >> "$GITHUB_ENV"
+          else
+            echo os=mac >> "$GITHUB_ENV"
+          fi
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      # There's no point in building if we're going to fail the build because of
+      # an unsorted key map, so we do this as early as we can.
+      - name: check key map
+        run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
+      - name: setup
+        run: pip install scons
+      - name: SCons MSVC Cache
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/cache@v4
+        with:
+          path: ~\scons_msvc_cache.json
+          key: ${{ env.CACHE_KEY }}
+      - name: Windows setup
+        if: ${{ matrix.os == 'windows-latest' }}
+        # Use NSIS 2.46 to reduce AV false positives.
+        run: |
+          choco install nsis-unicode -y
+      - name: Mac setup
+        if: ${{ matrix.os == 'macos-latest' }}
+        # We need php for swell_resgen.
+        run: brew install php
+      - name: build
+        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: sign Windows
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ vars.AZURE_SIGNING_NAME }}
+          certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
+          files-folder: ${{ github.workspace }}\installer
+          files-folder-filter: exe
+      - name: sign Mac
+        if: ${{ github.event_name == 'push' && matrix.os == 'macos-latest' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_CERTIFICATE_P12: ${{ secrets.APPLE_CERTIFICATE_P12 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          set -euxo pipefail
+
+          # Create and configure keychain
+          security create-keychain -p temp_password build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp_password build.keychain
+          security list-keychains -d user -s build.keychain
+
+          # Decode and save the certificate from the environment variable
+          echo "$APPLE_CERTIFICATE_P12" | base64 --decode > certificate.p12
+          
+          # Import certificate 
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+
+          # Set key partition list for codesign access with specific certificate targeting
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k temp_password -D "Developer ID Application" -t private build.keychain
+
+          # Extract identity from build.keychain only
+          IDENTITY=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1 | sed 's/.*) \([^"]*\).*/\1/' | xargs)
+          echo "Signing with identity: $IDENTITY"
+          if [[ -z "$IDENTITY" ]]; then
+            echo "No codesigning identity found in build.keychain!"
+            exit 1
+          fi
+
+          cd installer/mac
+
+          # Set up app bundle and entitlements
+          APP_BUNDLE="OSARAInstaller.app"
+          
+          # Create a temporary entitlements file for runtime (consistent with local build.sh)
+          runtime_entitlements="$APP_BUNDLE/Contents/Resources/runtime.entitlements"
+          cp OSARAInstaller.entitlements "$runtime_entitlements"
+          
+          # Deep sign all components in the app bundle with entitlements
+          echo "=== Deep signing app bundle with entitlements ==="
+          find $APP_BUNDLE -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
+
+          # Sign the main executable with timestamp and entitlements
+          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/applet"
+          
+          # Sign the app bundle with timestamp and entitlements
+          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" $APP_BUNDLE
+
+          # Verify signing with detailed output
+          echo "=== Verifying code signature ==="
+          codesign --verify --verbose=4 $APP_BUNDLE
+          codesign --display --verbose=4 $APP_BUNDLE
+
+          # Pre-flight validation using spctl
+          echo "=== Pre-flight validation with spctl ==="
+          spctl --assess --verbose=4 --type execute $APP_BUNDLE || echo "spctl assessment failed - this is expected before notarization"
+
+          # Validate bundle structure
+          echo "=== Validating bundle structure ==="
+          if [[ ! -f "$APP_BUNDLE/Contents/Info.plist" ]]; then
+            echo "ERROR: Missing Info.plist"
+            exit 1
+          fi
+          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/applet" ]]; then
+            echo "ERROR: Missing main executable"
+            exit 1
+          fi
+          echo "Bundle structure validation passed"
+
+          # Create zip for notarization (just the app bundle)
+          zip -r "osara_temp.zip" $APP_BUNDLE
+
+          # Submit for notarization
+          echo "=== Submit for notarization ==="
+          
+          # Submit without verbose to get clean JSON output
+          if xcrun notarytool submit osara_temp.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait \
+            --output-format json > notarization_output.json 2>&1; then
+            
+            echo "=== Notarization submission completed ==="
+            cat notarization_output.json
+            
+            # Check if notarization was successful
+            if command -v jq >/dev/null 2>&1; then
+              STATUS=$(jq -r '.status // "Unknown"' notarization_output.json)
+              echo "Notarization status: $STATUS"
+              
+              if [[ "$STATUS" == "Accepted" ]]; then
+                echo "✅ Notarization successful!"
+              else
+                echo "❌ Notarization failed with status: $STATUS"
+                
+                # Try to get detailed log
+                SUBMISSION_ID=$(jq -r '.id // empty' notarization_output.json)
+                if [[ -n "$SUBMISSION_ID" ]]; then
+                  echo "=== Fetching detailed notarization log for submission $SUBMISSION_ID ==="
+                  if xcrun notarytool log "$SUBMISSION_ID" \
+                    --apple-id "$APPLE_ID" \
+                    --password "$APPLE_ID_PASSWORD" \
+                    --team-id "$APPLE_TEAM_ID" > notarization_log.txt 2>&1; then
+                    echo "=== Notarization Log ==="
+                    cat notarization_log.txt
+                  else
+                    echo "Failed to fetch notarization log"
+                  fi
+                fi
+                exit 1
+              fi
+            else
+              echo "jq not available - cannot parse notarization response"
+              exit 1
+            fi
+          else
+            echo "❌ Notarization submission failed"
+            cat notarization_output.json || echo "No output file generated"
+            exit 1
+          fi
+
+          # Staple notarization to app
+          echo "=== Stapling notarization ticket ==="
+          if xcrun stapler staple $APP_BUNDLE; then
+            echo "✅ Stapling successful"
+          else
+            echo "❌ Stapling failed - but continuing as this might be a timing issue"
+            # Don't exit here as stapling can sometimes fail due to timing
+          fi
+
+          # Verify stapling
+          echo "=== Verifying stapled notarization ==="
+          if xcrun stapler validate $APP_BUNDLE; then
+            echo "✅ Stapling validation successful"
+          else
+            echo "⚠️ Stapling validation failed"
+          fi
+
+          # Final validation with spctl
+          echo "=== Final validation with spctl ==="
+          if spctl --assess --verbose=4 --type execute $APP_BUNDLE; then
+            echo "✅ Final spctl validation passed"
+          else
+            echo "⚠️ Final spctl validation failed"
+          fi
+
+          # Create final signed and notarized zip with app bundle and license
+          rm -f ../osara_${{ env.version }}.zip
+          zip -r ../osara_${{ env.version }}.zip $APP_BUNDLE
+          cd ../..
+
+          # Cleanup
+          rm installer/mac/osara_temp.zip certificate.p12
+          security delete-keychain build.keychain
+
+          echo "Mac app signed and notarized successfully!"
+      # We only need to upload the pot on one OS. We arbitrarily pick Windows.
+      - name: pot
+        if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
+        env:
+          crowdinAuthToken: ${{ secrets.CROWDIN_AUTH_TOKEN }}
+        run: |
+          scons version=${{ env.version }} pot
+          pip install requests
+          python ci/crowdinSync uploadPot
+      # Normal artifacts are always zipped. We upload snapshot builds to GitHub
+      # Releases so they can be downloaded directly.
+      - id: uploadBuild
+        name: upload build
+        if: ${{ github.event_name == 'push' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: installer/osara_*
+          # We have a hacky release we reuse for snapshots, rather than
+          # creating a tag and a release for every snapshot.
+          tag_name: snapshots
+      - id: getBuildUrl
+        name: get build URL
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo ${{ env.os }}Url=${{ fromJSON(steps.uploadBuild.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
+      # We upload pull request builds as normal artifacts.
+      - name: upload PR build Win
+        if: ${{ github.event_name == 'pull_request' && matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: osara_windows_${{ env.version }}
+          path: installer/osara_*.exe
+          # The installer is already compressed. Don't try to compress it again.
+          compression-level: 0
+      - name: upload PR build Mac
+        if: ${{ github.event_name == 'pull_request' && matrix.os == 'macos-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: osara_mac_${{ env.version }}
+          # This wildcard is necessary to make the upload-artifact action 
+          # include the app folder in the zip archive. If we specified
+          # OSARAInstaller.app directly, the action would include its
+          # contents, but not the app folder, breaking the app. This wildcard
+          # behaviour is explained in the documentation:
+          # "If a wildcard pattern is used, the path hierarchy will be preserved
+          # after the first wildcard pattern"
+          # See also https://github.com/actions/upload-artifact/issues/248
+          path: installer/mac/*.app
+    outputs:
+      version: ${{ env.version }}
+      # These will only be set for snapshot builds. Furthermore, each OS job
+      # will only set the output relevant to that OS. This is possible because
+      # outputs won't be set if the value is empty.
+      winInstallerUrl: ${{ steps.getBuildUrl.outputs.windowsUrl }}
+      macInstallerUrl: ${{ steps.getBuildUrl.outputs.macUrl }}
+  publish:
+    # This job updates the website with the new readme and snapshots.
+    if: ${{ github.event_name == 'push' }}
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: setup
+        run: pip install markdown
+      - uses: actions/checkout@v4
+      - name: build
+        env:
+          version: ${{ needs.build.outputs.version }}
+          winUrl: ${{ needs.build.outputs.winInstallerUrl }}
+          macUrl: ${{ needs.build.outputs.macInstallerUrl }}
+        run: python ci/buildSite
+      - name: upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # ci/buildSite built the site in _site/.
+          path: _site/
+      - name: deploy
+        uses: actions/deploy-pages@v4

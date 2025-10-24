@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
 # OSARA: Open Source Accessibility for the REAPER Application
-# CI server script to publish OSARA snapshots
-# Copyright 2016-2024 NV Access Limited, James Teh
+# CI script to build the OSARA website, including the snapshots page and update
+# data.
+# Copyright 2016-2025 NV Access Limited, James Teh
 # License: GNU General Public License version 2.0
 
 import sys
@@ -12,21 +13,13 @@ import datetime
 import urllib.request
 import markdown
 
-SNAPSHOT_INDEX_DIR = os.path.expanduser("~osara/data/snapshotIndex")
-SNAPSHOTS_DIR = os.path.expanduser("~osara/www/main/snapshots")
+SITE_DIR = "_site"
+SNAPSHOTS_DIR = os.path.join(SITE_DIR, "snapshots")
 SNAPSHOT_INDEX_FILE = os.path.join(SNAPSHOTS_DIR, "index.html")
 UPDATE_FILE = os.path.join(SNAPSHOTS_DIR, "update.json")
-README_URL = "https://github.com/jcsteh/osara/raw/master/readme.md"
-README_FILE = os.path.expanduser("~osara/www/main/index.html")
+README_FILE = os.path.join(SITE_DIR, "index.html")
 
-def getData(buildOs):
-	fn = os.path.join(SNAPSHOT_INDEX_DIR, buildOs)
-	try:
-		return json.load(open(fn))
-	except IOError:
-		return None
-
-def writeSnapshotIndex(winData, macData):
+def writeSnapshotIndex(data):
 	print("Writing snapshot index")
 	with open(SNAPSHOT_INDEX_FILE, "w") as f:
 		f.write("<html>\n"
@@ -39,30 +32,15 @@ def writeSnapshotIndex(winData, macData):
 '<p>Be aware that technically, OSARA has not yet had an official release. That said, the extension can safely be considered stable. At this point, OSARA is being used every day in production by people all over the world.</p>\n'
 '<p>If you find a bug, please <a href="https://github.com/jcsteh/osara/issues/new">open a new issue on GitHub</a> and describe the problem, preferably with thorough steps to reproduce the issue, what happened and what you expected to happen instead.</p>\n'
 '<p>Support requests should be posted on the <a href="https://groups.io/g/rwp">Reapers Without Peepers (RWP) group</a>.</p>\n'
-			"<ul>\n")
-		if winData:
-			winData["osName"] = "Windows"
-		if macData:
-			macData["osName"] = "Mac"
-		for data in winData, macData:
-			if not data:
-				continue
-			f.write(
-				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/installer/{data[installer]}">Download OSARA {data[version]} for {data[osName]}</a> ({data[date]})</li>\n'
-				.format(data=data))
-		if winData.get("pot"):
-			f.write(
-				'<li><a href="https://ci.appveyor.com/api/buildjobs/{data[jobId]}/artifacts/locale/{data[pot]}">Download gettext template for translators {data[version]}</a></li>\n'
-				.format(data=winData))
-		if winData.get("commit"):
-			f.write(
-				'<li><a href="https://github.com/jcsteh/osara/commits/{data[commit]}">Change log</a></li>\n'
-				.format(data=winData))
-
-		f.write(
+			"<ul>\n"
+			'<li>Version {data[version]}, {data[date]}</li>\n'
+			'<li><a href="{data[winUrl]}">Download for Windows</a></li>\n'
+			'<li><a href="{data[macUrl]}">Download for Mac</a></li>\n'
+			'<li><a href="https://github.com/jcsteh/osara/commits/{data[commit]}">Change log</a></li>\n'
 			"</ul>\n"
 			"</body>\n"
-			"</html>\n")
+			"</html>\n"
+			.format(data=data))
 
 def getCommits():
 	with urllib.request.urlopen(
@@ -71,7 +49,13 @@ def getCommits():
 		commits = json.load(req)
 	out = []
 	for commit in commits:
-		out.append([commit["sha"][:8], commit["commit"]["message"]])
+		out.append([
+			commit["sha"][:8],
+			# We always want crlf line endings to make Windows happy. However, some
+			# commit messages might already have crlf. Therefore, normalise to lf first
+			# and then convert to crlf.
+			commit["commit"]["message"].replace("\r\n", "\n").replace("\n", "\r\n")
+		])
 	return out
 
 def writeUpdateData(data):
@@ -81,9 +65,8 @@ def writeUpdateData(data):
 		json.dump(out, f)
 
 def updateReadme():
-	print("Downloading readme")
-	with urllib.request.urlopen(README_URL) as req:
-		bodyMd = req.read().decode('UTF-8')
+	print("Rendering readme")
+	bodyMd = open("readme.md", "rt", encoding="utf-8").read()
 	bodyHtml = markdown.markdown(bodyMd)
 	print("Writing readme")
 	with open(README_FILE, "w") as f:
@@ -97,25 +80,18 @@ def updateReadme():
 		f.write('\n</body>\n</html>\n')
 
 def main():
-	data = json.loads(sys.stdin.readline())
-	data["date"] = datetime.datetime.utcnow().ctime()
-	buildOs = data["os"]
-	if not buildOs.isalpha():
-		raise ValueError
-	print("Publishing %s snapshot %s" % (buildOs, data["version"]))
-	json.dump(data,
-		open(os.path.join(SNAPSHOT_INDEX_DIR, buildOs), "w"))
-	if buildOs == "win":
-		winData = data
-		macData = getData("mac")
-	else:
-		macData = data
-		winData = getData("win")
-
-	writeSnapshotIndex(winData, macData)
-	if buildOs == "win":
-		writeUpdateData(winData)
-		updateReadme()
+	os.makedirs(SNAPSHOTS_DIR)
+	data = {
+		"commit": os.getenv("GITHUB_SHA"),
+		"version": os.getenv("version"),
+		"winUrl": os.getenv("winUrl"),
+		"macUrl": os.getenv("macUrl"),
+		"date": datetime.datetime.now(datetime.UTC).ctime(),
+	}
+	print("Publishing snapshots for {data[version]}".format(data=data))
+	writeSnapshotIndex(data)
+	writeUpdateData(data)
+	updateReadme()
 
 if __name__ == "__main__":
 	main()

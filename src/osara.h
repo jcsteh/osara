@@ -50,6 +50,7 @@
 #define REAPERAPI_WANT_GetMasterTrack
 #define REAPERAPI_WANT_Track_GetPeakInfo
 #define REAPERAPI_WANT_GetHZoomLevel
+#define REAPERAPI_WANT_adjustZoom
 #define REAPERAPI_WANT_GetToggleCommandState
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_Undo_CanUndo2
@@ -98,6 +99,7 @@
 #define REAPERAPI_WANT_SetTakeStretchMarker
 #define REAPERAPI_WANT_ValidatePtr
 #define REAPERAPI_WANT_DeleteTempoTimeSigMarker
+#define REAPERAPI_WANT_GetProjectLength
 #define REAPERAPI_WANT_MIDIEditor_GetActive
 #define REAPERAPI_WANT_MIDIEditor_GetTake
 #define REAPERAPI_WANT_MIDIEditor_GetSetting_str
@@ -120,6 +122,9 @@
 #define REAPERAPI_WANT_TakeFX_SetParam
 #define REAPERAPI_WANT_TakeFX_FormatParamValue
 #define REAPERAPI_WANT_plugin_getapi
+#define REAPERAPI_WANT_PreventUIRefresh
+#define REAPERAPI_WANT_UpdateArrange
+#define REAPERAPI_WANT_Undo_OnStateChangeEx2
 #define REAPERAPI_WANT_Envelope_FormatValue
 #define REAPERAPI_WANT_CountTrackEnvelopes
 #define REAPERAPI_WANT_GetTrackEnvelope
@@ -219,6 +224,8 @@
 #define REAPERAPI_WANT_format_timestr_len
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
+#define REAPERAPI_WANT_GetSetProjectGrid
+#define REAPERAPI_WANT_GetTrackMIDINoteNameEx
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
@@ -312,10 +319,12 @@ typedef enum {
 	TF_MEASURE,
 	TF_MINSEC,
 	TF_SEC,
+	TF_ROUNDSEC,
 	TF_FRAME,
 	TF_HMSF,
 	TF_SAMPLE,
-	TF_MEASURETICK
+	TF_MEASURETICK,
+	TF_MS
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
 enum FormatTimeCacheRequest {
@@ -341,19 +350,13 @@ MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
 #include <string>
+#include <atlcomcli.h>
 #include <oleacc.h>
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
 
-extern IAccPropServices* accPropServices;
-
-// uia.cpp
-bool initializeUia();
-bool terminateUia();
-bool shouldUseUiaNotifications();
-bool sendUiaNotification(const std::string& message, bool interrupt = true);
-void resetUia();
+extern CComPtr<IAccPropServices> accPropServices;
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
@@ -370,6 +373,7 @@ void reportTransportState(int state);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);
+std::string gridDivisionToFriendlyName(double division);
 IReaperControlSurface* createSurface();
 // envelopeCommands.cpp
 extern bool selectedEnvelopeIsTake;

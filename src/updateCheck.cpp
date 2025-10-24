@@ -8,7 +8,11 @@
 #include <ctime>
 #include <string>
 #include <sstream>
+// simpleson uses sscanf. We don't have any control over that.
+#pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <simpleson/json.h>
+#pragma clang diagnostic pop
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
