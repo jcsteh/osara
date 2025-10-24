@@ -42,6 +42,6 @@ def makeConfigRc(target, source, env):
 		f'\tPUSHBUTTON "Cancel", IDCANCEL, 137, {y}, 40, 14\n')
 	y += 20
 	# We know the height now. Generate the DIALOGEX header.
-	lines[1] = f"{dialogCid} DIALOGEX 250, 125, 400, {y}"
+	lines[1] = f"{dialogCid} DIALOGEX 250, 125, 400, {y}\n"
 	lines.append('END\n')
 	out.writelines(lines)
