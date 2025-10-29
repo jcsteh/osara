@@ -4199,13 +4199,12 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
 		outputMessage(translate("no items selected"));
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if(lastCommand != command->gaccel.accel.cmd) { 
-		s<< getActionName(command->gaccel.accel.cmd) << " ";
+	if (lastCommand != command->gaccel.accel.cmd) { 
+		s << getActionName(command->gaccel.accel.cmd) << " ";
 		cache = FT_NO_CACHE;
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
@@ -4216,15 +4215,21 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 		return;
 	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
-	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
-	if(newStart!=oldStart)
-		s<<formatTime(newStart, TF_RULER, cache);
-	else if(newEnd!=oldEnd)
-		s<<formatTime(newEnd, TF_RULER, cache);
-	else if(newSourceOffset!=oldSourceOffset)
-		s<<formatTime(newSourceOffset, TF_RULER, cache);
-	else {
+	if (newStart != oldStart && newEnd != oldEnd) {
+		s << translate("start") << " " 
+			<< formatTime(newStart, TF_RULER, cache)
+			<<", " <<
+			translate("end") << " " 
+			<< formatTime(newEnd, TF_RULER, cache);
+	} else if (newStart != oldStart) {
+		s << formatTime(newStart, TF_RULER, cache);
+	} else if(newEnd!=oldEnd) {
+		s << formatTime(newEnd, TF_RULER, cache);
+	} else if(newSourceOffset!=oldSourceOffset) {
+		s << formatTime(newSourceOffset, TF_RULER, cache);
+	} else {
 		s.str("");
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
@@ -5671,6 +5676,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim left edge of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41306}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move left edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41307}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41205}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move position of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 40657}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 1 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40658}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 2 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40659}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 3 to play/edit cursor

@@ -147,6 +147,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item edit: Move right edge of item to edit cursor: Control+Alt+Shift+.
+- Item edit: Move position of item to edit cursor: Control+Alt+Shift+,
 - Item edit: Trim left edge of item to edit cursor: Win+Shift+,
 - Item edit: Trim right edge of item to edit cursor: Win+Shift+.
 - Item: go to next stretch marker: Control+'
@@ -898,6 +900,7 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Item edit: Move left edge of item to edit cursor
 - Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
 - Edit: Cut items
