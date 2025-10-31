@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
-"PO-Revision-Date: 2025-09-15 18:44\n"
+"PO-Revision-Date: 2025-10-15 18:46\n"
 
 msgid "enabled"
 msgstr "etkinleştirildi"
@@ -142,6 +142,10 @@ msgid "time selection start"
 msgstr ""
 
 msgid "time selection end"
+msgstr ""
+
+#. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+msgid "Control {control}, {value}"
 msgstr ""
 
 #. Reported when removing automation items. {} will be
@@ -621,10 +625,6 @@ msgstr ""
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
 msgid "Poly Aftertouch {note}  {value}"
-msgstr ""
-
-#. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
-msgid "Control {control}, {value}"
 msgstr ""
 
 msgid "Program {}"
@@ -1629,6 +1629,20 @@ msgstr[1] ""
 #. replaced with the number of tracks; e.g. "2 tracks unsoloed".
 msgid "{} track unsoloed"
 msgid_plural "{} tracks unsoloed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are armed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks armed".
+msgid "{} track armed"
+msgid_plural "{} tracks armed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unarmed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unarmed".
+msgid "{} track unarmed"
+msgid_plural "{} tracks unarmed"
 msgstr[0] ""
 msgstr[1] ""
 
