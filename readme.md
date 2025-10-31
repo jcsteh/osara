@@ -752,7 +752,7 @@ When the MIDI Editor is set to Event List mode, REAPER presents a list with all 
 When a note gets focus in the list, OSARA will play a preview of the focused note.
 To cancel a note preview, press the Control key.
 
-### Searching and navigating FX Presets Without Activating Them (Windows Only)
+### Searching and Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
 Sometimes, you need to be able to examine or search the available presets without activating each one.
 OSARA provides a dialog to facilitate this.
