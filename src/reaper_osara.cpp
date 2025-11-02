@@ -5652,10 +5652,9 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	if (startTS == endTS) {
 		itemInfo.fState = MFS_DISABLED;
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("No time selection");
+		itemInfo.dwTypeData = (char*)translate("Time &selection");
 	} else {
 		itemInfo.fState = MFS_ENABLED;
-		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 		itemInfo.dwTypeData = (char*)translate("Time &selection");
 	}
 	itemInfo.cch = strlen(itemInfo.dwTypeData);
@@ -5687,10 +5686,9 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		if (startTS == endTS) {
 			itemInfo.fState = MFS_DISABLED;
 			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-			itemInfo.dwTypeData = (char*)translate("No time selection");
+			itemInfo.dwTypeData = (char*)translate("Time &selection");
 		} else {
 			itemInfo.fState = MFS_ENABLED;
-			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.dwTypeData = (char*)translate("Time &selection");
 		}
 		itemInfo.cch = strlen(itemInfo.dwTypeData);
@@ -5710,10 +5708,9 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		if (startTS == endTS) {
 			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.fState = MFS_DISABLED;
-			itemInfo.dwTypeData = (char*)translate("No time selection");
+			itemInfo.dwTypeData = (char*)translate("Mono summed time selection");
 		} else {
 			itemInfo.fState = MFS_ENABLED;
-		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.dwTypeData = (char*)translate("Mono summed time selection");
 		}
 		itemInfo.cch = strlen(itemInfo.dwTypeData);

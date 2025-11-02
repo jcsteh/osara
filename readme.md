@@ -1141,3 +1141,4 @@ The resulting installer can be found in the installer directory.
 - Jenny K Brennan
 - Day Garwood
 - Matej Golian
+- Toni Barth
