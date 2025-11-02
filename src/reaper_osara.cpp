@@ -5627,12 +5627,11 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	int selTracks = CountSelectedTracks2(nullptr, true);
 	int selItems = CountSelectedMediaItems(nullptr);
 	HMENU menu = CreatePopupMenu();
-	HMENU subMenu;
 	MENUITEMINFO itemInfo;
 	itemInfo.cbSize = sizeof(MENUITEMINFO);
 	// Master submenu
 	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU;
-	subMenu = CreatePopupMenu();
+	HMENU subMenu = CreatePopupMenu();
 	itemInfo.hSubMenu = subMenu;
 	itemInfo.fType = MFT_STRING;
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
@@ -5685,7 +5684,7 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		// Tracks -> Time selection (ID 4)
 		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
 		itemInfo.fType = MFT_STRING;
-	if (startTS == endTS) {
+		if (startTS == endTS) {
 			itemInfo.fState = MFS_DISABLED;
 			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.dwTypeData = (char*)translate("No time selection");
@@ -5708,7 +5707,7 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		// Tracks -> Mono summed time selection (ID 6)
 		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
 		itemInfo.fType = MFT_STRING;
-	if (startTS == endTS) {
+		if (startTS == endTS) {
 			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.fState = MFS_DISABLED;
 			itemInfo.dwTypeData = (char*)translate("No time selection");
