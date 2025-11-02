@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-10-15 18:46\n"
+"PO-Revision-Date: 2025-11-01 18:41\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2536,6 +2536,12 @@ msgstr[0] "{} 分割被癒合"
 msgid "contents of time selection removed"
 msgstr "時間選區的內容已移除"
 
+msgid "start"
+msgstr "開始"
+
+msgid "end"
+msgstr "結束"
+
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
@@ -3231,16 +3237,20 @@ msgid "FX Preset"
 msgstr "FX 預設"
 
 msgctxt "FX Preset"
-msgid "Filter:"
-msgstr "過濾器:"
+msgid "&Presets:"
+msgstr "預設：(&P)"
 
 msgctxt "FX Preset"
-msgid "&OK"
-msgstr "確定(&O)"
+msgid "&Filter:"
+msgstr "過濾器：(&F)"
 
 msgctxt "FX Preset"
-msgid "&Cancel"
-msgstr "取消(&C)"
+msgid "&Apply"
+msgstr "套用(&A)"
+
+msgctxt "FX Preset"
+msgid "&Close"
+msgstr "關閉(&C)"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"

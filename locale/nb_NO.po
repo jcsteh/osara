@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-10-15 18:46\n"
+"PO-Revision-Date: 2025-11-01 18:41\n"
 
 msgid "enabled"
 msgstr ""
@@ -2636,6 +2636,12 @@ msgstr[1] ""
 msgid "contents of time selection removed"
 msgstr ""
 
+msgid "start"
+msgstr ""
+
+msgid "end"
+msgstr ""
+
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
@@ -3335,15 +3341,19 @@ msgid "FX Preset"
 msgstr ""
 
 msgctxt "FX Preset"
-msgid "Filter:"
+msgid "&Presets:"
 msgstr ""
 
 msgctxt "FX Preset"
-msgid "&OK"
+msgid "&Filter:"
 msgstr ""
 
 msgctxt "FX Preset"
-msgid "&Cancel"
+msgid "&Apply"
+msgstr ""
+
+msgctxt "FX Preset"
+msgid "&Close"
 msgstr ""
 
 msgctxt "OSARA Update"

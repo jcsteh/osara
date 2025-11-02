@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-10-15 18:46\n"
+"PO-Revision-Date: 2025-11-01 18:41\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -2636,6 +2636,12 @@ msgstr[1] "{} divisiones reparadas"
 msgid "contents of time selection removed"
 msgstr "contenido de selección de tiempo eliminado"
 
+msgid "start"
+msgstr "comienzo"
+
+msgid "end"
+msgstr "fin"
+
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
@@ -3335,16 +3341,20 @@ msgid "FX Preset"
 msgstr "Preajuste de FX"
 
 msgctxt "FX Preset"
-msgid "Filter:"
-msgstr "filtro:"
+msgid "&Presets:"
+msgstr "&Presets:"
 
 msgctxt "FX Preset"
-msgid "&OK"
-msgstr "&aceptar"
+msgid "&Filter:"
+msgstr "&Filtro:"
 
 msgctxt "FX Preset"
-msgid "&Cancel"
-msgstr "&cancelar"
+msgid "&Apply"
+msgstr "&Aplicar"
+
+msgctxt "FX Preset"
+msgid "&Close"
+msgstr "&Cerrar"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"
