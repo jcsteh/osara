@@ -5651,12 +5651,11 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	itemInfo.fType = MFT_STRING;
 	if (startTS == endTS) {
 		itemInfo.fState = MFS_DISABLED;
-		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Time &selection");
 	} else {
 		itemInfo.fState = MFS_ENABLED;
-		itemInfo.dwTypeData = (char*)translate("Time &selection");
 	}
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	itemInfo.dwTypeData = (char*)translate("Time &selection");
 	itemInfo.cch = strlen(itemInfo.dwTypeData);
 	itemInfo.wID = 2;
 	InsertMenuItem(subMenu, 1, true, &itemInfo);
@@ -5685,12 +5684,11 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		itemInfo.fType = MFT_STRING;
 		if (startTS == endTS) {
 			itemInfo.fState = MFS_DISABLED;
-			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-			itemInfo.dwTypeData = (char*)translate("Time &selection");
 		} else {
 			itemInfo.fState = MFS_ENABLED;
-			itemInfo.dwTypeData = (char*)translate("Time &selection");
 		}
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Time &selection");
 		itemInfo.cch = strlen(itemInfo.dwTypeData);
 		itemInfo.wID = 4;
 		InsertMenuItem(subMenu, 1, true, &itemInfo);
@@ -5706,13 +5704,12 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
 		itemInfo.fType = MFT_STRING;
 		if (startTS == endTS) {
-			// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 			itemInfo.fState = MFS_DISABLED;
-			itemInfo.dwTypeData = (char*)translate("Mono summed time selection");
 		} else {
 			itemInfo.fState = MFS_ENABLED;
-			itemInfo.dwTypeData = (char*)translate("Mono summed time selection");
 		}
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		itemInfo.dwTypeData = (char*)translate("Time &selection");
 		itemInfo.cch = strlen(itemInfo.dwTypeData);
 		itemInfo.wID = 6;
 		InsertMenuItem(subMenu, 3, true, &itemInfo);
