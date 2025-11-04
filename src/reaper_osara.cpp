@@ -646,6 +646,16 @@ bool isFreeItemPositioningEnabled(MediaTrack* track) {
 	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
 }
 
+bool doesAnySelectedTrackHaveItems () {
+	int trackCount = CountTracks(nullptr);
+	for (int i = 0; i < trackCount; ++i) {
+		MediaTrack* tr = GetTrack(nullptr, i);
+		if (isTrackSelected(tr) && CountTrackMediaItems(tr) > 0)
+			return true;
+	}
+	return false;
+}
+
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
@@ -5621,156 +5631,89 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
+// Helper for adding a menu item
+static void AddMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.wID = id;
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(menu, position, true, &info);
+}
+
+// Helper for creating a submenu (returns the submenu handle)
+static HMENU AddSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.hSubMenu = CreatePopupMenu();
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(parent, position, true, &info);
+	return info.hSubMenu;
+}
+
 void cmdShowPeakAndLoudnessMenu(Command* command) {
 	double startTS, endTS;
 		GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
+	int countTracks = CountTracks(nullptr);
 	int selTracks = CountSelectedTracks2(nullptr, true);
+	int itemCount = CountMediaItems(nullptr);
 	int selItems = CountSelectedMediaItems(nullptr);
+	bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
 	HMENU menu = CreatePopupMenu();
-	MENUITEMINFO itemInfo;
-	itemInfo.cbSize = sizeof(MENUITEMINFO);
 	// Master submenu
-	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU;
-	HMENU subMenu = CreatePopupMenu();
-	itemInfo.hSubMenu = subMenu;
-	itemInfo.fType = MFT_STRING;
+	bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	itemInfo.dwTypeData = (char*)translate("Master");
-	itemInfo.cch = strlen(itemInfo.dwTypeData);
-	InsertMenuItem(menu, 0, true, &itemInfo);
-	// Master -> Master mix (ID 1)
-	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
-	itemInfo.fType = MFT_STRING;
-	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	itemInfo.dwTypeData = (char*)translate("Master mix");
-	itemInfo.cch = strlen(itemInfo.dwTypeData);
-	itemInfo.wID = 1;
-	InsertMenuItem(subMenu, 0, true, &itemInfo);
-	// Master -> Time selection (ID 2)
-	itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
-	itemInfo.fType = MFT_STRING;
-	if (startTS == endTS) {
-		itemInfo.fState = MFS_DISABLED;
-	} else {
-		itemInfo.fState = MFS_ENABLED;
+	HMENU masterSub = AddSubMenu(menu, 0, "Master", !nothingToDryRun);
+	if (!nothingToDryRun) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		AddMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		AddMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
 	}
-	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	itemInfo.dwTypeData = (char*)translate("Time &selection");
-	itemInfo.cch = strlen(itemInfo.dwTypeData);
-	itemInfo.wID = 2;
-	InsertMenuItem(subMenu, 1, true, &itemInfo);
 	// Tracks submenu
-	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
-	subMenu = CreatePopupMenu();
-	itemInfo.hSubMenu = subMenu;
-	itemInfo.fType = MFT_STRING;
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	itemInfo.dwTypeData = (char*)translate("Tracks");
-	itemInfo.cch = strlen(itemInfo.dwTypeData);
-	if(selTracks > 0) itemInfo.fState = MFS_ENABLED;
-	else itemInfo.fState = MFS_DISABLED;
-	InsertMenuItem(menu, 1, true, &itemInfo);
+	HMENU tracksSub = AddSubMenu(menu, 1, "Tracks", selTracks > 0);
 	if (selTracks > 0) {
-		// Tracks -> Selected tracks (ID 3)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
-		itemInfo.fType = MFT_STRING;
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Selected &tracks");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 3;
-		InsertMenuItem(subMenu, 0, true, &itemInfo);
-		// Tracks -> Time selection (ID 4)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
-		itemInfo.fType = MFT_STRING;
-		if (startTS == endTS) {
-			itemInfo.fState = MFS_DISABLED;
-		} else {
-			itemInfo.fState = MFS_ENABLED;
-		}
+		AddMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Time &selection");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 4;
-		InsertMenuItem(subMenu, 1, true, &itemInfo);
-		// Tracks -> Selected tracks mono summed (ID 5)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
-		itemInfo.fType = MFT_STRING;
+		AddMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("&Mono summed selected tracks");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 5;
-		InsertMenuItem(subMenu, 2, true, &itemInfo);
-		// Tracks -> Mono summed time selection (ID 6)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
-		itemInfo.fType = MFT_STRING;
-		if (startTS == endTS) {
-			itemInfo.fState = MFS_DISABLED;
-		} else {
-			itemInfo.fState = MFS_ENABLED;
-		}
+		AddMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Time &selection");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 6;
-		InsertMenuItem(subMenu, 3, true, &itemInfo);
+		AddMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
 	}
 	// Items submenu
-	itemInfo.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
-	subMenu = CreatePopupMenu();
-	itemInfo.hSubMenu = subMenu;
-	itemInfo.fType = MFT_STRING;
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	itemInfo.dwTypeData = (char*)translate("Items");
-	itemInfo.cch = strlen(itemInfo.dwTypeData);
-	if(selItems > 0) itemInfo.fState = MFS_ENABLED;
-	else itemInfo.fState = MFS_DISABLED;
-	InsertMenuItem(menu, 2, true, &itemInfo);
+	HMENU itemsSub = AddSubMenu(menu, 2, "Items", selItems > 0);
 	if (selItems > 0) {
-		// Items -> Selected items (ID 7)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
-		itemInfo.fType = MFT_STRING;
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Selected &items");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 7;
-		InsertMenuItem(subMenu, 0, true, &itemInfo);
-		// Items -> Include track/take FX and settings (ID 8)
-		itemInfo.fMask = MIIM_TYPE | MIIM_ID;
-		itemInfo.fType = MFT_STRING;
+		AddMenuItem(itemsSub, 0, "Selected &items", 7);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		itemInfo.dwTypeData = (char*)translate("Include track/take &FX and settings");
-		itemInfo.cch = strlen(itemInfo.dwTypeData);
-		itemInfo.wID = 8;
-		InsertMenuItem(subMenu, 1, true, &itemInfo);
+		AddMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
 	}
-	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0,
-		mainHwnd, nullptr);
-	switch(id) {
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	AddMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	// Displaying and handling result
+	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
+	switch (id) {
 		case 0: return; // canceled
-		case 1: 
-			Main_OnCommand(42440, 0); // Calculate loudness of master mix via dry run render
-			break;
-		case 2:
-			Main_OnCommand(42441, 0); // Calculate loudness of master mix within time selection via dry run render
-			break;
-		case 3: 
-			Main_OnCommand(42438, 0); // Calculate loudness of selected tracks via dry run render
-			break;
-		case 4:
-			Main_OnCommand(42439, 0); // Calculate loudness of selected tracks within time selection via dry run render
-			break;
-		case 5:
-			Main_OnCommand(42447, 0); // Calculate mono loudness of selected tracks via dry run render
-			break;
-		case 6:
-			Main_OnCommand(42448, 0); // Calculate mono loudness of selected tracks within time selection via dry run render
-			break;
-		case 7:
-			Main_OnCommand(42468, 0); // Calculate loudness of selected items via dry run render
-			break;
-		case 8:
-			Main_OnCommand(42437, 0); // Calculate loudness of selected items, including take and track FX and settings, via dry run render
-			break;
+		case 1:Main_OnCommand(42440, 0); break; // Master mix
+		case 2: Main_OnCommand(42441, 0); break; // Master mix within time selection
+		case 3: Main_OnCommand(42438, 0); break; // Selected tracks
+		case 4: Main_OnCommand(42439, 0); break; // Selected tracks within time selection
+		case 5: Main_OnCommand(42447, 0); break; // Mono selected tracks
+		case 6: Main_OnCommand(42448, 0); break; // Mono selected tracks within time selection
+		case 7: Main_OnCommand(42468, 0); break; // Selected items
+		case 8: Main_OnCommand(42437, 0); break; // Selected items with FX
+		case 9: Main_OnCommand(43349, 0); break; // Dry run project using the most recent render settings
 	}
 }
 
