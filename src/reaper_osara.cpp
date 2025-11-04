@@ -5665,10 +5665,10 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	int selTracks = CountSelectedTracks2(nullptr, true);
 	int itemCount = CountMediaItems(nullptr);
 	int selItems = CountSelectedMediaItems(nullptr);
-	bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
+	const bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
 	HMENU menu = CreatePopupMenu();
 	// Master submenu
-	bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
+	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 	HMENU masterSub = AddSubMenu(menu, 0, "Master", !nothingToDryRun);
 	if (!nothingToDryRun) {
