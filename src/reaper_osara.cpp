@@ -646,6 +646,16 @@ bool isFreeItemPositioningEnabled(MediaTrack* track) {
 	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
 }
 
+bool doesAnySelectedTrackHaveItems () {
+	int trackCount = CountTracks(nullptr);
+	for (int i = 0; i < trackCount; ++i) {
+		MediaTrack* tr = GetTrack(nullptr, i);
+		if (isTrackSelected(tr) && CountTrackMediaItems(tr) > 0)
+			return true;
+	}
+	return false;
+}
+
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
@@ -5621,6 +5631,92 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
 }
 
+// Helper for adding a menu item
+static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.wID = id;
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(menu, position, true, &info);
+}
+
+// Helper for creating a submenu (returns the submenu handle)
+static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.hSubMenu = CreatePopupMenu();
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(parent, position, true, &info);
+	return info.hSubMenu;
+}
+
+void cmdShowPeakAndLoudnessMenu(Command* command) {
+	double startTS, endTS;
+		GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
+	int countTracks = CountTracks(nullptr);
+	int selTracks = CountSelectedTracks2(nullptr, true);
+	int itemCount = CountMediaItems(nullptr);
+	int selItems = CountSelectedMediaItems(nullptr);
+	const bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
+	HMENU menu = CreatePopupMenu();
+	// Master submenu
+	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU masterSub = addSubMenu(menu, 0, "Master", !nothingToDryRun);
+	if (!nothingToDryRun) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
+	}
+	// Tracks submenu
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0);
+	if (selTracks > 0) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
+	}
+	// Items submenu
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU itemsSub = addSubMenu(menu, 2, "Items", selItems > 0);
+	if (selItems > 0) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(itemsSub, 0, "Selected &items", 7);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
+	}
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	addMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	// Displaying and handling result
+	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
+	switch (id) {
+		case 0: return; // canceled
+		case 1:Main_OnCommand(42440, 0); break; // Master mix
+		case 2: Main_OnCommand(42441, 0); break; // Master mix within time selection
+		case 3: Main_OnCommand(42438, 0); break; // Selected tracks
+		case 4: Main_OnCommand(42439, 0); break; // Selected tracks within time selection
+		case 5: Main_OnCommand(42447, 0); break; // Mono selected tracks
+		case 6: Main_OnCommand(42448, 0); break; // Mono selected tracks within time selection
+		case 7: Main_OnCommand(42468, 0); break; // Selected items
+		case 8: Main_OnCommand(42437, 0); break; // Selected items with FX
+		case 9: Main_OnCommand(43349, 0); break; // Dry run project using the most recent render settings
+	}
+}
+
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
@@ -5858,6 +5954,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Analyze and show peak and loudness statistics for selected tracks/items")}, "OSARA_SHOWPEAKANDLOUDNESSMENU", cmdShowPeakAndLoudnessMenu},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},
