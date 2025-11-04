@@ -5632,7 +5632,7 @@ void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 }
 
 // Helper for adding a menu item
-static void AddMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
+static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
 	MENUITEMINFO info = {};
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
@@ -5645,7 +5645,7 @@ static void AddMenuItem(HMENU menu, int position, const char* label, UINT id, bo
 }
 
 // Helper for creating a submenu (returns the submenu handle)
-static HMENU AddSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
+static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
 	MENUITEMINFO info = {};
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
@@ -5670,37 +5670,37 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	// Master submenu
 	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU masterSub = AddSubMenu(menu, 0, "Master", !nothingToDryRun);
+	HMENU masterSub = addSubMenu(menu, 0, "Master", !nothingToDryRun);
 	if (!nothingToDryRun) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		addMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
+		addMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
 	}
 	// Tracks submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU tracksSub = AddSubMenu(menu, 1, "Tracks", selTracks > 0);
+	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0);
 	if (selTracks > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems);
+		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
+		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems);
+		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
+		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
 	}
 	// Items submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU itemsSub = AddSubMenu(menu, 2, "Items", selItems > 0);
+	HMENU itemsSub = addSubMenu(menu, 2, "Items", selItems > 0);
 	if (selItems > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(itemsSub, 0, "Selected &items", 7);
+		addMenuItem(itemsSub, 0, "Selected &items", 7);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		AddMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
+		addMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
 	}
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	AddMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	addMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
 	// Displaying and handling result
 	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	switch (id) {
