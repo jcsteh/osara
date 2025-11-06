@@ -5599,18 +5599,38 @@ void cmdMoveTracks(Command* command) {
 	}
 	MediaTrack* track = GetLastTouchedTrack();
 	MediaTrack* oldParent = GetParentTrack(track);
+	int oldDepth = 0;
+	if (oldParent) {
+		MediaTrack* nextParent = GetParentTrack(oldParent);
+		oldDepth++;
+		while (nextParent) {
+			oldDepth++;
+			nextParent = GetParentTrack(nextParent);
+		}
+	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	const bool up = command->gaccel.accel.cmd == 43647;
 	MediaTrack* newParent = GetParentTrack(track);
+	int newDepth = 0;
+	if (newParent) {
+		MediaTrack* nextParent = GetParentTrack(newParent);
+		newDepth++;
+		while (nextParent) {
+			newDepth++;
+			nextParent = GetParentTrack(nextParent);
+		}
+	}
 	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	ostringstream s;
-	if (oldParent != newParent && newParent) {
+	if (oldParent != newParent
+			&&newParent
+			&& newDepth > oldDepth) {
 		// Translators: Reported when a track you are moving enters a folder.
 		// {} will be replaced with the name of the folder.
 		// E.G, "entered drums folder"
 		s << format(translate("entered {} folder"),
 			getTrackNameOrNumber(newParent, true)) << ", ";
-	} else if (oldParent != newParent && !newParent) {
+	} else if (oldParent != newParent && newDepth < oldDepth) {
 		// Translators: Reported when a track you are moving leaves a folder.
 		// {} will be replaced with the name of the folder.
 		// E.G, "left drums folder"
@@ -5631,10 +5651,12 @@ void cmdMoveTracks(Command* command) {
 			getTrackNameOrNumber(GetTrack(nullptr, trackIndex - 1), true));
 	}
 	if (newParent) {
-		// Translators: Appended after the new position when moving a track inside of a folder.
-		// E.G, "inside guitars folder" or "inside 3 folder"
-		s << " " << format(translate("inside {} folder"),
-		getTrackNameOrNumber(newParent, true));
+		if (up || newDepth <= oldDepth) {
+			// Translators: Appended after the new position when moving a track inside of a folder.
+			// E.G, "inside guitars folder" or "inside 3 folder"
+			s << " " << format(translate("inside {} folder"),
+			getTrackNameOrNumber(newParent, true));
+		}
 	}
 	outputMessage(s);
 }
