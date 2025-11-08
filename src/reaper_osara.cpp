@@ -656,6 +656,17 @@ bool doesAnySelectedTrackHaveItems () {
 	return false;
 }
 
+bool isAnySelectedTrackAFolder() {
+	int selCount = CountSelectedTracks2(nullptr, true);
+	for (int i = 0; i < selCount; ++i) {
+		MediaTrack* track = GetSelectedTrack2(nullptr, i, false);
+		if (!track) continue;
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") == 1)
+			return true;
+	}
+	return false;
+}
+
 const char* automationModeAsString(int mode) {
 	// this works for track automation mode and global automation override.
 	switch (mode) {
@@ -5660,12 +5671,13 @@ static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enab
 
 void cmdShowPeakAndLoudnessMenu(Command* command) {
 	double startTS, endTS;
-		GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
+	GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
 	int countTracks = CountTracks(nullptr);
 	int selTracks = CountSelectedTracks2(nullptr, true);
 	int itemCount = CountMediaItems(nullptr);
 	int selItems = CountSelectedMediaItems(nullptr);
 	const bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
+	const bool selTracksIncludeFolder = isAnySelectedTrackAFolder();
 	HMENU menu = CreatePopupMenu();
 	// Master submenu
 	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
@@ -5679,14 +5691,15 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	}
 	// Tracks submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0);
+	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0
+		&& (selTracksHaveItems || selTracksIncludeFolder));
 	if (selTracks > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems);
+		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems);
+		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
 	}
@@ -5705,7 +5718,7 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	switch (id) {
 		case 0: return; // canceled
-		case 1:Main_OnCommand(42440, 0); break; // Master mix
+		case 1: Main_OnCommand(42440, 0); break; // Master mix
 		case 2: Main_OnCommand(42441, 0); break; // Master mix within time selection
 		case 3: Main_OnCommand(42438, 0); break; // Selected tracks
 		case 4: Main_OnCommand(42439, 0); break; // Selected tracks within time selection
