@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-11-01 18:41\n"
+"PO-Revision-Date: 2025-11-15 18:42\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2845,6 +2845,18 @@ msgstr "在游標處結束"
 msgid "end offset {} MS"
 msgstr "結束偏移{} MS"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一個對象（離開的對象保留被選取）"
 
@@ -3069,6 +3081,9 @@ msgstr "OSARA: 更快地擦帶，輕推和調整對象邊緣以更大的增量�
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
 msgstr "OSARA: 擦帶較慢，輕推和調整對象邊緣以較小的增量，放大"
+
+msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
+msgstr "OSARA: 分析並顯示選取的軌道/對象的峰值和響度統計資料"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 啟用當前和弦/音符的非連續選則/切換選則"

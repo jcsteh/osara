@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-11-01 18:41\n"
+"PO-Revision-Date: 2025-11-15 18:42\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -2949,6 +2949,18 @@ msgstr "final en cursor"
 msgid "end offset {} MS"
 msgstr "desplazamiento final {} MS"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: mover al siguiente ítem, dejando los otros seleccionados"
 
@@ -3173,6 +3185,9 @@ msgstr "OSARA: Scrub más rápido, desplazar y ajustar los bordes de los ítems 
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
 msgstr "Scrub más lento, desplazar y ajustar los bordes de los ítems en incrementos menores, y acercar el zoom"
+
+msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
+msgstr "OSARA: Analiza y muestra estadísticas de picos y sonoridad en la pista seleccionada"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"

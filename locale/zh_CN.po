@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2025-11-01 18:41\n"
+"PO-Revision-Date: 2025-11-15 18:42\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -351,7 +351,7 @@ msgstr "不连续选择"
 #. used when reporting the number of notes in a chord.
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} notes"
-msgstr "音符"
+msgstr "{} 音符"
 
 msgid "velocity"
 msgstr "力度"
@@ -1552,7 +1552,7 @@ msgstr[0] "{} 轨已静音"
 #. replaced with the number of tracks; e.g. "2 tracks unmuted".
 msgid "{} track unmuted"
 msgid_plural "{} tracks unmuted"
-msgstr[0] "{} 已取消静音"
+msgstr[0] "{} 轨已取消静音"
 
 msgid "master soloed"
 msgstr "主控已独奏"
@@ -1639,7 +1639,7 @@ msgstr[0] "{} 对象标准化到统一增益"
 #. "2 items un-normalized".
 msgid "{} item un-normalized"
 msgid_plural "{} items un-normalized"
-msgstr[0] "{} 对象已标准化"
+msgstr[0] "{} 对象取消标准化"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
@@ -1781,13 +1781,13 @@ msgstr "空白片段 lane"
 #. the number of tracks; e.g. "2 tracks copied".
 msgid "{} track copied"
 msgid_plural "{} tracks copied"
-msgstr[0] "{} 轨道已复制"
+msgstr[0] "{} 轨复制"
 
 #. Reported when copying items. {} will be replaced with
 #. the number of items; e.g. "2 items copied".
 msgid "{} item copied"
 msgid_plural "{} items copied"
-msgstr[0] "{} 对象已复制"
+msgstr[0] "{} 对象复制"
 
 #. Reported when copying the content of a time selection to the edit cursor.
 msgid "copied time selection to edit cursor"
@@ -2087,7 +2087,7 @@ msgstr "{} 片段标记"
 #. with the number of tracks; e.g. "2 tracks selected".
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
-msgstr[0] "{} 轨道已选中"
+msgstr[0] "{} 轨已选中"
 
 msgid "not defeating solo"
 msgstr "取消独奏失效"
@@ -2845,6 +2845,18 @@ msgstr "在光标处结束"
 msgid "end offset {} MS"
 msgstr "结束偏移 {} 毫秒"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
 
@@ -3069,6 +3081,9 @@ msgstr "OSARA: 更快地擦洗,以更大增量微移和调整对象块边缘,缩
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
 msgstr "OSARA: 更慢地擦洗,以更小增量微移和调整对象块边缘,放大"
+
+msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
+msgstr "OSARA: 分析并显示所选轨道/对象的峰值与响度统计信息"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"

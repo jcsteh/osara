@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-11-01 18:41\n"
+"PO-Revision-Date: 2025-11-15 18:42\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2949,6 +2949,18 @@ msgstr "se termine au curseur"
 msgid "end offset {} MS"
 msgstr "décalage de fin {} MS"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Sélectionne l'objet suivant (en laissant les autres objets sélectionnés)"
 
@@ -3173,6 +3185,9 @@ msgstr "OSARA: Scrub plus rapide, pousser et ajuster les bords des objets par de
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
 msgstr "OSARA: Scrub plus lent, pousser et ajuster les bords d'objets par des incréments plus petits, zoom avant horizontal"
+
+msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
+msgstr "OSARA: Analyser et afficher les statistiques de crête et de sonie pour les pistes/objets sélectionnés"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activer la sélection non contigu, bascule la sélection de l'accord, de la note en cours"
