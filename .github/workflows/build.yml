@@ -290,6 +290,12 @@ jobs:
           # after the first wildcard pattern"
           # See also https://github.com/actions/upload-artifact/issues/248
           path: installer/mac/*.app
+      - name: upload debug symbols Win
+        if: ${{ matrix.os == 'windows-latest' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows_debug_symbols
+          path: build/*/*.pdb
     outputs:
       version: ${{ env.version }}
       # These will only be set for snapshot builds. Furthermore, each OS job
