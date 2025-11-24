@@ -24,6 +24,8 @@
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <array>
+#include <ranges>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -277,6 +279,12 @@ string formatTimeSec (double time) {
 	return format(translate("{:.3f} sec"), time);
 }
 
+string formatTimeRoundSec (double time) {
+	// Translators: Used when reporting a time in whole seconds. {} will be
+	// replaced with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), static_cast<int> (round(time)));
+}
+
 string formatTimeFrame(double time, bool useCache) {
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
@@ -330,6 +338,12 @@ string formatTimeSample(double time) {
 	// Translators: Used when reporting a time in samples. {} will be replaced
 	// with the number of samples; e.g. "2 samples".
 	return format(translate("{} samples"), buf);
+}
+
+string formatTimeMs (double time) {
+	// Translators: Used when reporting a time in milliseconds. {} will be
+	// replaced with the number of ms; e.g. "2 ms".
+	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -401,6 +415,11 @@ string formatTime(double time, TimeFormat timeFormat,
 			s = formatTimeFrame(time, useCache);
 			break;
 		}
+		case TF_ROUNDSEC: {
+			// Rounded seconds
+			s = formatTimeRoundSec(time);
+			break;
+		}
 		case TF_HMSF: {
 			// Hours:minutes:seconds:frames
 			s = formatTimeHMSF(time, useCache);
@@ -409,6 +428,11 @@ string formatTime(double time, TimeFormat timeFormat,
 		case TF_SAMPLE: {
 			// Samples
 			s = formatTimeSample(time);
+			break;
+		}
+		case TF_MS: {
+			// Milliseconds
+			s = formatTimeMs(time);
 			break;
 		}
 		default:
@@ -602,6 +626,12 @@ bool isTrackSelected(MediaTrack* track) {
 	return *(int*)GetSetMediaTrackInfo(track, "I_SELECTED", nullptr);
 }
 
+bool isTrackFrozen(MediaTrack* track) {
+	auto frozen = (int*)GetSetMediaTrackInfo(track, "I_FREEZECOUNT", nullptr);
+	// This will be null in REAPER < 7.43.
+	return frozen ? *frozen : false;
+}
+
 bool isItemSelected(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_UISEL", nullptr);
 }
@@ -614,6 +644,27 @@ bool isPosInItem(double pos, MediaItem* item) {
 
 bool isFreeItemPositioningEnabled(MediaTrack* track) {
 	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
+}
+
+bool doesAnySelectedTrackHaveItems () {
+	int trackCount = CountTracks(nullptr);
+	for (int i = 0; i < trackCount; ++i) {
+		MediaTrack* tr = GetTrack(nullptr, i);
+		if (isTrackSelected(tr) && CountTrackMediaItems(tr) > 0)
+			return true;
+	}
+	return false;
+}
+
+bool isAnySelectedTrackAFolder() {
+	int selCount = CountSelectedTracks2(nullptr, true);
+	for (int i = 0; i < selCount; ++i) {
+		MediaTrack* track = GetSelectedTrack2(nullptr, i, false);
+		if (!track) continue;
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") == 1)
+			return true;
+	}
+	return false;
 }
 
 const char* automationModeAsString(int mode) {
@@ -879,6 +930,19 @@ TimeFormat getPrimaryOrSecondaryTimeFormatForCommand() {
 	return TF_RULER;
 }
 
+int countNonEmptyTakes(MediaItem* item) {
+	if (!item)
+		return 0;
+	int totalTakes = CountTakes(item);
+	int nonEmptyTakes = 0;
+	for (int t = 0; t < totalTakes; ++t) {
+		if (GetTake(item, t)) {
+			nonEmptyTakes++;
+		}
+	}
+    	return nonEmptyTakes;
+}
+
 // End of utility/helper functions
 
 // Functions exported from SWS
@@ -929,6 +993,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 	if (armed && !autoArm) {
 		separate();
 		s << translate("armed");
+	}
+	if (isTrackFrozen(track)) {
+		separate();
+		s << translate("frozen");
 	}
 	if (isTrackMuted(track)) {
 		separate();
@@ -1131,7 +1199,7 @@ void postToggleTrackSolo(int command) {
 	outputMessage(s);
 }
 
-void postToggleTrackArm(int command) {
+void postToggleLastTouchedTrackArm(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		outputMessage(translate("no selected tracks"));
@@ -1140,6 +1208,46 @@ void postToggleTrackArm(int command) {
 	outputMessage(isTrackArmed(track) ?
 		translate("armed") :
 		translate("unarmed"));
+}
+
+void postToggleTrackArm(int command) {
+	int armedCount=0;
+	int unarmedCount=0;
+	int selCount = CountSelectedTracks2(nullptr, true);
+	if(selCount== 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if(selCount==1) {
+		outputMessage(isTrackArmed(GetSelectedTrack2(nullptr, 0, true)) ?
+			translate("armed") : translate("unarmed"));
+		return;
+	}
+	ostringstream s;
+	for (int i=0; i<selCount; ++i) {
+		if(isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
+			++armedCount;
+		} else {
+			++unarmedCount;
+		}
+	}
+	if(armedCount>0) {
+		// Translators: Reported when multiple tracks are armed. {} will be replaced
+		// with the number of tracks; e.g. "2 tracks armed".
+		s << format(translate_plural("{} track armed", "{} tracks armed", armedCount),
+			armedCount);
+		if (unarmedCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unarmedCount>0) {
+		// Translators: Reported when multiple tracks are unarmed. {} will be
+		// replaced with the number of tracks; e.g. "2 tracks unarmed".
+		s << format(
+			translate_plural("{} track unarmed", "{} tracks unarmed", unarmedCount),
+			unarmedCount);
+	}
+	outputMessage(s);
 }
 
 void postCycleTrackMonitor(int command) {
@@ -1661,7 +1769,7 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << " "
+	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << ", "
 		<< GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
@@ -2095,7 +2203,8 @@ void postSetSelectionEnd(int command) {
 	double start;
 	GetSet_LoopTimeRange(false, false, &start, nullptr, false);
 	if(start == 0)
-		outputMessage(translate("selected to start of project"));
+	// Translators: This is reported when users or REAPER automatically selects from the start of project to the cursor.
+		outputMessage(translate("selected from start of project to cursor"));
 	else
 		outputMessage(translate("set selection end"));
 	fakeFocus = FOCUS_RULER;
@@ -2674,7 +2783,7 @@ PostCommand POST_COMMANDS[] = {
 	{7, postToggleTrackSolo}, // Track: Toggle solo for selected tracks
 	{40281, postToggleTrackSolo}, // Track: Solo/unsolo tracks
 	{9, postToggleTrackArm}, // Track: Toggle record arm for selected tracks
-	{40294, postToggleTrackArm}, // Toggle record arming for current (last touched) track
+	{40294, postToggleLastTouchedTrackArm}, // Track: Toggle record arming for current/last touched track
 	{40495, postCycleTrackMonitor}, // Track: Cycle track record monitor
 	{40282, postInvertTrackPhase}, // Track: Invert track phase
 	{40298, postToggleTrackFxBypass}, // Track: Toggle FX bypass for current track
@@ -3022,6 +3131,7 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
+	{43617, _t("inverted segment scrub offsets")}, // Scrub: Invert looped-segment scrub range
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -3102,6 +3212,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
 	{{MAIN_SECTION, 1157}, {_t("enabled snap"), _t("disabled snap")}}, // Options: Toggle snapping
 	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
+	{{MAIN_SECTION, 24800}, {_t("main key map"), nullptr}}, // Main action section: Clear any override
 	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
 	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
 	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
@@ -3701,11 +3812,11 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		if (take) {
 			s << " " << GetTakeName(take);
 		}
-		int takeCount = CountTakes(item);
-		if (takeCount > 1) {
-			// Translators: Used when navigating items to indicate the number of
-			// takes. {} will be replaced with the number; e.g. "2 takes".
-			s << " " << format(translate("{} takes"), takeCount);
+		int nonEmptyTakes = countNonEmptyTakes(item);
+		if (nonEmptyTakes > 1) {
+			// Translators: Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+			// {} will be replaced with the number of takes; e.g. "2 takes".
+			s << " " << format(translate("{} takes"), nonEmptyTakes);
 		}
 		s << " " << formatCursorPosition();
 		addTakeFxNames(take, s);
@@ -3728,6 +3839,58 @@ void cmdMoveToPrevItem(Command* command) {
 	} else {
 		moveToItem(-1);
 	}
+}
+
+// REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
+// We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
+void reportZoomStepsAsTime(double time) {
+	TimeFormat tf = TF_MS;
+	if (time >= 1.0) tf = TF_ROUNDSEC;
+	// TRANSLATORS: Reported when users change horizontal zoom in steps.
+	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
+	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
+}
+
+void adjustZoomByStep(bool zoomOut) {
+	static constexpr std::array STEPPED_ZOOM_SETTINGS = {
+		0.001, 0.003, 0.005, 0.007, 0.01,
+		0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75,
+		1.0, 5.0, 10.0, 30.0, 60.0};
+	double currentPPS = GetHZoomLevel();
+	// currentPPS should always be positive
+	assert(currentPPS > 0.0);
+	double currentZoomStep = 1.0 / currentPPS;
+	double nextZoomStep = currentZoomStep;
+	if (zoomOut) {
+		// Find next step zooming out
+		for (double value : STEPPED_ZOOM_SETTINGS) {
+			if (currentZoomStep < value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	} else {
+		// Find next step zooming in
+		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
+			if (currentZoomStep > value) {
+				nextZoomStep = value;
+				break;
+			}
+		}
+	}
+	if (nextZoomStep != currentZoomStep) {
+		double newPPS = 1.0 / nextZoomStep;
+	adjustZoom(newPPS, 1, true, -1);
+	}
+	reportZoomStepsAsTime(nextZoomStep);
+}
+
+void cmdZoomOutStepped(Command* command) {
+	adjustZoomByStep(true);
+}
+
+void cmdZoomInStepped(Command* command) {
+	adjustZoomByStep(false);
 }
 
 void cmdUndo(Command* command) {
@@ -4057,13 +4220,12 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
 		outputMessage(translate("no items selected"));
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
 		return;
 	}
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if(lastCommand != command->gaccel.accel.cmd) { 
-		s<< getActionName(command->gaccel.accel.cmd) << " ";
+	if (lastCommand != command->gaccel.accel.cmd) { 
+		s << getActionName(command->gaccel.accel.cmd) << " ";
 		cache = FT_NO_CACHE;
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
@@ -4074,15 +4236,21 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 		return;
 	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
-	double newEnd = newStart+GetMediaItemInfo_Value(item, "D_LENGTH");
+	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
-	if(newStart!=oldStart)
-		s<<formatTime(newStart, TF_RULER, cache);
-	else if(newEnd!=oldEnd)
-		s<<formatTime(newEnd, TF_RULER, cache);
-	else if(newSourceOffset!=oldSourceOffset)
-		s<<formatTime(newSourceOffset, TF_RULER, cache);
-	else {
+	if (newStart != oldStart && newEnd != oldEnd) {
+		s << translate("start") << " " 
+			<< formatTime(newStart, TF_RULER, cache)
+			<<", " <<
+			translate("end") << " " 
+			<< formatTime(newEnd, TF_RULER, cache);
+	} else if (newStart != oldStart) {
+		s << formatTime(newStart, TF_RULER, cache);
+	} else if(newEnd!=oldEnd) {
+		s << formatTime(newEnd, TF_RULER, cache);
+	} else if(newSourceOffset!=oldSourceOffset) {
+		s << formatTime(newSourceOffset, TF_RULER, cache);
+	} else {
 		s.str("");
 		// Translators: Reported when moving items to indicate that no movement
 		// occurred.
@@ -4493,6 +4661,11 @@ void cmdReportPhaseInvertedTracks(Command* command) {
 		/* includeMaster */ false);
 }
 
+void cmdReportFrozenTracks(Command* command) {
+	reportTracksWithState(translate("Frozen"), isTrackFrozen,
+		/* includeMaster */ false);
+}
+
 template <typename Func>
 string formatItemsWithState(Func stateCheck, bool multiLine) {
 	const char* separator = multiLine ? "\r\n" : ", ";
@@ -4853,11 +5026,11 @@ void cmdReportNumberOfTakesInItem(Command* command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item)
 		return;
-	int takeCount = CountTakes(item);
+	int nonEmptyTakes = countNonEmptyTakes(item);
 	// Translators: Reports the number of takes contained within the last touched item.
 	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
-	outputMessage(format(translate_plural("{} take", "{} takes", takeCount),
-		takeCount));
+	outputMessage(format(translate_plural("{} take", "{} takes", nonEmptyTakes),
+		nonEmptyTakes));
 }
 
 void cmdReportItemLength(Command* command) {
@@ -5315,7 +5488,7 @@ void cmdReportScrubStyle(Command* command) {
 		outputMessage(translate("one shot"));
 	} else {
 		// Translators: Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-		outputMessage(translate("scrub"));
+		outputMessage(translate("tape scrub"));
 	}
 }
 
@@ -5375,6 +5548,7 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 	Main_OnCommand(40042, 0); // Transport: Go to start of project
 	Main_OnCommand(40625, 0); // Time selection: Set start point
 	fakeFocus = FOCUS_RULER;
+	// Translators: This is reported when users select from cursor to the start of project.
 	outputMessage(translate("selected to start of project"));
 }
 
@@ -5432,6 +5606,130 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void cmdReportAndEditScrubSegmentOffsets(Command* command) {
+	int sizeStart = 0;
+	int sizeEnd = 0;
+	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
+	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
+	if (!start || sizeStart != sizeof(int)
+			|| !end || sizeEnd != sizeof(int)) {
+		// We didn't get an expected value from the API
+		return;
+	}
+	if (lastCommandRepeatCount == 0) {
+		ostringstream s;
+		if (*start == 0) {
+			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+			s << translate("start from cursor");
+		} else {
+			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+			s << format(translate("start offset {} MS"), *start);
+		}
+		s << ", ";
+		if (*end == 0) {
+			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+			s << translate("end at cursor");
+		} else {
+			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+			s << format(translate("end offset {} MS"), *end);
+		}
+		outputMessage(s);
+		return;
+	}
+	// When users press more than once, run this action instead
+	Main_OnCommand(43632, 0); // Scrub: Prompt to edit looped-segment scrub range
+}
+
+// Helper for adding a menu item
+static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.wID = id;
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(menu, position, true, &info);
+}
+
+// Helper for creating a submenu (returns the submenu handle)
+static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
+	MENUITEMINFO info = {};
+	info.cbSize = sizeof(MENUITEMINFO);
+	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
+	info.fType = MFT_STRING;
+	info.dwTypeData = (char*)translate(label);
+	info.cch = strlen(info.dwTypeData);
+	info.hSubMenu = CreatePopupMenu();
+	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
+	InsertMenuItem(parent, position, true, &info);
+	return info.hSubMenu;
+}
+
+void cmdShowPeakAndLoudnessMenu(Command* command) {
+	double startTS, endTS;
+	GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
+	int countTracks = CountTracks(nullptr);
+	int selTracks = CountSelectedTracks2(nullptr, true);
+	int itemCount = CountMediaItems(nullptr);
+	int selItems = CountSelectedMediaItems(nullptr);
+	const bool selTracksHaveItems = doesAnySelectedTrackHaveItems();
+	const bool selTracksIncludeFolder = isAnySelectedTrackAFolder();
+	HMENU menu = CreatePopupMenu();
+	// Master submenu
+	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU masterSub = addSubMenu(menu, 0, "Master", !nothingToDryRun);
+	if (!nothingToDryRun) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
+	}
+	// Tracks submenu
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0
+		&& (selTracksHaveItems || selTracksIncludeFolder));
+	if (selTracks > 0) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems || selTracksIncludeFolder);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems || selTracksIncludeFolder);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
+	}
+	// Items submenu
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	HMENU itemsSub = addSubMenu(menu, 2, "Items", selItems > 0);
+	if (selItems > 0) {
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(itemsSub, 0, "Selected &items", 7);
+		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+		addMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
+	}
+	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
+	addMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	// Displaying and handling result
+	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
+	switch (id) {
+		case 0: return; // canceled
+		case 1: Main_OnCommand(42440, 0); break; // Master mix
+		case 2: Main_OnCommand(42441, 0); break; // Master mix within time selection
+		case 3: Main_OnCommand(42438, 0); break; // Selected tracks
+		case 4: Main_OnCommand(42439, 0); break; // Selected tracks within time selection
+		case 5: Main_OnCommand(42447, 0); break; // Mono selected tracks
+		case 6: Main_OnCommand(42448, 0); break; // Mono selected tracks within time selection
+		case 7: Main_OnCommand(42468, 0); break; // Selected items
+		case 8: Main_OnCommand(42437, 0); break; // Selected items with FX
+		case 9: Main_OnCommand(43349, 0); break; // Dry run project using the most recent render settings
+	}
+}
+
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
@@ -5487,6 +5785,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40228}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Grow right edge of items
 	{MAIN_SECTION, {{0, 0, 41305}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim left edge of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 41311}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Trim right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41306}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move left edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41307}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move right edge of item to edit cursor
+	{MAIN_SECTION, {{0, 0, 41205}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Move position of item to edit cursor
 	{MAIN_SECTION, {{0, 0, 40657}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 1 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40658}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 2 to play/edit cursor
 	{MAIN_SECTION, {{0, 0, 40659}, nullptr}, nullptr, cmdInsertOrMoveSpecificMarker}, // Markers: Add/move marker 3 to play/edit cursor
@@ -5611,6 +5912,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report record armed tracks")}, "OSARA_REPORTARMED", cmdReportArmedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with record monitor on")}, "OSARA_REPORTMONITORED", cmdReportMonitoredTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tracks with phase inverted")}, "OSARA_REPORTPHASED", cmdReportPhaseInvertedTracks},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report frozen tracks")}, "OSARA_REPORTFROZEN", cmdReportFrozenTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
@@ -5662,6 +5964,10 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers")}, "OSARA_MANAGETEMPOTIMESIGMARKERS", cmdManageTempoTimeSigMarkers},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report scrub segment offsets; press twice to edit")}, "OSARA_REPORTANDEDITSCRUBSEGMENT", cmdReportAndEditScrubSegmentOffsets},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out")}, "OSARA_ZOOMOUTSTEPPED", cmdZoomOutStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in")}, "OSARA_ZOOMINSTEPPED", cmdZoomInStepped},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Analyze and show peak and loudness statistics for selected tracks/items")}, "OSARA_SHOWPEAKANDLOUDNESSMENU", cmdShowPeakAndLoudnessMenu},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Enable noncontiguous selection/toggle selection of current chord/note")}, "OSARA_MIDITOGGLESEL", cmdMidiToggleSelection},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move forward to next single note or chord")}, "OSARA_NEXTCHORD", cmdMidiMoveToNextChord},
 	{MIDI_EDITOR_SECTION, {DEFACCEL, _t("OSARA: Move backward to previous single note or chord")}, "OSARA_PREVCHORD", cmdMidiMoveToPreviousChord},

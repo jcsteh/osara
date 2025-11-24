@@ -43,18 +43,12 @@ If you wish to completely replace your existing key map with the OSARA key map (
 If the installer does replace the key map, a safety backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
-Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
-Please follow these instructions to install it:
-
-1. Open the OSARA disk image file you downloaded.
-2. Open the "Install OSARA.command" file.
- On macOS Catalina and later, you have to choose open from the context menu, accessed with VO+Shift+M.
-3. Follow the instructions.
+1. Open the OSARA zip file you downloaded. Finder will extract a new file called OSARAInstaller.app.
+As its name suggests, this file is an installer, IE you can open it right there in your downloads folder, you do not need to copy it to your Applications folder.
+2. Open OSARAInstaller.app, follow the instructions.
  If you wish to replace the existing key map with the OSARA key map (which is recommended), answer yes when prompted.
   A backup of your existing key map will be made in Reaper's KeyMaps folder. 
-4. The installer leaves a terminal window open.
- It can be closed with Command+Q.
-5. Press Command+E to eject the disk image.
+3. Once installed, you can remove the zip and app files from your downloads folder.
 
 ### Key Map
 Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
@@ -89,10 +83,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Track: Duplicate tracks: Alt+D
 
 #### Adjusting Track Parameters
-- Track: Toggle mute for selected tracks
+- Track: Toggle mute for selected tracks: F5
 - Track: Toggle mute for master track: Shift+F5
-- Track: Toggle solo for selected tracks
+- Track: Toggle solo for selected tracks: F6
 - Toggle record arming for current (last touched) track: F7
+- Track: Toggle record arm for selected tracks: Shift+F7
 - Track: Cycle track record monitor: F8
 - Track: Invert track phase: F9
 - Track: Toggle FX bypass for current track: B
@@ -128,7 +123,11 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Go back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
+
+#### Scrub
 - Scrub: Toggle looped-segment scrub at edit cursor: /
+- Scrub: Toggle preference for one-shot segment scrub when moving edit cursor: Control+/
+- Scrub: Invert looped-segment scrub range: Shift+/
 
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
@@ -148,6 +147,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item edit: Move right edge of item to edit cursor: Control+Alt+Shift+.
+- Item edit: Move position of item to edit cursor: Control+Alt+Shift+,
 - Item edit: Trim left edge of item to edit cursor: Win+Shift+,
 - Item edit: Trim right edge of item to edit cursor: Win+Shift+.
 - Item: go to next stretch marker: Control+'
@@ -272,12 +273,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Envelope: Glue automation items
 
 #### Zoom
-- View: Zoom out horizontal: - or NumPad-
-- View: Zoom in horizontal: = or NumPad+
-- View: Zoom out vertical
-- View: Zoom in vertical
-- View: Toggle track zoom to minimum height
-- View: Toggle track zoom to maximum height
+- View: Zoom out horizontal: NumPad-
+- View: Zoom in horizontal: NumPad+
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
@@ -755,15 +752,16 @@ When the MIDI Editor is set to Event List mode, REAPER presents a list with all 
 When a note gets focus in the list, OSARA will play a preview of the focused note.
 To cancel a note preview, press the Control key.
 
-### Navigating FX Presets Without Activating Them (Windows Only)
+### Searching and Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
 Sometimes, you need to be able to examine or search the available presets without activating each one.
 OSARA provides a dialog to facilitate this.
 
 You activate this dialog by pressing Alt+DownArrow when focused on REAPER's FX preset combo box.
 The dialog displays the preset list and allows you to navigate without presets being automatically activated.
-The Filter field allows you to filter the list to show only presets containing the entered text.
-Pressing the OK button activates the preset that's currently selected in the list.
+The Filter field (Alt+F) allows you to filter the list to show only presets containing the entered text.
+Pressing Enter while focus is in the list box or Alt+A to activate the Apply button loads the selected preset.
+Pressing Escape or Alt+C to activate the Close button closes the dialog, clears the filter and returns keyboard focus to REAPER's FX preset combo box.
 
 ### Configuration
 OSARA provides a Configuration dialog to adjust various settings.
@@ -802,6 +800,7 @@ You can configure this via the "Automatically check for new versions of REAPER o
 OSARA also includes some other miscellaneous actions.
 
 #### Main section of actions list
+- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
 - OSARA: go to master track: Control+Alt+Shift+Home
@@ -809,6 +808,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
+- OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out: =
+- OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in: -
 - OSARA: Report ripple editing mode: Control+Shift+P
 - OSARA: Report muted tracks: Alt+Shift+F5
  - Pressing this twice will display the information in a dialog with a text box for easy review.
@@ -847,13 +848,15 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report global / Track Automation Mode: Control+Shift+L
 - OSARA: Toggle global automation override between latch preview and off: Control+Alt+Shift+L
 - OSARA: Cycle through midi recording modes of selected tracks: Alt+Shift+\
+- OSARA: Report frozen tracks
 - OSARA: Report groups for current track
 - OSARA: Report length of last touched item
 - OSARA: Report number of takes in last touched item
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
-- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
+- OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
+- OSARA: Analyze and show peak and loudness statistics for selected tracks/items: Control+Shift+U
 
 #### Midi Editor section of actions list
 - OSARA: Move forward to next single note or chord: RightArrow
@@ -899,6 +902,7 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Item edit: Move left edge of item to edit cursor
 - Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
 - Edit: Cut items
@@ -971,6 +975,10 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Move cursor left 8 pixels
 - View: Move cursor right 8 pixels
 - View: Set horizontal zoom to default project setting
+- View: Zoom out vertical
+- View: Zoom in vertical
+- View: Toggle track zoom to maximum height
+- View: Toggle track zoom to minimum height
 - View: Time unit for ruler: Absolute frames
 - View: Time unit for ruler: Hours:Minutes:Seconds:Frames
 - View: Time unit for ruler: Measures.Beats
@@ -1133,3 +1141,4 @@ The resulting installer can be found in the installer directory.
 - Jenny K Brennan
 - Day Garwood
 - Matej Golian
+- Toni Barth

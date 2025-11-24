@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2025-07-01 18:47\n"
+"PO-Revision-Date: 2025-11-15 18:42\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -143,6 +143,10 @@ msgstr "comienzo de selección de tiempo"
 
 msgid "time selection end"
 msgstr "fin de selección de tiempo"
+
+#. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
+msgid "Control {control}, {value}"
+msgstr "Control {control}, {value}"
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
@@ -622,10 +626,6 @@ msgstr "Activado multi"
 #. "Poly Aftertouch c sharp 4  96"
 msgid "Poly Aftertouch {note}  {value}"
 msgstr "Poly Aftertouch {note}  {value}"
-
-#. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
-msgid "Control {control}, {value}"
-msgstr "Control {control}, {value}"
 
 msgid "Program {}"
 msgstr "Programa {}"
@@ -1309,6 +1309,13 @@ msgstr "{:#.3f} seg"
 msgid "{:.3f} sec"
 msgstr "{:#.3f} seg"
 
+#. Used when reporting a time in whole seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be
+#. replaced with the number of seconds; e.g. "2 sec".
+msgid "{} sec"
+msgstr "{} segundo"
+
 #. Used when reporting a time in frames. {} will be
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
@@ -1323,15 +1330,15 @@ msgid_plural "{} hours"
 msgstr[0] "{} hora"
 msgstr[1] "{} horas"
 
-#. Used when reporting a time in seconds. {} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{} sec"
-msgstr "{} segundo"
-
 #. Used when reporting a time in samples. {} will be replaced
 #. with the number of samples; e.g. "2 samples".
 msgid "{} samples"
 msgstr "{} muestras"
+
+#. Used when reporting a time in milliseconds. {} will be
+#. replaced with the number of ms; e.g. "2 ms".
+msgid "{} ms"
+msgstr "{} ms"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1500,10 +1507,10 @@ msgid "VCA pre-FX follow"
 msgstr "Seguir VCA pre-fx"
 
 msgid "grid whole"
-msgstr "rejilla ajustar a 1"
+msgstr "rejilla: ajustar a 1"
 
 msgid "grid half"
-msgstr "rejilla ajustar a corchea"
+msgstr "rejilla: ajustar a 1/2"
 
 msgid "grid quarter"
 msgstr "rejilla: ajustar a 1/4"
@@ -1537,6 +1544,9 @@ msgstr "rejilla en 128"
 
 msgid "grid  unknown"
 msgstr "rejilla a desconocido"
+
+msgid "frozen"
+msgstr "congelado"
 
 msgid "defeating solo"
 msgstr "rechazar solo"
@@ -1621,6 +1631,20 @@ msgid "{} track unsoloed"
 msgid_plural "{} tracks unsoloed"
 msgstr[0] "{} pista desactivado solo"
 msgstr[1] "{} pistas desactivado solo"
+
+#. Reported when multiple tracks are armed. {} will be replaced
+#. with the number of tracks; e.g. "2 tracks armed".
+msgid "{} track armed"
+msgid_plural "{} tracks armed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Reported when multiple tracks are unarmed. {} will be
+#. replaced with the number of tracks; e.g. "2 tracks unarmed".
+msgid "{} track unarmed"
+msgid_plural "{} tracks unarmed"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "record monitor off"
 msgstr "apagado"
@@ -1994,8 +2018,9 @@ msgid_plural "{} items disabled loop source"
 msgstr[0] "{} ítem desactivado de fuente de loop"
 msgstr[1] "{} ítems desactivado de fuente de loop"
 
-msgid "selected to start of project"
-msgstr "seleccionado hasta comienzo de proyecto"
+#. This is reported when users or REAPER automatically selects from the start of project to the cursor.
+msgid "selected from start of project to cursor"
+msgstr "seleccionado desde principio de proyecto hasta cursor"
 
 msgid "set selection end"
 msgstr "fin de selección fijado"
@@ -2258,6 +2283,9 @@ msgstr "desarmadas todas las pistas"
 msgid "all delta solos reset"
 msgstr "reiniciado todo delta solos"
 
+msgid "inverted segment scrub offsets"
+msgstr "compensación invertida del scrub del segmento"
+
 msgid "grid sixty forth"
 msgstr "rejilla: ajustar a 1/64"
 
@@ -2368,6 +2396,9 @@ msgstr "instantánea activada"
 
 msgid "disabled snap"
 msgstr "instantánea desactivada"
+
+msgid "main key map"
+msgstr "mapa de teclado principal"
 
 msgid "default key map"
 msgstr "mapa de teclado por defecto"
@@ -2480,10 +2511,13 @@ msgstr "Cambiar Selección de Ítem"
 msgid "group {}"
 msgstr "grupo {}"
 
-#. Used when navigating items to indicate the number of
-#. takes. {} will be replaced with the number; e.g. "2 takes".
+#. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
+#. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} tomas"
+
+msgid "{} per keypress"
+msgstr "{} por tecla pulsada"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -2602,6 +2636,12 @@ msgstr[1] "{} divisiones reparadas"
 msgid "contents of time selection removed"
 msgstr "contenido de selección de tiempo eliminado"
 
+msgid "start"
+msgstr "comienzo"
+
+msgid "end"
+msgstr "fin"
+
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
@@ -2660,6 +2700,9 @@ msgstr "Monitorizada"
 
 msgid "Phase inverted"
 msgstr "Fase invertida"
+
+msgid "Frozen"
+msgstr "Congelado"
 
 msgid "Time selection:"
 msgstr "Selección de tiempo:"
@@ -2868,12 +2911,16 @@ msgid "one shot"
 msgstr "una instantánea"
 
 #. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
-msgid "scrub"
-msgstr "scrub"
+msgid "tape scrub"
+msgstr "tape scrub"
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
 msgstr "En la Posición actual"
+
+#. This is reported when users select from cursor to the start of project.
+msgid "selected to start of project"
+msgstr "seleccionado hasta comienzo de proyecto"
 
 msgid "selected to end of project"
 msgstr "seleccionado hasta final de proyecto"
@@ -2884,6 +2931,36 @@ msgstr "fase normal en todas las pistas"
 msgid "unmonitored all tracks"
 msgstr "apagado monitor en todas las pistas"
 
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "comienzo desde cursor"
+
+#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "comienzo de desplazamiento {} MS"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "final en cursor"
+
+#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "desplazamiento final {} MS"
+
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: mover al siguiente ítem, dejando los otros seleccionados"
 
@@ -2943,6 +3020,9 @@ msgstr "OSARA: anuncia pistas con monitor de grabación activado"
 
 msgid "OSARA: Report tracks with phase inverted"
 msgstr "OSARA: anuncia pistas con fase invertida"
+
+msgid "OSARA: Report frozen tracks"
+msgstr "OSARA: anuncia pistas congeladas"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
 msgstr "OSARA: Anuncia selección de pista/ítem/tiempo/MIDI (dependiendo del foco)"
@@ -3096,6 +3176,18 @@ msgstr "OSARA: seleccionar ítems bajo el cursor de edición en pistas seleccion
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Anuncia tempo y compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"
+
+msgid "OSARA: Report scrub segment offsets; press twice to edit"
+msgstr "OSARA: anuncia segmento de desplazamiento de scrub. Pulsar dos veces para editar"
+
+msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
+msgstr "OSARA: Scrub más rápido, desplazar y ajustar los bordes de los ítems en incrementos mayores, y alejar el zoom"
+
+msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
+msgstr "Scrub más lento, desplazar y ajustar los bordes de los ítems en incrementos menores, y acercar el zoom"
+
+msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
+msgstr "OSARA: Analiza y muestra estadísticas de picos y sonoridad en la pista seleccionada"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
 msgstr "OSARA: Activa modo de selección no contíguo o cambia la selección de acorde/nota"
@@ -3264,16 +3356,20 @@ msgid "FX Preset"
 msgstr "Preajuste de FX"
 
 msgctxt "FX Preset"
-msgid "Filter:"
-msgstr "filtro:"
+msgid "&Presets:"
+msgstr "&Presets:"
 
 msgctxt "FX Preset"
-msgid "&OK"
-msgstr "&aceptar"
+msgid "&Filter:"
+msgstr "&Filtro:"
 
 msgctxt "FX Preset"
-msgid "&Cancel"
-msgstr "&cancelar"
+msgid "&Apply"
+msgstr "&Aplicar"
+
+msgctxt "FX Preset"
+msgid "&Close"
+msgstr "&Cerrar"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"
