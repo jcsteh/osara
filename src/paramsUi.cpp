@@ -617,6 +617,13 @@ class ParamsDialog {
 			if (!m.empty()) {
 				return false;
 			}
+			// Testing: MIDI utility parameters that are often exposed but not useful. Hoping hiding these will speed up navigation on Mac
+			string strippedName = name.substr(0, name.find_last_of(' '));
+			for (const string& text : {"MIDI CC", "MIDI Controller", "Program Change", "CC", "Pitch Bend", "Pitchbend", "Aftertouch", "Channel Pressure", "MIDI State", "Poly", "Omni", "All Notes", "All Sound", "Local Control", "X (Reserved)", "Internal", "Registered Parameter Number", "Non - Registered Parameter Number", "Reset All Controllers", "(MSB )", "(LSB) "}) {
+				if (strippedName.starts_with(text) || strippedName.ends_with(text)) {
+					return false;
+				}
+			}
 		}
 		if (filter.empty())
 			return true;
@@ -737,7 +744,7 @@ class ParamsDialog {
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
-		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
