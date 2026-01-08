@@ -3943,6 +3943,10 @@ void cmdSplitItems(Command* command) {
 	// number of items; e.g. "2 items added".
 	outputMessage(format(
 		translate_plural("{} item added", "{} items added", added), added));
+	if (added >= 1) {
+		// Only set fakeFocus if a split was successful.
+		fakeFocus = FOCUS_ITEM;
+	}
 	if (!added) {
 		return;
 	}
