@@ -3841,6 +3841,28 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
+void cmdMoveToZeroCrossing(Command* command) {
+	int selItems = CountSelectedMediaItems(nullptr);
+	if (selItems == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	double beforePos = GetCursorPosition();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double afterPos = GetCursorPosition();
+	double diff = afterPos - beforePos;
+	if (diff == 0.0) {
+		// No movement, avoid showing "+0".
+		outputMessage(format(translate("{}"), formatTimeSample(0)));
+		return;
+	}
+	if (diff > 0.0) {
+		outputMessage(format(translate("+{}"), formatTimeSample(diff)));
+	} else {
+		outputMessage(format(translate("-{}"), formatTimeSample(-diff)));
+	}
+}
+
 // REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
 void reportZoomStepsAsTime(double time) {
@@ -5740,6 +5762,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40288}, nullptr}, nullptr, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40417}, nullptr}, nullptr, cmdMoveToNextItem}, // Item navigation: Select and move to next item
 	{MAIN_SECTION, {{0, 0, 40416}, nullptr}, nullptr, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
+	{MAIN_SECTION, {{0, 0, 40791}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to next zero crossing in items
+	{MAIN_SECTION, {{0, 0, 40790}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to previous zero crossing in items
+	{MAIN_SECTION, {{0, 0, 41995}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to nearest zero crossing in items
 	{MAIN_SECTION, {{0, 0, 40029}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
 	{MIDI_EDITOR_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
