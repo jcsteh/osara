@@ -950,6 +950,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Insert new track
 - Track: Select all tracks
 - SWS: Toggle (invert) track selection
+- Track: Move tracks up
+-Track: Move tracks down
 - Track: Mute/unmute tracks
 - Track: Solo/unsolo tracks
 - Track: Toggle record arm for selected tracks

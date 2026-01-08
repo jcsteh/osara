@@ -954,6 +954,20 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
 bool shouldMoveToAutoItem = false;
 
+string getTrackNameOrNumber(MediaTrack* track, bool reportTrackNumber) {
+	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+	ostringstream s;
+	if (trackName && trackName[0]) {
+		s << trackName;
+	} else if (reportTrackNumber) {
+		// There's no name and track number reporting is disabled. We report the
+		// number in lieu of the name.
+		int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+		s << trackNum;
+	}
+	return s.str();
+	}
+
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
@@ -1027,14 +1041,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			s << formatFolderState(track);
 		}
 		separate();
-		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
-		if (trackName && trackName[0]) {
-			s << trackName;
-		} else if (!settings::reportTrackNumbers) {
-			// There's no name and track number reporting is disabled. We report the
-			// number in lieu of the name.
-			s << trackNum;
-		}
+		s << getTrackNameOrNumber(track, !settings::reportTrackNumbers);
 		if (folderDepth <0){ //end of folder
 			separate();
 			s << formatFolderState(track);
@@ -5632,6 +5639,75 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void cmdMoveTracks(Command* command) {
+	if (CountSelectedTracks(nullptr) == 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	MediaTrack* track = GetLastTouchedTrack();
+	MediaTrack* oldParent = GetParentTrack(track);
+	int oldDepth = 0;
+	if (oldParent) {
+		MediaTrack* nextParent = GetParentTrack(oldParent);
+		oldDepth++;
+		while (nextParent) {
+			oldDepth++;
+			nextParent = GetParentTrack(nextParent);
+		}
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	const bool up = command->gaccel.accel.cmd == 43647;
+	MediaTrack* newParent = GetParentTrack(track);
+	int newDepth = 0;
+	if (newParent) {
+		MediaTrack* nextParent = GetParentTrack(newParent);
+		newDepth++;
+		while (nextParent) {
+			newDepth++;
+			nextParent = GetParentTrack(nextParent);
+		}
+	}
+	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	ostringstream s;
+	if (oldParent != newParent
+			&&newParent
+			&& newDepth > oldDepth) {
+		// Translators: Reported when a track you are moving enters a folder.
+		// {} will be replaced with the name of the folder.
+		// E.G, "entered drums folder"
+		s << format(translate("entered {} folder"),
+			getTrackNameOrNumber(newParent, true)) << ", ";
+	} else if (oldParent != newParent && newDepth < oldDepth) {
+		// Translators: Reported when a track you are moving leaves a folder.
+		// {} will be replaced with the name of the folder.
+		// E.G, "left drums folder"
+		s << format(translate("left {} folder"),
+			getTrackNameOrNumber(oldParent, true)) << ", ";
+	}
+	if (up) {
+		// Translators: Reported when moving a track upward.
+		// {} will be replaced with the name or number of the track below.
+		// E.G, "above vocal" or "above 3"
+		s << format(translate("above {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackIndex + 1), true));
+	} else {
+		// Translators: Reported when moving a track downward.
+		// {} will be replaced with the name or number of the track above.
+		// E.G, "below vocal" or "below 3"
+		s << format(translate("below {}"),
+			getTrackNameOrNumber(GetTrack(nullptr, trackIndex - 1), true));
+	}
+	if (newParent) {
+		if (up || newDepth <= oldDepth) {
+			// Translators: Appended after the new position when moving a track inside of a folder.
+			// E.G, "inside guitars folder" or "inside 3 folder"
+			s << " " << format(translate("inside {} folder"),
+			getTrackNameOrNumber(newParent, true));
+		}
+	}
+	outputMessage(s);
+}
+
 void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
@@ -5881,6 +5957,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
+	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
