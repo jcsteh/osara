@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-11-15 18:42\n"
+"PO-Revision-Date: 2025-12-01 18:54\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2430,7 +2430,7 @@ msgid "{} takes"
 msgstr "{} 片段"
 
 msgid "{} per keypress"
-msgstr "{} 單一按鍵"
+msgstr "{} 每按一次"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -3077,10 +3077,10 @@ msgid "OSARA: Report scrub segment offsets; press twice to edit"
 msgstr "OSARA: 報告擦帶部分偏移；按兩次編輯"
 
 msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
-msgstr "OSARA: 更快地擦帶，輕推和調整對象邊緣以更大的增量縮小"
+msgstr "OSARA: 加快擦帶，更大範圍輕推和調整對象邊緣，視圖縮小"
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
-msgstr "OSARA: 擦帶較慢，輕推和調整對象邊緣以較小的增量，放大"
+msgstr "OSARA: 減慢擦帶，更小範圍輕推和調整對象邊緣，視圖放大"
 
 msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
 msgstr "OSARA: 分析並顯示選取的軌道/對象的峰值和響度統計資料"
