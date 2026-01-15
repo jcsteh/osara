@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2025-12-15 18:52\n"
+"PO-Revision-Date: 2026-01-15 18:58\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2689,6 +2689,15 @@ msgstr "группа {}"
 #. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} клипов"
+
+msgid "{}"
+msgstr ""
+
+msgid "+{}"
+msgstr ""
+
+msgid "-{}"
+msgstr ""
 
 msgid "{} per keypress"
 msgstr "при нажатии {}"

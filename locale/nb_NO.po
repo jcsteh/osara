@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-11-15 18:42\n"
+"PO-Revision-Date: 2026-01-15 18:58\n"
 
 msgid "enabled"
 msgstr ""
@@ -2514,6 +2514,15 @@ msgstr ""
 #. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
 #. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
+msgstr ""
+
+msgid "{}"
+msgstr ""
+
+msgid "+{}"
+msgstr ""
+
+msgid "-{}"
 msgstr ""
 
 msgid "{} per keypress"

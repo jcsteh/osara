@@ -11,23 +11,23 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2025-11-15 16:56\n"
+"PO-Revision-Date: 2026-01-15 18:58\n"
 
 msgid "enabled"
-msgstr "habilitar"
+msgstr "habilitando"
 
 #. A recording mode.
 msgid "disabled"
-msgstr "deshabilitar"
+msgstr "deshabilitando"
 
 msgid "OSARA: Toggle"
-msgstr "OSARA: Alternar"
+msgstr "OSARA: Alterna"
 
 msgid "OSARA: Enable"
-msgstr "OSARA: Habilita"
+msgstr "OSARA: Habilita el"
 
 msgid "OSARA: Disable"
-msgstr "OSARA: Deshabilita"
+msgstr "OSARA: Deshabilita el"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
@@ -63,11 +63,11 @@ msgstr "7. Se ocultarán los prefijos de tipo en la ventana de FX para mejorar l
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
-msgstr "8. Desactivar ajuste a la cuadrícula visible en el editor MIDI para que el movimiento por cuadrícula no dependa del ajuste de zoom horizontal."
+msgstr "8. Se desactivará el ajuste a la cuadrícula visible en el editor MIDI para que el movimiento por cuadrícula no dependa del ajuste de zoom horizontal."
 
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
-msgstr ""
+msgstr "9. Se configurará Control+Espacio para reproducir/detener cuando el foco del teclado esté en cuadros de diálogo, necesario con REAPER 7.41 o posterior."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1555,7 +1555,7 @@ msgid "phase inverted"
 msgstr "fase invertida"
 
 msgid "FX bypassed"
-msgstr "EFECTO desactivado"
+msgstr "FX desactivado"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1636,15 +1636,15 @@ msgstr[1] "desactivando solo en {} pistas"
 #. with the number of tracks; e.g. "2 tracks armed".
 msgid "{} track armed"
 msgid_plural "{} tracks armed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista armada"
+msgstr[1] "{} pistas armadas"
 
 #. Reported when multiple tracks are unarmed. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unarmed".
 msgid "{} track unarmed"
 msgid_plural "{} tracks unarmed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista desarmada"
+msgstr[1] "{} pistas desarmadas"
 
 msgid "record monitor off"
 msgstr "monitor de grabación apagado"
@@ -1820,19 +1820,19 @@ msgstr "con modo ripple en todas las pistas activado"
 
 #. Reported when auto crossfade and trim content behind media items are both enabled.
 msgid "enabled auto crossfades and trim"
-msgstr "fundidos automáticos y recorte activados"
+msgstr ""
 
 #. Reported when auto crossfade is enabled, trim behind media items is disabled.  
 msgid "crossfading, not trimming"
-msgstr "fundidos automáticos, sin recorte"
+msgstr ""
 
 #. Reported when trim content behind media items is enabled, auto crossfade is disabled.
 msgid "trimming, not crossfading"
-msgstr "recorte, sin fundidos automáticos"
+msgstr ""
 
 #. Reported when auto crosfade and trim content behind media items are both disabled.
 msgid "disabled auto crossfades and trim"
-msgstr "fundidos automáticos y recorte desactivados"
+msgstr ""
 
 msgid "repeat on"
 msgstr "repetir encendido"
@@ -1998,25 +1998,25 @@ msgstr[1] "{} ítems desbloqueados"
 
 #. Reported when an action is used to enable loop source for an item.
 msgid "enabled loop source"
-msgstr "bucle de fuente activado"
+msgstr ""
 
 #. Reported when an action is used to disable loopp source for an item.
 msgid "disabled loop source"
-msgstr "bucle de fuente desactivado"
+msgstr ""
 
 #. Reported when loop source is enabled for multiple items. {} will be replaced
 #. with the number of items; e.g. "2 items enabled lloop source".
 msgid "{} item enabled loop source"
 msgid_plural "{} items enabled loop source"
-msgstr[0] "{} ítem con bucle de fuente activado"
-msgstr[1] "{} ítems con bucle de fuente activado"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Reported when loop source is disabled for multiple items. {} will be
 #. replaced with the number of items; e.g. "2 items disabled loop source".
 msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
-msgstr[0] "{} ítem con bucle de fuente desactivado"
-msgstr[1] "{} ítems con bucle de fuente desactivado"
+msgstr[0] ""
+msgstr[1] ""
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
@@ -2038,10 +2038,10 @@ msgid "crossfade off"
 msgstr "crossfade apagado"
 
 msgid "trim behind items on"
-msgstr "recorte de ítems superpuestos activado"
+msgstr "recortar detrás de los ítems activado"
 
 msgid "trim behind items off"
-msgstr "recorte de ítems superpuestos desactivado"
+msgstr "recortar detrás de los ítems desactivado"
 
 msgid "locking on"
 msgstr "bloqueo encendido"
@@ -2516,8 +2516,17 @@ msgstr "grupo {}"
 msgid "{} takes"
 msgstr "{} tomas"
 
+msgid "{}"
+msgstr "{}"
+
+msgid "+{}"
+msgstr "+{}"
+
+msgid "-{}"
+msgstr "-{}"
+
 msgid "{} per keypress"
-msgstr ""
+msgstr "por tecla"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
@@ -2637,10 +2646,10 @@ msgid "contents of time selection removed"
 msgstr "contenido de la selección de tiempo eliminado"
 
 msgid "start"
-msgstr ""
+msgstr "inicio de"
 
 msgid "end"
-msgstr ""
+msgstr "fin de"
 
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
@@ -3007,10 +3016,10 @@ msgid "OSARA: Report ripple editing mode"
 msgstr "OSARA: Anuncia el estado del ripple"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: Anunciar las pistas muteadas"
+msgstr "OSARA: Anuncia las pistas muteadas"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: Anunciar las pistas con el solo activado"
+msgstr "OSARA: Anuncia las pistas con el solo activado"
 
 msgid "OSARA: Report record armed tracks"
 msgstr "OSARA: Anuncia las pistas armadas para grabación"
@@ -3019,37 +3028,37 @@ msgid "OSARA: Report tracks with record monitor on"
 msgstr "OSARA: Anuncia las pistas con el monitor encendido"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: Anunciar las pistas con la fase invertida"
+msgstr "OSARA: Anuncia las pistas con la fase invertida"
 
 msgid "OSARA: Report frozen tracks"
 msgstr ""
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
-msgstr "OSARA: Anunciar la selección de pista/ítem/tiempo/MIDI (según el foco)"
+msgstr "OSARA: Anuncia la selección de pista/ítem/tiempo/MIDI (según el foco)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
-msgstr "OSARA: Eliminar ítems/pistas/contenido de la selección de tiempo/marcadores/puntos de envolvente (según el foco)"
+msgstr "OSARA: Elimina ítems/pistas/contenido de la selección de tiempo/marcadores/puntos de envolvente (según el foco)"
 
 msgid "OSARA: Toggle shortcut help"
-msgstr "OSARA: Alternar la ayuda de teclado"
+msgstr "OSARA: Alterna la ayuda de teclado"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
-msgstr "OSARA: Anunciar la posición del cursor de edición/reproducción, el estado del transporte, marcadores y regiones más cercanos"
+msgstr "OSARA: Anuncia la posición del cursor de edición/reproducción, el estado del transporte, marcadores y regiones más cercanos"
 
 msgid "OSARA: Report number of takes in last touched item"
-msgstr "OSARA: Anunciar la cantidad de tomas en el último ítem enfocado"
+msgstr "OSARA: Anuncia la cantidad de tomas en el último ítem enfocado"
 
 msgid "OSARA: Report length of last touched item"
-msgstr "OSARA: Anunciar la duración del último ítem enfocado"
+msgstr "OSARA: Anuncia la duración del último ítem enfocado"
 
 msgid "OSARA: Report project length"
-msgstr "OSARA: Anunciar la duración total del proyecto"
+msgstr "OSARA: Anuncia la duración total del proyecto"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
-msgstr "OSARA: Habilitar la selección separada/alternar la selección de la pista/ítem actual (según el foco)"
+msgstr "OSARA: Habilita la selección separada/alternar la selección de la pista/ítem actual (según el foco)"
 
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
-msgstr "OSARA: Mover el último marcador elástico enfocado a la posición actual del cursor de reproducción"
+msgstr "OSARA: Mueve el último marcador elástico enfocado a la posición actual del cursor de reproducción"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
 msgstr "OSARA: Anuncia el nivel en pico dB en el cursor de reproducción para el canal 1 de la pista actual (anuncia el nivel de entrada en su lugar cuando la pista está armada)"
@@ -3106,7 +3115,7 @@ msgid "OSARA: Configuration"
 msgstr "OSARA: Configuración"
 
 msgid "OSARA: Report global / Track Automation Mode"
-msgstr "OSARA: Anunciar modo de automatización global / de pista"
+msgstr "OSARA: Anuncia el modo de automatización global / de pista"
 
 msgid "OSARA: Toggle global automation override between latch preview and off"
 msgstr "OSARA: alterna la anulación global de automatización entre escucha previa y apagada"
@@ -3118,13 +3127,13 @@ msgid "OSARA: About"
 msgstr "OSARA: Acerca de"
 
 msgid "OSARA: Report groups for current track"
-msgstr "OSARA: Anunciar los grupos para la pista actual"
+msgstr "OSARA: Anuncia los grupos para la pista actual"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr "OSARA: Silencia el siguiente mensaje de OSARA"
+msgstr "OSARA: Omite el siguiente mensaje de OSARA"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: Anunciar las regiones, último marcador de proyecto e ítems de las pistas seleccionadas en la posición actual"
+msgstr "OSARA: Anuncia las regiones, último marcador de proyecto e ítems de las pistas seleccionadas en la posición actual"
 
 msgid "OSARA: Go to first track"
 msgstr "OSARA: Va a la primera pista"
@@ -3163,7 +3172,7 @@ msgid "OSARA: Unmonitor all tracks"
 msgstr "OSARA: Desmonitorea todas las pistas"
 
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
-msgstr "OSARA: Optimicar REAPER para el uso con lectores de pantalla"
+msgstr "OSARA: Optimizar REAPER para el uso con lectores de pantalla"
 
 msgid "OSARA: Check for update"
 msgstr "OSARA: Busca la última actualización"
@@ -3357,19 +3366,19 @@ msgstr "Preset de FX"
 
 msgctxt "FX Preset"
 msgid "&Presets:"
-msgstr ""
+msgstr "&Presets:"
 
 msgctxt "FX Preset"
 msgid "&Filter:"
-msgstr ""
+msgstr "&Filtro:"
 
 msgctxt "FX Preset"
 msgid "&Apply"
-msgstr ""
+msgstr "&Aplicar"
 
 msgctxt "FX Preset"
 msgid "&Close"
-msgstr ""
+msgstr "&Cerrar"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"

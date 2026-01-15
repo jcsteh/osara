@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2025-12-01 18:54\n"
+"PO-Revision-Date: 2026-01-15 18:58\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2428,6 +2428,15 @@ msgstr "分組 {}"
 #. {} will be replaced with the number of takes; e.g. "2 takes".
 msgid "{} takes"
 msgstr "{} 片段"
+
+msgid "{}"
+msgstr ""
+
+msgid "+{}"
+msgstr ""
+
+msgid "-{}"
+msgstr ""
 
 msgid "{} per keypress"
 msgstr "{} 每按一次"
