@@ -346,6 +346,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
 - Toggle fullscreen: F11, Command+F11 on Mac
+- Show/hide video window: Control+Shift+V
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
