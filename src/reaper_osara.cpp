@@ -5632,6 +5632,18 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
+void cmdVideoWindowVisibility(Command* command) {
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	// Delay the report to avoid it being clobbered when GUI updates.
+	CallLater([]() {
+		if (GetToggleCommandState(50125)) { // Show/hide video window
+			outputMessage(translate("showed video window"));
+		} else {
+			outputMessage(translate("hid video window"));
+		}
+	}, 50);
+}
+
 void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
@@ -5881,6 +5893,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
