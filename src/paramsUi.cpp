@@ -5,6 +5,8 @@
  * License: GNU General Public License version 2.0
  */
 
+#include <chrono>
+#include <thread>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -355,6 +357,8 @@ class ParamsDialog {
 	}
 
 	void onSliderChange(double newVal) {
+		static CallLater later;
+		later.cancel();
 		if (newVal == this->val
 				|| newVal < this->param->min || newVal > this->param->max) {
 			return;
@@ -384,7 +388,9 @@ class ParamsDialog {
 			}
 		}
 		this->param->setValue(this->val);
-		this->updateValue();
+		later = CallLater([this]() {
+			this->updateValue();
+		}, 50);
 	}
 
 	void onValueEdited() {
