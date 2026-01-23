@@ -1,4 +1,4 @@
-.gitattributes text
+.gitattributes text eol=lf
 .gitignore text
 *.cpp text
 *.h text
@@ -7,7 +7,7 @@
 *.rc text
 sconstruct text
 *sconscript text
-*.nsi text
+*.nsi text eol=lf
 *.txt text
 *.ini text
 *.yml text
