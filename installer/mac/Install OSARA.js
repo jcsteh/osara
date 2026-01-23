@@ -27,6 +27,19 @@ function isPortableReaper ( dir ) {
 
 function run(argv) {
 	var source = getResourcesDir();
+	var s = app.doShellScript;
+	var running = false;
+	try {
+		var code = s("pgrep -x 'REAPER|REAPER64|REAPER-ARM' >/dev/null 2>&1; echo $?");
+		running = (code.trim() === "0");
+	} catch (ignore) {}
+	if (running) {
+		app.displayDialog("OSARA cannot be installed while REAPER is running. Please close REAPER then run this installer again.", {
+			buttons: ["OK"],
+			defaultButton: "OK"
+		});
+		return;
+	}
 	 var res = app.displayDialog("Choose whether to install OSARA into a standard or a portable REAPER", {
 		buttons: ["Standard REAPER Installation", "Portable REAPER Installation", "Cancel"],
 		defaultButton: "Standard REAPER Installation",
@@ -49,7 +62,6 @@ function run(argv) {
 	}
 	target = target.toString();
 
-	var s = app.doShellScript;
 	try{
 		s(`mkdir -p '${target}'`);
 		s(`mkdir -p '${target}/UserPlugins'`);
