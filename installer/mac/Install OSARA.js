@@ -27,9 +27,9 @@ function isPortableReaper ( dir ) {
 
 function run(argv) {
 	var source = getResourcesDir();
-	 var res = app.displayDialog("Choose weather to install Osara into a standard or a portable Reaper", {
-		buttons: ["Standard Reaper Installation", "Portable Reaper Installation", "Cancel"],
-		defaultButton: "Standard Reaper Installation",
+	 var res = app.displayDialog("Choose whether to install OSARA into a standard or a portable REAPER", {
+		buttons: ["Standard REAPER Installation", "Portable REAPER Installation", "Cancel"],
+		defaultButton: "Standard REAPER Installation",
 		cancelButton: "Cancel"
 	});
 	var portable = (res.buttonReturned === "Portable Reaper Installation");
@@ -37,12 +37,12 @@ function run(argv) {
 	if (portable === true) {
 		while(true) {
 			target = app.chooseFolder({
-				withPrompt:"Choose the folder containing your portable Reaper installation:"
+				withPrompt:"Choose the folder containing your portable REAPER installation:"
 			});
 			if(isPortableReaper(target)) {
 				break;
 			} // user chose a folder that doesn't contain Reaper.
-			app.displayDialog("The folder you chose does not contain an installation of Reaper.");
+			app.displayDialog("The folder you chose does not contain an installation of REAPER.");
 		}
 	} else {
 		target = app.pathTo("home folder") + "/Library/Application Support/REAPER"
@@ -51,17 +51,18 @@ function run(argv) {
 
 	var s = app.doShellScript;
 	try{
+		s(`mkdir -p '${target}'`);
 		s(`mkdir -p '${target}/UserPlugins'`);
 	} catch (ignore){}// directory probably already exists
-	s(`cat '${source}/reaper_osara.dylib' > '${target}/UserPlugins/reaper_osara.dylib'`);
+	s(`cp -f '${source}/reaper_osara.dylib' '${target}/UserPlugins/reaper_osara.dylib'`);
 	try{
-		s(`mkdir '${target}/KeyMaps'`);
+		s(`mkdir -p '${target}/KeyMaps'`);
 	} catch(ignore) {} // directory probably already exists
-	s(`cp '${source}/OSARA.ReaperKeyMap' '${target}/KeyMaps/'`);
+	s(`cp -f '${source}/OSARA.ReaperKeyMap' '${target}/KeyMaps/'`);
 	s(`mkdir -p '${target}/osara/locale'`);
-	s(`cp '${source}/locale/'* '${target}/osara/locale/'`);
+	s(`cp -f '${source}/locale/'* '${target}/osara/locale/'`);
 	var res = app.displayDialog(
-		"Do you want to replace the existing keymap with the Osara keymap?", {
+		"Do you want to replace the existing keymap with the OSARA keymap?", {
 		buttons: ["Yes", "No"],
 		defaultButton: "Yes"});
 	if(res.buttonReturned==="Yes") {
