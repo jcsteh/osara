@@ -62,16 +62,27 @@ function run(argv) {
 	s(`mkdir -p '${target}/osara/locale'`);
 	s(`cp -f '${source}/locale/'* '${target}/osara/locale/'`);
 	var res = app.displayDialog(
-		"Do you want to replace the existing keymap with the OSARA keymap?", {
+		"Do you want to replace the existing key map with the OSARA key map?\n\n" +
+		"New users are advised to answer Yes, which will completely replace your key map with a clean copy of the OSARA key map including all latest assignments.\n\n" +
+		"Answering No will install OSARA without modifying your key map, which may be preferable for experienced users who have prior alterations that they'd like to preserve.", {
 		buttons: ["Yes", "No"],
 		defaultButton: "Yes"});
+	var keymapReplaced = false;
 	if(res.buttonReturned==="Yes") {
+		keymapReplaced = true;
 		try{
-			s(`cp '${target}/reaper-kb.ini' '${target}/KeyMaps/backup.ReaperKeyMap'`);
+			s(`cp '${target}/reaper-kb.ini' '${target}/KeyMaps/OSARAReplacedBackup.ReaperKeyMap'`);
 		} catch(ignore) {} // there might not be a keymap to backup
 		s(`cp '${target}/KeyMaps/OSARA.ReaperKeyMap' '${target}/reaper-kb.ini'`);
 	}
-	app.displayDialog("Installation Complete", {
+	var finishMessage;
+	if (keymapReplaced) {
+		finishMessage = "OSARA is installed with its latest key map. A safety backup of your prior key map has been placed in " +
+			target + "/KeyMaps/OSARAReplacedBackup.ReaperKeyMap";
+	} else {
+		finishMessage = "OSARA has been installed with your current key map preserved.";
+	}
+	app.displayDialog(finishMessage, {
 		buttons: ["OK"],
 		defaultButton: "OK"
 	});
