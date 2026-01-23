@@ -31,6 +31,8 @@ Page custom portablePage portablePageLeave
 !define MUI_PAGE_CUSTOMFUNCTION_PRE directoryPagePre
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW finishPageShow
+!insertmacro MUI_PAGE_FINISH
 
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
@@ -41,6 +43,7 @@ Var dialog
 var standardRadio
 var portableRadio
 var portable
+Var keymapReplaced
 
 Function portablePage
 	nsDialogs::Create 1018
@@ -103,18 +106,29 @@ Section "OSARA plug-in" SecPlugin
 SectionEnd
 
 Section "Replace existing key map with OSARA key map" SecKeyMap
+	StrCpy $keymapReplaced 0
 	MessageBox MB_YESNO|MB_ICONQUESTION \
 		"Do you want to replace the existing key map with the OSARA key map?$\r$\n\
 		New users are advised to answer Yes, which will completely replace your key map with a clean copy of the OSARA key map including all latest assignments.$\r$\n\
 		Answering No will install OSARA without modifying your key map, which may be preferable for experienced users who have prior alterations that they'd like to preserve." \
 		/SD IDNO IDNO dontReplaceKeyMap
 	; If we reach here, the user chose yes.
+	StrCpy $keymapReplaced 1
 	SetOutPath "$INSTDIR"
 	delete "$INSTDIR\KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	Rename "reaper-kb.ini" "KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
 	File "..\config\windows\reaper-kb.ini"
 	dontReplaceKeyMap:
 SectionEnd
+
+Function finishPageShow
+	${If} $keymapReplaced = 1
+		StrCpy $0 "OSARA is installed with its latest key map. A safety backup of your prior key map has been placed in $INSTDIR\KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
+	${Else}
+		StrCpy $0 "OSARA has been installed with your current key map preserved."
+	${EndIf}
+	SendMessage $mui.FinishPage.Text ${WM_SETTEXT} 0 "STR:$0"
+FunctionEnd
 
 Section "Uninstall"
 	Delete "$INSTDIR\..\UserPlugins\reaper_osara32.dll"
