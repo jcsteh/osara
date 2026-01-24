@@ -63,10 +63,9 @@ function run(argv) {
 	target = target.toString();
 
 	try{
-		s(`mkdir -p '${target}'`);
 		s(`mkdir -p '${target}/UserPlugins'`);
 	} catch (ignore){}// directory probably already exists
-	s(`cp -f '${source}/reaper_osara.dylib' '${target}/UserPlugins/reaper_osara.dylib'`);
+	s(`cat '${source}/reaper_osara.dylib' > '${target}/UserPlugins/reaper_osara.dylib'`);
 	try{
 		s(`mkdir -p '${target}/KeyMaps'`);
 	} catch(ignore) {} // directory probably already exists
