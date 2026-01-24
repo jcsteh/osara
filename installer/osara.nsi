@@ -46,6 +46,15 @@ var portableRadio
 var portable
 Var keymapReplaced
 
+Function preLicenseCheck
+	FindWindow $0 "REAPERwnd"
+	${If} $0 <> 0
+		MessageBox MB_OK|MB_ICONEXCLAMATION \
+			"OSARA cannot be installed while REAPER is running. Please close REAPER then run this installer again."
+		Quit
+	${EndIf}
+FunctionEnd
+
 Function portablePage
 	nsDialogs::Create 1018
 	Pop $Dialog
@@ -80,15 +89,6 @@ FunctionEnd
 Function directoryPagePre
 	${Unless} $portable = ${BST_CHECKED}
 		Abort
-	${EndIf}
-FunctionEnd
-
-Function preLicenseCheck
-	FindWindow $0 "REAPERwnd"
-	${If} $0 <> 0
-		MessageBox MB_OK|MB_ICONEXCLAMATION \
-			"OSARA cannot be installed while REAPER is running. Please close REAPER then run this installer again."
-		Quit
 	${EndIf}
 FunctionEnd
 
