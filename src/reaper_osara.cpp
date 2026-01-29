@@ -943,6 +943,14 @@ int countNonEmptyTakes(MediaItem* item) {
     	return nonEmptyTakes;
 }
 
+// Return the play cursor position if playing, the edit cursor position if not.
+double getPlayOrEditCursorPosition() {
+	if (GetPlayState() & 1) {
+		return GetPlayPosition();
+	}
+	return GetCursorPosition();
+}
+
 // End of utility/helper functions
 
 // Functions exported from SWS
@@ -4405,8 +4413,7 @@ void reportTempoTimeSig() {
 		return;
 	}
 	double tempo=0;
-	int state=GetPlayState();
-	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	int timesig_num=0;
 	int timesig_denom=0;
 	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
@@ -5042,8 +5049,7 @@ void cmdReportCursorPosition(Command* command) {
 void reportCursorPositionPrimaryFormat() {
 	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
 	TimeFormat tf = TF_RULER;
-	int state = GetPlayState();
-	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	if (shouldReportTimeMovement())
 		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
 }
@@ -5526,7 +5532,7 @@ void cmdReportRegionMarkerItems(Command* command) {
 			s << (multiLine ? "\r\n" : ", ");
 		}
 	};
-	double pos = GetPlayState()? GetPlayPosition():GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	double start,end;
 	bool isrgn;
 	int number;
