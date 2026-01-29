@@ -5377,7 +5377,7 @@ void cmdInsertMarker(Command* command) {
 		return; // Not inserted.
 	}
 	int marker;
-	GetLastMarkerAndCurRegion(nullptr, GetCursorPosition(), &marker, nullptr);
+	GetLastMarkerAndCurRegion(nullptr, getPlayOrEditCursorPosition(), &marker, nullptr);
 	if (marker < 0) {
 		return;
 	}
