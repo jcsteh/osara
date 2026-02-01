@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-01-15 18:58\n"
+"PO-Revision-Date: 2026-02-01 18:57\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2430,13 +2430,13 @@ msgid "{} takes"
 msgstr "{} 片段"
 
 msgid "{}"
-msgstr ""
+msgstr "{ }"
 
 msgid "+{}"
-msgstr ""
+msgstr "+{ }"
 
 msgid "-{}"
-msgstr ""
+msgstr "-{ }"
 
 msgid "{} per keypress"
 msgstr "{} 每按一次"
@@ -2835,6 +2835,12 @@ msgstr "全不軌到相位正常"
 
 msgid "unmonitored all tracks"
 msgstr "取消監聽全部軌道"
+
+msgid "showed video window"
+msgstr "顯示視訊視窗"
+
+msgid "hid video window"
+msgstr "隱藏視訊視窗"
 
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"

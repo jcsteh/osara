@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-01-15 18:58\n"
+"PO-Revision-Date: 2026-02-01 18:57\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2939,6 +2939,12 @@ msgstr "phase normale pour toutes les pistes"
 
 msgid "unmonitored all tracks"
 msgstr "moniteur de toutes les pistes désactivés"
+
+msgid "showed video window"
+msgstr "afficher la fenêtre vidéo"
+
+msgid "hid video window"
+msgstr "masquer la fenêtre vidéo"
 
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
