@@ -173,6 +173,5 @@ void translateDialog(HWND dialog) {
 	// Translate dialog title.
 	translateWindow(dialog, lParam);
 	// Translate controls.
-	HWND enumRoot = dialog;
-	EnumChildWindows(enumRoot, translateWindow, lParam);
+	EnumChildWindows(dialog, translateWindow, lParam);
 }
