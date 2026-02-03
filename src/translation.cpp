@@ -97,5 +97,14 @@ void translateDialog(HWND dialog) {
 	// Translate dialog title.
 	translateWindow(dialog, lParam);
 	// Translate controls.
-	EnumChildWindows(dialog, translateWindow, lParam);
+	// On macOS (SWELL), EnumChildWindows only enumerates NSView subviews, but
+	// dialogs are often NSWindow handles. GetDlgItem(dialog, 0) returns the
+	// content view, which allows enumeration to work.
+	HWND enumRoot = dialog;
+#ifdef __APPLE__
+	if (auto contentView = GetDlgItem(dialog, 0)) {
+		enumRoot = contentView;
+	}
+#endif
+	EnumChildWindows(enumRoot, translateWindow, lParam);
 }
