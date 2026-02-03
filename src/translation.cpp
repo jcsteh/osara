@@ -16,10 +16,82 @@
 
 using namespace std;
 
+#ifdef __APPLE__
+static string strip_mnemonics(const string& text) {
+	string out;
+	out.reserve(text.size());
+	for (size_t i = 0; i < text.size(); ++i) {
+		char ch = text[i];
+		if (ch == '&') {
+			if (i + 1 < text.size() && text[i + 1] == '&') {
+				out.push_back('&');
+				++i;
+			}
+			continue;
+		}
+		out.push_back(ch);
+	}
+	return out;
+}
+
+static vector<string> strip_mnemonics(const vector<string>& texts) {
+	vector<string> out;
+	out.reserve(texts.size());
+	for (const auto& text : texts) {
+		out.push_back(strip_mnemonics(text));
+	}
+	return out;
+}
+
+static void add_stripped_mnemonics_entries(tinygettext::Dictionary& dict) {
+	vector<pair<string, vector<string>>> strippedEntries;
+	strippedEntries.reserve(256);
+	dict.foreach([&strippedEntries](const string& msgid, const vector<string>& msgstrs) {
+		auto strippedMsgId = strip_mnemonics(msgid);
+		auto strippedMsgStrs = strip_mnemonics(msgstrs);
+		if (strippedMsgId != msgid || strippedMsgStrs != msgstrs) {
+			strippedEntries.emplace_back(std::move(strippedMsgId), std::move(strippedMsgStrs));
+		}
+	});
+	for (const auto& entry : strippedEntries) {
+		if (entry.second.size() == 1) {
+			dict.add_translation(entry.first, entry.second[0]);
+		} else {
+			dict.add_translation(entry.first, entry.first, entry.second);
+		}
+	}
+
+	struct CtxtEntry {
+		string context;
+		string msgid;
+		vector<string> msgstrs;
+	};
+	vector<CtxtEntry> strippedCtxtEntries;
+	strippedCtxtEntries.reserve(256);
+	dict.foreach_ctxt([&strippedCtxtEntries](const string& context, const string& msgid,
+		const vector<string>& msgstrs) {
+		auto strippedMsgId = strip_mnemonics(msgid);
+		auto strippedMsgStrs = strip_mnemonics(msgstrs);
+		if (strippedMsgId != msgid || strippedMsgStrs != msgstrs) {
+			strippedCtxtEntries.push_back({context, std::move(strippedMsgId),
+				std::move(strippedMsgStrs)});
+		}
+	});
+	for (const auto& entry : strippedCtxtEntries) {
+		if (entry.msgstrs.size() == 1) {
+			dict.add_translation(entry.context, entry.msgid, entry.msgstrs[0]);
+		} else {
+			dict.add_translation(entry.context, entry.msgid, entry.msgid, entry.msgstrs);
+		}
+	}
+}
+#endif
+
 // Maps REAPER language pack names to locale codes used by OSARA. There can
 // be (and often are) multiple REAPER language packs per language.
 map<string, string> REAPER_LANG_TO_CODE = {
 	{"DE_(+SWS)", "de_DE"},
+	{"Deutsch", "de_DE"},
 	{"pt-BR", "pt_BR"},
 	{"Reaper+SWS_CHSDOU", "zh_CN"},
 	{"REAPER_zh_CN_www.szzyyzz.com", "zh_CN"},
@@ -71,6 +143,10 @@ void initTranslation() {
 	ifstream input(path);
 #endif
 	tinygettext::POParser::parse(path, input, translationDict);
+
+#ifdef __APPLE__
+	add_stripped_mnemonics_entries(translationDict);
+#endif
 }
 
 BOOL CALLBACK translateWindow(HWND hwnd, LPARAM lParam) {
@@ -101,10 +177,5 @@ void translateDialog(HWND dialog) {
 	// dialogs are often NSWindow handles. GetDlgItem(dialog, 0) returns the
 	// content view, which allows enumeration to work.
 	HWND enumRoot = dialog;
-#ifdef __APPLE__
-	if (auto contentView = GetDlgItem(dialog, 0)) {
-		enumRoot = contentView;
-	}
-#endif
 	EnumChildWindows(enumRoot, translateWindow, lParam);
 }
