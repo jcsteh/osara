@@ -8,7 +8,6 @@
 #include <string>
 #include <fstream>
 #include <map>
-#include <sstream>
 #include <tinygettext/dictionary.hpp>
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
