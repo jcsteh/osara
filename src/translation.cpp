@@ -8,6 +8,7 @@
 #include <string>
 #include <fstream>
 #include <map>
+#include <sstream>
 #include <tinygettext/dictionary.hpp>
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
@@ -20,6 +21,7 @@ using namespace std;
 // be (and often are) multiple REAPER language packs per language.
 map<string, string> REAPER_LANG_TO_CODE = {
 	{"DE_(+SWS)", "de_DE"},
+	{"Deutsch", "de_DE"},
 	{"pt-BR", "pt_BR"},
 	{"Reaper+SWS_CHSDOU", "zh_CN"},
 	{"REAPER_zh_CN_www.szzyyzz.com", "zh_CN"},
@@ -31,6 +33,39 @@ map<string, string> REAPER_LANG_TO_CODE = {
 };
 
 tinygettext::Dictionary translationDict;
+
+#ifndef _WIN32
+static istringstream filterPoAmpersands(istream& input) {
+	string filtered;
+	input.seekg(0, ios::end);
+	auto size = input.tellg();
+	if (size > 0) {
+		filtered.reserve(static_cast<size_t>(size));
+	}
+	input.seekg(0, ios::beg);
+	bool inString = false;
+	bool escaped = false;
+	char ch;
+	while (input.get(ch)) {
+		if (inString && !escaped && ch == '&') {
+			continue;
+		}
+		if (inString) {
+			if (escaped) {
+				escaped = false;
+			} else if (ch == '\\') {
+				escaped = true;
+			} else if (ch == '"') {
+				inString = false;
+			}
+		} else if (ch == '"') {
+			inString = true;
+		}
+		filtered.push_back(ch);
+	}
+	return istringstream(filtered);
+}
+#endif
 
 void initTranslation() {
 	// Figure out which file name to load. We base it on the REAPER language
@@ -67,10 +102,13 @@ void initTranslation() {
 	// deal with this is to convert the string to UTF-16, which Windows will
 	// interpret correctly.
 	ifstream input(widen(path));
-#else
-	ifstream input(path);
-#endif
 	tinygettext::POParser::parse(path, input, translationDict);
+#else
+	// SWELL doesn't support mnemonics, so strip ampersands inside PO strings on macOS.
+	ifstream input(path);
+	istringstream filteredInput = filterPoAmpersands(input);
+	tinygettext::POParser::parse(path, filteredInput, translationDict);
+#endif
 }
 
 BOOL CALLBACK translateWindow(HWND hwnd, LPARAM lParam) {
