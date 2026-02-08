@@ -53,6 +53,8 @@ if env["PLATFORM"] == "win32":
 		"/EHsc",
 		# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
 		"/clang:-Wno-missing-braces",
+		# Ignore deprecated literal operator in fmt
+		"/clang:-Wno-deprecated-literal-operator"
 	])
 	env.Append(CFLAGS=[
 		# Ignore warnings in WDL/win32_utf8.c, not our code
