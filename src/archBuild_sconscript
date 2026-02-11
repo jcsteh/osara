@@ -38,31 +38,52 @@ sources = [
 	"updateCheck.cpp",
 ]
 
+useMsVC = env["PLATFORM"] == "win32" and env["TARGET_ARCH"] == "arm64"
 if env["PLATFORM"] == "win32":
-	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
-	env["CC"] = "clang-cl"
-	env["LINK"] = "lld-link"
+	# On non ARM64EC Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
+	if not useMsVC:
+		env["CC"] = "clang-cl"
+		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
 		"/W3",
 		"/WX",
-		# Clang warns about unused functions in WDL
-		"/clang:-Wno-unused-function",
 	])
 	env.Append(CXXFLAGS=[
-		"/clang:-std=c++20",
+		"/std:c++20",
 		"/EHsc",
-		# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
-		"/clang:-Wno-missing-braces",
 	])
-	env.Append(CFLAGS=[
-		# Ignore warnings in WDL/win32_utf8.c, not our code
-		"/clang:-Wno-deprecated-declarations",
-		"/clang:-Wno-unused-variable"
-	])
+	if not useMsVC:
+		env.Append(CCFLAGS=[
+			# Clang warns about unused functions in WDL
+			"/clang:-Wno-unused-function",
+		])
+		env.Append(CXXFLAGS=[
+			# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
+			"/clang:-Wno-missing-braces",
+		])
+		env.Append(CFLAGS=[
+			# Ignore warnings in WDL/win32_utf8.c, not our code
+			"/clang:-Wno-deprecated-declarations",
+			"/clang:-Wno-unused-variable"
+		])
+	else:
+		env.Append(CPPDEFINES=[
+			"_CRT_SECURE_NO_DEPRECATE",
+			"_CRT_NONSTDC_NO_DEPRECATE",
+		])
+		env.Append(CXXFLAGS=[
+			# #479: fmt/format.h includes UTF-8 characters in comments. However, cl
+			# treats the file as ANSI unless it has a BOM. This causes a warning (and
+			# thus an error) on systems with certain locales. Just disable this warning.
+			"/wd4819",
+		])
 	# We always want debug symbols.
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
+	if env["TARGET_ARCH"] == "arm64":
+		env.Append(CCFLAGS="/arm64EC")
+		env.Append(LINKFLAGS="/machine:arm64ec")
 	sources.extend((
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
@@ -124,6 +145,10 @@ def addExternalSources(dir, files, **kwargs):
 		env.SharedObject(os.path.splitext(f)[0], dir.File(f), **kwargs)
 		for f in files)
 
+externalSourcesKwargs = {}
+if not useMsVC:
+	externalSourcesKwargs["CCFLAGS"] = "$CCFLAGS -Wno-deprecated-declarations"
+
 addExternalSources("#include/tinygettext/src", (
 	"dictionary.cpp",
 	"language.cpp",
@@ -136,12 +161,12 @@ addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="-Wno-deprecated-declarations"
+	**externalSourcesKwargs
 )
 addExternalSources(
 	"#include/simpleson",
 	("json.cpp",),
-	CCFLAGS="-Wno-deprecated-declarations"
+	**externalSourcesKwargs
 )
 
 env.SharedLibrary(

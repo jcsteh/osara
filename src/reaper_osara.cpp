@@ -6306,7 +6306,7 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 	int index = 0;
 	auto addItem = [&] (const char* itemName, const char* idStr) {
 		itemInfo.dwTypeData = (char*)itemName;
-		itemInfo.cch = strlen(itemName);
+		itemInfo.cch = (UINT)strlen(itemName);
 		itemInfo.wID = NamedCommandLookup(idStr);
 		InsertMenuItem(osaraMenu, index++, true, &itemInfo);
 	};

@@ -20,7 +20,11 @@ env.SetOption('num_jobs', multiprocessing.cpu_count())
 print("Building using {} jobs".format(env.GetOption('num_jobs')))
 
 if env["PLATFORM"] == "win32":
-	for arch, suffix in (("x86", "32"), ("x86_64", "64")):
+	for arch, suffix in (
+		("x86", "32"),
+		("x86_64", "64"),
+		("arm64", "_arm64ec"),
+	):
 		archEnv = Environment(tools=["msvc", "mslink", "textfile"],
 			TARGET_ARCH=arch, HOST_ARCH=arch, libSuffix=suffix,
 			version=env["version"], copyright=env["copyright"],
