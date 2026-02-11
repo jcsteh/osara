@@ -943,6 +943,14 @@ int countNonEmptyTakes(MediaItem* item) {
     	return nonEmptyTakes;
 }
 
+// Return the play cursor position if playing, the edit cursor position if not.
+double getPlayOrEditCursorPosition() {
+	if (GetPlayState() & 1) {
+		return GetPlayPosition();
+	}
+	return GetCursorPosition();
+}
+
 // End of utility/helper functions
 
 // Functions exported from SWS
@@ -3841,6 +3849,28 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
+void cmdMoveToZeroCrossing(Command* command) {
+	int selItems = CountSelectedMediaItems(nullptr);
+	if (selItems == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	double beforePos = GetCursorPosition();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	double afterPos = GetCursorPosition();
+	double diff = afterPos - beforePos;
+	if (diff == 0.0) {
+		// No movement, avoid showing "+0".
+		outputMessage(format(translate("{}"), formatTimeSample(0)));
+		return;
+	}
+	if (diff > 0.0) {
+		outputMessage(format(translate("+{}"), formatTimeSample(diff)));
+	} else {
+		outputMessage(format(translate("-{}"), formatTimeSample(-diff)));
+	}
+}
+
 // REAPER's stock actions adjust horizontal zoom in increments of 20%, returning pixels per second.
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
 void reportZoomStepsAsTime(double time) {
@@ -3921,6 +3951,10 @@ void cmdSplitItems(Command* command) {
 	// number of items; e.g. "2 items added".
 	outputMessage(format(
 		translate_plural("{} item added", "{} items added", added), added));
+	if (added >= 1) {
+		// Only set fakeFocus if a split was successful.
+		fakeFocus = FOCUS_ITEM;
+	}
 	if (!added) {
 		return;
 	}
@@ -4379,8 +4413,7 @@ void reportTempoTimeSig() {
 		return;
 	}
 	double tempo=0;
-	int state=GetPlayState();
-	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	int timesig_num=0;
 	int timesig_denom=0;
 	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
@@ -5016,8 +5049,7 @@ void cmdReportCursorPosition(Command* command) {
 void reportCursorPositionPrimaryFormat() {
 	// Call when you only want to report the primary ruler format, EG moving through transients, where fast key presses should continue to report info in a single format.
 	TimeFormat tf = TF_RULER;
-	int state = GetPlayState();
-	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	if (shouldReportTimeMovement())
 		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
 }
@@ -5345,7 +5377,7 @@ void cmdInsertMarker(Command* command) {
 		return; // Not inserted.
 	}
 	int marker;
-	GetLastMarkerAndCurRegion(nullptr, GetCursorPosition(), &marker, nullptr);
+	GetLastMarkerAndCurRegion(nullptr, getPlayOrEditCursorPosition(), &marker, nullptr);
 	if (marker < 0) {
 		return;
 	}
@@ -5500,7 +5532,7 @@ void cmdReportRegionMarkerItems(Command* command) {
 			s << (multiLine ? "\r\n" : ", ");
 		}
 	};
-	double pos = GetPlayState()? GetPlayPosition():GetCursorPosition();
+	double pos = getPlayOrEditCursorPosition();
 	double start,end;
 	bool isrgn;
 	int number;
@@ -5603,6 +5635,18 @@ void cmdJumpToTime(Command* command) {
 	// speech when the Jump dialog closes.
 	CallLater([] {
 		outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE));
+	}, 50);
+}
+
+void cmdVideoWindowVisibility(Command* command) {
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	// Delay the report to avoid it being clobbered when GUI updates.
+	CallLater([]() {
+		if (GetToggleCommandState(50125)) { // Show/hide video window
+			outputMessage(translate("showed video window"));
+		} else {
+			outputMessage(translate("hid video window"));
+		}
 	}, 50);
 }
 
@@ -5740,6 +5784,9 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40288}, nullptr}, nullptr, cmdGoToPrevTrackKeepSel}, // Track: Go to previous track (leaving other tracks selected)
 	{MAIN_SECTION, {{0, 0, 40417}, nullptr}, nullptr, cmdMoveToNextItem}, // Item navigation: Select and move to next item
 	{MAIN_SECTION, {{0, 0, 40416}, nullptr}, nullptr, cmdMoveToPrevItem}, // Item navigation: Select and move to previous item
+	{MAIN_SECTION, {{0, 0, 40791}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to next zero crossing in items
+	{MAIN_SECTION, {{0, 0, 40790}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to previous zero crossing in items
+	{MAIN_SECTION, {{0, 0, 41995}, nullptr}, nullptr, cmdMoveToZeroCrossing}, // Move edit cursor to nearest zero crossing in items
 	{MAIN_SECTION, {{0, 0, 40029}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
 	{MIDI_EDITOR_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40013}, nullptr}, nullptr, cmdUndo}, // Edit: Undo
@@ -5852,6 +5899,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
