@@ -78,6 +78,7 @@ class ParamSource {
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	virtual bool isParamAutomatable(int param) { return true; };
 
 	// Called to rebuild the parameter list because one or more parameters were
 	// invalidated. This need only be implemented if the source doesn't
@@ -610,8 +611,9 @@ class ParamsDialog {
 	}
 
 	const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
-	bool shouldIncludeParam(string name) {
+	bool shouldIncludeParam(int param, string name) {
 		if (!IsDlgButtonChecked(this->dialog, ID_PARAM_UNNAMED)) {
+			if (!this->source->isParamAutomatable(param)) return false;
 			smatch m;
 			regex_match(name, m, RE_UNNAMED_PARAM);
 			if (!m.empty()) {
@@ -637,7 +639,7 @@ class ParamsDialog {
 		ComboBox_ResetContent(this->paramCombo);
 		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
-			if (!this->shouldIncludeParam(name))
+			if (!this->shouldIncludeParam(p, name))
 				continue;
 			this->visibleParams.push_back(p);
 			ComboBox_AddString(this->paramCombo, name.c_str());
@@ -835,6 +837,12 @@ class FxParams: public ParamSource {
 				this->namedConfigParams[param]);
 		}
 		return this->getParam(this->fx, param - namedCount);
+	}
+	bool isParamAutomatable(int param) {
+		bool success, automatable;
+		success = this->_GetNamedConfigParm(this->obj, this->fx, format("param.{}.automatable", param).c_str(), (char*)&automatable, sizeof(automatable));
+		if (!success) return true;
+		return automatable;
 	}
 };
 
