@@ -838,11 +838,24 @@ class FxParams: public ParamSource {
 		}
 		return this->getParam(this->fx, param - namedCount);
 	}
-	bool isParamAutomatable(int param) {
-		bool success, automatable;
-		success = this->_GetNamedConfigParm(this->obj, this->fx, format("param.{}.automatable", param).c_str(), (char*)&automatable, sizeof(automatable));
-		if (!success) return true;
-		return automatable;
+	bool isParamAutomatable(int param) final {
+		const int namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			// Named config params aren't FX params; keep them visible.
+			return true;
+		}
+		const int fxParam = param - namedCount;
+		char buf[16] = {};
+		const bool success = this->_GetNamedConfigParm(
+			this->obj,
+			this->fx,
+			format("param.{}.automatable", fxParam).c_str(),
+			buf,
+			sizeof(buf));
+		if (!success) {
+			return true;
+		}
+		return buf[0] == '1';
 	}
 };
 
