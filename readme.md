@@ -586,10 +586,10 @@ As an alternative to using the Parameter combo box, you can press control+tab or
 Space can be used to play/stop the project when focused on sliders or the Parameters combo box.
 Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
 
-Some effects expose a lot of unnamed parameters, which can make finding the useful ones challenging.
-The Include unnamed parameters check box may help with this.
-When unchecked, unnamed parameters are excluded from the parameter list.
-Currently, this means parameters with completely empty names, the single character "-", a name like #001 or a name like P001.
+Some effects expose a lot of unnamed and potentially unusable parameters, which can make finding the useful ones challenging.
+OSARA attempts to identify unusable parameters and filters them out of the list by default.
+Currently, this filtering applies to parameters with completely empty names, the single character "-", a name like #001, a name like P001 and any parameter that isn't automatable.
+If you do want to navigate all effect parameters, check the Include unnamed and potentially unusable parameters check box.
 
 When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
