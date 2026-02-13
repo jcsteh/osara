@@ -78,6 +78,7 @@ class ParamSource {
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	virtual bool isProbablyUsefulParam(int param, const string& name) { return true; };
 
 	// Called to rebuild the parameter list because one or more parameters were
 	// invalidated. This need only be implemented if the source doesn't
@@ -412,9 +413,19 @@ class ParamsDialog {
 		if (!config[0]) {
 			return;
 		}
+		RECT rect;
+		GetWindowRect(this->dialog, &rect);
+		int minW = rect.right - rect.left;
+		int minH = rect.bottom - rect.top;
 		istringstream s(config);
 		int x, y, w, h;
 		s >> x >> y >> w >> h;
+		if (w < minW) {
+			w = minW;
+		}
+		if (h < minH) {
+			h = minH;
+		}
 		SetWindowPos(this->dialog, nullptr, x, y, w, h,
 			SWP_NOACTIVATE | SWP_NOZORDER);
 	}
@@ -609,14 +620,9 @@ class ParamsDialog {
 		}
 	}
 
-	const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
-	bool shouldIncludeParam(string name) {
+	bool shouldIncludeParam(int param, string name) {
 		if (!IsDlgButtonChecked(this->dialog, ID_PARAM_UNNAMED)) {
-			smatch m;
-			regex_match(name, m, RE_UNNAMED_PARAM);
-			if (!m.empty()) {
-				return false;
-			}
+			if (!this->source->isProbablyUsefulParam(param, name)) return false;
 		}
 		if (filter.empty())
 			return true;
@@ -637,7 +643,7 @@ class ParamsDialog {
 		ComboBox_ResetContent(this->paramCombo);
 		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
-			if (!this->shouldIncludeParam(name))
+			if (!this->shouldIncludeParam(p, name))
 				continue;
 			this->visibleParams.push_back(p);
 			ComboBox_AddString(this->paramCombo, name.c_str());
@@ -737,7 +743,7 @@ class ParamsDialog {
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
-		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
@@ -835,6 +841,32 @@ class FxParams: public ParamSource {
 				this->namedConfigParams[param]);
 		}
 		return this->getParam(this->fx, param - namedCount);
+	}
+
+	bool isProbablyUsefulParam(int param, const string& name) final {
+		const int namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			// Named config params aren't FX params; keep them visible.
+			return true;
+		}
+		const int fxParam = param - namedCount;
+		char buf[16] = {};
+		const bool success = this->_GetNamedConfigParm(
+			this->obj,
+			this->fx,
+			format("param.{}.automatable", fxParam).c_str(),
+			buf,
+			sizeof(buf));
+		if (success && buf[0] != '1') {
+			return false;
+		}
+		static const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
+		smatch m;
+		regex_match(name, m, RE_UNNAMED_PARAM);
+		if (!m.empty()) {
+			return false;
+		}
+		return true;
 	}
 };
 
