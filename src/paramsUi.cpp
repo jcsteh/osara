@@ -413,9 +413,19 @@ class ParamsDialog {
 		if (!config[0]) {
 			return;
 		}
+		RECT rect;
+		GetWindowRect(this->dialog, &rect);
+		int minW = rect.right - rect.left;
+		int minH = rect.bottom - rect.top;
 		istringstream s(config);
 		int x, y, w, h;
 		s >> x >> y >> w >> h;
+		if (w < minW) {
+			w = minW;
+		}
+		if (h < minH) {
+			h = minH;
+		}
 		SetWindowPos(this->dialog, nullptr, x, y, w, h,
 			SWP_NOACTIVATE | SWP_NOZORDER);
 	}
