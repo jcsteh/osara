@@ -25,7 +25,7 @@ BEGIN
 	PUSHBUTTON "&More", ID_PARAM_MORE, 112, 45, 40, 14
 	LTEXT "&Filter:", IDC_STATIC, 10, 63, 23, 10
 	EDITTEXT ID_PARAM_FILTER, 40, 62, 40, 10
-	CONTROL "Include &unnamed parameters", ID_PARAM_UNNAMED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 77, 140, 14
+	CONTROL "Include &unnamed and potentially unusable parameters", ID_PARAM_UNNAMED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 77, 140, 14
 	DEFPUSHBUTTON "&Close", IDCANCEL, 134, 93, 26, 14
 END
 

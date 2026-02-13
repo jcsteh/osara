@@ -739,7 +739,7 @@ class ParamsDialog {
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
-		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
