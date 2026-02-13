@@ -22,7 +22,7 @@ function isPortableReaper ( dir ) {
 		finder.exists(Path(dir + "/REAPER.app")) ||
 		finder.exists(Path(dir + "/REAPER-ARM.app")) ||
 		finder.exists(Path(dir + "/REAPER64.app")) ||
-		finder.exists(Path(dir + "REAPER32.app")) )
+		finder.exists(Path(dir + "/REAPER32.app")) )
 }
 
 function run(argv) {
@@ -45,7 +45,7 @@ function run(argv) {
 		defaultButton: "Standard REAPER Installation",
 		cancelButton: "Cancel"
 	});
-	var portable = (res.buttonReturned === "Portable Reaper Installation");
+	var portable = (res.buttonReturned === "Portable REAPER Installation");
 	var target;
 	if (portable === true) {
 		while(true) {
