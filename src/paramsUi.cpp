@@ -848,6 +848,7 @@ class FxParams: public ParamSource {
 		}
 		return this->getParam(this->fx, param - namedCount);
 	}
+
 	bool isParamAutomatable(int param) final {
 		const int namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
