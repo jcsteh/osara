@@ -785,7 +785,6 @@ class FxParams: public ParamSource {
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
 
 	void initNamedConfigParams();
-	bool isParamAutomatable(int param) const;
 
 	public:
 	FxParams(ReaperObj* obj, const string& apiPrefix, int fx=-1):
@@ -850,7 +849,15 @@ class FxParams: public ParamSource {
 			// Named config params aren't FX params; keep them visible.
 			return true;
 		}
-		if (!this->isParamAutomatable(param)) {
+		const int fxParam = param - namedCount;
+		char buf[16] = {};
+		const bool success = this->_GetNamedConfigParm(
+			this->obj,
+			this->fx,
+			format("param.{}.automatable", fxParam).c_str(),
+			buf,
+			sizeof(buf));
+		if (success && buf[0] != '1') {
 			return false;
 		}
 		static const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
@@ -862,27 +869,6 @@ class FxParams: public ParamSource {
 		return true;
 	}
 };
-
-template<typename ReaperObj>
-bool FxParams<ReaperObj>::isParamAutomatable(int param) const {
-	const int namedCount = (int)this->namedConfigParams.size();
-	if (param < namedCount) {
-		// Named config params aren't FX params; keep them visible.
-		return true;
-	}
-	const int fxParam = param - namedCount;
-	char buf[16] = {};
-	const bool success = this->_GetNamedConfigParm(
-		this->obj,
-		this->fx,
-		format("param.{}.automatable", fxParam).c_str(),
-		buf,
-		sizeof(buf));
-	if (!success) {
-		return true;
-	}
-	return buf[0] == '1';
-}
 
 template<typename ReaperObj>
 class FxParam: public Param {
