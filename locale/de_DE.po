@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2026-02-01 18:57\n"
+"PO-Revision-Date: 2026-02-15 18:59\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -3295,7 +3295,7 @@ msgid "&Filter:"
 msgstr "&Filter:"
 
 msgctxt "Parameters"
-msgid "Include &unnamed parameters"
+msgid "Include &unnamed and potentially unusable parameters"
 msgstr ""
 
 msgctxt "Parameters"
