@@ -4266,12 +4266,18 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	double oldSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	if (!shouldReportTimeMovement()) {
-		return;
-	}
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
+	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
+		double cursorPos = GetCursorPosition();
+		double cursorDiff = (newStart - oldStart != 0)
+				? newStart - oldStart : newEnd - oldEnd;
+		SetEditCurPos(cursorPos + cursorDiff, true, true);
+	}
+	if (!shouldReportTimeMovement()) {
+		return;
+	}
 	if (newStart != oldStart && newEnd != oldEnd) {
 		s << translate("start") << " " 
 			<< formatTime(newStart, TF_RULER, cache)
@@ -5334,8 +5340,14 @@ void cmdNudgeTimeSelection(Command* command) {
 	bool first= (lastCommand!=command->gaccel.accel.cmd);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
+	double cursorPos = GetCursorPosition();
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
+	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
+		double cursorDiff = (newStart - oldStart != 0)
+				? newStart - oldStart : newEnd - oldEnd;
+		SetEditCurPos(cursorPos + cursorDiff, true, true);
+	}
 	if (!shouldReportTimeMovement()) {
 		return;
 	}
