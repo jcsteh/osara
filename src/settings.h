@@ -51,5 +51,5 @@ BoolSetting(reportSurfaceChanges, MAIN_SECTION,
 	"Report changes made via &control surfaces",
 	false)
 BoolSetting(moveCursorWithEdges, MAIN_SECTION,
-	"Move edit cursor with &edges of items and time selection",
+	"Move cursor relative to adjusting &edges of items and time selection",
 	false)

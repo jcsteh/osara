@@ -790,7 +790,7 @@ The dialog contains the following options:
 - Report position when navigating chords in MIDI editor: When enabled, OSARA will report the cursor position as you move through chords in the piano roll.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
-- Move cursor when adjusting edges of items and time selection: When enabled, the edit or play cursors will reflect growing/shrinking edges of items and time selection. If the project is playing while you adjust edges, OSARA seeks to the updated cursor positions to provide real-time audio feedback.
+- Move cursor relative to adjusting edges of items and time selection: When enabled, the edit and play cursors will automatically make relative movements as you grow/shrink the edges of items and time selection. If the project is playing while you adjust edges, OSARA seeks to the updated cursor positions to provide real-time audio feedback.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
