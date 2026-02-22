@@ -67,8 +67,15 @@ jobs:
         # We need php for swell_resgen.
         run: brew install php
       - name: build
-        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
-      - name: sign Windows
+        run: |
+          if [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            echo "Building native Mac installer..."
+            scons mac_signing_mode=none "publisher=${{ env.publisher }}" version=${{ env.version }}
+          else
+            echo "Building Windows installer..."
+            scons "publisher=${{ env.publisher }}" version=${{ env.version }}
+          fi
+      - name: sign
         if: ${{ github.event_name == 'push' && matrix.os == 'windows-latest' }}
         uses: azure/trusted-signing-action@v0
         with:
@@ -114,33 +121,34 @@ jobs:
             exit 1
           fi
 
-          cd installer/mac
+          cd build/installer
 
           # Set up app bundle and entitlements
           APP_BUNDLE="OSARAInstaller.app"
           
           # Create a temporary entitlements file for runtime (consistent with local build.sh)
+          entitlements=../../installer/OSARAInstaller/OSARAInstaller.entitlements
           runtime_entitlements="$APP_BUNDLE/Contents/Resources/runtime.entitlements"
-          cp OSARAInstaller.entitlements "$runtime_entitlements"
-          
+          cp "$entitlements" "$runtime_entitlements"
+
           # Deep sign all components in the app bundle with entitlements
           echo "=== Deep signing app bundle with entitlements ==="
-          find $APP_BUNDLE -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
+          find "$APP_BUNDLE" -type f \( -name "*.dylib" -o -name "*.so" -o -name "*.framework" \) -exec codesign --force --options runtime --entitlements "$entitlements" --sign "$IDENTITY" {} \; || echo "No additional libraries found to sign"
 
           # Sign the main executable with timestamp and entitlements
-          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/applet"
-          
+          codesign --force --options runtime --timestamp --entitlements "$entitlements" --sign "$IDENTITY" "$APP_BUNDLE/Contents/MacOS/OSARAInstaller"
+
           # Sign the app bundle with timestamp and entitlements
-          codesign --force --options runtime --timestamp --entitlements OSARAInstaller.entitlements --sign "$IDENTITY" $APP_BUNDLE
+          codesign --force --options runtime --timestamp --entitlements "$entitlements" --sign "$IDENTITY" "$APP_BUNDLE"
 
           # Verify signing with detailed output
           echo "=== Verifying code signature ==="
-          codesign --verify --verbose=4 $APP_BUNDLE
-          codesign --display --verbose=4 $APP_BUNDLE
+          codesign --verify --verbose=4 "$APP_BUNDLE"
+          codesign --display --verbose=4 "$APP_BUNDLE"
 
           # Pre-flight validation using spctl
           echo "=== Pre-flight validation with spctl ==="
-          spctl --assess --verbose=4 --type execute $APP_BUNDLE || echo "spctl assessment failed - this is expected before notarization"
+          spctl --assess --verbose=4 --type execute "$APP_BUNDLE" || echo "spctl assessment failed - this is expected before notarization"
 
           # Validate bundle structure
           echo "=== Validating bundle structure ==="
@@ -148,14 +156,16 @@ jobs:
             echo "ERROR: Missing Info.plist"
             exit 1
           fi
-          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/applet" ]]; then
+          if [[ ! -f "$APP_BUNDLE/Contents/MacOS/OSARAInstaller" ]]; then
             echo "ERROR: Missing main executable"
             exit 1
           fi
           echo "Bundle structure validation passed"
 
-          # Create zip for notarization (just the app bundle)
-          zip -r "osara_temp.zip" $APP_BUNDLE
+          # Create zip for notarization (just the app bundle).
+          # Use ditto to preserve Unix permissions so the signed binary isn't
+          # corrupted before Apple's notarization service inspects it.
+          ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "osara_temp.zip"
 
           # Submit for notarization
           echo "=== Submit for notarization ==="
@@ -209,7 +219,7 @@ jobs:
 
           # Staple notarization to app
           echo "=== Stapling notarization ticket ==="
-          if xcrun stapler staple $APP_BUNDLE; then
+          if xcrun stapler staple "$APP_BUNDLE"; then
             echo "✅ Stapling successful"
           else
             echo "❌ Stapling failed - but continuing as this might be a timing issue"
@@ -218,7 +228,7 @@ jobs:
 
           # Verify stapling
           echo "=== Verifying stapled notarization ==="
-          if xcrun stapler validate $APP_BUNDLE; then
+          if xcrun stapler validate "$APP_BUNDLE"; then
             echo "✅ Stapling validation successful"
           else
             echo "⚠️ Stapling validation failed"
@@ -226,19 +236,22 @@ jobs:
 
           # Final validation with spctl
           echo "=== Final validation with spctl ==="
-          if spctl --assess --verbose=4 --type execute $APP_BUNDLE; then
+          if spctl --assess --verbose=4 --type execute "$APP_BUNDLE"; then
             echo "✅ Final spctl validation passed"
           else
             echo "⚠️ Final spctl validation failed"
           fi
 
-          # Create final signed and notarized zip with app bundle and license
-          rm -f ../osara_${{ env.version }}.zip
-          zip -r ../osara_${{ env.version }}.zip $APP_BUNDLE
+          # Create final signed and notarized zip with app bundle.
+          # Use ditto (not zip -r) to preserve Unix permissions, symlinks,
+          # and resource forks; zip -r strips the executable bit from the
+          # binary, making the app unlaunchable on macOS 13+.
+          rm -f ../../installer/osara_${{ env.version }}.zip
+          ditto -c -k --sequesterRsrc --keepParent "$APP_BUNDLE" "../../installer/osara_${{ env.version }}.zip"
           cd ../..
 
           # Cleanup
-          rm installer/mac/osara_temp.zip certificate.p12
+          rm build/installer/osara_temp.zip certificate.p12
           security delete-keychain build.keychain
 
           echo "Mac app signed and notarized successfully!"
@@ -281,15 +294,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: osara_mac_${{ env.version }}
-          # This wildcard is necessary to make the upload-artifact action 
-          # include the app folder in the zip archive. If we specified
-          # OSARAInstaller.app directly, the action would include its
-          # contents, but not the app folder, breaking the app. This wildcard
-          # behaviour is explained in the documentation:
-          # "If a wildcard pattern is used, the path hierarchy will be preserved
-          # after the first wildcard pattern"
-          # See also https://github.com/actions/upload-artifact/issues/248
-          path: installer/mac/*.app
+          path: installer/osara_*.zip
+          # The installer is already compressed. Don't try to compress it again.
+          compression-level: 0
       - name: upload debug symbols Win
         if: ${{ matrix.os == 'windows-latest' }}
         uses: actions/upload-artifact@v4
