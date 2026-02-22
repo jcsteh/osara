@@ -4271,7 +4271,7 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
 	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
 		double cursorPos = GetCursorPosition();
-		double cursorDiff = (newStart - oldStart != 0)
+		double cursorDiff = (newStart != oldStart)
 				? newStart - oldStart : newEnd - oldEnd;
 		SetEditCurPos(cursorPos + cursorDiff, true, true);
 	}
@@ -5344,7 +5344,7 @@ void cmdNudgeTimeSelection(Command* command) {
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
 	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
-		double cursorDiff = (newStart - oldStart != 0)
+		double cursorDiff = (newStart != oldStart)
 				? newStart - oldStart : newEnd - oldEnd;
 		SetEditCurPos(cursorPos + cursorDiff, true, true);
 	}
