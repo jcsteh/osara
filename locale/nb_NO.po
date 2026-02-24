@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2025-11-15 18:42\n"
+"PO-Revision-Date: 2026-02-15 18:59\n"
 
 msgid "enabled"
 msgstr ""
@@ -2516,6 +2516,15 @@ msgstr ""
 msgid "{} takes"
 msgstr ""
 
+msgid "{}"
+msgstr ""
+
+msgid "+{}"
+msgstr ""
+
+msgid "-{}"
+msgstr ""
+
 msgid "{} per keypress"
 msgstr ""
 
@@ -2931,6 +2940,12 @@ msgstr ""
 msgid "unmonitored all tracks"
 msgstr ""
 
+msgid "showed video window"
+msgstr ""
+
+msgid "hid video window"
+msgstr ""
+
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
 msgstr ""
@@ -3280,7 +3295,7 @@ msgid "&Filter:"
 msgstr ""
 
 msgctxt "Parameters"
-msgid "Include &unnamed parameters"
+msgid "Include &unnamed and potentially unusable parameters"
 msgstr ""
 
 msgctxt "Parameters"

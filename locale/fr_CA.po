@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2025-11-15 18:42\n"
+"PO-Revision-Date: 2026-02-15 18:59\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2516,6 +2516,15 @@ msgstr "groupe {}"
 msgid "{} takes"
 msgstr "{} Prises"
 
+msgid "{}"
+msgstr ""
+
+msgid "+{}"
+msgstr ""
+
+msgid "-{}"
+msgstr ""
+
 msgid "{} per keypress"
 msgstr "{} par touche appuyé"
 
@@ -2931,6 +2940,12 @@ msgstr "phase normale pour toutes les pistes"
 msgid "unmonitored all tracks"
 msgstr "moniteur de toutes les pistes désactivés"
 
+msgid "showed video window"
+msgstr "afficher la fenêtre vidéo"
+
+msgid "hid video window"
+msgstr "masquer la fenêtre vidéo"
+
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
 msgstr "démarrer depuis le curseur"
@@ -3280,8 +3295,8 @@ msgid "&Filter:"
 msgstr "&Filtre:"
 
 msgctxt "Parameters"
-msgid "Include &unnamed parameters"
-msgstr "Inclure &les paramètres non labélisés"
+msgid "Include &unnamed and potentially unusable parameters"
+msgstr "Inclure les paramètres &sans nom et potentiellement inutilisables"
 
 msgctxt "Parameters"
 msgid "&Close"

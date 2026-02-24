@@ -181,6 +181,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
 - Item: Copy loop of selected area of audio items: Control+Win+L
+- Move edit cursor to next zero crossing in items: Z
+- Move edit cursor to previous zero crossing in items: Shift+Z
 - SWS/FNG: Quantize item positions and MIDI note positions to grid: Control+Shift+Q
 
 #### Takes
@@ -344,6 +346,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
 - Toggle fullscreen: F11, Command+F11 on Mac
+- Show/hide video window: Control+Shift+V
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
@@ -583,10 +586,10 @@ As an alternative to using the Parameter combo box, you can press control+tab or
 Space can be used to play/stop the project when focused on sliders or the Parameters combo box.
 Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
 
-Some effects expose a lot of unnamed parameters, which can make finding the useful ones challenging.
-The Include unnamed parameters check box may help with this.
-When unchecked, unnamed parameters are excluded from the parameter list.
-Currently, this means parameters with completely empty names, the single character "-", a name like #001 or a name like P001.
+Some effects expose a lot of unnamed and potentially unusable parameters, which can make finding the useful ones challenging.
+OSARA attempts to identify unusable parameters and filters them out of the list by default.
+Currently, this filtering applies to parameters with completely empty names, the single character "-", a name like #001, a name like P001 and any parameter that isn't automatable.
+If you do want to navigate all effect parameters, check the Include unnamed and potentially unusable parameters check box.
 
 When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
@@ -765,7 +768,7 @@ Pressing Escape or Alt+C to activate the Close button closes the dialog, clears 
 
 ### Configuration
 OSARA provides a Configuration dialog to adjust various settings.
-You can open this dialog by pressing Control+F12 or Control+Alt+Shift+P (OSARA: Configuration).
+You can open this dialog by pressing Control+F12 (OSARA: Configuration).
 
 The dialog contains the following options:
 
@@ -787,6 +790,7 @@ The dialog contains the following options:
 - Report position when navigating chords in MIDI editor: When enabled, OSARA will report the cursor position as you move through chords in the piano roll.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
+- Move cursor relative to adjusting edges of items and time selection: When enabled, the edit and play cursors will automatically make relative movements as you grow/shrink the edges of items and time selection. If the project is playing while you adjust edges, OSARA seeks to the updated cursor positions to provide real-time audio feedback.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
@@ -915,6 +919,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Item properties: Decrease item rate by ~6% (one semitone)
 - Item properties: Increase item rate by ~6% (one semitone)
 - Item properties: Set item rate from user-supplied source media tempo/bpm...
+- Move edit cursor to nearest zero crossing in items
 - Take: Nudge active takes volume +1dB
 - Take: Nudge active takes volume -1dB
 - Item: Nudge items volume +1dB

@@ -211,15 +211,18 @@ void registerSettingCommands() {
 struct ReaperSetting {
 	const char* section;
 	const char* key;
-	// If flag > 0, we will add this bit flag to the existing setting. If it
+	// If addFlag > 0, we will add this bit flag to the existing setting. If it
 	// doesn't exist, we will use value below.
-	int flag;
-	// If flag == 0, we will always use this value.
+	int addFlag;
+	// If removeFlag > 0, we will remove this bit flag from the existing setting.
+	// If it doesn't exist, we will use value below.
+	int removeFlag;
+	// If addFlag and removeFlag are both 0, we will always use this value.
 	int value;
 };
 // If any settings are added, changed or removed below, this number should be
 // increased.
-constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 5;
+constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 6;
 const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 
 #ifdef _WIN32
@@ -260,6 +263,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer.")
+				<< nl << translate_ctxt("optimal REAPER configuration", "10. Display the file name and then the full path in the Recent Projects menu..")
 				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
 				<< nl;
 			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
@@ -298,35 +302,38 @@ void cmdConfigReaperOptimal(Command* command) {
 	}
 	const ReaperSetting settings[] = {
 		// Undock Media Explorer
-		{"reaper_explorer", "docked", 0, 0},
+		{"reaper_explorer", "docked", 0, 0, 0},
 		// Enable "Close window on escape key" option in Media Explorer menu
-		{"reaper_explorer", "autoplay", 1 << 4, 17},
+		{"reaper_explorer", "autoplay", 1 << 4, 0, 17},
 		// Enable legacy file browse dialogs for more accessible check boxes
-		{"REAPER", "legacy_filebrowse", 0, 1},
+		{"REAPER", "legacy_filebrowse", 0, 0, 1},
 		// Prefs -> Keyboard/Multi-touch: Allow space key to be used for navigation in various windows
-		{"REAPER", "mousewheelmode", 1 << 7, 130},
+		{"REAPER", "mousewheelmode", 1 << 7, 0, 130},
 		// Prefs -> Plug-ins: Show FX state as accessible text in name
-		{"REAPER", "fxfloat_focus", 1 << 20, 1048579},
+		{"REAPER", "fxfloat_focus", 1 << 20, 0, 1048579},
 		// Prefs -> Video: Use standard edit control for video code editor (for accessibility, lacks many features)
-		{"REAPER", "video_colorspace", 1 << 11, 789507},
+		{"REAPER", "video_colorspace", 1 << 11, 0, 789507},
 		// Disable FX browser -> Options menu -> Show in FX list -> Plug-in type prefixes
-		{"REAPER-fxadd", "uiflags", 1 << 24, 16777216},
+		{"REAPER-fxadd", "uiflags", 1 << 24, 0, 16777216},
 		// Disable MIDI Editor -> Options -> Snap settings -> Snap to visible grid
-		{"midiedit", "snapflags", 1 << 5, 32},
+		{"midiedit", "snapflags", 1 << 5, 0, 32},
 		// Enable hardcoded keybind for Control+Space in REAPER dialogs, needed in REAPER 7.41 or newer
-		{"REAPER", "mousemovemod", 1 << 5, 32},
+		{"REAPER", "mousemovemod", 1 << 5, 0, 32},
+		// Prefs -> General -> Recent project list display: Display file name and full path.
+		{"REAPER", "actionmenu", 1 << 1, 1 << 3, 3},
 	};
 	for (const auto& setting: settings) {
 		int newVal = setting.value;
-		if (setting.flag) {
+		if (setting.addFlag || setting.removeFlag) {
 			char existingVal[50];
 			GetPrivateProfileString(setting.section, setting.key, "", existingVal,
 				sizeof(existingVal), get_ini_file());
 			if (existingVal[0]) {
-				// There is an existing value. Add the flag to it rather than overwriting it
-				// completely.
+				// There is an existing value. Tweak the flags rather than overwriting
+				// it completely.
 				newVal = atoi(existingVal);
-				newVal |= setting.flag;
+				newVal |= setting.addFlag;
+				newVal &= ~setting.removeFlag;
 			}
 		}
 		string writeVal = format("{}", newVal);

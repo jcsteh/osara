@@ -50,3 +50,6 @@ BoolSetting(reportNotes, MIDI_EDITOR_SECTION,
 BoolSetting(reportSurfaceChanges, MAIN_SECTION,
 	"Report changes made via &control surfaces",
 	false)
+BoolSetting(moveCursorWithEdges, MAIN_SECTION,
+	"Move cursor relative to adjusting &edges of items and time selection",
+	false)
