@@ -263,7 +263,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "10. Display the file name and then the full path in the Recent Projects menu..")
+				<< nl << translate_ctxt("optimal REAPER configuration", "10. Display the file name and then the full path in the Recent Projects menu.")
 				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
 				<< nl;
 			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
