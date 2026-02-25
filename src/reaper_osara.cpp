@@ -2572,7 +2572,7 @@ void postChangeVerticalZoom(int command) {
 	}
 	// Translators: Used when reporting the vertical zoom level as a number.
 	// {} will be replaced with the number; e.g. "35 vertical zoom".
-	outputMessage(translate(format("{} vertical zoom", zoom)));
+	outputMessage(format(translate("{} vertical zoom"), zoom));
 }
 
 string getShortenedAltSectionName(int sectionId) {
