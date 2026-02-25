@@ -133,11 +133,6 @@ addExternalSources("#include/tinygettext/src", (
 	"tinygettext.cpp",
 ))
 addExternalSources(
-	"#include/fmt/src",
-	("format.cc", "os.cc"),
-	CCFLAGS="-Wunused-result"
-)
-addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
 	CCFLAGS="-Wno-deprecated-declarations"

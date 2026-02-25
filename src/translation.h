@@ -9,6 +9,8 @@
 
 #include <string>
 #include <tinygettext/dictionary.hpp>
+#define FMT_HEADER_ONLY
+#include <fmt/core.h>
 #include <fmt/format.h>
 
 extern tinygettext::Dictionary translationDict;
