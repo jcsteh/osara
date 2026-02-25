@@ -137,7 +137,7 @@ addExternalSources("#include/tinygettext/src", (
 addExternalSources(
 	"#include/fmt/src",
 	("format.cc", "os.cc"),
-	CCFLAGS="-Wunused-result]"
+	CCFLAGS="-Wunused-result"
 )
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
