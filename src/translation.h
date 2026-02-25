@@ -9,7 +9,6 @@
 
 #include <string>
 #include <tinygettext/dictionary.hpp>
-#include <fmt/core.h>
 #include <fmt/format.h>
 
 extern tinygettext::Dictionary translationDict;
@@ -41,7 +40,10 @@ constexpr auto _t(auto msg) {
 template<typename FormatStr, typename... Args>
 std::string format(FormatStr&& formatStr, Args&&... args) {
 	try {
-		return fmt::format(formatStr, std::forward<Args>(args)...);
+		return fmt::format(
+            fmt::runtime(std::forward<FormatStr>(formatStr)),
+            std::forward<Args>(args)...
+        );
 	} catch (fmt::format_error) {
 		return fmt::format("error in format string: {}", formatStr);
 	}
