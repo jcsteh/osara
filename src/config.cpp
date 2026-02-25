@@ -291,7 +291,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 void cmdConfigReaperOptimal(Command* command) {
 	// Even if the user chooses not to apply the configuration, we don't want to
 	// ask them again at startup until the optimal settings are updated.
-	string version = format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
+	string version = fmt::format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
 	SetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(),
 		true);
 	if (DialogBox(
@@ -336,7 +336,7 @@ void cmdConfigReaperOptimal(Command* command) {
 				newVal &= ~setting.removeFlag;
 			}
 		}
-		string writeVal = format("{}", newVal);
+		string writeVal = fmt::format("{}", newVal);
 		if (!WritePrivateProfileString(setting.section, setting.key, writeVal.c_str(),
 				get_ini_file())) {
 			MessageBox(
