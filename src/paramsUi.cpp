@@ -1253,7 +1253,7 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 		if (value == -1) {
 			// Translators: Indicates no MIDI channels for a send in the Track
 			// Parameters dialog.
-			return translate("none");
+			return translate_ctxt("MIDI channel", "none");
 		}
 		if (value == 0) {
 			// Translators: Indicates all MIDI channels for a send in the Track
@@ -1411,7 +1411,7 @@ class SourceAudioChannelParam: public AudioChannelParam {
 	public:
 	SourceAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
-		options.push_back({translate("none"), -1});
+		options.push_back({translate_ctxt("audio channel", "none"), -1});
 		MediaTrack* srcTrack = this->getTargetTrack();
 		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
 		this->addMonoOptions(channels);

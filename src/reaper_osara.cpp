@@ -672,7 +672,7 @@ const char* automationModeAsString(int mode) {
 	switch (mode) {
 		case -1:
 			// Translators: An automation mode.
-			return translate("none");
+			return translate_ctxt("automation mode", "none");
 		case 0:
 			// Translators: An automation mode.
 			return translate("trim/read");
@@ -4645,7 +4645,7 @@ string formatTracksWithState(const char* prefix, Func checkState,
 		}
 		// Translators: Used when reporting all tracks which are muted, soloed, etc.
 		// to indicate that no tracks are muted, soloed, etc.
-		s << translate("none");
+		s << translate_ctxt("tracks state", "none");
 	}
 	return s.str();
 }
@@ -4757,7 +4757,7 @@ void cmdReportSelection(Command* command) {
 					formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
 			resetTimeCache();
 		} else if (multiLine) {
-			s << translate("none");
+			s << translate_ctxt("time selection", "none");
 		} else {
 			s << translate("no time selection");
 		}
@@ -4786,7 +4786,8 @@ void cmdReportSelection(Command* command) {
 		}
 		string items = formatItemsWithState(isItemSelected, multiLine);
 		if (items.empty()) {
-			s << (multiLine ? translate("none") : translate("no selected items"));
+			s << (multiLine ? translate_ctxt("item selection", "none") :
+				translate("no selected items"));
 		} else {
 			s << items;
 		}
@@ -4808,7 +4809,7 @@ void cmdReportSelection(Command* command) {
 			int count = countSelectedEvents(take);
 			if (count == 0) {
 				if (multiLine) {
-					s << translate("none");
+					s << translate_ctxt("MIDI Editor selection", "none");
 				} else {
 					s << translate("no MIDI selection");
 				}
