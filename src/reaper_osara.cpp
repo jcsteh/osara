@@ -6496,7 +6496,7 @@ extern "C" {
 REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
 	if (rec) {
 		// Load.
-#ifdef _M_AMD64
+#if defined(_WIN32) && defined(_M_X64) && !defined(_M_ARM64EC)
 		using IsWow64Process2Fn = BOOL (WINAPI*)(HANDLE, USHORT*, USHORT*);
 		auto fn = reinterpret_cast<IsWow64Process2Fn>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "IsWow64Process2"));
 		if (fn) {
