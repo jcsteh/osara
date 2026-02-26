@@ -41,8 +41,8 @@ sources = [
 if env["PLATFORM"] == "win32":
 	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
 	env["CC"] = "clang-cl"
+	# For ARM64EC, we can't yet link with LLVM due to undefined symbol: __sanitizer_annotate_contiguous_container
 	if env["TARGET_ARCH"] != "arm64":
-		# We can't yet link with clang for ARM64EC
 		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
 		"/W3",
