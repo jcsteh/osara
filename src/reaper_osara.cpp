@@ -2572,7 +2572,7 @@ void postChangeVerticalZoom(int command) {
 	}
 	// Translators: Used when reporting the vertical zoom level as a number.
 	// {} will be replaced with the number; e.g. "35 vertical zoom".
-	outputMessage(translate(format("{} vertical zoom", zoom)));
+	outputMessage(format(translate("{} vertical zoom"), zoom));
 }
 
 string getShortenedAltSectionName(int sectionId) {
@@ -4423,7 +4423,7 @@ void reportTempoTimeSig() {
 	int timesig_num=0;
 	int timesig_denom=0;
 	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
-	outputMessage(format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
+	outputMessage(fmt::format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
 }
 
 void cmdManageTempoTimeSigMarkers(Command* command) {

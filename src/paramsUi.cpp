@@ -854,7 +854,7 @@ class FxParams: public ParamSource {
 		const bool success = this->_GetNamedConfigParm(
 			this->obj,
 			this->fx,
-			format("param.{}.automatable", fxParam).c_str(),
+			fmt::format("param.{}.automatable", fxParam).c_str(),
 			buf,
 			sizeof(buf));
 		if (success && buf[0] != '1') {
@@ -908,7 +908,7 @@ class FxParam: public Param {
 		this->isEditable = true;
 		// Set this as the last touched FX and FX parameter, as well as the last
 		// focused FX.
-		string paramStr = format("{}", param);
+		string paramStr = fmt::format("{}", param);
 		source._SetNamedConfigParm(source.obj, fx, "last_touched", paramStr.c_str());
 		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
@@ -1260,7 +1260,7 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 			// Parameters dialog.
 			return translate("all");
 		}
-		return format("{}", value);
+		return fmt::format("{}", value);
 	}
 
 	void setValue(double value) override {
@@ -1321,7 +1321,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	void addMonoOptions(int channels) {
 		for (int c = 0; c < channels; ++c) {
 			this->options.push_back({
-				format("{}", c + 1),
+				fmt::format("{}", c + 1),
 				c + MONO_FLAG
 			});
 		}
@@ -1330,7 +1330,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	void addStereoOptions(int channels) {
 		for (int c = 0; c <= channels - 2; ++c) {
 			this->options.push_back({
-				format("{}/{}", c + 1, c + 2),
+				fmt::format("{}/{}", c + 1, c + 2),
 				c
 			});
 		}
@@ -1340,7 +1340,7 @@ class AudioChannelParam:  public ReaperObjParam {
 		const int countFlag = isDest ? 0 : (srcChannels / 2 << 10);
 		for (int c = 0; c <= trackChannels - srcChannels; ++c) {
 			this->options.push_back({
-				format("{}-{}", c + 1, c + srcChannels),
+				fmt::format("{}-{}", c + 1, c + srcChannels),
 				c + countFlag
 			});
 		}
@@ -1451,10 +1451,10 @@ class DestAudioChannelParam:  public AudioChannelParam {
 			// channels there are. Just expose the current setting.
 			int dest = *(int*)provider.getSetValue(nullptr);
 			if (dest & MONO_FLAG) {
-				this->options.push_back({format("{}", (dest & ~MONO_FLAG) + 1), dest});
+				this->options.push_back({fmt::format("{}", (dest & ~MONO_FLAG) + 1), dest});
 			} else {
 				// Multi-channel, but we don't know how many.
-				this->options.push_back({format("{}-", dest + 1), dest});
+				this->options.push_back({fmt::format("{}-", dest + 1), dest});
 			}
 			this->max = 0;
 			return;

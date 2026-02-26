@@ -94,7 +94,7 @@ void startUpdateCheck(bool manual) {
 	// Keep track of the last time we checked for an update. We do this even for
 	// a manual check because the user probably doesn't want auto update checks
 	// soon if they've just done a manual check.
-	SetExtState(CONFIG_SECTION, LAST_CHECK_KEY, format("{}", curTime).c_str(),
+	SetExtState(CONFIG_SECTION, LAST_CHECK_KEY, fmt::format("{}", curTime).c_str(),
 		true);
 	UpdateChecker::instance = new UpdateChecker(manual);
 }

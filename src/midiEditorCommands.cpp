@@ -256,7 +256,7 @@ struct MidiEventListData {
 
 	static const MidiEventListData get(HWND editor, int index, ReqParams params={}) {
 		MidiEventListData data{index};
-		auto setting = format("list_{}", index);
+		auto setting = fmt::format("list_{}", index);
 		char eventData[255] = "\0";
 		if (MIDIEditor_GetSetting_str(editor, setting.c_str(), eventData, sizeof(eventData))) {
 			MediaItem_Take* take = MIDIEditor_GetTake (editor);
