@@ -140,12 +140,12 @@ addExternalSources("#include/tinygettext/src", (
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 addExternalSources(
 	"#include/simpleson",
 	("json.cpp",),
-	CCFLAGS="$CCFLAGS /clang:-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 
 env.SharedLibrary(
