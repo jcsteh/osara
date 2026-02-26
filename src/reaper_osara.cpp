@@ -6501,7 +6501,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		auto fn = reinterpret_cast<IsWow64Process2Fn>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "IsWow64Process2"));
 		if (fn) {
 			USHORT processMachine = 0;
-			USHORT nativeMachine  = 0;
+			USHORT nativeMachine = 0;
 			fn(GetCurrentProcess(), &processMachine, &nativeMachine);
 			if (nativeMachine == IMAGE_FILE_MACHINE_ARM64) {
 				return 0; // Don't load on ARM64, use ARM64EC build instead.
