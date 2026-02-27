@@ -7,8 +7,8 @@ import re
 
 RE_BOOL_SETTING = re.compile(r'^BoolSetting\(\s*(?P<name>[^,]+),\s*(?P<sectionId>[^,]+),\s*(?P<displayName>"[^"]+"),\s*(?P<default>true|false)\s*\)$')
 def makeConfigRc(target, source, env):
-	out = open(target[0].path, "wt", encoding="UTF-8")
-	resourceH = open(source[0].path, "rt", encoding="UTF-8")
+	out = open(target, "wt", encoding="UTF-8")
+	resourceH = open(source[0], "rt", encoding="UTF-8")
 	for line in resourceH:
 		if line.startswith("#define ID_CONFIG_DLG "):
 			cid = dialogCid = int(line.strip().rsplit(" ")[-1])
@@ -21,7 +21,7 @@ def makeConfigRc(target, source, env):
 	lines.append('\tCAPTION "OSARA Configuration"\n')
 	lines.append('BEGIN\n')
 	y = 6
-	settingsH = open(source[1].path, "rt", encoding="UTF-8")
+	settingsH = open(source[1], "rt", encoding="UTF-8")
 	setting = None
 	for line in settingsH:
 		line = line.strip()
@@ -45,3 +45,9 @@ def makeConfigRc(target, source, env):
 	lines[1] = f"{dialogCid} DIALOGEX 250, 125, 400, {y}\n"
 	lines.append('END\n')
 	out.writelines(lines)
+
+# Using the special variable 
+# __name__
+if __name__=="__main__":
+	import sys
+	makeConfigRc(sys.argv[1], sys.argv[2:], None)

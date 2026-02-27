@@ -105,7 +105,7 @@ int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope) {
 
 // For each automation item in the project, Call func(envelope, autoItemIndex).
 // func should return true to continue iterating, false to stop.
-void forEachAutomationItem(auto func) {
+void forEachAutomationItem(std::function<bool(TrackEnvelope*, int)> func) {
 	auto handleTrack = [&] (MediaTrack* track) {
 		int envelopes = CountTrackEnvelopes(track);
 		for (int e = 0; e < envelopes; ++e) {
@@ -186,7 +186,7 @@ void cmdDeleteEnvelopePoints(Command* command) {
 
 // For each selected envelope point, Call func(autoItemIndex, pointIndex) .
 // func should return true to continue iterating, false to stop.
-void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, auto func) {
+void forEachSelectedEnvelopePoint(TrackEnvelope* envelope, std::function<bool(int, int)> func) {
 	// Iterate the points in the envelope itself and each automation item. -1
 	// means the envelope itself.
 	int itemCount = CountAutomationItems(envelope);
@@ -661,8 +661,9 @@ bool isEnvelopeVisible(TrackEnvelope* envelope) {
 	return !m.empty() && m.str(4)[0] == '1';
 }
 
-set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
-	auto countFunc, auto getFunc
+template<typename T>
+set<TrackEnvelope*> getVisibleEnvelopes(T obj,
+	int (*countFunc)(T), TrackEnvelope* (*getFunc)(T, int)
 ) {
 	set<TrackEnvelope*> envelopes;
 	int count = countFunc(obj);
@@ -675,8 +676,9 @@ set<TrackEnvelope*> getVisibleEnvelopes(auto obj,
 	return envelopes;
 }
 
-void cmdhToggleEnvelope(int command, auto obj,
-	auto countFunc, auto getFunc,
+template<typename T>
+void cmdhToggleEnvelope(int command, T obj,
+	int (*countFunc)(T), TrackEnvelope* (*getFunc)(T, int),
 	const char* showedMsg, const char* hidMsg
 ) {
 	set<TrackEnvelope*> before = getVisibleEnvelopes(obj, countFunc, getFunc);

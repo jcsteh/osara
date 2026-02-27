@@ -13,7 +13,6 @@
 #include <cassert>
 #include <functional>
 #include <float.h>
-#include <compare>
 #include<regex>
 #include<string_view>
 #include "midiEditorCommands.h"
@@ -499,8 +498,20 @@ class MidiEventIterator {
 		return !(*this == other);
 	}
 
-	auto operator<=>(const MidiEventIterator& other) const {
-		return this->index <=> other.index;
+	bool operator<(const MidiEventIterator& other) const {
+		return this->index < other.index;
+	}
+
+	bool operator>(const MidiEventIterator& other) const {
+		return this->index > other.index;
+	}
+
+	bool operator<=(const MidiEventIterator& other) const {
+		return this->index <= other.index;
+	}
+
+	bool operator>=(const MidiEventIterator& other) const {
+		return this->index >= other.index;
 	}
 
 	value_type operator[](const difference_type index) const{
@@ -548,7 +559,7 @@ class MidiEventIterator {
 		return tmpIt;
 	}
 
-	difference_type operator-(const MidiEventIterator& other) {
+	difference_type operator-(const MidiEventIterator& other) const {
 		return this->index - other.index;
 	}
 
@@ -740,7 +751,7 @@ void cmdMidiMoveCursor(Command* command) {
 		fakeFocus = FOCUS_NOTE;
 		s << " " << format(
 			translate_plural("{} note", "{} notes", count), count);
-		int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+		int mutedCount = count_if(notes.begin(), notes.end(), [](MidiNote note) { return note.muted; });
 		if (mutedCount > 0) {
 			// Translators: used when reporting the number of muted notes in a chord.
 			// {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -1122,7 +1133,7 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 			// Translators: used when reporting the number of notes in a chord.
 			// {} will be replaced by the number of notes. E.g. "3 notes"
 			s << format(translate("{} notes"), count);
-			int mutedCount = count_if(notes.begin(), notes.end(), [](auto note) { return note.muted; });
+			int mutedCount = count_if(notes.begin(), notes.end(), [](MidiNote note) { return note.muted; });
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted notes in a chord.
 				// {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -2326,7 +2337,7 @@ void postMidiToggleMute(int command) {
 			}
 			s << getMidiNoteName(take, selectedNotes[0].pitch, selectedNotes[0].channel);
 		} else {
-			int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
+			int mutedCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](MidiNote note) { return note.muted; });
 			int unmutedCount = noteCount - mutedCount;
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted notes.
@@ -2352,7 +2363,7 @@ void postMidiToggleMute(int command) {
 			}
 			s << describeCC(take, cc);
 		} else {
-			int mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+			int mutedCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](MidiControlChange cc) { return cc.muted; });
 			int unmutedCount = CCCount - mutedCount;
 			if (mutedCount > 0) {
 				// Translators: used when reporting the number of muted CCs.
@@ -2368,8 +2379,8 @@ void postMidiToggleMute(int command) {
 			}
 		}
 	} else { // If both notes and CCs are selected
-		int mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](auto note) { return note.muted; });
-		int mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](auto cc) { return cc.muted; });
+		int mutedNoteCount = count_if(selectedNotes.begin(), selectedNotes.end(), [](MidiNote note) { return note.muted; });
+		int mutedCCCount = count_if(selectedCCs.begin(), selectedCCs.end(), [](MidiControlChange cc) { return cc.muted; });
 		int mutedCount = mutedNoteCount + mutedCCCount;
 		int unmutedCount = eventCount - mutedCount;
 		if (mutedCount > 0) {

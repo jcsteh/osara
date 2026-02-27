@@ -1,0 +1,50 @@
+add_library(reaper_osara SHARED)
+target_sources(reaper_osara
+  PRIVATE
+	osara.h
+	reaper_osara.cpp
+	config.h
+	config.cpp
+	paramsUi.h
+	paramsUi.cpp
+	peakWatcher.h
+	peakWatcher.cpp
+	midiEditorCommands.h
+	midiEditorCommands.cpp
+	envelopeCommands.h
+	envelopeCommands.cpp
+	controlSurface.cpp
+	exports.cpp
+	fxChain.h
+	fxChain.cpp
+	translation.h
+	translation.cpp
+	updateCheck.h
+	updateCheck.cpp
+	uia.h
+	uia.cpp
+	reaper_osara.rc
+	../build/config.rc
+)
+
+target_include_directories(reaper_osara
+  PRIVATE
+	../include
+)
+
+target_link_libraries(reaper_osara 
+  tinygettext
+  fmt
+  simpleson
+  WDL
+  user32
+  ole32
+  oleacc
+  OleAut32
+  Shell32
+  Comdlg32
+  Advapi32
+  UIAutomationCore
+  ws2_32
+  Comctl32
+)

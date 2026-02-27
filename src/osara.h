@@ -290,7 +290,8 @@ class CallLater {
 	public:
 	CallLater() = default;
 
-	CallLater(auto func, UINT ms) {
+	template <typename Func>
+	CallLater(Func func, UINT ms) {
 		// The caller might discard this CallLater, so use another object to hold
 		// the function.
 		auto holder = std::make_shared<Holder>(func);
@@ -304,7 +305,9 @@ class CallLater {
 
 	private:
 	struct Holder {
-		Holder(auto func): func(func) {}
+		template<typename Func>
+		Holder(Func func): func(func) {}
+
 		std::function<void()> func;
 		std::shared_ptr<Holder> self;
 	};

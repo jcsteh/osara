@@ -35,13 +35,6 @@ class UiaCore {
 	~UiaCore() {
 		FreeLibrary(this->dll);
 	}
-
-	decltype(UiaRaiseNotificationEvent)* RaiseNotificationEvent =
-		getFunc<decltype(UiaRaiseNotificationEvent)>("UiaRaiseNotificationEvent");
-	decltype(UiaDisconnectProvider)* DisconnectProvider = 
-		getFunc<decltype(UiaDisconnectProvider)>("UiaDisconnectProvider");
-	decltype(UiaDisconnectAllProviders)* DisconnectAllProviders =
-		getFunc<decltype(UiaDisconnectAllProviders)>("UiaDisconnectAllProviders");
 };
 
 unique_ptr<UiaCore> uiaCore;
@@ -250,41 +243,7 @@ WNDCLASSEX windowClass;
 bool initializeUia() {
 	hasTriedToInitialize = true;
 	uiaCore = make_unique<UiaCore>();
-	// If UiaRaiseNotificationEvent is available, UiaDisconnectProvider and
-	// UiaDisconnectAllProviders will also be available, so we don't need to
-	// check those.
-	if (!uiaCore->RaiseNotificationEvent) {
-		uiaCore = nullptr;
-		return false;
-	}
-	windowClass = getWindowClass();
-	if (!RegisterClassEx(&windowClass)) {
-		return false;
-	}
-	uiaWnd = CreateWindowEx(
-		// Make it transparent because it has to have width/height.
-		WS_EX_TRANSPARENT,
-		WINDOW_CLASS_NAME,
-		"Reaper OSARA Notifications",
-		WS_CHILD | WS_DISABLED,
-		0,
-		0,
-		// UIA notifications fail if the window has 0 width/height.
-		1,
-		1,
-		mainHwnd,
-		0,
-		pluginHInstance,
-		nullptr
-	);
-	if (!uiaWnd) {
-		return false;
-	}
-	ShowWindow(uiaWnd, SW_SHOWNA);
-	// Constructor  initializes refcount to 0, assignment to a CComPtr
-	// takes it to 1.
-	uiaProvider = new UiaProvider(uiaWnd);
-	return true;
+	return false;
 }
 
 bool hasTriedToInitializeUia() {
@@ -297,7 +256,6 @@ bool terminateUia() {
 		// disconnection.
 		CComPtr<IRawElementProviderSimple> tmpProv = std::move(uiaProvider);
 		uiaProvider = nullptr;
-		uiaCore->DisconnectProvider(tmpProv);
 	}
 	ShowWindow(uiaWnd, SW_HIDE);
 	if (!DestroyWindow(uiaWnd)) {
@@ -306,7 +264,6 @@ bool terminateUia() {
 	if (!UnregisterClass(WINDOW_CLASS_NAME, pluginHInstance)) {
 		return false;
 	}
-	uiaCore->DisconnectAllProviders();
 	uiaCore = nullptr;
 	return true;
 }
@@ -341,13 +298,7 @@ bool sendUiaNotification(const string& message, bool interrupt) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
-	return (uiaCore->RaiseNotificationEvent(
-		uiaProvider,
-		NotificationKind_Other,
-		interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
-		SysAllocString(widen(message).c_str()),
-		SysAllocString(L"REAPER_OSARA")
-	) == S_OK);
+	return false;
 }
 
 void resetUia() {

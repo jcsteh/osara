@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 #include <initguid.h>
-#include <coguid.h>
+#include <cguid.h>
 // Must be defined before any C++ STL header is included.
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include <oleacc.h>
@@ -25,7 +25,6 @@
 #include <iomanip>
 #include <cassert>
 #include <array>
-#include <ranges>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -3901,9 +3900,9 @@ void adjustZoomByStep(bool zoomOut) {
 		}
 	} else {
 		// Find next step zooming in
-		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
-			if (currentZoomStep > value) {
-				nextZoomStep = value;
+		for (int i = STEPPED_ZOOM_SETTINGS.size() - 1; i > 0; i--) {
+			if (currentZoomStep > STEPPED_ZOOM_SETTINGS[i]) {
+				nextZoomStep = STEPPED_ZOOM_SETTINGS[i];
 				break;
 			}
 		}
@@ -5372,8 +5371,8 @@ void cmdAbout(Command* command) {
 	ostringstream s;
 	// Translators: OSARA's full name presented in the About dialog.
 	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
-	// Translators: osara version. {} is replaced with the version; e.g.
-	// "Version: 2021.1pre-588,0531135a"
+		// Translators: osara version. {} is replaced with the version; e.g.
+		// "Version: 2021.1pre-588,0531135a"
 		format(translate("Version: {}"), OSARA_VERSION) << "\r\n" <<
 		OSARA_COPYRIGHT;
 	reviewMessage(translate("About OSARA"), s.str().c_str());

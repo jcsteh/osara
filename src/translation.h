@@ -33,7 +33,8 @@ auto translate_plural(S msg, S msgPlural, N num) {
 
 // This function is used to mark a string as translatable without actually
 // translating it. This is useful for strings in compile time data structures.
-constexpr auto _t(auto msg) {
+template<typename T>
+constexpr T _t(T msg) {
 	return msg;
 }
 

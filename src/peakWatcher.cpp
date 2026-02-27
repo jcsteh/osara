@@ -871,12 +871,22 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 	ctx->AddLine(CONFIG_FOOTER);
 }
 
-void BeginLoadProjectState (bool isUndo, struct project_config_extension_t* reg){
+void BeginLoadProjectState(bool isUndo, struct project_config_extension_t* reg) {
 	//clean up configuration data for dead projects
-	erase_if(watchers, [](const auto& item) {
-auto const& project = item.first;
-return ! ValidatePtr((void*)project, "ReaProject*");
-	});
+	std::vector<const ReaProject*> toErase;
+
+	for (auto item : watchers) {
+		const ReaProject* project = item.first;
+		if (!ValidatePtr((void*)project, "ReaProject*")) 
+		{
+			toErase.push_back(project);
+		}
+	}
+
+	for (auto project : toErase) {
+		watchers.erase(project);
+	}
+	toErase.clear();
 }
 
 void initialize() {
