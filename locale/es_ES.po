@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2026-02-15 18:59\n"
+"PO-Revision-Date: 2026-03-01 18:54\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -68,6 +68,10 @@ msgstr "8. Deshabilitar instantánea en la rejilla visible en editor midi para q
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
 msgstr "9. Hacer que Control+Espacio reproduzca/pare cuando el foco esté en un diálogo necesario en REAPER 7.41 o superior."
+
+msgctxt "optimal REAPER configuration"
+msgid "10. Display the file name and then the full path in the Recent Projects menu."
+msgstr "10. Mostrar el nombre del archivo y luego la ruta completa en el menú Proyectos Recientes."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1069,11 +1073,9 @@ msgstr "Eliminar salida hardware"
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
+msgctxt "MIDI channel"
 msgid "none"
-msgstr "ninguna"
+msgstr "ninguno"
 
 #. Indicates all MIDI channels for a send in the Track
 #. Parameters dialog.
@@ -1091,6 +1093,10 @@ msgstr "Añadidos &2 nuevos canales"
 #. dialog.
 msgid "Add &4 new channels"
 msgstr "Añadidos &4 nuevos canales"
+
+msgctxt "audio channel"
+msgid "none"
+msgstr "ningún"
 
 msgid "post-fader"
 msgstr "post-fader"
@@ -1363,6 +1369,11 @@ msgstr "mínima"
 #. A closed track folder.
 msgid "closed"
 msgstr "cerrada"
+
+#. An automation mode.
+msgctxt "automation mode"
+msgid "none"
+msgstr "ningún"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2232,6 +2243,9 @@ msgstr "zoom vertical máximo"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+msgid "{} vertical zoom"
+msgstr "{} zoom vertical"
+
 #. Reported when using "Main action section: Momentarily set
 #. override to alt-1", etc. {} is replaced with the shortened section name;
 #. e.g. "alt-1 momentary".
@@ -2695,6 +2709,12 @@ msgstr "[sin guardar]"
 msgid "{start} through {end}"
 msgstr "{start} hasta {end}"
 
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgctxt "tracks state"
+msgid "none"
+msgstr "ninguna"
+
 msgid "Muted"
 msgstr "Silenciado"
 
@@ -2731,17 +2751,29 @@ msgstr "fin {}"
 msgid "length {}"
 msgstr "longitud {}"
 
+msgctxt "time selection"
+msgid "none"
+msgstr "ninguna"
+
 msgid "Selected tracks:"
 msgstr "Pistas seleccionadas:"
 
 msgid "Selected items:"
 msgstr "Ítems seleccionados:"
 
+msgctxt "item selection"
+msgid "none"
+msgstr "ningún"
+
 #. Placed before the information about the selection that has
 #. been made in the MIDI Editor when pressing OSARA's report selection
 #. action twice.
 msgid "MIDI Editor selection:"
 msgstr "Selección de editor midi:"
+
+msgctxt "MIDI Editor selection"
+msgid "none"
+msgstr "ningún"
 
 msgid "no MIDI selection"
 msgstr "sin midi seleccionado"
@@ -3457,6 +3489,10 @@ msgstr "Anuncia &notas midi en el editor"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "Anuncia cambios hechos con &superficie de control"
+
+msgctxt "OSARA Configuration"
+msgid "Move cursor relative to adjusting &edges of items and time selection"
+msgstr "Mover el cursor en relación al ajuste de los &bordes de los ítems y la selección de tiempo"
 
 msgctxt "OSARA Configuration"
 msgid "OK"

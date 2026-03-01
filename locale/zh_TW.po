@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-02-15 18:59\n"
+"PO-Revision-Date: 2026-03-01 18:54\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -68,6 +68,10 @@ msgstr "8. 停用MIDI編輯器中可見網格的快照，因此網格的移動�
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
 msgstr "9. 當鍵盤焦點在對話框中時，進行 ctrl+space 播放/停止，需要 REAPER7.41或更高版本。"
+
+msgctxt "optimal REAPER configuration"
+msgid "10. Display the file name and then the full path in the Recent Projects menu."
+msgstr "10.在近期工程列表先顯示檔案名稱再顯示完整路徑。"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1019,9 +1023,7 @@ msgstr "刪除硬體輸出"
 
 #. Indicates no MIDI channels for a send in the Track
 #. Parameters dialog.
-#. An automation mode.
-#. Used when reporting all tracks which are muted, soloed, etc.
-#. to indicate that no tracks are muted, soloed, etc.
+msgctxt "MIDI channel"
 msgid "none"
 msgstr "沒有"
 
@@ -1041,6 +1043,10 @@ msgstr "添加 &2 新通道"
 #. dialog.
 msgid "Add &4 new channels"
 msgstr "添加 &4 新通道"
+
+msgctxt "audio channel"
+msgid "none"
+msgstr "沒有"
 
 msgid "post-fader"
 msgstr "推子後"
@@ -1308,6 +1314,11 @@ msgstr "小"
 #. A closed track folder.
 msgid "closed"
 msgstr "關閉"
+
+#. An automation mode.
+msgctxt "automation mode"
+msgid "none"
+msgstr "沒有"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2145,6 +2156,9 @@ msgstr "最大垂直縮放"
 
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
+msgid "{} vertical zoom"
+msgstr "{} 垂直縮放"
+
 #. Reported when using "Main action section: Momentarily set
 #. override to alt-1", etc. {} is replaced with the shortened section name;
 #. e.g. "alt-1 momentary".
@@ -2422,7 +2436,7 @@ msgstr "更改選取的對象"
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
 msgid "group {}"
-msgstr "分組 {}"
+msgstr "編組 {}"
 
 #. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
 #. {} will be replaced with the number of takes; e.g. "2 takes".
@@ -2430,13 +2444,13 @@ msgid "{} takes"
 msgstr "{} 片段"
 
 msgid "{}"
-msgstr "{ }"
+msgstr " {}"
 
 msgid "+{}"
-msgstr "+{ }"
+msgstr "加{}"
 
 msgid "-{}"
-msgstr "-{ }"
+msgstr "減{}"
 
 msgid "{} per keypress"
 msgstr "{} 每按一次"
@@ -2595,6 +2609,12 @@ msgstr "[未儲存]"
 msgid "{start} through {end}"
 msgstr "{} 到 {}"
 
+#. Used when reporting all tracks which are muted, soloed, etc.
+#. to indicate that no tracks are muted, soloed, etc.
+msgctxt "tracks state"
+msgid "none"
+msgstr "沒有"
+
 msgid "Muted"
 msgstr "靜音"
 
@@ -2631,17 +2651,29 @@ msgstr "結束 {}"
 msgid "length {}"
 msgstr "長度 {}"
 
+msgctxt "time selection"
+msgid "none"
+msgstr "沒有"
+
 msgid "Selected tracks:"
 msgstr "選取軌道"
 
 msgid "Selected items:"
 msgstr "選取對象"
 
+msgctxt "item selection"
+msgid "none"
+msgstr "沒有"
+
 #. Placed before the information about the selection that has
 #. been made in the MIDI Editor when pressing OSARA's report selection
 #. action twice.
 msgid "MIDI Editor selection:"
 msgstr "MIDI 編輯器選取"
+
+msgctxt "MIDI Editor selection"
+msgid "none"
+msgstr "沒有"
 
 msgid "no MIDI selection"
 msgstr "無 MIDI 選取"
@@ -3353,6 +3385,10 @@ msgstr "在MIDI編輯器報告MIDI音符(&N)"
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
 msgstr "報告通過＆控制界面進行的更改(&C)"
+
+msgctxt "OSARA Configuration"
+msgid "Move cursor relative to adjusting &edges of items and time selection"
+msgstr "相對調整對象邊緣和時間選區位置時移動遊標(&e)"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
