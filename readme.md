@@ -1094,7 +1094,7 @@ To build OSARA, you will need:
 	See the note about submodules in the previous section.
 
 #### Windows
-- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026)
 
 	Visual Studio 2026 Community/Professional/Enterprise is also supported.
 	However, Preview versions of Visual Studio will not be detected and cannot be used.
