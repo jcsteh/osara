@@ -1094,18 +1094,25 @@ To build OSARA, you will need:
 	See the note about submodules in the previous section.
 
 #### Windows
-- [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026)
 
-	Visual Studio 2022 Community/Professional/Enterprise is also supported.
+	Visual Studio 2026 Community/Professional/Enterprise is also supported.
 	However, Preview versions of Visual Studio will not be detected and cannot be used.
 
 	Whether installing Build Tools or Visual Studio, you must enable the following:
 
-	* In the list on the Workloads tab, in the Desktop & Mobile grouping: Desktop development with C++
-	* Then in the Installation details tree view, under Desktop development with C++ > Optional:
-		- C++ ATL for latest v143 build tools (x86 & x64)
-		- C++ Clang tools for Windows
-		- Windows 11 SDK (10.0.22000.0)
+	* On the Workloads tab:
+		- In the list, in the Desktop & Mobile grouping: Desktop development with C++
+		- Then in the Installation details tree view, under Desktop development with C++ > Optional:
+			- MSVC Build Tools for x64/x86 (Latest)
+			- C++ ATL for x64/x86 (Latest MSVC)
+			- C++ Clang tools for Windows
+			- Windows 11 SDK (10.0.26100.xxx)
+	* on the Individual components tab:
+		- In the Compilers, build tools, and runtimes grouping:
+			- MSVC Build Tools for ARM64/ARM64EC (Latest)
+		- In the SDKs, libraries, and frameworks grouping:
+			- C++ ATL for ARM64/ARM64EC (Latest MSVC)
 
 - [Python](https://www.python.org/downloads/), version 3.7 or later:
 - [SCons](https://www.scons.org/), version 3.0.4 or later:

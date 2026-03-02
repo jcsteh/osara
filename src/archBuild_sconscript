@@ -41,7 +41,9 @@ sources = [
 if env["PLATFORM"] == "win32":
 	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
 	env["CC"] = "clang-cl"
-	env["LINK"] = "lld-link"
+	# For ARM64EC, we can't yet link with LLVM due to undefined symbol: __sanitizer_annotate_contiguous_container
+	if env["TARGET_ARCH"] != "arm64":
+		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
 		"/W3",
 		"/WX",
@@ -49,7 +51,7 @@ if env["PLATFORM"] == "win32":
 		"/clang:-Wno-unused-function",
 	])
 	env.Append(CXXFLAGS=[
-		"/clang:-std=c++20",
+		"/std:c++20",
 		"/EHsc",
 		# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
 		"/clang:-Wno-missing-braces",
@@ -63,6 +65,9 @@ if env["PLATFORM"] == "win32":
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
+	if env["TARGET_ARCH"] == "arm64":
+		env.Append(CCFLAGS="/arm64EC")
+		env.Append(LINKFLAGS="/machine:arm64ec")
 	sources.extend((
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
@@ -135,12 +140,12 @@ addExternalSources("#include/tinygettext/src", (
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 addExternalSources(
 	"#include/simpleson",
 	("json.cpp",),
-	CCFLAGS="-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 
 env.SharedLibrary(
