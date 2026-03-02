@@ -516,12 +516,14 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Start on bar: Toggle on/off: Alt+S
 - Preview: Toggle repeat on/off: Control+R
 - Options: Preserve pitch when tempo-matching or changing play rate: Alt+P
+- Preview: adjust pitch by -1 semitones: Shift+9
+- Preview: adjust pitch by +1 semitones: Shift+0
 - Preview: reset pitch: Control+Backspace
 - Tempo match: Toggle on/off: Alt+T
 - Tempo match: /2: Alt+/
 - Tempo match: x2: Alt+2
 - Dock Media Explorer in Docker: Shift+D
-(Note: although the action name doesn't make it clear, this is a toggle. For best screen reader accessibility, you should run this action once to remove Media Explorer from the Docker)
+(Note: although the action name doesn't make it clear, this is a toggle. OSARA removes Media Explorer from the docker when you say Yes to the optimal accessibility prompt. If handling your own config manually, you should run this action once for best screen reader accessibility)
 
 ### Context Menus
 There are several context menus in REAPER, but some of them are difficult to access or not accessible at all from the keyboard.
