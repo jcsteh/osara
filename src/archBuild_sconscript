@@ -67,7 +67,7 @@ if env["PLATFORM"] == "win32":
 	env.Append(LINKFLAGS='/OPT:REF')
 	if env["TARGET_ARCH"] == "arm64":
 		env.Append(CCFLAGS="/arm64EC")
-		env.Append(LINKFLAGS="/machine:arm64ec")
+		env.Append(LINKFLAGS="/machine:arm64x")
 	sources.extend((
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
