@@ -149,6 +149,7 @@ FunctionEnd
 Section "Uninstall"
 	Delete "$INSTDIR\..\UserPlugins\reaper_osara32.dll"
 	Delete "$INSTDIR\..\UserPlugins\reaper_osara64.dll"
+	Delete "$INSTDIR\..\UserPlugins\reaper_osara_arm64ec.dll"
 	Delete "$INSTDIR\..\KeyMaps\OSARA.ReaperKeyMap"
 	Delete "$INSTDIR\uninstall.exe"
 	RMDir "$INSTDIR"
