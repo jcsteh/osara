@@ -57,11 +57,6 @@ jobs:
         with:
           path: ~\scons_msvc_cache.json
           key: ${{ env.CACHE_KEY }}
-      - name: Windows setup
-        if: ${{ runner.os == 'Windows' }}
-        # Use NSIS 2.46 to reduce AV false positives.
-        run: |
-          choco install nsis-unicode -y
       - name: Mac setup
         if: ${{ runner.os == 'macOS' }}
         # We need php for swell_resgen.
