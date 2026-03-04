@@ -7,6 +7,7 @@
 !include "x64.nsh"
 !include "LogicLib.nsh"
 !include "nsDialogs.nsh"
+!include "WinVer.nsh"
 
 SetCompressor /SOLID LZMA
 !ifndef NSIS_UNICODE
@@ -100,7 +101,11 @@ Section "OSARA plug-in" SecPlugin
 	; However, it's fine on a 64 bit system even with 32 bit REAPER.
 	${If} ${RunningX64}
 		File "..\build\x86_64\reaper_osara64.dll"
-		File "..\build\arm64\reaper_osara_arm64ec.dll"
+		; Only copy ARM64EC on Windows 10 or later.
+		; Older versions of Windows, at least Windows 7, will show an error when REAPER starts up.
+		${If} ${AtLeastWin10}
+			File "..\build\arm64\reaper_osara_arm64ec.dll"
+		${EndIf}
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
 	File /oname=OSARA.ReaperKeyMap "..\config\windows\reaper-kb.ini"
