@@ -105,6 +105,8 @@ Section "OSARA plug-in" SecPlugin
 		; Older versions of Windows, at least Windows 7, will show an error when REAPER starts up.
 		${If} ${AtLeastWin10}
 			File "..\build\arm64\reaper_osara_arm64ec.dll"
+		${Else}
+			Delete "$INSTDIR\UserPlugins\reaper_osara_arm64ec.dll"
 		${EndIf}
 	${EndIf}
 	SetOutPath "$INSTDIR\KeyMaps"
