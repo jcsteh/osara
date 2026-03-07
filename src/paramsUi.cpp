@@ -849,18 +849,7 @@ class FxParams: public ParamSource {
 			// Named config params aren't FX params; keep them visible.
 			return true;
 		}
-		const int fxParam = param - namedCount;
-		char buf[16] = {};
-		const bool success = this->_GetNamedConfigParm(
-			this->obj,
-			this->fx,
-			fmt::format("param.{}.automatable", fxParam).c_str(),
-			buf,
-			sizeof(buf));
-		if (success && buf[0] != '1') {
-			return false;
-		}
-		static const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
+		static const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound|Local Control|X \\(Reserved\\)|Internal|Registered Parameter Number|Non - Registered Parameter Number|Reset All Controllers|\\(MSB \\)|\\(LSB\\) ).*?) \\(\\d+\\)"};
 		smatch m;
 		regex_match(name, m, RE_UNNAMED_PARAM);
 		if (!m.empty()) {
