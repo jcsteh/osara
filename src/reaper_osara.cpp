@@ -953,8 +953,11 @@ double getPlayOrEditCursorPosition() {
 
 // End of utility/helper functions
 
-// Functions exported from SWS
+// Function exported from SWS
 const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
+// Native REAPER API function loaded dynamically for compatibility with older SDK headers.
+using MediaExplorerGetLastPlayedFileInfoFn = bool (*)(char* filenameOut, int filenameOut_sz, int* filemodeOut, double* selstartOut, double* selendOut, double* pitchshiftOut, double* voladjOut, double* rateadjOut, double* sourcebpmOut, char* extrainfoOut, int extrainfoOut_sz);
+MediaExplorerGetLastPlayedFileInfoFn gMediaExplorerGetLastPlayedFileInfo = nullptr;
 
 /*** Code to execute after existing actions.
  * This is used to report messages regarding the effect of the command, etc.
@@ -2767,6 +2770,17 @@ void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	outputMessage(text);
 }
 
+void postMExplorerChangePitch(int cmd, HWND hwnd) {
+	double pitchshift = 0.0;
+	if (!gMediaExplorerGetLastPlayedFileInfo
+			|| !gMediaExplorerGetLastPlayedFileInfo(
+			nullptr, 0, nullptr, nullptr, nullptr, &pitchshift, nullptr, nullptr,
+			nullptr, nullptr, 0)) {
+		return;
+	}
+	outputMessage(format(translate("{} semitones"), formatDouble(pitchshift, 6, true)));
+}
+
 typedef void (*PostCommandExecute)(int);
 typedef struct PostCommand {
 	int cmd;
@@ -3116,6 +3130,9 @@ using MExplorerPostExecute = void (*)(int, HWND);
 map<int, MExplorerPostExecute> mExplorerPostCommands{
 	{42178, postMExplorerChangeVolume }, // Preview: decrease volume by 1 dB
 	{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
+	{42162, postMExplorerChangePitch}, // Preview: adjust pitch by -1 semitones
+	{42163, postMExplorerChangePitch}, // Preview: adjust pitch by +1 semitones
+	{42239, postMExplorerChangePitch}, // Preview: reset pitch
 };
 
 map<int, PostCommandExecute> postCommandsMap;
@@ -6267,6 +6284,9 @@ void delayedInit() {
 	plugin_register("csurf_inst", (void*)surface);
 	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
 		"NF_GetSWSTrackNotes");
+	gMediaExplorerGetLastPlayedFileInfo =
+		(decltype(gMediaExplorerGetLastPlayedFileInfo))plugin_getapi(
+			"MediaExplorerGetLastPlayedFileInfo");
 
 	for (Command& command: COMMANDS) {
 		if (command.id) {
