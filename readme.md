@@ -624,13 +624,13 @@ To use Peak Watcher:
   These levels are measured pre-fader due to the reliance on the JS effect.
  - Gain reduction is only supported for track effects which expose this information.
 5. If you are watching a track, you can check the Follow when last touch track changes option to watch whatever track you move to in your project.
-6. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level.
-7. The Hold level grouping allows you to specify whether the highest level (or lowest level for some level types) remains as the reported level and for how long.
- Holding the highest/lowest level gives you time to examine the level, even if the audio level changed immediately after the highest/lowest level occurred.
+6. If you want to be notified when the level of channels exceeds a certain level, configure the channel check boxes as desired, then enter the desired level in the "When level reaches" edit field.
+7. The radio buttons pertaining to holding level allow you to specify whether the highest level (or lowest level for some measurement types) remains as the reported level and for how long.
+ Holding the highest/lowest level gives you time to examine the information, even if the audio level changed immediately after the highest/lowest level occurred.
  There are three options:
- - disabled: Don't hold the level at all.
- - until reset: Hold the level until the Peak Watcher is reset.
- - for (ms): Allows you to specify a time in milliseconds for which the level will be held.
+ - Do not hold: the level will not be held at all, Peak Watcher will respond to changes in audio level immediately.
+ - Hold until reset: Hold the highest/lowest detected level (depending on which level type has been chosen) until the watcher is reset by the user.
+ - Hold for time in ms: allows you to specify a time in milliseconds for which the level will be held.
 8. Press the Reset button to reset the reported peak levels if they are being held.
 9. When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 10. Alternatively, you can press the Disable button to disable this watcher.
@@ -649,8 +649,10 @@ You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher: 
 While paused, Peak Watcher won't notify you of any level changes.
 Use the same action again to resume automatic reporting.
 
-Peak Watcher settings are saved with the project.
-To configure default settings to use for new projects, you can save them in a project template and configure this template to be used as the template for new projects in the Project section of REAPER Preferences.
+Peak Watcher settings are saved with each project.
+To specify default Peak Watcher settings for new projects, you can:
+ 1. Configure each watcher as desired, then save a project template in REAPER's File menu.
+2. Go to the Projects category of REAPER Preferences, set the template you saved to be used as the default for new projects.
 
 ### Shortcut Help
 It is possible to have REAPER list all shortcuts and to search for individual shortcuts in the Action List.
