@@ -849,7 +849,25 @@ class FxParams: public ParamSource {
 			// Named config params aren't FX params; keep them visible.
 			return true;
 		}
-		static const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound|Local Control|X \\(Reserved\\)|Internal|Registered Parameter Number|Non - Registered Parameter Number|Reset All Controllers|\\(MSB \\)|\\(LSB\\) ).*?) \\(\\d+\\)"};
+		static const regex RE_UNNAMED_PARAM{
+			"(?:"
+			// Empty string or "-"
+			"|-"
+			// Example: "1234 -"
+			R"(|\d{1,4} -)"
+			// Example: "P123" or "#123"
+			R"(|[P#]\d{3})"
+			// Any one of several strings...
+			"|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
+			"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
+			R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
+			R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
+			// followed by any number of other characters; e.g. "MIDI CC 2|15"
+			" ).*?"
+			// OSARA appends a number in parentheses to all parameter names. See the
+			// getParamName function above.
+			R"() \(\d+\))"
+		};
 		smatch m;
 		regex_match(name, m, RE_UNNAMED_PARAM);
 		if (!m.empty()) {
