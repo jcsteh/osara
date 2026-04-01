@@ -976,6 +976,13 @@ string getTrackNameOrNumber(MediaTrack* track, bool reportTrackNumber) {
 	return s.str();
 }
 
+const char* getTrackFolderType(MediaTrack* track) {
+	if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
+		return nullptr;
+	}
+	return GetParentTrack(track) ? translate("nested folder") : translate("folder");
+}
+
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
@@ -5683,65 +5690,150 @@ void cmdMoveTracks(Command* command) {
 		return;
 	}
 	MediaTrack* track = GetLastTouchedTrack();
-	MediaTrack* oldParent = GetParentTrack(track);
-	int oldDepth = 0;
-	if (oldParent) {
-		MediaTrack* nextParent = GetParentTrack(oldParent);
-		oldDepth++;
-		while (nextParent) {
-			oldDepth++;
-			nextParent = GetParentTrack(nextParent);
-		}
-	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	const bool up = command->gaccel.accel.cmd == 43647;
 	MediaTrack* newParent = GetParentTrack(track);
-	int newDepth = 0;
-	if (newParent) {
-		MediaTrack* nextParent = GetParentTrack(newParent);
-		newDepth++;
-		while (nextParent) {
-			newDepth++;
-			nextParent = GetParentTrack(nextParent);
-		}
-	}
+	const char* newParentFolderType = newParent ? getTrackFolderType(newParent) : nullptr;
 	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const bool atTopOfTrackList = trackIndex == 0;
+	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
+	MediaTrack* adjacentTrack = nullptr;
+	MediaTrack* contextTrack = nullptr;
+	bool primaryMessageIncludesParent = false;
 	ostringstream s;
-	if (oldParent != newParent
-			&&newParent
-			&& newDepth > oldDepth) {
-		// Translators: Reported when a track you are moving enters a folder.
-		// {} will be replaced with the name of the folder.
-		// E.G, "entered drums folder"
-		s << format(translate("entered {} folder"),
-			getTrackNameOrNumber(newParent, true)) << ", ";
-	} else if (oldParent != newParent && newDepth < oldDepth) {
-		// Translators: Reported when a track you are moving leaves a folder.
-		// {} will be replaced with the name of the folder.
-		// E.G, "left drums folder"
-		s << format(translate("left {} folder"),
-			getTrackNameOrNumber(oldParent, true)) << ", ";
-	}
 	if (up) {
-		// Translators: Reported when moving a track upward.
-		// {} will be replaced with the name or number of the track below.
-		// E.G, "above vocal" or "above 3"
-		s << format(translate("above {}"),
-			getTrackNameOrNumber(GetTrack(nullptr, trackIndex + 1), true));
-	} else {
-		// Translators: Reported when moving a track downward.
-		// {} will be replaced with the name or number of the track above.
-		// E.G, "below vocal" or "below 3"
-		s << format(translate("below {}"),
-			getTrackNameOrNumber(GetTrack(nullptr, trackIndex - 1), true));
-	}
-	if (newParent) {
-		if (up || newDepth <= oldDepth) {
-			// Translators: Appended after the new position when moving a track inside of a folder.
-			// E.G, "inside guitars folder" or "inside 3 folder"
-			s << " " << format(translate("inside {} folder"),
-			getTrackNameOrNumber(newParent, true));
+		if (atTopOfTrackList) {
+			adjacentTrack = GetTrack(nullptr, trackIndex + 1);
+			const char* adjacentFolderType = getTrackFolderType(adjacentTrack);
+			// Translators: Reported when moving a track to the top of the track list.
+			// {} will be replaced with the name or number of the track below.
+			// E.G, "top of track list, above vocal" or "top of track list, above 2"
+			// Translators: Reported when moving a track to the top of the track list,
+			// above a folder track.
+			// The first {} will be replaced with the name or number of the folder track below.
+			// The second {} will be replaced with "folder" or "nested folder".
+			// E.G, "top of track list, above vocal folder" or "top of track list, above 2 nested folder"
+			s << format(translate(adjacentFolderType
+				? "top of track list, above {} {}"
+				: "top of track list, above {}"),
+				getTrackNameOrNumber(adjacentTrack, true),
+				adjacentFolderType);
+		} else {
+			adjacentTrack = GetTrack(nullptr, trackIndex + 1);
+			const char* adjacentFolderType = getTrackFolderType(adjacentTrack);
+			if (adjacentTrack == newParent) {
+				primaryMessageIncludesParent = true;
+				contextTrack = GetTrack(nullptr, trackIndex - 1);
+				// Translators: Reported when moving a track upward into a folder.
+				// The first {} will be replaced with the name or number of the folder.
+				// The second {} will be replaced with "folder" or "nested folder".
+				// The third {} will be replaced with the name or number of the track above.
+				// E.G, "inside drums folder, below snare" or "inside 3 nested folder, below 5"
+				s << format(translate("inside {} {}, below {}"),
+					getTrackNameOrNumber(newParent, true),
+					newParentFolderType,
+					getTrackNameOrNumber(contextTrack, true));
+			} else if (newParent && adjacentFolderType) {
+				primaryMessageIncludesParent = true;
+				contextTrack = GetTrack(nullptr, trackIndex - 1);
+				// Translators: Reported when moving a track upward inside a folder.
+				// The first {} will be replaced with the name or number of the current parent folder.
+				// The second {} will be replaced with "folder" or "nested folder" for the current parent.
+				// The third {} will be replaced with the name or number of the track above.
+				// E.G, "inside vocals folder, below lead vox" or "inside 3 nested folder, below 5"
+				s << format(translate("inside {} {}, below {}"),
+					getTrackNameOrNumber(newParent, true),
+					newParentFolderType,
+					getTrackNameOrNumber(contextTrack, true));
+			} else {
+				if (adjacentFolderType) {
+					// Translators: Reported when moving a track upward past a folder.
+					// The first {} will be replaced with the name or number of the folder track below.
+					// The second {} will be replaced with "folder" or "nested folder".
+					// E.G, "above vocal folder" or "above 3 nested folder"
+					s << format(translate("above {} {}"),
+						getTrackNameOrNumber(adjacentTrack, true),
+						adjacentFolderType);
+				} else {
+					// Translators: Reported when moving a track upward.
+					// {} will be replaced with the name or number of the track below.
+					// E.G, "above vocal" or "above 3"
+					s << format(translate("above {}"),
+						getTrackNameOrNumber(adjacentTrack, true));
+				}
+			}
 		}
+	} else {
+		if (atBottomOfTrackList) {
+			adjacentTrack = GetTrack(nullptr, trackIndex - 1);
+			const char* adjacentFolderType = getTrackFolderType(adjacentTrack);
+			// Translators: Reported when moving a track to the bottom of the track list.
+			// {} will be replaced with the name or number of the track above.
+			// E.G, "bottom of track list, below vocal" or "bottom of track list, below 3"
+			// Translators: Reported when moving a track to the bottom of the track list,
+			// below a folder track.
+			// The first {} will be replaced with the name or number of the folder track above.
+			// The second {} will be replaced with "folder" or "nested folder".
+			// E.G, "bottom of track list, below vocal folder" or "bottom of track list, below 3 nested folder"
+			s << format(translate(adjacentFolderType
+				? "bottom of track list, below {} {}"
+				: "bottom of track list, below {}"),
+				getTrackNameOrNumber(adjacentTrack, true),
+				adjacentFolderType);
+		} else {
+			adjacentTrack = GetTrack(nullptr, trackIndex - 1);
+			const char* adjacentFolderType = getTrackFolderType(adjacentTrack);
+			if (adjacentTrack == newParent) {
+				primaryMessageIncludesParent = true;
+				contextTrack = GetTrack(nullptr, trackIndex + 1);
+				// Translators: Reported when moving a track downward into a folder.
+				// The first {} will be replaced with the name or number of the folder.
+				// The second {} will be replaced with "folder" or "nested folder".
+				// The third {} will be replaced with the name or number of the track below.
+				// E.G, "inside drums folder, above snare" or "inside 3 nested folder, above 5"
+				s << format(translate("inside {} {}, above {}"),
+					getTrackNameOrNumber(newParent, true),
+					newParentFolderType,
+					getTrackNameOrNumber(contextTrack, true));
+			} else if (newParent && adjacentFolderType) {
+				primaryMessageIncludesParent = true;
+				contextTrack = GetTrack(nullptr, trackIndex + 1);
+				// Translators: Reported when moving a track downward inside a folder.
+				// The first {} will be replaced with the name or number of the current parent folder.
+				// The second {} will be replaced with "folder" or "nested folder" for the current parent.
+				// The third {} will be replaced with the name or number of the track below.
+				// E.G, "inside vocals folder, above lead vox" or "inside 3 nested folder, above 5"
+				s << format(translate("inside {} {}, above {}"),
+					getTrackNameOrNumber(newParent, true),
+					newParentFolderType,
+					getTrackNameOrNumber(contextTrack, true));
+			} else {
+				if (adjacentFolderType) {
+					// Translators: Reported when moving a track downward past a folder.
+					// The first {} will be replaced with the name or number of the folder track above.
+					// The second {} will be replaced with "folder" or "nested folder".
+					// E.G, "below vocal folder" or "below 3 nested folder"
+					s << format(translate("below {} {}"),
+						getTrackNameOrNumber(adjacentTrack, true),
+						adjacentFolderType);
+				} else {
+					// Translators: Reported when moving a track downward.
+					// {} will be replaced with the name or number of the track above.
+					// E.G, "below vocal" or "below 3"
+					s << format(translate("below {}"),
+						getTrackNameOrNumber(adjacentTrack, true));
+				}
+			}
+		}
+	}
+	if (newParent && !primaryMessageIncludesParent && newParent != adjacentTrack) {
+		// Translators: Appended after the new position when moving a track inside a folder.
+		// The first {} will be replaced with the name or number of the folder.
+		// The second {} will be replaced with "folder" or "nested folder".
+		// E.G, ", inside guitars folder" or ", inside 3 nested folder"
+		s << format(translate(", inside {} {}"),
+			getTrackNameOrNumber(newParent, true),
+			newParentFolderType);
 	}
 	outputMessage(s);
 }
