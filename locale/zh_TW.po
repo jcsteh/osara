@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-03-01 18:54\n"
+"PO-Revision-Date: 2026-04-01 19:34\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -2845,7 +2845,7 @@ msgstr "循環部分"
 
 #. Reported when switching to one-shot scrub style.
 msgid "one shot"
-msgstr "一次性"
+msgstr "單次"
 
 #. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
 msgid "tape scrub"
