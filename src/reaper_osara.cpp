@@ -5735,7 +5735,9 @@ void cmdMoveTracks(Command* command) {
 	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
 	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
+	// Adjacent track is where we're coming from.
 	MediaTrack* adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	// Context is one track further in the direction we're moving, used when entering folders.
 	MediaTrack* contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
 	bool primaryMessageIncludesParent = false;
 	ostringstream s;
