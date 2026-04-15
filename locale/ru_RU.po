@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2026-03-01 18:54\n"
+"PO-Revision-Date: 2026-04-15 19:47\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -71,7 +71,7 @@ msgstr "9. Заставляет сочетание клавиш Control+Space з
 
 msgctxt "optimal REAPER configuration"
 msgid "10. Display the file name and then the full path in the Recent Projects menu."
-msgstr ""
+msgstr "10. Показывает имя файла, а затем полный путь к нему в меню \"Недавно открытые проекты\"."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -1175,7 +1175,7 @@ msgstr "Удалить аппаратный выход"
 #. Parameters dialog.
 msgctxt "MIDI channel"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 #. Indicates all MIDI channels for a send in the Track
 #. Parameters dialog.
@@ -1196,7 +1196,7 @@ msgstr "Добавить &4 новых канала"
 
 msgctxt "audio channel"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 msgid "post-fader"
 msgstr "пост-фейдер"
@@ -1483,7 +1483,7 @@ msgstr "закрыто"
 #. An automation mode.
 msgctxt "automation mode"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 #. An automation mode.
 msgid "trim/read"
@@ -2418,7 +2418,7 @@ msgstr "максимальный вертикальный зум"
 #. Used when reporting the vertical zoom level as a number.
 #. {} will be replaced with the number; e.g. "35 vertical zoom".
 msgid "{} vertical zoom"
-msgstr ""
+msgstr "вертикальное смещение {}"
 
 #. Reported when using "Main action section: Momentarily set
 #. override to alt-1", etc. {} is replaced with the shortened section name;
@@ -2913,7 +2913,7 @@ msgstr "{start} через {end}"
 #. to indicate that no tracks are muted, soloed, etc.
 msgctxt "tracks state"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 msgid "Muted"
 msgstr "Приглушено"
@@ -2953,7 +2953,7 @@ msgstr "длина {}"
 
 msgctxt "time selection"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 msgid "Selected tracks:"
 msgstr "Выделенные треки:"
@@ -2963,7 +2963,7 @@ msgstr "Выделенные элементы:"
 
 msgctxt "item selection"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 #. Placed before the information about the selection that has
 #. been made in the MIDI Editor when pressing OSARA's report selection
@@ -2973,7 +2973,7 @@ msgstr "Выделение в MIDI редакторе:"
 
 msgctxt "MIDI Editor selection"
 msgid "none"
-msgstr ""
+msgstr "отсутствует"
 
 msgid "no MIDI selection"
 msgstr "нет выделения MIDI"
@@ -3181,10 +3181,10 @@ msgid "unmonitored all tracks"
 msgstr "мониторинг всех треков отменён"
 
 msgid "showed video window"
-msgstr ""
+msgstr "окно с видео показано"
 
 msgid "hid video window"
-msgstr ""
+msgstr "окно с видео скрыто"
 
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
@@ -3536,7 +3536,7 @@ msgstr "&Фильтр:"
 
 msgctxt "Parameters"
 msgid "Include &unnamed and potentially unusable parameters"
-msgstr ""
+msgstr "Включать &безымянные и потенциально непригодные для использования параметры"
 
 msgctxt "Parameters"
 msgid "&Close"
@@ -3700,7 +3700,7 @@ msgstr "Сообщать изменения, внесённые с помощь�
 
 msgctxt "OSARA Configuration"
 msgid "Move cursor relative to adjusting &edges of items and time selection"
-msgstr ""
+msgstr "Перемещать курсор относительно настройки &краёв элементов и выделения времени"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
