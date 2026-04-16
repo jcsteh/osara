@@ -1022,6 +1022,40 @@ string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* trac
 		getTrackNameOrNumber(track, true));
 }
 
+void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
+	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* nextTrack = GetTrack(nullptr, trackIndex + 1);
+	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
+		return;
+	}
+	int* compacting = (int*)GetSetMediaTrackInfo(nextTrack, "I_FOLDERCOMPACT", nullptr);
+	if (!compacting || *compacting != 2) {
+		return;
+	}
+	int open = 0;
+	GetSetMediaTrackInfo(nextTrack, "I_FOLDERCOMPACT", &open);
+}
+
+void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
+	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* prevTrack = GetTrack(nullptr, trackIndex - 1);
+	if (!prevTrack) {
+		return;
+	}
+	for (MediaTrack* parent = GetParentTrack(prevTrack); parent;
+		parent = GetParentTrack(parent)) {
+		if (GetMediaTrackInfo_Value(parent, "I_FOLDERDEPTH") != 1) {
+			continue;
+		}
+		int* compacting = (int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", nullptr);
+		if (!compacting || *compacting != 2) {
+			continue;
+		}
+		int open = 0;
+		GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", &open);
+	}
+}
+
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
 	selectedEnvelopeIsTake = false;
@@ -5729,8 +5763,13 @@ void cmdMoveTracks(Command* command) {
 		return;
 	}
 	MediaTrack* track = GetLastTouchedTrack();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	const bool up = command->gaccel.accel.cmd == 43647;
+	if (up) {
+		maybeOpenClosedFolderBeforeTrackMoveUp(track);
+	} else {
+		maybeOpenClosedFolderBeforeTrackMoveDown(track);
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	MediaTrack* newParent = GetParentTrack(track);
 	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
