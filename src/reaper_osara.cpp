@@ -1002,10 +1002,6 @@ void postGoToTrack(int command, MediaTrack* track) {
 		separate();
 		s << translate("armed");
 	}
-	if (isTrackFrozen(track)) {
-		separate();
-		s << translate("frozen");
-	}
 	if (isTrackMuted(track)) {
 		separate();
 		s << translate("muted");
@@ -1042,6 +1038,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (isTrackFrozen(track)) {
+			separate();
+			s << translate("frozen");
 		}
 		if (folderDepth <0){ //end of folder
 			separate();
