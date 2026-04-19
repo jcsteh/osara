@@ -1004,36 +1004,53 @@ string formatInsideFolder(MediaTrack* track) {
 }
 
 string formatTrackMoveRelative(bool up, MediaTrack* track) {
-	// Translators: Reported when moving a track upward or downward.
-	// {} will be replaced with a track reference; e.g. "vocal",
-	// "3", "drums folder" or "3 nested folder".
-	return format(translate(up ? "above {}" : "below {}"),
-		formatTrackReference(track));
+	if (up) {
+		// Translators: Reported when moving a track upward.
+		// {} will be replaced with a track reference; e.g. "vocal",
+		// "3", "drums folder" or "3 nested folder".
+		return format(translate("above {}"), formatTrackReference(track));
+	} else {
+		// Translators: Reported when moving a track downward.
+		// {} will be replaced with a track reference; e.g. "vocal",
+		// "3", "drums folder" or "3 nested folder".
+		return format(translate("below {}"), formatTrackReference(track));
+	}
 }
 
 string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* track) {
-	// Translators: Reported when moving a track inside a folder.
-	// The first {} will be replaced with a folder reference; e.g.
-	// "drums folder" or "3 nested folder".
-	// The second {} will be replaced with the name or number of the nearby track.
-	// E.G, "inside drums folder, below snare" or "inside 3 nested folder, above 5"
-	return format(translate(up ? "{}, below {}" : "{}, above {}"),
-		formatInsideFolder(folder),
-		getTrackNameOrNumber(track, true));
+	if (up) {
+		// Translators: Reported when moving a track upward inside a folder.
+		// The first {} will be replaced with a folder reference; e.g.
+		// "drums folder" or "3 nested folder".
+		// The second {} will be replaced with the name or number of the nearby track.
+		// E.G, "inside drums folder, below snare" or "inside 3 nested folder, below 5"
+		return format(translate("{}, below {}"),
+			formatInsideFolder(folder),
+			getTrackNameOrNumber(track, true));
+	} else {
+		// Translators: Reported when moving a track downward inside a folder.
+		// The first {} will be replaced with a folder reference; e.g.
+		// "drums folder" or "3 nested folder".
+		// The second {} will be replaced with the name or number of the nearby track.
+		// E.G, "inside drums folder, above snare" or "inside 3 nested folder, above 5"
+		return format(translate("{}, above {}"),
+			formatInsideFolder(folder),
+			getTrackNameOrNumber(track, true));
+	}
 }
 
-void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
-	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
-	MediaTrack* nextTrack = GetTrack(nullptr, trackIndex + 1);
-	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
-		return;
+void openClosedFolderAndParents(MediaTrack* folder) {
+	for (MediaTrack* track = folder; track; track = GetParentTrack(track)) {
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
+			continue;
+		}
+		int* compacting = (int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", nullptr);
+		if (!compacting || *compacting != 2) {
+			continue;
+		}
+		int open = 0;
+		GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", &open);
 	}
-	int* compacting = (int*)GetSetMediaTrackInfo(nextTrack, "I_FOLDERCOMPACT", nullptr);
-	if (!compacting || *compacting != 2) {
-		return;
-	}
-	int open = 0;
-	GetSetMediaTrackInfo(nextTrack, "I_FOLDERCOMPACT", &open);
 }
 
 void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
@@ -1042,18 +1059,16 @@ void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
 	if (!prevTrack) {
 		return;
 	}
-	for (MediaTrack* parent = GetParentTrack(prevTrack); parent;
-		parent = GetParentTrack(parent)) {
-		if (GetMediaTrackInfo_Value(parent, "I_FOLDERDEPTH") != 1) {
-			continue;
-		}
-		int* compacting = (int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", nullptr);
-		if (!compacting || *compacting != 2) {
-			continue;
-		}
-		int open = 0;
-		GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", &open);
+	openClosedFolderAndParents(GetParentTrack(prevTrack));
+}
+
+void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
+	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* nextTrack = GetTrack(nullptr, trackIndex + 1);
+	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
+		return;
 	}
+	openClosedFolderAndParents(nextTrack);
 }
 
 void postGoToTrack(int command, MediaTrack* track) {
