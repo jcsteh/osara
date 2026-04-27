@@ -5705,7 +5705,7 @@ static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bo
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
 	info.fType = MFT_STRING;
-	info.dwTypeData = (char*)translate(label);
+	info.dwTypeData = (char*)label;
 	info.cch = strlen(info.dwTypeData);
 	info.wID = id;
 	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
@@ -5718,7 +5718,7 @@ static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enab
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
 	info.fType = MFT_STRING;
-	info.dwTypeData = (char*)translate(label);
+	info.dwTypeData = (char*)label;
 	info.cch = strlen(info.dwTypeData);
 	info.hSubMenu = CreatePopupMenu();
 	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
@@ -5739,38 +5739,38 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	// Master submenu
 	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU masterSub = addSubMenu(menu, 0, "Master", !nothingToDryRun);
+	HMENU masterSub = addSubMenu(menu, 0, translate("Master"), !nothingToDryRun);
 	if (!nothingToDryRun) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		addMenuItem(masterSub, 0, translate("Master mix"), 1, itemCount != 0);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
+		addMenuItem(masterSub, 1, translate("Time &selection"), 2, startTS != endTS);
 	}
 	// Tracks submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0
+	HMENU tracksSub = addSubMenu(menu, 1, translate("Tracks"), selTracks > 0
 		&& (selTracksHaveItems || selTracksIncludeFolder));
 	if (selTracks > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(tracksSub, 0, translate("Selected &tracks"), 3, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
+		addMenuItem(tracksSub, 1, translate("Time &selection"), 4, startTS != endTS);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(tracksSub, 2, translate("&Mono summed selected tracks"), 5, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
+		addMenuItem(tracksSub, 3, translate("Mono summed time selection"), 6, startTS != endTS);
 	}
 	// Items submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU itemsSub = addSubMenu(menu, 2, "Items", selItems > 0);
+	HMENU itemsSub = addSubMenu(menu, 2, translate("Items"), selItems > 0);
 	if (selItems > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(itemsSub, 0, "Selected &items", 7);
+		addMenuItem(itemsSub, 0, translate("Selected &items"), 7);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
+		addMenuItem(itemsSub, 1, translate("Include track/take &FX and settings"), 8);
 	}
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	addMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	addMenuItem(menu, 3, translate("Dry run project using the most recent render settings"), 9);
 	// Displaying and handling result
 	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	switch (id) {
