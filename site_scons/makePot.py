@@ -1,6 +1,6 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Utility to build translation (pot) template
-# Copyright 2021-2023 James Teh
+# Copyright 2021-2026 James Teh
 # License: GNU General Public License version 2.0
 
 import re
@@ -22,12 +22,13 @@ msgstr ""
 
 """
 	)
+	global filePath
 	for s in source:
-		s = s.path
-		inp = open(s, "rt", encoding="UTF-8")
-		if s.endswith(".cpp"):
+		filePath = s.path
+		inp = open(filePath, "rt", encoding="UTF-8")
+		if filePath.endswith(".cpp"):
 			addCpp(inp)
-		elif s.endswith(".rc"):
+		elif filePath.endswith(".rc"):
 			addRc(inp)
 	for (context, msgid), data in messages.items():
 		for comment in data.get("comments", ()):
@@ -43,6 +44,11 @@ msgstr ""
 			out.write('msgstr ""\n')
 		out.write("\n")
 
+filePath = None
+lineNum = None
+def error(msg):
+	raise RuntimeError(f"{msg}, {filePath} line {lineNum}")
+
 RE_TRANSLATORS_COMMENT = re.compile(r"^\s*// Translators: (.*)$")
 RE_COMMENT = re.compile(r"^\s*// (.*)$")
 inTranslatorsComment = False
@@ -51,6 +57,8 @@ def handleTranslatorsComment(line):
 	global inTranslatorsComment, lastTranslatorsComment
 	m = RE_TRANSLATORS_COMMENT.match(line)
 	if m:
+		if lastTranslatorsComment:
+			error("Didn't find translatable message after last translators comment")
 		inTranslatorsComment = True
 		lastTranslatorsComment.append(m.group(1))
 		return True
@@ -66,7 +74,7 @@ def handleTranslatorsComment(line):
 def addMessage(data):
 	global messages, lastTranslatorsComment
 	if not data["msgid"]:
-		raise RuntimeError("Empty msgid")
+		error("Empty msgid")
 	key = (data.get("context"), data["msgid"])
 	data = messages.setdefault(key, data)
 	if lastTranslatorsComment:
@@ -78,7 +86,10 @@ RE_CPP_TRANSLATE = re.compile(r'\b(?:translate|_t)\(\s*(?:"(?P<msgid>.*?)"|[^)]*
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|[^)]*),?\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\(\s*(?:"(?P<msgid>.*?)"|[^)]*),?\s*(?:"(?P<plural>.*?)"|[^)]*),?\s*[^)]*\s*(?P<end>\))?')
 def addCpp(input):
+	global lineNum
+	lineNum = 0
 	for line in input:
+		lineNum += 1
 		if handleTranslatorsComment(line):
 			continue
 		while True:
@@ -94,6 +105,7 @@ def addCpp(input):
 			# There is an incomplete translate call. It must continue onto the next
 			# line. Add the next line and try again.
 			line += next(input)
+			lineNum += 1
 		for m in matches:
 			if not m.group("msgid"):
 				# This can happen if this is a runtime translation where the msgid is a
@@ -104,7 +116,10 @@ def addCpp(input):
 RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
 def addRc(input):
 	context = None
+	global lineNum
+	lineNum = 0
 	for line in input:
+		lineNum += 1
 		if handleTranslatorsComment(line):
 			continue
 		m = RE_RC_TRANSLATE.match(line)
@@ -113,7 +128,7 @@ def addRc(input):
 			if data["command"] == "CAPTION":
 				context = data["msgid"]
 			if not context:
-				raise RuntimeError("No caption before messages")
+				error("No caption before messages")
 			if not data["msgid"]:
 				continue
 			data["context"] = context
