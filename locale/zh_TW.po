@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-04-01 19:34\n"
+"PO-Revision-Date: 2026-05-01 19:45\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -1501,9 +1501,6 @@ msgstr "128分網格"
 msgid "grid  unknown"
 msgstr "網格未知"
 
-msgid "frozen"
-msgstr "凍結"
-
 msgid "defeating solo"
 msgstr "獨奏失效"
 
@@ -1512,6 +1509,9 @@ msgstr "翻轉相位"
 
 msgid "FX bypassed"
 msgstr "FX 旁通"
+
+msgid "frozen"
+msgstr "凍結"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1706,6 +1706,7 @@ msgstr "循環結束"
 msgid "Track"
 msgstr "軌道"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master"
 msgstr "主控"
 
@@ -2444,7 +2445,7 @@ msgid "{} takes"
 msgstr "{} 片段"
 
 msgid "{}"
-msgstr " {}"
+msgstr "{} "
 
 msgid "+{}"
 msgstr "加{}"
@@ -2893,17 +2894,46 @@ msgid "end offset {} MS"
 msgstr "結束偏移{} MS"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Master mix"
+msgstr "主控混音"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Time &selection"
+msgstr "時間選區(&s)"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Tracks"
+msgstr "軌道"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &tracks"
+msgstr "選取的軌道(&t)"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "&Mono summed selected tracks"
+msgstr "單聲道合併選取的軌道(&m)"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Mono summed time selection"
+msgstr "單聲道合併時間選區"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Items"
+msgstr "對象"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &items"
+msgstr "選取的對象(&i)"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Include track/take &FX and settings"
+msgstr "包括軌道/片段 FX 和設定(&f)"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
-#. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Dry run project using the most recent render settings"
+msgstr "使用最新的渲染設定試運行工程"
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一個對象（離開的對象保留被選取）"
 

@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2026-03-01 18:54\n"
+"PO-Revision-Date: 2026-05-01 19:45\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1556,9 +1556,6 @@ msgstr "rejilla en 128"
 msgid "grid  unknown"
 msgstr "rejilla a desconocido"
 
-msgid "frozen"
-msgstr "congelado"
-
 msgid "defeating solo"
 msgstr "rechazar solo"
 
@@ -1567,6 +1564,9 @@ msgstr "fase invertida"
 
 msgid "FX bypassed"
 msgstr "FX ignorado"
+
+msgid "frozen"
+msgstr "congelado"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1773,6 +1773,7 @@ msgstr "loop finalizado"
 msgid "Track"
 msgstr "Pista"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master"
 msgstr "Master"
 
@@ -2997,17 +2998,46 @@ msgid "end offset {} MS"
 msgstr "desplazamiento final {} MS"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Master mix"
+msgstr "Mezcla master"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Time &selection"
+msgstr "Selección de tiempo"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Tracks"
+msgstr "Pistas"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &tracks"
+msgstr "Pistas seleccionadas"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "&Mono summed selected tracks"
+msgstr "&agregadas pistas mono seleccionadas"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Mono summed time selection"
+msgstr "agregada selección de tiempo mono"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Items"
+msgstr "Ítems"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &items"
+msgstr "Ítems &seleccionados"
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Include track/take &FX and settings"
+msgstr "pista/toma &FX y ajustes incluídos "
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
-#. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Dry run project using the most recent render settings"
+msgstr "Simular el renderizado del proyecto usando los ajustes más recientes\""
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: mover al siguiente ítem, dejando los otros seleccionados"
 
