@@ -33,10 +33,13 @@ BoolSetting(reportTimeSelectionWhilePlaying, MAIN_SECTION,
 	"Report time se&lection start and end while playing",
 	false)
 BoolSetting(reportTransport, MAIN_SECTION,
-	"Report &transport state (play, record, etc.)",
+	"Report &transport play, pause and stop",
+	true)
+BoolSetting(reportRecord, MAIN_SECTION,
+	"Report &recording state",
 	true)
 BoolSetting(reportTrackNumbers, MAIN_SECTION,
-	"&Report track numbers",
+	"Report tr&ack numbers",
 	true)
 BoolSetting(reportFx, MAIN_SECTION,
 	"Report &FX when moving to tracks/takes",

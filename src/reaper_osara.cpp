@@ -1940,29 +1940,31 @@ void postToggleMasterTrackVisible(int command) {
 		translate("master track hidden"));
 }
 
-void reportTransportState(int state) {
+void reportTransportState(int before, int after) {
 	bool repeat = GetToggleCommandState(1068); // Transport: Toggle repeat
 	ostringstream s;
-	if (!settings::reportTransport)
-		return;
-	if (state & 2) {
+	// REAPER play state bits: 1 = playing, 2 = paused, 4 = recording.
+	if (after & 2 && (settings::reportTransport 
+			|| (settings::reportRecord && before & 4))) {
 		s << translate("pause");
-	} else if (state & 4 && repeat == true) {
+	// Recording also sets the playing bit, so handle record before play.
+	} else if (after & 4 && repeat && settings::reportRecord) {
 		s << translate("record") << ", " << translate("repeat on");
-	} else if (state & 4) {
+	} else if (after & 4 && settings::reportRecord) {
 		s << translate("record");
-	} else if (state & 1 && repeat == true) {
+	// Only report play here if recording is not active.
+	} else if (after & 1 && (after & 4) == 0 && repeat && (settings::reportTransport 
+			|| (settings::reportRecord && before & 4))) {
 		s << translate("play") << ", " << translate("repeat on");
-	} else if (state & 1) {
+	} else if (after & 1 && (after & 4) == 0 && (settings::reportTransport 
+			|| (settings::reportRecord && before & 4))) {
 		s << translate("play");
-	} else {
+	// If none of the transport bits are set, REAPER is stopped.
+	} else if ((after & (1 | 2 | 4)) == 0 &&
+			(settings::reportTransport || (settings::reportRecord && before & 4))) {
 		s << translate("stop");
 	}
 	outputMessage(s);
-}
-
-void postChangeTransportState(int command) {
-	reportTransportState(GetPlayState());
 }
 
 void postSelectMultipleItems(int command) {
@@ -2876,13 +2878,6 @@ PostCommand POST_COMMANDS[] = {
 	{40293, postTrackIo}, // Track: View I/O for current track
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
-	{1007, postChangeTransportState}, // Transport: Play
-	{40044, postChangeTransportState}, // Transport: Play/stop
-	{40073, postChangeTransportState}, // Transport: Play/pause
-	{40328, postChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
-	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
-	{1016, postChangeTransportState}, // Transport: Stop
-	{1013, postChangeTransportState}, // Transport: Record
 	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
@@ -3099,7 +3094,6 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
 {"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
-{"_XENAKIOS_TIMERTEST1", postChangeTransportState}, // Xenakios/SWS: Play selected items once
 {"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
 {"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
 {"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
@@ -5787,6 +5781,13 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	}
 }
 
+void cmdChangeTransportState(Command* command) {
+	int before = GetPlayState();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int after = GetPlayState();
+	reportTransportState(before, after);
+}
+
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
@@ -5913,6 +5914,14 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
+	{MAIN_SECTION, {{0, 0, 40044}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop
+	{MAIN_SECTION, {{0, 0, 40073}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/pause
+	{MAIN_SECTION, {{0, 0, 40328}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
+	{MAIN_SECTION, {{0, 0, 40317}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play (skip time selection)
+	{MAIN_SECTION, {{0, 0, 1016}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Stop
+	{MAIN_SECTION, {{0, 0, 1013}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Record
+	{MAIN_SECTION, {{0, 0, 1007}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play
+	{MAIN_SECTION, {DEFACCEL, nullptr}, "_XENAKIOS_TIMERTEST1", cmdChangeTransportState}, // Xenakios/SWS: Play selected items once                                                                                
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
