@@ -111,7 +111,7 @@ class Surface: public IReaperControlSurface {
 		}
 		// Calculate integer based transport state
 		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
-		reportTransportState(TransportState);
+		reportTransportState(0, TransportState);
 	}
 
 	void SetRepeatState(bool repeat) final {
