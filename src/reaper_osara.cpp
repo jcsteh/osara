@@ -1956,7 +1956,8 @@ void reportTransportState(int before, int after) {
 	} else if (after & 1 && (after & 4) == 0 && (settings::reportTransport 
 			|| (settings::reportRecord && before & 4))) {
 		s << translate("play");
-	} else if (settings::reportTransport || (settings::reportRecord && before & 4)) {
+	} else if ((after & (1 | 2 | 4)) == 0 &&
+			(settings::reportTransport || (settings::reportRecord && before & 4))) {
 		s << translate("stop");
 	}
 	outputMessage(s);
