@@ -5921,6 +5921,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 1016}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Stop
 	{MAIN_SECTION, {{0, 0, 1013}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Record
 	{MAIN_SECTION, {{0, 0, 1007}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play
+	{MAIN_SECTION, {DEFACCEL, nullptr}, "_XENAKIOS_TIMERTEST1", cmdChangeTransportState}, // Xenakios/SWS: Play selected items once                                                                                
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
