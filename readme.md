@@ -783,7 +783,9 @@ The dialog contains the following options:
  Using the same example, OSARA would report only "beat 2".
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
 - Report markers and regions during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
-- Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
+- Report time selection start and end while playing: When enabled, start and end of time selection will be reported during playback as the cursor passes them.
+- Report transport play, pause and stop: When enabled, OSARA will report those states as you control REAPER's transport.
+- Report recording state: When enabled, OSARA will report recording starting and stopping. This can be toggled separately from other transport reports if you want to cut down verbosity.
 - Report track numbers: When enabled, OSARA will report track numbers as well as track names.
  When disabled, track numbers will not be reported except for unnamed tracks.
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
