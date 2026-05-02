@@ -176,7 +176,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Shift+Delete
 - Item: Trim items to selected area: Control+Shift+T
-- Xenakios/SWS: Play selected items once: Control+Alt+Space
+- Transport: Play (stop at end of selected items, ignore loop selection): Control+Alt+Space
 - Item: Duplicate items: Control+D
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
@@ -906,6 +906,7 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Xenakios/SWS: Play selected items once
 - Item edit: Move left edge of item to edit cursor
 - Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
