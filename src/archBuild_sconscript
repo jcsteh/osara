@@ -151,4 +151,9 @@ addExternalSources(
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],
 	source=sources, LIBS=libs,
+	# On Windows, scons thinks that creating a .lib file always creates a .exp
+	# file, but it doesn't for OSARA. This results in rebuilding the dll every
+	# time scons is run, since scons can't find the .exp. Work around this by
+	# disabling import lib generation.
+	no_import_lib=1
 )
