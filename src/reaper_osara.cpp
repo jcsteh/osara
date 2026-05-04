@@ -1941,27 +1941,32 @@ void postToggleMasterTrackVisible(int command) {
 }
 
 void reportTransportState(int before, int after) {
+	bool shouldReport = settings::reportTransport;
+	if (before & 4 || after & 4) {
+		// We are recording now, or we were recording and just stopped.
+		// That means this change is related to recording.
+		shouldReport = settings::reportRecord;
+	}
+	if (!shouldReport) {
+		return;
+	}
 	bool repeat = GetToggleCommandState(1068); // Transport: Toggle repeat
 	ostringstream s;
 	// REAPER play state bits: 1 = playing, 2 = paused, 4 = recording.
-	if (after & 2 && (settings::reportTransport 
-			|| (settings::reportRecord && before & 4))) {
+	if (after & 2) {
 		s << translate("pause");
 	// Recording also sets the playing bit, so handle record before play.
-	} else if (after & 4 && repeat && settings::reportRecord) {
+	} else if (after & 4 && repeat) {
 		s << translate("record") << ", " << translate("repeat on");
-	} else if (after & 4 && settings::reportRecord) {
+	} else if (after & 4) {
 		s << translate("record");
 	// Only report play here if recording is not active.
-	} else if (after & 1 && (after & 4) == 0 && repeat && (settings::reportTransport 
-			|| (settings::reportRecord && before & 4))) {
+	} else if (after & 1 && (after & 4) == 0 && repeat) {
 		s << translate("play") << ", " << translate("repeat on");
-	} else if (after & 1 && (after & 4) == 0 && (settings::reportTransport 
-			|| (settings::reportRecord && before & 4))) {
+	} else if (after & 1 && (after & 4) == 0) {
 		s << translate("play");
 	// If none of the transport bits are set, REAPER is stopped.
-	} else if ((after & (1 | 2 | 4)) == 0 &&
-			(settings::reportTransport || (settings::reportRecord && before & 4))) {
+	} else if ((after & (1 | 2 | 4)) == 0) {
 		s << translate("stop");
 	}
 	outputMessage(s);
