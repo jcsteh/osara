@@ -106,7 +106,7 @@ class Surface: public IReaperControlSurface {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
-		int transportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
+		const int transportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
 		int previousTransportState = this->lastTransportState;
 		this->lastTransportState = transportState;
 		if (previousTransportState == transportState) {

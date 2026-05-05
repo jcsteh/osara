@@ -1961,9 +1961,9 @@ void reportTransportState(int before, int after) {
 	} else if (after & 4) {
 		s << translate("record");
 	// Only report play here if recording is not active.
-	} else if (after & 1 && (after & 4) == 0 && repeat) {
+	} else if (after & 1 && repeat) {
 		s << translate("play") << ", " << translate("repeat on");
-	} else if (after & 1 && (after & 4) == 0) {
+	} else if (after & 1) {
 		s << translate("play");
 	// If none of the transport bits are set, REAPER is stopped.
 	} else if ((after & (1 | 2 | 4)) == 0) {
