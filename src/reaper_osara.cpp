@@ -1965,8 +1965,7 @@ void reportTransportState(int before, int after) {
 		s << translate("play") << ", " << translate("repeat on");
 	} else if (after & 1) {
 		s << translate("play");
-	// If none of the transport bits are set, REAPER is stopped.
-	} else if ((after & (1 | 2 | 4)) == 0) {
+	} else {
 		s << translate("stop");
 	}
 	outputMessage(s);
