@@ -962,15 +962,14 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
 
 bool shouldMoveToAutoItem = false;
 
-string getTrackNameOrNumber(MediaTrack* track, bool reportTrackNumber) {
-	char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+string getTrackNameOrNumber(MediaTrack* track) {
+	char* const trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 	ostringstream s;
 	if (trackName && trackName[0]) {
 		s << trackName;
-	} else if (reportTrackNumber) {
-		// There's no name and track number reporting is disabled. We report the
-		// number in lieu of the name.
-		int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+	} else {
+		// There's no name, so report the track number in lieu of the name.
+		const int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
 		s << trackNum;
 	}
 	return s.str();
@@ -984,14 +983,14 @@ const char* getTrackFolderType(MediaTrack* track) {
 }
 
 string formatTrackReference(MediaTrack* track) {
-	const char* folderType = getTrackFolderType(track);
+	const char* const folderType = getTrackFolderType(track);
 	if (folderType) {
 		// Translators: Used when referring to a folder track in a movement message.
 		// The first {} will be replaced with the name or number of the folder track.
 		// The second {} will be replaced with "folder" or "nested folder".
-		return format(translate("{} {}"), getTrackNameOrNumber(track, true), folderType);
+		return format(translate("{} {}"), getTrackNameOrNumber(track), folderType);
 	}
-	return getTrackNameOrNumber(track, true);
+	return getTrackNameOrNumber(track);
 }
 
 string formatInsideFolder(MediaTrack* track) {
@@ -999,7 +998,7 @@ string formatInsideFolder(MediaTrack* track) {
 	// The first {} will be replaced with the name or number of the folder.
 	// The second {} will be replaced with "folder" or "nested folder".
 	return format(translate("inside {} {}"),
-		getTrackNameOrNumber(track, true),
+		getTrackNameOrNumber(track),
 		getTrackFolderType(track));
 }
 
@@ -1023,19 +1022,19 @@ string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* trac
 		// The first {} will be replaced with a folder reference; e.g.
 		// "drums folder" or "3 nested folder".
 		// The second {} will be replaced with the name or number of the nearby track.
-		// E.G, "inside drums folder, below snare" or "inside 3 nested folder, below 5"
+		// e.g. "inside drums folder, below snare" or "inside 3 nested folder, below 5"
 		return format(translate("{}, below {}"),
 			formatInsideFolder(folder),
-			getTrackNameOrNumber(track, true));
+			getTrackNameOrNumber(track));
 	} else {
 		// Translators: Reported when moving a track downward inside a folder.
 		// The first {} will be replaced with a folder reference; e.g.
 		// "drums folder" or "3 nested folder".
 		// The second {} will be replaced with the name or number of the nearby track.
-		// E.G, "inside drums folder, above snare" or "inside 3 nested folder, above 5"
+		// e.g. "inside drums folder, above snare" or "inside 3 nested folder, above 5"
 		return format(translate("{}, above {}"),
 			formatInsideFolder(folder),
-			getTrackNameOrNumber(track, true));
+			getTrackNameOrNumber(track));
 	}
 }
 
@@ -1044,7 +1043,7 @@ void openClosedFolderAndParents(MediaTrack* folder) {
 		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
 			continue;
 		}
-		int* compacting = (int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", nullptr);
+		int* const compacting = (int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", nullptr);
 		if (!compacting || *compacting != 2) {
 			continue;
 		}
@@ -1054,8 +1053,8 @@ void openClosedFolderAndParents(MediaTrack* folder) {
 }
 
 void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
-	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
-	MediaTrack* prevTrack = GetTrack(nullptr, trackIndex - 1);
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* const prevTrack = GetTrack(nullptr, trackIndex - 1);
 	if (!prevTrack) {
 		return;
 	}
@@ -1063,8 +1062,8 @@ void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
 }
 
 void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
-	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
-	MediaTrack* nextTrack = GetTrack(nullptr, trackIndex + 1);
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* const nextTrack = GetTrack(nullptr, trackIndex + 1);
 	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
 		return;
 	}
@@ -5771,11 +5770,17 @@ void cmdVideoWindowVisibility(Command* command) {
 }
 
 void cmdMoveTracks(Command* command) {
-	if (CountSelectedTracks(nullptr) == 0) {
+	const int selectedTracks = CountSelectedTracks2(nullptr, true);
+	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
+	if (selectedTracks == 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	MediaTrack* track = GetLastTouchedTrack();
+	if (selectedTracks == 1 && masterSelected) {
+		outputMessage(translate("master track cannot be moved"));
+		return;
+	}
+	MediaTrack* const track = GetLastTouchedTrack();
 	const bool up = command->gaccel.accel.cmd == 43647;
 	if (up) {
 		maybeOpenClosedFolderBeforeTrackMoveUp(track);
@@ -5783,17 +5788,27 @@ void cmdMoveTracks(Command* command) {
 		maybeOpenClosedFolderBeforeTrackMoveDown(track);
 	}
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
-	MediaTrack* newParent = GetParentTrack(track);
-	int trackIndex = GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* const newParent = GetParentTrack(track);
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
 	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
 	// Adjacent track is where we're coming from.
-	MediaTrack* adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
 	// Context is one track further in the direction we're moving, used when entering folders.
-	MediaTrack* contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
+	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
 	bool primaryMessageIncludesParent = false;
 	ostringstream s;
-	if (atTopOfTrackList) {
+	if (!adjacentTrack) {
+		if (up) {
+			// Translators: Reported when trying to move a track up when it is
+			// already at the top of the track list.
+			s << translate("top of track list");
+		} else {
+			// Translators: Reported when trying to move a track down when it is
+			// already at the bottom of the track list.
+			s << translate("bottom of track list");
+		}
+	} else if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
 		// {} will be replaced with a track reference; e.g. "vocal",
 		// "3", "drums folder" or "3 nested folder".
