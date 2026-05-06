@@ -81,6 +81,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - SWS: Select nearest previous folder: Alt+PageUp
 - Track properties: Toggle free item positioning: Alt+Shift+F2
 - Track: Duplicate tracks: Alt+D
+- Track: Move tracks up: Shift+PageUp
+- Track: Move tracks down: Shift+PageDown
 
 #### Adjusting Track Parameters
 - Track: Toggle mute for selected tracks: F5
