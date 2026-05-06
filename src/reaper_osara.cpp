@@ -522,6 +522,22 @@ string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 	return formatTime(GetCursorPosition(), format, cache);
 }
 
+string formatTrackNameOrNumber(MediaTrack* track) {
+	char* const trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+	ostringstream s;
+	const int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+	if (settings::reportTrackNumbers || !trackName || !trackName[0]) {
+		s << trackNum;
+	}
+	if (trackName && trackName[0]) {
+		if (s.tellp() > 0) {
+			s << " ";
+		}
+		s << trackName;
+	}
+	return s.str();
+}
+
 string formatFolderState(MediaTrack* track) {
 	ostringstream s;
 	int state = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
@@ -545,13 +561,7 @@ string formatFolderState(MediaTrack* track) {
 		if(!folderTrack) { // shouldn't happen
 			return "";
 		}
-		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
-		if (settings::reportTrackNumbers || !folderTrackName[0]) {
-			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", nullptr);
-		}
-		if (folderTrackName[0]) {
-			s << " " << folderTrackName;
-		}
+		s << " " << formatTrackNameOrNumber(folderTrack);
 	}
 	return s.str();
 }
@@ -961,22 +971,6 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
-
-string formatTrackNameOrNumber(MediaTrack* track) {
-	char* const trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
-	ostringstream s;
-	const int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
-	if (settings::reportTrackNumbers || !trackName || !trackName[0]) {
-		s << trackNum;
-	}
-	if (trackName && trackName[0]) {
-		if (s.tellp() > 0) {
-			s << " ";
-		}
-		s << trackName;
-	}
-	return s.str();
-}
 
 const char* getTrackFolderType(MediaTrack* track) {
 	if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
@@ -4699,19 +4693,7 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				if (settings::reportTrackNumbers) {
-					s << trackNumber;
-				}
-				if (name && name[0]) {
-					if (settings::reportTrackNumbers) {
-						s << " ";
-					}
-					s << name;
-				} else if (!settings::reportTrackNumbers) {
-					// There's no name and track number reporting is disabled. We report
-					// the number in lieu of the name.
-					s << i + 1;
-				}
+				s << formatTrackNameOrNumber(track);
 			}
 			continue;
 		}
