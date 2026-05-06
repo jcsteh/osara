@@ -1111,10 +1111,6 @@ void postGoToTrack(int command, MediaTrack* track) {
 		separate();
 		s << translate("armed");
 	}
-	if (isTrackFrozen(track)) {
-		separate();
-		s << translate("frozen");
-	}
 	if (isTrackMuted(track)) {
 		separate();
 		s << translate("muted");
@@ -1151,6 +1147,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (isTrackFrozen(track)) {
+			separate();
+			s << translate("frozen");
 		}
 		if (folderDepth <0){ //end of folder
 			separate();
@@ -2049,29 +2049,35 @@ void postToggleMasterTrackVisible(int command) {
 		translate("master track hidden"));
 }
 
-void reportTransportState(int state) {
+void reportTransportState(int before, int after) {
+	bool shouldReport = settings::reportTransport;
+	if (before & 4 || after & 4) {
+		// We are recording now, or we were recording and just stopped.
+		// That means this change is related to recording.
+		shouldReport = settings::reportRecord;
+	}
+	if (!shouldReport) {
+		return;
+	}
 	bool repeat = GetToggleCommandState(1068); // Transport: Toggle repeat
 	ostringstream s;
-	if (!settings::reportTransport)
-		return;
-	if (state & 2) {
+	// REAPER play state bits: 1 = playing, 2 = paused, 4 = recording.
+	if (after & 2) {
 		s << translate("pause");
-	} else if (state & 4 && repeat == true) {
+	// Recording also sets the playing bit, so handle record before play.
+	} else if (after & 4 && repeat) {
 		s << translate("record") << ", " << translate("repeat on");
-	} else if (state & 4) {
+	} else if (after & 4) {
 		s << translate("record");
-	} else if (state & 1 && repeat == true) {
+	// Only report play here if recording is not active.
+	} else if (after & 1 && repeat) {
 		s << translate("play") << ", " << translate("repeat on");
-	} else if (state & 1) {
+	} else if (after & 1) {
 		s << translate("play");
 	} else {
 		s << translate("stop");
 	}
 	outputMessage(s);
-}
-
-void postChangeTransportState(int command) {
-	reportTransportState(GetPlayState());
 }
 
 void postSelectMultipleItems(int command) {
@@ -2985,13 +2991,6 @@ PostCommand POST_COMMANDS[] = {
 	{40293, postTrackIo}, // Track: View I/O for current track
 	{40364, postToggleMetronome}, // Options: Toggle metronome
 	{40075, postToggleMasterTrackVisible}, // View: Toggle master track visible
-	{1007, postChangeTransportState}, // Transport: Play
-	{40044, postChangeTransportState}, // Transport: Play/stop
-	{40073, postChangeTransportState}, // Transport: Play/pause
-	{40328, postChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
-	{40317, postChangeTransportState}, // Transport: Play (skip time selection)
-	{1016, postChangeTransportState}, // Transport: Stop
-	{1013, postChangeTransportState}, // Transport: Record
 	{40718, postSelectMultipleItems}, // Item: Select all items on selected tracks in current time selection
 	{40421, postSelectMultipleItems}, // Item: Select all items in track
 	{40034, postSelectMultipleItems}, // Item grouping: Select all items in groups
@@ -3208,7 +3207,6 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
 {"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
-{"_XENAKIOS_TIMERTEST1", postChangeTransportState}, // Xenakios/SWS: Play selected items once
 {"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
 {"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
 {"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
@@ -5867,7 +5865,7 @@ static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bo
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
 	info.fType = MFT_STRING;
-	info.dwTypeData = (char*)translate(label);
+	info.dwTypeData = (char*)label;
 	info.cch = strlen(info.dwTypeData);
 	info.wID = id;
 	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
@@ -5880,7 +5878,7 @@ static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enab
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
 	info.fType = MFT_STRING;
-	info.dwTypeData = (char*)translate(label);
+	info.dwTypeData = (char*)label;
 	info.cch = strlen(info.dwTypeData);
 	info.hSubMenu = CreatePopupMenu();
 	info.fState = enabled ? MFS_ENABLED : MFS_DISABLED;
@@ -5901,38 +5899,38 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	// Master submenu
 	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU masterSub = addSubMenu(menu, 0, "Master", !nothingToDryRun);
+	HMENU masterSub = addSubMenu(menu, 0, translate("Master"), !nothingToDryRun);
 	if (!nothingToDryRun) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(masterSub, 0, "Master mix", 1, itemCount != 0);
+		addMenuItem(masterSub, 0, translate("Master mix"), 1, itemCount != 0);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(masterSub, 1, "Time &selection", 2, startTS != endTS);
+		addMenuItem(masterSub, 1, translate("Time &selection"), 2, startTS != endTS);
 	}
 	// Tracks submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU tracksSub = addSubMenu(menu, 1, "Tracks", selTracks > 0
+	HMENU tracksSub = addSubMenu(menu, 1, translate("Tracks"), selTracks > 0
 		&& (selTracksHaveItems || selTracksIncludeFolder));
 	if (selTracks > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 0, "Selected &tracks", 3, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(tracksSub, 0, translate("Selected &tracks"), 3, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 1, "Time &selection", 4, startTS != endTS);
+		addMenuItem(tracksSub, 1, translate("Time &selection"), 4, startTS != endTS);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 2, "&Mono summed selected tracks", 5, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(tracksSub, 2, translate("&Mono summed selected tracks"), 5, selTracksHaveItems || selTracksIncludeFolder);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 3, "Mono summed time selection", 6, startTS != endTS);
+		addMenuItem(tracksSub, 3, translate("Mono summed time selection"), 6, startTS != endTS);
 	}
 	// Items submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU itemsSub = addSubMenu(menu, 2, "Items", selItems > 0);
+	HMENU itemsSub = addSubMenu(menu, 2, translate("Items"), selItems > 0);
 	if (selItems > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(itemsSub, 0, "Selected &items", 7);
+		addMenuItem(itemsSub, 0, translate("Selected &items"), 7);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(itemsSub, 1, "Include track/take &FX and settings", 8);
+		addMenuItem(itemsSub, 1, translate("Include track/take &FX and settings"), 8);
 	}
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	addMenuItem(menu, 3, "Dry run project using the most recent render settings", 9);
+	addMenuItem(menu, 3, translate("Dry run project using the most recent render settings"), 9);
 	// Displaying and handling result
 	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
 	switch (id) {
@@ -5947,6 +5945,13 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 		case 8: Main_OnCommand(42437, 0); break; // Selected items with FX
 		case 9: Main_OnCommand(43349, 0); break; // Dry run project using the most recent render settings
 	}
+}
+
+void cmdChangeTransportState(Command* command) {
+	int before = GetPlayState();
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	int after = GetPlayState();
+	reportTransportState(before, after);
 }
 
 #define DEFACCEL {0, 0, 0}
@@ -6077,6 +6082,14 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
 	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down
+	{MAIN_SECTION, {{0, 0, 40044}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop
+	{MAIN_SECTION, {{0, 0, 40073}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/pause
+	{MAIN_SECTION, {{0, 0, 40328}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
+	{MAIN_SECTION, {{0, 0, 40317}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play (skip time selection)
+	{MAIN_SECTION, {{0, 0, 1016}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Stop
+	{MAIN_SECTION, {{0, 0, 1013}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Record
+	{MAIN_SECTION, {{0, 0, 1007}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play
+	{MAIN_SECTION, {DEFACCEL, nullptr}, "_XENAKIOS_TIMERTEST1", cmdChangeTransportState}, // Xenakios/SWS: Play selected items once                                                                                
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file

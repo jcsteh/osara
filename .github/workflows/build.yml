@@ -62,8 +62,23 @@ jobs:
         # We need php for swell_resgen.
         run: brew install php
       - name: build
-        run: scons "publisher=${{ env.publisher }}" version=${{ env.version }}
-      - name: sign Windows
+        run: scons build "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: sign Windows build
+        if: ${{ github.event_name == 'push' && runner.os == 'Windows' }}
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ vars.AZURE_SIGNING_NAME }}
+          certificate-profile-name: ${{ vars.AZURE_SIGNING_CERT_NAME }}
+          files-folder: ${{ github.workspace }}\build
+          files-folder-recurse: true
+          files-folder-filter: dll
+      - name: installer
+        run: scons installer "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: sign Windows installer
         if: ${{ github.event_name == 'push' && runner.os == 'Windows' }}
         uses: azure/trusted-signing-action@v0
         with:

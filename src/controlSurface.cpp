@@ -106,12 +106,16 @@ class Surface: public IReaperControlSurface {
 		if (play) {
 			cancelPendingMidiPreviewNotesOff();
 		}
+		const int transportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
+		int previousTransportState = this->lastTransportState;
+		this->lastTransportState = transportState;
+		if (previousTransportState == transportState) {
+			return;
+		}
 		if (this->wasCausedByCommand()) {
 			return;
 		}
-		// Calculate integer based transport state
-		int TransportState = (int)play | ((int)pause << 1) | ((int)rec << 2);
-		reportTransportState(TransportState);
+		reportTransportState(previousTransportState, transportState);
 	}
 
 	void SetRepeatState(bool repeat) final {
@@ -447,6 +451,7 @@ class Surface: public IReaperControlSurface {
 	const int PARAM_PAN = -3;
 	int lastParam = PARAM_NONE;
 	map<MediaTrack*, uint8_t> trackCache;
+	int lastTransportState = GetPlayState() & (1 | 2 | 4);
 	double lastPlayPos = 0;
 	int lastMarker = -1;
 	int lastRegion = -1;

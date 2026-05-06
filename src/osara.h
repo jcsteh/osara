@@ -369,7 +369,7 @@ extern CComPtr<IAccPropServices> accPropServices;
 bool isClassName(HWND hwnd, std::string className);
 
 extern bool isHandlingCommand;
-void reportTransportState(int state);
+void reportTransportState(int before, int after);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);

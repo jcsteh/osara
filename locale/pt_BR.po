@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2026-03-01 18:54\n"
+"PO-Revision-Date: 2026-05-01 19:45\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -1556,9 +1556,6 @@ msgstr ""
 msgid "grid  unknown"
 msgstr ""
 
-msgid "frozen"
-msgstr ""
-
 msgid "defeating solo"
 msgstr "solo rejeitado"
 
@@ -1567,6 +1564,9 @@ msgstr "Fase invertida"
 
 msgid "FX bypassed"
 msgstr "FX ignorado"
+
+msgid "frozen"
+msgstr ""
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1773,6 +1773,7 @@ msgstr "fim de loop"
 msgid "Track"
 msgstr ""
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master"
 msgstr ""
 
@@ -2997,17 +2998,46 @@ msgid "end offset {} MS"
 msgstr ""
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Master mix"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Time &selection"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "&Mono summed selected tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Mono summed time selection"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Items"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &items"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Include track/take &FX and settings"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
-#. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Dry run project using the most recent render settings"
+msgstr ""
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: Mover para o próximo item (deixando outros itens selecionados)"
 

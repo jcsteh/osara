@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-03-01 18:54\n"
+"PO-Revision-Date: 2026-05-01 19:45\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1501,9 +1501,6 @@ msgstr "128分网格"
 msgid "grid  unknown"
 msgstr "网格未知"
 
-msgid "frozen"
-msgstr "冻结"
-
 msgid "defeating solo"
 msgstr "独奏失效"
 
@@ -1512,6 +1509,9 @@ msgstr "翻转相位"
 
 msgid "FX bypassed"
 msgstr "FX 旁通"
+
+msgid "frozen"
+msgstr "冻结"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
@@ -1706,6 +1706,7 @@ msgstr "循环结束"
 msgid "Track"
 msgstr "轨道"
 
+#. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master"
 msgstr "主控"
 
@@ -2893,17 +2894,46 @@ msgid "end offset {} MS"
 msgstr "结束偏移 {}ms"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Master mix"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Time &selection"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "&Mono summed selected tracks"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Mono summed time selection"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Items"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Selected &items"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Include track/take &FX and settings"
+msgstr ""
+
 #. An entry in OSARA's context menu for analyzing loudness statistics.
-#. An entry in OSARA's context menu for analyzing loudness statistics.
+msgid "Dry run project using the most recent render settings"
+msgstr ""
+
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
 
