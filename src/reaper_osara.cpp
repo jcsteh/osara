@@ -986,55 +986,58 @@ string formatTrackReference(MediaTrack* track) {
 	const char* const folderType = getTrackFolderType(track);
 	if (folderType) {
 		// Translators: Used when referring to a folder track in a movement message.
-		// The first {} will be replaced with the name or number of the folder track.
-		// The second {} will be replaced with "folder" or "nested folder".
-		return format(translate("{} {}"), getTrackNameOrNumber(track), folderType);
+		// {track} will be replaced with the name or number of the folder track.
+		// {folderType} will be replaced with "folder" or "nested folder".
+		return format(translate("{track} {folderType}"),
+			"track"_a=getTrackNameOrNumber(track), "folderType"_a=folderType);
 	}
 	return getTrackNameOrNumber(track);
 }
 
 string formatInsideFolder(MediaTrack* track) {
 	// Translators: Used to report the folder containing a track after it has moved.
-	// The first {} will be replaced with the name or number of the folder.
-	// The second {} will be replaced with "folder" or "nested folder".
-	return format(translate("inside {} {}"),
-		getTrackNameOrNumber(track),
-		getTrackFolderType(track));
+	// {folder} will be replaced with the name or number of the folder.
+	// {folderType} will be replaced with "folder" or "nested folder".
+	return format(translate("inside {folder} {folderType}"),
+		"folder"_a=getTrackNameOrNumber(track),
+		"folderType"_a=getTrackFolderType(track));
 }
 
 string formatTrackMoveRelative(bool up, MediaTrack* track) {
 	if (up) {
 		// Translators: Reported when moving a track upward.
-		// {} will be replaced with a track reference; e.g. "vocal",
+		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "drums folder" or "3 nested folder".
-		return format(translate("above {}"), formatTrackReference(track));
+		return format(translate("above {track}"),
+			"track"_a=formatTrackReference(track));
 	} else {
 		// Translators: Reported when moving a track downward.
-		// {} will be replaced with a track reference; e.g. "vocal",
+		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "drums folder" or "3 nested folder".
-		return format(translate("below {}"), formatTrackReference(track));
+		return format(translate("below {track}"),
+			"track"_a=formatTrackReference(track));
 	}
 }
 
 string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* track) {
 	if (up) {
 		// Translators: Reported when moving a track upward inside a folder.
-		// The first {} will be replaced with a folder reference; e.g.
+		// {folder} will be replaced with a folder reference; e.g.
 		// "drums folder" or "3 nested folder".
-		// The second {} will be replaced with the name or number of the nearby track.
+		// {track} will be replaced with the name or number of the nearby track.
 		// e.g. "inside drums folder, below snare" or "inside 3 nested folder, below 5"
-		return format(translate("{}, below {}"),
-			formatInsideFolder(folder),
-			getTrackNameOrNumber(track));
+		return format(translate("{folder}, below {track}"),
+			"folder"_a=formatInsideFolder(folder),
+			"track"_a=getTrackNameOrNumber(track));
 	} else {
 		// Translators: Reported when moving a track downward inside a folder.
-		// The first {} will be replaced with a folder reference; e.g.
+		// {folder} will be replaced with a folder reference; e.g.
 		// "drums folder" or "3 nested folder".
-		// The second {} will be replaced with the name or number of the nearby track.
+		// {track} will be replaced with the name or number of the nearby track.
 		// e.g. "inside drums folder, above snare" or "inside 3 nested folder, above 5"
-		return format(translate("{}, above {}"),
-			formatInsideFolder(folder),
-			getTrackNameOrNumber(track));
+		return format(translate("{folder}, above {track}"),
+			"folder"_a=formatInsideFolder(folder),
+			"track"_a=getTrackNameOrNumber(track));
 	}
 }
 
@@ -5810,16 +5813,16 @@ void cmdMoveTracks(Command* command) {
 		}
 	} else if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
-		// {} will be replaced with a track reference; e.g. "vocal",
+		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "drums folder" or "3 nested folder".
-		s << format(translate("top of track list, above {}"),
-			formatTrackReference(adjacentTrack));
+		s << format(translate("top of track list, above {track}"),
+			"track"_a=formatTrackReference(adjacentTrack));
 	} else if (atBottomOfTrackList) {
 		// Translators: Reported when moving a track to the bottom of the track list.
-		// {} will be replaced with a track reference; e.g. "vocal",
+		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "drums folder" or "3 nested folder".
-		s << format(translate("bottom of track list, below {}"),
-			formatTrackReference(adjacentTrack));
+		s << format(translate("bottom of track list, below {track}"),
+			"track"_a=formatTrackReference(adjacentTrack));
 	} else if (adjacentTrack == newParent) {
 		primaryMessageIncludesParent = true;
 		s << formatTrackMoveInsideFolder(up, newParent, contextTrack);
@@ -5831,9 +5834,10 @@ void cmdMoveTracks(Command* command) {
 	}
 	if (newParent && !primaryMessageIncludesParent && newParent != adjacentTrack) {
 		// Translators: Appended after the new position when moving a track inside a folder.
-		// {} will be replaced with a folder reference; e.g. "guitars folder"
+		// {folder} will be replaced with a folder reference; e.g. "guitars folder"
 		// or "3 nested folder".
-		s << format(translate(", {}"), formatInsideFolder(newParent));
+		s << format(translate(", {folder}"),
+			"folder"_a=formatInsideFolder(newParent));
 	}
 	outputMessage(s);
 }
