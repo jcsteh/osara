@@ -1058,6 +1058,8 @@ void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
 	if (!prevTrack) {
 		return;
 	}
+	// Moving up can enter the folder containing the previous track, even if the
+	// previous track isn't itself a folder.
 	openClosedFolderAndParents(GetParentTrack(prevTrack));
 }
 
@@ -5780,7 +5782,7 @@ void cmdMoveTracks(Command* command) {
 	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
 	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
-	// Adjacent track is where we're coming from.
+	// After the move, this is the track that now occupies the moved track's old position.
 	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
 	// Context is one track further in the direction we're moving, used when entering folders.
 	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
@@ -5801,12 +5803,14 @@ void cmdMoveTracks(Command* command) {
 		// Translators: Reported when moving a track to the top of the track list.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+		// For example: "top of track list, above 3 drums nested folder".
 		s << format(translate("top of track list, above {track}"),
 			"track"_a=formatTrackReference(adjacentTrack));
 	} else if (atBottomOfTrackList) {
 		// Translators: Reported when moving a track to the bottom of the track list.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+		// For example: "bottom of track list, below 3 drums nested folder".
 		s << format(translate("bottom of track list, below {track}"),
 			"track"_a=formatTrackReference(adjacentTrack));
 	} else if (adjacentTrack == newParent) {
