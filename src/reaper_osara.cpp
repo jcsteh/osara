@@ -522,6 +522,22 @@ string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 	return formatTime(GetCursorPosition(), format, cache);
 }
 
+string formatTrackNameOrNumber(MediaTrack* track) {
+	char* const trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
+	ostringstream s;
+	const int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+	if (settings::reportTrackNumbers || !trackName || !trackName[0]) {
+		s << trackNum;
+	}
+	if (trackName && trackName[0]) {
+		if (s.tellp() > 0) {
+			s << " ";
+		}
+		s << trackName;
+	}
+	return s.str();
+}
+
 string formatFolderState(MediaTrack* track) {
 	ostringstream s;
 	int state = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
@@ -545,13 +561,7 @@ string formatFolderState(MediaTrack* track) {
 		if(!folderTrack) { // shouldn't happen
 			return "";
 		}
-		char* folderTrackName = (char*)GetSetMediaTrackInfo(folderTrack, "P_NAME", nullptr);
-		if (settings::reportTrackNumbers || !folderTrackName[0]) {
-			s << " " << (int)(size_t)GetSetMediaTrackInfo(folderTrack, "IP_TRACKNUMBER", nullptr);
-		}
-		if (folderTrackName[0]) {
-			s << " " << folderTrackName;
-		}
+		s << " " << formatTrackNameOrNumber(folderTrack);
 	}
 	return s.str();
 }
@@ -961,6 +971,103 @@ const char* (*NF_GetSWSTrackNotes)(MediaTrack* track) = nullptr;
  */
 
 bool shouldMoveToAutoItem = false;
+
+const char* getTrackFolderType(MediaTrack* track) {
+	if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
+		return nullptr;
+	}
+	return GetParentTrack(track) ? translate("nested folder") : translate("folder");
+}
+
+string formatTrackReference(MediaTrack* track) {
+	const char* const folderType = getTrackFolderType(track);
+	if (folderType) {
+		// Translators: Used when referring to a folder track in a movement message.
+		// {track} will be replaced with the name, number or both of the folder track.
+		// {folderType} will be replaced with "folder" or "nested folder".
+		return format(translate("{track} {folderType}"),
+			"track"_a=formatTrackNameOrNumber(track), "folderType"_a=folderType);
+	}
+	return formatTrackNameOrNumber(track);
+}
+
+string formatInsideFolder(MediaTrack* track) {
+	// Translators: Used to report the folder containing a track after it has moved.
+	// {folder} will be replaced with the name, number or both of the folder.
+	// {folderType} will be replaced with "folder" or "nested folder".
+	return format(translate("inside {folder} {folderType}"),
+		"folder"_a=formatTrackNameOrNumber(track),
+		"folderType"_a=getTrackFolderType(track));
+}
+
+string formatTrackMoveRelative(bool up, MediaTrack* track) {
+	if (up) {
+		// Translators: Reported when moving a track upward.
+		// {track} will be replaced with a track reference; e.g. "vocal",
+		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+		return format(translate("above {track}"),
+			"track"_a=formatTrackReference(track));
+	}
+	// Translators: Reported when moving a track downward.
+	// {track} will be replaced with a track reference; e.g. "vocal",
+	// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+	return format(translate("below {track}"),
+		"track"_a=formatTrackReference(track));
+}
+
+string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* track) {
+	if (up) {
+		// Translators: Reported when moving a track upward inside a folder.
+		// {folder} will be replaced with a folder reference; e.g.
+		// "drums folder" or "3 drums nested folder".
+		// {track} will be replaced with the name, number or both of the nearby track.
+		// e.g. "inside drums folder, below snare" or "inside 3 drums nested folder, below 5"
+		return format(translate("{folder}, below {track}"),
+			"folder"_a=formatInsideFolder(folder),
+			"track"_a=formatTrackNameOrNumber(track));
+	}
+	// Translators: Reported when moving a track downward inside a folder.
+	// {folder} will be replaced with a folder reference; e.g.
+	// "drums folder" or "3 drums nested folder".
+	// {track} will be replaced with the name, number or both of the nearby track.
+	// e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
+	return format(translate("{folder}, above {track}"),
+		"folder"_a=formatInsideFolder(folder),
+		"track"_a=formatTrackNameOrNumber(track));
+}
+
+void openClosedFolderAndParents(MediaTrack* folder) {
+	for (MediaTrack* track = folder; track; track = GetParentTrack(track)) {
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
+			continue;
+		}
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERCOMPACT") != 2) {
+			continue;
+		}
+		int open = 0;
+		GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", &open);
+	}
+}
+
+void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* const prevTrack = GetTrack(nullptr, trackIndex - 1);
+	if (!prevTrack) {
+		return;
+	}
+	// Moving up can enter the folder containing the previous track, even if the
+	// previous track isn't itself a folder.
+	openClosedFolderAndParents(GetParentTrack(prevTrack));
+}
+
+void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	MediaTrack* const nextTrack = GetTrack(nullptr, trackIndex + 1);
+	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
+		return;
+	}
+	openClosedFolderAndParents(nextTrack);
+}
 
 void postGoToTrack(int command, MediaTrack* track) {
 	fakeFocus = FOCUS_TRACK;
@@ -4585,19 +4692,7 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				if (settings::reportTrackNumbers) {
-					s << trackNumber;
-				}
-				if (name && name[0]) {
-					if (settings::reportTrackNumbers) {
-						s << " ";
-					}
-					s << name;
-				} else if (!settings::reportTrackNumbers) {
-					// There's no name and track number reporting is disabled. We report
-					// the number in lieu of the name.
-					s << i + 1;
-				}
+				s << formatTrackNameOrNumber(track);
 			}
 			continue;
 		}
@@ -5661,6 +5756,75 @@ void cmdVideoWindowVisibility(Command* command) {
 	}, 50);
 }
 
+void cmdMoveTracks(Command* command) {
+	const int selectedTracks = CountSelectedTracks2(nullptr, true);
+	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
+	if (selectedTracks == 0) {
+		outputMessage(translate("no selected tracks"));
+		return;
+	}
+	if (selectedTracks == 1 && masterSelected) {
+		outputMessage(translate("master track cannot be moved"));
+		return;
+	}
+	MediaTrack* const track = GetLastTouchedTrack();
+	const bool up = command->gaccel.accel.cmd == 43647;
+	if (up) {
+		maybeOpenClosedFolderBeforeTrackMoveUp(track);
+	} else {
+		maybeOpenClosedFolderBeforeTrackMoveDown(track);
+	}
+	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	MediaTrack* const newParent = GetParentTrack(track);
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const bool atTopOfTrackList = trackIndex == 0;
+	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
+	// After the move, this is the track that now occupies the moved track's old position.
+	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	// Context is one track further in the direction we're moving, used when entering folders.
+	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
+	if (!adjacentTrack) {
+		if (up) {
+			// Translators: Reported when trying to move a track up when it is
+			// already at the top of the track list.
+			outputMessage(translate("top of track list"));
+		} else {
+			// Translators: Reported when trying to move a track down when it is
+			// already at the bottom of the track list.
+			outputMessage(translate("bottom of track list"));
+		}
+		return;
+	}
+	ostringstream s;
+	if (atTopOfTrackList) {
+		// Translators: Reported when moving a track to the top of the track list.
+		// {track} will be replaced with a track reference; e.g. "vocal",
+		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+		// For example: "top of track list, above 3 drums nested folder".
+		s << format(translate("top of track list, above {track}"),
+			"track"_a=formatTrackReference(adjacentTrack));
+	} else if (atBottomOfTrackList) {
+		// Translators: Reported when moving a track to the bottom of the track list.
+		// {track} will be replaced with a track reference; e.g. "vocal",
+		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+		// For example: "bottom of track list, below 3 drums nested folder".
+		s << format(translate("bottom of track list, below {track}"),
+			"track"_a=formatTrackReference(adjacentTrack));
+	} else if (adjacentTrack == newParent) {
+		outputMessage(formatTrackMoveInsideFolder(up, newParent, contextTrack));
+		return;
+	} else if (newParent && getTrackFolderType(adjacentTrack)) {
+		outputMessage(formatTrackMoveInsideFolder(up, newParent, contextTrack));
+		return;
+	} else {
+		s << formatTrackMoveRelative(up, adjacentTrack);
+	}
+	if (newParent && newParent != adjacentTrack) {
+		s << ", " << formatInsideFolder(newParent);
+	}
+	outputMessage(s);
+}
+
 void cmdReportAndEditScrubSegmentOffsets(Command* command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
@@ -5918,6 +6082,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
+	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
+	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down
 	{MAIN_SECTION, {{0, 0, 40044}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop
 	{MAIN_SECTION, {{0, 0, 40073}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/pause
 	{MAIN_SECTION, {{0, 0, 40328}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play/stop (move edit cursor on stop)
