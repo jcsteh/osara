@@ -1007,13 +1007,12 @@ string formatTrackMoveRelative(bool up, MediaTrack* track) {
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
 		return format(translate("above {track}"),
 			"track"_a=formatTrackReference(track));
-	} else {
-		// Translators: Reported when moving a track downward.
-		// {track} will be replaced with a track reference; e.g. "vocal",
-		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
-		return format(translate("below {track}"),
-			"track"_a=formatTrackReference(track));
 	}
+	// Translators: Reported when moving a track downward.
+	// {track} will be replaced with a track reference; e.g. "vocal",
+	// "3", "3 vocal", "drums folder" or "3 drums nested folder".
+	return format(translate("below {track}"),
+		"track"_a=formatTrackReference(track));
 }
 
 string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* track) {
@@ -1026,16 +1025,15 @@ string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* trac
 		return format(translate("{folder}, below {track}"),
 			"folder"_a=formatInsideFolder(folder),
 			"track"_a=formatTrackNameOrNumber(track));
-	} else {
-		// Translators: Reported when moving a track downward inside a folder.
-		// {folder} will be replaced with a folder reference; e.g.
-		// "drums folder" or "3 drums nested folder".
-		// {track} will be replaced with the name, number or both of the nearby track.
-		// e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
-		return format(translate("{folder}, above {track}"),
-			"folder"_a=formatInsideFolder(folder),
-			"track"_a=formatTrackNameOrNumber(track));
 	}
+	// Translators: Reported when moving a track downward inside a folder.
+	// {folder} will be replaced with a folder reference; e.g.
+	// "drums folder" or "3 drums nested folder".
+	// {track} will be replaced with the name, number or both of the nearby track.
+	// e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
+	return format(translate("{folder}, above {track}"),
+		"folder"_a=formatInsideFolder(folder),
+		"track"_a=formatTrackNameOrNumber(track));
 }
 
 void openClosedFolderAndParents(MediaTrack* folder) {
@@ -1043,8 +1041,7 @@ void openClosedFolderAndParents(MediaTrack* folder) {
 		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
 			continue;
 		}
-		int* const compacting = (int*)GetSetMediaTrackInfo(track, "I_FOLDERCOMPACT", nullptr);
-		if (!compacting || *compacting != 2) {
+		if (GetMediaTrackInfo_Value(track, "I_FOLDERCOMPACT") != 2) {
 			continue;
 		}
 		int open = 0;
