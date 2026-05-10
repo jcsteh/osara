@@ -5784,19 +5784,20 @@ void cmdMoveTracks(Command* command) {
 	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
 	// Context is one track further in the direction we're moving, used when entering folders.
 	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
-	bool primaryMessageIncludesParent = false;
-	ostringstream s;
 	if (!adjacentTrack) {
 		if (up) {
 			// Translators: Reported when trying to move a track up when it is
 			// already at the top of the track list.
-			s << translate("top of track list");
+			outputMessage(translate("top of track list"));
 		} else {
 			// Translators: Reported when trying to move a track down when it is
 			// already at the bottom of the track list.
-			s << translate("bottom of track list");
+			outputMessage(translate("bottom of track list"));
 		}
-	} else if (atTopOfTrackList) {
+		return;
+	}
+	ostringstream s;
+	if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
@@ -5809,20 +5810,16 @@ void cmdMoveTracks(Command* command) {
 		s << format(translate("bottom of track list, below {track}"),
 			"track"_a=formatTrackReference(adjacentTrack));
 	} else if (adjacentTrack == newParent) {
-		primaryMessageIncludesParent = true;
-		s << formatTrackMoveInsideFolder(up, newParent, contextTrack);
+		outputMessage(formatTrackMoveInsideFolder(up, newParent, contextTrack));
+		return;
 	} else if (newParent && getTrackFolderType(adjacentTrack)) {
-		primaryMessageIncludesParent = true;
-		s << formatTrackMoveInsideFolder(up, newParent, contextTrack);
+		outputMessage(formatTrackMoveInsideFolder(up, newParent, contextTrack));
+		return;
 	} else {
 		s << formatTrackMoveRelative(up, adjacentTrack);
 	}
-	if (newParent && !primaryMessageIncludesParent && newParent != adjacentTrack) {
-		// Translators: Appended after the new position when moving a track inside a folder.
-		// {folder} will be replaced with a folder reference; e.g. "guitars folder"
-		// or "3 guitars nested folder".
-		s << format(translate(", {folder}"),
-			"folder"_a=formatInsideFolder(newParent));
+	if (newParent && newParent != adjacentTrack) {
+		s << ", " << formatInsideFolder(newParent);
 	}
 	outputMessage(s);
 }
