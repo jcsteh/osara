@@ -5774,16 +5774,13 @@ void cmdMoveTracks(Command* command) {
 	} else {
 		maybeOpenClosedFolderBeforeTrackMoveDown(track);
 	}
+	const int origTrackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	Main_OnCommand(command->gaccel.accel.cmd, 0);
 	MediaTrack* const newParent = GetParentTrack(track);
 	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
 	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
-	// After the move, this is the track that now occupies the moved track's old position.
-	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
-	// Context is one track further in the direction we're moving, used when entering folders.
-	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
-	if (!adjacentTrack) {
+	if (origTrackIndex == trackIndex) {
 		if (up) {
 			// Translators: Reported when trying to move a track up when it is
 			// already at the top of the track list.
@@ -5795,6 +5792,10 @@ void cmdMoveTracks(Command* command) {
 		}
 		return;
 	}
+	// After the move, this is the track that now occupies the moved track's old position.
+	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	// Context is one track further in the direction we're moving, used when entering folders.
+	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
 	ostringstream s;
 	if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
