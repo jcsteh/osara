@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2026-05-01 19:45\n"
+"PO-Revision-Date: 2026-05-15 19:57\n"
 
 msgid "enabled"
 msgstr "habilitando"
@@ -1556,6 +1556,46 @@ msgstr "cuadrícula en garrapateas"
 msgid "grid  unknown"
 msgstr "cuadrícula desconocida"
 
+#. Used when referring to a folder track in a movement message.
+#. {track} will be replaced with the name, number or both of the folder track.
+#. {folderType} will be replaced with "folder" or "nested folder".
+msgid "{track} {folderType}"
+msgstr "{folderType} {track}"
+
+#. Used to report the folder containing a track after it has moved.
+#. {folder} will be replaced with the name, number or both of the folder.
+#. {folderType} will be replaced with "folder" or "nested folder".
+msgid "inside {folder} {folderType}"
+msgstr "dentro de {folderType} {folder}"
+
+#. Reported when moving a track upward.
+#. {track} will be replaced with a track reference; e.g. "vocal",
+#. "3", "3 vocal", "drums folder" or "3 drums nested folder".
+msgid "above {track}"
+msgstr "arriba de {track}"
+
+#. Reported when moving a track downward.
+#. {track} will be replaced with a track reference; e.g. "vocal",
+#. "3", "3 vocal", "drums folder" or "3 drums nested folder".
+msgid "below {track}"
+msgstr "debajo de {track}"
+
+#. Reported when moving a track upward inside a folder.
+#. {folder} will be replaced with a folder reference; e.g.
+#. "drums folder" or "3 drums nested folder".
+#. {track} will be replaced with the name, number or both of the nearby track.
+#. e.g. "inside drums folder, below snare" or "inside 3 drums nested folder, below 5"
+msgid "{folder}, below {track}"
+msgstr "{folder}, debajo de {track}"
+
+#. Reported when moving a track downward inside a folder.
+#. {folder} will be replaced with a folder reference; e.g.
+#. "drums folder" or "3 drums nested folder".
+#. {track} will be replaced with the name, number or both of the nearby track.
+#. e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
+msgid "{folder}, above {track}"
+msgstr "{folder}, arriba de {track}"
+
 msgid "defeating solo"
 msgstr "solo defeating"
 
@@ -2979,6 +3019,33 @@ msgstr "mostrando ventana de video"
 msgid "hid video window"
 msgstr "ocultando ventana de video"
 
+msgid "master track cannot be moved"
+msgstr "no es posible mover la pista máster"
+
+#. Reported when trying to move a track up when it is
+#. already at the top of the track list.
+msgid "top of track list"
+msgstr "principio de la lista de pistas"
+
+#. Reported when trying to move a track down when it is
+#. already at the bottom of the track list.
+msgid "bottom of track list"
+msgstr "final de la lista de pistas"
+
+#. Reported when moving a track to the top of the track list.
+#. {track} will be replaced with a track reference; e.g. "vocal",
+#. "3", "3 vocal", "drums folder" or "3 drums nested folder".
+#. For example: "top of track list, above 3 drums nested folder".
+msgid "top of track list, above {track}"
+msgstr "principio de la lista de pistas, arriba de {track}"
+
+#. Reported when moving a track to the bottom of the track list.
+#. {track} will be replaced with a track reference; e.g. "vocal",
+#. "3", "3 vocal", "drums folder" or "3 drums nested folder".
+#. For example: "bottom of track list, below 3 drums nested folder".
+msgid "bottom of track list, below {track}"
+msgstr "final de la lista de pistas, debajo de {track}"
+
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
 msgstr "iniciando desde el cursor"
@@ -2999,44 +3066,44 @@ msgstr "desplazamiento de fin {} ms"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master mix"
-msgstr ""
+msgstr "Mezcla máster"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Time &selection"
-msgstr ""
+msgstr "&Selección de tiempo"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Tracks"
-msgstr ""
+msgstr "Pistas"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Selected &tracks"
-msgstr ""
+msgstr "&Pistas seleccionadas"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "&Mono summed selected tracks"
-msgstr ""
+msgstr "&Pistas seleccionadas sumadas a mono"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Mono summed time selection"
-msgstr ""
+msgstr "Selección de tiempo sumada a mono"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Items"
-msgstr ""
+msgstr "Ítems"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Selected &items"
-msgstr ""
+msgstr "&Ítems seleccionados"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Include track/take &FX and settings"
-msgstr ""
+msgstr "Incluir &FX y configuraciones de pista/toma"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Dry run project using the most recent render settings"
-msgstr ""
+msgstr "Renderizado de prueba del proyecto usando las configuraciones de renderizado más recientes"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: se Mueve al siguiente ítem (dejando otros ítems seleccionados)"
@@ -3497,12 +3564,16 @@ msgid "Report time se&lection start and end while playing"
 msgstr "Anunciar el inicio y el final de la se&lección de tiempo durante la reproducción"
 
 msgctxt "OSARA Configuration"
-msgid "Report &transport state (play, record, etc.)"
-msgstr "Anunciar estado de &transporte (reproducción, grabación, etc.)"
+msgid "Report &transport play, pause and stop"
+msgstr "Anunciar reproducción, pausa y detención del &transporte"
 
 msgctxt "OSARA Configuration"
-msgid "&Report track numbers"
-msgstr "Anuncia&r número de pistas"
+msgid "Report &recording state"
+msgstr "Anunciar estado de &grabación"
+
+msgctxt "OSARA Configuration"
+msgid "Report tr&ack numbers"
+msgstr "Anunciar números de pist&a"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
