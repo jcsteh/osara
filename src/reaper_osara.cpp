@@ -3142,6 +3142,8 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40182, postMidiMoveStart}, // Edit: Move notes right one pixel
 	{40183, postMidiMoveStart, true, true}, // Edit: Move notes left one grid unit
 	{40184, postMidiMoveStart, true, true}, // Edit: Move notes right one grid unit
+	{43456, postMidiMoveStart, true, true}, // Edit: Move notes left to grid
+	{43457, postMidiMoveStart, true, true}, // Edit: Move notes right to grid
 	{40187, postMidiMovePitchCursor}, // Edit: Increase pitch cursor one octave
 	{40188, postMidiMovePitchCursor}, // Edit: Decrease pitch cursor one octave
 	{40234, postMidiSwitchCCLane}, // CC: Next CC lane
@@ -3151,6 +3153,8 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40445, postMidiChangeLength}, // Edit: Shorten notes one pixel
 	{40446, postMidiChangeLength, true, true}, // Edit: Lengthen notes one grid unit
 	{40447, postMidiChangeLength, true, true}, // Edit: Shorten notes one grid unit
+	{43454, postMidiChangeLength, true, true}, // Edit: Lengthen notes to grid
+	{43455, postMidiChangeLength, true, true}, // Edit: Shorten notes to grid
 	{40462, postMidiChangeVelocity, true, true}, // Edit: Note velocity +01
 	{40463, postMidiChangeVelocity, true, true}, // Edit: Note velocity +10
 	{40464, postMidiChangeVelocity, true, true}, // Edit: Note velocity -01
@@ -3165,6 +3169,8 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{40673, postMidiMovePosition, false}, // Edit: Move CC events right 1 pixel
 	{40674, postMidiMovePosition, false}, // Edit: Move CC events left by grid
 	{40675, postMidiMovePosition, false}, // Edit: Move CC events right by grid
+	{43459, postMidiMovePosition, false}, // Edit: Move CC events left to grid
+	{43460, postMidiMovePosition, false}, // Edit: Move CC events right to grid
 	{40676, postMidiChangeCCValue, true, true}, // Edit: Increase value a little bit for CC events
 	{40677, postMidiChangeCCValue, true, true}, // Edit: Decrease value a little bit for CC events
 	{40733, postMidiCopyEvents, true}, // Edit: Copy events within time selection, if any (smart copy)
@@ -6009,6 +6015,12 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40120}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left
 	{MAIN_SECTION, {{0, 0, 40793}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left by grid size
 	{MAIN_SECTION, {{0, 0, 40794}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right by grid size
+	{MAIN_SECTION, {{0, 0, 43735}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points left to grid
+	{MAIN_SECTION, {{0, 0, 43736}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Item edit: Move items/envelope points right to grid
+	{MAIN_SECTION, {{0, 0, 41178}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Envelopes: Move selected points left by grid
+	{MAIN_SECTION, {{0, 0, 41179}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Envelopes: Move selected points right by grid
+	{MAIN_SECTION, {{0, 0, 43737}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Envelopes: Move selected points left to grid
+	{MAIN_SECTION, {{0, 0, 43738}, nullptr}, nullptr, cmdMoveItemsOrEnvPoint}, // Envelopes: Move selected points right to grid
 	{MAIN_SECTION, {{0, 0, 40225}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Grow left edge of items
 	{MAIN_SECTION, {{0, 0, 40226}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Shrink left edge of items
 	{MAIN_SECTION, {{0, 0, 40227}, nullptr}, nullptr, cmdMoveItemEdgeOrSource}, // Item edit: Shrink right edge of items

@@ -268,13 +268,6 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
 - Envelope: Insert automation item: Control+Shift+I
-- Envelope: Delete automation items
-- Envelope: Delete automation items, preserve points
-- Envelope: Split automation items
-- Envelope: Duplicate automation items
-- Envelope: Duplicate and pool automation items
-- Envelope: Convert all project automation to automation items
-- Envelope: Glue automation items
 
 #### Zoom
 - View: Zoom out horizontal: NumPad-
@@ -897,6 +890,17 @@ This list is worth referencing when making your own key map additions, assigning
 - Envelope: Insert new point at current position (do not remove nearby points)
 - Envelope: Select all points
 - Envelope: Invert selected points
+- Envelope: Delete automation items
+- Envelope: Delete automation items, preserve points
+- Envelope: Split automation items
+- Envelope: Duplicate automation items
+- Envelope: Duplicate and pool automation items
+- Envelope: Convert all project automation to automation items
+- Envelope: Glue automation items
+- Envelopes: Move selected points left by grid
+- Envelopes: Move selected points right by grid
+- Envelopes: Move selected points left to grid
+- Envelopes: Move selected points left to grid
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode
@@ -912,6 +916,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Xenakios/SWS: Invert item selection
 - Xenakios/SWS: Play selected items once
 - Item edit: Move left edge of item to edit cursor
+- Item edit: Move items/envelope points left to grid
+- Item edit: Move items/envelope points right to grid
 - Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
 - Edit: Cut items
@@ -1024,6 +1030,12 @@ Xenakios/SWS: Move cursor right configured pixels, creating time selection
 - Options: F1-F12 as step input mode
 - Select all CC events
 - Unselect all CC events
+- Edit: Lengthen notes to grid
+- Edit: Shorten notes to grid
+- Edit: Move notes left to grid
+- Edit: Move notes right to grid
+- Edit: Move CC events left to grid
+- Edit: Move CC events right to grid
 
 #### Unmapped OSARA actions
 - OSARA: Toggle Move relative to the play cursor for time movement commands during playback
