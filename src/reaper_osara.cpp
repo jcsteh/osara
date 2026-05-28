@@ -2708,9 +2708,11 @@ string getShortenedAltSectionName(int sectionId) {
 }
 
 constexpr int CMD_CLEAR_OVERRIDE = 24800;
+constexpr int CMD_SET_OVERRIDE_TO_DEFAULT = 24801;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_RECORDING = 24802;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_ALT1 = 24803;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT = 24851;
+constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_RECORDING = 24852;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1 = 24853;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT16 = 24868;
 constexpr int MAIN_ALT1_SECTION = 1;
@@ -2722,8 +2724,7 @@ void stopTrackingMomentaryOverride() {
 	momentaryOverrideReport.cancel();
 }
 
-void postToggleOverrideToAltN(int command) {
-	stopTrackingMomentaryOverride();
+void reportAltOverride(int command) {
 	int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
 		+ MAIN_ALT1_SECTION;
 	outputMessage(getShortenedAltSectionName(sectionId));
@@ -2739,26 +2740,56 @@ void reportCurrentKeyMapOverride() {
 			command < CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT16_SECTION;
 			++command) {
 		if (GetToggleCommandState2(section, command) > 0) {
-			postToggleOverrideToAltN(command);
+			reportAltOverride(command);
 			return;
 		}
 	}
 	outputMessage(translate("main key map"));
 }
 
+void postToggleOverride(int command) {
+	stopTrackingMomentaryOverride();
+	if (command == CMD_CLEAR_OVERRIDE ||
+			command == CMD_SET_OVERRIDE_TO_DEFAULT) {
+		outputMessage(translate("main key map"));
+		return;
+	}
+	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
+	if (command == CMD_TOGGLE_OVERRIDE_TO_RECORDING) {
+		if (GetToggleCommandState2(section, command) > 0) {
+			outputMessage(translate("recording key map"));
+		} else {
+			reportCurrentKeyMapOverride();
+		}
+		return;
+	}
+	if (GetToggleCommandState2(section, command) <= 0) {
+		reportCurrentKeyMapOverride();
+		return;
+	}
+	reportAltOverride(command);
+}
+
 int getMomentaryOverrideTimeout() {
-	int timeout = GetPrivateProfileInt("REAPER", "kbd_override_len", 1000, get_ini_file());
+	int timeout = GetPrivateProfileInt("REAPER", "kbd_override_len", 1000,
+		get_ini_file());
 	return timeout >= 0 ? timeout : 1000;
 }
 
-void postMomentarilySetOverrideToAltN(int command) {
-	int sectionId = command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1
-		+ MAIN_ALT1_SECTION;
+void postMomentarilySetOverride(int command) {
 	// Translators: Reported when using "Main action section: Momentarily set
 	// override to alt-1", etc. {} is replaced with the shortened section name;
 	// e.g. "alt-1 momentary".
-	outputMessage(format(translate("{} momentary"),
-		getShortenedAltSectionName(sectionId)));
+	if (command == CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT) {
+		outputMessage(translate("default momentary"));
+	} else if (command == CMD_MOMENTARILY_SET_OVERRIDE_TO_RECORDING) {
+		outputMessage(translate("recording key map momentary"));
+	} else {
+		int sectionId = command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1
+			+ MAIN_ALT1_SECTION;
+		outputMessage(format(translate("{} momentary"),
+			getShortenedAltSectionName(sectionId)));
+	}
 	momentaryOverrideReport.cancel();
 	momentaryOverrideReport = CallLater(reportCurrentKeyMapOverride,
 		getMomentaryOverrideTimeout() + 50);
@@ -3123,38 +3154,43 @@ PostCommand POST_COMMANDS[] = {
 	{40111, postChangeVerticalZoom}, // View: Zoom in vertical
 	{40112, postChangeVerticalZoom}, // View: Zoom out vertical
 	{40113, postChangeVerticalZoom}, // View: Toggle track zoom to maximum height
-	{24803, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-1
-	{24804, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-2
-	{24805, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-3
-	{24806, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-4
-	{24807, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-5
-	{24808, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-6
-	{24809, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-7
-	{24810, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-8
-	{24811, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-9
-	{24812, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-10
-	{24813, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-11
-	{24814, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-12
-	{24815, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-13
-	{24816, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-14
-	{24817, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-15
-	{24818, postToggleOverrideToAltN}, // Main action section: Toggle override to alt-16
-	{24853, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-1
-	{24854, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-2
-	{24855, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-3
-	{24856, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-4
-	{24857, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-5
-	{24858, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-6
-	{24859, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-7
-	{24860, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-8
-	{24861, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-9
-	{24862, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-10
-	{24863, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-11
-	{24864, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-12
-	{24865, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-13
-	{24866, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-14
-	{24867, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-15
-	{24868, postMomentarilySetOverrideToAltN}, // Main action section: Momentarily set override to alt-16
+	{24800, postToggleOverride}, // Main action section: Clear any override
+	{24801, postToggleOverride}, // Main action section: Set override to default
+	{24802, postToggleOverride}, // Main action section: Toggle override to recording
+	{24803, postToggleOverride}, // Main action section: Toggle override to alt-1
+	{24804, postToggleOverride}, // Main action section: Toggle override to alt-2
+	{24805, postToggleOverride}, // Main action section: Toggle override to alt-3
+	{24806, postToggleOverride}, // Main action section: Toggle override to alt-4
+	{24807, postToggleOverride}, // Main action section: Toggle override to alt-5
+	{24808, postToggleOverride}, // Main action section: Toggle override to alt-6
+	{24809, postToggleOverride}, // Main action section: Toggle override to alt-7
+	{24810, postToggleOverride}, // Main action section: Toggle override to alt-8
+	{24811, postToggleOverride}, // Main action section: Toggle override to alt-9
+	{24812, postToggleOverride}, // Main action section: Toggle override to alt-10
+	{24813, postToggleOverride}, // Main action section: Toggle override to alt-11
+	{24814, postToggleOverride}, // Main action section: Toggle override to alt-12
+	{24815, postToggleOverride}, // Main action section: Toggle override to alt-13
+	{24816, postToggleOverride}, // Main action section: Toggle override to alt-14
+	{24817, postToggleOverride}, // Main action section: Toggle override to alt-15
+	{24818, postToggleOverride}, // Main action section: Toggle override to alt-16
+	{24851, postMomentarilySetOverride}, // Main action section: Momentarily set override to default
+	{24852, postMomentarilySetOverride}, // Main action section: Momentarily set override to recording
+	{24853, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-1
+	{24854, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-2
+	{24855, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-3
+	{24856, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-4
+	{24857, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-5
+	{24858, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-6
+	{24859, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-7
+	{24860, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-8
+	{24861, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-9
+	{24862, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-10
+	{24863, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-11
+	{24864, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-12
+	{24865, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-13
+	{24866, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-14
+	{24867, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-15
+	{24868, postMomentarilySetOverride}, // Main action section: Momentarily set override to alt-16
 	{41175, postMidiResets}, // Reset all MIDI devices
 	{42348, postMidiResets}, // Reset all MIDI control surface devices
 	{40345, postMidiResets}, // Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins
@@ -3366,12 +3402,6 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 42362}, {_t("seconds secondary"), nullptr}}, // View: Secondary time unit for ruler: Seconds
 	{{MAIN_SECTION, 14}, {_t("master muted"), _t("master unmuted")}}, // Track: Toggle mute for master track
 	{{MAIN_SECTION, 1157}, {_t("enabled snap"), _t("disabled snap")}}, // Options: Toggle snapping
-	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
-	{{MAIN_SECTION, 24800}, {_t("main key map"), nullptr}}, // Main action section: Clear any override
-	{{MAIN_SECTION, 24801}, {_t("main key map"), nullptr}}, // Main action section: Set override to default
-	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
-	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
-	{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}}, // Main action section: Momentarily set override to recording
 	// Media Explorer toggles
 	{{MEDIA_EXPLORER_SECTION, 1011}, {_t("auto playing"), _t("not auto playing")}}, // Autoplay: Toggle on/off
 	{{MEDIA_EXPLORER_SECTION, 1068}, {_t("repeating previews"), _t("not repeating previews")}}, // Preview: Toggle repeat on/off
@@ -6411,10 +6441,6 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 		const char* message = newState ? entry->second.onMsg : entry->second.offMsg;
 		if (message) {
 			outputMessage(translate(message));
-		}
-		if (CMD_CLEAR_OVERRIDE <= command &&
-				command <= CMD_TOGGLE_OVERRIDE_TO_RECORDING) {
-			stopTrackingMomentaryOverride();
 		}
 		isHandlingCommand = false;
 		return true;
