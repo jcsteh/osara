@@ -2707,15 +2707,53 @@ string getShortenedAltSectionName(int sectionId) {
 	return full.substr(start, full.length() - start - fromEnd);
 }
 
+constexpr int CMD_CLEAR_OVERRIDE = 24800;
+constexpr int CMD_SET_OVERRIDE_TO_DEFAULT = 24801;
+constexpr int CMD_TOGGLE_OVERRIDE_TO_RECORDING = 24802;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_ALT1 = 24803;
+constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT = 24851;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1 = 24853;
+constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT16 = 24868;
 constexpr int MAIN_ALT1_SECTION = 1;
 constexpr int MAIN_ALT16_SECTION = 16;
 
+CallLater momentaryOverrideReport;
+
+void stopTrackingMomentaryOverride() {
+	momentaryOverrideReport.cancel();
+}
+
 void postToggleOverrideToAltN(int command) {
+	stopTrackingMomentaryOverride();
 	int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
 		+ MAIN_ALT1_SECTION;
 	outputMessage(getShortenedAltSectionName(sectionId));
+}
+
+void reportCurrentKeyMapOverride() {
+	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
+	if (GetToggleCommandState2(section, CMD_SET_OVERRIDE_TO_DEFAULT) > 0) {
+		outputMessage(translate("default key map"));
+		return;
+	}
+	if (GetToggleCommandState2(section, CMD_TOGGLE_OVERRIDE_TO_RECORDING) > 0) {
+		outputMessage(translate("recording key map"));
+		return;
+	}
+	for (int command = CMD_TOGGLE_OVERRIDE_TO_ALT1;
+			command < CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT16_SECTION;
+			++command) {
+		if (GetToggleCommandState2(section, command) > 0) {
+			postToggleOverrideToAltN(command);
+			return;
+		}
+	}
+	outputMessage(translate("main key map"));
+}
+
+int getMomentaryOverrideTimeout() {
+	int timeout = GetPrivateProfileInt("REAPER", "kbd_override_len", 1000, get_ini_file());
+	return timeout >= 0 ? timeout : 1000;
 }
 
 void postMomentarilySetOverrideToAltN(int command) {
@@ -2726,6 +2764,9 @@ void postMomentarilySetOverrideToAltN(int command) {
 	// e.g. "alt-1 momentary".
 	outputMessage(format(translate("{} momentary"),
 		getShortenedAltSectionName(sectionId)));
+	momentaryOverrideReport.cancel();
+	momentaryOverrideReport = CallLater(reportCurrentKeyMapOverride,
+		getMomentaryOverrideTimeout() + 50);
 }
 
 void postMidiResets(int command) {
@@ -6376,6 +6417,10 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 		if (message) {
 			outputMessage(translate(message));
 		}
+		if (CMD_CLEAR_OVERRIDE <= command &&
+				command <= CMD_TOGGLE_OVERRIDE_TO_RECORDING) {
+			stopTrackingMomentaryOverride();
+		}
 		isHandlingCommand = false;
 		return true;
 	}
@@ -6422,10 +6467,9 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	// Allow "Main action section: Momentarily set override" actions to pass
 	// through shortcut help so that users can learn about shortcuts in those
 	// alternative sections.
-	constexpr int ACTION_MOMENTARY_DEFAULT = 24851;
-	constexpr int ACTION_MOMENTARY_ALT16 = 24868;
 	if (isShortcutHelpEnabled &&
-			(command < ACTION_MOMENTARY_DEFAULT || command > ACTION_MOMENTARY_ALT16)) {
+			(command < CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT ||
+				command > CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT16)) {
 		outputMessage(getActionName(command, section, false));
 		return true;
 	}
