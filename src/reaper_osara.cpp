@@ -2708,7 +2708,6 @@ string getShortenedAltSectionName(int sectionId) {
 }
 
 constexpr int CMD_CLEAR_OVERRIDE = 24800;
-constexpr int CMD_SET_OVERRIDE_TO_DEFAULT = 24801;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_RECORDING = 24802;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_ALT1 = 24803;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT = 24851;
@@ -2732,10 +2731,6 @@ void postToggleOverrideToAltN(int command) {
 
 void reportCurrentKeyMapOverride() {
 	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
-	if (GetToggleCommandState2(section, CMD_SET_OVERRIDE_TO_DEFAULT) > 0) {
-		outputMessage(translate("default key map"));
-		return;
-	}
 	if (GetToggleCommandState2(section, CMD_TOGGLE_OVERRIDE_TO_RECORDING) > 0) {
 		outputMessage(translate("recording key map"));
 		return;
@@ -3373,7 +3368,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MAIN_SECTION, 1157}, {_t("enabled snap"), _t("disabled snap")}}, // Options: Toggle snapping
 	// Reducing verbeage when toggling and momentarily switching to alt keymap layers (Reaper 7)
 	{{MAIN_SECTION, 24800}, {_t("main key map"), nullptr}}, // Main action section: Clear any override
-	{{MAIN_SECTION, 24801}, {_t("default key map"), nullptr}}, // Main action section: Set override to default
+	{{MAIN_SECTION, 24801}, {_t("main key map"), nullptr}}, // Main action section: Set override to default
 	{{MAIN_SECTION, 24802}, {_t("recording key map"), nullptr}}, // Main action section: Toggle override to recording
 	{{MAIN_SECTION, 24851}, {_t("default momentary"), nullptr}}, // Main action section: Momentarily set override to default
 	{{MAIN_SECTION, 24852}, {_t("recording key map momentary"), nullptr}}, // Main action section: Momentarily set override to recording
