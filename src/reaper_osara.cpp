@@ -2722,12 +2722,6 @@ void stopTrackingMomentaryOverride() {
 	momentaryOverrideReport.cancel();
 }
 
-void reportAltOverride(int command) {
-	int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
-		+ MAIN_ALT1_SECTION;
-	outputMessage(getShortenedAltSectionName(sectionId));
-}
-
 void reportCurrentKeyMapOverride() {
 	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
 	if (GetToggleCommandState2(section, CMD_TOGGLE_OVERRIDE_TO_RECORDING) > 0) {
@@ -2737,10 +2731,13 @@ void reportCurrentKeyMapOverride() {
 	for (int command = CMD_TOGGLE_OVERRIDE_TO_ALT1;
 			command < CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT16_SECTION;
 			++command) {
-		if (GetToggleCommandState2(section, command) > 0) {
-			reportAltOverride(command);
-			return;
+		if (GetToggleCommandState2(section, command) != 1) {
+			continue;
 		}
+		int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
+			+ MAIN_ALT1_SECTION;
+		outputMessage(getShortenedAltSectionName(sectionId));
+		return;
 	}
 	outputMessage(translate("main key map"));
 }
