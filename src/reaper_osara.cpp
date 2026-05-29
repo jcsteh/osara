@@ -2722,10 +2722,10 @@ void stopTrackingMomentaryOverride() {
 	momentaryOverrideReport.cancel();
 }
 
-void reportCurrentKeyMapOverride() {
+void reportCurrentKeyMapOverride(bool interrupt) {
 	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
 	if (GetToggleCommandState2(section, CMD_TOGGLE_OVERRIDE_TO_RECORDING) > 0) {
-		outputMessage(translate("recording key map"));
+		outputMessage(translate("recording key map"), interrupt);
 		return;
 	}
 	for (int command = CMD_TOGGLE_OVERRIDE_TO_ALT1;
@@ -2736,15 +2736,15 @@ void reportCurrentKeyMapOverride() {
 		}
 		int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
 			+ MAIN_ALT1_SECTION;
-		outputMessage(getShortenedAltSectionName(sectionId));
+		outputMessage(getShortenedAltSectionName(sectionId), interrupt);
 		return;
 	}
-	outputMessage(translate("main key map"));
+	outputMessage(translate("main key map"), interrupt);
 }
 
 void postToggleOverride(int) {
 	stopTrackingMomentaryOverride();
-	reportCurrentKeyMapOverride();
+	reportCurrentKeyMapOverride(true);
 }
 
 int getMomentaryOverrideTimeout() {
@@ -2768,7 +2768,11 @@ void postMomentarilySetOverride(int command) {
 			getShortenedAltSectionName(sectionId)));
 	}
 	momentaryOverrideReport.cancel();
-	momentaryOverrideReport = CallLater(reportCurrentKeyMapOverride,
+	// reportCurrentKeyMapOverride must not interrupt speech here, as we might
+	// then be in the middle of reading the response to another action or an
+	// action name in shortcut help.
+	momentaryOverrideReport = CallLater(
+		[] { reportCurrentKeyMapOverride(false); },
 		getMomentaryOverrideTimeout() + 50);
 }
 
