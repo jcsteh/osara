@@ -2707,8 +2707,6 @@ string getShortenedAltSectionName(int sectionId) {
 	return full.substr(start, full.length() - start - fromEnd);
 }
 
-constexpr int CMD_CLEAR_OVERRIDE = 24800;
-constexpr int CMD_SET_OVERRIDE_TO_DEFAULT = 24801;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_RECORDING = 24802;
 constexpr int CMD_TOGGLE_OVERRIDE_TO_ALT1 = 24803;
 constexpr int CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT = 24851;
@@ -2747,27 +2745,9 @@ void reportCurrentKeyMapOverride() {
 	outputMessage(translate("main key map"));
 }
 
-void postToggleOverride(int command) {
+void postToggleOverride(int) {
 	stopTrackingMomentaryOverride();
-	if (command == CMD_CLEAR_OVERRIDE ||
-			command == CMD_SET_OVERRIDE_TO_DEFAULT) {
-		outputMessage(translate("main key map"));
-		return;
-	}
-	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
-	if (command == CMD_TOGGLE_OVERRIDE_TO_RECORDING) {
-		if (GetToggleCommandState2(section, command) > 0) {
-			outputMessage(translate("recording key map"));
-		} else {
-			reportCurrentKeyMapOverride();
-		}
-		return;
-	}
-	if (GetToggleCommandState2(section, command) <= 0) {
-		reportCurrentKeyMapOverride();
-		return;
-	}
-	reportAltOverride(command);
+	reportCurrentKeyMapOverride();
 }
 
 int getMomentaryOverrideTimeout() {
@@ -2777,9 +2757,6 @@ int getMomentaryOverrideTimeout() {
 }
 
 void postMomentarilySetOverride(int command) {
-	// Translators: Reported when using "Main action section: Momentarily set
-	// override to alt-1", etc. {} is replaced with the shortened section name;
-	// e.g. "alt-1 momentary".
 	if (command == CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT) {
 		outputMessage(translate("default momentary"));
 	} else if (command == CMD_MOMENTARILY_SET_OVERRIDE_TO_RECORDING) {
@@ -2787,6 +2764,9 @@ void postMomentarilySetOverride(int command) {
 	} else {
 		int sectionId = command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1
 			+ MAIN_ALT1_SECTION;
+		// Translators: Reported when using "Main action section: Momentarily
+		// set override to alt-1", etc. {} is replaced with the shortened
+		// section name; e.g. "alt-1 momentary".
 		outputMessage(format(translate("{} momentary"),
 			getShortenedAltSectionName(sectionId)));
 	}
