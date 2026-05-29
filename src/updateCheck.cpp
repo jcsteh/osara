@@ -215,6 +215,6 @@ INT_PTR CALLBACK UpdateChecker::dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-void cmdCheckForUpdate(Command* command) {
+void cmdCheckForUpdate(int command) {
 	startUpdateCheck(true);
 }

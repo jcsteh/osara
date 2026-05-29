@@ -718,9 +718,9 @@ MidiNote findNoteInChord(MediaItem_Take* take, int direction) {
 	return notes[curNoteInChord];
 }
 
-void cmdMidiMoveCursor(Command* command) {
+void cmdMidiMoveCursor(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	ostringstream s;
 	s << formatCursorPosition();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
@@ -1011,7 +1011,7 @@ vector<MidiControlChange> getSelectedCCs(MediaItem_Take* take, int offset=-1) {
 	return ccs;
 }
 
-void cmdMidiToggleSelection(Command* command) {
+void cmdMidiToggleSelection(int command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
 		outputMessage(translate("noncontiguous selection"));
@@ -1136,19 +1136,19 @@ void moveToChord(int direction, bool clearSelection=true, bool select=true) {
 	}
 }
 
-void cmdMidiMoveToNextChord(Command* command) {
+void cmdMidiMoveToNextChord(int command) {
 	moveToChord(1);
 }
 
-void cmdMidiMoveToPreviousChord(Command* command) {
+void cmdMidiMoveToPreviousChord(int command) {
 	moveToChord(-1);
 }
 
-void cmdMidiMoveToNextChordKeepSel(Command* command) {
+void cmdMidiMoveToNextChordKeepSel(int command) {
 	moveToChord(1, false, isSelectionContiguous);
 }
 
-void cmdMidiMoveToPreviousChordKeepSel(Command* command) {
+void cmdMidiMoveToPreviousChordKeepSel(int command) {
 	moveToChord(-1, false, isSelectionContiguous);
 }
 
@@ -1190,19 +1190,19 @@ void moveToNoteInChord(int direction, bool clearSelection=true, bool select=true
 	outputMessage(s);
 }
 
-void cmdMidiMoveToHigherNoteInChord(Command* command) {
+void cmdMidiMoveToHigherNoteInChord(int command) {
 	moveToNoteInChord(1);
 }
 
-void cmdMidiMoveToLowerNoteInChord(Command* command) {
+void cmdMidiMoveToLowerNoteInChord(int command) {
 	moveToNoteInChord(-1);
 }
 
-void cmdMidiMoveToHigherNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToHigherNoteInChordKeepSel(int command) {
 	moveToNoteInChord(1, false, isSelectionContiguous);
 }
 
-void cmdMidiMoveToLowerNoteInChordKeepSel(Command* command) {
+void cmdMidiMoveToLowerNoteInChordKeepSel(int command) {
 	moveToNoteInChord(-1, false, isSelectionContiguous);
 }
 
@@ -1263,23 +1263,23 @@ void cmdhInsertNote(int oldCount, int relativeNote, bool reportNewPos) {
 	outputMessage(s);
 }
 
-void cmdMidiInsertNote(Command* command) {
+void cmdMidiInsertNote(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount;
 	MIDI_CountEvts(take, &oldCount, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	// If we're advancing the cursor position, we should report the new position.
-	const bool reportNewPos = command->gaccel.accel.cmd ==
+	const bool reportNewPos = command ==
 		40051; // Edit: Insert note at edit cursor
 	cmdhInsertNote(oldCount, 0, reportNewPos);
 }
 
-void cmdMidiPasteEvents(Command* command) {
+void cmdMidiPasteEvents(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	int added = newCount - oldCount;
 if (added <= 0) {
@@ -1292,11 +1292,11 @@ if (added <= 0) {
 		translate_plural("{} event added", "{} events added", added), added));
 }
 
-void cmdMidiDeleteEvents(Command* command) {
+void cmdMidiDeleteEvents(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	int removed = oldCount - MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	// Translators: Used when events are deleted in the MIDI editor. {} is
 	// replaced by the number of events. E.g. "3 events removed"
@@ -1385,11 +1385,11 @@ void postMidiSelectEvents(int command) {
 		count));
 }
 
-void cmdMidiToggleSelCC (Command* command) {
+void cmdMidiToggleSelCC (int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount = countSelectedEvents (take);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	int newCount = countSelectedEvents (take);
 	int count = newCount - oldCount;
 	if (count >= 0) {
@@ -1558,11 +1558,11 @@ void moveToCC(int direction, bool clearSelection=true, bool select=true) {
 	outputMessage(s);
 }
 
-void cmdMidiInsertCC(Command* command) {
+void cmdMidiInsertCC(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	int oldCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	int newCount = MIDI_CountEvts(take, nullptr, nullptr, nullptr);
 	if (newCount <= oldCount) {
 		return; // Not inserted.
@@ -1576,19 +1576,19 @@ void cmdMidiInsertCC(Command* command) {
 	outputMessage(describeCC(take, cc));
 }
 
-void cmdMidiMoveToNextCC(Command* command) {
+void cmdMidiMoveToNextCC(int command) {
 	moveToCC(1);
 }
 
-void cmdMidiMoveToPreviousCC(Command* command) {
+void cmdMidiMoveToPreviousCC(int command) {
 	moveToCC(-1);
 }
 
-void cmdMidiMoveToNextCCKeepSel(Command* command) {
+void cmdMidiMoveToNextCCKeepSel(int command) {
 	moveToCC(1, false, isSelectionContiguous);
 }
 
-void cmdMidiMoveToPreviousCCKeepSel(Command* command) {
+void cmdMidiMoveToPreviousCCKeepSel(int command) {
 	moveToCC(-1, false, isSelectionContiguous);
 }
 
@@ -1618,21 +1618,21 @@ void midiMoveToItem(int direction) {
 	outputMessage(s);
 }
 
-void cmdMidiMoveToNextItem(Command* command) {
+void cmdMidiMoveToNextItem(int command) {
 	Undo_BeginBlock();
 	midiMoveToItem(1);
 	Undo_EndBlock(translate("OSARA: Move to next midi item on track"), 0);
 }
 
-void cmdMidiMoveToPrevItem(Command* command) {
+void cmdMidiMoveToPrevItem(int command) {
 	Undo_BeginBlock();
 	midiMoveToItem(-1);
 	Undo_EndBlock(translate("OSARA: Move to previous midi item on track"), 0);
 }
 
-void cmdMidiMoveToTrack(Command* command) {
+void cmdMidiMoveToTrack(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	MediaItem* item = GetMediaItemTake_Item(take);
 	MediaTrack* track = GetMediaItem_Track(item);
@@ -1661,7 +1661,7 @@ void cmdMidiMoveToTrack(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
+void cmdMidiSelectSamePitchStartingInTimeSelection(int command) {
 	double tsStart,tsEnd;
 	GetSet_LoopTimeRange(false, false, &tsStart, &tsEnd, false);
 	if(tsStart == tsEnd) {
@@ -1698,12 +1698,12 @@ void cmdMidiSelectSamePitchStartingInTimeSelection(Command* command) {
 		translate_plural("{} note selected", "{} notes selected", selectCount), selectCount ));
 }
 
-void cmdMidiNoteSplitOrJoin(Command* command) {
+void cmdMidiNoteSplitOrJoin(int command) {
 	HWND editor = MIDIEditor_GetActive();
 	MediaItem_Take* take = MIDIEditor_GetTake(editor);
 	// Get selected note count before action.
 	auto oldCount = countSelectedNotes(take);
-	auto cmdId = command->gaccel.accel.cmd;
+	auto cmdId = command;
 	MIDIEditor_OnCommand(editor, cmdId);
 	auto newCount = countSelectedNotes(take);
 	if (oldCount == newCount) {
@@ -1776,7 +1776,7 @@ void focusNearestMidiEvent(HWND hwnd) {
 	}
 }
 
-void cmdFocusNearestMidiEvent(Command* command) {
+void cmdFocusNearestMidiEvent(int command) {
 	HWND hwnd= GetFocus();
 	if (!hwnd) {
 		return;
@@ -1784,9 +1784,9 @@ void cmdFocusNearestMidiEvent(Command* command) {
 	focusNearestMidiEvent(hwnd);
 }
 
-void cmdMidiFilterWindow(Command *command) {
+void cmdMidiFilterWindow(int command) {
 	HWND editor = MIDIEditor_GetActive();
-	MIDIEditor_OnCommand(editor, command->gaccel.accel.cmd);
+	MIDIEditor_OnCommand(editor, command);
 	// TODO: we could also check the command state was "off", to skip searching otherwise
 	HWND filter = FindWindowW(L"#32770",
 		widen(LocalizeString("Filter Events", "midi_DLG_128", 0)).c_str());

@@ -1845,7 +1845,7 @@ class ItemParams: public ReaperObjParamSource {
 	MediaItem* item;
 };
 
-void cmdParamsFocus(Command* command) {
+void cmdParamsFocus(int command) {
 	unique_ptr<ParamSource> source;
 	MediaTrack* track;
 	MediaItem_Take* take;
@@ -2095,7 +2095,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	new ParamsDialog(std::move(source));
 }
 
-void cmdFxParamsFocus(Command* command) {
+void cmdFxParamsFocus(int command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			MediaTrack* track = GetLastTouchedTrack();
@@ -2119,6 +2119,6 @@ void cmdFxParamsFocus(Command* command) {
 	}
 }
 
-void cmdFxParamsMaster(Command* command) {
+void cmdFxParamsMaster(int command) {
 	fxParams_begin(GetMasterTrack(0), "TrackFX");
 }

@@ -12,12 +12,12 @@ void initialize();
 void onSwitchTab();
 }
 
-void cmdPeakWatcher(Command* command);
-void cmdReportPeakWatcherW1C1(Command* command);
-void cmdReportPeakWatcherW1C2(Command* command);
-void cmdReportPeakWatcherW2C1(Command* command);
-void cmdReportPeakWatcherW2C2(Command* command);
-void cmdResetPeakWatcherW1(Command* command);
-void cmdResetPeakWatcherW2(Command* command);
-void cmdPausePeakWatcher(Command* command);
+void cmdPeakWatcher(int command);
+void cmdReportPeakWatcherW1C1(int command);
+void cmdReportPeakWatcherW1C2(int command);
+void cmdReportPeakWatcherW2C1(int command);
+void cmdReportPeakWatcherW2C2(int command);
+void cmdResetPeakWatcherW1(int command);
+void cmdResetPeakWatcherW2(int command);
+void cmdPausePeakWatcher(int command);
 

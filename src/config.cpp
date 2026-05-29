@@ -70,7 +70,7 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 	return FALSE;
 }
 
-void cmdConfig(Command* command) {
+void cmdConfig(int command) {
 	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG),
 		GetForegroundWindow(), config_dialogProc);
 	translateDialog(dialog);
@@ -288,7 +288,7 @@ INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
 	return FALSE;
 }
 
-void cmdConfigReaperOptimal(Command* command) {
+void cmdConfigReaperOptimal(int command) {
 	// Even if the user chooses not to apply the configuration, we don't want to
 	// ask them again at startup until the optimal settings are updated.
 	string version = fmt::format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
@@ -361,6 +361,6 @@ void maybeAutoConfigReaperOptimal() {
 	const char* raw = GetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION);
 	int value = atoi(raw);
 	if (value < REAPER_OPTIMAL_CONFIG_VERSION) {
-		cmdConfigReaperOptimal(nullptr);
+		cmdConfigReaperOptimal(0);
 	}
 }

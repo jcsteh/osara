@@ -244,7 +244,7 @@ typedef struct Command {
 	int section;
 	gaccel_register_t gaccel;
 	const char* id;
-	void (*execute)(Command*);
+	void (*execute)(int);
 } Command;
 extern int lastCommandRepeatCount;
 extern DWORD lastCommandTime;
