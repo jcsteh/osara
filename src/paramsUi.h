@@ -7,7 +7,7 @@
 
 #include "osara.h"
 
-void cmdFxParamsFocus(Command* command);
-void cmdFxParamsMaster(Command* command);
-void cmdParamsFocus(Command* command);
+void cmdFxParamsFocus(int command);
+void cmdFxParamsMaster(int command);
+void cmdParamsFocus(int command);
 extern bool isParamsDialogOpen;

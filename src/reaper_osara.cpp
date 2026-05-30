@@ -3835,23 +3835,23 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	postGoToTrack(0);
 }
 
-void cmdGoToNextTrack(Command* command) {
+void cmdGoToNextTrack(int command) {
 	moveToTrack(1);
 }
 
-void cmdGoToPrevTrack(Command* command) {
+void cmdGoToPrevTrack(int command) {
 	moveToTrack(-1);
 }
 
-void cmdGoToNextTrackKeepSel(Command* command) {
+void cmdGoToNextTrackKeepSel(int command) {
 	moveToTrack(1, false, isSelectionContiguous);
 }
 
-void cmdGoToPrevTrackKeepSel(Command* command) {
+void cmdGoToPrevTrackKeepSel(int command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
-void cmdGoToFirstTrack(Command* command){
+void cmdGoToFirstTrack(int command){
 	MediaTrack* track = GetTrack(nullptr, 0);
 	if(!track) {
 		return;
@@ -3862,7 +3862,7 @@ void cmdGoToFirstTrack(Command* command){
 	SetMixerScroll(track); // MCP
 }
 
-void cmdGoToLastTrack(Command* command){
+void cmdGoToLastTrack(int command){
 	int trackNo = CountTracks(nullptr) - 1;
 	if (trackNo < 0) {
 		return;
@@ -3877,7 +3877,7 @@ void cmdGoToLastTrack(Command* command){
 	SetMixerScroll(track); // MCP
 }
 
-void cmdGoToMasterTrack(Command* command){
+void cmdGoToMasterTrack(int command){
 	if (MediaTrack* track1 = GetTrack(nullptr, 0)) {
 		// We can't scroll directly to the master track. Instead, scroll to track 1,
 		// which also scrolls the master track into view.
@@ -3991,7 +3991,7 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	}
 }
 
-void cmdMoveToNextItem(Command* command) {
+void cmdMoveToNextItem(int command) {
 	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(1);
 	} else {
@@ -3999,7 +3999,7 @@ void cmdMoveToNextItem(Command* command) {
 	}
 }
 
-void cmdMoveToPrevItem(Command* command) {
+void cmdMoveToPrevItem(int command) {
 	if (shouldMoveToAutoItem) {
 		moveToAutomationItem(-1);
 	} else {
@@ -4007,14 +4007,14 @@ void cmdMoveToPrevItem(Command* command) {
 	}
 }
 
-void cmdMoveToZeroCrossing(Command* command) {
+void cmdMoveToZeroCrossing(int command) {
 	int selItems = CountSelectedMediaItems(nullptr);
 	if (selItems == 0) {
 		outputMessage(translate("no selected items"));
 		return;
 	}
 	double beforePos = GetCursorPosition();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	double afterPos = GetCursorPosition();
 	double diff = afterPos - beforePos;
 	if (diff == 0.0) {
@@ -4073,15 +4073,15 @@ void adjustZoomByStep(bool zoomOut) {
 	reportZoomStepsAsTime(nextZoomStep);
 }
 
-void cmdZoomOutStepped(Command* command) {
+void cmdZoomOutStepped(int command) {
 	adjustZoomByStep(true);
 }
 
-void cmdZoomInStepped(Command* command) {
+void cmdZoomInStepped(int command) {
 	adjustZoomByStep(false);
 }
 
-void cmdUndo(Command* command) {
+void cmdUndo(int command) {
 	const char* text = Undo_CanUndo2(0);
 	Main_OnCommand(40029, 0); // Edit: Undo
 	if (!text)
@@ -4091,7 +4091,7 @@ void cmdUndo(Command* command) {
 	outputMessage(format(translate("undo {}"), text));
 }
 
-void cmdRedo(Command* command) {
+void cmdRedo(int command) {
 	const char* text = Undo_CanRedo2(0);
 	Main_OnCommand(40030, 0); // Edit: Redo
 	if (!text)
@@ -4101,9 +4101,9 @@ void cmdRedo(Command* command) {
 	outputMessage(format(translate("redo {}"), text));
 }
 
-void cmdSplitItems(Command* command) {
+void cmdSplitItems(int command) {
 	int oldCount = CountMediaItems(nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int added = CountMediaItems(nullptr) - oldCount;
 	// Translators: Reported when items are added. {} will be replaced with the
 	// number of items; e.g. "2 items added".
@@ -4137,7 +4137,7 @@ void cmdSplitItems(Command* command) {
 	}
 }
 
-void cmdPaste(Command* command) {
+void cmdPaste(int command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	int oldTakes = CountTakes(item);
 	int oldItems = CountMediaItems(0);
@@ -4149,7 +4149,7 @@ void cmdPaste(Command* command) {
 		oldPoints = countEnvelopePointsIncludingAutoItems(envelope);
 		oldAutoItems = CountAutomationItems(envelope);
 	}
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int added;
 	// We want to report both tracks and items if both got added; e.g.
 	// "1 track 2 items added".
@@ -4172,7 +4172,7 @@ void cmdPaste(Command* command) {
 	if (s.tellp() > 0) {
 		// Translators: Reported after the number of tracks and/or items added.
 		s << " " << translate("added");
-		maybeAddRippleMessage(s, command->gaccel.accel.cmd);
+		maybeAddRippleMessage(s, command);
 		outputMessage(s);
 		return;
 	}
@@ -4220,11 +4220,11 @@ void cmdhRemoveTracks(int command) {
 		removed));
 }
 
-void cmdRemoveTracks(Command* command) {
-	cmdhRemoveTracks(command->gaccel.accel.cmd);
+void cmdRemoveTracks(int command) {
+	cmdhRemoveTracks(command);
 }
 
-void cmdRemoveOrCopyAreaOfItems(Command* command) {
+void cmdRemoveOrCopyAreaOfItems(int command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	int selItems = CountSelectedMediaItems(nullptr);
@@ -4249,7 +4249,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 	if(start == end) {
 		s << translate("no time selection");
 	} else {
-		switch (command->gaccel.accel.cmd) {
+		switch (command) {
 			case 40060:{ // Item: Copy selected area of items
 				if(selItems == 0) {
 					s << translate("no items selected");
@@ -4298,7 +4298,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 				// affected.
 				s << format(
 					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
-				maybeAddRippleMessage(s, command->gaccel.accel.cmd);
+				maybeAddRippleMessage(s, command);
 			}
 		}
 	}
@@ -4310,7 +4310,7 @@ void cmdRemoveOrCopyAreaOfItems(Command* command) {
 			focusChanged = true;
 		}
 	}, 100);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	if(!focusChanged) {
 		outputMessage(s);
 	}
@@ -4331,11 +4331,11 @@ void cmdhRemoveItems(int command) {
 	outputMessage(s);
 }
 
-void cmdRemoveItems(Command* command) {
-	cmdhRemoveItems(command->gaccel.accel.cmd);
+void cmdRemoveItems(int command) {
+	cmdhRemoveItems(command);
 }
 
-void cmdCropTakes(Command* command) {
+void cmdCropTakes(int command) {
 	const int itemCount = CountSelectedMediaItems(nullptr);
 	int preCrop = 0;
 	for (int i = 0; i < itemCount; ++i) {
@@ -4344,7 +4344,7 @@ void cmdCropTakes(Command* command) {
 			++preCrop;
 		}
 	}
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int postCrop = 0;
 	for (int i = 0; i < itemCount; ++i) {
 		MediaItem* item = GetSelectedMediaItem(nullptr, i);
@@ -4363,9 +4363,9 @@ void cmdCropTakes(Command* command) {
 	}
 }
 
-void cmdHealSplitsInItems(Command* command) {
+void cmdHealSplitsInItems(int command) {
 	const int preHealed = CountSelectedMediaItems(nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	const int postHealed = CountSelectedMediaItems(nullptr);
 	const int healed = preHealed - postHealed;
 	if (healed == 0) {
@@ -4385,21 +4385,21 @@ void cmdHealSplitsInItems(Command* command) {
 	outputMessage(s);
 }
 
-void cmdCut(Command* command) {
+void cmdCut(int command) {
 	switch (GetCursorContext2(true)) {
 		case 0: // Track
-			cmdhRemoveTracks(command->gaccel.accel.cmd);
+			cmdhRemoveTracks(command);
 			return;
 		case 1: // Item
-			cmdhRemoveItems(command->gaccel.accel.cmd);
+			cmdhRemoveItems(command);
 			return;
 		case 2: // Envelope
-			cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd);
+			cmdhDeleteEnvelopePointsOrAutoItems(command);
 			return;
 	}
 }
 
-void cmdRemoveTimeSelection(Command* command) {
+void cmdRemoveTimeSelection(int command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
@@ -4408,7 +4408,7 @@ void cmdRemoveTimeSelection(Command* command) {
 	}
 }
 
-void cmdMoveItemEdgeOrSource(Command* command) {
+void cmdMoveItemEdgeOrSource(int command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
 		outputMessage(translate("no items selected"));
@@ -4416,14 +4416,14 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	}
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if (lastCommand != command->gaccel.accel.cmd) { 
-		s << getActionName(command->gaccel.accel.cmd) << " ";
+	if (lastCommand != command) { 
+		s << getActionName(command) << " ";
 		cache = FT_NO_CACHE;
 	}
 	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
 	double oldSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
 	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
 	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
@@ -4457,7 +4457,7 @@ void cmdMoveItemEdgeOrSource(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMoveItemsOrEnvPoint(Command* command) {
+void cmdMoveItemsOrEnvPoint(int command) {
 	if(GetCursorContext2(true) == 2 ) {// Envelope
 	cmdMoveSelEnvelopePoints(command);
 	} else {
@@ -4465,8 +4465,8 @@ void cmdMoveItemsOrEnvPoint(Command* command) {
 	}
 }
 
-void cmdInsertOrMoveSpecificMarker(Command* command) {
-	int cmd = command->gaccel.accel.cmd;
+void cmdInsertOrMoveSpecificMarker(int command) {
+	int cmd = command;
 	int beforeCount = CountProjectMarkers(0, nullptr, nullptr);
 	int wantNum;
 	// Work out the desired marker based on the command ID.
@@ -4512,28 +4512,28 @@ void cmdInsertOrMoveSpecificMarker(Command* command) {
 	}
 }
 
-void cmdDeleteMarker(Command* command) {
+void cmdDeleteMarker(int command) {
 	int count = CountProjectMarkers(0, nullptr, nullptr);
 	Main_OnCommand(40613, 0); // Markers: Delete marker near cursor
 	if (CountProjectMarkers(0, nullptr, nullptr) != count)
 		outputMessage(translate("marker deleted"));
 }
 
-void cmdDeleteRegion(Command* command) {
+void cmdDeleteRegion(int command) {
 	int count = CountProjectMarkers(0, nullptr, nullptr);
 	Main_OnCommand(40615, 0); // Markers: Delete region near cursor
 	if (CountProjectMarkers(0, nullptr, nullptr) != count)
 		outputMessage(translate("region deleted"));
 }
 
-void cmdDeleteTimeSig(Command* command) {
+void cmdDeleteTimeSig(int command) {
 	int count = CountTempoTimeSigMarkers(0);
 	Main_OnCommand(40617, 0); // Markers: Delete time signature marker near cursor
 	if (CountTempoTimeSigMarkers(0) != count)
 		outputMessage(translate("time signature deleted"));
 }
 
-void cmdRemoveStretch(Command* command) {
+void cmdRemoveStretch(int command) {
 	MediaItem* item = GetSelectedMediaItem(0, 0);
 	if (!item)
 		return;
@@ -4546,13 +4546,13 @@ void cmdRemoveStretch(Command* command) {
 		outputMessage(translate("stretch marker deleted"));
 }
 
-void cmdClearTimeLoopSel(Command* command) {
+void cmdClearTimeLoopSel(int command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	double old = start + end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
 	old += start + end;
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
 	double cur = start + end;
 	GetSet_LoopTimeRange(false, true, &start, &end, false);
@@ -4561,10 +4561,10 @@ void cmdClearTimeLoopSel(Command* command) {
 		outputMessage(translate("cleared time/loop selection"));
 }
 
-void cmdUnselAllTracksItemsPoints(Command* command) {
+void cmdUnselAllTracksItemsPoints(int command) {
 	int old = CountSelectedTracks(0) + CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
 	if (old != cur)
@@ -4584,7 +4584,7 @@ void reportTempoTimeSig() {
 	outputMessage(fmt::format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
 }
 
-void cmdManageTempoTimeSigMarkers(Command* command) {
+void cmdManageTempoTimeSigMarkers(int command) {
 	if(lastCommandRepeatCount==0) {
 		reportTempoTimeSig();
 		return;
@@ -4592,7 +4592,7 @@ void cmdManageTempoTimeSigMarkers(Command* command) {
 	Main_OnCommand(40256, 0); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
 }
 
-void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
+void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
 	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask & 1;
 	vector<MediaItem*> items;
@@ -4622,14 +4622,16 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(Command* command) {
 	PreventUIRefresh(-1);
 	UpdateArrange();
 	if (makeUndoPoint) {
-		Undo_EndBlock(command->gaccel.desc, UNDO_STATE_ITEMS);
+		Undo_EndBlock(
+			translate("OSARA: Select items under edit cursor on selected tracks"),
+			UNDO_STATE_ITEMS);
 	}
-	postSelectMultipleItems(command->gaccel.accel.cmd);
+	postSelectMultipleItems(command);
 }
 
-void cmdSwitchProjectTab(Command* command) {
+void cmdSwitchProjectTab(int command) {
 	ReaProject* oldProj = EnumProjects(-1, nullptr, 0);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	ReaProject* newProj = EnumProjects(-1, nullptr, 0);
 	if (newProj == oldProj) {
 		return;
@@ -4647,7 +4649,7 @@ void cmdSwitchProjectTab(Command* command) {
 	peakWatcher::onSwitchTab();
 }
 
-void cmdMoveToNextItemKeepSel(Command* command) {
+void cmdMoveToNextItemKeepSel(int command) {
 	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
 		moveToAutomationItem(1, false, isSelectionContiguous);
 	} else {
@@ -4655,7 +4657,7 @@ void cmdMoveToNextItemKeepSel(Command* command) {
 	}
 }
 
-void cmdMoveToPrevItemKeepSel(Command* command) {
+void cmdMoveToPrevItemKeepSel(int command) {
 	if (fakeFocus == FOCUS_ENVELOPE || fakeFocus == FOCUS_AUTOMATIONITEM) {
 		moveToAutomationItem(-1, false, isSelectionContiguous);
 	} else {
@@ -4663,7 +4665,7 @@ void cmdMoveToPrevItemKeepSel(Command* command) {
 	}
 }
 
-void cmdPropertiesFocus(Command* command) {
+void cmdPropertiesFocus(int command) {
 	if (shouldMoveToAutoItem && currentAutomationItem != -1) {
 		Main_OnCommand(42090, 0); // Envelope: Automation item properties...
 	} else {
@@ -4671,8 +4673,8 @@ void cmdPropertiesFocus(Command* command) {
 	}
 }
 
-void cmdReportRippleMode(Command* command) {
-	postCycleRippleMode(command->gaccel.accel.cmd);
+void cmdReportRippleMode(int command) {
+	postCycleRippleMode(command);
 }
 
 string formatTrackRange(int start, const char* startName,
@@ -4810,11 +4812,11 @@ void reportTracksWithState(const char* prefix, Func checkState,
 	}
 }
 
-void cmdReportMutedTracks(Command* command) {
+void cmdReportMutedTracks(int command) {
 	reportTracksWithState(translate("Muted"), isTrackMuted, /* includeMaster */ true);
 }
 
-void cmdReportSoloedTracks(Command* command) {
+void cmdReportSoloedTracks(int command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
 	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true,
@@ -4832,21 +4834,21 @@ void cmdReportSoloedTracks(Command* command) {
 	}
 }
 
-void cmdReportArmedTracks(Command* command) {
+void cmdReportArmedTracks(int command) {
 	reportTracksWithState(translate("Armed"), isTrackArmed, /* includeMaster */ false);
 }
 
-void cmdReportMonitoredTracks(Command* command) {
+void cmdReportMonitoredTracks(int command) {
 	reportTracksWithState(translate("Monitored"), isTrackMonitored,
 		/* includeMaster */ false);
 }
 
-void cmdReportPhaseInvertedTracks(Command* command) {
+void cmdReportPhaseInvertedTracks(int command) {
 	reportTracksWithState(translate("Phase inverted"), isTrackPhaseInverted,
 		/* includeMaster */ false);
 }
 
-void cmdReportFrozenTracks(Command* command) {
+void cmdReportFrozenTracks(int command) {
 	reportTracksWithState(translate("Frozen"), isTrackFrozen,
 		/* includeMaster */ false);
 }
@@ -4875,7 +4877,7 @@ string formatItemsWithState(Func stateCheck, bool multiLine) {
 	return s.str();
 }
 
-void cmdReportSelection(Command* command) {
+void cmdReportSelection(int command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
@@ -5008,11 +5010,11 @@ void cmdhDeleteTakeMarkers(int command) {
 		removed));
 }
 
-void cmdDeleteTakeMarkers(Command* command) {
-	cmdhDeleteTakeMarkers(command->gaccel.accel.cmd);
+void cmdDeleteTakeMarkers(int command) {
+	cmdhDeleteTakeMarkers(command);
 }
 
-void cmdRemoveFocus(Command* command) {
+void cmdRemoveFocus(int command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
 			cmdhRemoveTracks(40005); // Track: Remove tracks
@@ -5021,16 +5023,16 @@ void cmdRemoveFocus(Command* command) {
 			cmdhRemoveItems(40006); // Item: Remove items
 			break;
 		case FOCUS_MARKER:
-			cmdDeleteMarker(nullptr);
+			cmdDeleteMarker(0);
 			break;
 		case FOCUS_REGION:
-			cmdDeleteRegion(nullptr);
+			cmdDeleteRegion(0);
 			break;
 		case FOCUS_TIMESIG:
-			cmdDeleteTimeSig(nullptr);
+			cmdDeleteTimeSig(0);
 			break;
 		case FOCUS_STRETCH:
-			cmdRemoveStretch(nullptr);
+			cmdRemoveStretch(0);
 			break;
 		case FOCUS_ENVELOPE:
 			cmdhDeleteEnvelopePointsOrAutoItems(40333, true, false); // Envelope: Delete all selected points
@@ -5042,11 +5044,11 @@ void cmdRemoveFocus(Command* command) {
 			cmdhDeleteTakeMarkers(42386); // Item: Delete take marker at cursor);
 			break;
 		default:
-			cmdRemoveTimeSelection(nullptr);
+			cmdRemoveTimeSelection(0);
 	}
 }
 
-void cmdShortcutHelp(Command* command) {
+void cmdShortcutHelp(int command) {
 	static bool wasMidiStepInputEnabled = false;
 	auto toggleMidiStepInput = [] {
 		if (HWND editor = MIDIEditor_GetActive()) {
@@ -5075,7 +5077,7 @@ void cmdShortcutHelp(Command* command) {
 	outputMessage(s);
 }
 
-void cmdReportCursorPosition(Command* command) {
+void cmdReportCursorPosition(int command) {
 	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	int state = GetPlayState();
 	double pos = state & 1 ? GetPlayPosition() : GetCursorPosition();
@@ -5207,7 +5209,7 @@ void reportCursorPositionPrimaryFormat() {
 		outputMessage(formatTime(pos, tf, FT_USE_CACHE));
 }
 
-void cmdReportNumberOfTakesInItem(Command* command) {
+void cmdReportNumberOfTakesInItem(int command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item)
 		return;
@@ -5218,7 +5220,7 @@ void cmdReportNumberOfTakesInItem(Command* command) {
 		nonEmptyTakes));
 }
 
-void cmdReportItemLength(Command* command) {
+void cmdReportItemLength(int command) {
 	MediaItem* item = getItemWithFocus();
 	if (!item) {
 		outputMessage(translate("no items selected"));
@@ -5230,13 +5232,13 @@ void cmdReportItemLength(Command* command) {
 	outputMessage(formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
 }
 
-void cmdReportProjectLength(Command* command) {
+void cmdReportProjectLength(int command) {
 	TimeFormat tf = getPrimaryOrSecondaryTimeFormatForCommand();
 	double end = GetProjectLength(nullptr);
 	outputMessage(formatLength(0, end, tf, FT_NO_CACHE, false));
 }
 
-void cmdToggleSelection(Command* command) {
+void cmdToggleSelection(int command) {
 	if (isSelectionContiguous) {
 		isSelectionContiguous = false;
 		outputMessage(translate("noncontiguous selection"));
@@ -5275,7 +5277,7 @@ void cmdToggleSelection(Command* command) {
 	outputMessage(select ? translate("selected") : translate("unselected"));
 }
 
-void cmdMoveStretch(Command* command) {
+void cmdMoveStretch(int command) {
 	if (lastStretchPos == -1)
 		return;
 	int itemCount = CountSelectedMediaItems(0);
@@ -5313,29 +5315,29 @@ void reportPeak(MediaTrack* track, int channel) {
 	outputMessage(s);
 }
 
-void cmdReportPeakCurrentC1(Command* command) {
+void cmdReportPeakCurrentC1(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	reportPeak(track, 0);
 }
 
-void cmdReportPeakCurrentC2(Command* command) {
+void cmdReportPeakCurrentC2(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
 	reportPeak(track, 1);
 }
 
-void cmdReportPeakMasterC1(Command* command) {
+void cmdReportPeakMasterC1(int command) {
 	reportPeak(GetMasterTrack(0), 0);
 }
 
-void cmdReportPeakMasterC2(Command* command) {
+void cmdReportPeakMasterC2(int command) {
 	reportPeak(GetMasterTrack(0), 1);
 }
 
-void cmdDeleteAllTimeSigs(Command* command) {
+void cmdDeleteAllTimeSigs(int command) {
 	Undo_BeginBlock();
 	int count = CountTempoTimeSigMarkers(0);
 	if (!count)
@@ -5375,27 +5377,27 @@ if(cursorPos == newCursorPos)
 	reportCursorPositionPrimaryFormat();
 }
 
-void cmdMoveToNextTransient(Command* command) {
+void cmdMoveToNextTransient(int command) {
 	moveToTransient(false);
 }
 
-void cmdMoveToPreviousTransient(Command* command) {
+void cmdMoveToPreviousTransient(int command) {
 	moveToTransient(true);
 }
 
-void cmdShowContextMenu1(Command* command) {
+void cmdShowContextMenu1(int command) {
 	showReaperContextMenu(0);
 }
 
-void cmdShowContextMenu2(Command* command) {
+void cmdShowContextMenu2(int command) {
 	showReaperContextMenu(1);
 }
 
-void cmdShowContextMenu3(Command* command) {
+void cmdShowContextMenu3(int command) {
 	showReaperContextMenu(2);
 }
 
-void cmdReportAutomationMode(Command* command) {
+void cmdReportAutomationMode(int command) {
 	// This reports the global automation override if set, otherwise the current track automation mode.
 	MediaTrack* track = GetLastTouchedTrack();
 	const int globalMode = GetGlobalAutomationOverride() ;
@@ -5416,7 +5418,7 @@ void cmdReportAutomationMode(Command* command) {
 	}
 }
 
-void cmdToggleGlobalAutomationLatchPreview(Command* command) {
+void cmdToggleGlobalAutomationLatchPreview(int command) {
 	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
 		SetGlobalAutomationOverride(-1);
 		outputMessage(translate("global automation override off"));
@@ -5426,7 +5428,7 @@ void cmdToggleGlobalAutomationLatchPreview(Command* command) {
 	}
 }
 
-void cmdCycleTrackAutomation(Command* command) {
+void cmdCycleTrackAutomation(int command) {
 	int count = CountSelectedTracks2(0, true);
 	if (count == 0) {
 		outputMessage(translate("no selected tracks"));
@@ -5446,7 +5448,7 @@ void cmdCycleTrackAutomation(Command* command) {
 		automationModeAsString(newmode)));
 }
 
-void cmdCycleMidiRecordingMode(Command* command) {
+void cmdCycleMidiRecordingMode(int command) {
 	int count = CountSelectedTracks2(0, false);
 	if (count == 0) {
 		outputMessage(translate("no selected tracks"));
@@ -5483,12 +5485,12 @@ void cmdCycleMidiRecordingMode(Command* command) {
 	outputMessage(recordingModeAsString(newmode));
 }
 
-void cmdNudgeTimeSelection(Command* command) {
-	bool first= (lastCommand!=command->gaccel.accel.cmd);
+void cmdNudgeTimeSelection(int command) {
+	bool first= (lastCommand!=command);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	double cursorPos = GetCursorPosition();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
 	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
 		double cursorDiff = (newStart != oldStart)
@@ -5514,7 +5516,7 @@ void cmdNudgeTimeSelection(Command* command) {
 	outputMessage(s);
 }
 
-void cmdAbout(Command* command) {
+void cmdAbout(int command) {
 	ostringstream s;
 	// Translators: OSARA's full name presented in the About dialog.
 	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
@@ -5525,13 +5527,13 @@ void cmdAbout(Command* command) {
 	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
-void cmdInsertMarker(Command* command) {
+void cmdInsertMarker(int command) {
 	if (!shouldReportTimeMovement()) {
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		Main_OnCommand(command, 0);
 		return;
 	}
 	int count = CountProjectMarkers(nullptr, nullptr, nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	if (CountProjectMarkers(nullptr, nullptr, nullptr) == count) {
 		return; // Not inserted.
 	}
@@ -5547,13 +5549,13 @@ void cmdInsertMarker(Command* command) {
 	outputMessage(format(translate("marker {} inserted"), number));
 }
 
-void cmdInsertRegion(Command* command) {
+void cmdInsertRegion(int command) {
 	if (!shouldReportTimeMovement()) {
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		Main_OnCommand(command, 0);
 		return;
 	}
 	int oldCount = CountProjectMarkers(nullptr, nullptr, nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int newCount = CountProjectMarkers(nullptr, nullptr, nullptr);
 	if (newCount == oldCount) {
 		return; // Not inserted.
@@ -5587,15 +5589,15 @@ void cmdInsertRegion(Command* command) {
 	outputMessage(format(translate("region {} inserted"), number));
 }
 
-void cmdChangeItemGroup(Command* command) {
+void cmdChangeItemGroup(int command) {
 	MediaItem* item = getItemWithFocus();
 	if(!item) {
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		Main_OnCommand(command, 0);
 		return;
 	}
 	int selCount = CountSelectedMediaItems(nullptr);
 	int oldGroupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int newGroupId = *(int*)GetSetMediaItemInfo(item, "I_GROUPID", nullptr);
 	if (newGroupId) {
 		// Translators: Reported when adding items to a group. {count} will be
@@ -5614,7 +5616,7 @@ void cmdChangeItemGroup(Command* command) {
 	}
 }
 
-void cmdReportTrackGroups(Command* command) {
+void cmdReportTrackGroups(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track) {
 		return;
@@ -5660,15 +5662,15 @@ void cmdReportTrackGroups(Command* command) {
 	outputMessage(s);
 }
 
-void cmdMuteNextMessage(Command* command){
+void cmdMuteNextMessage(int command){
 	muteNextMessage = true;
 }
 
-void cmdReportScrubStyle(Command* command) {
+void cmdReportScrubStyle(int command) {
 	if (settings::moveFromPlayCursor && (GetPlayState() & 1)) {
 		SetEditCurPos(GetPlayPosition(), false, false);
 	}
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int loopedSegmentState = GetToggleCommandState(41187); // Toggle looped-segment scrub
 	int oneShotState = GetToggleCommandState(43593);       // Toggle one-shot scrub
 	if (loopedSegmentState == 1) {
@@ -5683,7 +5685,7 @@ void cmdReportScrubStyle(Command* command) {
 	}
 }
 
-void cmdReportRegionMarkerItems(Command* command) {
+void cmdReportRegionMarkerItems(int command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
 	auto separate = [&s, multiLine]() {
@@ -5734,7 +5736,7 @@ void cmdReportRegionMarkerItems(Command* command) {
 	}
 }
 
-void cmdSelectFromCursorToStartOfProject(Command* command) {
+void cmdSelectFromCursorToStartOfProject(int command) {
 	Main_OnCommand(40626, 0); // Time selection: Set end point
 	Main_OnCommand(40042, 0); // Transport: Go to start of project
 	Main_OnCommand(40625, 0); // Time selection: Set start point
@@ -5743,7 +5745,7 @@ void cmdSelectFromCursorToStartOfProject(Command* command) {
 	outputMessage(translate("selected to start of project"));
 }
 
-void cmdSelectFromCursorToEndOfProject(Command* command) {
+void cmdSelectFromCursorToEndOfProject(int command) {
 	Main_OnCommand(40625, 0); // Time selection: Set start point
 	Main_OnCommand(40043, 0); // Transport: Go to end of project
 	Main_OnCommand(40626, 0); // Time selection: Set end point
@@ -5751,7 +5753,7 @@ void cmdSelectFromCursorToEndOfProject(Command* command) {
 	outputMessage(translate("selected to end of project"));
 }
 
-void cmdSetPhaseNormalAllTracks(Command* command) {
+void cmdSetPhaseNormalAllTracks(int command) {
 	int count = CountTracks(nullptr);
 	if (count == 0) {
 		outputMessage(translate("no tracks"));
@@ -5766,7 +5768,7 @@ void cmdSetPhaseNormalAllTracks(Command* command) {
 	outputMessage(translate("phase normal all tracks"));
 }
 
-void cmdUnmonitorAllTracks(Command* command) {
+void cmdUnmonitorAllTracks(int command) {
 	int count = CountTracks(nullptr);
 	if (count == 0) {
 		outputMessage(translate("no tracks"));
@@ -5782,14 +5784,14 @@ void cmdUnmonitorAllTracks(Command* command) {
 	outputMessage(translate("unmonitored all tracks"));
 }
 
-void cmdOpenDoc(Command* command) {
+void cmdOpenDoc(int command) {
 	const char DOC_URL[] = "https://osara.reaperaccessibility.com/";
 	ShellExecute(nullptr, "open", DOC_URL, nullptr, nullptr,
 		SW_SHOWNORMAL);
 }
 
-void cmdJumpToTime(Command* command) {
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+void cmdJumpToTime(int command) {
+	Main_OnCommand(command, 0);
 	// Delay the message slightly to avoid it being clobbered by other VoiceOver
 	// speech when the Jump dialog closes.
 	CallLater([] {
@@ -5797,8 +5799,8 @@ void cmdJumpToTime(Command* command) {
 	}, 50);
 }
 
-void cmdVideoWindowVisibility(Command* command) {
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+void cmdVideoWindowVisibility(int command) {
+	Main_OnCommand(command, 0);
 	// Delay the report to avoid it being clobbered when GUI updates.
 	CallLater([]() {
 		if (GetToggleCommandState(50125)) { // Show/hide video window
@@ -5809,7 +5811,7 @@ void cmdVideoWindowVisibility(Command* command) {
 	}, 50);
 }
 
-void cmdMoveTracks(Command* command) {
+void cmdMoveTracks(int command) {
 	const int selectedTracks = CountSelectedTracks2(nullptr, true);
 	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
 	if (selectedTracks == 0) {
@@ -5821,14 +5823,14 @@ void cmdMoveTracks(Command* command) {
 		return;
 	}
 	MediaTrack* const track = GetLastTouchedTrack();
-	const bool up = command->gaccel.accel.cmd == 43647;
+	const bool up = command == 43647;
 	if (up) {
 		maybeOpenClosedFolderBeforeTrackMoveUp(track);
 	} else {
 		maybeOpenClosedFolderBeforeTrackMoveDown(track);
 	}
 	const int origTrackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	MediaTrack* const newParent = GetParentTrack(track);
 	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	const bool atTopOfTrackList = trackIndex == 0;
@@ -5879,7 +5881,7 @@ void cmdMoveTracks(Command* command) {
 	outputMessage(s);
 }
 
-void cmdReportAndEditScrubSegmentOffsets(Command* command) {
+void cmdReportAndEditScrubSegmentOffsets(int command) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
 	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
@@ -5942,7 +5944,7 @@ static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enab
 	return info.hSubMenu;
 }
 
-void cmdShowPeakAndLoudnessMenu(Command* command) {
+void cmdShowPeakAndLoudnessMenu(int command) {
 	double startTS, endTS;
 	GetSet_LoopTimeRange(false, false, &startTS, &endTS, false);
 	int countTracks = CountTracks(nullptr);
@@ -6003,9 +6005,9 @@ void cmdShowPeakAndLoudnessMenu(Command* command) {
 	}
 }
 
-void cmdChangeTransportState(Command* command) {
+void cmdChangeTransportState(int command) {
 	int before = GetPlayState();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int after = GetPlayState();
 	reportTransportState(before, after);
 }
@@ -6460,7 +6462,7 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		} else {
 			lastCommandRepeatCount = 0;
 		}
-		it->second->execute(it->second);
+		it->second->execute(it->second->gaccel.accel.cmd);
 		lastCommand = it->second->gaccel.accel.cmd;
 		lastCommandTime = GetTickCount();
 		isHandlingCommand = false;

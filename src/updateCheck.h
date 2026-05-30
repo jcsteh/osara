@@ -11,4 +11,4 @@
 
 void startUpdateCheck(bool manual=false);
 void cancelUpdateCheck();
-void cmdCheckForUpdate(Command* command);
+void cmdCheckForUpdate(int command);

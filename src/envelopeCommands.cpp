@@ -180,8 +180,8 @@ void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints, bool che
 	}
 }
 
-void cmdDeleteEnvelopePoints(Command* command) {
-	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, true, false);
+void cmdDeleteEnvelopePoints(int command) {
+	cmdhDeleteEnvelopePointsOrAutoItems(command, true, false);
 }
 
 // For each selected envelope point, Call func(autoItemIndex, pointIndex) .
@@ -351,12 +351,12 @@ optional<bool> toggleCurrentEnvelopePointSelection() {
 	return {isSelected};
 }
 
-void cmdInsertEnvelopePoint(Command* command) {
+void cmdInsertEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(0);
 	if (!envelope)
 		return;
 	int oldCount = CountEnvelopePoints(envelope);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	if (CountEnvelopePoints(envelope) <= oldCount)
 		return;
 	moveToEnvelopePoint(0); // Select and report inserted point.
@@ -484,27 +484,27 @@ void cmdhSelectEnvelope(int direction) {
 	outputMessage(s);
 }
 
-void cmdSelectNextEnvelope(Command* command) {
+void cmdSelectNextEnvelope(int command) {
 	cmdhSelectEnvelope(1);
 }
 
-void cmdSelectPreviousEnvelope(Command* command) {
+void cmdSelectPreviousEnvelope(int command) {
 	cmdhSelectEnvelope(-1);
 }
 
-void cmdMoveToNextEnvelopePoint(Command* command) {
+void cmdMoveToNextEnvelopePoint(int command) {
 	moveToEnvelopePoint(1, true, true);
 }
 
-void cmdMoveToPrevEnvelopePoint(Command* command) {
+void cmdMoveToPrevEnvelopePoint(int command) {
 	moveToEnvelopePoint(-1, true, true);
 }
 
-void cmdMoveToNextEnvelopePointKeepSel(Command* command) {
+void cmdMoveToNextEnvelopePointKeepSel(int command) {
 	moveToEnvelopePoint(1, false, isSelectionContiguous);
 }
 
-void cmdMoveToPrevEnvelopePointKeepSel(Command* command) {
+void cmdMoveToPrevEnvelopePointKeepSel(int command) {
 	moveToEnvelopePoint(-1, false, isSelectionContiguous);
 }
 
@@ -709,8 +709,8 @@ void cmdhToggleTrackEnvelope(int command) {
 		translate("hid track {} envelope"));
 }
 
-void cmdToggleTrackEnvelope(Command* command) {
-	cmdhToggleTrackEnvelope(command->gaccel.accel.cmd);
+void cmdToggleTrackEnvelope(int command) {
+	cmdhToggleTrackEnvelope(command);
 }
 
 void cmdhToggleTakeEnvelope(int command) {
@@ -727,8 +727,8 @@ void cmdhToggleTakeEnvelope(int command) {
 		translate("hid take {} envelope"));
 }
 
-void cmdToggleTakeEnvelope(Command* command) {
-	cmdhToggleTakeEnvelope(command->gaccel.accel.cmd);
+void cmdToggleTakeEnvelope(int command) {
+	cmdhToggleTakeEnvelope(command);
 }
 
 void postSelectMultipleEnvelopePoints(int command) {
@@ -744,21 +744,21 @@ void postSelectMultipleEnvelopePoints(int command) {
 		count));
 }
 
-void cmdMoveSelEnvelopePoints(Command* command) {
+void cmdMoveSelEnvelopePoints(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if(!envelope || !currentEnvelopePoint || !shouldReportTimeMovement()) {
-		Main_OnCommand(command->gaccel.accel.cmd, 0);
+		Main_OnCommand(command, 0);
 		return;
 	}
 	double oldPos {0.0};
 	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &oldPos, nullptr, nullptr, nullptr, nullptr);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	double newPos{0.0};
 	GetEnvelopePointEx(envelope, currentAutomationItem, *currentEnvelopePoint, &newPos, nullptr, nullptr, nullptr, nullptr);
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if(lastCommand != command->gaccel.accel.cmd) { 
-		s << getActionName(command->gaccel.accel.cmd) << " ";
+	if(lastCommand != command) { 
+		s << getActionName(command) << " ";
 	}
 	if(oldPos == newPos) {
 		s << translate("no change");
@@ -768,7 +768,7 @@ void cmdMoveSelEnvelopePoints(Command* command) {
 	outputMessage(s);
 }
 
-void cmdCycleEnvelopePointShape(Command* command) {
+void cmdCycleEnvelopePointShape(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
 		return;
@@ -800,7 +800,7 @@ void cmdCycleEnvelopePointShape(Command* command) {
 	outputMessage(getEnvelopeShapeName(shape));
 }
 
-void cmdToggleVolumeEnvelope(Command* command) {
+void cmdToggleVolumeEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(40693); // Take: Toggle take volume envelope
 	} else {
@@ -808,7 +808,7 @@ void cmdToggleVolumeEnvelope(Command* command) {
 	}
 }
 
-void cmdTogglePanEnvelope(Command* command) {
+void cmdTogglePanEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(40694); // Take: Toggle take pan envelope
 	} else {
@@ -816,7 +816,7 @@ void cmdTogglePanEnvelope(Command* command) {
 	}
 }
 
-void cmdToggleMuteEnvelope(Command* command) {
+void cmdToggleMuteEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(40695); // Take: Toggle take mute envelope
 	} else {
@@ -824,7 +824,7 @@ void cmdToggleMuteEnvelope(Command* command) {
 	}
 }
 
-void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
+void cmdTogglePreFXPanOrTakePitchEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(41612); // Take: Toggle take pitch envelope
 	} else {
@@ -832,7 +832,7 @@ void cmdTogglePreFXPanOrTakePitchEnvelope(Command* command) {
 	}
 }
 
-void cmdToggleLastTouchedEnvelope(Command* command) {
+void cmdToggleLastTouchedEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(41142); // FX: Show/hide track envelope for last touched FX parameter
 	} else {
@@ -840,26 +840,26 @@ void cmdToggleLastTouchedEnvelope(Command* command) {
 	}
 }
 
-void cmdInsertAutoItem(Command* command) {
+void cmdInsertAutoItem(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
 		return;
 	}
 	int oldItems = CountAutomationItems(envelope);
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int added = CountAutomationItems(envelope) - oldItems;
 	if (added) {
 		outputMessage(translate("inserted automation item"));
 	}
 }
 
-void cmdDeleteAutoItems(Command* command) {
-	cmdhDeleteEnvelopePointsOrAutoItems(command->gaccel.accel.cmd, false, true);
+void cmdDeleteAutoItems(int command) {
+	cmdhDeleteEnvelopePointsOrAutoItems(command, false, true);
 }
 
-void cmdAddAutoItems(Command* command) {
+void cmdAddAutoItems(int command) {
 	int oldItems = countAllAutomationItems();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int added = countAllAutomationItems() - oldItems;
 	// Translators: Reported when adding automation items. {} will be
 	// replaced with the number of items; e.g. "2 automation items added".
@@ -868,9 +868,9 @@ void cmdAddAutoItems(Command* command) {
 		added));
 }
 
-void cmdGlueAutoItems(Command* command) {
+void cmdGlueAutoItems(int command) {
 	int oldItems = countAllAutomationItems();
-	Main_OnCommand(command->gaccel.accel.cmd, 0);
+	Main_OnCommand(command, 0);
 	int removed = oldItems - countAllAutomationItems();
 	if (removed == 0) {
 		outputMessage(translate("no automation items glued"));
