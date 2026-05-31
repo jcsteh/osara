@@ -44,11 +44,12 @@ var standardRadio
 var portableRadio
 var portable
 Var keymapReplaced
+!define OSARA_LANG_ENGLISH 1033
 
 !macro OSARA_LANG_STRING NAME TEXT
 	; The NSIS preprocessor strips quotes from the macro argument value, so
 	; LangString must add them here to keep spaces in the translated text.
-	LangString ${NAME} 1033 "${TEXT}"
+	LangString ${NAME} ${OSARA_LANG_ENGLISH} "${TEXT}"
 !macroend
 
 ; Translators: Displayed if the installer starts while REAPER is still running.
