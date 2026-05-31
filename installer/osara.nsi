@@ -44,7 +44,9 @@ var standardRadio
 var portableRadio
 var portable
 Var keymapReplaced
-!define OSARA_LANG_ENGLISH 1033
+
+!insertmacro MUI_LANGUAGE "English"
+!define OSARA_LANG_ENGLISH ${LANG_ENGLISH}
 
 !macro OSARA_LANG_STRING NAME TEXT
 	; The NSIS preprocessor strips quotes from the macro argument value, so

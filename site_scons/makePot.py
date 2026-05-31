@@ -57,25 +57,28 @@ RE_TRANSLATORS_COMMENT = re.compile(r"^\s*(?://|;)\s*Translators:\s*(.*)$")
 RE_COMMENT = re.compile(r"^\s*(?://|;)\s*(.*)$")
 inTranslatorsComment = False
 lastTranslatorsComment = []
+lastTranslatorsCommentLine = None
 def resetTranslatorsCommentState():
-	global inTranslatorsComment, lastTranslatorsComment
+	global inTranslatorsComment, lastTranslatorsComment, lastTranslatorsCommentLine
 	inTranslatorsComment = False
 	lastTranslatorsComment = []
+	lastTranslatorsCommentLine = None
 
 def ensureNoDanglingTranslatorsComment(input):
 	if lastTranslatorsComment:
 		raise RuntimeError(
-			f"{input.name}:{lineNum}: Translators comment wasn't followed by a translatable message"
+			f"{input.name}:{lastTranslatorsCommentLine}: Translators comment wasn't followed by a translatable message"
 		)
 
 def handleTranslatorsComment(line):
-	global inTranslatorsComment, lastTranslatorsComment
+	global inTranslatorsComment, lastTranslatorsComment, lastTranslatorsCommentLine
 	m = RE_TRANSLATORS_COMMENT.match(line)
 	if m:
 		if lastTranslatorsComment:
 			error("Didn't find translatable message after last translators comment")
 		inTranslatorsComment = True
 		lastTranslatorsComment.append(m.group(1))
+		lastTranslatorsCommentLine = lineNum
 		return True
 	if inTranslatorsComment:
 		m = RE_COMMENT.match(line)
@@ -87,7 +90,7 @@ def handleTranslatorsComment(line):
 	return False
 
 def addMessage(data):
-	global messages, lastTranslatorsComment
+	global messages, lastTranslatorsComment, lastTranslatorsCommentLine
 	if not data["msgid"]:
 		error("Empty msgid")
 	key = (data.get("context"), data["msgid"])
@@ -96,6 +99,7 @@ def addMessage(data):
 		comments = data.setdefault("comments", [])
 		comments.extend(lastTranslatorsComment)
 		lastTranslatorsComment = []
+		lastTranslatorsCommentLine = None
 
 RE_CPP_TRANSLATE = re.compile(r'\b(?:translate|_t)\(\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|[^)]*),?\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
