@@ -62,6 +62,12 @@ def resetTranslatorsCommentState():
 	inTranslatorsComment = False
 	lastTranslatorsComment = []
 
+def ensureNoDanglingTranslatorsComment(input):
+	if lastTranslatorsComment:
+		raise RuntimeError(
+			f"{input.name}:{lineNum}: Translators comment wasn't followed by a translatable message"
+		)
+
 def handleTranslatorsComment(line):
 	global inTranslatorsComment, lastTranslatorsComment
 	m = RE_TRANSLATORS_COMMENT.match(line)
@@ -122,6 +128,7 @@ def addCpp(input):
 				# variable.
 				continue
 			addMessage(m.groupdict())
+	ensureNoDanglingTranslatorsComment(input)
 
 RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
 def addRc(input):
@@ -144,6 +151,7 @@ def addRc(input):
 				continue
 			data["context"] = context
 			addMessage(data)
+	ensureNoDanglingTranslatorsComment(input)
 
 def addNsi(input):
 	global lineNum
@@ -160,3 +168,4 @@ def addNsi(input):
 			"context": "installer",
 			"msgid": unescapeNsiString(m.group("msgid")),
 		})
+	ensureNoDanglingTranslatorsComment(input)

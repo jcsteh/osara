@@ -24,8 +24,11 @@ LOCALE_TO_NSIS_LANGUAGE = OrderedDict((
 	("zh_TW", "TradChinese"),
 ))
 
-def _parse_po_string(text):
-	return literal_eval(text)
+def _parse_po_string(text, path, lineNum, field):
+	try:
+		return literal_eval(text)
+	except (SyntaxError, ValueError) as e:
+		raise RuntimeError(f"{path}:{lineNum}: error parsing {field}: {e}") from e
 
 
 def _parse_po(path):
@@ -33,7 +36,7 @@ def _parse_po(path):
 	current = {}
 	currentField = None
 	with open(path, "rt", encoding="UTF-8") as input:
-		for rawLine in input:
+		for rawLineNum, rawLine in enumerate(input, start=1):
 			line = rawLine.rstrip("\r\n")
 			if not line:
 				if current.get("msgid"):
@@ -46,17 +49,21 @@ def _parse_po(path):
 			for field in ("msgctxt", "msgid", "msgstr"):
 				prefix = f"{field} "
 				if line.startswith(prefix):
-					current[field] = _parse_po_string(line[len(prefix):])
+					current[field] = _parse_po_string(line[len(prefix):], path, rawLineNum, field)
 					currentField = field
 					break
 				if field == "msgstr" and line.startswith("msgstr[0] "):
-					current[field] = _parse_po_string(line[len("msgstr[0] "):])
+					current[field] = _parse_po_string(
+						line[len("msgstr[0] "):], path, rawLineNum, "msgstr[0]"
+					)
 					currentField = field
 					break
 			else:
 				if not currentField or not line.startswith('"'):
 					continue
-				current[currentField] += _parse_po_string(line)
+				current[currentField] += _parse_po_string(
+					line, path, rawLineNum, f"{currentField} continuation"
+				)
 	if current.get("msgid"):
 		entries[(current.get("msgctxt"), current["msgid"])] = current.get("msgstr", "")
 	return entries
