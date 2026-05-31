@@ -30,6 +30,8 @@ msgstr ""
 			addCpp(inp)
 		elif filePath.endswith(".rc"):
 			addRc(inp)
+		elif filePath.endswith(".nsi"):
+			addNsi(inp)
 	for (context, msgid), data in messages.items():
 		for comment in data.get("comments", ()):
 			out.write('#. %s\n' % comment)
@@ -49,8 +51,8 @@ lineNum = None
 def error(msg):
 	raise RuntimeError(f"{msg}, {filePath} line {lineNum}")
 
-RE_TRANSLATORS_COMMENT = re.compile(r"^\s*// Translators: (.*)$")
-RE_COMMENT = re.compile(r"^\s*// (.*)$")
+RE_TRANSLATORS_COMMENT = re.compile(r"^\s*(?://|;)\s*Translators:\s*(.*)$")
+RE_COMMENT = re.compile(r"^\s*(?://|;)\s*(.*)$")
 inTranslatorsComment = False
 lastTranslatorsComment = []
 def handleTranslatorsComment(line):
@@ -133,3 +135,21 @@ def addRc(input):
 				continue
 			data["context"] = context
 			addMessage(data)
+
+RE_NSI_TRANSLATE = re.compile(
+	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>(?:[^"\\]|\\.)*)"'
+)
+def addNsi(input):
+	global lineNum
+	lineNum = 0
+	for line in input:
+		lineNum += 1
+		if handleTranslatorsComment(line):
+			continue
+		m = RE_NSI_TRANSLATE.match(line)
+		if not m:
+			continue
+		addMessage({
+			"context": "installer",
+			"msgid": m.group("msgid").replace(r'\"', '"'),
+		})

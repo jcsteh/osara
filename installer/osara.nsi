@@ -14,7 +14,6 @@ SetCompressor /SOLID LZMA
 	Unicode true
 !endif
 Name "OSARA"
-Caption "OSARA ${VERSION} Setup"
 OutFile "${OUTFILE}"
 VIProductVersion "0.0.0.0" ;Needs to be here so other version info shows up
 VIAddVersionKey "ProductName" "OSARA"
@@ -39,19 +38,38 @@ Page custom portablePage portablePageLeave
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
-!insertmacro MUI_LANGUAGE "English"
-
 Var dialog
 var standardRadio
 var portableRadio
 var portable
 Var keymapReplaced
 
+!macro OSARA_LANG_STRING NAME TEXT
+	LangString ${NAME} 1033 "${TEXT}"
+!macroend
+
+; Translators: Displayed if the installer starts while REAPER is still running.
+!insertmacro OSARA_LANG_STRING osaraReaperRunning "OSARA cannot be installed while REAPER is running. Please close REAPER then run this installer again."
+; Translators: Prompt on the custom installer page where the user chooses between a standard or portable REAPER install.
+!insertmacro OSARA_LANG_STRING osaraInstallTypePrompt "Install into a standard or portable installation of REAPER?"
+; Translators: Option text on the custom installer page. Keep the ampersand so Windows can expose a shortcut key.
+!insertmacro OSARA_LANG_STRING osaraStandardInstall "&Standard installation"
+; Translators: Option text on the custom installer page. Keep the ampersand so Windows can expose a shortcut key.
+!insertmacro OSARA_LANG_STRING osaraPortableInstall "&Portable installation"
+; Translators: Prompt asking whether the existing REAPER key map should be replaced with the OSARA key map. Keep the $\r$\n sequences as line breaks.
+!insertmacro OSARA_LANG_STRING osaraReplaceKeyMapPrompt "Do you want to replace the existing key map with the OSARA key map?$\r$\nNew users are advised to answer Yes, which will completely replace your key map with a clean copy of the OSARA key map including all latest assignments.$\r$\nAnswering No will install OSARA without modifying your key map, which may be preferable for experienced users who have prior alterations that they'd like to preserve."
+; Translators: Shown on the finish page after replacing the user's key map. Keep $INSTDIR unchanged because it is replaced with the install path.
+!insertmacro OSARA_LANG_STRING osaraFinishKeyMapReplaced "OSARA is installed with its latest key map. A safety backup of your prior key map has been placed in $INSTDIR\KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
+; Translators: Shown on the finish page when the existing key map is preserved.
+!insertmacro OSARA_LANG_STRING osaraFinishKeyMapPreserved "OSARA has been installed with your current key map preserved."
+
+!include "..\build\installerStrings.nsh"
+
 Function preLicenseCheck
 	FindWindow $0 "REAPERwnd"
 	${If} $0 <> 0
 		MessageBox MB_OK|MB_ICONEXCLAMATION \
-			"OSARA cannot be installed while REAPER is running. Please close REAPER then run this installer again."
+			"$(osaraReaperRunning)"
 		Quit
 	${EndIf}
 FunctionEnd
@@ -62,11 +80,11 @@ Function portablePage
 	${If} $Dialog == error
 		Abort
 	${EndIf}
-	${NSD_CreateLabel} 0% 0% 100% 10% "Install into a standard or portable installation of REAPER?"
+	${NSD_CreateLabel} 0% 0% 100% 10% "$(osaraInstallTypePrompt)"
 	Pop $0
-	${NSD_CreateRadioButton} 10% 20% 50% 10% "&Standard installation"
+	${NSD_CreateRadioButton} 10% 20% 50% 10% "$(osaraStandardInstall)"
 	Pop $standardRadio
-	${NSD_CreateRadioButton} 10% 40% 50% 10% "&Portable installation"
+	${NSD_CreateRadioButton} 10% 40% 50% 10% "$(osaraPortableInstall)"
 	Pop $portableRadio
 	${If} $portable = ${BST_CHECKED}
 		${NSD_Check} $portableRadio
@@ -126,9 +144,7 @@ SectionEnd
 Section "Replace existing key map with OSARA key map" SecKeyMap
 	StrCpy $keymapReplaced 0
 	MessageBox MB_YESNO|MB_ICONQUESTION \
-		"Do you want to replace the existing key map with the OSARA key map?$\r$\n\
-		New users are advised to answer Yes, which will completely replace your key map with a clean copy of the OSARA key map including all latest assignments.$\r$\n\
-		Answering No will install OSARA without modifying your key map, which may be preferable for experienced users who have prior alterations that they'd like to preserve." \
+		"$(osaraReplaceKeyMapPrompt)" \
 		/SD IDNO IDNO dontReplaceKeyMap
 	; If we reach here, the user chose yes.
 	StrCpy $keymapReplaced 1
@@ -141,9 +157,9 @@ SectionEnd
 
 Function finishPageShow
 	${If} $keymapReplaced = 1
-		StrCpy $0 "OSARA is installed with its latest key map. A safety backup of your prior key map has been placed in $INSTDIR\KeyMaps\OSARAReplacedBackup.ReaperKeyMap"
+		StrCpy $0 "$(osaraFinishKeyMapReplaced)"
 	${Else}
-		StrCpy $0 "OSARA has been installed with your current key map preserved."
+		StrCpy $0 "$(osaraFinishKeyMapPreserved)"
 	${EndIf}
 	SendMessage $mui.FinishPage.Text ${WM_SETTEXT} 0 "STR:$0"
 FunctionEnd

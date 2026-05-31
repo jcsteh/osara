@@ -4,6 +4,7 @@
 # License: GNU General Public License version 2.0
 
 import os
+from makeInstallerStrings import makeInstallerStrings
 from makePot import makePot
 import multiprocessing
 
@@ -34,8 +35,11 @@ if env["PLATFORM"] == "win32":
 			exports={"env": archEnv},
 			variant_dir="build/%s" % arch, duplicate=False)
 	configRc = "build/x86_64/config.rc"
+	installerStrings = env.Command("build/installerStrings.nsh",
+		["installer/osara.nsi", env.Glob("locale/*.po"), "site_scons/makeInstallerStrings.py"],
+		makeInstallerStrings)
 
-	installer = env.Command("installer/osara_${version}.exe", ["installer/osara.nsi", "build"],
+	installer = env.Command("installer/osara_${version}.exe", ["installer/osara.nsi", "build", installerStrings],
 		[[
             os.path.join("include", "nsis", "NSIS", "makensis.exe"),
             "/V2",
@@ -60,6 +64,6 @@ env.Alias("installer", installer)
 env.Default(installer)
 
 pot = env.Command("locale/osara_${version}.pot",
-	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
+	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), "installer/osara.nsi", configRc],
 	makePot)
 env.Alias("pot", pot)
