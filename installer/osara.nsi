@@ -46,6 +46,8 @@ var portable
 Var keymapReplaced
 
 !macro OSARA_LANG_STRING NAME TEXT
+	; The NSIS preprocessor strips quotes from the macro argument value, so
+	; LangString must add them here to keep spaces in the translated text.
 	LangString ${NAME} 1033 "${TEXT}"
 !macroend
 
