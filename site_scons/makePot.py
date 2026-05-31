@@ -137,7 +137,7 @@ def addRc(input):
 			addMessage(data)
 
 RE_NSI_TRANSLATE = re.compile(
-	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>(?:[^"\\]|\\.)*)"'
+	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*)"\s*$'
 )
 def addNsi(input):
 	global lineNum
@@ -151,5 +151,5 @@ def addNsi(input):
 			continue
 		addMessage({
 			"context": "installer",
-			"msgid": m.group("msgid").replace(r'\"', '"'),
+			"msgid": m.group("msgid").replace(r'$\"', '"'),
 		})

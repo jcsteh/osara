@@ -24,7 +24,7 @@ LOCALE_TO_NSIS_LANGUAGE = OrderedDict((
 ))
 
 RE_INSTALLER_STRING = re.compile(
-	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>(?:[^"\\]|\\.)*)"'
+	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*)"\s*$'
 )
 
 
@@ -74,12 +74,12 @@ def _read_installer_strings(path):
 			match = RE_INSTALLER_STRING.match(line)
 			if not match:
 				continue
-			strings[match.group("name")] = match.group("msgid").replace(r'\"', '"')
+			strings[match.group("name")] = match.group("msgid").replace(r'$\"', '"')
 	return strings
 
 
 def _escape_nsi(text):
-	return text.replace('"', '$\\"')
+	return text.replace('"', r'$\"')
 
 
 def makeInstallerStrings(target, source, env):
@@ -105,6 +105,8 @@ def makeInstallerStrings(target, source, env):
 		for locale, language in LOCALE_TO_NSIS_LANGUAGE.items():
 			localePath = localePaths.get(locale)
 			if not localePath or language in seenLanguages:
+				# Some OSARA locales share the same NSIS language slot, so the first
+				# locale in LOCALE_TO_NSIS_LANGUAGE with an available .po wins.
 				continue
 			seenLanguages.add(language)
 			translations = _parse_po(localePath)
