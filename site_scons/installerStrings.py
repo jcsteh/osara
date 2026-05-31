@@ -7,7 +7,7 @@ import re
 
 
 RE_INSTALLER_STRING = re.compile(
-	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*)"\s*$'
+	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*?)"\s*(?:;.*)?$'
 )
 
 RE_LITERAL_DOLLAR = re.compile(

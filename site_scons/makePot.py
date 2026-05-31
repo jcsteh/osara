@@ -57,6 +57,11 @@ RE_TRANSLATORS_COMMENT = re.compile(r"^\s*(?://|;)\s*Translators:\s*(.*)$")
 RE_COMMENT = re.compile(r"^\s*(?://|;)\s*(.*)$")
 inTranslatorsComment = False
 lastTranslatorsComment = []
+def resetTranslatorsCommentState():
+	global inTranslatorsComment, lastTranslatorsComment
+	inTranslatorsComment = False
+	lastTranslatorsComment = []
+
 def handleTranslatorsComment(line):
 	global inTranslatorsComment, lastTranslatorsComment
 	m = RE_TRANSLATORS_COMMENT.match(line)
@@ -91,6 +96,7 @@ RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\(\s*(?:"(?P<msgid>.*?)"|[^)]*),?\s*(?:"(?P<plural>.*?)"|[^)]*),?\s*[^)]*\s*(?P<end>\))?')
 def addCpp(input):
 	global lineNum
+	resetTranslatorsCommentState()
 	lineNum = 0
 	for line in input:
 		lineNum += 1
@@ -121,6 +127,7 @@ RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHB
 def addRc(input):
 	context = None
 	global lineNum
+	resetTranslatorsCommentState()
 	lineNum = 0
 	for line in input:
 		lineNum += 1
@@ -140,6 +147,7 @@ def addRc(input):
 
 def addNsi(input):
 	global lineNum
+	resetTranslatorsCommentState()
 	lineNum = 0
 	for line in input:
 		lineNum += 1

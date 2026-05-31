@@ -49,9 +49,8 @@ def _parse_po(path):
 					current[field] = _parse_po_string(line[len(prefix):])
 					currentField = field
 					break
-				indexedPrefix = f"{field}[0] "
-				if line.startswith(indexedPrefix):
-					current[field] = _parse_po_string(line[len(indexedPrefix):])
+				if field == "msgstr" and line.startswith("msgstr[0] "):
+					current[field] = _parse_po_string(line[len("msgstr[0] "):])
 					currentField = field
 					break
 			else:
@@ -103,7 +102,8 @@ def makeInstallerStrings(target, source, env):
 			seenLanguages.add(language)
 			translations = _parse_po(localePath)
 			for name, english in strings.items():
-				translated = translations.get(("installer", english)) or english
+				key = ("installer", english)
+				translated = translations[key] if key in translations else english
 				output.write(
 					f'LangString {name} ${{LANG_{language.upper()}}} "{escapeNsiString(translated)}"\n'
 				)
