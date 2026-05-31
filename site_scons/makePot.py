@@ -50,8 +50,8 @@ msgstr ""
 
 filePath = None
 lineNum = None
-def error(msg):
-	raise RuntimeError(f"{msg}, {filePath} line {lineNum}")
+def error(msg, path=None, line=None):
+	raise RuntimeError(f"{msg}, {path or filePath} line {line or lineNum}")
 
 RE_TRANSLATORS_COMMENT = re.compile(r"^\s*(?://|;)\s*Translators:\s*(.*)$")
 RE_COMMENT = re.compile(r"^\s*(?://|;)\s*(.*)$")
@@ -66,8 +66,10 @@ def resetTranslatorsCommentState():
 
 def ensureNoDanglingTranslatorsComment(input):
 	if lastTranslatorsComment:
-		raise RuntimeError(
-			f"{input.name}:{lastTranslatorsCommentLine}: Translators comment wasn't followed by a translatable message"
+		error(
+			"Translators comment wasn't followed by a translatable message",
+			path=getattr(input, "name", filePath),
+			line=lastTranslatorsCommentLine,
 		)
 
 def handleTranslatorsComment(line):
@@ -75,7 +77,10 @@ def handleTranslatorsComment(line):
 	m = RE_TRANSLATORS_COMMENT.match(line)
 	if m:
 		if lastTranslatorsComment:
-			error("Didn't find translatable message after last translators comment")
+			error(
+				"Didn't find translatable message after last translators comment",
+				line=lastTranslatorsCommentLine,
+			)
 		inTranslatorsComment = True
 		lastTranslatorsComment.append(m.group(1))
 		lastTranslatorsCommentLine = lineNum
