@@ -131,7 +131,7 @@ void _outputMessage(const string& message, bool interrupt) {
 #else // _WIN32
 
 void _outputMessage(const string& message, bool interrupt) {
-	NSA11yWrapper::osxa11y_announce(message);
+	NSA11yWrapper::osxa11y_announce(message, interrupt);
 }
 
 #endif // _WIN32
