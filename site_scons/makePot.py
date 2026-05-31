@@ -7,6 +7,8 @@ import re
 from collections import OrderedDict
 import itertools
 
+from installerStrings import RE_INSTALLER_STRING, unescapeNsiString
+
 # Maps (context, msgid) to a dict of message data. We need this so we output
 # only one entry for each message.
 messages = OrderedDict()
@@ -136,9 +138,6 @@ def addRc(input):
 			data["context"] = context
 			addMessage(data)
 
-RE_NSI_TRANSLATE = re.compile(
-	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*)"\s*$'
-)
 def addNsi(input):
 	global lineNum
 	lineNum = 0
@@ -146,10 +145,10 @@ def addNsi(input):
 		lineNum += 1
 		if handleTranslatorsComment(line):
 			continue
-		m = RE_NSI_TRANSLATE.match(line)
+		m = RE_INSTALLER_STRING.match(line)
 		if not m:
 			continue
 		addMessage({
 			"context": "installer",
-			"msgid": m.group("msgid").replace(r'$\"', '"'),
+			"msgid": unescapeNsiString(m.group("msgid")),
 		})

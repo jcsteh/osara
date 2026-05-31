@@ -1,12 +1,13 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 # Utility to build translated NSIS installer strings
-# Copyright 2026 James Teh, OpenAI
+# Copyright 2026 James Teh
 # License: GNU General Public License version 2.0
 
 from ast import literal_eval
 from collections import OrderedDict
 import os
-import re
+
+from installerStrings import RE_INSTALLER_STRING, escapeNsiString, unescapeNsiString
 
 
 LOCALE_TO_NSIS_LANGUAGE = OrderedDict((
@@ -22,11 +23,6 @@ LOCALE_TO_NSIS_LANGUAGE = OrderedDict((
 	("zh_CN", "SimpChinese"),
 	("zh_TW", "TradChinese"),
 ))
-
-RE_INSTALLER_STRING = re.compile(
-	r'^\s*!insertmacro OSARA_LANG_STRING (?P<name>\w+) "(?P<msgid>.*)"\s*$'
-)
-
 
 def _parse_po_string(text):
 	return literal_eval(text)
@@ -74,12 +70,8 @@ def _read_installer_strings(path):
 			match = RE_INSTALLER_STRING.match(line)
 			if not match:
 				continue
-			strings[match.group("name")] = match.group("msgid").replace(r'$\"', '"')
+			strings[match.group("name")] = unescapeNsiString(match.group("msgid"))
 	return strings
-
-
-def _escape_nsi(text):
-	return text.replace('"', r'$\"')
 
 
 def makeInstallerStrings(target, source, env):
@@ -113,6 +105,6 @@ def makeInstallerStrings(target, source, env):
 			for name, english in strings.items():
 				translated = translations.get(("installer", english)) or english
 				output.write(
-					f'LangString {name} ${{LANG_{language.upper()}}} "{_escape_nsi(translated)}"\n'
+					f'LangString {name} ${{LANG_{language.upper()}}} "{escapeNsiString(translated)}"\n'
 				)
 			output.write("\n")

@@ -14,6 +14,7 @@ SetCompressor /SOLID LZMA
 	Unicode true
 !endif
 Name "OSARA"
+Caption "OSARA ${VERSION} Setup"
 OutFile "${OUTFILE}"
 VIProductVersion "0.0.0.0" ;Needs to be here so other version info shows up
 VIAddVersionKey "ProductName" "OSARA"
