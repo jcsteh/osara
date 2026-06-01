@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cassert>
+#include <algorithm>
 #include <variant>
 #include <vector>
 #include<map>
@@ -25,6 +26,8 @@
 #include <WDL/win32_utf8.h>
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h>
+#undef min
+#undef max
 #include "fxChain.h"
 #include "resource.h"
 #include "translation.h"

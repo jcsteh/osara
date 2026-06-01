@@ -4,6 +4,7 @@
 # License: GNU General Public License version 2.0
 
 import os
+import platform
 from makePot import makePot
 import multiprocessing
 
@@ -46,7 +47,7 @@ if env["PLATFORM"] == "win32":
             "$SOURCE"
         ]])
 
-else: # Mac
+elif env["PLATFORM"] == "darwin":
 	archEnv = Environment(tools=["clangxx", "applelink", "textfile"],
 		libSuffix="", version=env["version"], copyright=env["copyright"])
 	archEnv.SConscript("src/archBuild_sconscript",
@@ -54,6 +55,27 @@ else: # Mac
 		variant_dir="build", duplicate=False)
 	installer = env.Command("installer/osara_${version}.zip", ["installer/mac/build.sh", "build"],
 		[["$SOURCE", "$version"]])
+	configRc = "build/config.rc"
+else: # Linux
+	if platform.machine() not in ("x86_64", "AMD64"):
+		raise RuntimeError("Linux builds currently support x86_64 only")
+	archEnv = Environment(tools=["clang", "clangxx", "gnulink", "textfile"],
+		libSuffix="", version=env["version"], copyright=env["copyright"])
+	archEnv.SConscript("src/archBuild_sconscript",
+		exports={"env": archEnv},
+		variant_dir="build", duplicate=False)
+	installer = env.Command("installer/osara_${version}.tar.xz",
+		[
+			"build/reaper_osara.so",
+			"config/windows/reaper-kb.ini",
+			env.Glob("locale/*.po"),
+			"copying.txt",
+		],
+		'tar -cJf "$TARGET" '
+		'--transform="s|^build/reaper_osara[.]so$|UserPlugins/reaper_osara.so|" '
+		'--transform="s|^config/windows/reaper-kb[.]ini$|KeyMaps/OSARA.ReaperKeyMap|" '
+		'--transform="s|^locale/|osara/locale/|" '
+		"$SOURCES")
 	configRc = "build/config.rc"
 
 env.Alias("installer", installer)

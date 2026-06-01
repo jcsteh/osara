@@ -8,6 +8,11 @@
 #ifndef _OSARA_H
 #define _OSARA_H
 
+#include <functional>
+#include <memory>
+#include <string>
+#include <sstream>
+
 #ifdef _WIN32
 # include <windows.h>
 #else
@@ -17,10 +22,8 @@
 # include <windows.h>
 # pragma clang diagnostic pop
 #endif
-#include <functional>
-#include <memory>
-#include <string>
-#include <sstream>
+#undef min
+#undef max
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack

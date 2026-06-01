@@ -16,14 +16,17 @@
 // We only need this on Windows and it apparently causes compilation issues on Mac.
 #include <codecvt>
 #include "uia.h"
-#else
+#elif defined(__APPLE__)
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
+#else
+#include "linuxa11y_wrapper.h"
 #endif
 #include <string>
 #include <sstream>
 #include <map>
 #include <iomanip>
 #include <cassert>
+#include <algorithm>
 #include <array>
 #include <ranges>
 #include <math.h>
@@ -33,6 +36,8 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
+#undef min
+#undef max
 #include "config.h"
 #include "resource.h"
 #include "paramsUi.h"
@@ -128,13 +133,19 @@ void _outputMessage(const string& message, bool interrupt) {
 	lastMessageHwnd = focus;
 }
 
-#else // _WIN32
+#elif defined(__APPLE__)
 
 void _outputMessage(const string& message, bool interrupt) {
 	NSA11yWrapper::osxa11y_announce(message);
 }
 
-#endif // _WIN32
+#else
+
+void _outputMessage(const string& message, bool interrupt) {
+	LinuxA11y::announce(message, interrupt);
+}
+
+#endif
 
 bool muteNextMessage = false;
 void outputMessage(const string& message, bool interrupt) {
@@ -1540,7 +1551,7 @@ int findRegionEndingAt(double wantedEndPos) {
 		}
 		// GetLastMarkerAndCurRegion doesn't return a region at its end position,
 		// so subtract a bit.
-		double tempPos = max(start - 0.001, 0);
+		double tempPos = max(start - 0.001, 0.0);
 		int region;
 		GetLastMarkerAndCurRegion(nullptr, tempPos, nullptr, &region);
 		if (region < 0) {
@@ -6766,8 +6777,12 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		winEventHook = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS,
 			hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
 		annotateSpuriousDialogs(mainHwnd);
-#else
+#elif defined(__APPLE__)
 		NSA11yWrapper::init();
+#else
+		if (!LinuxA11y::init()) {
+			return 0;
+		}
 #endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
@@ -6830,8 +6845,10 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		UnhookWinEvent(winEventHook);
 		terminateUia();
 		accPropServices = nullptr;
-#else
+#elif defined(__APPLE__)
 		NSA11yWrapper::destroy();
+#else
+		LinuxA11y::destroy();
 #endif
 		return 0;
 	}
@@ -6840,7 +6857,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 }
 
 #ifndef _WIN32
-// Mac resources
+// SWELL resources for non-Windows platforms.
 #include <swell-dlggen.h>
 #include "reaper_osara.rc_mac_dlg"
 #include "config.rc_mac_dlg"

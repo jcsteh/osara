@@ -22,7 +22,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-2025-vs2026, macos-latest]
+        os: [windows-2025-vs2026, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: set env
@@ -39,8 +39,13 @@ jobs:
           fi
           if [ "$RUNNER_OS" = "Windows" ]; then
             echo os=windows >> "$GITHUB_ENV"
-          else
+            echo keymapOs=windows >> "$GITHUB_ENV"
+          elif [ "$RUNNER_OS" = "macOS" ]; then
             echo os=mac >> "$GITHUB_ENV"
+            echo keymapOs=mac >> "$GITHUB_ENV"
+          else
+            echo os=linux >> "$GITHUB_ENV"
+            echo keymapOs=windows >> "$GITHUB_ENV"
           fi
       - uses: actions/checkout@v4
         with:
@@ -48,9 +53,13 @@ jobs:
       # There's no point in building if we're going to fail the build because of
       # an unsorted key map, so we do this as early as we can.
       - name: check key map
-        run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
+        run: python tools/sortKeymap.py -t config/${{ env.keymapOs }}/reaper-kb.ini
       - name: setup
         run: pip install scons
+      - name: Linux setup
+        if: ${{ runner.os == 'Linux' }}
+        # We need php for swell_resgen and xz-utils for the installer tarball.
+        run: sudo apt-get update && sudo apt-get install -y clang php-cli xz-utils
       - name: SCons MSVC Cache
         if: ${{ runner.os == 'Windows' }}
         uses: actions/cache@v4
@@ -300,6 +309,14 @@ jobs:
           # after the first wildcard pattern"
           # See also https://github.com/actions/upload-artifact/issues/248
           path: installer/mac/*.app
+      - name: upload PR build Linux
+        if: ${{ github.event_name == 'pull_request' && runner.os == 'Linux' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: osara_linux_${{ env.version }}
+          path: installer/osara_*.tar.xz
+          # The tarball is already compressed. Don't try to compress it again.
+          compression-level: 0
       - name: upload debug symbols Win
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4
@@ -313,6 +330,7 @@ jobs:
       # outputs won't be set if the value is empty.
       winInstallerUrl: ${{ steps.getBuildUrl.outputs.windowsUrl }}
       macInstallerUrl: ${{ steps.getBuildUrl.outputs.macUrl }}
+      linuxInstallerUrl: ${{ steps.getBuildUrl.outputs.linuxUrl }}
   publish:
     # This job updates the website with the new readme and snapshots.
     if: ${{ github.event_name == 'push' }}
@@ -330,6 +348,7 @@ jobs:
           version: ${{ needs.build.outputs.version }}
           winUrl: ${{ needs.build.outputs.winInstallerUrl }}
           macUrl: ${{ needs.build.outputs.macInstallerUrl }}
+          linuxUrl: ${{ needs.build.outputs.linuxInstallerUrl }}
         run: python ci/buildSite
       - name: upload
         uses: actions/upload-pages-artifact@v3
