@@ -67,13 +67,13 @@ else: # Linux
 	installer = env.Command("installer/osara_${version}.tar.xz",
 		[
 			"build/reaper_osara.so",
-			"config/windows/reaper-kb.ini",
+			"config/linux/reaper-kb.ini",
 			env.Glob("locale/*.po"),
 			"copying.txt",
 		],
 		'tar -cJf "$TARGET" '
 		'--transform="s|^build/reaper_osara[.]so$|UserPlugins/reaper_osara.so|" '
-		'--transform="s|^config/windows/reaper-kb[.]ini$|KeyMaps/OSARA.ReaperKeyMap|" '
+		'--transform="s|^config/linux/reaper-kb[.]ini$|KeyMaps/OSARA.ReaperKeyMap|" '
 		'--transform="s|^locale/|osara/locale/|" '
 		"$SOURCES")
 	configRc = "build/config.rc"

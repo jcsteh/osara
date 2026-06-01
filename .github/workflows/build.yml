@@ -39,13 +39,10 @@ jobs:
           fi
           if [ "$RUNNER_OS" = "Windows" ]; then
             echo os=windows >> "$GITHUB_ENV"
-            echo keymapOs=windows >> "$GITHUB_ENV"
           elif [ "$RUNNER_OS" = "macOS" ]; then
             echo os=mac >> "$GITHUB_ENV"
-            echo keymapOs=mac >> "$GITHUB_ENV"
           else
             echo os=linux >> "$GITHUB_ENV"
-            echo keymapOs=windows >> "$GITHUB_ENV"
           fi
       - uses: actions/checkout@v4
         with:
@@ -53,7 +50,7 @@ jobs:
       # There's no point in building if we're going to fail the build because of
       # an unsorted key map, so we do this as early as we can.
       - name: check key map
-        run: python tools/sortKeymap.py -t config/${{ env.keymapOs }}/reaper-kb.ini
+        run: python tools/sortKeymap.py -t config/${{ env.os }}/reaper-kb.ini
       - name: setup
         run: pip install scons
       - name: Linux setup
