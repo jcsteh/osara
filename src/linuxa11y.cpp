@@ -1,7 +1,7 @@
 /*
  * OSARA: Open Source Accessibility for the REAPER Application
  * Linux accessibility announcement bridge
- * Copyright 2026 NV Access Limited, James Teh
+ * Copyright 2026 robbie Murray
  * License: GNU General Public License version 2.0
  */
 
