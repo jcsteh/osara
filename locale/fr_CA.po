@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-05-15 19:57\n"
+"PO-Revision-Date: 2026-06-01 21:46\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -2287,9 +2287,21 @@ msgstr "zoom vertical maximal"
 msgid "{} vertical zoom"
 msgstr "{} zoom vertical"
 
-#. Reported when using "Main action section: Momentarily set
-#. override to alt-1", etc. {} is replaced with the shortened section name;
-#. e.g. "alt-1 momentary".
+msgid "recording key map"
+msgstr "enregistrement du KeyMap"
+
+msgid "main key map"
+msgstr "cartographie du clavier principale"
+
+msgid "default momentary"
+msgstr "momentané par défaut"
+
+msgid "recording key map momentary"
+msgstr "enregistrement du KeyMap momentanément"
+
+#. Reported when using "Main action section: Momentarily
+#. set override to alt-1", etc. {} is replaced with the shortened
+#. section name; e.g. "alt-1 momentary".
 msgid "{} momentary"
 msgstr "momentané"
 
@@ -2451,21 +2463,6 @@ msgstr "magnétisme activé"
 
 msgid "disabled snap"
 msgstr "magnétisme désactivé"
-
-msgid "main key map"
-msgstr "cartographie du clavier principale"
-
-msgid "default key map"
-msgstr "keyMap par défaut"
-
-msgid "recording key map"
-msgstr "enregistrement du KeyMap"
-
-msgid "default momentary"
-msgstr "momentané par défaut"
-
-msgid "recording key map momentary"
-msgstr "enregistrement du KeyMap momentanément"
 
 msgid "auto playing"
 msgstr "lecture automatique activé"
@@ -2738,6 +2735,9 @@ msgstr "sélection temporelle ou boucle supprimées"
 
 msgid "unselected tracks/items/envelope points"
 msgstr "piste, Objet, enveloppe, désélectionné"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: Sélectionner les objets sous le curseur d'édition sur les pistes sélectionnées"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -3314,9 +3314,6 @@ msgstr "OSARA: Rechercher une mise à jour"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: Ouvrir la documentation en ligne"
-
-msgid "OSARA: Select items under edit cursor on selected tracks"
-msgstr "OSARA: Sélectionner les objets sous le curseur d'édition sur les pistes sélectionnées"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Énoncer le tempo et la signature rythmique au curseur de lecture, appuyez deux fois pour ajouter/éditer des marqueurs de tempo"

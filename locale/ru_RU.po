@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2026-05-15 19:57\n"
+"PO-Revision-Date: 2026-06-01 21:46\n"
 
 msgid "enabled"
 msgstr "включено"
@@ -2461,9 +2461,21 @@ msgstr "максимальный вертикальный зум"
 msgid "{} vertical zoom"
 msgstr "вертикальное смещение {}"
 
-#. Reported when using "Main action section: Momentarily set
-#. override to alt-1", etc. {} is replaced with the shortened section name;
-#. e.g. "alt-1 momentary".
+msgid "recording key map"
+msgstr "запись раскладки клавиатуры"
+
+msgid "main key map"
+msgstr "основная раскладка клавиатуры"
+
+msgid "default momentary"
+msgstr "моментальный по умолчанию"
+
+msgid "recording key map momentary"
+msgstr "моментальная запись раскладки клавиатуры"
+
+#. Reported when using "Main action section: Momentarily
+#. set override to alt-1", etc. {} is replaced with the shortened
+#. section name; e.g. "alt-1 momentary".
 msgid "{} momentary"
 msgstr "{} моментальный"
 
@@ -2625,21 +2637,6 @@ msgstr "включенная привязка"
 
 msgid "disabled snap"
 msgstr "отключенная привязка"
-
-msgid "main key map"
-msgstr "основная раскладка клавиатуры"
-
-msgid "default key map"
-msgstr "раскладка клавиатуры по умолчанию"
-
-msgid "recording key map"
-msgstr "запись раскладки клавиатуры"
-
-msgid "default momentary"
-msgstr "моментальный по умолчанию"
-
-msgid "recording key map momentary"
-msgstr "моментальная запись раскладки клавиатуры"
 
 msgid "auto playing"
 msgstr "автоматическое воспроизведение"
@@ -2938,6 +2935,9 @@ msgstr "очищено выделение времени/цикла"
 
 msgid "unselected tracks/items/envelope points"
 msgstr "снято выделение треков/элементов/точек огибающей"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: Выделить элементы под курсором редактирования на выделенных треках"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -3522,9 +3522,6 @@ msgstr "OSARA: Проверить обновления"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: Открыть онлайн-документацию"
-
-msgid "OSARA: Select items under edit cursor on selected tracks"
-msgstr "OSARA: Выделить элементы под курсором редактирования на выделенных треках"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Сообщить темп и тактовый размер в текущей позиции курсора воспроизведения; нажмите дважды, чтобы добавить/отредактировать маркеры темпа"

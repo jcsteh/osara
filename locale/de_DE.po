@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: German\n"
 "Language: de_DE\n"
-"PO-Revision-Date: 2026-05-15 19:57\n"
+"PO-Revision-Date: 2026-06-01 21:46\n"
 
 msgid "enabled"
 msgstr "aktiviert"
@@ -2287,9 +2287,21 @@ msgstr ""
 msgid "{} vertical zoom"
 msgstr ""
 
-#. Reported when using "Main action section: Momentarily set
-#. override to alt-1", etc. {} is replaced with the shortened section name;
-#. e.g. "alt-1 momentary".
+msgid "recording key map"
+msgstr ""
+
+msgid "main key map"
+msgstr ""
+
+msgid "default momentary"
+msgstr ""
+
+msgid "recording key map momentary"
+msgstr ""
+
+#. Reported when using "Main action section: Momentarily
+#. set override to alt-1", etc. {} is replaced with the shortened
+#. section name; e.g. "alt-1 momentary".
 msgid "{} momentary"
 msgstr ""
 
@@ -2450,21 +2462,6 @@ msgid "enabled snap"
 msgstr ""
 
 msgid "disabled snap"
-msgstr ""
-
-msgid "main key map"
-msgstr ""
-
-msgid "default key map"
-msgstr ""
-
-msgid "recording key map"
-msgstr ""
-
-msgid "default momentary"
-msgstr ""
-
-msgid "recording key map momentary"
 msgstr ""
 
 msgid "auto playing"
@@ -2738,6 +2735,9 @@ msgstr "Loop und Time Selektion entfernt"
 
 msgid "unselected tracks/items/envelope points"
 msgstr "Alle Tracks, Items und Automationspunkte deselektiert"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr ""
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -3313,9 +3313,6 @@ msgid "OSARA: Check for update"
 msgstr ""
 
 msgid "OSARA: Open online documentation"
-msgstr ""
-
-msgid "OSARA: Select items under edit cursor on selected tracks"
 msgstr ""
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"

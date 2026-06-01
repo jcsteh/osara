@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2026-05-15 19:57\n"
+"PO-Revision-Date: 2026-06-01 21:46\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -1200,13 +1200,13 @@ msgid "peak dB"
 msgstr "decibelios del pico"
 
 msgid "integrated LUFS"
-msgstr "loops integrados"
+msgstr "lufs integrados"
 
 msgid "momentary LUFS"
-msgstr "loops instantáneos"
+msgstr "lufs instantáneos"
 
 msgid "short term LUFS"
-msgstr "loops de corta duración"
+msgstr "lufs de corta duración"
 
 msgid "loudness range LU"
 msgstr "rango en LU de sonoridad"
@@ -1687,15 +1687,15 @@ msgstr[1] "{} pistas desactivado solo"
 #. with the number of tracks; e.g. "2 tracks armed".
 msgid "{} track armed"
 msgid_plural "{} tracks armed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista armada"
+msgstr[1] "{} pistas armadas"
 
 #. Reported when multiple tracks are unarmed. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unarmed".
 msgid "{} track unarmed"
 msgid_plural "{} tracks unarmed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} pista desarmada"
+msgstr[1] "{} pistas desarmadas"
 
 msgid "record monitor off"
 msgstr "apagado"
@@ -2287,9 +2287,21 @@ msgstr "zoom vertical máximo"
 msgid "{} vertical zoom"
 msgstr "{} zoom vertical"
 
-#. Reported when using "Main action section: Momentarily set
-#. override to alt-1", etc. {} is replaced with the shortened section name;
-#. e.g. "alt-1 momentary".
+msgid "recording key map"
+msgstr "mapa de teclado de grabación"
+
+msgid "main key map"
+msgstr "mapa de teclado principal"
+
+msgid "default momentary"
+msgstr "momentáneo por defecto"
+
+msgid "recording key map momentary"
+msgstr "mapa de teclado de grabación momentáneo"
+
+#. Reported when using "Main action section: Momentarily
+#. set override to alt-1", etc. {} is replaced with the shortened
+#. section name; e.g. "alt-1 momentary".
 msgid "{} momentary"
 msgstr "{} momentáneo"
 
@@ -2452,21 +2464,6 @@ msgstr "instantánea activada"
 msgid "disabled snap"
 msgstr "instantánea desactivada"
 
-msgid "main key map"
-msgstr "mapa de teclado principal"
-
-msgid "default key map"
-msgstr "mapa de teclado por defecto"
-
-msgid "recording key map"
-msgstr "mapa de teclado de grabación"
-
-msgid "default momentary"
-msgstr "momentáneo por defecto"
-
-msgid "recording key map momentary"
-msgstr "mapa de teclado de grabación momentáneo"
-
 msgid "auto playing"
 msgstr "auto reproduciendo"
 
@@ -2572,13 +2569,13 @@ msgid "{} takes"
 msgstr "{} tomas"
 
 msgid "{}"
-msgstr ""
+msgstr "{}"
 
 msgid "+{}"
-msgstr ""
+msgstr "+{}"
 
 msgid "-{}"
-msgstr ""
+msgstr "-{}"
 
 msgid "{} per keypress"
 msgstr "{} por tecla pulsada"
@@ -2738,6 +2735,9 @@ msgstr "selección de tiempo/loop eliminado"
 
 msgid "unselected tracks/items/envelope points"
 msgstr "deseleccionado pistas, 'items o puntos de envolvente"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: seleccionar ítems bajo el cursor de edición en pistas seleccionadas"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -3314,9 +3314,6 @@ msgstr "OSARA: Comprobar actualización"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: abrir documentación en línea"
-
-msgid "OSARA: Select items under edit cursor on selected tracks"
-msgstr "OSARA: seleccionar ítems bajo el cursor de edición en pistas seleccionadas"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: Anuncia tempo y compás en la posición del cursor de reproducción. Pulsar dos veces para añadir o editar marcadores de tempo"

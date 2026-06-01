@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-05-15 19:57\n"
+"PO-Revision-Date: 2026-06-01 21:46\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -2200,9 +2200,21 @@ msgstr "最大垂直缩放"
 msgid "{} vertical zoom"
 msgstr "{} 垂直缩放"
 
-#. Reported when using "Main action section: Momentarily set
-#. override to alt-1", etc. {} is replaced with the shortened section name;
-#. e.g. "alt-1 momentary".
+msgid "recording key map"
+msgstr "录音案件映射"
+
+msgid "main key map"
+msgstr "主要键映射"
+
+msgid "default momentary"
+msgstr "默认 临时"
+
+msgid "recording key map momentary"
+msgstr "录音键映射 临时"
+
+#. Reported when using "Main action section: Momentarily
+#. set override to alt-1", etc. {} is replaced with the shortened
+#. section name; e.g. "alt-1 momentary".
 msgid "{} momentary"
 msgstr "{} 瞬时"
 
@@ -2364,21 +2376,6 @@ msgstr "启用吸附"
 
 msgid "disabled snap"
 msgstr "禁用吸附"
-
-msgid "main key map"
-msgstr "主要键映射"
-
-msgid "default key map"
-msgstr "默认案件映射"
-
-msgid "recording key map"
-msgstr "录音案件映射"
-
-msgid "default momentary"
-msgstr "默认 临时"
-
-msgid "recording key map momentary"
-msgstr "录音键映射 临时"
 
 msgid "auto playing"
 msgstr "自动播放"
@@ -2638,6 +2635,9 @@ msgstr "清除时间/循环选区"
 
 msgid "unselected tracks/items/envelope points"
 msgstr "取消选中轨道/对象/包络点"
+
+msgid "OSARA: Select items under edit cursor on selected tracks"
+msgstr "OSARA: 选择所选轨道上编辑光标处的对象"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -3210,9 +3210,6 @@ msgstr "OSARA: 检查更新"
 
 msgid "OSARA: Open online documentation"
 msgstr "OSARA: 打开在线文档"
-
-msgid "OSARA: Select items under edit cursor on selected tracks"
-msgstr "OSARA: 选择所选轨道上编辑光标处的对象"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
 msgstr "OSARA: 报告播放光标处的速度与拍号，双击添加/编辑速度标记"
