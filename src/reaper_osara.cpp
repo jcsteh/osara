@@ -36,8 +36,6 @@
 #define REAPERAPI_IMPLEMENT
 #include "osara.h"
 #include <WDL/db2val.h>
-#undef min
-#undef max
 #include "config.h"
 #include "resource.h"
 #include "paramsUi.h"

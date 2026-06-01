@@ -8,11 +8,6 @@
 #ifndef _OSARA_H
 #define _OSARA_H
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <sstream>
-
 #ifdef _WIN32
 # include <windows.h>
 #else
@@ -21,9 +16,15 @@
 # pragma clang diagnostic ignored "-Weverything"
 # include <windows.h>
 # pragma clang diagnostic pop
+// Undefine C-style macros defined by SWELL.
+# undef min
+# undef max
 #endif
-#undef min
-#undef max
+
+#include <functional>
+#include <memory>
+#include <string>
+#include <sstream>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
