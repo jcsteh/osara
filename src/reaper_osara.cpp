@@ -6778,9 +6778,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #elif defined(__APPLE__)
 		NSA11yWrapper::init();
 #else
-		if (!LinuxA11y::init()) {
-			return 0;
-		}
+		LinuxA11y::init();
 #endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
