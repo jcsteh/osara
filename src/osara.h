@@ -16,7 +16,11 @@
 # pragma clang diagnostic ignored "-Weverything"
 # include <windows.h>
 # pragma clang diagnostic pop
+// Undefine C-style macros defined by SWELL.
+# undef min
+# undef max
 #endif
+
 #include <functional>
 #include <memory>
 #include <string>

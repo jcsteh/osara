@@ -177,7 +177,7 @@ struct MidiNote {
 	bool muted;
 
 	double getLength() const {
-		return max (0, (this->end - this->start));
+		return max(0.0, (this->end - this->start));
 	}
 
 	struct ReqParams {
@@ -536,13 +536,13 @@ class MidiEventIterator {
 		return *this;
 	}
 
-	MidiEventIterator operator+(const difference_type increment) {
+	MidiEventIterator operator+(const difference_type increment) const {
 		auto tmpIt = *this;
 		tmpIt += increment;
 		return tmpIt;
 	}
 
-	MidiEventIterator operator-(const difference_type decrement) {
+	MidiEventIterator operator-(const difference_type decrement) const {
 		auto tmpIt = *this;
 		tmpIt -= decrement;
 		return tmpIt;
