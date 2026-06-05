@@ -5,14 +5,14 @@
  * License: GNU General Public License version 2.0
  */
 
-#include "linuxa11y_wrapper.h"
+#include "linuxA11y.h"
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Weverything"
 #include <windows.h>
 #pragma clang diagnostic pop
 
-namespace LinuxA11y {
+namespace linuxA11y {
 	using AnnounceFn = void (*)(const char* message, int interrupt);
 	static AnnounceFn announceFn = nullptr;
 

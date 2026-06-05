@@ -1,9 +1,9 @@
-#ifndef linuxa11y_wrapper_h
-#define linuxa11y_wrapper_h
+#ifndef linuxA11y_h
+#define linuxA11y_h
 
 #include <string>
 
-namespace LinuxA11y {
+namespace linuxA11y {
 	bool init();
 	void announce(const std::string& message, bool interrupt);
 	void destroy();

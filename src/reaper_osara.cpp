@@ -19,7 +19,7 @@
 #elif defined(__APPLE__)
 #include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #else
-#include "linuxa11y_wrapper.h"
+#include "linuxA11y.h"
 #endif
 #include <string>
 #include <sstream>
@@ -140,7 +140,7 @@ void _outputMessage(const string& message, bool interrupt) {
 #else
 
 void _outputMessage(const string& message, bool interrupt) {
-	LinuxA11y::announce(message, interrupt);
+	linuxA11y::announce(message, interrupt);
 }
 
 #endif
@@ -6778,7 +6778,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #elif defined(__APPLE__)
 		NSA11yWrapper::init();
 #else
-		LinuxA11y::init();
+		linuxA11y::init();
 #endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
@@ -6844,7 +6844,7 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 #elif defined(__APPLE__)
 		NSA11yWrapper::destroy();
 #else
-		LinuxA11y::destroy();
+		linuxA11y::destroy();
 #endif
 		return 0;
 	}

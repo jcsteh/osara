@@ -4,6 +4,7 @@
 # License: GNU General Public License version 2.0
 
 import os.path
+import shutil
 from makeConfigRc import makeConfigRc
 
 Import("env")
@@ -37,6 +38,24 @@ sources = [
 	"translation.cpp",
 	"updateCheck.cpp",
 ]
+
+swellDir = env.Dir("#include/WDL/WDL/swell")
+
+def configureSwell():
+	env.Append(CPPPATH=(swellDir,))
+	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
+	# We don't want the "lib" prefix for our shared library.
+	env["SHLIBPREFIX"] = ""
+
+	# SWELL uses the same generated resource file names on generic platforms.
+	php = shutil.which("php")
+	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
+		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
+	dialogRes = env.Command(["config.rc_mac_dlg", "config.rc_mac_menu"],
+		"config.rc",
+		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
+	env.Depends("reaper_osara.cpp", [res, dialogRes])
+	return swellDir
 
 if env["PLATFORM"] == "win32":
 	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
@@ -88,8 +107,7 @@ if env["PLATFORM"] == "win32":
 	]
 
 elif env["PLATFORM"] == "darwin":
-	swellDir = env.Dir("#include/WDL/WDL/swell")
-	env.Append(CPPPATH=(swellDir,))
+	configureSwell()
 	env["CXX"] = "clang++"
 	import subprocess
 	env["xcodeDevDir"] = (
@@ -101,49 +119,22 @@ elif env["PLATFORM"] == "darwin":
 	cxxFlags = coreFlags + " -std=c++20 -Werror"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
-	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
 	sources.append(swellDir.File("swell-modstub.mm"))
 	sources.append("osxa11y.mm")
 	libs = []
 	# OS X frameworks.
 	for f in ("Cocoa", "Carbon", "Appkit"):
 		env.Append(LINKFLAGS=("-framework", f))
-	# We don't want the "lib" prefix for our dylib.
-	env["SHLIBPREFIX"] = ""
-
-	# Generate Mac resources.
-	import shutil
-	php = shutil.which("php")
-	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
-		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
-	dialogRes = env.Command(["config.rc_mac_dlg", "config.rc_mac_menu"],
-		"config.rc",
-		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
-	env.Depends("reaper_osara.cpp", [res, dialogRes])
 
 else: # Linux
-	swellDir = env.Dir("#include/WDL/WDL/swell")
-	env.Append(CPPPATH=(swellDir,))
+	configureSwell()
 	env["CC"] = "clang"
 	env["CXX"] = "clang++"
 	env.Append(CXXFLAGS=("-std=c++20", "-Werror"))
-	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
 	sources.append(env.SharedObject("swell-modstub-generic",
 		swellDir.File("swell-modstub-generic.cpp")))
-	sources.append("linuxa11y.cpp")
+	sources.append("linuxA11y.cpp")
 	libs = ["dl"]
-	# We don't want the "lib" prefix for our shared library.
-	env["SHLIBPREFIX"] = ""
-
-	# SWELL uses the same generated resource file names on generic platforms.
-	import shutil
-	php = shutil.which("php")
-	res = env.Command(["reaper_osara.rc_mac_dlg", "reaper_osara.rc_mac_menu"], "reaper_osara.rc",
-		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
-	dialogRes = env.Command(["config.rc_mac_dlg", "config.rc_mac_menu"],
-		"config.rc",
-		[[php, "include/WDL/WDL/swell/swell_resgen.php", "$SOURCE"]])
-	env.Depends("reaper_osara.cpp", [res, dialogRes])
 
 def addExternalSources(dir, files, **kwargs):
 	dir = env.Dir(dir)
