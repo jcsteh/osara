@@ -41,9 +41,7 @@ sources = [
 if env["PLATFORM"] == "win32":
 	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
 	env["CC"] = "clang-cl"
-	# For ARM64EC, we can't yet link with LLVM due to undefined symbol: __sanitizer_annotate_contiguous_container
-	if env["TARGET_ARCH"] != "arm64":
-		env["LINK"] = "lld-link"
+	env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
 		# Explicitly set 32/64-bit so clang-cl doesn't default to x64 regardless of MSVC env.
 		"-m32" if env["TARGET_ARCH"] == "x86" else "-m64",
