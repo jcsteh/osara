@@ -45,6 +45,8 @@ if env["PLATFORM"] == "win32":
 	if env["TARGET_ARCH"] != "arm64":
 		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
+		# Explicitly set 32/64-bit so clang-cl doesn't default to x64 regardless of MSVC env.
+		"-m32" if env["TARGET_ARCH"] == "x86" else "-m64",
 		"/W3",
 		"/WX",
 		# Clang warns about unused functions in WDL
