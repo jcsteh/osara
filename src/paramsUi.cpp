@@ -866,8 +866,8 @@ class FxParams: public ParamSource {
 			"|-"
 			// Example: "1234 -"
 			R"(|\d{1,4} -)"
-			// Example: "P123" or "#123"
-			R"(|[P#]\d{3})"
+			// Example: "123" or "P123" or "#1234"
+			R"(|[P#]?\d{3,4})"
 			// Any one of several strings...
 			"|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
 			"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
