@@ -868,13 +868,6 @@ class FxParams: public ParamSource {
 			R"(|\d{1,4} -)"
 			// Example: "123" or "P123" or "#1234"
 			R"(|[P#]?\d{3,4})"
-			// Any one of several strings...
-			"|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
-			"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
-			R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
-			R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
-			// followed by any number of other characters; e.g. "MIDI CC 2|15"
-			" ).*?"
 			// OSARA appends a number in parentheses to all parameter names. See the
 			// getParamName function above.
 			R"() \(\d+\))"
@@ -883,6 +876,28 @@ class FxParams: public ParamSource {
 		regex_match(name, m, RE_UNNAMED_PARAM);
 		if (!m.empty()) {
 			return false;
+		}
+		char automatable[2] = "";
+		this->_GetNamedConfigParm(this->obj, this->fx,
+			format("param.{}.automatable", param).c_str(),
+			automatable, sizeof(automatable));
+		if (automatable[0] == '0') {
+			// Check for some strings only for non-automatable parameters.
+			static const regex RE_UNNAMED_NONAUTOMATABLE_PARAM{
+				// Any one of several strings...
+				"(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
+				"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
+				R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
+				R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
+				// followed by any number of other characters; e.g. "MIDI CC 2|15"
+				" ).*?"
+				// OSARA appends a number in parentheses to all parameter names.
+				R"( \(\d+\))"
+			};
+			regex_match(name, m, RE_UNNAMED_NONAUTOMATABLE_PARAM);
+			if (!m.empty()) {
+				return false;
+			}
 		}
 		return true;
 	}
