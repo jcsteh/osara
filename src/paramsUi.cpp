@@ -783,6 +783,7 @@ class FxParams: public ParamSource {
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
+	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
 
 	void initNamedConfigParams();
 
@@ -803,6 +804,8 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_GetNamedConfigParm").c_str());
 		*(void**)&this->_SetNamedConfigParm = plugin_getapi(
 			(apiPrefix + "_SetNamedConfigParm").c_str());
+		*(void**)&this->_GetParamSectionName = plugin_getapi(
+			(apiPrefix + "_GetParamSectionName").c_str());
 		if (fx >= 0) {
 			this->initNamedConfigParams();
 		}
@@ -848,6 +851,14 @@ class FxParams: public ParamSource {
 		if (param < namedCount) {
 			// Named config params aren't FX params; keep them visible.
 			return true;
+		}
+		if (this->_GetParamSectionName) {
+			char section[100];
+			this->_GetParamSectionName(this->obj, this->fx, param, section,
+				sizeof(section));
+			if (strcmp(section, "MIDI") == 0) {
+				return false;
+			}
 		}
 		static const regex RE_UNNAMED_PARAM{
 			"(?:"
