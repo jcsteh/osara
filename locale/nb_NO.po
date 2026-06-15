@@ -11,266 +11,266 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2026-06-01 21:46\n"
+"PO-Revision-Date: 2026-06-15 21:28\n"
 
 msgid "enabled"
-msgstr ""
+msgstr "aktivert"
 
 #. A recording mode.
 msgid "disabled"
-msgstr ""
+msgstr "deaktivert"
 
 msgid "OSARA: Toggle"
-msgstr ""
+msgstr "Skifte"
 
 msgid "OSARA: Enable"
-msgstr ""
+msgstr "OSARA: Aktiver"
 
 msgid "OSARA: Disable"
-msgstr ""
+msgstr "OSARA: Deaktiver"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr ""
+msgstr "Ønsker du å justere REAPER-innstillingene for optimal kompatibilitet med skjermlesere? Ved å velge ja gjør du følgende endringer:"
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr ""
+msgstr "1. Frigjør Media Explorer, slik at den får fokus når den åpnes."
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr ""
+msgstr "2. Lukk Media Explorer ved å bruke escape tasten."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr ""
+msgstr "3. Aktiver systemarv-dialogen for filer, slik at REAPER-spesifikke alternativer i dialogene Åpne og Lagre som kan nås med tabulatortasten."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr ""
+msgstr "4. Aktiver mellomromstasten for bruk til avkryssingsbokser og knapper i ulike vinduer, der det gir mer mening enn å spille av prosjektet."
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr ""
+msgstr "5. Vis tekstmerkelapper som viser parallell, slått av og omgått i FX-listen."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr ""
+msgstr "6. Bruk en standard universelt utformet redigeringskontroll for å redigere videokode."
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
-msgstr ""
+msgstr "7. Skjul prefiks for type i FX-utforskeren slik at det er mer effektivt å bla gjennom FX."
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
-msgstr ""
+msgstr "8. Deaktiver fest til synlig rutenett i MIDI-redigering slik at navigasjon ved hjelp av rutenettet ikke er avhengig av den horisontale zoom-innstillingen."
 
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
-msgstr ""
+msgstr "9. Gjør Control+Space til spill av/stopp når tastaturfokus er i en dialog, nødvendig med REAPER 7.41 eller nyere."
 
 msgctxt "optimal REAPER configuration"
 msgid "10. Display the file name and then the full path in the Recent Projects menu."
-msgstr ""
+msgstr "10. Vis filnavnet og deretter hele banen i menyen for Nylige prosjekter."
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr ""
+msgstr "Merk: Hvis det ikke passer nå å justere på REAPER, kan du gjøre disse tilpasningene senere ved å gå til menyen for Utvidelser på menylinjen og deretter til OSARA undermeny."
 
 msgid "Error writing configuration changes."
-msgstr ""
+msgstr "Feil ved skriving av konfigurasjonsendringer."
 
 msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr ""
+msgstr "REAPER vil nå avslutte. Vennligst restart REAPER for å bruke endringene."
 
 msgid "Restart REAPER"
-msgstr ""
+msgstr "Start REAPER på nytt"
 
 msgid "volume"
-msgstr ""
+msgstr "volum"
 
 msgid "pan"
-msgstr ""
+msgstr "pan"
 
 msgid "muted"
-msgstr ""
+msgstr "dempet"
 
 msgid "unmuted"
-msgstr ""
+msgstr "ikke dempet"
 
 msgid "soloed"
-msgstr ""
+msgstr "i solo"
 
 msgid "unsoloed"
-msgstr ""
+msgstr "ikke i solo"
 
 msgid "armed"
-msgstr ""
+msgstr "opptak på"
 
 msgid "unarmed"
-msgstr ""
+msgstr "opptak av"
 
 #. Reported when navigating to the master track.
 msgid "master"
-msgstr ""
+msgstr "master"
 
 #. Reported when moving to a named project marker. {} will
 #. be replaced with the marker's name; e.g. "intro marker".
 #. used when reporting a named marker. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker"
 msgid "{} marker"
-msgstr ""
+msgstr "{} markør"
 
 #. Reported when moving to an unnamed project marker. {}
 #. will be replaced with the marker's name; e.g. "marker 2".
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
-msgstr ""
+msgstr "markør {}"
 
 #. Reported when playback reaches a named region. {} will
 #. be replaced with the region's name; e.g. "intro region".
 #. used when reporting a named region. {} will be
 #. replaced with the name of the region; e.g. "intro region"
 msgid "{} region"
-msgstr ""
+msgstr "{} region"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
 #. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
-msgstr ""
+msgstr "region {}"
 
 msgid "time selection start"
-msgstr ""
+msgstr "start for tidsvalg"
 
 msgid "time selection end"
-msgstr ""
+msgstr "slutt for tidsvalg"
 
 #. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 msgid "Control {control}, {value}"
-msgstr ""
+msgstr "Control {control}, {value}"
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
 msgid "{} automation item removed"
 msgid_plural "{} automation items removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} automasjonselement fjernet"
+msgstr[1] "{} automasjonselementer fjernet"
 
 #. Reported when removing envelope points. {} will be
 #. replaced with the number of points; e.g. "2 points removed".
 msgid "{} point removed"
 msgid_plural "{} points removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} punkt fjernet"
+msgstr[1] "{} punkter fjernet"
 
 #. A shape for an envelope point.
 msgid "linear"
-msgstr ""
+msgstr "lineær"
 
 #. A shape for an envelope point.
 msgid "square"
-msgstr ""
+msgstr "kvadrat"
 
 #. A shape for an envelope point.
 msgid "slow start/end"
-msgstr ""
+msgstr "langsom start/slutt"
 
 #. A shape for an envelope point.
 msgid "fast start"
-msgstr ""
+msgstr "rask start"
 
 #. A shape for an envelope point.
 msgid "fast end"
-msgstr ""
+msgstr "rask slutt"
 
 #. A shape for an envelope point.
 msgid "bezier"
-msgstr ""
+msgstr "bezier"
 
 #. Reported when moving to an envelope point. {point} will be
 #. replaced with the number of the point. {value} will be replaced with its
 #. value. {shape} will be replaced with its shape.
 #. For example: "point 1 value 0.00 dB linear".
 msgid "point {point} value {value} {shape}"
-msgstr ""
+msgstr "punkt {point} verdi {value} {shape}"
 
 msgid "selected"
-msgstr ""
+msgstr "valgt"
 
 msgid "unselected"
-msgstr ""
+msgstr "ikke valgt\t#"
 
 msgid "no take envelopes"
-msgstr ""
+msgstr "ingen tagnings-kurve"
 
 msgid "no track envelopes"
-msgstr ""
+msgstr "ingen spor-kurve"
 
 msgid "no visible envelopes"
-msgstr ""
+msgstr "ingen synlige kurver"
 
 #. Reported when selecting an envelope. {} will be replaced
 #. with the name of the envelope; e.g. "volume envelope".
 msgid "{} envelope"
-msgstr ""
+msgstr "{} kurve"
 
 msgid "bypassed"
-msgstr ""
+msgstr "omgått"
 
 msgid "Change Automation Item Selection"
-msgstr ""
+msgstr "Endre valg av automasjonselement"
 
 #. Reported when moving to an automation item. {} will be
 #. replaced with the name or number of the automation item; e.g. "auto 2".
 msgid "auto {}"
-msgstr ""
+msgstr "auto {}"
 
 #. Reported when copying automation items. {} will be replaced
 #. with the number of items; e.g. "2 automation items copied".
 msgid "{} automation item copied"
 msgid_plural "{} automation items copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} automasjonselement kopiert"
+msgstr[1] "{} automasjonselementer kopiert"
 
 #. Reported when copying envelope points. {} will be replaced
 #. with the number of points; e.g. "2 envelope points copied".
 msgid "{} envelope point copied"
 msgid_plural "{} envelope points copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} envelope-punkt kopiert"
+msgstr[1] "{} kurve-punkter kopiert"
 
 msgid "no envelopes toggled"
-msgstr ""
+msgstr "ingen kurver endret"
 
 msgid "showed track {} envelope"
-msgstr ""
+msgstr "viste kurve for spor {}"
 
 msgid "hid track {} envelope"
-msgstr ""
+msgstr "skjulte kurve for spor {}"
 
 msgid "showed take {} envelope"
-msgstr ""
+msgstr "viste kurve for tagning {}"
 
 msgid "hid take {} envelope"
-msgstr ""
+msgstr "skjulte kurve for tagning {}"
 
 #. Reported when selecting envelope points. {} will be replaced
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} punkt valgt"
+msgstr[1] "{} punkter valgt"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
 msgid "no change"
-msgstr ""
+msgstr "ingen endring"
 
 msgid "inserted automation item"
-msgstr ""
+msgstr "satt inn automasjonsobjekt"
 
 #. Reported when adding automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items added".
@@ -278,75 +278,75 @@ msgstr ""
 #. replaced with the number of items; e.g. "2 automation items added".
 msgid "{} automation item added"
 msgid_plural "{} automation items added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} automasjonsobjekt lagt til"
+msgstr[1] "{} automasjonsobjekter lagt til"
 
 msgid "no automation items glued"
-msgstr ""
+msgstr "ingen automasjonsobjekter limt sammen"
 
 msgid "glued automation items"
-msgstr ""
+msgstr "automasjonsobjekter limt sammen"
 
 msgid "active"
-msgstr ""
+msgstr "aktiv"
 
 #. Reported when switching tabs in an effect such as ReaEQ.
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
-msgstr ""
+msgstr "{} fane"
 
 #. The name of a musical note.
 msgid "c"
-msgstr ""
+msgstr "c"
 
 #. The name of a musical note.
 msgid "c sharp"
-msgstr ""
+msgstr "ciss"
 
 #. The name of a musical note.
 msgid "d"
-msgstr ""
+msgstr "d"
 
 #. The name of a musical note.
 msgid "d sharp"
-msgstr ""
+msgstr "diss"
 
 #. The name of a musical note.
 msgid "e"
-msgstr ""
+msgstr "e"
 
 #. The name of a musical note.
 msgid "f"
-msgstr ""
+msgstr "f"
 
 #. The name of a musical note.
 msgid "f sharp"
-msgstr ""
+msgstr "fiss"
 
 #. The name of a musical note.
 msgid "g"
-msgstr ""
+msgstr "g"
 
 #. The name of a musical note.
 msgid "g sharp"
-msgstr ""
+msgstr "giss"
 
 #. The name of a musical note.
 msgid "a"
-msgstr ""
+msgstr "a"
 
 #. The name of a musical note.
 msgid "a sharp"
-msgstr ""
+msgstr "aiss"
 
 #. The name of a musical note.
 msgid "b"
-msgstr ""
+msgstr "h"
 
 msgid "{} note"
 msgid_plural "{} notes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} note"
+msgstr[1] "{} noter"
 
 #. used when reporting the number of muted notes in a chord.
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
@@ -354,16 +354,16 @@ msgstr[1] ""
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
 msgid_plural "{} muted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} dempet"
+msgstr[1] "{} dempede"
 
 msgid "noncontiguous selection"
-msgstr ""
+msgstr "ikke-sammenhengende utvalg"
 
 #. used when reporting the number of notes in a chord.
 #. {} will be replaced by the number of notes. E.g. "3 notes"
 msgid "{} notes"
-msgstr ""
+msgstr "{} noter"
 
 msgid "velocity"
 msgstr ""
