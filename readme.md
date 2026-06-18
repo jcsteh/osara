@@ -1111,7 +1111,7 @@ To build OSARA, you will need:
 	See the note about submodules in the previous section.
 
 #### Windows
-- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026)
+- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026), version 18.7.0 or newer.
 
 	Visual Studio 2026 Community/Professional/Enterprise is also supported.
 	However, Preview versions of Visual Studio will not be detected and cannot be used.
@@ -1124,7 +1124,7 @@ To build OSARA, you will need:
 			- MSVC Build Tools for x64/x86 (Latest)
 			- C++ ATL for x64/x86 (Latest MSVC)
 			- C++ Clang tools for Windows
-			- Windows 11 SDK (10.0.26100.xxx)
+			- Windows 11 SDK (10.0.28000.xxxx)
 	* on the Individual components tab:
 		- In the Compilers, build tools, and runtimes grouping:
 			- MSVC Build Tools for ARM64/ARM64EC (Latest)
