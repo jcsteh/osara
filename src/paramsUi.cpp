@@ -867,8 +867,8 @@ class FxParams: public ParamSource {
 			"|unnamed"
 			// Example: "1234 -"
 			R"(|\d{1,4} -)"
-			// Example: "12" or "P123" or "#1234"
-			R"(|[P#]?\d{2,4})"
+			// Example: "1" or "P123" or "#1234"
+			R"(|[P#]?\d{1,4})"
 			// Example: "Spec 1000"
 			R"(|Spec \d+)"
 			// OSARA appends a number in parentheses to all parameter names. See the
