@@ -783,6 +783,7 @@ class FxParams: public ParamSource {
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
+	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
 
 	void initNamedConfigParams();
 
@@ -803,6 +804,8 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_GetNamedConfigParm").c_str());
 		*(void**)&this->_SetNamedConfigParm = plugin_getapi(
 			(apiPrefix + "_SetNamedConfigParm").c_str());
+		*(void**)&this->_GetParamSectionName = plugin_getapi(
+			(apiPrefix + "_GetParamSectionName").c_str());
 		if (fx >= 0) {
 			this->initNamedConfigParams();
 		}
@@ -849,21 +852,25 @@ class FxParams: public ParamSource {
 			// Named config params aren't FX params; keep them visible.
 			return true;
 		}
+		if (this->_GetParamSectionName) {
+			char section[100];
+			this->_GetParamSectionName(this->obj, this->fx, param, section,
+				sizeof(section));
+			if (strcmp(section, "MIDI") == 0) {
+				return false;
+			}
+		}
 		static const regex RE_UNNAMED_PARAM{
 			"(?:"
 			// Empty string or "-"
 			"|-"
+			"|unnamed"
 			// Example: "1234 -"
 			R"(|\d{1,4} -)"
-			// Example: "P123" or "#123"
-			R"(|[P#]\d{3})"
-			// Any one of several strings...
-			"|(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
-			"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
-			R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
-			R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
-			// followed by any number of other characters; e.g. "MIDI CC 2|15"
-			" ).*?"
+			// Example: "1" or "P123" or "#1234"
+			R"(|[P#]?\d{1,4})"
+			// Example: "Spec 1000"
+			R"(|Spec \d+)"
 			// OSARA appends a number in parentheses to all parameter names. See the
 			// getParamName function above.
 			R"() \(\d+\))"
@@ -872,6 +879,26 @@ class FxParams: public ParamSource {
 		regex_match(name, m, RE_UNNAMED_PARAM);
 		if (!m.empty()) {
 			return false;
+		}
+		char automatable[2] = "";
+		this->_GetNamedConfigParm(this->obj, this->fx,
+			format("param.{}.automatable", param).c_str(),
+			automatable, sizeof(automatable));
+		if (automatable[0] == '0') {
+			// Check for some strings only for non-automatable parameters.
+			static const regex RE_UNNAMED_NONAUTOMATABLE_PARAM{
+				// Any one of several strings...
+				"(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
+				"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
+				R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
+				R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
+				// followed by any number of other characters; e.g. "MIDI CC 2|15"
+				") .*"
+			};
+			regex_match(name, m, RE_UNNAMED_NONAUTOMATABLE_PARAM);
+			if (!m.empty()) {
+				return false;
+			}
 		}
 		return true;
 	}
