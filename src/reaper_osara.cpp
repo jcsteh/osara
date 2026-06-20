@@ -1484,6 +1484,37 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
+void postInvertSegmentScrubRange(int) {
+	int sizeStart = 0;
+	int sizeEnd = 0;
+	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
+	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
+	if (!start || sizeStart != sizeof(int)
+			|| !end || sizeEnd != sizeof(int)) {
+		// We didn't get an expected value from the API
+		return;
+	}
+	ostringstream s;
+	if (*start == 0) {
+		// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+		s << translate("start from cursor");
+	} else {
+		// Translators: Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+		// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+		s << format(translate("start offset {} MS"), *start);
+	}
+	s << ", ";
+	if (*end == 0) {
+		// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+		s << translate("end at cursor");
+	} else {
+		// Translators: Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+		// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+		s << format(translate("end offset {} MS"), *end);
+	}
+	outputMessage(s);
+}
+
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	if (selectedItemsCount == 0) {
@@ -2965,6 +2996,7 @@ PostCommand POST_COMMANDS[] = {
 	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
+	{43617, postInvertSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -3303,7 +3335,6 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
-	{43617, _t("inverted segment scrub offsets")}, // Scrub: Invert looped-segment scrub range
 };
 const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
@@ -5897,7 +5928,7 @@ void cmdReportAndEditScrubSegmentOffsets(int command) {
 			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 			s << translate("start from cursor");
 		} else {
-			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
+			// Translators: Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
 			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
 			s << format(translate("start offset {} MS"), *start);
 		}
@@ -5906,7 +5937,7 @@ void cmdReportAndEditScrubSegmentOffsets(int command) {
 			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
 			s << translate("end at cursor");
 		} else {
-			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
+			// Translators: Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
 			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 			s << format(translate("end offset {} MS"), *end);
 		}
