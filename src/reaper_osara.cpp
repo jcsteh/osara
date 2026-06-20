@@ -1484,7 +1484,7 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
-void postInvertSegmentScrubRange(int) {
+void postSegmentScrubRange(int) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
 	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
@@ -2996,7 +2996,7 @@ PostCommand POST_COMMANDS[] = {
 	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
-	{43617, postInvertSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
+	{43617, postSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -5913,35 +5913,8 @@ void cmdMoveTracks(int command) {
 }
 
 void cmdReportAndEditScrubSegmentOffsets(int command) {
-	int sizeStart = 0;
-	int sizeEnd = 0;
-	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
-	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
-	if (!start || sizeStart != sizeof(int)
-			|| !end || sizeEnd != sizeof(int)) {
-		// We didn't get an expected value from the API
-		return;
-	}
 	if (lastCommandRepeatCount == 0) {
-		ostringstream s;
-		if (*start == 0) {
-			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-			s << translate("start from cursor");
-		} else {
-			// Translators: Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
-			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-			s << format(translate("start offset {} MS"), *start);
-		}
-		s << ", ";
-		if (*end == 0) {
-			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-			s << translate("end at cursor");
-		} else {
-			// Translators: Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
-			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-			s << format(translate("end offset {} MS"), *end);
-		}
-		outputMessage(s);
+		postSegmentScrubRange(command);
 		return;
 	}
 	// When users press more than once, run this action instead
