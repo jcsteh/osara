@@ -3341,10 +3341,10 @@ const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40105, // View: Move cursor right one pixel
 	40102, // Time selection: Move cursor left, creating time selection
 	40103, // Time selection: Move cursor right, creating time selection
-	41042, // Go forward one measure
-	41043, // Go back one measure
-	41044, // Go forward one beat
-	41045, // Go back one beat
+	41042, // Move edit cursor forward one measure
+	41043, // Move edit cursor back one measure
+	41044, // Move edit cursor forward one beat
+	41045, // Move edit cursor back one beat
 	41041, // Move edit cursor to start of current measure
 	41040, // Move edit cursor to start of next measure
 	40646, // View: Move cursor left to grid division
