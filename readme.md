@@ -990,6 +990,8 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Move cursor right by grid division
 - View: Move cursor left 8 pixels
 - View: Move cursor right 8 pixels
+- Xenakios/SWS: Move cursor right configured seconds
+- Xenakios/SWS: Move cursor left configured seconds
 - View: Set horizontal zoom to default project setting
 - View: Zoom out vertical
 - View: Zoom in vertical
