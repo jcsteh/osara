@@ -3338,7 +3338,19 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
-const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
+// SWS/Xenakios actions which should also move from the play cursor when
+// settings::moveFromPlayCursor is enabled. These only have named command IDs,
+// so they are resolved to numeric IDs and inserted into
+// MOVE_FROM_PLAY_CURSOR_COMMANDS at init (see plugin_register handling below).
+const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
+	"_XENAKIOS_MOVECURRRIGHTCONFSECS", // Xenakios/SWS: Move cursor right configured seconds
+	"_XENAKIOS_MOVECURRLEFTCONFSECS", // Xenakios/SWS: Move cursor left configured seconds
+	nullptr,
+};
+
+// Not const: the SWS actions above are added at init once their numeric IDs are
+// known.
+set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
 	40105, // View: Move cursor right one pixel
 	40102, // Time selection: Move cursor left, creating time selection
@@ -6538,6 +6550,13 @@ void delayedInit() {
 			continue;
 		}
 		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
+	}
+
+	for (int i = 0; MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[i]; ++i) {
+		int cmd = NamedCommandLookup(MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[i]);
+		if (cmd) {
+			MOVE_FROM_PLAY_CURSOR_COMMANDS.insert(cmd);
+		}
 	}
 
 	maybeAutoConfigReaperOptimal();
