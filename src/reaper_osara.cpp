@@ -3014,10 +3014,10 @@ PostCommand POST_COMMANDS[] = {
 	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{40231, postCursorMovement}, // Move edit cursor to start of next beat
 	{40230, postCursorMovement}, // Move edit cursor to start of current/previous beat
-	{41042, postCursorMovement}, // Go forward one measure
-	{41043, postCursorMovement}, // Go back one measure
-	{41044, postCursorMovement}, // Go forward one beat
-	{41045, postCursorMovement}, // Go back one beat
+	{41042, postCursorMovement}, // Move edit cursor forward one measure
+	{41043, postCursorMovement}, // Move edit cursor back one measure
+	{41044, postCursorMovement}, // Move edit cursor forward one beat
+	{41045, postCursorMovement}, // Move edit cursor back one beat
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
@@ -3295,16 +3295,18 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
-{"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
-{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
-{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
-{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
-{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
-{"_XENAKIOS_MOVECUR10PIX_RIGHTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels, creating time selection
-{"_XENAKIOS_MOVECURRLEFTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels
-{"_XENAKIOS_MOVECURRIGHTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels
-{"_XENAKIOS_MOVECURRLEFTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels, creating time selection
-{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
+	{"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
+	{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
+	{"_XENAKIOS_MOVECURRRIGHTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor right configured seconds
+	{"_XENAKIOS_MOVECURRLEFTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor left configured seconds
+	{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
+	{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
+	{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
+	{"_XENAKIOS_MOVECUR10PIX_RIGHTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels, creating time selection
+	{"_XENAKIOS_MOVECURRLEFTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels
+	{"_XENAKIOS_MOVECURRIGHTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels
+	{"_XENAKIOS_MOVECURRLEFTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels, creating time selection
+	{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
 	{nullptr},
 };
 
@@ -3336,19 +3338,30 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
-const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
+// Not const: the SWS/Xenakios actions in MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS
+// below are added to this set at init once their numeric IDs are known.
+set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
 	40105, // View: Move cursor right one pixel
 	40102, // Time selection: Move cursor left, creating time selection
 	40103, // Time selection: Move cursor right, creating time selection
-	41042, // Go forward one measure
-	41043, // Go back one measure
-	41044, // Go forward one beat
-	41045, // Go back one beat
+	41042, // Move edit cursor forward one measure
+	41043, // Move edit cursor back one measure
+	41044, // Move edit cursor forward one beat
+	41045, // Move edit cursor back one beat
 	41041, // Move edit cursor to start of current measure
 	41040, // Move edit cursor to start of next measure
 	40646, // View: Move cursor left to grid division
-40647, // View: Move cursor right to grid division
+	40647, // View: Move cursor right to grid division
+};
+
+// SWS/Xenakios actions which should also move from the play cursor when
+// settings::moveFromPlayCursor is enabled. These only have named command IDs,
+// so they are resolved to numeric IDs and inserted into
+// MOVE_FROM_PLAY_CURSOR_COMMANDS at init (see delayedInit).
+const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
+	"_XENAKIOS_MOVECURRRIGHTCONFSECS", // Xenakios/SWS: Move cursor right configured seconds
+	"_XENAKIOS_MOVECURRLEFTCONFSECS", // Xenakios/SWS: Move cursor left configured seconds
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
@@ -6536,6 +6549,13 @@ void delayedInit() {
 			continue;
 		}
 		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
+	}
+
+	for (const char* command : MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS) {
+		int cmd = NamedCommandLookup(command);
+		if (cmd) {
+			MOVE_FROM_PLAY_CURSOR_COMMANDS.insert(cmd);
+		}
 	}
 
 	maybeAutoConfigReaperOptimal();
