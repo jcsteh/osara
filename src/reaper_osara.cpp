@@ -3338,18 +3338,8 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
-// SWS/Xenakios actions which should also move from the play cursor when
-// settings::moveFromPlayCursor is enabled. These only have named command IDs,
-// so they are resolved to numeric IDs and inserted into
-// MOVE_FROM_PLAY_CURSOR_COMMANDS at init (see plugin_register handling below).
-const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
-	"_XENAKIOS_MOVECURRRIGHTCONFSECS", // Xenakios/SWS: Move cursor right configured seconds
-	"_XENAKIOS_MOVECURRLEFTCONFSECS", // Xenakios/SWS: Move cursor left configured seconds
-	nullptr,
-};
-
-// Not const: the SWS actions above are added at init once their numeric IDs are
-// known.
+// Not const: the SWS/Xenakios actions in MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS
+// below are added to this set at init once their numeric IDs are known.
 set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
 	40105, // View: Move cursor right one pixel
@@ -3362,7 +3352,16 @@ set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	41041, // Move edit cursor to start of current measure
 	41040, // Move edit cursor to start of next measure
 	40646, // View: Move cursor left to grid division
-40647, // View: Move cursor right to grid division
+	40647, // View: Move cursor right to grid division
+};
+
+// SWS/Xenakios actions which should also move from the play cursor when
+// settings::moveFromPlayCursor is enabled. These only have named command IDs,
+// so they are resolved to numeric IDs and inserted into
+// MOVE_FROM_PLAY_CURSOR_COMMANDS at init (see delayedInit).
+const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
+	"_XENAKIOS_MOVECURRRIGHTCONFSECS", // Xenakios/SWS: Move cursor right configured seconds
+	"_XENAKIOS_MOVECURRLEFTCONFSECS", // Xenakios/SWS: Move cursor left configured seconds
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
@@ -6552,8 +6551,8 @@ void delayedInit() {
 		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
 
-	for (int i = 0; MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[i]; ++i) {
-		int cmd = NamedCommandLookup(MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[i]);
+	for (const char* command : MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS) {
+		int cmd = NamedCommandLookup(command);
 		if (cmd) {
 			MOVE_FROM_PLAY_CURSOR_COMMANDS.insert(cmd);
 		}
