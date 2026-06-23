@@ -119,10 +119,10 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Transport: Go to end of project: Control+End
 - Move edit cursor to start of next measure: Alt+End
 - Move edit cursor to start of current measure: Alt+Home
-- Go forward one measure: PageDown
-- Go back one measure: PageUp
-- Go forward one beat: Control+PageDown
-- Go back one beat: Control+PageUp
+- Move edit cursor forward one measure: PageDown
+- Move edit cursor back one measure: PageUp
+- Move edit cursor forward one beat: Control+PageDown
+- Move edit cursor back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
 
