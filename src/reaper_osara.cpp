@@ -3297,6 +3297,8 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
 	{"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
 	{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
+	{"_XENAKIOS_MOVECURRRIGHTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor right configured seconds
+	{"_XENAKIOS_MOVECURRLEFTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor left configured seconds
 	{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
 	{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
 	{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
