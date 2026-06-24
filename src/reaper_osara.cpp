@@ -137,9 +137,14 @@ void _outputMessage(const string& message, bool interrupt) {
 #endif // _WIN32
 
 bool muteNextMessage = false;
+int automaticMessageSuppressionDepth = 0;
+
 void outputMessage(const string& message, bool interrupt) {
 	if(muteNextMessage && isHandlingCommand){
 		muteNextMessage = false;
+		return;
+	}
+	if (automaticMessageSuppressionDepth > 0) {
 		return;
 	}
 	_outputMessage(message, interrupt);
@@ -147,6 +152,22 @@ void outputMessage(const string& message, bool interrupt) {
 
 void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
+}
+
+void outputMessageFromApi(const string& message, bool interrupt) {
+	if(muteNextMessage && isHandlingCommand){
+		muteNextMessage = false;
+		return;
+	}
+	_outputMessage(message, interrupt);
+}
+
+void setAutomaticMessageSuppression(bool suppress) {
+	if (suppress) {
+		++automaticMessageSuppressionDepth;
+	} else if (automaticMessageSuppressionDepth > 0) {
+		--automaticMessageSuppressionDepth;
+	}
 }
 
 bool CallLater::cancel() {
