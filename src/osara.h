@@ -50,6 +50,7 @@
 #define REAPERAPI_WANT_GetMasterTrack
 #define REAPERAPI_WANT_Track_GetPeakInfo
 #define REAPERAPI_WANT_GetHZoomLevel
+#define REAPERAPI_WANT_adjustZoom
 #define REAPERAPI_WANT_GetToggleCommandState
 #define REAPERAPI_WANT_Main_OnCommand
 #define REAPERAPI_WANT_Undo_CanUndo2
@@ -224,6 +225,7 @@
 #define REAPERAPI_WANT_parse_timestr_len
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
 #define REAPERAPI_WANT_GetSetProjectGrid
+#define REAPERAPI_WANT_GetTrackMIDINoteNameEx
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
@@ -242,7 +244,7 @@ typedef struct Command {
 	int section;
 	gaccel_register_t gaccel;
 	const char* id;
-	void (*execute)(Command*);
+	void (*execute)(int);
 } Command;
 extern int lastCommandRepeatCount;
 extern DWORD lastCommandTime;
@@ -317,10 +319,12 @@ typedef enum {
 	TF_MEASURE,
 	TF_MINSEC,
 	TF_SEC,
+	TF_ROUNDSEC,
 	TF_FRAME,
 	TF_HMSF,
 	TF_SAMPLE,
-	TF_MEASURETICK
+	TF_MEASURETICK,
+	TF_MS
 } TimeFormat;
 const TimeFormat TF_RULER = TF_NONE;
 enum FormatTimeCacheRequest {
@@ -365,7 +369,7 @@ extern CComPtr<IAccPropServices> accPropServices;
 bool isClassName(HWND hwnd, std::string className);
 
 extern bool isHandlingCommand;
-void reportTransportState(int state);
+void reportTransportState(int before, int after);
 void reportRepeat(bool repeat);
 void postGoToTrack(int command, MediaTrack* track);
 void formatPan(double pan, std::ostringstream& output);

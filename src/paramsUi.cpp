@@ -78,6 +78,7 @@ class ParamSource {
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	virtual bool isProbablyUsefulParam(int param, const string& name) { return true; };
 
 	// Called to rebuild the parameter list because one or more parameters were
 	// invalidated. This need only be implemented if the source doesn't
@@ -412,9 +413,19 @@ class ParamsDialog {
 		if (!config[0]) {
 			return;
 		}
+		RECT rect;
+		GetWindowRect(this->dialog, &rect);
+		int minW = rect.right - rect.left;
+		int minH = rect.bottom - rect.top;
 		istringstream s(config);
 		int x, y, w, h;
 		s >> x >> y >> w >> h;
+		if (w < minW) {
+			w = minW;
+		}
+		if (h < minH) {
+			h = minH;
+		}
 		SetWindowPos(this->dialog, nullptr, x, y, w, h,
 			SWP_NOACTIVATE | SWP_NOZORDER);
 	}
@@ -549,9 +560,10 @@ class ParamsDialog {
 			}
 			return 1; // Eat the keystroke.
 		}
-		if (msg->wParam == VK_SPACE) {
-			// Let REAPER handle the space key so control+space works.
-			return 0; // Not interested.
+		if (msg->wParam == VK_SPACE && isClassName(GetFocus(), "Button")) {
+			// Pass the space key to our window for buttons and check boxes so they can
+			// be activated as expected.
+			return -1; // Pass to our window.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
 		if (msg->hwnd == dialog->paramCombo ||
@@ -562,15 +574,23 @@ class ParamsDialog {
 				// A function key.
 				(VK_F1 <= msg->wParam && msg->wParam <= VK_F12) ||
 				// Anything with both alt and shift.
-				(alt && shift)
+				(alt && shift) ||
+				// Anything with both alt and control.
+				(alt && control) ||
+				// Modified space.
+				(msg->wParam == VK_SPACE && (alt || control || shift))
 			) {
+				return -666; // Force to main window.
+			}
+			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
+				// In the combo box, we also pass space to the main section.
 				return -666; // Force to main window.
 			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
 			return -1; // Pass to our window.
 		}
-		if (alt && 'A' <= msg->wParam && msg->wParam <= 'Z') {
+		if (alt && !shift && !control && 'A' <= msg->wParam && msg->wParam <= 'Z') {
 			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
 			// the Parameter combo box.
 			return -1; // Pass to our window.
@@ -600,14 +620,9 @@ class ParamsDialog {
 		}
 	}
 
-	const regex RE_UNNAMED_PARAM{"(?:|-|\\d{1,4} -|[P#]\\d{3}) \\(\\d+\\)"};
-	bool shouldIncludeParam(string name) {
+	bool shouldIncludeParam(int param, string name) {
 		if (!IsDlgButtonChecked(this->dialog, ID_PARAM_UNNAMED)) {
-			smatch m;
-			regex_match(name, m, RE_UNNAMED_PARAM);
-			if (!m.empty()) {
-				return false;
-			}
+			if (!this->source->isProbablyUsefulParam(param, name)) return false;
 		}
 		if (filter.empty())
 			return true;
@@ -628,7 +643,7 @@ class ParamsDialog {
 		ComboBox_ResetContent(this->paramCombo);
 		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
-			if (!this->shouldIncludeParam(name))
+			if (!this->shouldIncludeParam(p, name))
 				continue;
 			this->visibleParams.push_back(p);
 			ComboBox_AddString(this->paramCombo, name.c_str());
@@ -728,7 +743,7 @@ class ParamsDialog {
 		this->valueEdit = GetDlgItem(this->dialog, ID_PARAM_VAL_EDIT);
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
-		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_CHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
@@ -768,6 +783,7 @@ class FxParams: public ParamSource {
 	bool (*_FormatParamValue)(ReaperObj*, int, int, double, char*, int);
 	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
+	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
 
 	void initNamedConfigParams();
 
@@ -788,6 +804,8 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_GetNamedConfigParm").c_str());
 		*(void**)&this->_SetNamedConfigParm = plugin_getapi(
 			(apiPrefix + "_SetNamedConfigParm").c_str());
+		*(void**)&this->_GetParamSectionName = plugin_getapi(
+			(apiPrefix + "_GetParamSectionName").c_str());
 		if (fx >= 0) {
 			this->initNamedConfigParams();
 		}
@@ -826,6 +844,63 @@ class FxParams: public ParamSource {
 				this->namedConfigParams[param]);
 		}
 		return this->getParam(this->fx, param - namedCount);
+	}
+
+	bool isProbablyUsefulParam(int param, const string& name) final {
+		const int namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			// Named config params aren't FX params; keep them visible.
+			return true;
+		}
+		if (this->_GetParamSectionName) {
+			char section[100];
+			this->_GetParamSectionName(this->obj, this->fx, param, section,
+				sizeof(section));
+			if (strcmp(section, "MIDI") == 0) {
+				return false;
+			}
+		}
+		static const regex RE_UNNAMED_PARAM{
+			"(?:"
+			// Empty string or "-"
+			"|-"
+			"|unnamed"
+			// Example: "1234 -"
+			R"(|\d{1,4} -)"
+			// Example: "1" or "P123" or "#1234"
+			R"(|[P#]?\d{1,4})"
+			// Example: "Spec 1000"
+			R"(|Spec \d+)"
+			// OSARA appends a number in parentheses to all parameter names. See the
+			// getParamName function above.
+			R"() \(\d+\))"
+		};
+		smatch m;
+		regex_match(name, m, RE_UNNAMED_PARAM);
+		if (!m.empty()) {
+			return false;
+		}
+		char automatable[2] = "";
+		this->_GetNamedConfigParm(this->obj, this->fx,
+			format("param.{}.automatable", param).c_str(),
+			automatable, sizeof(automatable));
+		if (automatable[0] == '0') {
+			// Check for some strings only for non-automatable parameters.
+			static const regex RE_UNNAMED_NONAUTOMATABLE_PARAM{
+				// Any one of several strings...
+				"(?:MIDI CC|MIDI Controller|Program Change|CC|Pitch Bend|Pitchbend"
+				"|Aftertouch|Channel Pressure|MIDI State|Poly|Omni|All Notes|All Sound"
+				R"(|Local Control|X \(Reserved\)|Internal|Registered Parameter Number)"
+				R"(|Non - Registered Parameter Number|Reset All Controllers|\(MSB \)|\(LSB\))"
+				// followed by any number of other characters; e.g. "MIDI CC 2|15"
+				") .*"
+			};
+			regex_match(name, m, RE_UNNAMED_NONAUTOMATABLE_PARAM);
+			if (!m.empty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 };
 
@@ -867,7 +942,7 @@ class FxParam: public Param {
 		this->isEditable = true;
 		// Set this as the last touched FX and FX parameter, as well as the last
 		// focused FX.
-		string paramStr = format("{}", param);
+		string paramStr = fmt::format("{}", param);
 		source._SetNamedConfigParm(source.obj, fx, "last_touched", paramStr.c_str());
 		source._SetNamedConfigParm(source.obj, fx, "focused", "1");
 	}
@@ -1212,14 +1287,14 @@ class SourceMidiChannelParam:  public ReaperObjParam {
 		if (value == -1) {
 			// Translators: Indicates no MIDI channels for a send in the Track
 			// Parameters dialog.
-			return translate("none");
+			return translate_ctxt("MIDI channel", "none");
 		}
 		if (value == 0) {
 			// Translators: Indicates all MIDI channels for a send in the Track
 			// Parameters dialog.
 			return translate("all");
 		}
-		return format("{}", value);
+		return fmt::format("{}", value);
 	}
 
 	void setValue(double value) override {
@@ -1280,7 +1355,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	void addMonoOptions(int channels) {
 		for (int c = 0; c < channels; ++c) {
 			this->options.push_back({
-				format("{}", c + 1),
+				fmt::format("{}", c + 1),
 				c + MONO_FLAG
 			});
 		}
@@ -1289,7 +1364,7 @@ class AudioChannelParam:  public ReaperObjParam {
 	void addStereoOptions(int channels) {
 		for (int c = 0; c <= channels - 2; ++c) {
 			this->options.push_back({
-				format("{}/{}", c + 1, c + 2),
+				fmt::format("{}/{}", c + 1, c + 2),
 				c
 			});
 		}
@@ -1299,7 +1374,7 @@ class AudioChannelParam:  public ReaperObjParam {
 		const int countFlag = isDest ? 0 : (srcChannels / 2 << 10);
 		for (int c = 0; c <= trackChannels - srcChannels; ++c) {
 			this->options.push_back({
-				format("{}-{}", c + 1, c + srcChannels),
+				fmt::format("{}-{}", c + 1, c + srcChannels),
 				c + countFlag
 			});
 		}
@@ -1370,7 +1445,7 @@ class SourceAudioChannelParam: public AudioChannelParam {
 	public:
 	SourceAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
-		options.push_back({translate("none"), -1});
+		options.push_back({translate_ctxt("audio channel", "none"), -1});
 		MediaTrack* srcTrack = this->getTargetTrack();
 		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
 		this->addMonoOptions(channels);
@@ -1410,10 +1485,10 @@ class DestAudioChannelParam:  public AudioChannelParam {
 			// channels there are. Just expose the current setting.
 			int dest = *(int*)provider.getSetValue(nullptr);
 			if (dest & MONO_FLAG) {
-				this->options.push_back({format("{}", (dest & ~MONO_FLAG) + 1), dest});
+				this->options.push_back({fmt::format("{}", (dest & ~MONO_FLAG) + 1), dest});
 			} else {
 				// Multi-channel, but we don't know how many.
-				this->options.push_back({format("{}-", dest + 1), dest});
+				this->options.push_back({fmt::format("{}-", dest + 1), dest});
 			}
 			this->max = 0;
 			return;
@@ -1797,7 +1872,7 @@ class ItemParams: public ReaperObjParamSource {
 	MediaItem* item;
 };
 
-void cmdParamsFocus(Command* command) {
+void cmdParamsFocus(int command) {
 	unique_ptr<ParamSource> source;
 	MediaTrack* track;
 	MediaItem_Take* take;
@@ -2047,7 +2122,7 @@ void fxParams_begin(ReaperObj* obj, const string& apiPrefix) {
 	new ParamsDialog(std::move(source));
 }
 
-void cmdFxParamsFocus(Command* command) {
+void cmdFxParamsFocus(int command) {
 	switch (fakeFocus) {
 		case FOCUS_TRACK: {
 			MediaTrack* track = GetLastTouchedTrack();
@@ -2071,6 +2146,6 @@ void cmdFxParamsFocus(Command* command) {
 	}
 }
 
-void cmdFxParamsMaster(Command* command) {
+void cmdFxParamsMaster(int command) {
 	fxParams_begin(GetMasterTrack(0), "TrackFX");
 }

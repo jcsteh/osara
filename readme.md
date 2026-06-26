@@ -43,18 +43,12 @@ If you wish to completely replace your existing key map with the OSARA key map (
 If the installer does replace the key map, a safety backup of your existing key map will be made in Reaper's KeyMaps folder.
 
 ### Mac
-Because OSARA is an extension (not a standalone application) and also needs to install a key map, the installation process is a little different to most Mac applications.
-Please follow these instructions to install it:
-
-1. Open the OSARA disk image file you downloaded.
-2. Open the "Install OSARA.command" file.
- On macOS Catalina and later, you have to choose open from the context menu, accessed with VO+Shift+M.
-3. Follow the instructions.
+1. Open the OSARA zip file you downloaded. Finder will extract a new file called OSARAInstaller.app.
+As its name suggests, this file is an installer, IE you can open it right there in your downloads folder, you do not need to copy it to your Applications folder.
+2. Open OSARAInstaller.app, follow the instructions.
  If you wish to replace the existing key map with the OSARA key map (which is recommended), answer yes when prompted.
   A backup of your existing key map will be made in Reaper's KeyMaps folder. 
-4. The installer leaves a terminal window open.
- It can be closed with Command+Q.
-5. Press Command+E to eject the disk image.
+3. Once installed, you can remove the zip and app files from your downloads folder.
 
 ### Key Map
 Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
@@ -87,12 +81,15 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - SWS: Select nearest previous folder: Alt+PageUp
 - Track properties: Toggle free item positioning: Alt+Shift+F2
 - Track: Duplicate tracks: Alt+D
+- Track: Move tracks up: Shift+PageUp
+- Track: Move tracks down: Shift+PageDown
 
 #### Adjusting Track Parameters
-- Track: Mute/unmute tracks: F5
+- Track: Toggle mute for selected tracks: F5
 - Track: Toggle mute for master track: Shift+F5
-- Track: Solo/unsolo tracks: F6
+- Track: Toggle solo for selected tracks: F6
 - Toggle record arming for current (last touched) track: F7
+- Track: Toggle record arm for selected tracks: Shift+F7
 - Track: Cycle track record monitor: F8
 - Track: Invert track phase: F9
 - Track: Toggle FX bypass for current track: B
@@ -122,27 +119,38 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Transport: Go to end of project: Control+End
 - Move edit cursor to start of next measure: Alt+End
 - Move edit cursor to start of current measure: Alt+Home
-- Go forward one measure: PageDown
-- Go back one measure: PageUp
-- Go forward one beat: Control+PageDown
-- Go back one beat: Control+PageUp
+- Move edit cursor forward one measure: PageDown
+- Move edit cursor back one measure: PageUp
+- Move edit cursor forward one beat: Control+PageDown
+- Move edit cursor back one beat: Control+PageUp
 - View: Move cursor right to grid division: Alt+Shift+RightArrow
 - View: Move cursor left to grid division: Alt+Shift+LeftArrow
+
+#### Scrub
+- Scrub: Toggle looped-segment scrub at edit cursor: /
+- Scrub: Toggle preference for one-shot segment scrub when moving edit cursor: Control+/
+- Scrub: Invert looped-segment scrub range: Shift+/
 
 #### Items
 - Item navigation: Select and move to previous item: Control+LeftArrow
 - Item navigation: Select and move to next item: Control+RightArrow
-- Item: Split items at edit or play cursor: S
+- Custom: Select and split item under edit or play cursor: A
+- Item: Split items at edit or play cursor (select right): S
 - Item: Split items at time selection: Shift+S
+- Item: Split at previous zero crossing: Alt+Z
 - Item: Heal splits in items: Control+H
 - Item edit: Move items/envelope points right: . or NumPad6
 - Item edit: Move items/envelope points left: , or NumPad4
+- Item edit: Move contents of items left: Shift+,
+- Item edit: Move contents of items right: Shift+.
 - Item edit: Move items/envelope points right by grid size: Alt+Shift+. or Control+Alt+NumPad6
 - Item edit: Move items/envelope points left by grid size: Alt+Shift+, or Control+Alt+NumPad4
 - Item edit: Grow left edge of items: Control+, or Control+NumPad4
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
+- Item edit: Move right edge of item to edit cursor: Control+Alt+Shift+.
+- Item edit: Move position of item to edit cursor: Control+Alt+Shift+,
 - Item edit: Trim left edge of item to edit cursor: Win+Shift+,
 - Item edit: Trim right edge of item to edit cursor: Win+Shift+.
 - Item: go to next stretch marker: Control+'
@@ -150,14 +158,15 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item navigation: Move cursor to start of items: Control+Shift+,
 - Item navigation: Move cursor to end of items: Control+Shift+.
 - Item: Select all items in track: Control+Alt+A
-- Item: Select all items on selected tracks in current time selection: Alt+Shift+A
 - Item grouping: Group items: Control+G
 - Item grouping: Remove items from group: Control+Shift+G
 - Item grouping: Select all items in groups: Shift+G
 - Item: Select all items in current time selection: Control+Shift+A
+- Custom: Select items on selected tracks in current time selection (clears prior item selection): Alt+Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
 - Item properties: Toggle lock
+- Item properties: Loop item source
 - Item properties: Normalize items: Control+Shift+N
 - Item properties: Normalize multiple items to common gain: Shift+N
 - Item properties: Reset item take gain to +0dB (un-normalize): Control+Alt+0
@@ -169,11 +178,13 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item: Set item end to source media end: Control+L
 - Item: Remove selected area of items: Control+Shift+Delete
 - Item: Trim items to selected area: Control+Shift+T
-- Xenakios/SWS: Play selected items once: Control+Alt+Space
+- Transport: Play (stop at end of selected items, ignore loop selection): Control+Alt+Space
 - Item: Duplicate items: Control+D
 - Take: Duplicate active take: Control+Alt+D
 - Item: Duplicate selected area of items: Control+Shift+D
 - Item: Copy loop of selected area of audio items: Control+Win+L
+- Move edit cursor to next zero crossing in items: Z
+- Move edit cursor to previous zero crossing in items: Shift+Z
 - SWS/FNG: Quantize item positions and MIDI note positions to grid: Control+Shift+Q
 
 #### Takes
@@ -208,19 +219,29 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - FX: Show/hide track envelope for last touched FX parameter: Control+Alt+L
 
 #### Markers and Regions
+- Markers: Insert marker at current position: M
 - Markers: Go to previous marker/project start: ;
 - Markers: Go to next marker/project end: '
 - Markers: Go to marker 01: 1
+- Markers: Add/move marker 1 to play/edit cursor: Control+1
 - Markers: Go to marker 02: 2
+- Markers: Add/move marker 2 to play/edit cursor: Control+2
 - Markers: Go to marker 03: 3
+- Markers: Add/move marker 3 to play/edit cursor: Control+3
 - Markers: Go to marker 04: 4
+- Markers: Add/move marker 4 to play/edit cursor: Control+4
 - Markers: Go to marker 05: 5 
+- Markers: Add/move marker 5 to play/edit cursor: Control+5
 - Markers: Go to marker 06:6
+- Markers: Add/move marker 6 to play/edit cursor: Control+6
 - Markers: Go to marker 07: 7
+- Markers: Add/move marker 7 to play/edit cursor: Control+7
 - Markers: Go to marker 08: 8
+- Markers: Add/move marker 8 to play/edit cursor: Control+8
 - Markers: Go to marker 09: 9
+- Markers: Add/move marker 9 to play/edit cursor: Control+9
 - Markers: Go to marker 10: 0
-- Markers: Insert marker at current position: M
+- Markers: Add/move marker 10 to play/edit cursor: Control+0
 - Regions: Go to region 01 after current region finishes playing (smooth seek): Alt+1
 - Regions: Go to region 02 after current region finishes playing (smooth seek): Alt+2
 - Regions: Go to region 03 after current region finishes playing (smooth seek): Alt+3
@@ -239,29 +260,18 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Move edit cursor to next tempo or time signature change: Shift+'
 
 #### Automation
-- Item edit: Move items/envelope points up one track/a bit: NumPad8
-- Item edit: Move items/envelope points down one track/a bit: NumPad2
+- Item edit: Move items/envelope points up one track/a bit: Control+Alt+Shift+UpArrow or NumPad8
+- Item edit: Move items/envelope points down one track/a bit: Control+Alt+Shift+DownArrow or NumPad2
 - (SWS extension) SWS/FNG: Move selected envelope points up: Alt+NumPad8
 - (SWS extension) SWS/FNG: Move selected envelope points down: Alt+NumPad2
 - Envelope: Delete all selected points: Control+Shift+Delete
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
 - Envelope: Insert automation item: Control+Shift+I
-- Envelope: Delete automation items
-- Envelope: Delete automation items, preserve points
-- Envelope: Split automation items
-- Envelope: Duplicate automation items
-- Envelope: Duplicate and pool automation items
-- Envelope: Convert all project automation to automation items
-- Envelope: Glue automation items
 
 #### Zoom
-- View: Zoom out horizontal: - or NumPad-
-- View: Zoom in horizontal: = or NumPad+
-- View: Zoom out vertical
-- View: Zoom in vertical
-- View: Toggle track zoom to minimum height
-- View: Toggle track zoom to maximum height
+- View: Zoom out horizontal: NumPad-
+- View: Zoom in horizontal: NumPad+
 
 #### Options
 - Options: Cycle ripple editing mode: Alt+Shift+P
@@ -331,6 +341,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 #### View
 - View: Toggle master track visible: Control+Alt+Shift+M
 - Toggle fullscreen: F11, Command+F11 on Mac
+- Show/hide video window: Control+Shift+V
 
 #### Grid
 - Grid: Set to 1: Control+Shift+1
@@ -567,10 +578,13 @@ Clearing the text in the Filter field shows the entire list.
 
 As an alternative to using the Parameter combo box, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
 
-Some effects expose a lot of unnamed parameters which can make finding useful parameters challenging.
-The Include unnamed parameters check box may help with this.
-When unchecked, unnamed parameters are excluded from the parameter list.
-Currently, this means parameters with completely empty names, the single character "-", a name like #001 or a name like P001.
+Space can be used to play/stop the project when focused on sliders or the Parameters combo box.
+Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
+
+Some effects expose a lot of unnamed and potentially unusable parameters, which can make finding the useful ones challenging.
+OSARA attempts to identify unusable parameters and filters them out of the list by default.
+Currently, this filtering applies to parameters with completely empty names, the single character "-", a name like #001, a name like P001 and any parameter that isn't automatable.
+If you do want to navigate all effect parameters, check the Include unnamed and potentially unusable parameters check box.
 
 When you are done working with parameters, press the Close button.
 Alternatively, you can press enter or escape.
@@ -626,9 +640,9 @@ At any time, you can report or reset the levels for either of the watchers using
 - OSARA: Reset Peak Watcher first watcher: Alt+F10
 - OSARA: Reset Peak Watcher second watcher: Alt+Shift+F10
 
-You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher.
+You can also quickly pause Peak Watcher using OSARA: Pause/resume Peak Watcher: Control+Alt+F10.
 While paused, Peak Watcher won't notify you of any level changes.
-You can later use the same action again to resume automatic reporting.
+Use the same action again to resume automatic reporting.
 
 Peak Watcher settings are saved with the project.
 To configure default settings to use for new projects, you can save them in a project template and configure this template to be used as the template for new projects in the Project section of REAPER Preferences.
@@ -703,50 +717,53 @@ The points within an automation item can only be accessed after moving to that a
 To return to the points in the underlying envelope, simply move focus back to the envelope by selecting it again with Alt+L or Alt+Shift+L (OSARA: Select next track/take envelope (depending on focus), OSARA: Select previous track/take envelope (depending on focus)).
 
 ### Notes and Chords in the MIDI Editor
-In the MIDI Editor, OSARA enables you to move between chords and to move to individual notes in a chord.
-In this context, a chord is any number of notes that are placed at the exact same position.
-If there is only one note at a given position, it will be treated as a chord.
+In the MIDI Editor, OSARA provides actions to move backward and forward between single notes and chords. In this context, a chord is any number of notes that are placed at the exact same position.
+When positioned on a chord, actions are also available to move through individual notes of it.
 
-You move between chords using the Left and Right arrow keys (OSARA: Move to previous chord, OSARA: Move to next chord).
-When you move to a chord, the edit cursor will be placed at the chord and the new position will be reported.
-The notes of the chord will be previewed and the number of notes will be reported.
-The notes in the chord are also selected so you can manipulate the entire chord.
+Use the Left and Right arrow keys to navigate backward and forward through MIDI note data (OSARA: Move backward to previous single note or chord, OSARA: Move forward to next single note or chord).
+When you move to a note or chord, the edit cursor will be placed at that position and the new cursor position will be reported.
+The note, or notes making up a chord will be previewed, and the number of notes will be reported.
+All notes in a chord are automatically selected, so you can manipulate the entire chord.
 For example, pressing Delete will delete the chord.
 
-Once you have moved to a chord, you can move to individual notes using the Up and Down arrow keys (OSARA: Move to previous note in chord, OSARA: Move to next note in chord).
-When you move to a note, that note will be previewed and its name will be reported.
+When you've moved to a chord, you can move through individual notes using the Up and Down arrow keys (OSARA: Move to higher note in chord, OSARA: Move to lower note in chord).
+When you move to a note, that note will be previewed, its name and length will be reported.
 The single note will also be selected so you can manipulate just that note.
-For example, pressing Delete will delete only that note.
+For example, moving to the third note in a chord then pressing Delete will delete only that note.
 
-When a chord or a note within a chord is being previewed, you can cancel the note preview by pressing the Control key.
+When a note or chord is being previewed, you can cancel the note preview by pressing the Control key.
 
-You can select multiple chords or multiple notes in a chord.
-To do this, first move to the first chord or note you want to select.
-Then, use Shift+DownArrow or Shift+UpArrow to add the next or previous chord or note to the selection.
-For example, if you've moved to a chord and also want to add the next chord to the selection, you would press Shift+RightArrow.
+You can select multiple notes and multiple notes within a chord, either contiguously or noncontiguously.
 
-Noncontiguous selection is also possible.
-You do this in the same way described above for tracks and items.
-That is, press Shift+Space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to switch to noncontiguous selection, move to other chords/notes with Shift+Arrows and press Shift+Space to select/unselect the current chord/note.
+To make a contiguous selection:
+1. Move to the first chord or note you want to select. Remember, when moving to a chord, all notes of it are automatically selected.
+2. To add the previous note or chord to selection, use Shift+LeftArrow.
+3. To add the next note or chord to selection, use Shift+RightArrow.
+
+Noncontiguous selection is also possible in the MIDI Editor. You do this in the same way described above for tracks and items. That is:
+1. Move to the first note or chord you want to select.
+2. Press Shift+Space (OSARA: Enable noncontiguous selection/toggle selection of current chord/note) to start a noncontiguous selection.
+3. Navigate other chords/notes with Shift+Arrows, pressing Shift+Space to toggle selection of those.
 
 ### Note Preview in the MIDI Event List (Windows Only)
 When the MIDI Editor is set to Event List mode, REAPER presents a list with all the events in the current MIDI item.
 When a note gets focus in the list, OSARA will play a preview of the focused note.
 To cancel a note preview, press the Control key.
 
-### Navigating FX Presets Without Activating Them (Windows Only)
+### Searching and Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
 Sometimes, you need to be able to examine or search the available presets without activating each one.
 OSARA provides a dialog to facilitate this.
 
 You activate this dialog by pressing Alt+DownArrow when focused on REAPER's FX preset combo box.
 The dialog displays the preset list and allows you to navigate without presets being automatically activated.
-The Filter field allows you to filter the list to show only presets containing the entered text.
-Pressing the OK button activates the preset that's currently selected in the list.
+The Filter field (Alt+F) allows you to filter the list to show only presets containing the entered text.
+Pressing Enter while focus is in the list box or Alt+A to activate the Apply button loads the selected preset.
+Pressing Escape or Alt+C to activate the Close button closes the dialog, clears the filter and returns keyboard focus to REAPER's FX preset combo box.
 
 ### Configuration
 OSARA provides a Configuration dialog to adjust various settings.
-You can open this dialog by pressing Control+F12 or Control+Alt+Shift+P (OSARA: Configuration).
+You can open this dialog by pressing Control+F12 (OSARA: Configuration).
 
 The dialog contains the following options:
 
@@ -761,13 +778,16 @@ The dialog contains the following options:
  Using the same example, OSARA would report only "beat 2".
 - Move relative to the play cursor for time movement commands during playback: When enabled, time movement commands such as scrubbing or moving by bar/beat will move from where you are currently playing, rather than relative to the edit cursor.
 - Report markers and regions during playback: When enabled, project markers and regions will be reported during playback as the cursor passes them.
-- Report transport state (play, record, etc.): When enabled, OSARA will report the transport state when you change it; e.g. if you begin playing or recording.
+- Report time selection start and end while playing: When enabled, start and end of time selection will be reported during playback as the cursor passes them.
+- Report transport play, pause and stop: When enabled, OSARA will report those states as you control REAPER's transport.
+- Report recording state: When enabled, OSARA will report recording starting and stopping. This can be toggled separately from other transport reports if you want to cut down verbosity.
 - Report track numbers: When enabled, OSARA will report track numbers as well as track names.
  When disabled, track numbers will not be reported except for unnamed tracks.
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report position when navigating chords in MIDI editor: When enabled, OSARA will report the cursor position as you move through chords in the piano roll.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
 - Report changes made via control surfaces: When enabled, OSARA will report track selection changes, parameter changes, etc. made using a control surface.
+- Move cursor relative to adjusting edges of items and time selection: When enabled, the edit and play cursors will automatically make relative movements as you grow/shrink the edges of items and time selection. If the project is playing while you adjust edges, OSARA seeks to the updated cursor positions to provide real-time audio feedback.
 
 When you are done, press the OK button to accept any changes or the Cancel button to discard them.
 
@@ -781,6 +801,7 @@ You can configure this via the "Automatically check for new versions of REAPER o
 OSARA also includes some other miscellaneous actions.
 
 #### Main section of actions list
+- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
 - OSARA: go to first track: Control+Alt+Home
 - OSARA: go to last track: Control+Alt+End
 - OSARA: go to master track: Control+Alt+Shift+Home
@@ -788,6 +809,8 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Move to next item (leaving other items selected): Control+Shift+RightArrow
 - OSARA: Move to previous item (leaving other items selected): Control+Shift+LeftArrow
 - OSARA: View properties for current media item/take/automation item (depending on focus): Shift+F2
+- OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out: =
+- OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in: -
 - OSARA: Report ripple editing mode: Control+Shift+P
 - OSARA: Report muted tracks: Alt+Shift+F5
  - Pressing this twice will display the information in a dialog with a text box for easy review.
@@ -826,15 +849,25 @@ OSARA also includes some other miscellaneous actions.
 - OSARA: Report global / Track Automation Mode: Control+Shift+L
 - OSARA: Toggle global automation override between latch preview and off: Control+Alt+Shift+L
 - OSARA: Cycle through midi recording modes of selected tracks: Alt+Shift+\
+- OSARA: Report frozen tracks
 - OSARA: Report groups for current track
 - OSARA: Report length of last touched item
 - OSARA: Report number of takes in last touched item
 - OSARA: Report regions, last project marker and items on selected tracks at current position: Control+Shift+R
  - Pressing this twice will display the information in a dialog with a text box for easy review.
 - OSARA: Report project length: Control+Win+J
-- OSARA: About: Control+F1 (use this dialog when you need to check the date of the snapshot you're running)
+- OSARA: Report scrub segment offsets; press twice to edit: Control+Shift+/
+- OSARA: Analyze and show peak and loudness statistics for selected tracks/items: Control+Shift+U
 
 #### Midi Editor section of actions list
+- OSARA: Move forward to next single note or chord: RightArrow
+- OSARA: Move backward to previous single note or chord: LeftArrow
+- OSARA: Move forward to next single note or chord and add to selection: Shift+RightArrow
+- OSARA: Move backward to previous single note or chord and add to selection: Shift+LeftArrow
+- OSARA: Move to higher note in chord: UpArrow
+- OSARA: Move to lower note in chord: DownArrow
+- OSARA: Move to higher note in chord and add to selection: Shift+UpArrow
+- OSARA: Move to lower note in chord and add to selection: Shift+DownArrow
 - OSARA: Move to next midi item on track: Control+RightArrow
 - OSARA: Move to previous midi item on track: Control+LeftArrow
 - OSARA: Move to next CC: Control+=
@@ -857,6 +890,17 @@ This list is worth referencing when making your own key map additions, assigning
 - Envelope: Insert new point at current position (do not remove nearby points)
 - Envelope: Select all points
 - Envelope: Invert selected points
+- Envelope: Delete automation items
+- Envelope: Delete automation items, preserve points
+- Envelope: Split automation items
+- Envelope: Duplicate automation items
+- Envelope: Duplicate and pool automation items
+- Envelope: Convert all project automation to automation items
+- Envelope: Glue automation items
+- Envelopes: Move selected points left by grid
+- Envelopes: Move selected points right by grid
+- Envelopes: Move selected points left to grid
+- Envelopes: Move selected points left to grid
 - Global automation override: All automation in latch mode
 - Global automation override: All automation in latch preview mode
 - Global automation override: All automation in read mode
@@ -870,11 +914,14 @@ This list is worth referencing when making your own key map additions, assigning
 - (SWS extension) Xenakios/SWS: Select items under edit cursor on selected tracks
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
+- Xenakios/SWS: Play selected items once
+- Item edit: Move left edge of item to edit cursor
+- Item edit: Move items/envelope points left to grid
+- Item edit: Move items/envelope points right to grid
+- Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
 - Edit: Cut items
 - Item: Remove items
-- Item navigation: Move cursor to start of items
-- Item navigation: Move cursor to end of items
 - Item properties: Pitch item down one octave
 - Item properties: Pitch item up one octave
 - Item properties: Toggle take preserve pitch
@@ -883,6 +930,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Item properties: Decrease item rate by ~6% (one semitone)
 - Item properties: Increase item rate by ~6% (one semitone)
 - Item properties: Set item rate from user-supplied source media tempo/bpm...
+- Move edit cursor to nearest zero crossing in items
 - Take: Nudge active takes volume +1dB
 - Take: Nudge active takes volume -1dB
 - Item: Nudge items volume +1dB
@@ -899,6 +947,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Options: Envelope points move with media items
 - Options: Trim content behind media items when editing
 - Options: Cycle through editing modes: Auto-crossfade off, auto-crossfade on, trim content behind media items
+- Scrub: Enable looped-segment scrub at edit cursor
+- Scrub: Enable one-shot segment scrub at edit cursor
+- Scrub: Toggle one-shot segment scrub at edit cursor
+-Scrub: Disable looped-segment/one-shot scrub at edit cursor
 - Tempo: Decrease current project tempo 0.1 BPM
 - Tempo: Decrease current project tempo 10 BPM
 - Tempo: Decrease current project tempo 10 percent
@@ -911,7 +963,8 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Insert new track
 - Track: Select all tracks
 - SWS: Toggle (invert) track selection
-- Track: Toggle mute for selected tracks
+- Track: Mute/unmute tracks
+- Track: Solo/unsolo tracks
 - Track: Toggle record arm for selected tracks
 - Track: Remove tracks
 - Track: Cut tracks
@@ -928,10 +981,22 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Toggle track pre-FX pan envelope visible
 - Track: Toggle track mute envelope visible
 - Transport: Toggle preserve pitch in audio items when changing master playrate
+- Transport: Play
 - Transport: Play/stop (move edit cursor on stop)
+- Transport: Stop
 - Move edit cursor to start of next beat
 - Move edit cursor to start of current/previous beat
+- View: Move cursor left by grid division
+- View: Move cursor right by grid division
+- View: Move cursor left 8 pixels
+- View: Move cursor right 8 pixels
+- Xenakios/SWS: Move cursor right configured seconds
+- Xenakios/SWS: Move cursor left configured seconds
 - View: Set horizontal zoom to default project setting
+- View: Zoom out vertical
+- View: Zoom in vertical
+- View: Toggle track zoom to maximum height
+- View: Toggle track zoom to minimum height
 - View: Time unit for ruler: Absolute frames
 - View: Time unit for ruler: Hours:Minutes:Seconds:Frames
 - View: Time unit for ruler: Measures.Beats
@@ -947,6 +1012,14 @@ This list is worth referencing when making your own key map additions, assigning
 - View: Secondary time unit for ruler: Seconds
 - Reset all MIDI devices
 - Reset all MIDI control surface devices
+- Xenakios/SWS: Move cursor left 10 pixels
+- Xenakios/SWS: Move cursor right 10 pixels
+- Xenakios/SWS: Move cursor left 10 pixels, creating time selection
+- Xenakios/SWS: Move cursor right 10 pixels, creating time selection
+- Xenakios/SWS: Move cursor left configured pixels
+- Xenakios/SWS: Move cursor right configured pixels
+- Xenakios/SWS: Move cursor left configured pixels, creating time selection
+Xenakios/SWS: Move cursor right configured pixels, creating time selection
 
 #### Unmapped in MIDI Editor section
 - Edit: Select all events in time selection (even if CC lane is hidden)
@@ -959,9 +1032,14 @@ This list is worth referencing when making your own key map additions, assigning
 - Options: F1-F12 as step input mode
 - Select all CC events
 - Unselect all CC events
+- Edit: Lengthen notes to grid
+- Edit: Shorten notes to grid
+- Edit: Move notes left to grid
+- Edit: Move notes right to grid
+- Edit: Move CC events left to grid
+- Edit: Move CC events right to grid
 
 #### Unmapped OSARA actions
-- OSARA: Pause/resume Peak Watcher
 - OSARA: Toggle Move relative to the play cursor for time movement commands during playback
 - OSARA: Toggle Report FX when moving to tracks/takes
 - OSARA: Toggle Report MIDI notes in MIDI editor
@@ -1035,18 +1113,25 @@ To build OSARA, you will need:
 	See the note about submodules in the previous section.
 
 #### Windows
-- [Build Tools for Visual Studio 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+- [Build Tools for Visual Studio 2026](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2026)
 
-	Visual Studio 2022 Community/Professional/Enterprise is also supported.
+	Visual Studio 2026 Community/Professional/Enterprise is also supported.
 	However, Preview versions of Visual Studio will not be detected and cannot be used.
 
 	Whether installing Build Tools or Visual Studio, you must enable the following:
 
-	* In the list on the Workloads tab, in the Desktop & Mobile grouping: Desktop development with C++
-	* Then in the Installation details tree view, under Desktop development with C++ > Optional:
-		- C++ ATL for latest v143 build tools (x86 & x64)
-		- C++ Clang tools for Windows
-		- Windows 11 SDK (10.0.22000.0)
+	* On the Workloads tab:
+		- In the list, in the Desktop & Mobile grouping: Desktop development with C++
+		- Then in the Installation details tree view, under Desktop development with C++ > Optional:
+			- MSVC Build Tools for x64/x86 (Latest)
+			- C++ ATL for x64/x86 (Latest MSVC)
+			- C++ Clang tools for Windows
+			- Windows 11 SDK (10.0.26100.xxx)
+	* on the Individual components tab:
+		- In the Compilers, build tools, and runtimes grouping:
+			- MSVC Build Tools for ARM64/ARM64EC (Latest)
+		- In the SDKs, libraries, and frameworks grouping:
+			- C++ ATL for ARM64/ARM64EC (Latest MSVC)
 
 - [Python](https://www.python.org/downloads/), version 3.7 or later:
 - [SCons](https://www.scons.org/), version 3.0.4 or later:
@@ -1087,3 +1172,4 @@ The resulting installer can be found in the installer directory.
 - Jenny K Brennan
 - Day Garwood
 - Matej Golian
+- Toni Barth

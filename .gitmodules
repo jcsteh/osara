@@ -10,3 +10,6 @@
 [submodule "include/simpleson"]
 	path = include/simpleson
 	url = https://github.com/gregjesl/simpleson
+[submodule "include/nsis"]
+	path = include/nsis
+	url = https://github.com/nvaccess/nsis-build

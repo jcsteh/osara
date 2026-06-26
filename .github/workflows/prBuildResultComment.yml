@@ -6,6 +6,7 @@ on:
     types: [completed]   
 env:
   runUrl: https://github.com/jcsteh/osara/actions/runs/${{ github.event.workflow_run.id }}
+  nightlyUrl: https://nightly.link/jcsteh/osara/actions/artifacts
 jobs:
   success:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' }}
@@ -56,8 +57,8 @@ jobs:
           pr-number: ${{ steps.getPr.outputs.number }}
           message: |
             [Build ${{ github.event.workflow_run.run_number }} succeeded!](${{ env.runUrl }})
-            - [Download for Windows](${{ env.runUrl }}/artifacts/${{ fromJSON(steps.getArtifactIds.outputs.result).windows }})
-            - [Download for Mac](${{ env.runUrl }}/artifacts/${{ fromJSON(steps.getArtifactIds.outputs.result).mac }})
+            - [Download for Windows](${{ env.nightlyUrl }}/${{ fromJSON(steps.getArtifactIds.outputs.result).windows }}.zip)
+            - [Download for Mac](${{ env.nightlyUrl }}/${{ fromJSON(steps.getArtifactIds.outputs.result).mac }}.zip)
   failure:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest

@@ -897,7 +897,7 @@ void onSwitchTab(){
 
 } // namespace peakWatcher
 
-void cmdPeakWatcher(Command* command) {
+void cmdPeakWatcher(int command) {
 	peakWatcher::Target target = peakWatcher::getFocusedTarget();
 	if (holds_alternative<peakWatcher::NoTarget>(target)) {
 		outputMessage(translate("Peak Watcher does not support the current focus"));
@@ -945,31 +945,31 @@ void cmdPeakWatcher(Command* command) {
 	new peakWatcher::Dialog(target, watcher, types);
 }
 
-void cmdReportPeakWatcherW1C1(Command* command) {
+void cmdReportPeakWatcherW1C1(int command) {
 	peakWatcher::report(0, 0);
 }
 
-void cmdReportPeakWatcherW1C2(Command* command) {
+void cmdReportPeakWatcherW1C2(int command) {
 	peakWatcher::report(0, 1);
 }
 
-void cmdReportPeakWatcherW2C1(Command* command) {
+void cmdReportPeakWatcherW2C1(int command) {
 	peakWatcher::report(1, 0);
 }
 
-void cmdReportPeakWatcherW2C2(Command* command) {
+void cmdReportPeakWatcherW2C2(int command) {
 	peakWatcher::report(1, 1);
 }
 
-void cmdResetPeakWatcherW1(Command* command) {
+void cmdResetPeakWatcherW1(int command) {
 	peakWatcher::resetWatcher(0, true);
 }
 
-void cmdResetPeakWatcherW2(Command* command) {
+void cmdResetPeakWatcherW2(int command) {
 	peakWatcher::resetWatcher(1, true);
 }
 
-void cmdPausePeakWatcher(Command* command) {
+void cmdPausePeakWatcher(int command) {
 	if (peakWatcher::timer) {
 		// Running.
 		peakWatcher::stop();

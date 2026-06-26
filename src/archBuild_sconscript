@@ -41,15 +41,19 @@ sources = [
 if env["PLATFORM"] == "win32":
 	# On Windows, OSARA is build with LLVM to have a toolchain that's closer to what's used on Mac
 	env["CC"] = "clang-cl"
-	env["LINK"] = "lld-link"
+	# For ARM64EC, we can't yet link with LLVM due to undefined symbol: __sanitizer_annotate_contiguous_container
+	if env["TARGET_ARCH"] != "arm64":
+		env["LINK"] = "lld-link"
 	env.Append(CCFLAGS=[
+		# Explicitly set 32/64-bit so clang-cl doesn't default to x64 regardless of MSVC env.
+		"-m32" if env["TARGET_ARCH"] == "x86" else "-m64",
 		"/W3",
 		"/WX",
 		# Clang warns about unused functions in WDL
 		"/clang:-Wno-unused-function",
 	])
 	env.Append(CXXFLAGS=[
-		"/clang:-std=c++20",
+		"/std:c++20",
 		"/EHsc",
 		# Ignore suggestions to add braces around initialization of subobjects. We might want to fix this at some point
 		"/clang:-Wno-missing-braces",
@@ -63,6 +67,9 @@ if env["PLATFORM"] == "win32":
 	env.Append(PDB="${TARGET}.pdb")
 	# having symbols usually turns this off, but we have no need for unused symbols.
 	env.Append(LINKFLAGS='/OPT:REF')
+	if env["TARGET_ARCH"] == "arm64":
+		env.Append(CCFLAGS="/arm64EC")
+		env.Append(LINKFLAGS="/machine:arm64x")
 	sources.extend((
 		"uia.cpp",
 		env.Object("win32_utf8.obj", "#include/WDL/WDL/win32_utf8.c"),
@@ -132,19 +139,23 @@ addExternalSources("#include/tinygettext/src", (
 	"po_parser.cpp",
 	"tinygettext.cpp",
 ))
-addExternalSources("#include/fmt/src", ("format.cc", "os.cc"))
 addExternalSources(
 	"#include/WDL/WDL/jnetlib",
 	("httpGet.cpp", "connection.cpp", "asyncdns.cpp", "util.cpp"),
-	CCFLAGS="-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 addExternalSources(
 	"#include/simpleson",
 	("json.cpp",),
-	CCFLAGS="-Wno-deprecated-declarations"
+	CCFLAGS="$CCFLAGS -Wno-deprecated-declarations"
 )
 
 env.SharedLibrary(
 	target="reaper_osara%s" % env["libSuffix"],
 	source=sources, LIBS=libs,
+	# On Windows, scons thinks that creating a .lib file always creates a .exp
+	# file, but it doesn't for OSARA. This results in rebuilding the dll every
+	# time scons is run, since scons can't find the .exp. Work around this by
+	# disabling import lib generation.
+	no_import_lib=1
 )

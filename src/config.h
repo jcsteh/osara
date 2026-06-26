@@ -20,8 +20,8 @@ namespace settings {
 const char CONFIG_SECTION[] = "osara";
 
 void loadConfig();
-void cmdConfig(Command* command);
+void cmdConfig(int command);
 void registerSettingCommands();
 bool handleSettingCommand(int command);
-void cmdConfigReaperOptimal(Command* command);
+void cmdConfigReaperOptimal(int command);
 void maybeAutoConfigReaperOptimal();
