@@ -6204,7 +6204,6 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 41385}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Fit items to time selection, padding with silence if needed
 	{MAIN_SECTION, {{0, 0, 41320}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move items to time selection, trim/loop to fit
 	{MAIN_SECTION, {{0, 0, 41069}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move, stretch, and loop items to fit time selection
-	{MAIN_SECTION, {{0, 0, }, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move, stretch, and loop items to fit time selection
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
 	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down
