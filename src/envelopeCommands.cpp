@@ -580,8 +580,11 @@ void moveToAutomationItem(int direction, bool clearSelection=true, bool select=t
 		}
 		SetEditCurPos(pos, true, true); // Seek playback.
 
-		// Report the automation item.
 		fakeFocus = FOCUS_AUTOMATIONITEM;
+		if (!shouldReportTimeMovement()) {
+			return;
+		}
+		// Report the automation item.
 		ostringstream s;
 		char name[500];
 		GetSetAutomationItemInfo_String(envelope, i, "P_POOL_NAME", name, false);
