@@ -2,7 +2,7 @@
  * OSARA: Open Source Accessibility for the REAPER Application
  * Exported API functions code
  * Exports functions to be called by REAPER extensions and scripts.
- * Copyright 2020-2023 James Teh
+ * Copyright 2020-2026 James Teh
  * License: GNU General Public License version 2.0
  */
 
@@ -14,7 +14,7 @@
 // The _vararg_ version is needed for ReaScript.
 
 void osara_outputMessage(const char* message) {
-	outputMessage(message);
+	outputMessageFromApi(message);
 }
 void* _vararg_osara_outputMessage(void** args, int nArgs) {
 	osara_outputMessage((const char*)args[0]);
@@ -33,6 +33,14 @@ void* _vararg_osara_getVersion(void** args, int nArgs) {
 	return nullptr;
 }
 
+void osara_suppressMessagesFromOsara() {
+	suppressOsaraMessages();
+}
+void* _vararg_osara_suppressMessagesFromOsara(void** args, int nArgs) {
+	osara_suppressMessagesFromOsara();
+	return nullptr;
+}
+
 void registerExports(reaper_plugin_info_t* rec) {
 	rec->Register("API_osara_outputMessage", (void*)osara_outputMessage);
 	rec->Register("APIvararg_osara_outputMessage",
@@ -45,7 +53,6 @@ void registerExports(reaper_plugin_info_t* rec) {
 		"focus such as list boxes and trees.");
 	rec->Register("API_osara_isShortcutHelpEnabled",
 		(void*)osara_isShortcutHelpEnabled);
-	rec->Register("API_osara_outputMessage", (void*)osara_outputMessage);
 	rec->Register("APIvararg_osara_getVersion",
 		(void*)_vararg_osara_getVersion);
 	rec->Register("APIdef_osara_getVersion",
@@ -53,4 +60,11 @@ void registerExports(reaper_plugin_info_t* rec) {
 		"Get the version of OSARA.\n"
 		"This will be in the form: year.month.day.build,commit\n"
 		"For example: 2024.3.6.1332,13560ef7");
+	rec->Register("API_osara_suppressMessagesFromOsara",
+		(void*)osara_suppressMessagesFromOsara);
+	rec->Register("APIvararg_osara_suppressMessagesFromOsara",
+		(void*)_vararg_osara_suppressMessagesFromOsara);
+	rec->Register("APIdef_osara_suppressMessagesFromOsara",
+		(void*)"void\0\0\0"
+		"Suppress reporting of messages from OSARA itself in response to actions or control surface changes.\nThis should be called before a sequence of actions you want to perform quietly. The suppression will be disabled after your script completes. This has no effect on messages sent explicitly via osara_outputMessage.");
 }
