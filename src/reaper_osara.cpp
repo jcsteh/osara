@@ -5849,7 +5849,8 @@ void cmdMoveAndFitItemsToTimeSelection(int command) {
 		outputMessage(translate("no selected items"));
 		return;
 	}
-	vector<tuple<double, double, double>> itemData(selectedItemsCount);
+	vector<tuple<double, double, double>> itemData;
+	itemData.reserve(selectedItemsCount);
 	for (int i = 0; i < selectedItemsCount; ++i) {
 		MediaItem* item = GetSelectedMediaItem(nullptr, i);
 		double position = GetMediaItemInfo_Value(item, "D_POSITION");
@@ -5858,7 +5859,7 @@ void cmdMoveAndFitItemsToTimeSelection(int command) {
 		double rate = 0;
 		if (take)
 			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
-		itemData[i] = make_tuple(position, rate, length);
+		itemData.emplace_back(position, rate, length);
 	}
 	Main_OnCommand(command, 0);
 	int itemsChanged = 0;
@@ -5870,10 +5871,10 @@ void cmdMoveAndFitItemsToTimeSelection(int command) {
 		double rate = 0;
 		if (take)
 			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
-		if (position != std::get<0>(itemData[i]) // Get position from tuple
-				|| rate != std::get<1>(itemData[i]) // Get rate from tuple
-				|| length != std::get<2>(itemData[i])) // Get length from tuple
-			++ itemsChanged;
+		auto [oldPos, oldRate, oldLen] = itemData[i];
+		if (position != oldPos || rate != oldRate || length != oldLen) {
+			++itemsChanged;
+		}
 	}
 	// Translators: {} will be replaced with the number of items; e.g.
 	// "2 items fit to time selection".
