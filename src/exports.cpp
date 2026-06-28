@@ -14,7 +14,7 @@
 // The _vararg_ version is needed for ReaScript.
 
 void osara_outputMessage(const char* message) {
-	outputMessage(message);
+	outputMessageFromApi(message);
 }
 void* _vararg_osara_outputMessage(void** args, int nArgs) {
 	osara_outputMessage((const char*)args[0]);
@@ -23,6 +23,14 @@ void* _vararg_osara_outputMessage(void** args, int nArgs) {
 
 bool osara_isShortcutHelpEnabled() {
 	return isShortcutHelpEnabled;
+}
+
+void osara_suppressAutomaticMessages(bool suppress) {
+	setAutomaticMessageSuppression(suppress);
+}
+void* _vararg_osara_suppressAutomaticMessages(void** args, int nArgs) {
+	osara_suppressAutomaticMessages((uintptr_t)args[0] != 0);
+	return nullptr;
 }
 
 void osara_getVersion(char* versionOut, int versionOut_sz) {
@@ -46,6 +54,18 @@ void registerExports(reaper_plugin_info_t* rec) {
 	rec->Register("API_osara_isShortcutHelpEnabled",
 		(void*)osara_isShortcutHelpEnabled);
 	rec->Register("API_osara_outputMessage", (void*)osara_outputMessage);
+	rec->Register("API_osara_suppressAutomaticMessages",
+		(void*)osara_suppressAutomaticMessages);
+	rec->Register("APIvararg_osara_suppressAutomaticMessages",
+		(void*)_vararg_osara_suppressAutomaticMessages);
+	rec->Register("APIdef_osara_suppressAutomaticMessages",
+		(void*)"void\0bool\0suppress\0"
+		"Suppress or resume OSARA's automatic reporting of state changes (e.g. "
+		"track mute/solo/arm, volume, pan, toggle actions).\n"
+		"Call with true before a sequence of actions or API calls you want to "
+		"perform quietly, and false when done. Calls may be nested; make sure "
+		"every true call is matched by a false call.\n"
+		"This has no effect on messages sent explicitly via osara_outputMessage.");
 	rec->Register("APIvararg_osara_getVersion",
 		(void*)_vararg_osara_getVersion);
 	rec->Register("APIdef_osara_getVersion",
