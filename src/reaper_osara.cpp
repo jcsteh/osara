@@ -5843,6 +5843,46 @@ void cmdJumpToTime(int command) {
 	}, 50);
 }
 
+void cmdMoveAndFitItemsToTimeSelection(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(nullptr);
+	if (selectedItemsCount == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	vector<tuple<double, double, double>> itemData;
+	itemData.reserve(selectedItemsCount);
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		double length = GetMediaItemInfo_Value(item, "D_LENGTH");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		itemData.emplace_back(position, rate, length);
+	}
+	Main_OnCommand(command, 0);
+	int itemsChanged = 0;
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		double length = GetMediaItemInfo_Value(item, "D_LENGTH");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		auto [oldPos, oldRate, oldLen] = itemData[i];
+		if (position != oldPos || rate != oldRate || length != oldLen) {
+			++itemsChanged;
+		}
+	}
+	// Translators: {} will be replaced with the number of items; e.g.
+	// "2 items fit to time selection".
+	outputMessage(format(
+		translate_plural("{} item fit to time selection", "{} items fit to time selection", itemsChanged),
+		itemsChanged));
+}
+
 void cmdVideoWindowVisibility(int command) {
 	Main_OnCommand(command, 0);
 	// Delay the report to avoid it being clobbered when GUI updates.
@@ -6160,6 +6200,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 41206}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move and stretch items to fit time selection
+	{MAIN_SECTION, {{0, 0, 41386}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Fit items to time selection, looping if needed
+	{MAIN_SECTION, {{0, 0, 41385}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Fit items to time selection, padding with silence if needed
+	{MAIN_SECTION, {{0, 0, 41320}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move items to time selection, trim/loop to fit
+	{MAIN_SECTION, {{0, 0, 41069}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move, stretch, and loop items to fit time selection
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
 	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down

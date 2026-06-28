@@ -149,8 +149,8 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Item edit: Shrink left edge of items: Control+. or Control+NumPad6
 - Item edit: Shrink right edge of items: Alt+, or Alt+NumPad4
 - Item edit: Grow right edge of items: Alt+. or Alt+NumPad6
-- Item edit: Move right edge of item to edit cursor: Control+Alt+Shift+.
-- Item edit: Move position of item to edit cursor: Control+Alt+Shift+,
+- Item edit: Move left edge of item to edit cursor: Control+Alt+Shift+,
+- Item edit: Move right edge of item to edit cursor (preserving item length): Control+Alt+Shift+.
 - Item edit: Trim left edge of item to edit cursor: Win+Shift+,
 - Item edit: Trim right edge of item to edit cursor: Win+Shift+.
 - Item: go to next stretch marker: Control+'
@@ -186,6 +186,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Move edit cursor to next zero crossing in items: Z
 - Move edit cursor to previous zero crossing in items: Shift+Z
 - SWS/FNG: Quantize item positions and MIDI note positions to grid: Control+Shift+Q
+- Item: Move and stretch items to fit time selection: Control+Alt+F
 
 #### Takes
 - Take: Switch items to next take: T
@@ -915,11 +916,15 @@ This list is worth referencing when making your own key map additions, assigning
 - Item: Invert selection
 - Xenakios/SWS: Invert item selection
 - Xenakios/SWS: Play selected items once
-- Item edit: Move left edge of item to edit cursor
 - Item edit: Move items/envelope points left to grid
 - Item edit: Move items/envelope points right to grid
-- Item: Select all items on selected tracks in current time selection
 - Item: Split items at timeline grid
+- Item: Select all items on selected tracks in current time selection
+- Item: Move, stretch, and loop items to fit time selection
+- Item: Move items to time selection, trim/loop to fit
+- Item: Fit items to time selection, padding with silence if needed
+- Item: Fit items to time selection, looping if needed
+
 - Edit: Cut items
 - Item: Remove items
 - Item properties: Pitch item down one octave
