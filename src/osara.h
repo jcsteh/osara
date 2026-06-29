@@ -278,6 +278,8 @@ extern int lastCommand;
 bool shouldReportTimeMovement() ;
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
+void outputMessageFromApi(const std::string& message);
+void suppressOsaraMessages();
 
 // Call a function or lambda (even a lambda with capture) asynchronously after
 // the specified number of ms. The function must take no parameters and return
