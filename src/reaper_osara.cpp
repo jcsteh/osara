@@ -1484,6 +1484,37 @@ void postCursorMovementScrub(int command) {
 		fakeFocus = FOCUS_RULER; // Set this even if we aren't reporting.
 }
 
+void postSegmentScrubRange(int) {
+	int sizeStart = 0;
+	int sizeEnd = 0;
+	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
+	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
+	if (!start || sizeStart != sizeof(int)
+			|| !end || sizeEnd != sizeof(int)) {
+		// We didn't get an expected value from the API
+		return;
+	}
+	ostringstream s;
+	if (*start == 0) {
+		// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+		s << translate("start from cursor");
+	} else {
+		// Translators: Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+		// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+		s << format(translate("start offset {} MS"), *start);
+	}
+	s << ", ";
+	if (*end == 0) {
+		// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+		s << translate("end at cursor");
+	} else {
+		// Translators: Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+		// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+		s << format(translate("end offset {} MS"), *end);
+	}
+	outputMessage(s);
+}
+
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	if (selectedItemsCount == 0) {
@@ -2965,6 +2996,7 @@ PostCommand POST_COMMANDS[] = {
 	{41667, postCursorMovementScrub}, // View: Move cursor right 8 pixels
 	{40102, postCursorMovementScrub}, // Time selection: Move cursor left, creating time selection
 	{40103, postCursorMovementScrub}, // Time selection: Move cursor right, creating time selection
+	{43617, postSegmentScrubRange}, // Scrub: Invert looped-segment scrub range
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
@@ -2982,10 +3014,10 @@ PostCommand POST_COMMANDS[] = {
 	{41041, postCursorMovement}, // Move edit cursor to start of current measure
 	{40231, postCursorMovement}, // Move edit cursor to start of next beat
 	{40230, postCursorMovement}, // Move edit cursor to start of current/previous beat
-	{41042, postCursorMovement}, // Go forward one measure
-	{41043, postCursorMovement}, // Go back one measure
-	{41044, postCursorMovement}, // Go forward one beat
-	{41045, postCursorMovement}, // Go back one beat
+	{41042, postCursorMovement}, // Move edit cursor forward one measure
+	{41043, postCursorMovement}, // Move edit cursor back one measure
+	{41044, postCursorMovement}, // Move edit cursor forward one beat
+	{41045, postCursorMovement}, // Move edit cursor back one beat
 	{1041, postCycleTrackFolderState}, // Track: Cycle track folder state
 	{1042, postCycleTrackFolderCollapsed}, // Track: Cycle track folder collapsed state
 	{40172, postGoToMarker}, // Markers: Go to previous marker/project start
@@ -3263,16 +3295,18 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGEITEMVOLDOWN", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume down
 	{"_XENAKIOS_NUDGEITEMVOLUP", postChangeItemVolume}, // Xenakios/SWS: Nudge item volume up
 	{"_FNG_RATE_101", postChangeItemRate}, // SWS/FNG: Time compress selected items (fine)
-{"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
-{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
-{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
-{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
-{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
-{"_XENAKIOS_MOVECUR10PIX_RIGHTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels, creating time selection
-{"_XENAKIOS_MOVECURRLEFTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels
-{"_XENAKIOS_MOVECURRIGHTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels
-{"_XENAKIOS_MOVECURRLEFTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels, creating time selection
-{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
+	{"_FNG_RATE_1_101", postChangeItemRate}, // SWS/FNG: Time stretch selected items (fine)
+	{"_FNG_QUANTIZE_TO_GRID", postQuantize}, // SWS/FNG: Quantize item positions and MIDI note positions to grid
+	{"_XENAKIOS_MOVECURRRIGHTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor right configured seconds
+	{"_XENAKIOS_MOVECURRLEFTCONFSECS", postCursorMovement}, // Xenakios/SWS: Move cursor left configured seconds
+	{"_XENAKIOS_MOVECUR10PIX_LEFT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels
+	{"_XENAKIOS_MOVECUR10PIX_RIGHT", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels
+	{"_XENAKIOS_MOVECUR10PIX_LEFTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left 10 pixels, creating time selection
+	{"_XENAKIOS_MOVECUR10PIX_RIGHTCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right 10 pixels, creating time selection
+	{"_XENAKIOS_MOVECURRLEFTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels
+	{"_XENAKIOS_MOVECURRIGHTCONF", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels
+	{"_XENAKIOS_MOVECURRLEFTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor left configured pixels, creating time selection
+	{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
 	{nullptr},
 };
 
@@ -3303,21 +3337,31 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
 	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
-	{43617, _t("inverted segment scrub offsets")}, // Scrub: Invert looped-segment scrub range
 };
-const set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
+// Not const: the SWS/Xenakios actions in MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS
+// below are added to this set at init once their numeric IDs are known.
+set<int> MOVE_FROM_PLAY_CURSOR_COMMANDS = {
 	40104, // View: Move cursor left one pixel
 	40105, // View: Move cursor right one pixel
 	40102, // Time selection: Move cursor left, creating time selection
 	40103, // Time selection: Move cursor right, creating time selection
-	41042, // Go forward one measure
-	41043, // Go back one measure
-	41044, // Go forward one beat
-	41045, // Go back one beat
+	41042, // Move edit cursor forward one measure
+	41043, // Move edit cursor back one measure
+	41044, // Move edit cursor forward one beat
+	41045, // Move edit cursor back one beat
 	41041, // Move edit cursor to start of current measure
 	41040, // Move edit cursor to start of next measure
 	40646, // View: Move cursor left to grid division
-40647, // View: Move cursor right to grid division
+	40647, // View: Move cursor right to grid division
+};
+
+// SWS/Xenakios actions which should also move from the play cursor when
+// settings::moveFromPlayCursor is enabled. These only have named command IDs,
+// so they are resolved to numeric IDs and inserted into
+// MOVE_FROM_PLAY_CURSOR_COMMANDS at init (see delayedInit).
+const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
+	"_XENAKIOS_MOVECURRRIGHTCONFSECS", // Xenakios/SWS: Move cursor right configured seconds
+	"_XENAKIOS_MOVECURRLEFTCONFSECS", // Xenakios/SWS: Move cursor left configured seconds
 };
 
 map<int, PostCommandExecute> midiPostCommandsMap;
@@ -5799,6 +5843,46 @@ void cmdJumpToTime(int command) {
 	}, 50);
 }
 
+void cmdMoveAndFitItemsToTimeSelection(int command) {
+	int selectedItemsCount = CountSelectedMediaItems(nullptr);
+	if (selectedItemsCount == 0) {
+		outputMessage(translate("no selected items"));
+		return;
+	}
+	vector<tuple<double, double, double>> itemData;
+	itemData.reserve(selectedItemsCount);
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		double length = GetMediaItemInfo_Value(item, "D_LENGTH");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		itemData.emplace_back(position, rate, length);
+	}
+	Main_OnCommand(command, 0);
+	int itemsChanged = 0;
+	for (int i = 0; i < selectedItemsCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		double position = GetMediaItemInfo_Value(item, "D_POSITION");
+		double length = GetMediaItemInfo_Value(item, "D_LENGTH");
+		MediaItem_Take* take = GetActiveTake(item);
+		double rate = 0;
+		if (take)
+			rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
+		auto [oldPos, oldRate, oldLen] = itemData[i];
+		if (position != oldPos || rate != oldRate || length != oldLen) {
+			++itemsChanged;
+		}
+	}
+	// Translators: {} will be replaced with the number of items; e.g.
+	// "2 items fit to time selection".
+	outputMessage(format(
+		translate_plural("{} item fit to time selection", "{} items fit to time selection", itemsChanged),
+		itemsChanged));
+}
+
 void cmdVideoWindowVisibility(int command) {
 	Main_OnCommand(command, 0);
 	// Delay the report to avoid it being clobbered when GUI updates.
@@ -5882,35 +5966,8 @@ void cmdMoveTracks(int command) {
 }
 
 void cmdReportAndEditScrubSegmentOffsets(int command) {
-	int sizeStart = 0;
-	int sizeEnd = 0;
-	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
-	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
-	if (!start || sizeStart != sizeof(int)
-			|| !end || sizeEnd != sizeof(int)) {
-		// We didn't get an expected value from the API
-		return;
-	}
 	if (lastCommandRepeatCount == 0) {
-		ostringstream s;
-		if (*start == 0) {
-			// Translators: Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-			s << translate("start from cursor");
-		} else {
-			// Translators: Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-			// {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-			s << format(translate("start offset {} MS"), *start);
-		}
-		s << ", ";
-		if (*end == 0) {
-			// Translators: Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-			s << translate("end at cursor");
-		} else {
-			// Translators: Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-			// {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-			s << format(translate("end offset {} MS"), *end);
-		}
-		outputMessage(s);
+		postSegmentScrubRange(command);
 		return;
 	}
 	// When users press more than once, run this action instead
@@ -6143,6 +6200,11 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 42207}, nullptr}, nullptr, cmdAddAutoItems}, // Envelope: Convert all project automation to automation items
 	{MAIN_SECTION, {{0, 0, 42089}, nullptr}, nullptr, cmdGlueAutoItems}, // Envelope: Glue automation items
 	{MAIN_SECTION, {{0, 0, 40069}, nullptr}, nullptr, cmdJumpToTime}, // View: Jump (go) to time window
+	{MAIN_SECTION, {{0, 0, 41206}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move and stretch items to fit time selection
+	{MAIN_SECTION, {{0, 0, 41386}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Fit items to time selection, looping if needed
+	{MAIN_SECTION, {{0, 0, 41385}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Fit items to time selection, padding with silence if needed
+	{MAIN_SECTION, {{0, 0, 41320}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move items to time selection, trim/loop to fit
+	{MAIN_SECTION, {{0, 0, 41069}, nullptr}, nullptr, cmdMoveAndFitItemsToTimeSelection}, // Item: Move, stretch, and loop items to fit time selection
 	{MAIN_SECTION, {{0, 0, 50125}, nullptr}, nullptr, cmdVideoWindowVisibility}, // Video: Show/hide video window
 	{MAIN_SECTION, {{0, 0, 43647}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks up
 	{MAIN_SECTION, {{0, 0, 43648}, nullptr}, nullptr, cmdMoveTracks}, // Track: Move tracks down
@@ -6532,6 +6594,13 @@ void delayedInit() {
 			continue;
 		}
 		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
+	}
+
+	for (const char* command : MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS) {
+		int cmd = NamedCommandLookup(command);
+		if (cmd) {
+			MOVE_FROM_PLAY_CURSOR_COMMANDS.insert(cmd);
+		}
 	}
 
 	maybeAutoConfigReaperOptimal();
