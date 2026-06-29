@@ -32,6 +32,7 @@
 #include "translation.h"
 
 using namespace std;
+using namespace fmt::literals;
 
 class Param {
 	public:
@@ -1579,72 +1580,127 @@ class TrackParams: public ReaperObjParamSource {
 	MediaTrack* track;
 	unique_ptr<FxParams<MediaTrack>> fxParams;
 
-	void addSendParams(int category, const char* categoryName, const char* trackParam) {
+	template<int category>
+	void addSendParams(const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
-		string lastDispPrefix;
-		int sameDispPrefixCount = 1;
+		string lastTarget;
+		int sameTargetCount = 1;
 		for (int i = 0; i < count; ++i) {
-			ostringstream dispPrefix;
-			// Example display name: "1 Drums send volume"
+			string target;
 			if (trackParam) {
 				// Send or receive.
 				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, nullptr);
-				dispPrefix << (int)(size_t)GetSetMediaTrackInfo(sendTrack, "IP_TRACKNUMBER",
-					nullptr) << " ";
+				auto trackNum = (int)(size_t)GetSetMediaTrackInfo(sendTrack,
+					"IP_TRACKNUMBER", nullptr);
 				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
-				if (trackName) {
-					dispPrefix << trackName << " ";
+				if (trackName && trackName[0]) {
+					target = fmt::format("{} {}", trackNum, trackName);
+				} else {
+					target = fmt::format("{}", trackNum);
 				}
 			} else {
 				// Hardware output.
 				char sendName[100] = "";
 				GetTrackSendName(this->track, i, sendName, sizeof(sendName));
-				dispPrefix << sendName << " ";
+				target = sendName;
 			}
-			dispPrefix << categoryName << " ";
-			if (dispPrefix.str() == lastDispPrefix) {
+			if (target == lastTarget) {
 				// There are multiple sends to the same target. Number the second onwards
 				// to differentiate them. We don't number the first to avoid unnecessary
 				// verbosity for the majority of cases where there is only one send to a
 				// given target.
-				dispPrefix << ++sameDispPrefixCount << " ";
+				++sameTargetCount;
 			} else {
-				sameDispPrefixCount = 1;
-				lastDispPrefix = dispPrefix.str();
+				sameTargetCount = 1;
+				lastTarget = target;
 			}
+			string dispTemplate;
+			if constexpr (category == 0) {
+				if (sameTargetCount == 1) {
+					// Translators: Indicates a parameter for a track send in the Track
+					// Parameters dialog. {target} will be replaced by the track number and/or
+					// name. {param} will be replaced with the parameter name.
+					// Example: "2 reverb send volume"
+					dispTemplate = translate("{target} send {param}");
+				} else {
+					// Translators: Indicates a parameter for a track send in the Track
+					// Parameters dialog. {target} will be replaced by the track number and/or
+					// name. {targetNum} will be replaced with a number distinguishing this
+					// send from other sends to the same track. {param} will be replaced with
+					// the parameter name.
+					// Example: "2 reverb send 2 volume"
+					dispTemplate = translate("{target} send {targetNum} {param}");
+				}
+			} else if constexpr (category == -1) {
+				if (sameTargetCount == 1) {
+					// Translators: Indicates a parameter for a track receive in the Track
+					// Parameters dialog. {target} will be replaced by the track number and/or
+					// name. {param} will be replaced with the parameter name.
+					// Example: "1 vocal receive volume"
+					dispTemplate = translate("{target} receive {param}");
+				} else {
+					// Translators: Indicates a parameter for a track receive in the Track
+					// Parameters dialog. {target} will be replaced by the track number and/or
+					// name. {targetNum} will be replaced with a number distinguishing this
+					// receive from other receives from the same track. {param} will be
+					// replaced with the parameter name.
+					// Example: "1 vocal receive 2 volume"
+					dispTemplate = translate("{target} receive {targetNum} {param}");
+				}
+			} else {
+				if (sameTargetCount == 1) {
+					// Translators: Indicates a parameter for a hardware audio output in the
+					// track Parameters dialog. {target} will be replaced by the name of the
+					// audio output. {param} will be replaced with the parameter name.
+					// Example: "main hardware volume"
+					dispTemplate = translate("{target} hardware {param}");
+				} else {
+					// Translators: Indicates a parameter for a hardware audio output in the
+					// track Parameters dialog. {target} will be replaced by the name of the
+					// audio output. {targetNum} will be replaced with a number distinguishing
+					// this send from other sends to the same output. {param} will be replaced
+					// with the parameter name.
+					// Example: "main hardware 2 volume"
+					dispTemplate = translate("{target} hardware {targetNum} {param}");
+				}
+			}
+			auto paramName = [&](const char* param) {
+				return format(dispTemplate, "target"_a=target, "param"_a=param,
+					"targetNum"_a=sameTargetCount);
+			};
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + translate("volume"), this->track, category, i, "D_VOL",
+				paramName(translate("volume")), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + translate("pan"), this->track, category, i, "D_PAN",
+				paramName(translate("pan")), this->track, category, i, "D_PAN",
 				ReaperObjPanParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + translate("mute"), this->track, category, i, "B_MUTE",
+				paramName(translate("mute")), this->track, category, i, "B_MUTE",
 				ReaperObjToggleParam::make));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + translate("mono"), this->track, category, i, "B_MONO",
+				paramName(translate("mono")), this->track, category, i, "B_MONO",
 				ReaperObjToggleParam::make));
 			if (trackParam) {
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					dispPrefix.str() + translate("source MIDI channel"),
+					paramName(translate("source MIDI channel")),
 					this->track, category, i, "I_MIDIFLAGS",
 					SourceMidiChannelParam::make));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					dispPrefix.str() + translate("destination MIDI channel"),
+					paramName(translate("destination MIDI channel")),
 					this->track, category, i, "I_MIDIFLAGS",
 					DestMidiChannelParam::make));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					dispPrefix.str() + translate("source audio channel"),
+					paramName(translate("source audio channel")),
 					this->track, category, i, "I_SRCCHAN",
 					SourceAudioChannelParam::make));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					dispPrefix.str() + translate("destination audio channel"),
+					paramName(translate("destination audio channel")),
 					this->track, category, i, "I_DSTCHAN",
 					DestAudioChannelParam::make));
 			}
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				dispPrefix.str() + translate("send type"), this->track, category, i,
-				"I_SENDMODE", SendTypeParam::make));
+				paramName(translate("send type")), this->track, category, i, "I_SENDMODE",
+				SendTypeParam::make));
 		}
 	}
 
@@ -1661,15 +1717,9 @@ class TrackParams: public ReaperObjParamSource {
 			this->track, "D_PAN", ReaperObjPanParam::make));
 		this->params.push_back(make_unique<TrackParamProvider>(translate("mute"),
 			this->track, "B_MUTE", ReaperObjToggleParam::make));
-		// Translators: Indicates a parameter for a track send in the Track Parameters
-		// dialog.
-		this->addSendParams(0, translate("send"), "P_DESTTRACK");
-		// Translators: Indicates a parameter for a track receive in the Track
-		// Parameters dialog.
-		this->addSendParams(-1, translate("receive"), "P_SRCTRACK");
-		// Translators: Indicates a parameter for a hardware audio output in the
-		//  Track Parameters dialog.
-		this->addSendParams(1, translate("hardware"), nullptr);
+		this->addSendParams<0>("P_DESTTRACK"); // Sends
+		this->addSendParams<-1>("P_SRCTRACK"); // Receives
+		this->addSendParams<1>(nullptr); // Hardware outputs
 
 		int fxParamCount = CountTCPFXParms(nullptr, track);
 		if (fxParamCount > 0) {
