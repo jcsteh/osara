@@ -1435,6 +1435,11 @@ class AudioChannelParam:  public ReaperObjParam {
 	private:
 	Param::AfterOption addChannels(int count) {
 		MediaTrack* track = this->getTargetTrack();
+		if (!track) {
+			// No target track (e.g. a hardware output, or a send REAPER reports with
+			// no destination track). There's nothing to add channels to.
+			return Param::AfterOption::nothing;
+		}
 		int channels = *(int*)GetSetMediaTrackInfo(track, "I_NCHAN", nullptr);
 		channels += count;
 		GetSetMediaTrackInfo(track, "I_NCHAN", (void*)&channels);
@@ -1448,6 +1453,21 @@ class SourceAudioChannelParam: public AudioChannelParam {
 			AudioChannelParam(provider) {
 		options.push_back({translate_ctxt("audio channel", "none"), -1});
 		MediaTrack* srcTrack = this->getTargetTrack();
+		if (!srcTrack) {
+			// No source track. We don't know how many source channels there are, so
+			// just expose the current setting alongside "none".
+			int src = *(int*)provider.getSetValue(nullptr);
+			if (src != -1) {
+				if (src & MONO_FLAG) {
+					this->options.push_back({fmt::format("{}", (src & ~MONO_FLAG) + 1), src});
+				} else {
+					// Multi-channel, but we don't know how many.
+					this->options.push_back({fmt::format("{}-", src + 1), src});
+				}
+			}
+			this->finishOptions();
+			return;
+		}
 		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
 		this->addMonoOptions(channels);
 		this->addStereoOptions(channels);
@@ -1473,7 +1493,6 @@ class DestAudioChannelParam:  public AudioChannelParam {
 	DestAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
 		MediaTrack* dstTrack = this->getTargetTrack();
-		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
 		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
 		int srcChans = *(int*)sendProv.getSetValue("I_SRCCHAN", nullptr) >> 10;
 		if (srcChans == 0) {
@@ -1481,9 +1500,11 @@ class DestAudioChannelParam:  public AudioChannelParam {
 		} else if (srcChans > 1) {
 			srcChans *= 2;
 		}
-		if (srcChans == -1) {
-			// If no source audio channel is set, we don't know how many destination
-			// channels there are. Just expose the current setting.
+		if (!dstTrack || srcChans == -1) {
+			// If there's no destination track (e.g. a hardware output, or a send
+			// REAPER reports with no destination track), or no source audio channel
+			// is set, we don't know how many destination channels there are. Just
+			// expose the current setting.
 			int dest = *(int*)provider.getSetValue(nullptr);
 			if (dest & MONO_FLAG) {
 				this->options.push_back({fmt::format("{}", (dest & ~MONO_FLAG) + 1), dest});
@@ -1494,6 +1515,7 @@ class DestAudioChannelParam:  public AudioChannelParam {
 			this->max = 0;
 			return;
 		}
+		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
 		// Destination only supports stereo if the source is mono or stereo.
 		if (srcChans <= 2) {
 			this->addStereoOptions(trackChans);
