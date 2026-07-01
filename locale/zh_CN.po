@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-06-01 21:46\n"
+"PO-Revision-Date: 2026-07-01 20:20\n"
 
 msgid "enabled"
 msgstr "启用"
@@ -1057,6 +1057,54 @@ msgstr "FX 前"
 msgid "post-fx"
 msgstr "FX 后"
 
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "2 reverb send volume"
+msgid "{target} send {param}"
+msgstr "{target} 发送 {param}"
+
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. send from other sends to the same track. {param} will be replaced with
+#. the parameter name.
+#. Example: "2 reverb send 2 volume"
+msgid "{target} send {targetNum} {param}"
+msgstr "{target} 发送 {targetNum} {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "1 vocal receive volume"
+msgid "{target} receive {param}"
+msgstr "{target} 接收 {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. receive from other receives from the same track. {param} will be
+#. replaced with the parameter name.
+#. Example: "1 vocal receive 2 volume"
+msgid "{target} receive {targetNum} {param}"
+msgstr "{target} 接收 {targetNum} {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {param} will be replaced with the parameter name.
+#. Example: "main hardware volume"
+msgid "{target} hardware {param}"
+msgstr "{target} 硬件 {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {targetNum} will be replaced with a number distinguishing
+#. this send from other sends to the same output. {param} will be replaced
+#. with the parameter name.
+#. Example: "main hardware 2 volume"
+msgid "{target} hardware {targetNum} {param}"
+msgstr "{target} 硬件 {targetNum} {param}"
+
 msgid "mute"
 msgstr "静音"
 
@@ -1077,21 +1125,6 @@ msgstr "音频目标通道"
 
 msgid "send type"
 msgstr "发送类型"
-
-#. Indicates a parameter for a track send in the Track Parameters
-#. dialog.
-msgid "send"
-msgstr "发送"
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog.
-msgid "receive"
-msgstr "接收"
-
-#. Indicates a parameter for a hardware audio output in the
-#.  Track Parameters dialog.
-msgid "hardware"
-msgstr "硬件"
 
 msgid "Track Parameters"
 msgstr "轨道参数"
@@ -1505,7 +1538,7 @@ msgstr "网格未知"
 #. {track} will be replaced with the name, number or both of the folder track.
 #. {folderType} will be replaced with "folder" or "nested folder".
 msgid "{track} {folderType}"
-msgstr ""
+msgstr "{track}{folderType}"
 
 #. Used to report the folder containing a track after it has moved.
 #. {folder} will be replaced with the name, number or both of the folder.
@@ -1676,6 +1709,24 @@ msgstr "启用效果差异独奏"
 
 msgid "disabled delta solo"
 msgstr "禁用效果差异独奏"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "从光标处开始"
+
+#. Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "开始偏移 {}ms"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "在光标处结束"
+
+#. Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "结束偏移 {}ms"
 
 msgid "no selected items"
 msgstr "无选定对象"
@@ -2262,9 +2313,6 @@ msgstr "全部轨道取消录音预备"
 
 msgid "all delta solos reset"
 msgstr "全部效果差异独奏重置"
-
-msgid "inverted segment scrub offsets"
-msgstr "反转区段擦带偏移"
 
 msgid "grid sixty forth"
 msgstr "64分网格"
@@ -2909,6 +2957,12 @@ msgstr "全不轨到相位正常"
 msgid "unmonitored all tracks"
 msgstr "取消监听全部轨道"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items fit to time selection".
+msgid "{} item fit to time selection"
+msgid_plural "{} items fit to time selection"
+msgstr[0] "{} 对象适配到时间选区"
+
 msgid "showed video window"
 msgstr "显示视频窗口"
 
@@ -2941,24 +2995,6 @@ msgstr "{track} 之上，轨道列表顶部"
 #. For example: "bottom of track list, below 3 drums nested folder".
 msgid "bottom of track list, below {track}"
 msgstr "{track} 之下，轨道列表底部"
-
-#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-msgid "start from cursor"
-msgstr "从光标处开始"
-
-#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-msgid "start offset {} MS"
-msgstr "开始偏移 {}ms"
-
-#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-msgid "end at cursor"
-msgstr "在光标处结束"
-
-#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-msgid "end offset {} MS"
-msgstr "结束偏移 {}ms"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master mix"
@@ -3338,11 +3374,11 @@ msgstr "自动通知通道:"
 
 msgctxt "Peak Watcher"
 msgid "&1"
-msgstr "1(&1)"
+msgstr "&1"
 
 msgctxt "Peak Watcher"
 msgid "&2"
-msgstr "2(&2)"
+msgstr "&2"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"

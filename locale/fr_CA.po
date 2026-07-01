@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-06-01 21:46\n"
+"PO-Revision-Date: 2026-07-01 20:20\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -1107,6 +1107,54 @@ msgstr "pré-Fx"
 msgid "post-fx"
 msgstr "post-fx"
 
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "2 reverb send volume"
+msgid "{target} send {param}"
+msgstr "{target} envoi {param}"
+
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. send from other sends to the same track. {param} will be replaced with
+#. the parameter name.
+#. Example: "2 reverb send 2 volume"
+msgid "{target} send {targetNum} {param}"
+msgstr "{target} envoi {targetNum} {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "1 vocal receive volume"
+msgid "{target} receive {param}"
+msgstr "{target} retour {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. receive from other receives from the same track. {param} will be
+#. replaced with the parameter name.
+#. Example: "1 vocal receive 2 volume"
+msgid "{target} receive {targetNum} {param}"
+msgstr "{target} retour {targetNum} {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {param} will be replaced with the parameter name.
+#. Example: "main hardware volume"
+msgid "{target} hardware {param}"
+msgstr "{target} matériel {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {targetNum} will be replaced with a number distinguishing
+#. this send from other sends to the same output. {param} will be replaced
+#. with the parameter name.
+#. Example: "main hardware 2 volume"
+msgid "{target} hardware {targetNum} {param}"
+msgstr "{target} matériel {targetNum} {param}"
+
 msgid "mute"
 msgstr "muter"
 
@@ -1127,21 +1175,6 @@ msgstr "canal audio de destination"
 
 msgid "send type"
 msgstr "type d'envoi"
-
-#. Indicates a parameter for a track send in the Track Parameters
-#. dialog.
-msgid "send"
-msgstr "envoi"
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog.
-msgid "receive"
-msgstr "retour"
-
-#. Indicates a parameter for a hardware audio output in the
-#.  Track Parameters dialog.
-msgid "hardware"
-msgstr "matériel"
 
 msgid "Track Parameters"
 msgstr "Paramètre de Piste"
@@ -1740,6 +1773,24 @@ msgstr "delta solo activé"
 
 msgid "disabled delta solo"
 msgstr "delta solo désactivé"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "démarrer depuis le curseur"
+
+#. Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "décalage de démarrage {} MS"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "se termine au curseur"
+
+#. Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "décalage de fin {} MS"
 
 msgid "no selected items"
 msgstr "aucun objets n'est sélectionné"
@@ -2349,9 +2400,6 @@ msgstr "toutes les pistes sont désarmées"
 
 msgid "all delta solos reset"
 msgstr "tous les delta solos sont réinitialisés"
-
-msgid "inverted segment scrub offsets"
-msgstr "décalages du scrub segmenté inversé"
 
 msgid "grid sixty forth"
 msgstr "grille sur quadruple croche, 1/64"
@@ -3013,6 +3061,13 @@ msgstr "phase normale pour toutes les pistes"
 msgid "unmonitored all tracks"
 msgstr "moniteur de toutes les pistes désactivés"
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items fit to time selection".
+msgid "{} item fit to time selection"
+msgid_plural "{} items fit to time selection"
+msgstr[0] "{} objet adapté à la sélection temporelle"
+msgstr[1] "{} objets adapté à la sélection temporelle"
+
 msgid "showed video window"
 msgstr "afficher la fenêtre vidéo"
 
@@ -3045,24 +3100,6 @@ msgstr "début de la liste des pistes, au-dessus de {track}"
 #. For example: "bottom of track list, below 3 drums nested folder".
 msgid "bottom of track list, below {track}"
 msgstr "fin de la liste des pistes, sous {track}"
-
-#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-msgid "start from cursor"
-msgstr "démarrer depuis le curseur"
-
-#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-msgid "start offset {} MS"
-msgstr "décalage de démarrage {} MS"
-
-#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-msgid "end at cursor"
-msgstr "se termine au curseur"
-
-#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-msgid "end offset {} MS"
-msgstr "décalage de fin {} MS"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master mix"

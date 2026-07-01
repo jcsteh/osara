@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2026-06-01 21:46\n"
+"PO-Revision-Date: 2026-07-01 20:20\n"
 
 msgid "enabled"
 msgstr "habilitando"
@@ -1107,6 +1107,54 @@ msgstr "pre-fx"
 msgid "post-fx"
 msgstr "post-fx"
 
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "2 reverb send volume"
+msgid "{target} send {param}"
+msgstr "Envío hacia {target}: {param}"
+
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. send from other sends to the same track. {param} will be replaced with
+#. the parameter name.
+#. Example: "2 reverb send 2 volume"
+msgid "{target} send {targetNum} {param}"
+msgstr "Envío {targetNum} hacia {target}: {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "1 vocal receive volume"
+msgid "{target} receive {param}"
+msgstr "Recepción desde {target}: {param}"
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. receive from other receives from the same track. {param} will be
+#. replaced with the parameter name.
+#. Example: "1 vocal receive 2 volume"
+msgid "{target} receive {targetNum} {param}"
+msgstr "Recepción {targetNum} desde {target}: {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {param} will be replaced with the parameter name.
+#. Example: "main hardware volume"
+msgid "{target} hardware {param}"
+msgstr "Salida de hardware hacia {target}: {param}"
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {targetNum} will be replaced with a number distinguishing
+#. this send from other sends to the same output. {param} will be replaced
+#. with the parameter name.
+#. Example: "main hardware 2 volume"
+msgid "{target} hardware {targetNum} {param}"
+msgstr "Salida de hardware {targetNum} hacia {target}: {param}"
+
 msgid "mute"
 msgstr "muteo"
 
@@ -1120,28 +1168,13 @@ msgid "destination MIDI channel"
 msgstr "destino del canal midi"
 
 msgid "source audio channel"
-msgstr "destino del canal de audio"
+msgstr "origen del canal de audio"
 
 msgid "destination audio channel"
-msgstr "origen del canal de audio"
+msgstr "destino del canal de audio"
 
 msgid "send type"
 msgstr "tipo de envío"
-
-#. Indicates a parameter for a track send in the Track Parameters
-#. dialog.
-msgid "send"
-msgstr "enviando"
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog.
-msgid "receive"
-msgstr "recibiendo"
-
-#. Indicates a parameter for a hardware audio output in the
-#.  Track Parameters dialog.
-msgid "hardware"
-msgstr "hardware"
 
 msgid "Track Parameters"
 msgstr "Parámetros de Pista"
@@ -1297,8 +1330,8 @@ msgstr "pulso {}"
 #. with the number of ticks; e.g. "2 ticks".
 msgid "{} tick"
 msgid_plural "{} ticks"
-msgstr[0] "momento {}"
-msgstr[1] "momento {}"
+msgstr[0] "{} tick"
+msgstr[1] "{} ticks"
 
 #. Used when reporting a time in minutes. {} will be
 #. replaced with the number of minutes; e.g. "2 min".
@@ -1681,7 +1714,7 @@ msgstr[1] "solo en {} pistas activado"
 msgid "{} track unsoloed"
 msgid_plural "{} tracks unsoloed"
 msgstr[0] "solo en {} pista desactivado"
-msgstr[1] "desactivando solo en {} pistas"
+msgstr[1] "solo en {} pistas desactivado"
 
 #. Reported when multiple tracks are armed. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks armed".
@@ -1740,6 +1773,24 @@ msgstr "habilitar solo en modo delta"
 
 msgid "disabled delta solo"
 msgstr "deshabilitar solo en modo delta"
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr "iniciando desde el cursor"
+
+#. Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr "desplazamiento de inicio {} ms"
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr "finalizando en el cursor"
+
+#. Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
+msgstr "desplazamiento de fin {} ms"
 
 msgid "no selected items"
 msgstr "no hay ítems seleccionados"
@@ -2350,9 +2401,6 @@ msgstr "todas las pistas desarmadas"
 msgid "all delta solos reset"
 msgstr "todos los solos en delta reseteados"
 
-msgid "inverted segment scrub offsets"
-msgstr "desplazamientos del segmento de scrub invertido"
-
 msgid "grid sixty forth"
 msgstr "cuadrícula en semifusas"
 
@@ -2706,13 +2754,13 @@ msgstr "fin de"
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
-msgstr "{} marcador movido"
+msgstr "marcador {} movido"
 
 #. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
 #. Reported when inserting a marker. {} will be replaced with the
 #. number of the new marker; e.g. "marker 2 inserted".
 msgid "marker {} inserted"
-msgstr "{} marcador insertado"
+msgstr "marcador {} insertado"
 
 #. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
 msgid "marker {} moved"
@@ -3011,7 +3059,14 @@ msgid "phase normal all tracks"
 msgstr "todas las pistas a fase normal"
 
 msgid "unmonitored all tracks"
-msgstr "desmonitoreando todas las pistas"
+msgstr "todas las pistas desmonitoreadas"
+
+#. {} will be replaced with the number of items; e.g.
+#. "2 items fit to time selection".
+msgid "{} item fit to time selection"
+msgid_plural "{} items fit to time selection"
+msgstr[0] "{} ítem ajustado a la selección de tiempo"
+msgstr[1] "{} ítems ajustados a la selección de tiempo"
 
 msgid "showed video window"
 msgstr "mostrando ventana de video"
@@ -3045,24 +3100,6 @@ msgstr "principio de la lista de pistas, arriba de {track}"
 #. For example: "bottom of track list, below 3 drums nested folder".
 msgid "bottom of track list, below {track}"
 msgstr "final de la lista de pistas, debajo de {track}"
-
-#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-msgid "start from cursor"
-msgstr "iniciando desde el cursor"
-
-#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-msgid "start offset {} MS"
-msgstr "desplazamiento de inicio {} ms"
-
-#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-msgid "end at cursor"
-msgstr "finalizando en el cursor"
-
-#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-msgid "end offset {} MS"
-msgstr "desplazamiento de fin {} ms"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master mix"

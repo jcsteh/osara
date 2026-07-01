@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
-"PO-Revision-Date: 2026-06-15 21:28\n"
+"PO-Revision-Date: 2026-07-01 20:20\n"
 
 msgid "enabled"
 msgstr "aktivert"
@@ -366,31 +366,31 @@ msgid "{} notes"
 msgstr "{} noter"
 
 msgid "velocity"
-msgstr ""
+msgstr "styrke"
 
 msgid "nothing pasted"
-msgstr ""
+msgstr "ingenting limt inn"
 
 #. Reported when pasting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events added".
 msgid "{} event added"
 msgid_plural "{} events added"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} hendelse lagt til"
+msgstr[1] "{} hendelser lagt til"
 
 #. Used when events are deleted in the MIDI editor. {} is
 #. replaced by the number of events. E.g. "3 events removed"
 msgid "{} event removed"
 msgid_plural "{} events removed"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} hendelse fjernet"
+msgstr[1] "{} hendelser fjernet"
 
 #. Reported when copying events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events copied".
 msgid "{} event copied"
 msgid_plural "{} events copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} hendelse kopiert"
+msgstr[1] "{} hendelser kopiert"
 
 #. used when notes are selected in the MIDI editor.
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
@@ -398,8 +398,8 @@ msgstr[1] ""
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} note valgt"
+msgstr[1] "{} noter valgt"
 
 #. Reported when selecting CC events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 CC events selected".
@@ -407,264 +407,264 @@ msgstr[1] ""
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} CC-hendelse valgt"
+msgstr[1] "{} CC-hendelser valgt"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} hendelse valgt"
+msgstr[1] "{} hendelser valgt"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
 msgid "{} CC event unselected"
 msgid_plural "{} CC events unselected"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} hendelse ikke markert"
+msgstr[1] "{} hendelser ikke markert"
 
 msgid "Bank Select MSB"
-msgstr ""
+msgstr "Bank velg MSB"
 
 msgid "Mod Wheel MSB"
-msgstr ""
+msgstr "Mod-hjul MSB"
 
 msgid "Breath MSB"
-msgstr ""
+msgstr "Pust MSB"
 
 msgid "Foot Pedal MSB"
-msgstr ""
+msgstr "Fotpedal MSB"
 
 msgid "Portamento MSB"
-msgstr ""
+msgstr "Portamento MSB"
 
 msgid "Data Entry MSB"
-msgstr ""
+msgstr "Inntastingsdata MSB"
 
 msgid "Volume MSB"
-msgstr ""
+msgstr "Volum MSB"
 
 msgid "Balance MSB"
-msgstr ""
+msgstr "Balanse MSB"
 
 msgid "Pan Position MSB"
-msgstr ""
+msgstr "Panposisjon MSB"
 
 msgid "Expression MSB"
-msgstr ""
+msgstr "Expression MSB"
 
 msgid "Control 1 MSB"
-msgstr ""
+msgstr "Styring 1 MSB"
 
 msgid "Control 2 MSB"
-msgstr ""
+msgstr "Styring 2 MSB"
 
 msgid "GP Slider 1"
-msgstr ""
+msgstr "GP-glidebryter 1"
 
 msgid "GP Slider 2"
-msgstr ""
+msgstr "GP-glidebryter 2"
 
 msgid "GP Slider 3"
-msgstr ""
+msgstr "GP-glidebryter 3"
 
 msgid "GP Slider 4"
-msgstr ""
+msgstr "GP-glidebryter 4"
 
 msgid "Bank Select LSB"
-msgstr ""
+msgstr "Bankvalg LSB"
 
 msgid "Mod Wheel LSB"
-msgstr ""
+msgstr "Mod-hjul LSB"
 
 msgid "Breath LSB"
-msgstr ""
+msgstr "Pust LSB"
 
 msgid "Foot Pedal LSB"
-msgstr ""
+msgstr "Fotpedal LSB"
 
 msgid "Portamento LSB"
-msgstr ""
+msgstr "Portamento LSB"
 
 msgid "Data Entry LSB"
-msgstr ""
+msgstr "Inntastingsdata LSB"
 
 msgid "Volume LSB"
-msgstr ""
+msgstr "Volum LSB"
 
 msgid "Balance LSB"
-msgstr ""
+msgstr "Balanse LSB"
 
 msgid "Pan Position LSB"
-msgstr ""
+msgstr "Panposisjon LSB"
 
 msgid "Expression LSB"
-msgstr ""
+msgstr "Expression LSB"
 
 msgid "Control 1 LSB"
-msgstr ""
+msgstr "Styring 1 LSB"
 
 msgid "Control 2 LSB"
-msgstr ""
+msgstr "Styring 2 LSB"
 
 msgid "Hold Pedal (on/off)"
-msgstr ""
+msgstr "Holdpedal (på/av)"
 
 msgid "Portamento (on/off)"
-msgstr ""
+msgstr "Portamento (på/av)"
 
 msgid "Sostenuto (on/off)"
-msgstr ""
+msgstr "Sostenuto (på/av)"
 
 msgid "Soft Pedal (on/off)"
-msgstr ""
+msgstr "Dempepedal (på/av)"
 
 msgid "Legato Pedal (on/off)"
-msgstr ""
+msgstr "Legatopedal (på/av)"
 
 msgid "Hold 2 Pedal (on/off)"
-msgstr ""
+msgstr "Holdpedal 2 (på/av)"
 
 msgid "Sound Variation"
-msgstr ""
+msgstr "Lydvariasjon"
 
 msgid "Timbre/Resonance"
-msgstr ""
+msgstr "Klang/Resonanse"
 
 msgid "Sound Release"
-msgstr ""
+msgstr "Lyd-release"
 
 msgid "Sound Attack"
-msgstr ""
+msgstr "Lyd-attack"
 
 msgid "Brightness/Cutoff Freq"
-msgstr ""
+msgstr "Diskant/Cutoff-frekvens"
 
 msgid "Sound Control 6"
-msgstr ""
+msgstr "Lydstyring 6"
 
 msgid "Sound Control 7"
-msgstr ""
+msgstr "Lydstyring 7"
 
 msgid "Sound Controll 8"
-msgstr ""
+msgstr "Lydstyring 8"
 
 msgid "Sound Control 9"
-msgstr ""
+msgstr "Lydstyring 9"
 
 msgid "Sound Control 10"
-msgstr ""
+msgstr "Lydstyring 10"
 
 msgid "GP Button 1 (on/off)"
-msgstr ""
+msgstr "GP-knapp 1 (på/av)"
 
 msgid "GP Button 2 (on/off)"
-msgstr ""
+msgstr "GP-knapp 2 (på/av)"
 
 msgid "GP Button 3 (on/off)"
-msgstr ""
+msgstr "GP-knapp 3 (på/av)"
 
 msgid "GP Button 4 (on/off)"
-msgstr ""
+msgstr "GP-knapp 4 (på/av)"
 
 msgid "Effects Level"
-msgstr ""
+msgstr "Effektnivå"
 
 msgid "Tremolo Level"
-msgstr ""
+msgstr "Tremolonivå"
 
 msgid "Chorus Level"
-msgstr ""
+msgstr "Chorusnivå"
 
 msgid "Celeste Level"
-msgstr ""
+msgstr "Celestenivå"
 
 msgid "Phaser Level"
-msgstr ""
+msgstr "Fasernivå"
 
 msgid "Data Button Inc"
-msgstr ""
+msgstr "Dataknapp øke"
 
 msgid "Data Button Dec"
-msgstr ""
+msgstr "Dataknapp senke"
 
 msgid "Non-Reg Parm LSB"
-msgstr ""
+msgstr "Non-Reg Parm LSB"
 
 msgid "Non-Reg Parm MSB"
-msgstr ""
+msgstr "Non-Reg Parm MSB"
 
 msgid "Reg Parm LSB"
-msgstr ""
+msgstr "Reg Parm LSB"
 
 msgid "Reg Parm MSB"
-msgstr ""
+msgstr "Reg Parm MSB"
 
 msgid "All Sound Off"
-msgstr ""
+msgstr "All lyd av"
 
 msgid "Reset"
-msgstr ""
+msgstr "Nullstill"
 
 msgid "Local"
-msgstr ""
+msgstr "Lokal"
 
 msgid "All Notes Off"
-msgstr ""
+msgstr "Alle noter av"
 
 msgid "Omni On"
-msgstr ""
+msgstr "Omni på"
 
 msgid "Omni Off"
-msgstr ""
+msgstr "Omni av"
 
 msgid "Mono On"
-msgstr ""
+msgstr "Mono på"
 
 msgid "Poly On"
-msgstr ""
+msgstr "Poly på"
 
 #. MIDI poly aftertouch. {note} will be replaced with the note
 #. name and {value} will be replaced with the aftertouch value; e.g.
 #. "Poly Aftertouch c sharp 4  96"
 msgid "Poly Aftertouch {note}  {value}"
-msgstr ""
+msgstr "Poly Aftertouch {note}  {value}"
 
 msgid "Program {}"
-msgstr ""
+msgstr "Program {}"
 
 #. MIDI channel pressure. {} will be replaced with the pressure value; e.g. "Channel pressure 64"
 msgid "Channel pressure {}"
-msgstr ""
+msgstr "Trykkverdi kanal {}"
 
 #. MIDI pitch bend.  {} will be replaced with the pitch bend value; e.g. "Pitch Bend 100"
 msgid "Pitch Bend {}"
-msgstr ""
+msgstr "Pitch bend {}"
 
 msgid "Change CC Selection"
-msgstr ""
+msgstr "Endre CC-utvalg"
 
 msgid "OSARA: Move to next midi item on track"
-msgstr ""
+msgstr "OSARA: Flytt til neste midi-objekt på spor"
 
 msgid "OSARA: Move to previous midi item on track"
-msgstr ""
+msgstr "OSARA: Flytt til forrige midi-objekt på spor"
 
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
 #. be replaced with its name. For example: "item 2 chorus".
 msgid "item {num} {name}"
-msgstr ""
+msgstr "objekt {num} {name}"
 
 msgid "no time selection"
-msgstr ""
+msgstr "ingen tidsutvalg"
 
 msgid "no notes selected"
-msgstr ""
+msgstr "ingen noter valgt"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
-msgstr ""
+msgstr "OSARA: Velg alle noter med samme tonehøyde innen tidsutvalg"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -673,8 +673,8 @@ msgstr ""
 #. the command. E.g. "1 note split into 2"
 msgid "{oldCount} note split into {newCount}"
 msgid_plural "{oldCount} notes split into {newCount}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{oldCount} note delt i {newCount}"
+msgstr[1] "{oldCount} noter delt i {newCount}"
 
 #. used when joining notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -1107,6 +1107,54 @@ msgstr ""
 msgid "post-fx"
 msgstr ""
 
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "2 reverb send volume"
+msgid "{target} send {param}"
+msgstr ""
+
+#. Indicates a parameter for a track send in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. send from other sends to the same track. {param} will be replaced with
+#. the parameter name.
+#. Example: "2 reverb send 2 volume"
+msgid "{target} send {targetNum} {param}"
+msgstr ""
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {param} will be replaced with the parameter name.
+#. Example: "1 vocal receive volume"
+msgid "{target} receive {param}"
+msgstr ""
+
+#. Indicates a parameter for a track receive in the Track
+#. Parameters dialog. {target} will be replaced by the track number and/or
+#. name. {targetNum} will be replaced with a number distinguishing this
+#. receive from other receives from the same track. {param} will be
+#. replaced with the parameter name.
+#. Example: "1 vocal receive 2 volume"
+msgid "{target} receive {targetNum} {param}"
+msgstr ""
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {param} will be replaced with the parameter name.
+#. Example: "main hardware volume"
+msgid "{target} hardware {param}"
+msgstr ""
+
+#. Indicates a parameter for a hardware audio output in the
+#. track Parameters dialog. {target} will be replaced by the name of the
+#. audio output. {targetNum} will be replaced with a number distinguishing
+#. this send from other sends to the same output. {param} will be replaced
+#. with the parameter name.
+#. Example: "main hardware 2 volume"
+msgid "{target} hardware {targetNum} {param}"
+msgstr ""
+
 msgid "mute"
 msgstr ""
 
@@ -1126,21 +1174,6 @@ msgid "destination audio channel"
 msgstr ""
 
 msgid "send type"
-msgstr ""
-
-#. Indicates a parameter for a track send in the Track Parameters
-#. dialog.
-msgid "send"
-msgstr ""
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog.
-msgid "receive"
-msgstr ""
-
-#. Indicates a parameter for a hardware audio output in the
-#.  Track Parameters dialog.
-msgid "hardware"
 msgstr ""
 
 msgid "Track Parameters"
@@ -1739,6 +1772,24 @@ msgid "enabled delta solo"
 msgstr ""
 
 msgid "disabled delta solo"
+msgstr ""
+
+#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
+msgid "start from cursor"
+msgstr ""
+
+#. Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
+msgid "start offset {} MS"
+msgstr ""
+
+#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
+msgid "end at cursor"
+msgstr ""
+
+#. Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
+#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
+msgid "end offset {} MS"
 msgstr ""
 
 msgid "no selected items"
@@ -2348,9 +2399,6 @@ msgid "all tracks unarmed"
 msgstr ""
 
 msgid "all delta solos reset"
-msgstr ""
-
-msgid "inverted segment scrub offsets"
 msgstr ""
 
 msgid "grid sixty forth"
@@ -3013,6 +3061,13 @@ msgstr ""
 msgid "unmonitored all tracks"
 msgstr ""
 
+#. {} will be replaced with the number of items; e.g.
+#. "2 items fit to time selection".
+msgid "{} item fit to time selection"
+msgid_plural "{} items fit to time selection"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "showed video window"
 msgstr ""
 
@@ -3044,24 +3099,6 @@ msgstr ""
 #. "3", "3 vocal", "drums folder" or "3 drums nested folder".
 #. For example: "bottom of track list, below 3 drums nested folder".
 msgid "bottom of track list, below {track}"
-msgstr ""
-
-#. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
-msgid "start from cursor"
-msgstr ""
-
-#. Used when the start offset is anything other than 0, will be a negative number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
-msgid "start offset {} MS"
-msgstr ""
-
-#. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
-msgid "end at cursor"
-msgstr ""
-
-#. Used when the end offset is anything other than 0, will be a positive number measured in milliseconds.
-#. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
-msgid "end offset {} MS"
 msgstr ""
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
