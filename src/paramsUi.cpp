@@ -1473,7 +1473,6 @@ class DestAudioChannelParam:  public AudioChannelParam {
 	DestAudioChannelParam(ReaperObjParamProvider& provider ):
 			AudioChannelParam(provider) {
 		MediaTrack* dstTrack = this->getTargetTrack();
-		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
 		auto& sendProv = static_cast<TrackSendParamProvider&>(provider);
 		int srcChans = *(int*)sendProv.getSetValue("I_SRCCHAN", nullptr) >> 10;
 		if (srcChans == 0) {
@@ -1494,6 +1493,7 @@ class DestAudioChannelParam:  public AudioChannelParam {
 			this->max = 0;
 			return;
 		}
+		int trackChans = *(int*)GetSetMediaTrackInfo(dstTrack, "I_NCHAN", nullptr);
 		// Destination only supports stereo if the source is mono or stereo.
 		if (srcChans <= 2) {
 			this->addStereoOptions(trackChans);
@@ -1583,9 +1583,27 @@ class TrackParams: public ReaperObjParamSource {
 	template<int category>
 	void addSendParams(const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
+		int i = 0;
+		if constexpr (category == 0) {
+			// Since REAPER 7.75, the category 0 (sends) index space used by
+			// GetSetTrackSendInfo also includes hardware outputs, which the routing UI
+			// orders before the real sends. GetTrackNumSends(track, 0), however, still
+			// returns only the number of real sends. If the first entry is a hardware
+			// output (it has no destination track), skip past the hardware outputs so
+			// we enumerate only real sends; they are enumerated separately as category 1
+			// by a subsequent call to this function. On REAPER versions before 7.75,
+			// category 0 contains no hardware outputs, so this behaves like a simple
+			// 0..count iteration.
+			const int hwCount = GetTrackNumSends(track, 1);
+			if (hwCount > 0 &&
+					!GetSetTrackSendInfo(this->track, category, 0, trackParam, nullptr)) {
+				i += hwCount;
+				count += hwCount;
+			}
+		}
 		string lastTarget;
 		int sameTargetCount = 1;
-		for (int i = 0; i < count; ++i) {
+		for (; i < count; ++i) {
 			string target;
 			if (trackParam) {
 				// Send or receive.
