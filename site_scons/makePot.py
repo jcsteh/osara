@@ -7,6 +7,8 @@ import re
 from collections import OrderedDict
 import itertools
 
+from installerStrings import RE_INSTALLER_STRING, unescapeNsiString
+
 # Maps (context, msgid) to a dict of message data. We need this so we output
 # only one entry for each message.
 messages = OrderedDict()
@@ -30,6 +32,8 @@ msgstr ""
 			addCpp(inp)
 		elif filePath.endswith(".rc"):
 			addRc(inp)
+		elif filePath.endswith(".nsi"):
+			addNsi(inp)
 	for (context, msgid), data in messages.items():
 		for comment in data.get("comments", ()):
 			out.write('#. %s\n' % comment)
@@ -46,21 +50,40 @@ msgstr ""
 
 filePath = None
 lineNum = None
-def error(msg):
-	raise RuntimeError(f"{msg}, {filePath} line {lineNum}")
+def error(msg, path=None, line=None):
+	raise RuntimeError(f"{msg}, {path or filePath} line {line or lineNum}")
 
-RE_TRANSLATORS_COMMENT = re.compile(r"^\s*// Translators: (.*)$")
-RE_COMMENT = re.compile(r"^\s*// (.*)$")
+RE_TRANSLATORS_COMMENT = re.compile(r"^\s*(?://|;)\s*Translators:\s*(.*)$")
+RE_COMMENT = re.compile(r"^\s*(?://|;)\s*(.*)$")
 inTranslatorsComment = False
 lastTranslatorsComment = []
+lastTranslatorsCommentLine = None
+def resetTranslatorsCommentState():
+	global inTranslatorsComment, lastTranslatorsComment, lastTranslatorsCommentLine
+	inTranslatorsComment = False
+	lastTranslatorsComment = []
+	lastTranslatorsCommentLine = None
+
+def ensureNoDanglingTranslatorsComment(input):
+	if lastTranslatorsComment:
+		error(
+			"Translators comment wasn't followed by a translatable message",
+			path=getattr(input, "name", filePath),
+			line=lastTranslatorsCommentLine,
+		)
+
 def handleTranslatorsComment(line):
-	global inTranslatorsComment, lastTranslatorsComment
+	global inTranslatorsComment, lastTranslatorsComment, lastTranslatorsCommentLine
 	m = RE_TRANSLATORS_COMMENT.match(line)
 	if m:
 		if lastTranslatorsComment:
-			error("Didn't find translatable message after last translators comment")
+			error(
+				"Didn't find translatable message after last translators comment",
+				line=lastTranslatorsCommentLine,
+			)
 		inTranslatorsComment = True
 		lastTranslatorsComment.append(m.group(1))
+		lastTranslatorsCommentLine = lineNum
 		return True
 	if inTranslatorsComment:
 		m = RE_COMMENT.match(line)
@@ -72,7 +95,7 @@ def handleTranslatorsComment(line):
 	return False
 
 def addMessage(data):
-	global messages, lastTranslatorsComment
+	global messages, lastTranslatorsComment, lastTranslatorsCommentLine
 	if not data["msgid"]:
 		error("Empty msgid")
 	key = (data.get("context"), data["msgid"])
@@ -81,12 +104,14 @@ def addMessage(data):
 		comments = data.setdefault("comments", [])
 		comments.extend(lastTranslatorsComment)
 		lastTranslatorsComment = []
+		lastTranslatorsCommentLine = None
 
 RE_CPP_TRANSLATE = re.compile(r'\b(?:translate|_t)\(\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_CTXT = re.compile(r'\btranslate_ctxt\(\s*(?:"(?P<context>.*?)"|[^)]*),?\s*(?:"(?P<msgid>.*?)"|[^)]*)\s*(?P<end>\))?')
 RE_CPP_TRANSLATE_PLURAL = re.compile(r'\btranslate_plural\(\s*(?:"(?P<msgid>.*?)"|[^)]*),?\s*(?:"(?P<plural>.*?)"|[^)]*),?\s*[^)]*\s*(?P<end>\))?')
 def addCpp(input):
 	global lineNum
+	resetTranslatorsCommentState()
 	lineNum = 0
 	for line in input:
 		lineNum += 1
@@ -112,11 +137,13 @@ def addCpp(input):
 				# variable.
 				continue
 			addMessage(m.groupdict())
+	ensureNoDanglingTranslatorsComment(input)
 
 RE_RC_TRANSLATE = re.compile(r'^\s*(?P<command>CAPTION|LTEXT|DEFPUSHBUTTON|PUSHBUTTON|GROUPBOX|CONTROL)\s+"(?P<msgid>.*?)"')
 def addRc(input):
 	context = None
 	global lineNum
+	resetTranslatorsCommentState()
 	lineNum = 0
 	for line in input:
 		lineNum += 1
@@ -133,3 +160,21 @@ def addRc(input):
 				continue
 			data["context"] = context
 			addMessage(data)
+	ensureNoDanglingTranslatorsComment(input)
+
+def addNsi(input):
+	global lineNum
+	resetTranslatorsCommentState()
+	lineNum = 0
+	for line in input:
+		lineNum += 1
+		if handleTranslatorsComment(line):
+			continue
+		m = RE_INSTALLER_STRING.match(line)
+		if not m:
+			continue
+		addMessage({
+			"context": "installer",
+			"msgid": unescapeNsiString(m.group("msgid")),
+		})
+	ensureNoDanglingTranslatorsComment(input)
