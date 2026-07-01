@@ -1435,11 +1435,6 @@ class AudioChannelParam:  public ReaperObjParam {
 	private:
 	Param::AfterOption addChannels(int count) {
 		MediaTrack* track = this->getTargetTrack();
-		if (!track) {
-			// No target track (e.g. a hardware output, or a send REAPER reports with
-			// no destination track). There's nothing to add channels to.
-			return Param::AfterOption::nothing;
-		}
 		int channels = *(int*)GetSetMediaTrackInfo(track, "I_NCHAN", nullptr);
 		channels += count;
 		GetSetMediaTrackInfo(track, "I_NCHAN", (void*)&channels);
@@ -1453,21 +1448,6 @@ class SourceAudioChannelParam: public AudioChannelParam {
 			AudioChannelParam(provider) {
 		options.push_back({translate_ctxt("audio channel", "none"), -1});
 		MediaTrack* srcTrack = this->getTargetTrack();
-		if (!srcTrack) {
-			// No source track. We don't know how many source channels there are, so
-			// just expose the current setting alongside "none".
-			int src = *(int*)provider.getSetValue(nullptr);
-			if (src != -1) {
-				if (src & MONO_FLAG) {
-					this->options.push_back({fmt::format("{}", (src & ~MONO_FLAG) + 1), src});
-				} else {
-					// Multi-channel, but we don't know how many.
-					this->options.push_back({fmt::format("{}-", src + 1), src});
-				}
-			}
-			this->finishOptions();
-			return;
-		}
 		int channels = *(int*)GetSetMediaTrackInfo(srcTrack, "I_NCHAN", nullptr);
 		this->addMonoOptions(channels);
 		this->addStereoOptions(channels);
@@ -1500,11 +1480,9 @@ class DestAudioChannelParam:  public AudioChannelParam {
 		} else if (srcChans > 1) {
 			srcChans *= 2;
 		}
-		if (!dstTrack || srcChans == -1) {
-			// If there's no destination track (e.g. a hardware output, or a send
-			// REAPER reports with no destination track), or no source audio channel
-			// is set, we don't know how many destination channels there are. Just
-			// expose the current setting.
+		if (srcChans == -1) {
+			// If no source audio channel is set, we don't know how many destination
+			// channels there are. Just expose the current setting.
 			int dest = *(int*)provider.getSetValue(nullptr);
 			if (dest & MONO_FLAG) {
 				this->options.push_back({fmt::format("{}", (dest & ~MONO_FLAG) + 1), dest});
@@ -1606,13 +1584,15 @@ class TrackParams: public ReaperObjParamSource {
 	void addSendParams(const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
 		// Since REAPER 7.75, the category 0 (sends) index space used by
-		// GetSetTrackSendInfo also includes hardware outputs, ordered before the
-		// real sends to match the routing UI. GetTrackNumSends(track, 0), however,
-		// still returns only the number of real sends. We therefore walk the index
-		// space, skipping hardware outputs (which have no destination track and are
-		// enumerated separately as category 1 below), until we've found every send.
-		// On REAPER versions before 7.75, category 0 contains no hardware outputs,
-		// so this behaves like a simple 0..count iteration.
+		// GetSetTrackSendInfo also includes hardware outputs; the routing UI orders
+		// these before the real sends. GetTrackNumSends(track, 0), however, still
+		// returns only the number of real sends. We therefore walk the index space,
+		// identifying hardware outputs by their lack of a destination track and
+		// skipping them (they are enumerated separately as category 1 below) until we
+		// have found every real send. We deliberately don't rely on the relative
+		// order of hardware outputs and sends. On REAPER versions before 7.75,
+		// category 0 contains no hardware outputs, so this behaves like a simple
+		// 0..count iteration.
 		int maxIndex = count;
 		if constexpr (category == 0) {
 			maxIndex += GetTrackNumSends(track, 1);
