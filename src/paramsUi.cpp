@@ -1583,34 +1583,31 @@ class TrackParams: public ReaperObjParamSource {
 	template<int category>
 	void addSendParams(const char* trackParam) {
 		int count = GetTrackNumSends(track, category);
-		// Since REAPER 7.75, the category 0 (sends) index space used by
-		// GetSetTrackSendInfo also includes hardware outputs; the routing UI orders
-		// these before the real sends. GetTrackNumSends(track, 0), however, still
-		// returns only the number of real sends. We therefore walk the index space,
-		// identifying hardware outputs by their lack of a destination track and
-		// skipping them (they are enumerated separately as category 1 below) until we
-		// have found every real send. We deliberately don't rely on the relative
-		// order of hardware outputs and sends. On REAPER versions before 7.75,
-		// category 0 contains no hardware outputs, so this behaves like a simple
-		// 0..count iteration.
-		int maxIndex = count;
+		int i = 0;
 		if constexpr (category == 0) {
-			maxIndex += GetTrackNumSends(track, 1);
+			// Since REAPER 7.75, the category 0 (sends) index space used by
+			// GetSetTrackSendInfo also includes hardware outputs, which the routing UI
+			// orders before the real sends. GetTrackNumSends(track, 0), however, still
+			// returns only the number of real sends. If the first entry is a hardware
+			// output (it has no destination track), skip past the hardware outputs so
+			// we enumerate only real sends; they are enumerated separately as category 1
+			// by a subsequent call to this function. On REAPER versions before 7.75,
+			// category 0 contains no hardware outputs, so this behaves like a simple
+			// 0..count iteration.
+			const int hwCount = GetTrackNumSends(track, 1);
+			if (hwCount > 0 &&
+					!GetSetTrackSendInfo(this->track, category, 0, trackParam, nullptr)) {
+				i += hwCount;
+				count += hwCount;
+			}
 		}
 		string lastTarget;
 		int sameTargetCount = 1;
-		for (int i = 0, found = 0; i < maxIndex && found < count; ++i) {
+		for (; i < count; ++i) {
 			string target;
 			if (trackParam) {
 				// Send or receive.
 				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, nullptr);
-				if constexpr (category == 0) {
-					if (!sendTrack) {
-						// A hardware output occupying a slot in the sends index space.
-						// Skip it here; it is enumerated as a hardware output below.
-						continue;
-					}
-				}
 				auto trackNum = (int)(size_t)GetSetMediaTrackInfo(sendTrack,
 					"IP_TRACKNUMBER", nullptr);
 				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
@@ -1722,7 +1719,6 @@ class TrackParams: public ReaperObjParamSource {
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				paramName(translate("send type")), this->track, category, i, "I_SENDMODE",
 				SendTypeParam::make));
-			++found;
 		}
 	}
 
