@@ -4195,27 +4195,25 @@ void cmdPaste(int command) {
 	}
 	Main_OnCommand(command, 0);
 	int added;
-	// We want to report both tracks and items if both got added; e.g.
-	// "1 track 2 items added".
+	// We want to report both tracks and items if both got added. Each part is
+	// a full, independently translatable phrase (e.g. "1 track added", "3 items
+	// added") because concatenating counted nouns doesn't work for languages
+	// with grammatical gender or complex plural forms; see #1410.
 	ostringstream s;
 	if ((added = CountTracks(0) - oldTracks) > 0) {
-		// Translators: Reported when tracks are added. Other things might be added
-		// at the same time (e.g. items), so other messages may surround this.
-		// {} will be replaced with the number of tracks; e.g. "2 tracks".
-		s << format(translate_plural("{} track", "{} tracks", added), added);
+		// Translators: Reported when tracks are added. {} will be replaced with
+		// the number of tracks; e.g. "2 tracks added".
+		s << format(translate_plural("{} track added", "{} tracks added", added), added);
 	}
 	if ((added = CountMediaItems(0) - oldItems) > 0) {
 		if (s.tellp() > 0) {
-			s << " ";
+			s << ", ";
 		}
-		// Translators: Reported when items are added. Other things might be added
-		// at the same time (e.g. tracks), so other messages may surround this.
-		// {} will be replaced with the number of items; e.g. "2 items".
-		s << format(translate_plural("{} item", "{} items", added), added);
+		// Translators: Reported when items are added. {} will be replaced with
+		// the number of items; e.g. "2 items added".
+		s << format(translate_plural("{} item added", "{} items added", added), added);
 	}
 	if (s.tellp() > 0) {
-		// Translators: Reported after the number of tracks and/or items added.
-		s << " " << translate("added");
 		maybeAddRippleMessage(s, command);
 		outputMessage(s);
 		return;
