@@ -4196,7 +4196,7 @@ void cmdPaste(int command) {
 	Main_OnCommand(command, 0);
 	int added;
 	// We want to report both tracks and items if both got added. Each part is
-	// a full, independently translatable phrase (e.g. "1 track added, 3 items
+	// a full, independently translatable phrase (e.g. "1 track added", "3 items
 	// added") because concatenating counted nouns doesn't work for languages
 	// with grammatical gender or complex plural forms; see #1410.
 	ostringstream s;
