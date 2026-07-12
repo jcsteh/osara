@@ -312,7 +312,7 @@ class ParamsDialog {
 	double val;
 	string valText;
 	HWND prevFocus;
-	bool isDestroying = false;
+	bool shouldAllowDeactivate = false;
 	bool suppressValueChangeReport = false;
 
 	void updateValueText() {
@@ -452,7 +452,7 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
-					dialog->isDestroying = true;
+					dialog->shouldAllowDeactivate = true;
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
@@ -460,12 +460,12 @@ class ParamsDialog {
 				break;
 			case WM_CLOSE:
 				dialog->saveWindowPos();
-				dialog->isDestroying = true;
+				dialog->shouldAllowDeactivate = true;
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
 			case WM_ACTIVATE:
-				if (!dialog->isDestroying && LOWORD(wParam) == WA_INACTIVE) {
+				if (!dialog->shouldAllowDeactivate && LOWORD(wParam) == WA_INACTIVE) {
 					// If something steals focus, close the dialog. Otherwise, we won't
 					// unregister the key hook,  surface feedback won't report FX parameter
 					// changes and there will be a dialog left open the user can't get to
@@ -695,6 +695,11 @@ class ParamsDialog {
 		if (choice == -1) {
 			return; // Cancelled.
 		}
+		// Some options can cause the focus to move, even though we want focus to
+		// remain in this dialog.
+		HWND origFocus = GetFocus();
+		// Don't let the unwanted focus movement dismiss the dialog.
+		this->shouldAllowDeactivate = true;
 		Param::AfterOption after = options[choice].second();
 		if (after == Param::AfterOption::invalidateValues) {
 			this->onParamChange();
@@ -703,6 +708,12 @@ class ParamsDialog {
 			this->updateParamList();
 		} else if (after == Param::AfterOption::dismiss) {
 			SendMessage(this->dialog, WM_CLOSE, 0, 0);
+			return;
+		}
+		this->shouldAllowDeactivate = false;
+		if (GetFocus() != prevFocus) {
+			// Restore the focus whence it came.
+			SetFocus(origFocus);
 		}
 	}
 
@@ -1212,8 +1223,15 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	}
 
 	Param::MoreOptions getMoreOptions() final {
+		Param::MoreOptions options;
+		if (this->getEnvelopeName()) {
+			options.push_back({
+				translate("Show/hide &envelope"),
+				[this] { return this->showHideEnvelope(); }
+			});
+		}
 		if (this->category == 0) {
-			return {
+			options.insert(options.end(), {
 				{
 					translate("Go to send destination track"),
 					[this] { return this->goToTargetTrack("P_DESTTRACK"); }
@@ -1222,10 +1240,9 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 					translate("Delete send"),
 					[this] { return this->remove(); }
 				},
-			};
-		}
-		if (this->category == -1) {
-			return {
+			});
+		} else if (this->category == -1) {
+			options.insert(options.end(), {
 				{
 					translate("Go to receive source track"),
 					[this] { return this->goToTargetTrack("P_SRCTRACK"); }
@@ -1234,14 +1251,16 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 					translate("Delete receive"),
 					[this] { return this->remove(); }
 				},
-			};
+			});
+		} else {
+			options.insert(options.end(), {
+				{
+					translate("Delete hardware output"),
+					[this] { return this->remove(); }
+				},
+			});
 		}
-		return {
-			{
-				translate("Delete hardware output"),
-				[this] { return this->remove(); }
-			},
-		};
+		return options;
 	}
 
 	private:
@@ -1255,6 +1274,27 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	Param::AfterOption remove() {
 		RemoveTrackSend(this->track, this->category, this->index);
 		return Param::AfterOption::invalidateParams;
+	}
+
+	const char* getEnvelopeName() {
+		if (this->name == "D_VOL") {
+			return "P_ENV:<VOLENV";
+		}
+		if (this->name == "D_PAN") {
+			return "P_ENV:<PANENV";
+		}
+		if (this->name == "B_MUTE") {
+			return "P_ENV:<MUTEENV";
+		}
+		return nullptr;
+	}
+
+	Param::AfterOption showHideEnvelope() {
+		auto* env = (TrackEnvelope*)this->getSetValue(this->getEnvelopeName(),
+			nullptr);
+		SetCursorContext(2, env);
+		Main_OnCommand(40884, 0); // Envelope: Toggle hide/display selected envelope
+		return Param::AfterOption::nothing;
 	}
 
 	MediaTrack* track;
