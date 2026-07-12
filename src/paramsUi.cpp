@@ -314,6 +314,7 @@ class ParamsDialog {
 	HWND prevFocus;
 	bool isDestroying = false;
 	bool suppressValueChangeReport = false;
+	CallLater valChangeLater;
 
 	void updateValueText() {
 		if (this->valText.empty()) {
@@ -357,6 +358,7 @@ class ParamsDialog {
 	}
 
 	void onSliderChange(double newVal) {
+		this->valChangeLater.cancel();
 		if (newVal == this->val
 				|| newVal < this->param->min || newVal > this->param->max) {
 			return;
@@ -365,7 +367,6 @@ class ParamsDialog {
 		if (newVal < val) {
 			step = -step;
 		}
-		this->val = newVal;
 
 		// If the value text (if any) doesn't change, the value change is insignificant.
 		// Snap to the next change in value text.
@@ -381,12 +382,33 @@ class ParamsDialog {
 			if (testText.compare(this->valText) != 0) {
 				// The value text is different, so this change is significant.
 				// Snap to this value.
-				this->val = newVal;
 				break;
 			}
 		}
-		this->param->setValue(this->val);
+		this->param->setValue(newVal);
 		this->updateValue();
+		this->checkForValChange();
+	}
+
+	void checkForValChange(int tries = 0) {
+		double newVal = this->param->getValue();
+		if (newVal != this->val) {
+			this->val = newVal;
+			this->updateValue();
+			return;
+		}
+		++tries;
+		// Some values don't update immediately when they are set. Retry after a
+		// short delay. Unfortunately, we can't use the surface API to be notified
+		// about new values because that only notifies for tracks, not items/takes.
+		if (tries == 10) {
+			// Don't keep retrying forever. If the value hasn't changed by now, it
+			// probably never will.
+			return;
+		}
+		this->valChangeLater = CallLater([this, tries] {
+			this->checkForValChange(tries);
+		}, 30);
 	}
 
 	void onValueEdited() {
@@ -611,6 +633,7 @@ class ParamsDialog {
 	}
 
 	~ParamsDialog() {
+		this->valChangeLater.cancel();
 		plugin_register("-accelerator", &this->accelReg);
 		isParamsDialogOpen = false;
 		// Try to restore focus back to where it was when the dialog was opened.
