@@ -359,32 +359,67 @@ class ParamsDialog {
 
 	void onSliderChange(double newVal) {
 		this->valChangeLater.cancel();
-		if (newVal == this->val
-				|| newVal < this->param->min || newVal > this->param->max) {
-			return;
-		}
 		double step = this->param->step;
-		if (newVal < val) {
+		if (newVal < this->val) {
 			step = -step;
+		}
+		if (step < 0 && newVal < this->param->min) {
+			newVal = this->param->min;
+		} else if (step > 0 && newVal > this->param->max) {
+			newVal = this->param->max;
 		}
 
 		// If the value text (if any) doesn't change, the value change is insignificant.
 		// Snap to the next change in value text.
 		// Continually adding to a float accumulates inaccuracy, so multiply by the
 		// number of steps each iteration instead.
+		const string origText = this->param->getValueText(this->val);
+		const string minText = this->param->getValueText(this->param->min);
+		const string maxText = this->param->getValueText(this->param->max);
+		const bool canOnlyFormatCurrent = !origText.empty() &&
+			// Some parameters return an empty string when you query the formatted text
+			// for a value which isn't the current.
+			(minText.empty() || maxText.empty() ||
+			// Others return the current value's formatted text for all values.
+			(origText == minText && origText == maxText));
+		dbg(
+			"params slider: origVal {} origText '{}' newVal {} step {} "
+			"minText {} maxText {} canOnlyFormatCurrent {}",
+			this->val, origText, newVal, step, minText, maxText, canOnlyFormatCurrent);
+		double tryVal = newVal;
 		for (unsigned int steps = 1;
-			this->param->min <= newVal && newVal <= this->param->max;
-			newVal = this->val + (step * steps++)
+			this->param->min <= tryVal && tryVal <= this->param->max;
+			tryVal = this->val + (step * steps++)
 		) {
-			const string testText = this->param->getValueText(newVal);
+			if (step < 0 && tryVal + step < this->param->min) {
+				// We're less than a step away from the minimum. This could be due to
+				// floating point imprecision. The loop will never hit the minimum, so
+				// ensure we try the minimum here. This can be significant for some
+				// parameters which only accept a value of 0 or 1.
+				tryVal = this->param->min;
+			} else if (step > 0 && tryVal + step > this->param->max) {
+				tryVal = this->param->max;
+			}
+			string testText = this->param->getValueText(tryVal);
+			dbg("params slider: tryVal {} testText '{}'", tryVal, testText);
+			if (canOnlyFormatCurrent) {
+				// To deal with this, we have to set the value before we can format it.
+				this->param->setValue(tryVal);
+				double nowVal = this->param->getValue();
+				testText = this->param->getValueText(nowVal);
+				dbg("params slider: set for format, nowVal {} testText '{}'",
+					nowVal, testText);
+			}
 			if (testText.empty())
 				break; // Formatted values not supported.
-			if (testText.compare(this->valText) != 0) {
+			if (testText != origText) {
 				// The value text is different, so this change is significant.
 				// Snap to this value.
+				newVal = tryVal;
 				break;
 			}
 		}
+		dbg("params slider: final set to {}", newVal);
 		this->param->setValue(newVal);
 		this->updateValue();
 		this->checkForValChange();
@@ -392,6 +427,8 @@ class ParamsDialog {
 
 	void checkForValChange(int tries = 0) {
 		double newVal = this->param->getValue();
+		dbg("params check val: origVal {} newVal {} tries {}",
+			this->val, newVal, tries);
 		if (newVal != this->val) {
 			this->val = newVal;
 			this->updateValue();
