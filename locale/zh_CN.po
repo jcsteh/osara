@@ -11,10 +11,10 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-07-01 20:20\n"
+"PO-Revision-Date: 2026-07-15 19:43\n"
 
 msgid "enabled"
-msgstr "启用"
+msgstr "以启用"
 
 #. A recording mode.
 msgid "disabled"
@@ -31,57 +31,57 @@ msgstr "OSARA: 禁用"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr "您想调整 REAPER 首选项以获得与读屏软件的最佳兼容性吗？选择是将进行以下更改："
+msgstr "您想调整 REAPER 首选项以实现读屏的最佳兼容性吗？选择是将进行以下更改:"
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
-msgstr "1. 媒体资源管理器取消停靠泊坞窗，使其在打开时获得焦点。"
+msgstr "1. 取消停靠媒体资源管理器,确保打开时自动获得焦点."
 
 msgctxt "optimal REAPER configuration"
 msgid "2. Enable closing Media Explorer using the escape key."
-msgstr "2. 启用 ESC 键关闭媒体资源管理器。"
+msgstr "2. 启用 ESC 键 关闭媒体资源管理器."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr "3. 启用旧版文件浏览对话框，以便使用 Tab 键访问“打开”和“另存为”对话框中的 REAPER 特定选项。"
+msgstr "3. 启用旧版文件浏览对话框,以便能用 tab 键切换到打开和另存为对话框中的 REAPER 特定选项."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr "4. 启用空格键可用于各种窗口中的复选框和按钮，这比空格键播放更便捷。"
+msgstr "4. 允许在各个窗口中使用空格键操作复选框和按钮,以免空格键直接播放工程而带来不便."
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr "5. 在 FX 列表中显示文本标签以指示并行、离线和旁通。"
+msgstr "5. 在FX列表中显示并行,离线和旁路状态的文本标签."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
-msgstr "6. 对视频代码编辑器使用标准的、可访问的编辑控件。"
+msgstr "6. 为视频代码编辑器使用标准的,无障碍的编辑控件."
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
-msgstr "7.在FX浏览器中隐藏类型前缀,浏览FX更方便."
+msgstr "7.  在FX 浏览器中隐藏类型前缀,以便更高效的浏览 FX."
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
-msgstr "8. 禁用“MIDI 编辑器”中吸附到可见网格，以便网格移动不取决于水平缩放设置。"
+msgstr "8.  在 MIDI 编辑器中禁用吸附到网格,以便网格移动不依赖于水平缩放设置."
 
 msgctxt "optimal REAPER configuration"
 msgid "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
-msgstr "9. 当键盘焦点在对话框中，使 Ctrl + 空格键播放/停止，需 REAPER 7.41 或更高版本。"
+msgstr "9.  当键盘焦点在对话框中时,使 Control+Space 执行播放/停止,REAPER 7.41 或更高版本需要此设置。"
 
 msgctxt "optimal REAPER configuration"
 msgid "10. Display the file name and then the full path in the Recent Projects menu."
-msgstr "10. 在近期工程菜单中，先显示文件名，再显示完整路径。"
+msgstr "\t10. 在最近使用的工程菜单中显示文件名和完整路径"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
-msgstr "注意：如果现在不便调整 REAPER，您可稍后转到菜单栏中的“扩展”菜单，再转到“OSARA”子菜单来应用这些设置。"
+msgstr "注: 若当前不想调整 REAPER 设置,后续仍可通过菜单栏\"扩展\"菜单中的\"OSARA\"子菜单进行配置."
 
 msgid "Error writing configuration changes."
-msgstr "写入配置更改时发生错误。"
+msgstr "写入配置更改时出错"
 
 msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER 即将退出，请重启 REAPER 以应用更改。"
+msgstr "REAPER 现在将退出.请重启 REAPER 以应用更改"
 
 msgid "Restart REAPER"
 msgstr "重启 REAPER"
@@ -99,16 +99,16 @@ msgid "unmuted"
 msgstr "取消静音"
 
 msgid "soloed"
-msgstr "独奏"
+msgstr "以独奏"
 
 msgid "unsoloed"
 msgstr "取消独奏"
 
 msgid "armed"
-msgstr "录音预备"
+msgstr "录音准备"
 
 msgid "unarmed"
-msgstr "取消录音预备"
+msgstr "取消录音准备"
 
 #. Reported when navigating to the master track.
 msgid "master"
@@ -126,31 +126,31 @@ msgstr "{} 标记"
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 #. used to report an unnamed marker. {} is replaced with the marker number.  
 msgid "marker {}"
-msgstr "标记 {} "
+msgstr "标记 {}"
 
 #. Reported when playback reaches a named region. {} will
 #. be replaced with the region's name; e.g. "intro region".
 #. used when reporting a named region. {} will be
 #. replaced with the name of the region; e.g. "intro region"
 msgid "{} region"
-msgstr "{} 区间"
+msgstr "{} 区域"
 
 #. Reported when playback reaches an unnamed region. {}
 #. will be replaced with the region's number; e.g. "region 2".
 #. used to report an unnamed region. {} is replaced with the region number.  
 #. used to report an unnamed region. {} is replaced with the region number.  
 msgid "region {}"
-msgstr "区间 {} "
+msgstr "区域 {}"
 
 msgid "time selection start"
-msgstr "时间选区开始"
+msgstr "选区开始"
 
 msgid "time selection end"
-msgstr "时间选区结束"
+msgstr "选区结束"
 
 #. A MIDI CC. {control} will be replaced with the control number and name. {value} will be replaced with the value of the control; e.g. "control 70 (Sound Variation), 64"
 msgid "Control {control}, {value}"
-msgstr "控制 {control}, {value}"
+msgstr "Cc {control}, {value}"
 
 #. Reported when removing automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items removed".
@@ -196,10 +196,10 @@ msgid "point {point} value {value} {shape}"
 msgstr "点{point} 值{value} {shape}"
 
 msgid "selected"
-msgstr "选定"
+msgstr "已选择"
 
 msgid "unselected"
-msgstr "未选中"
+msgstr "未选择"
 
 msgid "no take envelopes"
 msgstr "无片段包络"
@@ -216,7 +216,7 @@ msgid "{} envelope"
 msgstr "{} 包络"
 
 msgid "bypassed"
-msgstr "旁通"
+msgstr "旁路"
 
 msgid "Change Automation Item Selection"
 msgstr "更改自动化对象选择"
@@ -236,13 +236,13 @@ msgstr[0] "{} 自动化对象复制"
 #. with the number of points; e.g. "2 envelope points copied".
 msgid "{} envelope point copied"
 msgid_plural "{} envelope points copied"
-msgstr[0] "{} 包络点复制"
+msgstr[0] "{} 包络点以复制"
 
 msgid "no envelopes toggled"
 msgstr "无包络切换"
 
 msgid "showed track {} envelope"
-msgstr "显示 轨道 {} 包络"
+msgstr "显示轨道 {} 包络"
 
 msgid "hid track {} envelope"
 msgstr "隐藏轨道 {} 包络"
@@ -257,15 +257,15 @@ msgstr "隐藏片段 {} 包络"
 #. with the number of points; e.g. "2 points selected".
 msgid "{} point selected"
 msgid_plural "{} points selected"
-msgstr[0] "{} 点选中"
+msgstr[0] "{} 点已选择"
 
 #. Reported when moving items to indicate that no movement
 #. occurred.
 msgid "no change"
-msgstr "无更改"
+msgstr "无变化"
 
 msgid "inserted automation item"
-msgstr "插入自动化对象"
+msgstr "已插入自动化对象"
 
 #. Reported when adding automation items. {} will be
 #. replaced with the number of items; e.g. "2 automation items added".
@@ -279,10 +279,10 @@ msgid "no automation items glued"
 msgstr "无自动化对象黏合"
 
 msgid "glued automation items"
-msgstr "黏合自动化对象"
+msgstr "已黏合自动化对象"
 
 msgid "active"
-msgstr "活跃"
+msgstr "活动"
 
 #. Reported when switching tabs in an effect such as ReaEQ.
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
@@ -295,7 +295,7 @@ msgstr "C"
 
 #. The name of a musical note.
 msgid "c sharp"
-msgstr "升 C"
+msgstr "c sharp"
 
 #. The name of a musical note.
 msgid "d"
@@ -303,7 +303,7 @@ msgstr "D"
 
 #. The name of a musical note.
 msgid "d sharp"
-msgstr "升 D"
+msgstr "d sharp"
 
 #. The name of a musical note.
 msgid "e"
@@ -315,7 +315,7 @@ msgstr "F"
 
 #. The name of a musical note.
 msgid "f sharp"
-msgstr "升 F"
+msgstr "f sharp"
 
 #. The name of a musical note.
 msgid "g"
@@ -323,7 +323,7 @@ msgstr "G"
 
 #. The name of a musical note.
 msgid "g sharp"
-msgstr "升 G"
+msgstr "g sharp"
 
 #. The name of a musical note.
 msgid "a"
@@ -331,7 +331,7 @@ msgstr "A"
 
 #. The name of a musical note.
 msgid "a sharp"
-msgstr "升 A"
+msgstr "a sharp"
 
 #. The name of a musical note.
 msgid "b"
@@ -347,7 +347,7 @@ msgstr[0] "{} 音符"
 #. {} will be replaced by the number of muted notes. E.g. "3 muted"
 msgid "{} muted"
 msgid_plural "{} muted"
-msgstr[0] "{} 静音"
+msgstr[0] "{} 已静音"
 
 msgid "noncontiguous selection"
 msgstr "不连续选择"
@@ -387,7 +387,7 @@ msgstr[0] "{} 事件复制"
 #. {} is replaced by the number of notes. E.g. "4 notes selected"
 msgid "{} note selected"
 msgid_plural "{} notes selected"
-msgstr[0] "{} 音符选中"
+msgstr[0] "{} 音符已选择"
 
 #. Reported when selecting CC events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 CC events selected".
@@ -395,19 +395,19 @@ msgstr[0] "{} 音符选中"
 #. is replaced by the number of events selected.
 msgid "{} CC event selected"
 msgid_plural "{} CC events selected"
-msgstr[0] "{} CC 事件选中"
+msgstr[0] "{} CC 事件已选择"
 
 #. Reported when selecting events in the MIDI editor. {} will be replaced with
 #. the number of events; e.g. "2 events selected".
 msgid "{} event selected"
 msgid_plural "{} events selected"
-msgstr[0] "{} 事件选中"
+msgstr[0] "{} 事件已选择"
 
 #. Used in the MIDI editor when CC events are unselected.  {}
 #. is replaced by the number of events unselected.
 msgid "{} CC event unselected"
 msgid_plural "{} CC events unselected"
-msgstr[0] "{} CC 事件取消选中"
+msgstr[0] "{} CC 事件未选择"
 
 msgid "Bank Select MSB"
 msgstr "音色库选择 MSB"
@@ -494,7 +494,7 @@ msgid "Control 2 LSB"
 msgstr "控制 2 LSB"
 
 msgid "Hold Pedal (on/off)"
-msgstr "保持音踏板 (开/关)"
+msgstr "保持音踏板 (开/ 关)"
 
 msgid "Portamento (on/off)"
 msgstr "滑音 (开/关)"
@@ -628,13 +628,13 @@ msgid "Pitch Bend {}"
 msgstr "弯音 {}"
 
 msgid "Change CC Selection"
-msgstr "更改CC选择"
+msgstr "更改 CC 选择"
 
 msgid "OSARA: Move to next midi item on track"
-msgstr "OSARA: 移到轨道上的下一个 MIDI 对象"
+msgstr "OSARA: 转到当前轨道下一个 midi 对象"
 
 msgid "OSARA: Move to previous midi item on track"
-msgstr "OSARA: 移到轨道上的上一个 MIDI 对象"
+msgstr "OSARA: 转到当前轨道上一个 midi 对象"
 
 #. Used when reporting activation of the next/previous track in
 #. the MIDI editor. {num} will be replaced with the item number. {name} will
@@ -643,13 +643,13 @@ msgid "item {num} {name}"
 msgstr "对象 {num} {name}"
 
 msgid "no time selection"
-msgstr "无时间选区"
+msgstr "无选区"
 
 msgid "no notes selected"
-msgstr "无音符选中"
+msgstr "无音符选择"
 
 msgid "OSARA: Select all notes with the same pitch within time selection"
-msgstr "OSARA: 在时间选区内选择全部相同音高的音符"
+msgstr "OSARA: 从选区开始选择具有相同音高的全部音符"
 
 #. used when splitting notes in the midi editor.
 #. {oldCount} is replaced by the number of notes that were selected
@@ -667,7 +667,7 @@ msgstr[0] "{oldCount} 音符拆分为 {newCount}"
 #. the command. E.g. "2 notes joined into 1"
 msgid "{oldCount} note joined into {newCount}"
 msgid_plural "{oldCount} notes joined into {newCount}"
-msgstr[0] "{oldCount} 音符合并为 {newCount}"
+msgstr[0] "{oldCount} 音符合并到 {newCount}"
 
 msgid "velocity +1"
 msgstr "力度 +1"
@@ -682,7 +682,7 @@ msgid "velocity -10"
 msgstr "力度 -10"
 
 msgid "velocity changed"
-msgstr "力度更改"
+msgstr "力度变化"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. "3
@@ -703,7 +703,7 @@ msgstr[0] "{} 音符缩短像素"
 #. "3 notes lengthened grid unit"
 msgid "{} note lengthened grid unit"
 msgid_plural "{} notes lengthened grid unit"
-msgstr[0] "{} 音符加长网格单位"
+msgstr[0] "{} 音符延长网格单位"
 
 #. Used when changing note length in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
@@ -731,126 +731,126 @@ msgstr[0] "{} 音符连奏"
 #. "3 notes length changed"
 msgid "{} note length changed"
 msgid_plural "{} notes length changed"
-msgstr[0] "{} 音符长度更改"
+msgstr[0] "{} 音符长度已改变"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone up"
 msgid "{} note semitone up"
 msgid_plural "{} notes semitone up"
-msgstr[0] "{} 音符升高半音"
+msgstr[0] "{} 音符向上半音"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone down"
 msgid "{} note semitone down"
 msgid_plural "{} notes semitone down"
-msgstr[0] "{} 音符降低半音"
+msgstr[0] "{} 音符向下半音"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes octave up"
 msgid "{} note octave up"
 msgid_plural "{} notes octave up"
-msgstr[0] "{} 音符升高八度"
+msgstr[0] "{} 音符向上八度"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes octave down"
 msgid "{} note octave down"
 msgid_plural "{} notes octave down"
-msgstr[0] "{} 音符降低八度"
+msgstr[0] "{} 音符向下八度"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone up ignoring scale"
 msgid "{} note semitone up ignoring scale"
 msgid_plural "{} notes semitone up ignoring scale"
-msgstr[0] "{} 升高半音忽略音阶"
+msgstr[0] "{} 音符向上半音忽略音阶"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes semitone down ignoring scale"
 msgid "{} note semitone down ignoring scale"
 msgid_plural "{} notes semitone down ignoring scale"
-msgstr[0] "{} 降低半音忽略音阶"
+msgstr[0] "{} 音符向下半音忽略音阶"
 
 #. Used when changing note pitch in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pitch changed"
 msgid "{} note pitch changed"
 msgid_plural "{} notes pitch changed"
-msgstr[0] "{} 音符音高更改"
+msgstr[0] "{} 音符音高已改变"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
 #. "3 CC events pixel left"
 msgid "{} CC event pixel left"
 msgid_plural "{} CC events pixel left"
-msgstr[0] "{} CC 事件左移像素"
+msgstr[0] "{} CC 事件向左像素"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
 #. "3 CC events pixel right"
 msgid "{} CC event pixel right"
 msgid_plural "{} CC events pixel right"
-msgstr[0] "{} CC 事件右移像素"
+msgstr[0] "{} CC 事件向右像素"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
 #. "3 CC events grid unit left"
 msgid "{} CC event grid unit left"
 msgid_plural "{} CC events grid unit left"
-msgstr[0] "{} CC 事件左移网格"
+msgstr[0] "{} CC 事件向左网格单位"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
 #. "3 CC events grid unit right"
 msgid "{} CC event grid unit right"
 msgid_plural "{} CC events grid unit right"
-msgstr[0] "{} CC 事件右移网格"
+msgstr[0] "{} CC 事件向右网格单位"
 
 #. Used when moving CCs in the MIDI
 #. editor. {} is replaced by the number of CCs, e.g. 
 #. "3 CC events moved"
 msgid "{} CC event moved"
 msgid_plural "{} CC events moved"
-msgstr[0] "{} CC 事件移动"
+msgstr[0] "{} CC 事件已移除"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pixel left"
 msgid "{} note pixel left"
 msgid_plural "{} notes pixel left"
-msgstr[0] "{} 音符左移像素"
+msgstr[0] "{} 音符像左像素"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pixel right"
 msgid "{} note pixel right"
 msgid_plural "{} notes pixel right"
-msgstr[0] "{} 音符右移像素"
+msgstr[0] "{} 音符向右像素"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes grid unit left"
 msgid "{} note grid unit left"
 msgid_plural "{} notes grid unit left"
-msgstr[0] "{} 音符左移网格单位"
+msgstr[0] "{} 音符向左网格单位"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes grid unit right"
 msgid "{} note grid unit right"
 msgid_plural "{} notes grid unit right"
-msgstr[0] "{} 音符右移网格单位"
+msgstr[0] "{} 音符向右网格单位"
 
 #. Used when moving notes in the MIDI
 #. editor. {} is replaced by the number of notes, e.g. 
 #. "3 notes pixel left"
 msgid "{} note start moved"
 msgid_plural "{} notes start moved"
-msgstr[0] "{} 音符起始位置移动"
+msgstr[0] "{} 音符开始移动"
 
 #. Used when MIDI CCs change. {} is replaced by the
 #. number of values changed. E.g. "2 values increased"
@@ -868,66 +868,66 @@ msgstr[0] "{} 值减少"
 #. number of values changed. E.g. "2 values changed"
 msgid "{} value changed"
 msgid_plural "{} values changed"
-msgstr[0] "{} 值更改"
+msgstr[0] "{} 值已改变"
 
 msgid "Enabled MIDI inputs as step input"
-msgstr "启用 MIDI 输入作为步进输入"
+msgstr "已启用所有 MIDI 输入进行步进录制"
 
 msgid "Disabled MIDI inputs as step input"
-msgstr "禁用 MIDI 输入作为步进输入"
+msgstr "已禁用所有 MIDI 输入进行步进录制"
 
 msgid "Enabled  f1-f12 as step input"
-msgstr "启用 F1-F12 作为步进输入"
+msgstr "已启用 F1-F12 进行步进录制"
 
 msgid "Disabled  f1-f12 as step input"
-msgstr "禁用 F1-F12 作为步进输入"
+msgstr "已禁用 F1-F12 进行步进录制"
 
 #. used when reporting the number of muted notes.
 #. {} will be replaced by the number of muted notes. E.g. "3 notes muted"
 msgid "{} note muted"
 msgid_plural "{} notes muted"
-msgstr[0] "{} 音符静音"
+msgstr[0] "{} 音符已静音"
 
 #. used when reporting the number of unmuted notes.
 #. {} will be replaced by the number of notes. E.g. "3 notes unmuted"
 msgid "{} note unmuted"
 msgid_plural "{} notes unmuted"
-msgstr[0] "{} 音符取消静音"
+msgstr[0] "{} 音符已取消静音"
 
 #. used when reporting the number of muted CCs.
 #. {} will be replaced by the number of muted CCs. E.g. "3 CCs muted"
 msgid "{} CC muted"
 msgid_plural "{} CCs muted"
-msgstr[0] "{} CC 静音"
+msgstr[0] "{} CC 已静音"
 
 #. used when reporting the number of unmuted CCs.
 #. {} will be replaced by the number of CCs. E.g. "3 CCs unmuted"
 msgid "{} CC unmuted"
 msgid_plural "{} CCs unmuted"
-msgstr[0] "{} CC 取消静音"
+msgstr[0] "{} CC 已取消静音"
 
 #. used when reporting the number of muted events.
 #. {} will be replaced by the number of muted events. E.g. "3 events muted"
 msgid "{} event muted"
 msgid_plural "{} events muted"
-msgstr[0] "{} 事件静音"
+msgstr[0] "{} 事件已静音"
 
 #. used when reporting the number of unmuted events.
 #. {} will be replaced by the number of events. E.g. "3 events unmuted"
 msgid "{} event unmuted"
 msgid_plural "{} events unmuted"
-msgstr[0] "{} 事件取消静音"
+msgstr[0] "{} 事件已取消静音"
 
 msgid "enabled snap to grid"
-msgstr "启用吸附到网格"
+msgstr "已启用网格吸附"
 
 msgid "disabled snap to grid"
-msgstr "禁用吸附到网格"
+msgstr "已禁用网格吸附"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per beat; e.g. 100 pixels/beat.
 msgid "{} pixels/beat"
-msgstr "{} 像素/拍"
+msgstr "{} 像素/节拍"
 
 #. Reported when zooming in or out horizontally. {} will be
 #. replaced with the number of pixels per second; e.g. 100 pixels/second.
@@ -947,25 +947,25 @@ msgid "off"
 msgstr "关"
 
 msgid "Unrestrict minimum"
-msgstr "取消最小值限制"
+msgstr "取消最小值的限制"
 
 msgid "Restrict minimum to current value"
 msgstr "将最小值限制为当前值"
 
 msgid "Unrestrict maximum"
-msgstr "取消最大值限制"
+msgstr "取消最大值的限制"
 
 msgid "Restrict maximum to current value"
 msgstr "将最大值限制为当前值"
 
 msgid "low shelf"
-msgstr "低频搁架"
+msgstr "低搁架"
 
 msgid "high shelf"
-msgstr "高频搁架"
+msgstr "高搁架"
 
 msgid "band"
-msgstr "频段"
+msgstr "频带"
 
 msgid "low pass"
 msgstr "低通"
@@ -977,7 +977,7 @@ msgid "all pass"
 msgstr "全通"
 
 msgid "notch"
-msgstr "带阻"
+msgstr "陷波"
 
 msgid "band pass"
 msgstr "带通"
@@ -986,34 +986,34 @@ msgid "parallel band pass"
 msgstr "并行带通"
 
 msgid "band (alt)"
-msgstr "频段 (alt)"
+msgstr "钟形 (备用)"
 
 msgid "band (alt 2)"
-msgstr "频段 (alt 2)"
+msgstr "钟形 (备用 2)"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. whether a ReaEQ band is enabled. {} will be replaced with the band
 #. number; e.g. "band 2 enable".
 msgid "Band {} enable"
-msgstr "频段 {} 启用"
+msgstr "频带 {} 启用"
 
 #. A parameter in the FX Parameters dialog which adjusts
 #. the type of a ReaEQ band. {} will be replaced with the band number;
 #. e.g. "band 2 type".
 msgid "Band {} type"
-msgstr "频段 {} 类型"
+msgstr "频带 {} 类型"
 
 msgid "FX Parameters"
 msgstr "FX 参数"
 
 msgid "Go to send destination track"
-msgstr "转到发送目标轨道"
+msgstr "转到发送轨道"
 
 msgid "Delete send"
 msgstr "删除发送"
 
 msgid "Go to receive source track"
-msgstr "转到接收来源轨道"
+msgstr "转到接收轨道"
 
 msgid "Delete receive"
 msgstr "删除接收"
@@ -1030,32 +1030,32 @@ msgstr "无"
 #. Indicates all MIDI channels for a send in the Track
 #. Parameters dialog.
 msgid "all"
-msgstr "全部"
+msgstr "所有"
 
 #. An option in the context menu for the source and
 #. destination audio channel parameters in the OSARA Track Parameters
 #. dialog.
 msgid "Add &2 new channels"
-msgstr "添加 &2 个新通道"
+msgstr "添加&2个新通道"
 
 #. An option in the context menu for the source and
 #. destination audio channel parameters in the OSARA Track Parameters
 #. dialog.
 msgid "Add &4 new channels"
-msgstr "添加 &4 个新通道"
+msgstr "添加&4个新通道"
 
 msgctxt "audio channel"
 msgid "none"
 msgstr "无"
 
 msgid "post-fader"
-msgstr "推子后"
+msgstr "推子-后"
 
 msgid "pre-fx"
-msgstr "FX 前"
+msgstr "推子前 (FX 前)"
 
 msgid "post-fx"
-msgstr "FX 后"
+msgstr "推子前 (FX 后)"
 
 #. Indicates a parameter for a track send in the Track
 #. Parameters dialog. {target} will be replaced by the track number and/or
@@ -1112,16 +1112,16 @@ msgid "mono"
 msgstr "单声道"
 
 msgid "source MIDI channel"
-msgstr "源 MIDI 通道"
+msgstr "来源 MIDI 通道"
 
 msgid "destination MIDI channel"
-msgstr "MIDI 目标通道"
+msgstr "目标 MIDI 通道"
 
 msgid "source audio channel"
-msgstr "音频来源通道"
+msgstr "来源音频通道"
 
 msgid "destination audio channel"
-msgstr "音频目标通道"
+msgstr "目标音频通道"
 
 msgid "send type"
 msgstr "发送类型"
@@ -1150,12 +1150,12 @@ msgstr "对象参数"
 #. In the menu of effects when opening the FX Parameters
 #. dialog, this is presented after effects which are monitoring FX.
 msgid "[monitor]"
-msgstr "【监听】"
+msgstr "[monitor]"
 
 #. In the menu of effects when opening the FX Parameters
 #. dialog, this is presented after effects which are input FX.
 msgid "[input]"
-msgstr "【输入】"
+msgstr "[input]"
 
 msgid "(Container Parameters)"
 msgstr "（容器参数）"
@@ -1168,34 +1168,34 @@ msgid "track"
 msgstr "轨道"
 
 msgid "1st watcher"
-msgstr "第一峰值查看器"
+msgstr "第1监视器"
 
 msgid "2nd watcher"
-msgstr "第二峰值查看器"
+msgstr "第2监视器"
 
 msgid "1st chan"
-msgstr "第一通道"
+msgstr "第1通道"
 
 msgid "2nd chan"
-msgstr "第二通道"
+msgstr "第2通道"
 
 msgid "peak dB"
 msgstr "峰值 dB"
 
 msgid "integrated LUFS"
-msgstr "整体 LUFS"
+msgstr "集成 LUFS"
 
 msgid "momentary LUFS"
 msgstr "瞬时 LUFS"
 
 msgid "short term LUFS"
-msgstr "短时 LUFS"
+msgstr "短期 LUFS"
 
 msgid "loudness range LU"
 msgstr "响度范围 LU"
 
 msgid "integrated RMS"
-msgstr "整体 RMS"
+msgstr "集成 RMS"
 
 msgid "momentary RMS"
 msgstr "瞬时 RMS"
@@ -1204,7 +1204,7 @@ msgid "true peak dBTP"
 msgstr "真实峰值 dBTP"
 
 msgid "gain reduction dB"
-msgstr "增益衰减 dB"
+msgstr "增益减少 dB"
 
 msgid "not configured"
 msgstr "未配置"
@@ -1220,7 +1220,7 @@ msgstr "阈值"
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher value is disabled.
 msgid "watcher disabled"
-msgstr "峰值查看器禁用"
+msgstr "监视器已禁用"
 
 #. Reported when the user resets a Peak Watcher value.
 msgid "reset"
@@ -1228,28 +1228,28 @@ msgstr "重置"
 
 msgctxt "Peak Watcher"
 msgid "Peak Watcher"
-msgstr "峰值查看器"
+msgstr "峰值监视器"
 
 #. Reported when the user tries to report a Peak Watcher
 #. channel, but the Peak Watcher is paused.
 msgid "Peak Watcher paused"
-msgstr "峰值监视器已暂停"
+msgstr "已暂停峰值监视器"
 
 msgid "Peak Watcher does not support the current focus"
-msgstr "峰值查看器不支持当前焦点"
+msgstr "峰值监视器不支持当前焦点"
 
 #. Used when asking which Peak Watcher value to configure.
 #. {} will be replaced with the value number; e.g. "Value &2".
 #. After this, information about the existing configuration for the value
 #. will be appended.
 msgid "paused Peak Watcher"
-msgstr "暂停峰值查看器"
+msgstr "已暂停峰值监视器"
 
 msgid "resumed Peak Watcher"
-msgstr "恢复峰值查看器"
+msgstr "已恢复峰值监视器"
 
 msgid "Peak Watcher not enabled"
-msgstr "峰值查看器未启用"
+msgstr "未启用峰值监视器"
 
 #. Used when reporting a length of time in measures.
 #. {} will be replaced with the number of measures; e.g.
@@ -1261,7 +1261,7 @@ msgstr[0] "{} 小节"
 #. Used when reporting the measure of a time position.
 #. {} will be replaced with the measure number; e.g. "bar 2".
 msgid "bar {}"
-msgstr "{} 节"
+msgstr "{} 小节"
 
 #. Used when reporting a length of time in beats.
 #. {} will be replaced with the number of beats; e.g. "2 beats".
@@ -1306,7 +1306,7 @@ msgstr "{} 秒"
 #. replaced with the number of frames; e.g. "2 frames".
 msgid "{} frame"
 msgid_plural "{} frames"
-msgstr[0] "帧"
+msgstr[0] "{} 帧"
 
 #. used when reporting a time in hours. {} will be replaced
 #. with the number of hours; e.g. "2 hours".
@@ -1322,7 +1322,7 @@ msgstr "{} 采样点"
 #. Used when reporting a time in milliseconds. {} will be
 #. replaced with the number of ms; e.g. "2 ms".
 msgid "{} ms"
-msgstr "{} ms 毫秒"
+msgstr "{} 毫秒"
 
 #. A track which is a nested folder.
 msgid "nested folder"
@@ -1334,11 +1334,11 @@ msgstr "文件夹"
 
 #. A track which ends its folder.
 msgid "end of folder"
-msgstr "文件夹结束"
+msgstr "文件夹尾"
 
 #. An open track folder.
 msgid "open"
-msgstr "开启"
+msgstr "展开"
 
 #. An open (but small visually) track folder.
 msgid "small"
@@ -1346,7 +1346,7 @@ msgstr "小"
 
 #. A closed track folder.
 msgid "closed"
-msgstr "关闭"
+msgstr "折叠"
 
 #. An automation mode.
 msgctxt "automation mode"
@@ -1375,11 +1375,11 @@ msgstr "锁存"
 
 #. An automation mode.
 msgid "latch preview"
-msgstr "锁存预览"
+msgstr "预览锁存"
 
 #. An automation mode.
 msgid "bypass"
-msgstr "旁通"
+msgstr "旁路"
 
 #. An automation mode OSARA doesn't know about.
 #. A recording mode OSARA doesn't know about.
@@ -1392,11 +1392,11 @@ msgstr "输入"
 
 #. A recording mode.
 msgid "output (stereo)"
-msgstr "输出（立体声）"
+msgstr "输出 (立体声)"
 
 #. A recording mode.
 msgid "output (stereo, latency compensated)"
-msgstr "输出（立体声、延迟补偿）"
+msgstr "输出 (立体声,延迟补偿)"
 
 #. A recording mode.
 msgid "output (midi)"
@@ -1404,15 +1404,15 @@ msgstr "输出 (MIDI)"
 
 #. A recording mode.
 msgid "output (mono)"
-msgstr "输出（单声道）"
+msgstr "输出 (单声道)"
 
 #. A recording mode.
 msgid "output (mono, latency compensated)"
-msgstr "输出（单声道、延迟补偿）"
+msgstr "输出 (单声道, 延迟补偿)"
 
 #. A recording mode.
 msgid "midi overdub"
-msgstr "MIDI 叠加"
+msgstr "midi 堆叠"
 
 #. A recording mode.
 msgid "midi replace"
@@ -1420,62 +1420,62 @@ msgstr "MIDI 替换"
 
 #. A recording mode.
 msgid "midi touch-replace"
-msgstr "MIDI 触碰-替换"
+msgstr "MIDI 触碰替换"
 
 #. A recording mode.
 msgid "midi latch-replace"
 msgstr "MIDI 锁存替换"
 
 msgid "volume lead"
-msgstr "音量主导"
+msgstr "音量引导"
 
 msgid "volume follow"
 msgstr "音量跟随"
 
 msgid "VCA lead"
-msgstr "VCA 主导"
+msgstr "VCA 引导"
 
 msgid "VCA follow"
 msgstr "VCA 跟随"
 
 msgid "pan lead"
-msgstr "声像主导"
+msgstr "声像引导"
 
 msgid "pan follow"
 msgstr "声像跟随"
 
 msgid "width lead"
-msgstr "宽度主导"
+msgstr "宽度引导"
 
 msgid "width follow"
 msgstr "宽度跟随"
 
 msgid "mute lead"
-msgstr "静音主导"
+msgstr "静音引导"
 
 msgid "mute follow"
 msgstr "静音跟随"
 
 msgid "solo lead"
-msgstr "独奏主导"
+msgstr "独奏引导"
 
 msgid "solo follow"
-msgstr "独奏跟随"
+msgstr "独奏 跟随"
 
 msgid "record arm lead"
-msgstr "录音预备主导"
+msgstr "录音准备引导"
 
 msgid "record arm follow"
-msgstr "录音预备跟随"
+msgstr "录音准备跟随"
 
 msgid "polarity lead"
-msgstr "极性主导"
+msgstr "极性引导"
 
 msgid "polarity follow"
 msgstr "极性跟随"
 
 msgid "automation mode lead"
-msgstr "自动化模式主导"
+msgstr "自动化模式引导"
 
 msgid "automation mode follow"
 msgstr "自动化模式跟随"
@@ -1490,40 +1490,40 @@ msgid "reverse width"
 msgstr "反向宽度"
 
 msgid "do not lead when following"
-msgstr "跟随时不主导"
+msgstr "跟随时不引导"
 
 msgid "VCA pre-FX follow"
-msgstr "VCA FX 前跟随"
+msgstr "VCA FX-前跟随"
 
 msgid "grid whole"
-msgstr "全音符网格"
+msgstr "整格"
 
 msgid "grid half"
-msgstr "2分网格"
+msgstr "半格"
 
 msgid "grid quarter"
 msgstr "4分网格"
 
 msgid "grid quarter triplet"
-msgstr "4分三连音网格"
+msgstr "4分3连音网格"
 
 msgid "grid eighth"
 msgstr "8分网格"
 
 msgid "grid eighth triplet"
-msgstr "8分三连音网格"
+msgstr "8分3连音网格"
 
 msgid "grid sixteenth"
 msgstr "16分网格"
 
 msgid "grid sixteenth triplet"
-msgstr "16分三连音网格"
+msgstr "16分3连音网格"
 
 msgid "grid thirty second"
 msgstr "32分网格"
 
 msgid "grid thirty second triplet"
-msgstr "32分三连音网格"
+msgstr "32分3连音网格"
 
 msgid "grid sixty fourth"
 msgstr "64分网格"
@@ -1532,13 +1532,13 @@ msgid "grid one hundred twenty eighth"
 msgstr "128分网格"
 
 msgid "grid  unknown"
-msgstr "网格未知"
+msgstr "未知网格"
 
 #. Used when referring to a folder track in a movement message.
 #. {track} will be replaced with the name, number or both of the folder track.
 #. {folderType} will be replaced with "folder" or "nested folder".
 msgid "{track} {folderType}"
-msgstr "{track}{folderType}"
+msgstr "{track} {folderType}"
 
 #. Used to report the folder containing a track after it has moved.
 #. {folder} will be replaced with the name, number or both of the folder.
@@ -1550,13 +1550,13 @@ msgstr "在 {folder} {folderType} 内"
 #. {track} will be replaced with a track reference; e.g. "vocal",
 #. "3", "3 vocal", "drums folder" or "3 drums nested folder".
 msgid "above {track}"
-msgstr "{track} 之上"
+msgstr "上方 {track}"
 
 #. Reported when moving a track downward.
 #. {track} will be replaced with a track reference; e.g. "vocal",
 #. "3", "3 vocal", "drums folder" or "3 drums nested folder".
 msgid "below {track}"
-msgstr "{track} 之下"
+msgstr "下方 {track}"
 
 #. Reported when moving a track upward inside a folder.
 #. {folder} will be replaced with a folder reference; e.g.
@@ -1564,7 +1564,7 @@ msgstr "{track} 之下"
 #. {track} will be replaced with the name, number or both of the nearby track.
 #. e.g. "inside drums folder, below snare" or "inside 3 drums nested folder, below 5"
 msgid "{folder}, below {track}"
-msgstr "{folder}，{track} 之下"
+msgstr "{folder}，下方{track}"
 
 #. Reported when moving a track downward inside a folder.
 #. {folder} will be replaced with a folder reference; e.g.
@@ -1572,23 +1572,23 @@ msgstr "{folder}，{track} 之下"
 #. {track} will be replaced with the name, number or both of the nearby track.
 #. e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
 msgid "{folder}, above {track}"
-msgstr "{folder}，{track} 之上"
+msgstr "{folder}， 上方 {track}"
 
 msgid "defeating solo"
 msgstr "独奏失效"
 
 msgid "phase inverted"
-msgstr "翻转相位"
+msgstr "相位以反转"
 
 msgid "FX bypassed"
-msgstr "FX 旁通"
+msgstr "FX 已旁路"
 
 msgid "frozen"
 msgstr "冻结"
 
 #. Reported when navigating to a track which is grouped.
 msgid "grouped"
-msgstr "编组"
+msgstr "已编组"
 
 #. Reported when navigating to a track which has track notes.
 msgid "notes"
@@ -1597,76 +1597,73 @@ msgstr "备注"
 #. Reported when navigating tracks to indicate how many items
 #. the track has. {} will be replaced by the number of items; e.g.
 #. "2 items".
-#. Reported when items are added. Other things might be added
-#. at the same time (e.g. tracks), so other messages may surround this.
-#. {} will be replaced with the number of items; e.g. "2 items".
 msgid "{} item"
 msgid_plural "{} items"
 msgstr[0] "{} 对象"
 
 msgid "free item positioning"
-msgstr "自由摆放对象位置"
+msgstr "自由对象定位"
 
 #. Reported when navigating tracks before listing the effects on
 #. the track.
 #. Reported when switching takes before listing the effects on
 #. the take.
 msgid "FX:"
-msgstr "FX："
+msgstr "FX:"
 
 msgid "delta"
-msgstr "效果差异"
+msgstr "差异独奏"
 
 msgid "master muted"
-msgstr "主控静音"
+msgstr "主控已静音"
 
 msgid "master unmuted"
-msgstr "主控取消静音"
+msgstr "主控已取消静音"
 
 msgid "no selected tracks"
-msgstr "无选中轨道"
+msgstr "未选择轨道"
 
 #. Reported when multiple tracks are muted. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks muted".
 msgid "{} track muted"
 msgid_plural "{} tracks muted"
-msgstr[0] "{} 轨道静音"
+msgstr[0] "{} 轨道已静音"
 
 #. Reported when multiple tracks are unmuted. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unmuted".
 msgid "{} track unmuted"
 msgid_plural "{} tracks unmuted"
-msgstr[0] "{} 轨道取消静音"
+msgstr[0] "{} 轨道已取消静音"
 
 msgid "master soloed"
-msgstr "主控独奏"
+msgstr "主控已独奏"
 
 msgid "master unsoloed"
-msgstr "主控取消独奏"
+msgstr "主控已取消独奏"
 
 #. Reported when multiple tracks are soloed. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks soloed".
 msgid "{} track soloed"
 msgid_plural "{} tracks soloed"
-msgstr[0] "{} 轨道独奏"
+msgstr[0] "{} 轨道已独奏"
 
 #. Reported when multiple tracks are unsoloed. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unsoloed".
 msgid "{} track unsoloed"
 msgid_plural "{} tracks unsoloed"
-msgstr[0] "{} 轨道取消独奏"
+msgstr[0] "{} 轨道已取消独奏"
 
 #. Reported when multiple tracks are armed. {} will be replaced
 #. with the number of tracks; e.g. "2 tracks armed".
 msgid "{} track armed"
 msgid_plural "{} tracks armed"
-msgstr[0] "{} 轨道录音预备"
+msgstr[0] "{} 轨道已录音准备"
 
 #. Reported when multiple tracks are unarmed. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks unarmed".
 msgid "{} track unarmed"
 msgid_plural "{} tracks unarmed"
-msgstr[0] "{} 轨道取消录音预备"
+msgstr[0] "{} 轨道已取消录音准备"
 
 msgid "record monitor off"
 msgstr "录音监听关"
@@ -1674,20 +1671,20 @@ msgstr "录音监听关"
 #. Record monitor set to normal.
 msgctxt "record monitor"
 msgid "normal"
-msgstr "正常监听"
+msgstr "监听输入"
 
 #. Record monitor set to not when playing.
 msgid "not when playing"
-msgstr "仅输入时监听"
+msgstr "监听输入(磁带自动风格)"
 
 msgid "phase normal"
-msgstr "相位正常"
+msgstr "正常相位"
 
 #. Reported when multiple tracks have phase inverted. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks phase inverted".
 msgid "{} track phase inverted"
 msgid_plural "{} tracks phase inverted"
-msgstr[0] "{} 轨道相位翻转"
+msgstr[0] "{} 轨道相位已反转"
 
 #. Reported when multiple tracks have phase normal. {} will be
 #. replaced with the number of tracks; e.g. "2 tracks phase normal".
@@ -1696,58 +1693,58 @@ msgid_plural "{} tracks phase normal"
 msgstr[0] "{} 轨道相位正常"
 
 msgid "FX active"
-msgstr "FX 活跃"
+msgstr "FX 活动"
 
 msgid "all tracks FX bypassed"
-msgstr "全部轨道 FX 旁通"
+msgstr "所有轨道 FX 已旁路"
 
 msgid "all tracks FX active"
-msgstr "全部轨道 FX 活跃"
+msgstr "所有轨道FX活动"
 
 msgid "enabled delta solo"
-msgstr "启用效果差异独奏"
+msgstr "已启用差异独奏"
 
 msgid "disabled delta solo"
-msgstr "禁用效果差异独奏"
+msgstr "已禁用差异独奏"
 
 #. Used when the start offset for looped or one-shot segment is exactly 0. The audible segment starts from the edit cursor position.
 msgid "start from cursor"
-msgstr "从光标处开始"
+msgstr "从光标开始"
 
 #. Used when the start offset is anything other than 0, could be a positive or negative number measured in milliseconds.
 #. {} will be replaced with a number of milliseconds. E.g., "start offset -100 MS".
 msgid "start offset {} MS"
-msgstr "开始偏移 {}ms"
+msgstr "起始偏移 {} 毫秒"
 
 #. Used when the end offset for looped or one-shot segment is exactly 0. The audible segment ends at the edit cursor position.
 msgid "end at cursor"
-msgstr "在光标处结束"
+msgstr "到光标结束"
 
 #. Used when the end offset is anything other than 0, could be a positive or negative number measured in milliseconds.
 #. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 msgid "end offset {} MS"
-msgstr "结束偏移 {}ms"
+msgstr "结束偏移 {}毫秒"
 
 msgid "no selected items"
-msgstr "无选定对象"
+msgstr "未选择对象"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized to common gain".
 msgid "{} item normalized to common gain"
 msgid_plural "{} items normalized to common gain"
-msgstr[0] "{} 对象标准化到统一增益"
+msgstr[0] "{} 对象已标准化到统一增益"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items un-normalized".
 msgid "{} item un-normalized"
 msgid_plural "{} items un-normalized"
-msgstr[0] "{} 对象取消标准化"
+msgstr[0] "{} 对象已取消标准化"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items normalized".
 msgid "{} item normalized"
 msgid_plural "{} items normalized"
-msgstr[0] "{} 对象标准化"
+msgstr[0] "{} 对象已标准化"
 
 msgid "not a folder"
 msgstr "非文件夹"
@@ -1755,24 +1752,24 @@ msgstr "非文件夹"
 #. Reported when moving to the start of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region start".
 msgid "{} region start"
-msgstr "{} 区间开始"
+msgstr "{} 区域开始"
 
 #. Reported when moving to the start of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 start".
 msgid "region {} start"
-msgstr "区间 {} 开始"
+msgstr "区域 {} 开始"
 
 #. Reported when moving to the end of a named region. {}
 #. will be replaced with the region's name; e.g. "intro region end".
 msgid "{} region end"
-msgstr "{} 区间结束"
+msgstr "{} 区域结束"
 
 #. Reported when moving to the end of an unnamed region.
 #. {} will be replaced with the region's number; e.g.
 #. "region 2 end".
 msgid "region {} end"
-msgstr "区间 {} 结束"
+msgstr "区域 {} 结束"
 
 #. Reported when moving by marker and the cursor lands at the
 #. start of the time selection.
@@ -1799,7 +1796,7 @@ msgstr "轨道"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master"
-msgstr "主控(&M)"
+msgstr "M主控"
 
 msgid "Item"
 msgstr "对象"
@@ -1811,17 +1808,17 @@ msgstr "片段"
 #. "2 items faded in to cursor".
 msgid "{} item faded in to cursor"
 msgid_plural "{} items faded in to cursor"
-msgstr[0] "{} 对象淡入到光标处"
+msgstr[0] "{} 对象淡入到光标"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items faded out from cursor".
 msgid "{} item faded out from cursor"
 msgid_plural "{} items faded out from cursor"
-msgstr[0] "{} 对象从光标处淡出"
+msgstr[0] "{} 对象从光标淡出"
 
 #. Panned to the center.
 msgid "center"
-msgstr "中间"
+msgstr "中心"
 
 #. Panned to the left. {:g} will be replaced with the amount;
 #. e.g. "20% left".
@@ -1834,39 +1831,39 @@ msgid "{:g}% right"
 msgstr "{:g}% 右"
 
 msgid "ripple per-track"
-msgstr "波纹单一轨"
+msgstr "单轨道波纹"
 
 msgid "ripple all tracks"
-msgstr "波纹全部轨"
+msgstr "全轨道波纹"
 
 msgid "ripple off"
-msgstr "波纹关"
+msgstr "关闭波纹"
 
 #. This message will be appended when duplicating, removing or pasting items with ripple per-track  enabled; E.G.
 #. "2 items removed ripple per track is on".
 msgid "ripple per track is on"
-msgstr "波纹单一轨开"
+msgstr "单轨道波纹开"
 
 #. This message will be appended when duplicating, removing or pasting items with  ripple all tracks enabled; E.G.
 #. "1 item added ripple all tracks is on".
 msgid "ripple all tracks is on"
-msgstr "波纹全部轨开"
+msgstr "全轨道波纹开"
 
 #. Reported when auto crossfade and trim content behind media items are both enabled.
 msgid "enabled auto crossfades and trim"
-msgstr "启用自动交叠淡变和修剪"
+msgstr "已启用自动交叉淡化和修剪"
 
 #. Reported when auto crossfade is enabled, trim behind media items is disabled.  
 msgid "crossfading, not trimming"
-msgstr "交叠淡变，不修剪"
+msgstr "交叉淡化,不修剪"
 
 #. Reported when trim content behind media items is enabled, auto crossfade is disabled.
 msgid "trimming, not crossfading"
-msgstr "修剪，不交叠淡变"
+msgstr "修剪,不交叉淡化"
 
 #. Reported when auto crosfade and trim content behind media items are both disabled.
 msgid "disabled auto crossfades and trim"
-msgstr "禁用自动交叠淡变和修剪"
+msgstr "已禁用自动交叉淡化和修剪"
 
 msgid "repeat on"
 msgstr "重复开"
@@ -1878,13 +1875,13 @@ msgid "no takes"
 msgstr "无片段"
 
 msgid "empty take lane"
-msgstr "空片段子轨"
+msgstr "空片段车道"
 
 #. Reported when copying tracks. {} will be replaced with
 #. the number of tracks; e.g. "2 tracks copied".
 msgid "{} track copied"
 msgid_plural "{} tracks copied"
-msgstr[0] "{} 轨道复制"
+msgstr[0] "{} 轨道已复制"
 
 #. Reported when copying items. {} will be replaced with
 #. the number of items; e.g. "2 items copied".
@@ -1894,11 +1891,11 @@ msgstr[0] "{} 对象复制"
 
 #. Reported when copying the content of a time selection to the edit cursor.
 msgid "copied time selection to edit cursor"
-msgstr "复制时间选区到编辑光标"
+msgstr "复制选区到编辑光标"
 
 #. Reported when moving the content of a time selection to edit cursor.
 msgid "moved time selection to edit cursor"
-msgstr "移动时间选区到编辑光标"
+msgstr "移动选区到编辑光标"
 
 #. Reported when moving to a tempo change. {} will be replaced
 #. with the tempo in bpm; e.g. "tempo 100".
@@ -1919,13 +1916,13 @@ msgid "metronome on"
 msgstr "节拍器开"
 
 msgid "metronome off"
-msgstr "节拍器官"
+msgstr "节拍器关"
 
 msgid "master track visible"
-msgstr "主控轨可见"
+msgstr "主控轨道可见"
 
 msgid "master track hidden"
-msgstr "主控轨隐藏"
+msgstr "主控轨道隐藏"
 
 msgid "pause"
 msgstr "暂停"
@@ -1945,7 +1942,7 @@ msgstr "停止"
 #. number of selected items; e.g. "2 items selected".
 msgid "{} item selected"
 msgid_plural "{} items selected"
-msgstr[0] "{} 对象选中"
+msgstr[0] "{} 对象已选择"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items quantized".
@@ -1954,23 +1951,23 @@ msgid_plural "{} items quantized"
 msgstr[0] "{} 对象量化"
 
 msgid "no items selected"
-msgstr "无对象选中"
+msgstr "未选择对象"
 
 #. Reported when moving items up. {} will be replaced by the
 #. number of items; e.g. "2 items moved up".
 msgid "{} item moved up"
 msgid_plural "{} items moved up"
-msgstr[0] "{} 对象上移"
+msgstr[0] "{} 对象已上移"
 
 #. Reported when moving items down. {} will be replaced by the
 #. number of items; e.g. "2 items moved".
 msgid "{} item moved down"
 msgid_plural "{} items moved down"
-msgstr[0] "{} 对象下移"
+msgstr[0] "{} 对象已下移"
 
 #. Reported when prompting for the name of a track.
 msgid "Track name"
-msgstr "轨道名"
+msgstr "轨道名称"
 
 #. Reported when multiple items are muted. {} will be replaced
 #. with the number of items; e.g. "2 items muted".
@@ -2000,47 +1997,47 @@ msgstr[0] "{} 对象取消独奏"
 #. Used when navigating items to indicate that an item is
 #. locked.
 msgid "locked"
-msgstr "锁定"
+msgstr "已锁定"
 
 #. Reported when an action is used to unlock an item.
 msgid "unlocked"
-msgstr "解锁"
+msgstr "已解锁"
 
 #. Reported when multiple items are locked. {} will be replaced
 #. with the number of items; e.g. "2 items locked".
 msgid "{} item locked"
 msgid_plural "{} items locked"
-msgstr[0] "{} 对象锁定"
+msgstr[0] "{} 对象已锁定"
 
 #. Reported when multiple items are unlocked. {} will be
 #. replaced with the number of items; e.g. "2 items unlocked".
 msgid "{} item unlocked"
 msgid_plural "{} items unlocked"
-msgstr[0] "{} 对象解锁"
+msgstr[0] "{} 对象已解锁"
 
 #. Reported when an action is used to enable loop source for an item.
 msgid "enabled loop source"
-msgstr "启用循环源"
+msgstr "已启用循环源"
 
 #. Reported when an action is used to disable loopp source for an item.
 msgid "disabled loop source"
-msgstr "禁用循环源"
+msgstr "已禁用循环源"
 
 #. Reported when loop source is enabled for multiple items. {} will be replaced
 #. with the number of items; e.g. "2 items enabled lloop source".
 msgid "{} item enabled loop source"
 msgid_plural "{} items enabled loop source"
-msgstr[0] "{} 对象起用循环源"
+msgstr[0] "{} 对象已启用循环源"
 
 #. Reported when loop source is disabled for multiple items. {} will be
 #. replaced with the number of items; e.g. "2 items disabled loop source".
 msgid "{} item disabled loop source"
 msgid_plural "{} items disabled loop source"
-msgstr[0] "{} 对象禁用循环源"
+msgstr[0] "{} 对象已禁用循环源"
 
 #. This is reported when users or REAPER automatically selects from the start of project to the cursor.
 msgid "selected from start of project to cursor"
-msgstr "从工程开始选择到光标处"
+msgstr "从工程开始处选择到光标位置"
 
 msgid "set selection end"
 msgstr "设置选区结束"
@@ -2052,22 +2049,22 @@ msgid "master stereo"
 msgstr "主控立体声"
 
 msgid "crossfade on"
-msgstr "交叠淡变开"
+msgstr "交叉淡化开"
 
 msgid "crossfade off"
-msgstr "交叠淡变关"
+msgstr "交叉淡化关"
 
 msgid "trim behind items on"
-msgstr "修剪对象背后开"
+msgstr "修剪对象后开"
 
 msgid "trim behind items off"
-msgstr "修剪对象背后关"
+msgstr "修剪对象后关"
 
 msgid "locking on"
-msgstr "锁定开"
+msgstr "锁定"
 
 msgid "locking off"
-msgstr "锁定关"
+msgstr "解锁"
 
 msgid "solo in front"
 msgstr "独奏在前"
@@ -2082,17 +2079,17 @@ msgid "{} play rate"
 msgstr "{} 播放速率"
 
 msgid "fx active"
-msgstr "FX 活跃"
+msgstr "fx 活动"
 
 #. Record mode set to normal.
 msgid "normal record"
-msgstr "正常录音"
+msgstr "正常录制"
 
 msgid "selected item auto-punch"
-msgstr "选中对象自动穿入穿出"
+msgstr "选择对象自动切录"
 
 msgid "time selection auto-punch"
-msgstr "时间选区自动穿入穿出"
+msgstr "选区自动切录"
 
 #. When changing the global automation override, reported prior
 #. to the chosen automation mode.
@@ -2103,36 +2100,36 @@ msgstr "覆盖"
 #. number of takes; e.g. "2 takes reversed".
 msgid "{} take reversed"
 msgid_plural "{} takes reversed"
-msgstr[0] "{} 片段反转"
+msgstr[0] "{} 片段已反向"
 
 msgid "enabled pre roll before recording"
-msgstr "启用录制前预卷"
+msgstr "已启用录制前的预卷"
 
 msgid "disabled pre roll before recording"
-msgstr "禁用录制前预卷"
+msgstr "已禁用录制前的预卷"
 
 msgid "enabled count in before recording"
-msgstr "启用录制前预示"
+msgstr "已启用录制前的预数拍"
 
 msgid "disabled count in before recording"
-msgstr "禁用录制前预示"
+msgstr "已禁用录制前的预数拍"
 
 #. A take channel mode.
 msgctxt "take channel mode"
 msgid "normal"
-msgstr "正常"
+msgstr "标准"
 
 #. A take channel mode.
 msgid "mono (left)"
-msgstr "单声道（左）"
+msgstr "单声道(左)"
 
 #. A take channel mode.
 msgid "mono (downmix)"
-msgstr "单声道（缩混）"
+msgstr "单声道(缩混)"
 
 #. A take channel mode.
 msgid "mono (right)"
-msgstr "单声道（右）"
+msgstr "单声道(右)"
 
 #. A take channel mode OSARA doesn't know about.
 msgid "unknown mode"
@@ -2144,7 +2141,7 @@ msgstr "未知模式"
 #. For example: "set 2 takes to mono (left)"
 msgid "set {count} take to {mode}"
 msgid_plural "set {count} takes to {mode}"
-msgstr[0] "{count} 片段设为 {mode}"
+msgstr[0] "将 {count} 片段设置为 {mode}"
 
 #. Reported when changing the tempo. {} will be replaced with
 #. the new tempo; e.g. "50 bpm".
@@ -2152,34 +2149,34 @@ msgid "{} bpm"
 msgstr "{} bpm"
 
 msgid "enabled playback position follows project timebase when changing tempo"
-msgstr "启用改变速度时，播放位置跟随工程时基"
+msgstr "以启用更改速度时, 播放位置跟随工程时基"
 
 msgid "disabled playback position follows project timebase when changing tempo"
-msgstr "禁用改变速度时，播放位置跟随工程时基"
+msgstr "以禁用更改速度时, 播放位置跟随工程时基"
 
 msgid "preserving pitch when changing play rate"
-msgstr "改变播放速率时保持音高"
+msgstr "更改播放速率时,保留音高"
 
 msgid "not preserving pitch when changing play rate"
-msgstr "改变播放速率时不保持音高"
+msgstr "更改播放速率时,不保留音高"
 
 #. Reported when setting the ends of multiple items to the end
 #. of their source media. {} will be replaced with the number of items; e.g.
 #. "2 item ends set to source media end"
 msgid "{} item ends set to source media end"
-msgstr "{} 对象结束设为源媒体结束"
+msgstr "{} 对象结束设置为源媒体结束"
 
 #. Reported when setting the end of a single item to its source
 #. media end. {} will be replaced with the end time; e.g.
 #. "item end set to source media end: bar 3 beat 1 25%"
 msgid "item end set to source media end: {}"
-msgstr "对象结束设为源媒体结束：{}"
+msgstr "对象结束设为源媒体结束: {}"
 
 #. Reported when trimming items to selected area. {} will be replaced by the
 #. number of items; e.g. "2 items trimmed".
 msgid "{} item trimmed"
 msgid_plural "{} items trimmed"
-msgstr[0] "{} 对象修剪"
+msgstr[0] "{} 对象已修剪"
 
 #. Reported when moving to a take marker. {} will be
 #. replaced with the name of the marker; e.g. "fix take marker".
@@ -2190,7 +2187,7 @@ msgstr "{} 片段标记"
 #. with the number of tracks; e.g. "2 tracks selected".
 msgid "{} track selected"
 msgid_plural "{} tracks selected"
-msgstr[0] "{} 轨道选中"
+msgstr[0] "{} 轨道已选择"
 
 msgid "not defeating solo"
 msgstr "取消独奏失效"
@@ -2203,19 +2200,19 @@ msgstr "{:g}% 灵敏度"
 #. Reported when changing the transient detection threshold.
 #. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
 msgid "{:g} dB threshold"
-msgstr "{:g} dB 阈值"
+msgstr "{:g} 阈值 dB"
 
 msgid "enabled envelope points move with media items"
-msgstr "启用包络点随媒体对象一起移动"
+msgstr "已启用包络点随媒体对象移动"
 
 msgid "disabled envelope points move with media items"
-msgstr "禁用包络点随媒体对象一起移动"
+msgstr "已禁用包络点随媒体对象移动"
 
 msgid "enabled free item positioning"
-msgstr "启用自由摆放对象位置"
+msgstr "已启用自由对象定位"
 
 msgid "disabled free item positioning"
-msgstr "禁用自由摆放对象位置"
+msgstr "已禁用自由对象定位"
 
 #. Used when changing item rate. {} is replaced by the new rate. E.G. "1.0 item rate"
 msgid "{} item rate"
@@ -2226,22 +2223,22 @@ msgid "{} semitones"
 msgstr "{} 半音"
 
 msgid "enabled preserve pitch when changing item rate"
-msgstr "启用改变对象速率时保持音高"
+msgstr "已启用改变对象速率时,保持音高"
 
 msgid "disabled preserve pitch when changing item rate"
-msgstr "禁用改变对象速率时保持音高"
+msgstr "已禁用改变对象速率时,保持音高"
 
 msgid "minimum vertical zoom"
 msgstr "最小垂直缩放"
 
 msgid "small vertical zoom"
-msgstr "较小垂直缩放"
+msgstr "小垂直缩放"
 
 msgid "medium vertical zoom"
 msgstr "中等垂直缩放"
 
 msgid "large vertical zoom"
-msgstr "较大垂直缩放"
+msgstr "大垂直缩放"
 
 msgid "maximum vertical zoom"
 msgstr "最大垂直缩放"
@@ -2255,13 +2252,13 @@ msgid "recording key map"
 msgstr "录音案件映射"
 
 msgid "main key map"
-msgstr "主要键映射"
+msgstr "主要案键映射"
 
 msgid "default momentary"
-msgstr "默认 临时"
+msgstr "默认瞬时"
 
 msgid "recording key map momentary"
-msgstr "录音键映射 临时"
+msgstr "录音案件瞬时"
 
 #. Reported when using "Main action section: Momentarily
 #. set override to alt-1", etc. {} is replaced with the shortened
@@ -2271,27 +2268,27 @@ msgstr "{} 瞬时"
 
 #. Reported when users run the "Reset all MIDI devices" action.
 msgid "midi devices reset"
-msgstr "MIDI 设备重置"
+msgstr "重置 midi 设备"
 
 #. Reported when users run the "Reset all MIDI control surface devices" action.
 msgid "Control surfaces reset"
-msgstr "控制面重置"
+msgstr "重置控制面"
 
 #. Reported when users run the "Send all-notes-off and all-sounds-off to all MIDI outputs/plug-ins" action.
 msgid "all notes off"
-msgstr "全部音符关"
+msgstr "关闭所有音符"
 
 msgid "Octave up"
-msgstr "升高八度"
+msgstr "向上八度"
 
 msgid "Octave down"
-msgstr "降低八度"
+msgstr "向下八度"
 
 msgid "Increase MIDI channel"
-msgstr "提升 MIDI 通道"
+msgstr "选择上一个 midi 通道"
 
 msgid "Decrease MIDI channel"
-msgstr "降低 MIDI 通道"
+msgstr "选择下一个 midi 通道"
 
 msgid "set selection start"
 msgstr "设置选区开始"
@@ -2303,85 +2300,85 @@ msgid "set loop end"
 msgstr "设置循环结束"
 
 msgid "all tracks unmuted"
-msgstr "全部轨道取消静音"
+msgstr "所有轨道已取消静音"
 
 msgid "all tracks unsoloed"
-msgstr "全部轨道取消独奏"
+msgstr "所有轨道已取消独奏"
 
 msgid "all tracks unarmed"
-msgstr "全部轨道取消录音预备"
+msgstr "所有轨道已取消录音准备"
 
 msgid "all delta solos reset"
-msgstr "全部效果差异独奏重置"
+msgstr "重制所有差异独奏"
 
 msgid "grid sixty forth"
 msgstr "64分网格"
 
 msgid "grid straight"
-msgstr "二等分网格"
+msgstr "平直网格"
 
 msgid "grid dotted"
-msgstr "付点网格"
+msgstr "附点网格"
 
 msgid "grid triplet"
 msgstr "3联音网格"
 
 msgid "length whole"
-msgstr "全音符长度"
+msgstr "全音长度"
 
 msgid "length half"
-msgstr "2分音符长度"
+msgstr "半音长度"
 
 msgid "length thirty second"
-msgstr "32分音符长度"
+msgstr "32分长度"
 
 msgid "length quarter"
-msgstr "4分音符长度"
+msgstr "4分长度"
 
 msgid "length quarter triplet"
-msgstr "4分三连音长度"
+msgstr "4分3连音长度"
 
 msgid "length sixteenth"
-msgstr "16分音符长度"
+msgstr "16分长度"
 
 msgid "length sixteenth triplet"
-msgstr "16分三连音长度"
+msgstr "16分3连音长度"
 
 msgid "length eighth"
-msgstr "8分音符长度"
+msgstr "8分长度"
 
 msgid "length eighth triplet"
-msgstr "8分三连音长度"
+msgstr "8分3连音长度"
 
 msgid "length thirty second triplet"
-msgstr "32分三连音符长度"
+msgstr "32分3连音长度"
 
 msgid "length sixty forth"
-msgstr "64分音符长度"
+msgstr "64分长度"
 
 msgid "length one hundred twenty eighth"
-msgstr "128分音长度"
+msgstr "128分长度"
 
 msgid "length straight"
-msgstr "二等分长度"
+msgstr "平直长度"
 
 msgid "length dotted"
-msgstr "付点长度"
+msgstr "附点长度"
 
 msgid "length triplet"
-msgstr "3联音长度"
+msgstr "三连音长度"
 
 msgid "full screen"
 msgstr "全屏"
 
 msgid "normal screen"
-msgstr "正常屏幕"
+msgstr "默认大小"
 
 msgid "showed Media Explorer"
-msgstr "显示媒体资源管理器"
+msgstr "已显示媒体资源管理器"
 
 msgid "hid Media Explorer"
-msgstr "隐藏媒体资源管理器"
+msgstr "已隐藏媒体资源管理器"
 
 msgid "absolute frames"
 msgstr "绝对帧"
@@ -2390,88 +2387,88 @@ msgid "hours:minutes:seconds:frames"
 msgstr "时:分:秒:帧"
 
 msgid "measures.beats"
-msgstr "小节.节拍"
+msgstr "小节.拍"
 
 msgid "minutes:seconds"
 msgstr "分:秒"
 
 msgid "samples"
-msgstr "采样点"
+msgstr "采样"
 
 msgid "seconds"
 msgstr "秒"
 
 msgid "absolute frames secondary"
-msgstr "绝对帧 辅助"
+msgstr "绝对帧,辅助"
 
 msgid "hours:minutes:seconds:frames secondary"
-msgstr "时:分:秒:帧 辅助"
+msgstr "时:分:秒:帧,辅助"
 
 msgid "minutes:seconds secondary"
-msgstr "分:秒 辅助"
+msgstr "分:秒,辅助"
 
 msgid "no secondary time unit"
 msgstr "无辅助时间单位"
 
 msgid "samples secondary"
-msgstr "采样点 辅助"
+msgstr "采样,辅助"
 
 msgid "seconds secondary"
-msgstr "秒 辅助"
+msgstr "秒,辅助"
 
 msgid "enabled snap"
-msgstr "启用吸附"
+msgstr "已启用吸附"
 
 msgid "disabled snap"
-msgstr "禁用吸附"
+msgstr "已禁用吸附"
 
 msgid "auto playing"
-msgstr "自动播放"
+msgstr "自动播放开"
 
 msgid "not auto playing"
-msgstr "不自动播放"
+msgstr "自动播放关"
 
 msgid "repeating previews"
-msgstr "重复预览"
+msgstr "重复预览开"
 
 msgid "not repeating previews"
-msgstr "不重复预览"
+msgstr "重复预览关"
 
 msgid "starting on bar"
-msgstr "从小节开始"
+msgstr "从小节线开始"
 
 msgid "not starting on bar"
-msgstr "不从小节开始"
+msgstr "不从小节线开始"
 
 msgid "preserving pitch"
-msgstr "保持音高"
+msgstr "保留音高"
 
 msgid "not preserving pitch"
-msgstr "不保持音高"
+msgstr "不保留音高"
 
 msgid "reset pitch"
-msgstr "重置音高"
+msgstr "重制音高"
 
 msgid "tempo matching"
-msgstr "速度匹配"
+msgstr "匹配速度"
 
 msgid "not tempo  matching"
-msgstr "布疋配速度"
+msgstr "不匹配速度"
 
 msgid "half time"
-msgstr "半速"
+msgstr "一半速度"
 
 msgid "normal time"
-msgstr "正常速度"
+msgstr "标准速度"
 
 msgid "double time"
-msgstr "倍速"
+msgstr "两倍速度"
 
 msgid "docked Media Explorer"
-msgstr "停靠媒体资源管理器到泊坞窗"
+msgstr "已停靠媒体资源管理器到博物窗"
 
 msgid "removed Media Explorer from dock"
-msgstr "从泊坞窗移除媒体资源管理器"
+msgstr "已从博物窗移除媒体资源管理器"
 
 msgid "piano roll view"
 msgstr "钢琴卷帘视图"
@@ -2486,7 +2483,7 @@ msgid "notation view"
 msgstr "乐谱视图"
 
 msgid "rectangle notes (normal)"
-msgstr "矩形音符（正常）"
+msgstr "矩形音符(正常)"
 
 msgid "triangle notes"
 msgstr "三角形音符"
@@ -2522,7 +2519,7 @@ msgstr "更改对象选择"
 #. Used when navigating items to indicate that an item is
 #. grouped. {} will be replaced with the group number; e.g. "group 1".
 msgid "group {}"
-msgstr "编组 {}"
+msgstr "组 {}"
 
 #. Used when navigating items to indicate the number of takes, only if there is more than 1 take.
 #. {} will be replaced with the number of takes; e.g. "2 takes".
@@ -2539,111 +2536,108 @@ msgid "-{}"
 msgstr "-{}"
 
 msgid "{} per keypress"
-msgstr "{} 单一按键"
+msgstr "{} 每次案件"
 
 #. Reported when undoing an action. {}
 #. will be replaced with the name of the action; e.g. "undo Remove tracks".
 msgid "undo {}"
-msgstr "撤销 {}"
+msgstr "{} 撤消"
 
 #. Reported when redoing an action. {}
 #. will be replaced with the name of the action; e.g. "redo Remove tracks".
 msgid "redo {}"
-msgstr "重做 {}"
+msgstr "{} 重做"
 
 #. Reported when items are added. {} will be replaced with the
 #. number of items; e.g. "2 items added".
+#. Reported when items are added. {} will be replaced with
+#. the number of items; e.g. "2 items added".
 msgid "{} item added"
 msgid_plural "{} items added"
 msgstr[0] "{} 对象添加"
 
-#. Reported when tracks are added. Other things might be added
-#. at the same time (e.g. items), so other messages may surround this.
-#. {} will be replaced with the number of tracks; e.g. "2 tracks".
-msgid "{} track"
-msgid_plural "{} tracks"
-msgstr[0] "{} 轨道"
-
-#. Reported after the number of tracks and/or items added.
-msgid "added"
-msgstr "添加"
+#. Reported when tracks are added. {} will be replaced with
+#. the number of tracks; e.g. "2 tracks added".
+msgid "{} track added"
+msgid_plural "{} tracks added"
+msgstr[0] "{} 轨道已添加"
 
 #. Reported when envelope points are added. {} will be replaced
 #. with the number of points; e.g. "2 points added".
 msgid "{} point added"
 msgid_plural "{} points added"
-msgstr[0] "{} 点添加"
+msgstr[0] "{} 点已添加"
 
 #. Reported when takes are added to multiple items. {} will be replaced with the
 #. number of takes; e.g. "2 takes added to selected items".
 msgid "{} take added to selected items"
 msgid_plural "{} takes added to selected items"
-msgstr[0] "{} 片段添加到选中的对象"
+msgstr[0] "{} 片段已添加到选择的对象"
 
 #. Reported when takes are added. {} will be replaced with the
 #. number of takes; e.g. "2 takes added".
 msgid "{} take added"
 msgid_plural "{} takes added"
-msgstr[0] "{} 片段添加"
+msgstr[0] "{} 片段已添加"
 
 #. Reported when tracks are removed. {} will be replaced with the
 #. number of tracks; e.g. "2 tracks removed".
 msgid "{} track removed"
 msgid_plural "{} tracks removed"
-msgstr[0] "{} 轨道移除"
+msgstr[0] "{} 轨道已移除"
 
 #. used for  "Item: Copy selected area of items".
 #. {} is replaced by the number of items affected.
 msgid "selected area of {} item copied"
 msgid_plural "selected area of {} items copied"
-msgstr[0] "{} 对象中的选中区域复制"
+msgstr[0] "选区的 {} 对象已复制"
 
 #. used for  "Item: Copy loop of selected area of audio items".
 #. {} is replaced by the number of items affected.
 msgid "loop of selected area of {} item copied"
 msgid_plural "loop of selected area of {} items copied"
-msgstr[0] "{} 对象选中区域的循环复制"
+msgstr[0] "选区的 {} 循环对象已复制"
 
 #. used for  "Item: Duplicate selected area of items".
 #. {} is replaced by the number of items affected.
 msgid "selected area of {} item duplicated"
 msgid_plural "selected area of {} items duplicated"
-msgstr[0] "{} 对象中的选中区域克隆"
+msgstr[0] "{}对象的选区已克隆"
 
 #. used for  "Item: Cut selected area of items" and "Item:
 #. Remove selected area of items".  {} is replaced by the number of items
 #. affected.
 msgid "selected area of {} item removed"
 msgid_plural "selected area of {} items removed"
-msgstr[0] "{} 对象中的选中区域移除"
+msgstr[0] "选区的 {} 对象已移除"
 
 #. Reported when items are removed. {} will be replaced with the
 #. number of items; e.g. "2 items removed".
 msgid "{} item removed"
 msgid_plural "{} items removed"
-msgstr[0] "{} 对象移除"
+msgstr[0] "{} 对象已移除"
 
 #. Reported when cropped to active take on  multiple items. {} will be replaced with the
 #. number of items; e.g. "2 items cropped to active take".
 msgid "{} item cropped to active take"
 msgid_plural "{} items cropped to active take"
-msgstr[0] "{} 对象裁减到活跃片段"
+msgstr[0] "{} 对象裁剪到活动片段"
 
 msgid "no takes removed"
-msgstr "无片段移除"
+msgstr "无片段被移除"
 
 #. Reported when healing was not possible.
 msgid "nothing healed"
-msgstr "无内容愈合"
+msgstr "无修复"
 
 #. Reported when splits in items are healed. {} will be replaced with the
 #. number of splits that have been successfully healed; e.g. "2 splits healed".
 msgid "{} split healed"
 msgid_plural "{} splits healed"
-msgstr[0] "{} 分割愈合"
+msgstr[0] "{} 分割已修复"
 
 msgid "contents of time selection removed"
-msgstr "时间选区的内容移除"
+msgstr "选区的内容已移除"
 
 msgid "start"
 msgstr "开始"
@@ -2654,23 +2648,23 @@ msgstr "结束"
 #. used when reporting a named marker has been moved. {} will be
 #. replaced with the name of the marker; e.g. "v2 marker moved"
 msgid "{} marker moved"
-msgstr "{} 标记移动"
+msgstr "{} 标记已移动"
 
 #. Reports an unnamed marker has been inserted. {} is replaced with the marker number.
 #. Reported when inserting a marker. {} will be replaced with the
 #. number of the new marker; e.g. "marker 2 inserted".
 msgid "marker {} inserted"
-msgstr "标记 {} 插入"
+msgstr "标记 {} 已插入"
 
 #. used to report an unnamed marker has been moved. {} is replaced with the marker number.  
 msgid "marker {} moved"
-msgstr "标记 {} 移动"
+msgstr "标记 {} 已移动"
 
 msgid "marker deleted"
 msgstr "标记已删除"
 
 msgid "region deleted"
-msgstr "区间已删除"
+msgstr "区域已删除"
 
 msgid "time signature deleted"
 msgstr "拍号已删除"
@@ -2679,13 +2673,13 @@ msgid "stretch marker deleted"
 msgstr "拉伸标记已删除"
 
 msgid "cleared time/loop selection"
-msgstr "清除时间/循环选区"
+msgstr "已清除时间/循环选区"
 
 msgid "unselected tracks/items/envelope points"
-msgstr "取消选中轨道/对象/包络点"
+msgstr "已取消选择轨道/对象/包络点"
 
 msgid "OSARA: Select items under edit cursor on selected tracks"
-msgstr "OSARA: 选择所选轨道上编辑光标处的对象"
+msgstr "OSARA: 选择已选中轨道上编辑光标下方的对象"
 
 #. Reported when switching to a project tab containing an
 #. unsaved project.
@@ -2705,25 +2699,25 @@ msgid "none"
 msgstr "无"
 
 msgid "Muted"
-msgstr "静音"
+msgstr "已静音"
 
 msgid "Soloed"
-msgstr "独奏"
+msgstr "已独奏"
 
 msgid "Armed"
-msgstr "录音预备"
+msgstr "已录音准备"
 
 msgid "Monitored"
-msgstr "监听"
+msgstr "已监听"
 
 msgid "Phase inverted"
-msgstr "相位翻转"
+msgstr "相位已反转"
 
 msgid "Frozen"
 msgstr "冻结"
 
 msgid "Time selection:"
-msgstr "时间选区："
+msgstr "时间选区:"
 
 #. Used when reporting the time selection. {} will be
 #. replaced with the start time; e.g. "start bar 2 beat 1 0%".
@@ -2745,10 +2739,10 @@ msgid "none"
 msgstr "无"
 
 msgid "Selected tracks:"
-msgstr "所选轨道："
+msgstr "已选择的轨道:"
 
 msgid "Selected items:"
-msgstr "所选对象："
+msgstr "已选择的对象:"
 
 msgctxt "item selection"
 msgid "none"
@@ -2758,7 +2752,7 @@ msgstr "无"
 #. been made in the MIDI Editor when pressing OSARA's report selection
 #. action twice.
 msgid "MIDI Editor selection:"
-msgstr "MIDI 编辑器所选："
+msgstr "MIDI 编辑器选择"
 
 msgctxt "MIDI Editor selection"
 msgid "none"
@@ -2779,79 +2773,79 @@ msgstr "选择"
 #. the number of markers; e.g. "2 take markers deleted".
 msgid "take marker deleted"
 msgid_plural "{} take markers deleted"
-msgstr[0] "片段标记删除"
+msgstr[0] "{} 片段标记已删除"
 
 msgid "shortcut help off"
-msgstr "热键帮助关"
+msgstr "快捷键帮助关"
 
 msgid "resumed MIDI step input"
-msgstr "恢复 MIDI 步进输入"
+msgstr "已恢复 MIDI 步进输入"
 
 msgid "shortcut help on"
-msgstr "热键帮助开"
+msgstr "快捷键帮助开"
 
 msgid "paused MIDI step input"
-msgstr "暂停 MIDI 步进输入"
+msgstr "已暂停 MIDI 步进输入"
 
 msgid "paused"
-msgstr "暂停"
+msgstr "已暂停"
 
 msgid "recording"
-msgstr "录音"
+msgstr "录音中"
 
 msgid "playing"
-msgstr "播放"
+msgstr "播放中"
 
 msgid "stopped"
-msgstr "停止"
+msgstr "已停止"
 
 #. Reported when the cursor is before the first marker in the
 #. project. {} will be replaced with the marker's name or number; e.g.
 #. "before marker intro".
 msgid "before marker {}"
-msgstr "{} 标记前"
+msgstr "在标记 {} 左边"
 
 #. Reported when the cursor is right at a marker. {} will be
 #. replaced with the marker's name or number; e.g. "at marker intro".
 msgid "at marker {}"
-msgstr "{} 标记处"
+msgstr "在标记 {}"
 
 #. Reported when the cursor is between two markers. {before}
 #. will be replaced with the name or number of the marker before the
 #. cursor. {after} will be replaced with the name or number of the marker
 #. after the cursor. For example: "between markers intro, verse 1".
 msgid "between markers {before}, {after}"
-msgstr "{before}、{after} 标记间"
+msgstr "在标记 {before}, {after} 之间"
 
 #. Reported when the cursor is after the last marker in the
 #. project. {} will be replaced with the marker's name or number; e.g.
 #. "after marker outro".
 msgid "after marker {}"
-msgstr "{} 标记后"
+msgstr "在标记 {} 右边"
 
 #. Reported when the cursor is inside a region. {} will be
 #. replaced with the region's name or number; e.g. "in region intro".
 msgid "in region {}"
-msgstr "{} 区间内"
+msgstr "在区域 {}"
 
 #. Reported when the cursor is before the first region in the
 #. project. {} will be replaced with the region's name or number; e.g.
 #. "before region intro".
 msgid "before region {}"
-msgstr "{} 区间前"
+msgstr "在区域 {} 左边"
 
 #. Reported when the cursor is after the last region in the
 #. project. {} will be replaced with the region's name or number; e.g.
 #. "before region intro".
 msgid "after region {}"
-msgstr "{} 区间后"
+msgstr "在区域 {} 右边"
 
 #. Reported when the cursor is between two regions. {before}
 #. will be replaced with the name or number of the region before the
 #. cursor. {after} will be replaced with the name or number of the region
 #. after the cursor. For example: "between regions intro, verse 1".
 msgid "between regions {before}, {after}"
-msgstr "{before}、{after}区间之间"
+msgstr "在 {before}、{after} 区域之间"
 
 #. Reports the number of takes contained within the last touched item.
 #. {} will be replaced with the number; e.g. "1 take", or "2 takes".
@@ -2860,48 +2854,48 @@ msgid_plural "{} takes"
 msgstr[0] "{} 片段"
 
 msgid "Move stretch marker"
-msgstr "移除拉伸标记"
+msgstr "移动拉伸标记"
 
 msgid "stretch marker moved"
-msgstr "拉伸标记移动"
+msgstr "拉伸标记已移动"
 
 msgid "Delete all time signature markers"
-msgstr "删除全部拍号标记"
+msgstr "删除所有拍号标记"
 
 msgid "deleted all time signature markers"
-msgstr "全部拍号标记删除"
+msgstr "已删除所有拍号标记"
 
 #. Used to report global automation override mode.  {} is
 #. replaced with the mode; e.g. "Global automation override latch
 #. preview"
 msgid "global automation override {}"
-msgstr "全局自动化覆盖 {}"
+msgstr "{} 全局自动化覆盖"
 
 #. Used to report track automation override mode.  {} is
 #. replaced with the mode; e.g. "track automation override latch
 #. preview"
 msgid "track automation mode {}"
-msgstr "轨道自动化模式 {}"
+msgstr "{} 轨道自动化模式"
 
 msgid "global automation override off"
-msgstr "全局自动化覆盖关"
+msgstr "关闭全局自动化覆盖"
 
 msgid "global automation override latch preview"
-msgstr "全局自动化覆盖锁存预览"
+msgstr "锁存器预览，全局自动化覆盖"
 
 #. Report the track automation mode. {} is replaced with the
 #. automation mode; e.g. "automation mode trim/read for selected tracks"
 msgid "{} automation mode for selected tracks"
-msgstr "所选轨道的自动化模式{}"
+msgstr "{} 已选择轨道的自动化模式"
 
 #. OSARA's full name presented in the About dialog.
 msgid "OSARA: Open Source Accessibility for the REAPER Application"
-msgstr "OSARA: REAPER 应用程序的开源可访问性"
+msgstr "OSARA: reaper应用程序的开源可访问性"
 
 #. osara version. {} is replaced with the version; e.g.
 #. "Version: 2021.1pre-588,0531135a"
 msgid "Version: {}"
-msgstr "版本： {}"
+msgstr "版本: {}"
 
 msgid "About OSARA"
 msgstr "关於 OSARA"
@@ -2909,68 +2903,68 @@ msgstr "关於 OSARA"
 #. Reported when inserting a region. {} will be replaced with the
 #. number of the new region; e.g. "region 2 inserted".
 msgid "region {} inserted"
-msgstr "区间 {} 插入"
+msgstr "区域 {} 已插入"
 
 #. Reported when adding items to a group. {count} will be
 #. replaced with the number of items. {group} will be replaced with the
 #. group number. For example: "2 items added to group 1".
 msgid "item added to group {group}"
 msgid_plural "{count} items added to group {group}"
-msgstr[0] "对象添加到编组{group}"
+msgstr[0] "{count} 对象已添加到编组 {group}"
 
 #. Reported when removing items from a group. {count} will be
 #. replaced with the number of items. {group} will be replaced with the group
 #. number. For example: "2 items removed from group 1".
 msgid "item removed from group {group}"
 msgid_plural "{count} items removed from group {group}"
-msgstr[0] "对象从编组 {group} 移除"
+msgstr[0] "对象已从编组移除 {group}"
 
 msgid "track not grouped"
-msgstr "轨道未编组"
+msgstr "轨道未分组"
 
 #. Reported when switching to looped segment scrub style.
 msgid "looped segment"
-msgstr "循环区段"
+msgstr "循环分段"
 
 #. Reported when switching to one-shot scrub style.
 msgid "one shot"
-msgstr "单次擦带"
+msgstr "触发一次"
 
 #. Reported when using REAPER's default scrub style, IE when looped segment and one-shot are disabled.
 msgid "tape scrub"
-msgstr "磁带擦带"
+msgstr "磁带擦洗"
 
 #. The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 msgid "At Current Position"
-msgstr "在当前位置"
+msgstr "当前位置"
 
 #. This is reported when users select from cursor to the start of project.
 msgid "selected to start of project"
-msgstr "选中到工程开始"
+msgstr "选区到工程开始"
 
 msgid "selected to end of project"
-msgstr "选中到工程结束"
+msgstr "选区到工程结束"
 
 msgid "phase normal all tracks"
-msgstr "全不轨到相位正常"
+msgstr "所有轨道相位正常"
 
 msgid "unmonitored all tracks"
-msgstr "取消监听全部轨道"
+msgstr "取消监听所有轨道"
 
 #. {} will be replaced with the number of items; e.g.
 #. "2 items fit to time selection".
 msgid "{} item fit to time selection"
 msgid_plural "{} items fit to time selection"
-msgstr[0] "{} 对象适配到时间选区"
+msgstr[0] "{} 对象适应时间选区"
 
 msgid "showed video window"
-msgstr "显示视频窗口"
+msgstr "已显示视频窗口"
 
 msgid "hid video window"
 msgstr "隐藏视频窗口"
 
 msgid "master track cannot be moved"
-msgstr "主控轨不可移动"
+msgstr "主控轨不能移动"
 
 #. Reported when trying to move a track up when it is
 #. already at the top of the track list.
@@ -2987,23 +2981,23 @@ msgstr "轨道列表底部"
 #. "3", "3 vocal", "drums folder" or "3 drums nested folder".
 #. For example: "top of track list, above 3 drums nested folder".
 msgid "top of track list, above {track}"
-msgstr "{track} 之上，轨道列表顶部"
+msgstr "{track} 之上,轨道列表顶部"
 
 #. Reported when moving a track to the bottom of the track list.
 #. {track} will be replaced with a track reference; e.g. "vocal",
 #. "3", "3 vocal", "drums folder" or "3 drums nested folder".
 #. For example: "bottom of track list, below 3 drums nested folder".
 msgid "bottom of track list, below {track}"
-msgstr "{track} 之下，轨道列表底部"
+msgstr "{track} 之下,轨道列表底部"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Master mix"
-msgstr "主控混音(&M)"
+msgstr "M主控混合"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Time &selection"
-msgstr "时间选区：(&S)"
+msgstr "选区 (&S)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Tracks"
@@ -3011,15 +3005,15 @@ msgstr "轨道(&T)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Selected &tracks"
-msgstr "所选轨道(&T)"
+msgstr "已选择的轨道(&T)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "&Mono summed selected tracks"
-msgstr "所选轨道单声道混合(&M)"
+msgstr "已选择的轨道,单声道混合(&M)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Mono summed time selection"
-msgstr "时间选区单声道混合(&N)"
+msgstr "选区,单声道混合(&N)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Items"
@@ -3027,7 +3021,7 @@ msgstr "对象(&I)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Selected &items"
-msgstr "所选对象(&I)"
+msgstr "已选择的对象(&I)"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Include track/take &FX and settings"
@@ -3035,7 +3029,7 @@ msgstr "包括轨道/对象上的 &FX 和设置"
 
 #. An entry in OSARA's context menu for analyzing loudness statistics.
 msgid "Dry run project using the most recent render settings"
-msgstr "使用最新渲染设置进行工程试运行(&D)"
+msgstr "使用最新渲染设置进行工程模拟渲染(&D)"
 
 msgid "OSARA: Move to next item (leaving other items selected)"
 msgstr "OSARA: 移到下一对象(保留其它选择对象)"
@@ -3047,100 +3041,100 @@ msgid "OSARA: View properties for current media item/take/automation item (depen
 msgstr "OSARA: 查看当前媒体对象/片段/自动化对象的属性(取决于焦点)"
 
 msgid "OSARA: View parameters for current track/item/FX (depending on focus)"
-msgstr "OSARA: 查看当前轨道/对象/FX 的参数（取决于焦点）"
+msgstr "OSARA: 查看当前轨道/对象/FX 参数(取决于焦点)"
 
 msgid "OSARA: View FX parameters for current track/take (depending on focus)"
 msgstr "OSARA: 查看当前轨/片段的FX参数(取决于焦点)"
 
 msgid "OSARA: View FX parameters for master track"
-msgstr "OSARA: 查看主控轨的 FX 参数"
+msgstr "OSARA: 查看主控轨道的 FX 参数"
 
 msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
-msgstr "OSARA: 配置当前轨道/轨道 FX 的峰值查看器（取决于焦点）"
+msgstr "OSARA: 为当前轨道/轨道 FX 配置峰值监视器(取决于焦点)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
-msgstr "OSARA: 报告第一峰值查看器第一通道的峰值"
+msgstr "OSARA: 朗读第1监视器第1通道的峰值"
 
 msgid "OSARA: Report Peak Watcher value for first watcher second channel"
-msgstr "OSARA: 报告第一峰值查看器第二通道的峰值"
+msgstr "OSARA: 朗读第1监视器第2通道的峰值"
 
 msgid "OSARA: Report Peak Watcher value for second watcher first channel"
-msgstr "OSARA: 报告第二峰值查看器第一通道的峰值"
+msgstr "OSARA: 朗读第2监视器第1通道的峰值"
 
 msgid "OSARA: Report Peak Watcher value for second watcher second channel"
-msgstr "OSARA: 报告第二峰值查看器第二通道的峰值"
+msgstr "OSARA: 朗读第2监视器第2通道的峰值"
 
 msgid "OSARA: Reset Peak Watcher first watcher"
-msgstr "OSARA: 重置第一峰值查看器"
+msgstr "OSARA: 重置第1峰值监视器"
 
 msgid "OSARA: Reset Peak Watcher second watcher"
-msgstr "OSARA: 重置第二峰值查看器"
+msgstr "OSARA: 重置第2峰值监视器"
 
 msgid "OSARA: Pause/resume Peak Watcher"
-msgstr "OSARA: 暂停/恢复峰值查看器"
+msgstr "OSARA: 暂停/恢复峰值监视器"
 
 msgid "OSARA: Report ripple editing mode"
-msgstr "OSARA: 报告波纹编辑模式"
+msgstr "OSARA: 朗读波纹编辑模式"
 
 msgid "OSARA: Report muted tracks"
-msgstr "OSARA: 报告静音轨"
+msgstr "OSARA: 朗读静音轨道"
 
 msgid "OSARA: Report soloed tracks"
-msgstr "OSARA: 报告独奏的轨道"
+msgstr "OSARA: 朗读独奏轨道"
 
 msgid "OSARA: Report record armed tracks"
-msgstr "OSARA: 报告录音预备的轨道"
+msgstr "OSARA: 朗读录音准备轨道"
 
 msgid "OSARA: Report tracks with record monitor on"
-msgstr "OSARA: 报告监听的轨道"
+msgstr "OSARA: 朗读录音监听轨道"
 
 msgid "OSARA: Report tracks with phase inverted"
-msgstr "OSARA: 报告相位翻转的轨道"
+msgstr "OSARA: 朗读相位反转轨道"
 
 msgid "OSARA: Report frozen tracks"
-msgstr "OSARA: 报告冻结的轨道"
+msgstr "OSARA: 朗读冻结轨道"
 
 msgid "OSARA: Report track/item/time/MIDI selection (depending on focus)"
-msgstr "OSARA: 报告轨道/对象/时间/MIDI 选择（取决于焦点）"
+msgstr "OSARA： 朗读轨道/对象/时间/MIDI 选择(取决于焦点)"
 
 msgid "OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)"
 msgstr "OSARA: 移除对象/轨道/时间选区的内容/标记/包络点(取决于焦点)"
 
 msgid "OSARA: Toggle shortcut help"
-msgstr "OSARA: 切换快捷方式帮助"
+msgstr "OSARA: 切换快捷键帮助"
 
 msgid "OSARA: Report edit/play cursor position, transport state and nearest markers and regions"
-msgstr "OSARA: 报告编辑/播放光标位置、走带状态以及最近的标记和区间"
+msgstr "OSARA: 朗读编辑/播放光标位置,走带状态,以及附近的标记和区域"
 
 msgid "OSARA: Report number of takes in last touched item"
-msgstr "OSARA: 报告最後触碰对象的片段数量"
+msgstr "OSARA: 朗读最后触碰对象的片段数量"
 
 msgid "OSARA: Report length of last touched item"
-msgstr "OSARA: 报告最后触碰对象的长度"
+msgstr "OSARA: 朗读最后触碰对象的长度"
 
 msgid "OSARA: Report project length"
-msgstr "OSARA: 报告工程长度"
+msgstr "OSARA: 朗读工程长度"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current track/item (depending on focus)"
-msgstr "OSARA: 启用不连续选择/切换当前轨/对象的选择(取决于焦点)"
+msgstr "OSARA: 启用不连续选择/切换当前轨道/对象的选择(取决于焦点)"
 
 msgid "OSARA: Move last focused stretch marker to current edit cursor position"
 msgstr "OSARA: 将最后一个聚焦的拉伸标记移动到当前编辑光标位置"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: 报告当前轨通道 1 播放光标处的峰值 dB 电平（录音预备时报告输入电平）"
+msgstr "OSARA: 朗读当前轨道通道 1 播放光标处的电平峰值 dB (当轨道处于录音准备时,朗读输入电平)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of current track (reports input level instead when track is armed)"
-msgstr "OSARA: 报告当前轨通道 2 播放光标处的峰值 dB 电平（录音预备时报告输入电平）"
+msgstr "OSARA: 朗读当前轨道通道 2 播放光标处的电平峰值 dB (当轨道处于录音准备时,朗读输入电平)"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 1 of master track"
-msgstr "OSARA: 报告主控轨通道 1 播放光标处的峰值 dB 电平"
+msgstr "OSARA: 朗读主控轨道通道 1 播放光标处的峰值 dB 电平"
 
 msgid "OSARA: Report level in peak dB at play cursor for channel 2 of master track"
-msgstr "OSARA: 报告主控轨通道 2 播放光标处的峰值 dB 电平"
+msgstr "OSARA: 朗读主控轨道通道 2 播放光标处的峰值 dB 电平"
 
 msgid "OSARA: Delete all time signature markers"
-msgstr "OSARA: 删除全部拍号标记"
+msgstr "OSARA: 删除所有拍号标记"
 
 msgid "OSARA: Select next track/take envelope (depending on focus)"
 msgstr "OSARA: 选择下一条轨道/片段包络(取决于焦点)"
@@ -3149,16 +3143,16 @@ msgid "OSARA: Select previous track/take envelope (depending on focus)"
 msgstr "OSARA: 选择上一条轨道/片段包络(取决于焦点)"
 
 msgid "OSARA: Move to next envelope point"
-msgstr "OSARA: 移到下一包络点"
+msgstr "OSARA: 移到下一个包络点"
 
 msgid "OSARA: Move to previous envelope point"
-msgstr "OSARA: 移到上一包络点"
+msgstr "OSARA: 移到上一个包络点"
 
 msgid "OSARA: Move to next envelope point (leaving other points selected)"
-msgstr "OSARA: 移到下一包络点(保持其它选择的点)"
+msgstr "OSARA: 移到下一个包络点(保持其它选择的点)"
 
 msgid "OSARA: Move to previous envelope point (leaving other points selected)"
-msgstr "OSARA: 移到上一包络点(保持其它选择的点)"
+msgstr "OSARA: 移到上一个包络点(保持其它选择的点)"
 
 msgid "OSARA: Move to next transient"
 msgstr "OSARA: 移到下一个瞬态"
@@ -3167,79 +3161,79 @@ msgid "OSARA: Move to previous transient"
 msgstr "OSARA: 移到上一个瞬态"
 
 msgid "OSARA: Show first context menu (depending on focus)"
-msgstr "OSARA: 显示第一个上下文菜单（取决于焦点）"
+msgstr "OSARA: 显示第1个上下文菜单(取决于焦点)"
 
 msgid "OSARA: Show second context menu (depending on focus)"
-msgstr "OSARA: 显示第二个上下文菜单（取决于焦点）"
+msgstr "OSARA: 显示第二个上下文菜单(取决于焦点)"
 
 msgid "OSARA: Show third context menu (depending on focus)"
-msgstr "OSARA: 显示第三个上下文菜单（取决于焦点）"
+msgstr "OSARA: 显示第三个上下文菜单(取决于焦点)"
 
 msgid "OSARA: Cycle through midi recording modes of selected tracks"
-msgstr "OSARA: 轮换所选轨道的 MIDI 录制模式"
+msgstr "OSARA: 循环切换选择轨道的 midi 录制模式"
 
 msgid "OSARA: Configuration"
 msgstr "OSARA: 配置"
 
 msgid "OSARA: Report global / Track Automation Mode"
-msgstr "OSARA: 报告全局/轨道自动化模式"
+msgstr "OSARA: 朗读全局/轨道自动化模式"
 
 msgid "OSARA: Toggle global automation override between latch preview and off"
-msgstr "OSARA: 在锁定预览和关闭之间切换全局自动化覆盖"
+msgstr "OSARA: 在锁存器预览和关闭之间切换全局自动化覆盖"
 
 msgid "OSARA: Cycle automation mode of selected tracks"
-msgstr "OSARA: 轮换所选轨道的自动化模式"
+msgstr "OSARA: 循环切换选择轨道的自动化模式"
 
 msgid "OSARA: About"
 msgstr "OSARA: 关于"
 
 msgid "OSARA: Report groups for current track"
-msgstr "OSARA: 报告当前轨道的编组"
+msgstr "OSARA: 朗读当前轨道的分组"
 
 msgid "OSARA: Mute next message from OSARA"
-msgstr "OSARA: 静音下一条 OSARA 消息"
+msgstr "OSARA: 将 OSARA 的下一条消息静音"
 
 msgid "OSARA: Report regions, last project marker and items on selected tracks at current position"
-msgstr "OSARA: 报告当前位置的区间、最后的工程标记和所选轨上的对象"
+msgstr "OSARA: 朗读光标位置所在的区域,左边的工程标记和选择轨道的对象"
 
 msgid "OSARA: Go to first track"
-msgstr "OSARA: 转道第一条轨道"
+msgstr "OSARA: 转到第一轨道"
 
 msgid "OSARA: Go to last track"
-msgstr "OSARA: 转道最後一条轨道"
+msgstr "OSARA: 转到最后一轨道"
 
 msgid "OSARA: Go to master track"
-msgstr "OSARA: 转道主控轨"
+msgstr "OSARA: 转到主控轨道"
 
 msgid "OSARA: Cycle shape of selected envelope points"
-msgstr "OSARA: 轮换选中包络点的形状"
+msgstr "OSARA:循环切换已选择的包络点形状"
 
 msgid "OSARA: Toggle track/take volume envelope visibility (depending on focus)"
-msgstr "OSARA: 切换轨道或片段音量包络可见（取决于焦点）"
+msgstr "OSARA: 切换轨道/片段的音量包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track/take pan envelope visibility (depending on focus)"
-msgstr "OSARA: 切换轨道或片段声像包络可见（取决于焦点）"
+msgstr "OSARA: 切换轨道/片段的声像包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track/take mute envelope visibility (depending on focus)"
-msgstr "OSARA: 切换轨道或片段静音包络可见（取决于焦点）"
+msgstr "OSARA: 切换轨道/片段的禁音包络可见 (取决于焦点)"
 
 msgid "OSARA: Toggle track pre-FX pan or take pitch envelope visibility (depending on focus)"
-msgstr "OSARA: 切换轨道 FX 前声像或片段音高包络可见（取决于焦点）"
+msgstr "OSARA: 切换轨道 FX 钱声像货片段音高的包络可见 (取决于焦点)"
 
 msgid "OSARA: Select from cursor to start of project"
-msgstr "OSARA: 从光标处选择到工程开始"
+msgstr "OSARA: 从光标到工程开始创建选区"
 
 msgid "OSARA: Select from cursor to end of project"
-msgstr "OSARA: 从光标处选择到工程结束"
+msgstr "OSARA: 从光标到工程结束创建选区"
 
 msgid "OSARA: Set phase normal for all tracks"
-msgstr "OSARA: 将全部轨道的相位设为正常"
+msgstr "OSARA: 将所有轨道设置为正常相位"
 
 msgid "OSARA: Unmonitor all tracks"
-msgstr "OSARA: 取消监听全部轨道"
+msgstr "OSARA: 取消监听所有轨道"
 
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
-msgstr "OSARA: 配置 REAPER 以获得最佳读屏软件可访问性"
+msgstr "OSARA：优化 REAPER 的读屏辅助功能"
 
 msgid "OSARA: Check for update"
 msgstr "OSARA: 检查更新"
@@ -3248,89 +3242,89 @@ msgid "OSARA: Open online documentation"
 msgstr "OSARA: 打开在线文档"
 
 msgid "OSARA: Report tempo and time signature at play cursor; press twice to add/edit tempo markers"
-msgstr "OSARA: 报告播放光标处的速度与拍号，双击添加/编辑速度标记"
+msgstr "OSARA: 朗读播放光标处的速度和拍号； 双击添加/编辑速度标记"
 
 msgid "OSARA: Report scrub segment offsets; press twice to edit"
-msgstr "OSARA: 报告擦带区段偏移，双击编辑"
+msgstr "OSARA: 朗读擦洗分段偏移值;双击编辑值"
 
 msgid "OSARA: Scrub faster, nudge and adjust item edges in larger increments, zoom out"
-msgstr "OSARA: 加快擦带、以更大幅度微移和调整对象边缘，视图缩小"
+msgstr "OSARA: 更快地擦洗,以更大增量微移和调整对象边缘,缩小"
 
 msgid "OSARA: Scrub slower, nudge and adjust item edges in smaller increments, zoom in"
-msgstr "OSARA: 减慢擦带、以更小幅度微移和调整对象边缘，视图放大"
+msgstr "OSARA: 更慢地擦洗,以更小增量微移和调整对象边缘,放大"
 
 msgid "OSARA: Analyze and show peak and loudness statistics for selected tracks/items"
-msgstr "OSARA: 分析并显示所选轨道/对象的峰值和响度统计信息"
+msgstr "OSARA: 分析并显示所选轨道/对象的峰值与响度统计数据"
 
 msgid "OSARA: Enable noncontiguous selection/toggle selection of current chord/note"
-msgstr "OSARA: 启用不连续选择，切换当前和弦/音符的选择状态"
+msgstr "OSARA: 启用不连续选择/切换当前和弦/音符的选择"
 
 msgid "OSARA: Move forward to next single note or chord"
-msgstr "OSARA: 右移到下一音符或和弦"
+msgstr "OSARA：向前移到下一个单音或和弦"
 
 msgid "OSARA: Move backward to previous single note or chord"
-msgstr "OSARA: 左移到上一音符或和弦"
+msgstr "OSARA：向后移到上一个单音或和弦"
 
 msgid "OSARA: Move forward to next single note or chord and add to selection"
-msgstr "OSARA: 右移到下一音符或和弦并加入选择"
+msgstr "OSARA：向前移到下一个单音或和弦并加入选择"
 
 msgid "OSARA: Move backward to previous single note or chord and add to selection"
-msgstr "OSARA: 左移到上一音符或和弦并加入选择"
+msgstr "OSARA：向后移动到上一个单音或和弦并加入选择"
 
 msgid "OSARA: Move to higher note in chord"
-msgstr "OSARA: 移到和弦中更高的音"
+msgstr "OSARA：移到和弦中的更高音符"
 
 msgid "OSARA: Move to lower note in chord"
-msgstr "OSARA: 移到和弦中更低的音"
+msgstr "OSARA：移到和弦中的更低音符"
 
 msgid "OSARA: Move to higher note in chord and add to selection"
-msgstr "OSARA: 移到和弦中更高的音并添加到选择"
+msgstr "OSARA：移到和弦中的更高音符并加入选择"
 
 msgid "OSARA: Move to lower note in chord and add to selection"
-msgstr "OSARA: 移到和弦中更低的音并添加到选择"
+msgstr "OSARA：移到和弦中的更低音符并加入选择"
 
 msgid "OSARA: Move to next CC"
-msgstr "OSARA: 转到下一个CC"
+msgstr "OSARA: 移到下一个CC"
 
 msgid "OSARA: Move to previous CC"
-msgstr "OSARA: 转到上一个CC"
+msgstr "OSARA: 移到上一个CC"
 
 msgid "OSARA: Move to next CC and add to selection"
-msgstr "OSARA: 移到下一个 CC 并添加到选择"
+msgstr "OSARA: 移到下一个CC并添加到选择"
 
 msgid "OSARA: Move to previous CC and add to selection"
-msgstr "OSARA: 移到上一个 CC 并添加到选择"
+msgstr "OSARA: 移到上一个CC并添加到选择"
 
 msgid "OSARA: Select all notes with the same pitch starting in time selection"
-msgstr "OSARA: 从时间选区开始选择全部相同音高的音符"
+msgstr "OSARA: 从时间选区开始选择具有相同音高的所有音符"
 
 msgid "OSARA: Focus event nearest edit cursor"
-msgstr "OSARA: 聚焦到编辑光标最近的事件"
+msgstr "OSARA: 光标最近的焦点事件"
 
 msgid "Configuration..."
 msgstr "配置..."
 
 msgid "Online &documentation"
-msgstr "在线文档(&d)"
+msgstr "在线文档(&D)"
 
 msgid "Check for &update"
 msgstr "检查更新(&u)"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
-msgstr "配置 REAPER 以获得最佳读屏软件的可访问性"
+msgstr "优化 REAPER 的读屏辅助功能(&O)"
 
 msgid "No OSARA update available."
-msgstr "无可用的 OSARA 更新。"
+msgstr "无可用的 OSARA 更新."
 
 msgctxt "OSARA Update"
 msgid "OSARA Update"
-msgstr "OSARA更新"
+msgstr "OSARA 更新"
 
 msgid "OSARA version {} is available. Changes:"
-msgstr "OSARA 版本 {} 可用。更新："
+msgstr "OSARA 版本 {} 可用.变化:"
 
 msgid "Error checking for OSARA update."
-msgstr "检查 OSARA 更新时出错。"
+msgstr "检查 OSARA 更新时出错."
 
 msgctxt "Parameters"
 msgid "Parameters"
@@ -3338,23 +3332,23 @@ msgstr "参数"
 
 msgctxt "Parameters"
 msgid "&Parameter:"
-msgstr "参数(&P)："
+msgstr "参数:(&P)"
 
 msgctxt "Parameters"
 msgid "Value:"
-msgstr "值(V)："
+msgstr "值:"
 
 msgctxt "Parameters"
 msgid "&More"
-msgstr "更多(&M)"
+msgstr "更多菜单(&M)"
 
 msgctxt "Parameters"
 msgid "&Filter:"
-msgstr "过滤器(&F)："
+msgstr "过滤:(&F)"
 
 msgctxt "Parameters"
 msgid "Include &unnamed and potentially unusable parameters"
-msgstr "包含未命名且可能不可用的参数(&U)"
+msgstr "包含未命名和可能不可用的参数(&U)"
 
 msgctxt "Parameters"
 msgid "&Close"
@@ -3366,27 +3360,27 @@ msgstr "跟随最后触碰轨道切换(&F)"
 
 msgctxt "Peak Watcher"
 msgid "Level type:"
-msgstr "电平类型："
+msgstr "电平类型:"
 
 msgctxt "Peak Watcher"
 msgid "Notify automatically for channels:"
-msgstr "自动通知通道:"
+msgstr "通道自动通知:"
 
 msgctxt "Peak Watcher"
 msgid "&1"
-msgstr "&1"
+msgstr "&1 通道"
 
 msgctxt "Peak Watcher"
 msgid "&2"
-msgstr "&2"
+msgstr "&2 通道"
 
 msgctxt "Peak Watcher"
 msgid "When &level reaches:"
-msgstr "当电平达到(&L)："
+msgstr "当电平达到:(&L)"
 
 msgctxt "Peak Watcher"
 msgid "Hold level:"
-msgstr "保持电平:"
+msgstr "保持电平"
 
 msgctxt "Peak Watcher"
 msgid "&disabled"
@@ -3398,7 +3392,7 @@ msgstr "直到重置(&U)"
 
 msgctxt "Peak Watcher"
 msgid "for (&ms):"
-msgstr "保持（毫秒）(&M)："
+msgstr "保持(毫秒):(&M)"
 
 msgctxt "Peak Watcher"
 msgid "&Reset"
@@ -3406,15 +3400,15 @@ msgstr "重置(&R)"
 
 msgctxt "Peak Watcher"
 msgid "OK"
-msgstr "确定(&O)"
+msgstr "确定"
 
 msgctxt "Peak Watcher"
 msgid "Cancel"
-msgstr "取消(&C)"
+msgstr "取消"
 
 msgctxt "Peak Watcher"
 msgid "D&isable"
-msgstr "禁用(&i)"
+msgstr "禁用(&I)"
 
 msgctxt "Message"
 msgid "Message"
@@ -3422,27 +3416,27 @@ msgstr "消息"
 
 msgctxt "Message"
 msgid "&Close"
-msgstr "关闭)&C)"
+msgstr "关闭(&C)"
 
 msgctxt "FX Preset"
 msgid "FX Preset"
-msgstr "FX 预置"
+msgstr "FX 预设"
 
 msgctxt "FX Preset"
 msgid "&Presets:"
-msgstr "预置(&P)："
+msgstr "预设:(&p)"
 
 msgctxt "FX Preset"
 msgid "&Filter:"
-msgstr "过滤器(&F)："
+msgstr "过滤(&f)"
 
 msgctxt "FX Preset"
 msgid "&Apply"
-msgstr "应用(&A)"
+msgstr "应用(&a)"
 
 msgctxt "FX Preset"
 msgid "&Close"
-msgstr "关闭(&C)"
+msgstr "关闭(&c)"
 
 msgctxt "OSARA Update"
 msgid "Go to &download page"
@@ -3454,11 +3448,11 @@ msgstr "关闭(&C)"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "Configure REAPER for Optimal Screen Reader Accessibility"
-msgstr "配置 REAPER 以获得最佳读屏软件可访问性"
+msgstr "配置 REAPER 实现屏幕阅读器最佳无障碍访问"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&Yes"
-msgstr "是(&Y)"
+msgstr "是(&y)"
 
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
@@ -3470,65 +3464,65 @@ msgstr "OSARA 配置"
 
 msgctxt "OSARA Configuration"
 msgid "Report position when &scrubbing"
-msgstr "擦带时报告位置(&S)"
+msgstr "擦洗时朗读位置(&S)"
 
 msgctxt "OSARA Configuration"
 msgid "Report time movement during playback/recording"
-msgstr "报告播放/录制期间的时间移动"
+msgstr "朗读播放/录制期间的时间移动(&T)"
 
 msgctxt "OSARA Configuration"
 msgid "Report f&ull time for time movement commands"
-msgstr "报告时间移动命令的完整时间(&u)"
+msgstr "朗读时间移动命令的完整时间(&U)"
 
 msgctxt "OSARA Configuration"
 msgid "&Move relative to the play cursor for time movement commands during playback"
-msgstr "播放期间编辑光标跟随播放光标移动(&M)"
+msgstr "播放时,移动编辑光标跟随播放指针移动(&M)"
 
 msgctxt "OSARA Configuration"
 msgid "Report mar&kers and regions during playback"
-msgstr "在播放期间报告标记、区间(&K)"
+msgstr "播放期间朗读标记和区域(&K)"
 
 msgctxt "OSARA Configuration"
 msgid "Report time se&lection start and end while playing"
-msgstr "播放时报告时间选区开始点和结束点(&L)"
+msgstr "播放时，朗读选区开始和结束(L&)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &transport play, pause and stop"
-msgstr "报告走代状态（播放、暂停与停止）(&T)"
+msgstr "朗读走带状态的播放,暂停 和停止)(&T)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &recording state"
-msgstr "报告录制状态(&R)"
+msgstr "朗读录制状态(&R)"
 
 msgctxt "OSARA Configuration"
 msgid "Report tr&ack numbers"
-msgstr "报告轨道序号(&A)"
+msgstr "朗读轨道编号(&R)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &FX when moving to tracks/takes"
-msgstr "移到轨道/片段时报告FX(&F)"
+msgstr "转到轨道/片段时朗读 FX 名称(&F)"
 
 msgctxt "OSARA Configuration"
 msgid "Report &position when navigating events in MIDI editor"
-msgstr "在 MIDI 编辑器中导航事件时报告位置(&P)"
+msgstr "在MIDI编辑器中朗读浏览事件的位置(&P)"
 
 msgctxt "OSARA Configuration"
 msgid "Report MIDI &notes in MIDI editor"
-msgstr "在 MIDI 编辑器中报告 MIDI 音符(&N)"
+msgstr "在 midi 编辑器中朗读 midi 音符(&M)"
 
 msgctxt "OSARA Configuration"
 msgid "Report changes made via &control surfaces"
-msgstr "报告通过控制面所做的更改(&C)"
+msgstr "朗读控制面所做的更改(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "Move cursor relative to adjusting &edges of items and time selection"
-msgstr "调整对象边缘和时间选区时光标相对移动(&E)"
+msgstr "调整对象/选区的边缘时，编辑光标相应移动(&E)"
 
 msgctxt "OSARA Configuration"
 msgid "OK"
-msgstr "确定"
+msgstr "确定(&O)"
 
 msgctxt "OSARA Configuration"
 msgid "Cancel"
-msgstr "取消"
+msgstr "取消(&C)"
 
