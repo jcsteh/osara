@@ -29,6 +29,7 @@ map<string, string> REAPER_LANG_TO_CODE = {
 	{"REAPER_SWS_FRC", "fr_CA"},
 	{"Russian", "ru_RU"},
 	{"Turkish", "tr_TR"},
+	{"REAPER_norsk_bokmal", "nb_NO"},
 };
 
 tinygettext::Dictionary translationDict;
