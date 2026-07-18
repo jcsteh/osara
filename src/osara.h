@@ -226,6 +226,9 @@
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
 #define REAPERAPI_WANT_GetSetProjectGrid
 #define REAPERAPI_WANT_GetTrackMIDINoteNameEx
+#ifdef LOGGING
+#define REAPERAPI_WANT_ShowConsoleMsg
+#endif
 
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
@@ -379,5 +382,12 @@ IReaperControlSurface* createSurface();
 extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
+
+#ifdef LOGGING
+#define dbg(msg, ...) \
+	ShowConsoleMsg(fmt::format("osara " msg "\n", __VA_ARGS__).c_str())
+#else
+# define dbg(msg)
+#endif
 
 #endif
