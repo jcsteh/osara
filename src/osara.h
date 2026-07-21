@@ -387,7 +387,7 @@ void registerExports(reaper_plugin_info_t* rec);
 #define dbg(msg, ...) \
 	ShowConsoleMsg(fmt::format("osara " msg "\n", __VA_ARGS__).c_str())
 #else
-# define dbg(msg)
+# define dbg(msg, ...)
 #endif
 
 #endif
