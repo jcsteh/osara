@@ -3273,6 +3273,8 @@ MidiPostCommand MIDI_POST_COMMANDS[] = {
 	{1139, postToggleRepeat}, // Transport: Toggle repeat
 	{1011, postMidiChangeZoom}, // View: Zoom out horizontally
 	{1012, postMidiChangeZoom}, // View: Zoom in horizontally
+	{40111, postMidiChangeVerticalZoom}, // View: Zoom in vertically
+	{40112, postMidiChangeVerticalZoom}, // View: Zoom out vertically
 };
 PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_NUDGSELTKVOLUP", postChangeTrackVolume}, // Xenakios/SWS: Nudge volume of selected tracks up

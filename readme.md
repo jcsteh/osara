@@ -504,6 +504,8 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - View: Toggle snap to grid: Alt+S
 - View: Zoom in horizontally: NumPad+, Shift+=
 - View: Zoom out horizontally: NumPad-, Shift+-
+- View: Zoom in vertically: Control+Shift+UpArrow
+- View: Zoom out vertically: Control+Shift+DownArrow
 
 #### Media Explorer
 - Preview: increase volume by 1 dB: Alt+Shift+UpArrow

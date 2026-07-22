@@ -56,9 +56,8 @@ struct FreeReaperPtr {
 	}
 };
 
-// return the midi editor zoom ratio of the take
-double getMidiZoomRatio(MediaItem_Take* take) {
-	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) ");
+double getMidiZoomRatio(MediaItem_Take* take, bool vertical=false) {
+	static const regex re("CFGEDITVIEW -?[0-9.]+ ([0-9.]+) -?[0-9.]+ ([0-9.]+) ");
 	char guid[40]; 
 	GetSetMediaItemTakeInfo_String(take, "GUID", guid, false);
 	MediaItem* item = GetMediaItemTake_Item(take);
@@ -75,7 +74,7 @@ double getMidiZoomRatio(MediaItem_Take* take) {
 	if (!regex_search(stateSV.cbegin() + takePos, stateSV.cend(), match, re)) {
 		return -1;
 	}
-	return stod(match.str(1));
+	return stod(match.str(vertical ? 2 : 1));
 }
 
 // Note: while the below struct is called MidiControlChange in line with naming in Reaper,
@@ -2421,6 +2420,20 @@ void postMidiChangeZoom(int command) {
 		// replaced with the number of pixels per second; e.g. 100 pixels/second.
 		outputMessage(format(translate("{} pixels/second"), formatDouble(zoom, 1)));
 	}
+}
+
+void postMidiChangeVerticalZoom(int command) {
+	MediaItem_Take* take = MIDIEditor_GetTake(MIDIEditor_GetActive());
+	if(!take) {
+		return;
+	}
+	double zoom = getMidiZoomRatio(take, true);
+	if (zoom <0) {
+		return;
+	}
+	// Translators: Reported when zooming in or out vertically in the MIDI editor. {} will be
+	// replaced with the number of pixels per semitone; e.g. 12 pixels/semitone.
+	outputMessage(format(translate("{} pixels/semitone"), formatDouble(zoom, 1)));
 }
 
 // F1-f12 step input doesn't use actions, so we need to hook the key presses.
