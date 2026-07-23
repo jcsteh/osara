@@ -4148,6 +4148,10 @@ void cmdRedo(int command) {
 }
 
 void cmdSplitItems(int command) {
+	if (!GetSelectedTrack2(nullptr, 0, false)) {
+		outputMessage("no track selected");
+		return;
+	}
 	int oldCount = CountMediaItems(nullptr);
 	Main_OnCommand(command, 0);
 	int added = CountMediaItems(nullptr) - oldCount;
