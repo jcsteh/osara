@@ -4155,6 +4155,33 @@ void cmdSplitItems(int command) {
 	int oldCount = CountMediaItems(nullptr);
 	Main_OnCommand(command, 0);
 	int added = CountMediaItems(nullptr) - oldCount;
+	if (!added) {
+		double curPos = GetCursorPosition();
+		bool canSplit = false;
+		bool alreadyOnSplit = false;
+		for (int i = 0; i < CountSelectedTracks2(nullptr, false); ++i) {
+			MediaTrack* track = GetSelectedTrack2(nullptr, i, false);
+			for (int j = 0; j < CountTrackMediaItems(track); ++j) {
+				MediaItem* item = GetTrackMediaItem(track, j);
+				double position = GetMediaItemInfo_Value(item, "D_POSITION");
+				double length = GetMediaItemInfo_Value(item, "D_LENGTH");
+				if (curPos > position && curPos < (position + length))
+					canSplit = true;
+				else if (position == curPos || curPos == (position + length))
+					alreadyOnSplit = true;
+			}
+		}
+		if (!canSplit && !alreadyOnSplit) {
+			// Translators: Reported when there is not an item under the edit cursor to be split.
+			outputMessage(translate("no item at cursor"));
+			return;
+		}
+		else if (!canSplit && alreadyOnSplit) {
+			// Translators: Reported when an item cannot be split because the cursor is already on its edge.
+			outputMessage(translate("already split at cursor"));
+			return;
+		}
+	}
 	// Translators: Reported when items are added. {} will be replaced with the
 	// number of items; e.g. "2 items added".
 	outputMessage(format(
