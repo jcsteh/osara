@@ -74,11 +74,20 @@ class Param {
 
 class ParamSource {
 	public:
+	struct Category {
+		string name;
+		int parent = -1;
+	};
+
 	virtual ~ParamSource() = default;
 	virtual string getTitle() = 0;
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	// Return the category index for this parameter, -1 for no category.
+	virtual int getParamCategory(int param) { return -1; }
+	// Return the information for this category index.
+	virtual Category getCategory(int category) { return {}; }
 	virtual bool isProbablyUsefulParam(int param, const string& name) { return true; };
 
 	// Called to rebuild the parameter list because one or more parameters were
@@ -91,7 +100,8 @@ class ParamSource {
 // it. Used where the parameters are predefined; e.g. for tracks and items.
 class ParamProvider {
 	public:
-	ParamProvider(const string displayName): displayName(displayName) {
+	ParamProvider(const string displayName, int category = -1):
+		displayName(displayName), category(category) {
 	}
 
 	virtual ~ParamProvider() = default;
@@ -99,6 +109,7 @@ class ParamProvider {
 	virtual unique_ptr<Param> makeParam() = 0;
 
 	const string displayName;
+	const int category;
 };
 
 class ReaperObjParamProvider;
@@ -117,8 +128,8 @@ class ReaperObjParamProvider: public ParamProvider {
 
 	protected:
 	ReaperObjParamProvider(const string displayName, const string name,
-		MakeParamFromProviderFunc makeParamFromProvider):
-		ParamProvider(displayName), name(name),
+		MakeParamFromProviderFunc makeParamFromProvider, int category = -1):
+		ParamProvider(displayName, category), name(name),
 		makeParamFromProvider(makeParamFromProvider) {}
 
 	const string name;
@@ -143,6 +154,12 @@ class ReaperObjParam: public Param {
 class ReaperObjParamSource: public ParamSource {
 	protected:
 	vector<unique_ptr<ParamProvider>> params;
+	vector<Category> categories;
+
+	int addCategory(const string& name, int parent = -1) {
+		this->categories.push_back({name, parent});
+		return (int)this->categories.size() - 1;
+	}
 
 	public:
 	int getParamCount() final {
@@ -155,6 +172,14 @@ class ReaperObjParamSource: public ParamSource {
 
 	unique_ptr<Param> getParam(int param) final {
 		return this->params[param]->makeParam();
+	}
+
+	int getParamCategory(int param) final {
+		return this->params[param]->category;
+	}
+
+	Category getCategory(int category) final {
+		return this->categories[category];
 	}
 };
 
@@ -290,6 +315,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 };
 
 const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
+const LPARAM CATEGORY_ITEM = -1;
 
 bool isParamsDialogOpen = false;
 
@@ -307,6 +333,7 @@ class ParamsDialog {
 	HWND moreButton;
 	string filter;
 	vector<HTREEITEM> paramTreeItems;
+	vector<HTREEITEM> categoryTreeItems;
 	int paramNum;
 	unique_ptr<Param> param;
 	double val;
@@ -360,6 +387,10 @@ class ParamsDialog {
 			return;
 		}
 		const int paramNum = this->getParamNum(item);
+		if (paramNum == CATEGORY_ITEM) {
+			this->disableParamControls();
+			return;
+		}
 		this->paramNum = paramNum;
 		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
@@ -367,6 +398,15 @@ class ParamsDialog {
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
+	}
+
+	void disableParamControls() {
+		this->param = nullptr;
+		EnableWindow(this->slider, FALSE);
+		EnableWindow(this->valueEdit, FALSE);
+		EnableWindow(this->moreButton, FALSE);
+		SetWindowText(this->valueEdit, "");
+		SetWindowText(this->valueLabel, "");
 	}
 
 	void onSliderChange(double newVal) {
@@ -665,12 +705,26 @@ class ParamsDialog {
 				newItemIndex = 0;
 			}
 			if (newItemIndex >= 0) {
+				const int oldParam = currentItem == dialog->paramTreeItems.end() ? -1 :
+					dialog->paramNum;
 				dialog->suppressValueChangeReport = true;
 				TreeView_SelectItem(dialog->paramTree,
 					dialog->paramTreeItems[newItemIndex]);
 				dialog->onParamChange();
 				dialog->suppressValueChangeReport = false;
+				// Only announce categories newly entered by this navigation. Repeating
+				// shared ancestors would be noisy when moving between sibling parameters.
+				const vector<int> oldCategories = oldParam < 0 ? vector<int>() :
+					dialog->getParamCategoryPath(oldParam);
+				const vector<int> newCategories = dialog->getParamCategoryPath(
+					dialog->paramNum);
+				auto firstNewCategory = mismatch(oldCategories.begin(), oldCategories.end(),
+					newCategories.begin(), newCategories.end()).second;
 				ostringstream s;
+				for (auto category = firstNewCategory;
+						category != newCategories.end(); ++category) {
+					s << dialog->source->getCategory(*category).name << ", ";
+				}
 				s << dialog->source->getParamName(dialog->paramNum) << ", " <<
 					dialog->valText;
 				outputMessage(s);
@@ -742,7 +796,59 @@ class ParamsDialog {
 			return true;
 		// Convert param name to lower case for match.
 		transform(name.begin(), name.end(), name.begin(), ::tolower);
-		return name.find(filter) != string::npos;
+		if (name.find(filter) != string::npos) {
+			return true;
+		}
+		// If this parameter's category (or one of its ancestor categories) matches,
+		// include the parameter.
+		for (int category = this->source->getParamCategory(param); category >= 0;) {
+			ParamSource::Category info = this->source->getCategory(category);
+			transform(info.name.begin(), info.name.end(), info.name.begin(), ::tolower);
+			if (info.name.find(filter) != string::npos) {
+				return true;
+			}
+			category = info.parent;
+		}
+		return false;
+	}
+
+	vector<int> getParamCategoryPath(int param) {
+		vector<int> categories;
+		for (int category = this->source->getParamCategory(param); category >= 0;) {
+			categories.push_back(category);
+			category = this->source->getCategory(category).parent;
+		}
+		reverse(categories.begin(), categories.end());
+		return categories;
+	}
+
+	// Gets the tree item for a category. If it doesn't exist yet, it is created.
+	HTREEITEM getCategoryTreeItem(int category) {
+		if (category < 0) {
+			return TVI_ROOT;
+		}
+		// categoryTreeItems can contain null if we haven't added any parameters in
+		// that category yet.
+		if (category < (int)this->categoryTreeItems.size() &&
+				this->categoryTreeItems[category]) {
+			HTREEITEM item = this->categoryTreeItems[category];
+			return item;
+		}
+		if (category >= (int)this->categoryTreeItems.size()) {
+			this->categoryTreeItems.resize(category + 1);
+		}
+		const ParamSource::Category info = this->source->getCategory(category);
+		TVINSERTSTRUCT item{};
+		// This will create tree items for any ancestor categories that don't have
+		// tree items yet.
+		item.hParent = this->getCategoryTreeItem(info.parent);
+		item.hInsertAfter = TVI_LAST;
+		item.item.mask = TVIF_TEXT | TVIF_CHILDREN | TVIF_PARAM;
+		item.item.pszText = (char*)info.name.c_str();
+		item.item.cChildren = 1;
+		item.item.lParam = CATEGORY_ITEM;
+		return this->categoryTreeItems[category] = TreeView_InsertItem(
+			this->paramTree, &item);
 	}
 
 	void updateParamList() {
@@ -751,6 +857,7 @@ class ParamsDialog {
 			prevSelParam = this->getParamNum(item);
 		}
 		this->paramTreeItems.clear();
+		this->categoryTreeItems.clear();
 		// Use the first item if the previously selected param gets filtered out.
 		HTREEITEM newSelection = nullptr;
 		TreeView_DeleteAllItems(this->paramTree);
@@ -759,7 +866,8 @@ class ParamsDialog {
 			if (!this->shouldIncludeParam(p, name))
 				continue;
 			TVINSERTSTRUCT item{};
-			item.hParent = TVI_ROOT;
+			item.hParent = this->getCategoryTreeItem(
+				this->source->getParamCategory(p));
 			item.hInsertAfter = TVI_LAST;
 			item.item.mask = TVIF_TEXT | TVIF_PARAM;
 			item.item.pszText = (char*)name.c_str();
@@ -771,7 +879,7 @@ class ParamsDialog {
 			}
 		}
 		if (!newSelection) {
-			EnableWindow(this->slider, FALSE);
+			this->disableParamControls();
 			return;
 		}
 		TreeView_SelectItem(this->paramTree, newSelection);
@@ -792,6 +900,9 @@ class ParamsDialog {
 	}
 
 	void moreMenu() {
+		if (!this->param) {
+			return;
+		}
 		Param::MoreOptions options = this->param->getMoreOptions();
 		if (options.empty()) {
 			return;
@@ -1889,6 +2000,7 @@ class TrackParams: public ReaperObjParamSource {
 
 	void rebuildParams() final {
 		this->params.clear();
+		this->categories.clear();
 		this->params.push_back(make_unique<TrackParamProvider>(translate("volume"),
 			this->track, "D_VOL", ReaperObjVolParam::make));
 		this->params.push_back(make_unique<TrackParamProvider>(translate("pan"),
