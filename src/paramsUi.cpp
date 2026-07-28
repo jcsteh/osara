@@ -1442,8 +1442,8 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	public:
 	TrackSendParamProvider(const string displayName, MediaTrack* track,
 		int category, int index, const string name,
-		MakeParamFromProviderFunc makeParamFromProvider):
-		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		MakeParamFromProviderFunc makeParamFromProvider, int paramCategory):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider, paramCategory),
 		track(track), category(category), index(index) {}
 
 	void* getSetValue(const char* name, void* newValue) {
@@ -1874,6 +1874,15 @@ class TrackParams: public ReaperObjParamSource {
 				count += hwCount;
 			}
 		}
+		const char* categoryName;
+		if constexpr (category == 0) {
+			categoryName = translate("sends");
+		} else if constexpr (category == -1) {
+			categoryName = translate("receives");
+		} else {
+			categoryName = translate("hardware outputs");
+		}
+		const int sendCategory = this->addCategory(categoryName);
 		string lastTarget;
 		int sameTargetCount = 1;
 		for (; i < count; ++i) {
@@ -1905,93 +1914,44 @@ class TrackParams: public ReaperObjParamSource {
 				sameTargetCount = 1;
 				lastTarget = target;
 			}
-			string dispTemplate;
-			if constexpr (category == 0) {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a track send in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {param} will be replaced with the parameter name.
-					// Example: "2 reverb send volume"
-					dispTemplate = translate("{target} send {param}");
-				} else {
-					// Translators: Indicates a parameter for a track send in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {targetNum} will be replaced with a number distinguishing this
-					// send from other sends to the same track. {param} will be replaced with
-					// the parameter name.
-					// Example: "2 reverb send 2 volume"
-					dispTemplate = translate("{target} send {targetNum} {param}");
-				}
-			} else if constexpr (category == -1) {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a track receive in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {param} will be replaced with the parameter name.
-					// Example: "1 vocal receive volume"
-					dispTemplate = translate("{target} receive {param}");
-				} else {
-					// Translators: Indicates a parameter for a track receive in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {targetNum} will be replaced with a number distinguishing this
-					// receive from other receives from the same track. {param} will be
-					// replaced with the parameter name.
-					// Example: "1 vocal receive 2 volume"
-					dispTemplate = translate("{target} receive {targetNum} {param}");
-				}
-			} else {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a hardware audio output in the
-					// track Parameters dialog. {target} will be replaced by the name of the
-					// audio output. {param} will be replaced with the parameter name.
-					// Example: "main hardware volume"
-					dispTemplate = translate("{target} hardware {param}");
-				} else {
-					// Translators: Indicates a parameter for a hardware audio output in the
-					// track Parameters dialog. {target} will be replaced by the name of the
-					// audio output. {targetNum} will be replaced with a number distinguishing
-					// this send from other sends to the same output. {param} will be replaced
-					// with the parameter name.
-					// Example: "main hardware 2 volume"
-					dispTemplate = translate("{target} hardware {targetNum} {param}");
-				}
+			string categoryName = target;
+			if (sameTargetCount > 1) {
+				categoryName = fmt::format("{} {}", target, sameTargetCount);
 			}
-			auto paramName = [&](const char* param) {
-				return format(dispTemplate, "target"_a=target, "param"_a=param,
-					"targetNum"_a=sameTargetCount);
-			};
+			const int targetCategory = this->addCategory(categoryName, sendCategory);
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("volume")), this->track, category, i, "D_VOL",
-				ReaperObjVolParam::make));
+				translate("volume"), this->track, category, i, "D_VOL",
+				ReaperObjVolParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("pan")), this->track, category, i, "D_PAN",
-				ReaperObjPanParam::make));
+				translate("pan"), this->track, category, i, "D_PAN",
+				ReaperObjPanParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("mute")), this->track, category, i, "B_MUTE",
-				ReaperObjToggleParam::make));
+				translate("mute"), this->track, category, i, "B_MUTE",
+				ReaperObjToggleParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("mono")), this->track, category, i, "B_MONO",
-				ReaperObjToggleParam::make));
+				translate("mono"), this->track, category, i, "B_MONO",
+				ReaperObjToggleParam::make, targetCategory));
 			if (trackParam) {
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("source MIDI channel")),
+					translate("source MIDI channel"),
 					this->track, category, i, "I_MIDIFLAGS",
-					SourceMidiChannelParam::make));
+					SourceMidiChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("destination MIDI channel")),
+					translate("destination MIDI channel"),
 					this->track, category, i, "I_MIDIFLAGS",
-					DestMidiChannelParam::make));
+					DestMidiChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("source audio channel")),
+					translate("source audio channel"),
 					this->track, category, i, "I_SRCCHAN",
-					SourceAudioChannelParam::make));
+					SourceAudioChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("destination audio channel")),
+					translate("destination audio channel"),
 					this->track, category, i, "I_DSTCHAN",
-					DestAudioChannelParam::make));
+					DestAudioChannelParam::make, targetCategory));
 			}
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("send type")), this->track, category, i, "I_SENDMODE",
-				SendTypeParam::make));
+				translate("send type"), this->track, category, i, "I_SENDMODE",
+				SendTypeParam::make, targetCategory));
 		}
 	}
 
