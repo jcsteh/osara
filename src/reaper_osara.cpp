@@ -1976,9 +1976,10 @@ void postMoveToTimeSig(int command) {
 	int marker = FindTempoTimeSigMarker(0, cursor + 0.0001);
 	double pos, bpm;
 	int sigNum, sigDenom;
-	GetTempoTimeSigMarker(0, marker, &pos, nullptr, nullptr, &bpm, &sigNum, &sigDenom, nullptr);
-	if (pos != cursor)
+	if (!GetTempoTimeSigMarker(0, marker, &pos, nullptr, nullptr, &bpm, &sigNum,
+		&sigDenom, nullptr) || pos != cursor) {
 		return;
+	}
 	fakeFocus = FOCUS_TIMESIG;
 	ostringstream s;
 	// Translators: Reported when moving to a tempo change. {} will be replaced
