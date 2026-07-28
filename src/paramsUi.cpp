@@ -297,7 +297,7 @@ class ParamsDialog {
 	private:
 	unique_ptr<ParamSource> source;
 	HWND dialog;
-	HWND paramCombo;
+	HWND paramTree;
 	HWND slider;
 #ifdef _WIN32
 	CComPtr<TextSliderUiaProvider> sliderUiaProvider;
@@ -306,7 +306,7 @@ class ParamsDialog {
 	HWND valueLabel;
 	HWND moreButton;
 	string filter;
-	vector<int> visibleParams;
+	vector<HTREEITEM> paramTreeItems;
 	int paramNum;
 	unique_ptr<Param> param;
 	double val;
@@ -348,10 +348,24 @@ class ParamsDialog {
 		}
 	}
 
+	int getParamNum(HTREEITEM item) {
+		TVITEM itemInfo{};
+		itemInfo.mask = TVIF_HANDLE | TVIF_PARAM;
+		itemInfo.hItem = item;
+		TreeView_GetItem(this->paramTree, &itemInfo);
+		return (int)itemInfo.lParam;
+	}
+
 	void onParamChange() {
-		this->paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
-		this->param = this->source->getParam(this->paramNum);
+		HTREEITEM item = TreeView_GetSelection(this->paramTree);
+		if (!item) {
+			return;
+		}
+		const int paramNum = this->getParamNum(item);
+		this->paramNum = paramNum;
+		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
+		EnableWindow(this->slider, TRUE);
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
@@ -528,10 +542,7 @@ class ParamsDialog {
 		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
 			case WM_COMMAND:
-				if (LOWORD(wParam) == ID_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
-					dialog->onParamChange();
-					return TRUE;
-				} else if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
+				if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
 					dialog->onFilterChange();
 					return TRUE;
 				} else if (LOWORD(wParam) == ID_PARAM_VAL_EDIT && HIWORD(wParam) ==EN_KILLFOCUS) {
@@ -551,6 +562,14 @@ class ParamsDialog {
 					return TRUE;
 				}
 				break;
+			case WM_NOTIFY: {
+				auto* notify = (NMHDR*)lParam;
+				if (notify->idFrom == ID_PARAM && notify->code == TVN_SELCHANGED) {
+					dialog->onParamChange();
+					return TRUE;
+				}
+				break;
+			}
 			case WM_CLOSE:
 				dialog->saveWindowPos();
 				dialog->shouldAllowDeactivate = true;
@@ -634,17 +653,23 @@ class ParamsDialog {
 		if (msg->wParam == VK_TAB && control) {
 			// Control+tab switches to the next parameter, control+shift+tab to the
 			// previous.
-			int newParam = ComboBox_GetCurSel(dialog->paramCombo) +
-				(shift ? -1 : 1);
-			if (newParam < 0) {
-				newParam = dialog->visibleParams.size() - 1;
-			} else if (newParam == dialog->visibleParams.size()) {
-				newParam = 0;
+			if (dialog->paramTreeItems.empty()) {
+				return 1; // Eat the keystroke.
 			}
-			// newParam could be -1 if there are no visible parameters.
-			if (newParam >= 0) {
-				ComboBox_SetCurSel(dialog->paramCombo, newParam);
+			auto currentItem = find(dialog->paramTreeItems.begin(),
+				dialog->paramTreeItems.end(), TreeView_GetSelection(dialog->paramTree));
+			int newItemIndex = currentItem == dialog->paramTreeItems.end() ? 0 :
+				(int)(currentItem - dialog->paramTreeItems.begin()) +
+				(shift ? -1 : 1);
+			if (newItemIndex < 0) {
+				newItemIndex = dialog->paramTreeItems.size() - 1;
+			} else if (newItemIndex == dialog->paramTreeItems.size()) {
+				newItemIndex = 0;
+			}
+			if (newItemIndex >= 0) {
 				dialog->suppressValueChangeReport = true;
+				TreeView_SelectItem(dialog->paramTree,
+					dialog->paramTreeItems[newItemIndex]);
 				dialog->onParamChange();
 				dialog->suppressValueChangeReport = false;
 				ostringstream s;
@@ -660,9 +685,9 @@ class ParamsDialog {
 			return -1; // Pass to our window.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
-		if (msg->hwnd == dialog->paramCombo ||
+		if (msg->hwnd == dialog->paramTree ||
 				isClassName(GetFocus(), "Edit")) {
-			// In text boxes and combo boxes, we only allow specific keys through to
+			// In text boxes and the parameter tree, we only allow specific keys through to
 			// the main section.
 			if (
 				// A function key.
@@ -676,17 +701,13 @@ class ParamsDialog {
 			) {
 				return -666; // Force to main window.
 			}
-			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
-				// In the combo box, we also pass space to the main section.
-				return -666; // Force to main window.
-			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
 			return -1; // Pass to our window.
 		}
 		if (alt && !shift && !control && 'A' <= msg->wParam && msg->wParam <= 'Z') {
 			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
-			// the Parameter combo box.
+			// the Parameter tree.
 			return -1; // Pass to our window.
 		}
 		switch (msg->wParam) {
@@ -727,29 +748,35 @@ class ParamsDialog {
 	}
 
 	void updateParamList() {
-		int prevSelParam;
-		if (this->visibleParams.empty())
-			prevSelParam = -1;
-		else
-			prevSelParam = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
-		this->visibleParams.clear();
+		int prevSelParam = -1;
+		if (HTREEITEM item = TreeView_GetSelection(this->paramTree)) {
+			prevSelParam = this->getParamNum(item);
+		}
+		this->paramTreeItems.clear();
 		// Use the first item if the previously selected param gets filtered out.
-		int newComboSel = 0;
-		ComboBox_ResetContent(this->paramCombo);
+		HTREEITEM newSelection = nullptr;
+		TreeView_DeleteAllItems(this->paramTree);
 		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
 			if (!this->shouldIncludeParam(p, name))
 				continue;
-			this->visibleParams.push_back(p);
-			ComboBox_AddString(this->paramCombo, name.c_str());
-			if (p == prevSelParam)
-				newComboSel = (int)this->visibleParams.size() - 1;
+			TVINSERTSTRUCT item{};
+			item.hParent = TVI_ROOT;
+			item.hInsertAfter = TVI_LAST;
+			item.item.mask = TVIF_TEXT | TVIF_PARAM;
+			item.item.pszText = (char*)name.c_str();
+			item.item.lParam = p;
+			HTREEITEM insertedItem = TreeView_InsertItem(this->paramTree, &item);
+			this->paramTreeItems.push_back(insertedItem);
+			if (p == prevSelParam || !newSelection) {
+				newSelection = insertedItem;
+			}
 		}
-		ComboBox_SetCurSel(this->paramCombo, newComboSel);
-		if (this->visibleParams.empty()) {
+		if (!newSelection) {
 			EnableWindow(this->slider, FALSE);
 			return;
 		}
+		TreeView_SelectItem(this->paramTree, newSelection);
 		EnableWindow(this->slider, TRUE);
 		this->onParamChange();
 	}
@@ -822,11 +849,11 @@ class ParamsDialog {
 		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
-		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
-		WDL_UTF8_HookComboBox(this->paramCombo);
-		LONG_PTR origProc = SetWindowLongPtr(this->paramCombo, GWLP_WNDPROC,
+		this->paramTree = GetDlgItem(this->dialog, ID_PARAM);
+		WDL_UTF8_HookTreeView(this->paramTree);
+		LONG_PTR origProc = SetWindowLongPtr(this->paramTree, GWLP_WNDPROC,
 			(LONG_PTR)ParamsDialog::contextWndProc);
-		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
+		SetWindowLongPtr(this->paramTree, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
 #ifdef _WIN32
 		this->sliderUiaProvider = TextSliderUiaProvider::create(this->slider);

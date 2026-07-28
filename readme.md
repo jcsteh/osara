@@ -1,7 +1,7 @@
 # OSARA: Open Source Accessibility for the REAPER Application
 
 - Author: James Teh &lt;jamie@jantrid.net&gt; & other contributors
-- Copyright: 2014-2024 NV Access Limited, James Teh & other contributors
+- Copyright: 2014-2026 NV Access Limited, James Teh & other contributors
 - License: GNU General Public License version 2.0
 
 OSARA is a [REAPER](http://www.reaper.fm/) extension which aims to make REAPER accessible to screen reader users.
@@ -568,20 +568,20 @@ Note that some effects expose easily readable values, while others expose only p
  When effects do expose easily readable values, these will be reported when focus is on the slider. The editable text is an internal number and probably won't correspond to the readable value on the slider.
 
 #### Using Parameter Lists
-Once you have opened a parameter list dialog, you can select a parameter from the Parameter combo box and check or adjust its value using the Value slider.
+Once you have opened a parameter list dialog, you can select a parameter from the Parameter tree and check or adjust its value using the Value slider.
 For parameters which support it, there is also an editable text field which allows you to edit the value textually.
 
 For a few parameters, there is a context menu with additional options related to the parameter.
 You access this using the More button after the value slider, which will only be available if the parameter provides a context menu.
-Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the Parameter combo box or Value slider.
+Alternatively, on Windows, you can press the Applications key or Shift+F10 while on the Parameter tree or Value slider.
 
 The Filter field allows you to narrow the list to only contain parameters which include the entered text.
 For example, if the full list contained "Volume" and "Pan" parameters and you type "vol" in the Filter field, the list will be narrowed to only show "Volume".
 Clearing the text in the Filter field shows the entire list.
 
-As an alternative to using the Parameter combo box, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
+As an alternative to using the Parameter tree, you can press control+tab or control+shift+tab anywhere in the dialog to move to the next or previous parameter, respectively.
 
-Space can be used to play/stop the project when focused on sliders or the Parameters combo box.
+Space can be used to play/stop the project when focused on the slider.
 Control+Space can be used to pause, thus moving the edit cursor if you want to cue up a different part of the project.
 
 Some effects expose a lot of unnamed and potentially unusable parameters, which can make finding the useful ones challenging.
