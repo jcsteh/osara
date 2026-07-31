@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <functional>
 #include <iomanip>
@@ -1016,6 +1017,8 @@ class FxParams: public ParamSource {
 	// these based on the effect and the known named parameters it supports. See
 	// initNamedConfigParams().
 	vector<FxNamedConfigParam<ReaperObj>> namedConfigParams;
+	vector<Category> categories;
+	map<string, int> categoryIndexes;
 	int (*_GetNumParams)(ReaperObj*, int);
 	bool (*_GetFXName)(ReaperObj*, int, char*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
@@ -1029,6 +1032,23 @@ class FxParams: public ParamSource {
 	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
 
 	void initNamedConfigParams();
+
+	int getFxParamCategory(int fx, int param) {
+		if (!this->_GetParamSectionName) {
+			return -1;
+		}
+		char section[100] = "";
+		this->_GetParamSectionName(this->obj, fx, param, section, sizeof(section));
+		if (!section[0]) {
+			return -1;
+		}
+		auto [it, inserted] = this->categoryIndexes.emplace(section,
+			(int)this->categories.size());
+		if (inserted) {
+			this->categories.push_back({section});
+		}
+		return it->second;
+	}
 
 	public:
 	FxParams(ReaperObj* obj, const string& apiPrefix, int fx=-1):
@@ -1087,6 +1107,18 @@ class FxParams: public ParamSource {
 				this->namedConfigParams[param]);
 		}
 		return this->getParam(this->fx, param - namedCount);
+	}
+
+	int getParamCategory(int param) final {
+		const int namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			return -1;
+		}
+		return this->getFxParamCategory(this->fx, param - namedCount);
+	}
+
+	Category getCategory(int category) final {
+		return this->categories[category];
 	}
 
 	bool isProbablyUsefulParam(int param, const string& name) final {
