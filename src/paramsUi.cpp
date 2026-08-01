@@ -369,68 +369,99 @@ class ParamsDialog {
 			newVal = this->param->max;
 		}
 
-		// If the value text (if any) doesn't change, the value change is insignificant.
-		// Snap to the next change in value text.
-		// Continually adding to a float accumulates inaccuracy, so multiply by the
-		// number of steps each iteration instead.
 		const string origText = this->param->getValueText(this->val);
-		const string minText = this->param->getValueText(this->param->min);
-		const string maxText = this->param->getValueText(this->param->max);
-		const bool canOnlyFormatCurrent = !origText.empty() &&
-			// Some parameters return an empty string when you query the formatted text
-			// for a value which isn't the current.
-			(minText.empty() || maxText.empty() ||
-			// Others return the current value's formatted text for all values.
-			(origText == minText && origText == maxText));
+		enum class CanFormat {none, onlyCurrent, all};
 		dbg(
-			"params slider: origVal {} origText '{}' newVal {} step {} "
-			"minText {} maxText {} canOnlyFormatCurrent {}",
-			this->val, origText, newVal, step, minText, maxText, canOnlyFormatCurrent);
-		double tryVal = newVal;
-		for (unsigned int steps = 1;
-			this->param->min <= tryVal && tryVal <= this->param->max;
-			tryVal = this->val + (step * steps++)
+			"params slider: origVal {} origText '{}' newVal {} step {}",
+			this->val, origText, newVal, step);
+		const CanFormat canFormat = [&] {
+			if (origText.empty()) {
+				dbg("cannot format");
+				return CanFormat::none;
+			}
+			const string minText = this->param->getValueText(this->param->min);
+			const string maxText = this->param->getValueText(this->param->max);
+			dbg(
+				"minText '{}' maxText '{}'",
+				minText, maxText);
+			if (
+				// Some parameters return an empty string when you query the formatted text
+				// for a value which isn't the current.
+				minText.empty() || maxText.empty() ||
+				// Others return the current value's formatted text for all values.
+				(origText == minText && origText == maxText)
+			) {
+				dbg("can only format current");
+				return CanFormat::onlyCurrent;
+			}
+			dbg("can format all");
+			return CanFormat::all;
+		}();
+		if (
+			canFormat == CanFormat::all ||
+			(canFormat == CanFormat::onlyCurrent &&
+				IsDlgButtonChecked(this->dialog, ID_PARAM_TRY_SET))
 		) {
-			if (step < 0 && tryVal + step < this->param->min) {
-				// We're less than a step away from the minimum. This could be due to
-				// floating point imprecision. The loop will never hit the minimum, so
-				// ensure we try the minimum here. This can be significant for some
-				// parameters which only accept a value of 0 or 1.
-				tryVal = this->param->min;
-			} else if (step > 0 && tryVal + step > this->param->max) {
-				tryVal = this->param->max;
-			}
-			string testText = this->param->getValueText(tryVal);
-			dbg("params slider: tryVal {} testText '{}'", tryVal, testText);
-			if (canOnlyFormatCurrent) {
-				// To deal with this, we have to set the value before we can format it.
-				this->param->setValue(tryVal);
-				double nowVal = this->param->getValue();
-				testText = this->param->getValueText(nowVal);
-				dbg("params slider: set for format, nowVal {} testText '{}'",
-					nowVal, testText);
-			}
-			if (testText.empty())
-				break; // Formatted values not supported.
-			if (testText != origText) {
-				// The value text is different, so this change is significant.
-				// Snap to this value.
-				newVal = tryVal;
-				break;
+			// If the value text (if any) doesn't change, the value change is insignificant.
+			// Snap to the next change in value text.
+			// Continually adding to a float accumulates inaccuracy, so multiply by the
+			// number of steps each iteration instead.
+			double tryVal = newVal;
+			for (unsigned int steps = 1;
+				this->param->min <= tryVal && tryVal <= this->param->max;
+				tryVal = newVal + (step * steps++)
+			) {
+				if (step < 0 && tryVal + step < this->param->min) {
+					// We're less than a step away from the minimum. This could be due to
+					// floating point imprecision. The loop will never hit the minimum, so
+					// ensure we try the minimum here. This can be significant for some
+					// parameters which only accept a value of 0 or 1.
+					tryVal = this->param->min;
+				} else if (step > 0 && tryVal + step > this->param->max) {
+					tryVal = this->param->max;
+				}
+				dbg("tryVal {}", tryVal);
+				string testText;
+				if (canFormat == CanFormat::onlyCurrent) {
+					// Some parameters only format their current value. Set the value
+					// before formatting it so we can still detect meaningful steps.
+					this->param->setValue(tryVal);
+					double nowVal = this->param->getValue();
+					testText = this->param->getValueText(nowVal);
+					dbg("set for format, nowVal {} testText '{}'",
+						nowVal, testText);
+				} else {
+					testText = this->param->getValueText(tryVal);
+					dbg("testText '{}'", testText);
+				}
+				if (!testText.empty() && testText != origText) {
+					// The value text is different, so this change is significant.
+					// Snap to this value.
+					newVal = tryVal;
+					break;
+				}
 			}
 		}
 		dbg("params slider: final set to {}", newVal);
 		this->param->setValue(newVal);
-		this->updateValue();
-		this->checkForValChange();
+		this->checkForValChange(canFormat == CanFormat::onlyCurrent);
 	}
 
-	void checkForValChange(int tries = 0) {
+	void checkForValChange(bool checkText, int tries = 0) {
 		double newVal = this->param->getValue();
 		dbg("params check val: origVal {} newVal {} tries {}",
 			this->val, newVal, tries);
-		if (newVal != this->val) {
+		bool changed = newVal != this->val;
+		if (changed && checkText) {
+			// Some parameters update their numeric value before they update their
+			// formatted text. Wait for that to change too.
+			const string newText = this->param->getValueText(newVal);
+			dbg("origText '{}' newText '{}'", this->valText, newText);
+			changed = newText != this->valText;
+		}
+		if (changed) {
 			this->val = newVal;
+			dbg("detected value change");
 			this->updateValue();
 			return;
 		}
@@ -441,10 +472,13 @@ class ParamsDialog {
 		if (tries == 10) {
 			// Don't keep retrying forever. If the value hasn't changed by now, it
 			// probably never will.
+			if (checkText) {
+				this->val = newVal;
+			}
 			return;
 		}
-		this->valChangeLater = CallLater([this, tries] {
-			this->checkForValChange(tries);
+		this->valChangeLater = CallLater([this, tries, checkText] {
+			this->checkForValChange(checkText, tries);
 		}, 30);
 	}
 
@@ -816,6 +850,7 @@ class ParamsDialog {
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
 		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_TRY_SET, BST_CHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
