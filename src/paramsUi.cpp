@@ -41,20 +41,33 @@ class Param {
 	double max;
 	double step;
 	double largeStep;
-	bool isEditable;
+	// True if the value should be editable via a text box. In this case,
+	// getValueForEditing and setValueFromEdited must be implemented.
+	bool isEditable = false;
+	// True to allow the editable value to be empty. If false, an empty text box
+	// will just be ignored.
+	bool allowsEmptyEdited = false;
+	// True if the value is a range that can be expressed numerically. In this
+	// case, a slider will be available to adjust the value. This applies to
+	// toggles and stepped values as well; i.e. the text values don't need to be
+	// numeric. min, max, step and largeStep must be set, and getValue
+	// and setValue must be implemented.
+	bool isRange = true;
 
-	Param(): isEditable(false) {
-	}
-
+	Param() = default;
 	virtual ~Param() = default;
 
-	virtual double getValue() = 0;
+	virtual double getValue() { return 0; }
+	// If isRange is false, the value argument can be ignored, but this must
+	// still return the value text for the current value.
 	virtual string getValueText(double value) = 0;
 	virtual string getValueForEditing() {
 		return "";
 	}
-	virtual void setValue(double value) = 0;
-	virtual void setValueFromEdited(const string& text) {
+	virtual void setValue(double value) {}
+	// Returns an error message if the value could not be set.
+	virtual string setValueFromEdited(const string& text) {
+		return {};
 	}
 
 	// Possible reactions after an option has been chosen from the context menu.
@@ -260,13 +273,14 @@ class ReaperObjVolParam: public ReaperObjParam {
 		}
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		if (text.compare(0, 4, "-inf") == 0) {
 			this->setValue(0);
-			return;
+			return {};
 		}
 		double db = atof(text.c_str());
 		this->setValue(DB2VAL(db));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
@@ -306,8 +320,9 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		this->setValue(parsepanstr(text.c_str()));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
@@ -410,7 +425,7 @@ class ParamsDialog {
 		this->paramNum = paramNum;
 		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
-		EnableWindow(this->slider, TRUE);
+		EnableWindow(this->slider, this->param->isRange);
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
@@ -551,14 +566,22 @@ class ParamsDialog {
 	}
 
 	void onValueEdited() {
-		char rawText[30];
-		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0)
+		char rawText[256];
+		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0 &&
+				!this->param->allowsEmptyEdited)
 			return;
 		if (this->param->getValueForEditing().compare(rawText) == 0)
 			return;
-		this->param->setValueFromEdited(rawText);
+		const string error = this->param->setValueFromEdited(rawText);
 		this->val = this->param->getValue();
 		this->updateValue();
+		if (!error.empty()) {
+			// MessageBox activates itself, which would otherwise cause WM_ACTIVATE
+			// to close the Parameters dialog.
+			this->shouldAllowDeactivate = true;
+			MessageBox(this->dialog, error.c_str(), nullptr, MB_OK | MB_ICONERROR);
+			this->shouldAllowDeactivate = false;
+		}
 	}
 
 	void saveWindowPos() {
@@ -1254,8 +1277,9 @@ class FxParam: public Param {
 		this->source._SetParam(this->source.obj, this->fx, this->param, value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		this->setValue(atof(text.c_str()));
+		return {};
 	}
 
 	Param::MoreOptions getMoreOptions() final {
@@ -2095,9 +2119,10 @@ class ItemLenParam: public ReaperObjParam {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		double offset = this->getOffset();
 		this->setValue(parse_timestr_len(text.c_str(), offset, -1));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
