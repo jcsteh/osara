@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-07-15 19:43\n"
+"PO-Revision-Date: 2026-08-01 19:39\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -986,6 +986,11 @@ msgstr "{} pixels/battements"
 msgid "{} pixels/second"
 msgstr "{} pixels/seconde"
 
+#. Reported when zooming in or out vertically in the MIDI editor. {} will be
+#. replaced with the number of pixels per semitone; e.g. 12 pixels/semitone.
+msgid "{} pixels/semitone"
+msgstr "{} pixels/demi-ton"
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -1055,6 +1060,9 @@ msgstr "Bande {} type"
 
 msgid "FX Parameters"
 msgstr "Paramètre d'FX"
+
+msgid "Show/hide &envelope"
+msgstr "Afficher/masquer &l'enveloppe"
 
 msgid "Go to send destination track"
 msgstr "Aller sur l'envoi de la piste de destination"
@@ -3454,6 +3462,10 @@ msgstr "&Filtre:"
 msgctxt "Parameters"
 msgid "Include &unnamed and potentially unusable parameters"
 msgstr "Inclure les paramètres &sans nom et potentiellement inutilisables"
+
+msgctxt "Parameters"
+msgid "&Try setting value to detect steps"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Close"
