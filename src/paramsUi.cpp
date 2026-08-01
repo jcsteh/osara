@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cstdint>
 #include <functional>
 #include <iomanip>
 #include <memory>
@@ -553,7 +554,7 @@ class ParamsDialog {
 	}
 
 	void onValueEdited() {
-		char rawText[256];
+		char rawText[512];
 		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0 &&
 				!this->param->allowsEmptyEdited)
 			return;
@@ -1029,11 +1030,14 @@ template<typename ReaperObj>
 class FxParam;
 template<typename ReaperObj>
 class FxNamedConfigParam;
+template<typename ReaperObj>
+class FxPinMappingParam;
 
 template<typename ReaperObj>
 class FxParams: public ParamSource {
 	friend class FxParam<ReaperObj>;
 	friend class FxNamedConfigParam<ReaperObj>;
+	friend class FxPinMappingParam<ReaperObj>;
 
 	private:
 	ReaperObj* obj;
@@ -1042,6 +1046,13 @@ class FxParams: public ParamSource {
 	// these based on the effect and the known named parameters it supports. See
 	// initNamedConfigParams().
 	vector<FxNamedConfigParam<ReaperObj>> namedConfigParams;
+	struct Pin {
+		bool isOutput;
+		int index;
+		string name;
+		int category;
+	};
+	vector<Pin> pins;
 	vector<Category> categories;
 	map<string, int> categoryIndexes;
 	int (*_GetNumParams)(ReaperObj*, int);
@@ -1055,8 +1066,12 @@ class FxParams: public ParamSource {
 	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
 	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
+	int (*_GetIOSize)(ReaperObj*, int, int*, int*);
+	int (*_GetPinMappings)(ReaperObj*, int, int, int, int*);
+	bool (*_SetPinMappings)(ReaperObj*, int, int, int, int, int);
 
 	void initNamedConfigParams();
+	void initPins();
 
 	int getFxParamCategory(int fx, int param) {
 		if (!this->_GetParamSectionName) {
@@ -1094,17 +1109,23 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_SetNamedConfigParm").c_str());
 		*(void**)&this->_GetParamSectionName = plugin_getapi(
 			(apiPrefix + "_GetParamSectionName").c_str());
+		*(void**)&this->_GetIOSize = plugin_getapi((apiPrefix + "_GetIOSize").c_str());
+		*(void**)&this->_GetPinMappings = plugin_getapi(
+			(apiPrefix + "_GetPinMappings").c_str());
+		*(void**)&this->_SetPinMappings = plugin_getapi(
+			(apiPrefix + "_SetPinMappings").c_str());
 		if (fx >= 0) {
 			this->initNamedConfigParams();
+			this->initPins();
 		}
 	}
 
 	string getTitle() final;
 
 	int getParamCount() final {
-		// Any named config params come first, followed by normal params.
+		// Named config params come first, followed by normal params and pin mappings.
 		return (int)this->namedConfigParams.size() +
-			this->_GetNumParams(this->obj, this->fx);
+			this->_GetNumParams(this->obj, this->fx) + (int)this->pins.size();
 	}
 
 	string getParamName(int param) final {
@@ -1112,11 +1133,13 @@ class FxParams: public ParamSource {
 		auto namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			ns << this->namedConfigParams[param].getDisplayName();
-		} else {
+		} else if (param < namedCount + this->_GetNumParams(this->obj, this->fx)) {
 			char name[256];
 			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
 				sizeof(name));
 			ns << name;
+		} else {
+			ns << this->pins[param - namedCount - this->_GetNumParams(this->obj, this->fx)].name;
 		}
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
@@ -1131,6 +1154,11 @@ class FxParams: public ParamSource {
 			return make_unique<FxNamedConfigParam<ReaperObj>>(
 				this->namedConfigParams[param]);
 		}
+		const int fxParamCount = this->_GetNumParams(this->obj, this->fx);
+		if (param >= namedCount + fxParamCount) {
+			return make_unique<FxPinMappingParam<ReaperObj>>(*this,
+				this->pins[param - namedCount - fxParamCount]);
+		}
 		return this->getParam(this->fx, param - namedCount);
 	}
 
@@ -1138,6 +1166,10 @@ class FxParams: public ParamSource {
 		const int namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			return -1;
+		}
+		const int fxParamCount = this->_GetNumParams(this->obj, this->fx);
+		if (param >= namedCount + fxParamCount) {
+			return this->pins[param - namedCount - fxParamCount].category;
 		}
 		return this->getFxParamCategory(this->fx, param - namedCount);
 	}
@@ -1150,6 +1182,9 @@ class FxParams: public ParamSource {
 		const int namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			// Named config params aren't FX params; keep them visible.
+			return true;
+		}
+		if (param >= namedCount + this->_GetNumParams(this->obj, this->fx)) {
 			return true;
 		}
 		if (this->_GetParamSectionName) {
@@ -1318,6 +1353,106 @@ class FxParam: public Param {
 	}
 };
 
+template<typename ReaperObj>
+class FxPinMappingParam: public Param {
+	private:
+	static constexpr int HIGH_MAPPINGS_PIN_OFFSET = 0x1000000;
+	FxParams<ReaperObj>& source;
+	const typename FxParams<ReaperObj>::Pin pin;
+
+	void getMappings(uint32_t& low, uint32_t& high, uint32_t& highLow,
+			uint32_t& highHigh) const {
+		int highOut = 0;
+		low = (uint32_t)this->source._GetPinMappings(this->source.obj,
+			this->source.fx, this->pin.isOutput, this->pin.index, &highOut);
+		high = (uint32_t)highOut;
+		highLow = (uint32_t)this->source._GetPinMappings(this->source.obj,
+			this->source.fx, this->pin.isOutput,
+			this->pin.index + HIGH_MAPPINGS_PIN_OFFSET, &highOut);
+		highHigh = (uint32_t)highOut;
+	}
+
+	string getMappingText() const {
+		uint32_t low, high, highLow, highHigh;
+		this->getMappings(low, high, highLow, highHigh);
+		ostringstream text;
+		for (int channel = 0; channel < 128; ++channel) {
+			const uint32_t mask = uint32_t{1} << (channel % 32);
+			const uint32_t mappings = channel < 32 ? low :
+				channel < 64 ? high : channel < 96 ? highLow : highHigh;
+			if (!(mappings & mask)) {
+				continue;
+			}
+			if (text.tellp() > 0) {
+				text << " ";
+			}
+			text << channel + 1;
+		}
+		return text.str();
+	}
+
+	public:
+	FxPinMappingParam(FxParams<ReaperObj>& source,
+			const typename FxParams<ReaperObj>::Pin& pin):
+			source(source), pin(pin) {
+		this->isEditable = true;
+		this->isRange = false;
+		this->allowsEmptyEdited = true;
+	}
+
+	string getValueText(double) final {
+		return this->getMappingText();
+	}
+
+	string getValueForEditing() final {
+		return this->getMappingText();
+	}
+
+	string setValueFromEdited(const string& text) final {
+		uint32_t low = 0, high = 0, highLow = 0, highHigh = 0;
+		istringstream channels(text);
+		for (;;) {
+			channels >> ws;
+			if (channels.eof()) {
+				break;
+			}
+			int channel;
+			if (!(channels >> channel)) {
+				return translate("Channel lists must contain positive numbers separated by spaces.");
+			}
+			if (channel < 1 || channel > 128) {
+				return translate("Channels must be from 1 through 128.");
+			}
+			const uint32_t mask = uint32_t{1} << ((channel - 1) % 32);
+			if (channel <= 32) {
+				low |= mask;
+			} else if (channel <= 64) {
+				high |= mask;
+			} else if (channel <= 96) {
+				highLow |= mask;
+			} else {
+				highHigh |= mask;
+			}
+		}
+		uint32_t oldLow, oldHigh, oldHighLow, oldHighHigh;
+		this->getMappings(oldLow, oldHigh, oldHighLow, oldHighHigh);
+		if (!this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index, (int)low, (int)high)) {
+			// Translators: An error reported when the channels mapped to an an FX
+			// input or output could not be set.
+			return translate("Could not set the channels.");
+		}
+		if (!this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index + HIGH_MAPPINGS_PIN_OFFSET,
+				(int)highLow, (int)highHigh)) {
+			this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index, (int)oldLow, (int)oldHigh);
+			return translate("Could not set the channels.");
+		}
+		return {};
+	}
+};
+
 // The possible values for an FX named config param. The first string is the
 // display name. The second is the name to pass to the API.
 using FxNamedConfigParamValues = vector<pair<const char*, const char*>>;
@@ -1428,6 +1563,56 @@ void FxParams<ReaperObj>::initNamedConfigParams() {
 				name.str(), REAEQ_BAND_TYPE_VALUES));
 		}
 	}
+}
+
+template<typename ReaperObj>
+void FxParams<ReaperObj>::initPins() {
+	int inputCount = 0;
+	int outputCount = 0;
+	if (!this->_GetIOSize || !this->_GetPinMappings || !this->_SetPinMappings ||
+			this->_GetIOSize(this->obj, this->fx, &inputCount, &outputCount) < 0 ||
+			inputCount < 0 || outputCount < 0) {
+		return;
+	}
+	const auto addPins = [this](bool isOutput, int count, const char* pinType,
+			const char* categoryName, const char* unnamedPinFormat,
+			const char* mappingFormat) {
+		if (count == 0) {
+			return;
+		}
+		const int category = (int)this->categories.size();
+		this->categories.push_back({categoryName});
+		for (int pin = 0; pin < count; ++pin) {
+			char pinName[256] = "";
+			this->_GetNamedConfigParm(this->obj, this->fx,
+				format("{}_pin_{}", pinType, pin).c_str(), pinName, sizeof(pinName));
+			string name = pinName;
+			if (name.empty()) {
+				name = format(unnamedPinFormat, pin + 1);
+			}
+			this->pins.push_back({isOutput, pin, format(mappingFormat, name), category});
+		}
+	};
+	addPins(false, inputCount, "in",
+		// Translators: A category in the FX Parameters dialog containing input pin
+		// mappings.
+		translate("Inputs"),
+		// Translators: The name of an unnamed input pin in the FX Parameters dialog.
+		// {} will be replaced with the pin number.
+		translate("Input {}"),
+		// Translators: A parameter in the FX Parameters dialog which configures the
+		// track channels from which an input pin receives. {} is the pin name.
+		translate("{} receives from track channels"));
+	addPins(true, outputCount, "out",
+		// Translators: A category in the FX Parameters dialog containing output pin
+		// mappings.
+		translate("Outputs"),
+		// Translators: The name of an unnamed output pin in the FX Parameters dialog.
+		// {} will be replaced with the pin number.
+		translate("Output {}"),
+		// Translators: A parameter in the FX Parameters dialog which configures the
+		// track channels to which an output pin is sent. {} is the pin name.
+		translate("{} sends to track channels"));
 }
 
 template<typename ReaperObj>
