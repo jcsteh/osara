@@ -34,6 +34,7 @@ sources = [
 	"controlSurface.cpp",
 	"exports.cpp",
 	"fxChain.cpp",
+	"keyMap.cpp",
 	"translation.cpp",
 	"updateCheck.cpp",
 ]
