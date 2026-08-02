@@ -174,12 +174,16 @@ class KeyMapMerge {
 		for (const auto& [identity, osara]: osaraKeys) {
 			auto user = userKeys.find(identity);
 			if (user == userKeys.end()) {
+				// This key is new in the OSARA map and isn't bound in the user's map.
 				keysToAdd.push_back(osara);
 			} else if (user->second.command != osara.command) {
+				// This key exists in both maps and is bound to different actions.
 				conflicts.push_back({osara, user->second});
 			}
 		}
 		for (const auto& [identity, osara]: osaraOther) {
+			// Custom actions and scripts have unique ids. If they've changed in the
+			// OSARA map, replace them in the user's map.
 			auto user = userOther.find(identity);
 			if (user == userOther.end()) {
 				otherToAdd.push_back(osara);
@@ -210,8 +214,13 @@ class KeyMapMerge {
 
 	const string& getError() const { return error; }
 	const vector<Conflict>& getConflicts() const { return conflicts; }
-	void setConflictAccepted(size_t index, bool accepted) { conflicts[index].accepted = accepted; }
-	bool isConflictAccepted(size_t index) const { return conflicts[index].accepted; }
+	void setConflictAccepted(size_t index, bool accepted) {
+		conflicts[index].accepted = accepted;
+	}
+	bool isConflictAccepted(size_t index) const {
+		return conflicts[index].accepted;
+	}
+
 	string getKeyText(const Conflict& conflict) const {
 		static const regex pattern(R"(#\s*([^:]+)\s*:\s*([^:]+)\s*:)");
 		smatch match;
@@ -241,6 +250,7 @@ class KeyMapMerge {
 		return static_cast<int>(count_if(conflicts.begin(), conflicts.end(),
 			[](const Conflict& conflict) { return conflict.accepted; }));
 	}
+
 	bool hasChanges() const {
 		return !keysToAdd.empty() || !otherToAdd.empty() || !replacements.empty() ||
 			getAcceptedConflictCount() != 0;
@@ -255,6 +265,9 @@ class KeyMapMerge {
 		}
 		vector<string> output;
 		output.reserve(userLines.size() + keysToAdd.size() + otherToAdd.size());
+		// Write the original lines from the user map exactly as they were except
+		// where we explicitly need to replace something with a line from the OSARA
+		// map.
 		for (size_t index = 0; index < userLines.size(); ++index) {
 			auto replacement = outputReplacements.find(index);
 			output.push_back(replacement == outputReplacements.end() ?
@@ -327,12 +340,7 @@ class KeyMapMergeDialog {
 
 	bool isChecked(int index) const {
 #ifdef _WIN32
-		LVITEM item = {};
-		item.mask = LVIF_STATE;
-		item.iItem = index;
-		item.stateMask = LVIS_STATEIMAGEMASK;
-		ListView_GetItem(list, &item);
-		return (item.state & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(2);
+		return ListView_GetCheckState(list, index);
 #else
 		return merge->isConflictAccepted(index);
 #endif
@@ -340,12 +348,7 @@ class KeyMapMergeDialog {
 
 	void setChecked(int index, bool checked) {
 #ifdef _WIN32
-		LVITEM item = {};
-		item.mask = LVIF_STATE;
-		item.iItem = index;
-		item.stateMask = LVIS_STATEIMAGEMASK;
-		item.state = INDEXTOSTATEIMAGEMASK(checked ? 2 : 1);
-		ListView_SetItem(list, &item);
+		ListView_SetCheckState(list, index, checked);
 #else
 		merge->setConflictAccepted(index, checked);
 		const string choice = translate(checked ? "Yes" : "No");
