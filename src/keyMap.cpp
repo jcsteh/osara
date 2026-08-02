@@ -12,17 +12,13 @@
 #include <regex>
 #include <vector>
 #include <WDL/win32_utf8.h>
+#include <WDL/wdltypes.h>
 #include "keyMap.h"
 #include "resource.h"
 #include "translation.h"
 
 #ifdef _WIN32
 #include <CommCtrl.h>
-#else
-// SWELL does not define these extended ListView styles. It still supports the
-// state-image values used below to retain each conflict's checked state.
-#define LVS_EX_CHECKBOXES 0
-#define LVS_EX_FULLROWSELECT 0
 #endif
 
 using namespace std;
@@ -215,6 +211,7 @@ class KeyMapMerge {
 	const string& getError() const { return error; }
 	const vector<Conflict>& getConflicts() const { return conflicts; }
 	void setConflictAccepted(size_t index, bool accepted) { conflicts[index].accepted = accepted; }
+	bool isConflictAccepted(size_t index) const { return conflicts[index].accepted; }
 	string getKeyText(const Conflict& conflict) const {
 		static const regex pattern(R"(#\s*([^:]+)\s*:\s*([^:]+)\s*:)");
 		smatch match;
@@ -308,34 +305,52 @@ class KeyMapMergeDialog {
 	unique_ptr<KeyMapMerge> merge;
 	HWND dialog;
 	HWND list;
+#ifndef _WIN32
+	accelerator_register_t accelReg = {};
+#endif
 
 	void close() {
+#ifndef _WIN32
+		plugin_register("-accelerator", &accelReg);
+#endif
 		DestroyWindow(dialog);
 		delete this;
 	}
 
 	void updateChoices() {
+#ifdef _WIN32
 		for (int index = 0; index < ListView_GetItemCount(list); ++index) {
 			merge->setConflictAccepted(index, isChecked(index));
 		}
+#endif
 	}
 
 	bool isChecked(int index) const {
+#ifdef _WIN32
 		LVITEM item = {};
 		item.mask = LVIF_STATE;
 		item.iItem = index;
 		item.stateMask = LVIS_STATEIMAGEMASK;
 		ListView_GetItem(list, &item);
 		return (item.state & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(2);
+#else
+		return merge->isConflictAccepted(index);
+#endif
 	}
 
 	void setChecked(int index, bool checked) {
+#ifdef _WIN32
 		LVITEM item = {};
 		item.mask = LVIF_STATE;
 		item.iItem = index;
 		item.stateMask = LVIS_STATEIMAGEMASK;
 		item.state = INDEXTOSTATEIMAGEMASK(checked ? 2 : 1);
 		ListView_SetItem(list, &item);
+#else
+		merge->setConflictAccepted(index, checked);
+		const string choice = translate(checked ? "Yes" : "No");
+		ListView_SetItemText(list, index, 0, choice.data());
+#endif
 	}
 
 	void setAllChoices(bool accepted) {
@@ -361,6 +376,26 @@ class KeyMapMergeDialog {
 		showMergeCompleteAndExit(added, overridden);
 	}
 
+#ifndef _WIN32
+	void toggleFocusedChoice() {
+		const int index = ListView_GetNextItem(list, -1, LVNI_FOCUSED);
+		if (index != -1) {
+			setChecked(index, !isChecked(index));
+		}
+	}
+
+	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+		auto* self = static_cast<KeyMapMergeDialog*>(accelReg->user);
+		if (msg->message == WM_KEYDOWN && msg->hwnd == self->list &&
+			msg->wParam == VK_SPACE
+		) {
+			self->toggleFocusedChoice();
+			return 1; // Eat the key.
+		}
+		return 0; // Not interested.
+	}
+#endif
+
 	static INT_PTR CALLBACK dialogProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		auto* self = reinterpret_cast<KeyMapMergeDialog*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 		switch (msg) {
@@ -385,6 +420,14 @@ class KeyMapMergeDialog {
 			case WM_CLOSE:
 				self->close();
 				return TRUE;
+#ifndef _WIN32
+			case WM_NOTIFY:
+				if (lParam && reinterpret_cast<NMHDR*>(lParam)->code == NM_DBLCLK) {
+					self->toggleFocusedChoice();
+					return TRUE;
+				}
+				break;
+#endif
 		}
 		return FALSE;
 	}
@@ -397,8 +440,16 @@ class KeyMapMergeDialog {
 		SetWindowLongPtr(dialog, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 		list = GetDlgItem(dialog, ID_KEYMAP_LIST);
 		WDL_UTF8_HookListView(list);
+#ifdef _WIN32
 		ListView_SetExtendedListViewStyle(list, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
 		const vector<string> headings = {translate("Key"), translate("OSARA"), translate("Yours")};
+#else
+		// SWELL doesn't support check boxes in SysListView32, so we use an extra
+		// text column instead. We maintain the state on the KeyMapMerge instance.
+		ListView_SetExtendedListViewStyleEx(list, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+		const vector<string> headings = {
+			translate("Use OSARA"), translate("Key"), translate("OSARA"), translate("Yours")};
+#endif
 		for (int index = 0; index < static_cast<int>(headings.size()); ++index) {
 			LVCOLUMN column = {};
 			column.mask = LVCF_TEXT | LVCF_WIDTH;
@@ -412,13 +463,28 @@ class KeyMapMergeDialog {
 			item.mask = LVIF_TEXT;
 			item.iItem = index;
 			string key = this->merge->getKeyText(conflicts[index]);
-			item.pszText = key.data();
-			ListView_InsertItem(list, &item);
 			string osara = this->merge->getActionText(conflicts[index].osara);
 			string user = this->merge->getActionText(conflicts[index].user);
+#ifdef _WIN32
+			item.pszText = key.data();
+			ListView_InsertItem(list, &item);
 			ListView_SetItemText(list, index, 1, osara.data());
 			ListView_SetItemText(list, index, 2, user.data());
+#else
+			string choice = translate("No");
+			item.pszText = choice.data();
+			ListView_InsertItem(list, &item);
+			ListView_SetItemText(list, index, 1, key.data());
+			ListView_SetItemText(list, index, 2, osara.data());
+			ListView_SetItemText(list, index, 3, user.data());
+#endif
 		}
+#ifndef _WIN32
+		accelReg.translateAccel = translateAccel;
+		accelReg.isLocal = true;
+		accelReg.user = this;
+		plugin_register("accelerator", &accelReg);
+#endif
 		ShowWindow(dialog, SW_SHOWNORMAL);
 	}
 };
