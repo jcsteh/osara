@@ -34,6 +34,7 @@
 #include "osara.h"
 #include <WDL/db2val.h>
 #include "config.h"
+#include "keyMap.h"
 #include "resource.h"
 #include "paramsUi.h"
 #include "peakWatcher.h"
@@ -6325,6 +6326,7 @@ Command OSARA_COMMANDS[] = {
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Set phase normal for all tracks")}, "OSARA_SETPHASENORMALALLTRACKS", cmdSetPhaseNormalAllTracks},
 	{ MAIN_SECTION, {DEFACCEL, _t("OSARA: Unmonitor all tracks")}, "OSARA_UNMONITORALLTRACKS", cmdUnmonitorAllTracks},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure REAPER for optimal screen reader accessibility")}, "OSARA_CONFIGREAPEROPTIMAL", cmdConfigReaperOptimal},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Merge OSARA key map")}, "OSARA_MERGEKEYMAP", cmdMergeOsaraKeyMap},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Check for update")}, "OSARA_UPDATE", cmdCheckForUpdate},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Open online documentation")}, "OSARA_OPENDOC", cmdOpenDoc},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Select items under edit cursor on selected tracks")}, "OSARA_SELITEMSEDITCURSSELTRACKS", cmdSelectItemsUnderEditCursorOnSelectedTracks},
@@ -6638,6 +6640,7 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 	addItem(translate("Online &documentation"), "_OSARA_OPENDOC");
 	addItem(translate("Check for &update"), "_OSARA_UPDATE");
 	addItem(translate("Configure REAPER for &optimal screen reader accessibility"), "_OSARA_CONFIGREAPEROPTIMAL");
+	addItem(translate("Merge OSARA key map"), "_OSARA_MERGEKEYMAP");
 	addItem(translate("About OSARA"), "_OSARA_ABOUT");
 }
 
