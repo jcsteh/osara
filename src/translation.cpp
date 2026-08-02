@@ -5,9 +5,11 @@
  * License: GNU General Public License version 2.0
  */
 
+#include <algorithm>
 #include <string>
 #include <fstream>
 #include <map>
+#include <vector>
 #include <tinygettext/dictionary.hpp>
 #include <tinygettext/po_parser.hpp>
 #include "osara.h"
@@ -65,6 +67,51 @@ static istringstream filterPoAmpersands(istream& input) {
 	}
 	return istringstream(filtered);
 }
+
+static string stripAmpersands(string text) {
+	text.erase(remove(text.begin(), text.end(), '&'), text.end());
+	return text;
+}
+
+static vector<string> stripAmpersands(const vector<string>& texts) {
+	vector<string> stripped;
+	stripped.reserve(texts.size());
+	for (const string& text: texts) {
+		stripped.push_back(stripAmpersands(text));
+	}
+	return stripped;
+}
+
+// filterPoAmpersands strips ampersands from msgids as well as translations.
+// translateDialog needs that, since GetWindowText returns text which SWELL has
+// already stripped. However, it also means a message containing an ampersand
+// in the source code can never match the dictionary; e.g. the items OSARA adds
+// to the Extensions menu. Parse the file a second time without the filter and
+// add those original msgids as extra keys for the stripped translations, so
+// both forms of a message can be looked up.
+static void addUnstrippedMsgids(const string& path) {
+	ifstream input(path);
+	tinygettext::Dictionary unstripped;
+	tinygettext::POParser::parse(path, input, unstripped);
+	// Note that tinygettext never stores the plural msgid; it only uses it in
+	// log messages. That's why we pass msgid for it below.
+	unstripped.foreach([](const string& msgid, vector<string>& msgstrs) {
+		if (msgid.find('&') == string::npos) {
+			return;
+		}
+		translationDict.add_translation(msgid, msgid, stripAmpersands(msgstrs));
+	});
+	unstripped.foreach_ctxt([](const string& ctxt, const string& msgid,
+			vector<string>& msgstrs) {
+		if (msgid.find('&') == string::npos) {
+			return;
+		}
+		// The context is looked up in its stripped form, since that's what
+		// filterPoAmpersands produced and what translateDialog passes.
+		translationDict.add_translation(stripAmpersands(ctxt), msgid, msgid,
+			stripAmpersands(msgstrs));
+	});
+}
 #endif
 
 void initTranslation() {
@@ -108,6 +155,7 @@ void initTranslation() {
 	ifstream input(path);
 	istringstream filteredInput = filterPoAmpersands(input);
 	tinygettext::POParser::parse(path, filteredInput, translationDict);
+	addUnstrippedMsgids(path);
 #endif
 }
 
