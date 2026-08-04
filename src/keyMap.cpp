@@ -307,9 +307,19 @@ class KeyMapMerge {
 };
 
 void showMergeCompleteAndExit(int added, int overridden) {
+	// Translators: Shown after merging the OSARA key map. {} is the number of
+	// new key bindings. For example: "3 key bindings added."
+	string message = format(translate_plural("{} key binding added.",
+		"{} key bindings added.", added), added);
+	// Translators: Shown after merging the OSARA key map. {} is the number of
+	// conflicting bindings overridden with OSARA's bindings. For example: 
+	// "1 conflicting binding overridden."
+	message += " " + format(translate_plural("{} conflicting binding overridden.",
+		"{} conflicting bindings overridden.", overridden), overridden);
+	message += " ";
+	message += translate("REAPER will now exit. Please restart REAPER to apply the changes.");
 	MessageBox(GetForegroundWindow(),
-		format(translate("{} key bindings added and {} conflicting bindings overridden. REAPER will now exit. Please restart REAPER to apply the changes."),
-			added, overridden).c_str(),
+		message.c_str(),
 		translate("Restart REAPER"), MB_OK | MB_ICONINFORMATION);
 	Main_OnCommand(40004, 0); // File: Quit REAPER
 }
@@ -445,13 +455,25 @@ class KeyMapMergeDialog {
 		WDL_UTF8_HookListView(list);
 #ifdef _WIN32
 		ListView_SetExtendedListViewStyle(list, LVS_EX_CHECKBOXES | LVS_EX_FULLROWSELECT);
-		const vector<string> headings = {translate("Key"), translate("OSARA"), translate("Yours")};
+		const vector<string> headings = {
+			// Translators: A column header in the Merge OSARA Key Map dialog
+			// indicating the keyboard shortcut for a conflicting binding.
+			translate("Key"),
+			// Translators: A column header in the Merge OSARA Key Map dialog
+			// indicating the action assigned to a key in the OSARA key map.
+			translate("OSARA"),
+			// Translators: A column header in the Merge OSARA Key Map dialog
+			// indicating the action assigned to a key in the user's current key map.
+			translate("Yours")};
 #else
 		// SWELL doesn't support check boxes in SysListView32, so we use an extra
 		// text column instead. We maintain the state on the KeyMapMerge instance.
 		ListView_SetExtendedListViewStyleEx(list, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
 		const vector<string> headings = {
-			translate("Use OSARA"), translate("Key"), translate("OSARA"), translate("Yours")};
+			// Translators: A column header in the Merge OSARA Key Map dialog
+			// indicating whether the OSARA binding will replace the user's binding.
+			translate("Use OSARA"),
+			translate("Key"), translate("OSARA"), translate("Yours")};
 #endif
 		for (int index = 0; index < static_cast<int>(headings.size()); ++index) {
 			LVCOLUMN column = {};
@@ -501,8 +523,14 @@ void finishMerge(unique_ptr<KeyMapMerge> merge) {
 }
 
 bool confirmAutomaticMerge(const KeyMapMerge& merge) {
+	// Translators: Shown before merging the OSARA key map when there are no key
+	// binding conflicts. {} is the number of new key bindings. For example: "No
+	// key binding conflicts were found. 3 key bindings will be added. Do you want
+	// to merge the OSARA key map?"
 	return MessageBox(GetForegroundWindow(),
-		format(translate("No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?"),
+		format(translate_plural("No key binding conflicts were found. {} key binding will be added. Do you want to merge the OSARA key map?",
+			"No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?",
+			merge.getAddedKeyCount()),
 			merge.getAddedKeyCount()).c_str(),
 		translate("Merge OSARA Key Map"), MB_YESNO | MB_ICONQUESTION) == IDYES;
 }
