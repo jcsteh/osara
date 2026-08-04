@@ -18,11 +18,13 @@ AUTH_TOKEN = os.getenv("crowdinAuthToken")
 if not AUTH_TOKEN:
 	raise ValueError("crowdinAuthToken environment variable not set")
 PROJECT_ID = 442894
-POT_FILE_ID = 4
+MAIN_POT_FILE_ID = 4
+WIN_INSTALLER_DIRECTORY = "winInstaller"
+TRANSLATION_FILE_NAME = "osara.po"
 TMP_DOWNLOAD_PATH = "locale.zip"
 
-def request(path, method=requests.get, headers={}, **kwargs):
-	headers["Authorization"] = "Bearer %s" % AUTH_TOKEN
+def request(path, method=requests.get, headers=None, **kwargs):
+	headers = {"Authorization": "Bearer %s" % AUTH_TOKEN, **(headers or {})}
 	r = method("https://api.crowdin.com/api/v2/%s" % path, headers=headers,
 		**kwargs)
 	# Convert errors to exceptions, but print the response before raising.
@@ -63,23 +65,70 @@ def syncTranslations():
 		zf.extractall()
 	os.remove(TMP_DOWNLOAD_PATH)
 	print("Committing new translations")
-	subprocess.check_call(("git", "add", *glob.glob("locale/*.po")))
+	subprocess.check_call(("git", "add", "--",
+		*glob.glob("locale/**/*.po", recursive=True)))
 	subprocess.check_call(("git", "commit", "-m", "Update translations."))
 	print("Pushing to GitHub")
 	subprocess.check_call(("git", "push"))
 
-def uploadPot():
-	potPath = glob.glob("locale/*.pot")[0]
-	fn = os.path.basename(potPath)
-	pot = open(potPath, "rb")
+def findSingleFile(pattern):
+	paths = glob.glob(pattern)
+	if len(paths) != 1:
+		raise RuntimeError(f"Expected exactly one file matching {pattern}, found {len(paths)}")
+	return paths[0]
+
+def listProjectResources(resource):
+	resources = []
+	offset = 0
+	while True:
+		r = projectRequest(resource, params={"limit": 500, "offset": offset})
+		data = r.json()["data"]
+		resources.extend(data)
+		if len(data) < 500:
+			return resources
+		offset += len(data)
+
+def getWinInstallerDirectoryId():
+	for directory in listProjectResources("directories"):
+		data = directory["data"]
+		if data["name"] == WIN_INSTALLER_DIRECTORY and not data.get("directoryId"):
+			return data["id"]
+	print("Creating Crowdin directory for Windows installer translations")
+	r = projectRequest("directories", method=requests.post,
+		json={"name": WIN_INSTALLER_DIRECTORY})
+	return r.json()["data"]["id"]
+
+def findFileId(name, directoryId):
+	for file in listProjectResources("files"):
+		data = file["data"]
+		if data["name"] == name and data.get("directoryId") == directoryId:
+			return data["id"]
+	return None
+
+def uploadPotFile(potPath, fileId=None, directoryId=None):
 	print("Uploading pot to Crowdin temporary storage")
-	r = request("storages", method=requests.post,
-		headers={"Crowdin-API-FileName": "osara.po"}, data=pot)
+	with open(potPath, "rb") as pot:
+		r = request("storages", method=requests.post,
+			headers={"Crowdin-API-FileName": TRANSLATION_FILE_NAME}, data=pot)
 	storageId = r.json()["data"]["id"]
-	print("Updating pot file on Crowdin")
-	r = projectRequest("files/%d" % POT_FILE_ID, method=requests.put,
-		json={"storageId": storageId})
+	if fileId is None:
+		fileId = findFileId(TRANSLATION_FILE_NAME, directoryId)
+	if fileId is not None:
+		print("Updating pot file on Crowdin")
+		r = projectRequest("files/%d" % fileId, method=requests.put,
+			json={"storageId": storageId})
+	else:
+		print("Adding pot file to Crowdin")
+		data = {"storageId": storageId, "name": TRANSLATION_FILE_NAME}
+		if directoryId is not None:
+			data["directoryId"] = directoryId
+		r = projectRequest("files", method=requests.post, json=data)
 	return r
+
+def uploadPot():
+	uploadPotFile(findSingleFile("locale/*.pot"), fileId=MAIN_POT_FILE_ID)
+	directoryId = getWinInstallerDirectoryId()
+	uploadPotFile(findSingleFile("locale/winInstaller/*.pot"), directoryId=directoryId)
 
 if __name__ == "__main__":
 	command = sys.argv[1]
