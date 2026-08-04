@@ -161,26 +161,32 @@ class KeyMapMerge {
 		map<string, OtherRecord>& other
 	) {
 		for (size_t index = 0; index < lines.size(); ++index) {
+			dbg("line {}: '{}'", index, lines[index]);
 			KeyRecord key;
 			if (parseKey(lines[index], index, key)) {
+				dbg("parsed key, identity '{}'", key.identity);
 				keys[key.identity] = key;
 				continue;
 			}
 			OtherRecord record;
 			if (parseOther(lines[index], index, record)) {
+				dbg("parsed other, identity '{}'", record.identity);
 				other[record.identity] = record;
 			}
 		}
 	}
 
 	void analyse() {
+		dbg("analyse");
 		for (const auto& [identity, osara]: osaraKeys) {
 			auto user = userKeys.find(identity);
 			if (user == userKeys.end()) {
 				// This key is new in the OSARA map and isn't bound in the user's map.
+				dbg("add key '{}'", identity);
 				keysToAdd.push_back(osara);
 			} else if (user->second.command != osara.command) {
 				// This key exists in both maps and is bound to different actions.
+				dbg("conflict '{}'", identity);
 				conflicts.push_back({osara, user->second});
 			}
 		}
@@ -201,17 +207,22 @@ class KeyMapMerge {
 		const string resourcePath = GetResourcePath();
 		const string userPath = joinPath(resourcePath, "reaper-kb.ini");
 		const string osaraPath = joinPath(resourcePath, "KeyMaps/OSARA.ReaperKeyMap");
+		dbg("read {}", userPath);
 		if (!readLines(userPath, userLines)) {
 			error = translate("Unable to read your REAPER key map.");
 			return false;
 		}
+		dbg("read {}", osaraPath);
 		if (!readLines(osaraPath, osaraLines)) {
 			error = translate("Unable to read the OSARA key map");
 			return false;
 		}
+		dbg("index user");
 		indexLines(userLines, userKeys, userOther);
+		dbg("index osara");
 		indexLines(osaraLines, osaraKeys, osaraOther);
 		analyse();
+		dbg("added {}, conflicts {}", keysToAdd.size(), conflicts.size());
 		return true;
 	}
 
