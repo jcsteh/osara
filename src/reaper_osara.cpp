@@ -4160,16 +4160,18 @@ void cmdSplitItems(int command) {
 		double curPos = GetCursorPosition();
 		bool canSplit = false;
 		bool alreadyOnSplit = false;
-		for (int i = 0; i < CountSelectedTracks2(nullptr, false); ++i) {
-			MediaTrack* track = GetSelectedTrack2(nullptr, i, false);
-			for (int j = 0; j < CountTrackMediaItems(track); ++j) {
-				MediaItem* item = GetTrackMediaItem(track, j);
+		for (int t = 0; t < CountSelectedTracks2(nullptr, false); ++t) {
+			MediaTrack* track = GetSelectedTrack2(nullptr, t, false);
+			for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+				MediaItem* item = GetTrackMediaItem(track, i);
 				double position = GetMediaItemInfo_Value(item, "D_POSITION");
 				double length = GetMediaItemInfo_Value(item, "D_LENGTH");
-				if (curPos > position && curPos < (position + length))
+				if (curPos > position && curPos < (position + length)) {
 					canSplit = true;
-				else if (position == curPos || curPos == (position + length))
+				}
+				else if (position == curPos || curPos == (position + length)) {
 					alreadyOnSplit = true;
+				}
 			}
 		}
 		if (!canSplit && !alreadyOnSplit) {
@@ -4177,7 +4179,7 @@ void cmdSplitItems(int command) {
 			outputMessage(translate("no item at cursor"));
 			return;
 		}
-		else if (!canSplit && alreadyOnSplit) {
+		if (!canSplit && alreadyOnSplit) {
 			// Translators: Reported when an item cannot be split because the cursor is already on its edge.
 			outputMessage(translate("already split at cursor"));
 			return;
