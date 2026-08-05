@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-07-15 19:43\n"
+"PO-Revision-Date: 2026-08-01 19:39\n"
 
 msgid "enabled"
 msgstr "以启用"
@@ -59,7 +59,7 @@ msgstr "6. 为视频代码编辑器使用标准的,无障碍的编辑控件."
 
 msgctxt "optimal REAPER configuration"
 msgid "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
-msgstr "7.  在FX 浏览器中隐藏类型前缀,以便更高效的浏览 FX."
+msgstr "7. 隐藏 FX 浏览器中的类型前缀，浏览 FX 时更高效。"
 
 msgctxt "optimal REAPER configuration"
 msgid "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
@@ -936,6 +936,11 @@ msgstr "{} 像素/节拍"
 msgid "{} pixels/second"
 msgstr "{} 像素/秒"
 
+#. Reported when zooming in or out vertically in the MIDI editor. {} will be
+#. replaced with the number of pixels per semitone; e.g. 12 pixels/semitone.
+msgid "{} pixels/semitone"
+msgstr "{} 像素/半音"
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -1005,6 +1010,9 @@ msgstr "频带 {} 类型"
 
 msgid "FX Parameters"
 msgstr "FX 参数"
+
+msgid "Show/hide &envelope"
+msgstr "显示/隐藏包络(&E)"
 
 msgid "Go to send destination track"
 msgstr "转到发送轨道"
@@ -3349,6 +3357,10 @@ msgstr "过滤:(&F)"
 msgctxt "Parameters"
 msgid "Include &unnamed and potentially unusable parameters"
 msgstr "包含未命名和可能不可用的参数(&U)"
+
+msgctxt "Parameters"
+msgid "&Try setting value to detect steps"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Close"

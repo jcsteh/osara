@@ -312,7 +312,7 @@ class ParamsDialog {
 	double val;
 	string valText;
 	HWND prevFocus;
-	bool isDestroying = false;
+	bool shouldAllowDeactivate = false;
 	bool suppressValueChangeReport = false;
 	CallLater valChangeLater;
 
@@ -369,68 +369,99 @@ class ParamsDialog {
 			newVal = this->param->max;
 		}
 
-		// If the value text (if any) doesn't change, the value change is insignificant.
-		// Snap to the next change in value text.
-		// Continually adding to a float accumulates inaccuracy, so multiply by the
-		// number of steps each iteration instead.
 		const string origText = this->param->getValueText(this->val);
-		const string minText = this->param->getValueText(this->param->min);
-		const string maxText = this->param->getValueText(this->param->max);
-		const bool canOnlyFormatCurrent = !origText.empty() &&
-			// Some parameters return an empty string when you query the formatted text
-			// for a value which isn't the current.
-			(minText.empty() || maxText.empty() ||
-			// Others return the current value's formatted text for all values.
-			(origText == minText && origText == maxText));
+		enum class CanFormat {none, onlyCurrent, all};
 		dbg(
-			"params slider: origVal {} origText '{}' newVal {} step {} "
-			"minText {} maxText {} canOnlyFormatCurrent {}",
-			this->val, origText, newVal, step, minText, maxText, canOnlyFormatCurrent);
-		double tryVal = newVal;
-		for (unsigned int steps = 1;
-			this->param->min <= tryVal && tryVal <= this->param->max;
-			tryVal = this->val + (step * steps++)
+			"params slider: origVal {} origText '{}' newVal {} step {}",
+			this->val, origText, newVal, step);
+		const CanFormat canFormat = [&] {
+			if (origText.empty()) {
+				dbg("cannot format");
+				return CanFormat::none;
+			}
+			const string minText = this->param->getValueText(this->param->min);
+			const string maxText = this->param->getValueText(this->param->max);
+			dbg(
+				"minText '{}' maxText '{}'",
+				minText, maxText);
+			if (
+				// Some parameters return an empty string when you query the formatted text
+				// for a value which isn't the current.
+				minText.empty() || maxText.empty() ||
+				// Others return the current value's formatted text for all values.
+				(origText == minText && origText == maxText)
+			) {
+				dbg("can only format current");
+				return CanFormat::onlyCurrent;
+			}
+			dbg("can format all");
+			return CanFormat::all;
+		}();
+		if (
+			canFormat == CanFormat::all ||
+			(canFormat == CanFormat::onlyCurrent &&
+				IsDlgButtonChecked(this->dialog, ID_PARAM_TRY_SET))
 		) {
-			if (step < 0 && tryVal + step < this->param->min) {
-				// We're less than a step away from the minimum. This could be due to
-				// floating point imprecision. The loop will never hit the minimum, so
-				// ensure we try the minimum here. This can be significant for some
-				// parameters which only accept a value of 0 or 1.
-				tryVal = this->param->min;
-			} else if (step > 0 && tryVal + step > this->param->max) {
-				tryVal = this->param->max;
-			}
-			string testText = this->param->getValueText(tryVal);
-			dbg("params slider: tryVal {} testText '{}'", tryVal, testText);
-			if (canOnlyFormatCurrent) {
-				// To deal with this, we have to set the value before we can format it.
-				this->param->setValue(tryVal);
-				double nowVal = this->param->getValue();
-				testText = this->param->getValueText(nowVal);
-				dbg("params slider: set for format, nowVal {} testText '{}'",
-					nowVal, testText);
-			}
-			if (testText.empty())
-				break; // Formatted values not supported.
-			if (testText != origText) {
-				// The value text is different, so this change is significant.
-				// Snap to this value.
-				newVal = tryVal;
-				break;
+			// If the value text (if any) doesn't change, the value change is insignificant.
+			// Snap to the next change in value text.
+			// Continually adding to a float accumulates inaccuracy, so multiply by the
+			// number of steps each iteration instead.
+			double tryVal = newVal;
+			for (unsigned int steps = 1;
+				this->param->min <= tryVal && tryVal <= this->param->max;
+				tryVal = newVal + (step * steps++)
+			) {
+				if (step < 0 && tryVal + step < this->param->min) {
+					// We're less than a step away from the minimum. This could be due to
+					// floating point imprecision. The loop will never hit the minimum, so
+					// ensure we try the minimum here. This can be significant for some
+					// parameters which only accept a value of 0 or 1.
+					tryVal = this->param->min;
+				} else if (step > 0 && tryVal + step > this->param->max) {
+					tryVal = this->param->max;
+				}
+				dbg("tryVal {}", tryVal);
+				string testText;
+				if (canFormat == CanFormat::onlyCurrent) {
+					// Some parameters only format their current value. Set the value
+					// before formatting it so we can still detect meaningful steps.
+					this->param->setValue(tryVal);
+					double nowVal = this->param->getValue();
+					testText = this->param->getValueText(nowVal);
+					dbg("set for format, nowVal {} testText '{}'",
+						nowVal, testText);
+				} else {
+					testText = this->param->getValueText(tryVal);
+					dbg("testText '{}'", testText);
+				}
+				if (!testText.empty() && testText != origText) {
+					// The value text is different, so this change is significant.
+					// Snap to this value.
+					newVal = tryVal;
+					break;
+				}
 			}
 		}
 		dbg("params slider: final set to {}", newVal);
 		this->param->setValue(newVal);
-		this->updateValue();
-		this->checkForValChange();
+		this->checkForValChange(canFormat == CanFormat::onlyCurrent);
 	}
 
-	void checkForValChange(int tries = 0) {
+	void checkForValChange(bool checkText, int tries = 0) {
 		double newVal = this->param->getValue();
 		dbg("params check val: origVal {} newVal {} tries {}",
 			this->val, newVal, tries);
-		if (newVal != this->val) {
+		bool changed = newVal != this->val;
+		if (changed && checkText) {
+			// Some parameters update their numeric value before they update their
+			// formatted text. Wait for that to change too.
+			const string newText = this->param->getValueText(newVal);
+			dbg("origText '{}' newText '{}'", this->valText, newText);
+			changed = newText != this->valText;
+		}
+		if (changed) {
 			this->val = newVal;
+			dbg("detected value change");
 			this->updateValue();
 			return;
 		}
@@ -441,10 +472,13 @@ class ParamsDialog {
 		if (tries == 10) {
 			// Don't keep retrying forever. If the value hasn't changed by now, it
 			// probably never will.
+			if (checkText) {
+				this->val = newVal;
+			}
 			return;
 		}
-		this->valChangeLater = CallLater([this, tries] {
-			this->checkForValChange(tries);
+		this->valChangeLater = CallLater([this, tries, checkText] {
+			this->checkForValChange(checkText, tries);
 		}, 30);
 	}
 
@@ -511,7 +545,7 @@ class ParamsDialog {
 					return TRUE;
 				} else if (LOWORD(wParam) == IDCANCEL) {
 					dialog->saveWindowPos();
-					dialog->isDestroying = true;
+					dialog->shouldAllowDeactivate = true;
 					DestroyWindow(dialogHwnd);
 					delete dialog;
 					return TRUE;
@@ -519,12 +553,12 @@ class ParamsDialog {
 				break;
 			case WM_CLOSE:
 				dialog->saveWindowPos();
-				dialog->isDestroying = true;
+				dialog->shouldAllowDeactivate = true;
 				DestroyWindow(dialogHwnd);
 				delete dialog;
 				return TRUE;
 			case WM_ACTIVATE:
-				if (!dialog->isDestroying && LOWORD(wParam) == WA_INACTIVE) {
+				if (!dialog->shouldAllowDeactivate && LOWORD(wParam) == WA_INACTIVE) {
 					// If something steals focus, close the dialog. Otherwise, we won't
 					// unregister the key hook,  surface feedback won't report FX parameter
 					// changes and there will be a dialog left open the user can't get to
@@ -755,6 +789,11 @@ class ParamsDialog {
 		if (choice == -1) {
 			return; // Cancelled.
 		}
+		// Some options can cause the focus to move, even though we want focus to
+		// remain in this dialog.
+		HWND origFocus = GetFocus();
+		// Don't let the unwanted focus movement dismiss the dialog.
+		this->shouldAllowDeactivate = true;
 		Param::AfterOption after = options[choice].second();
 		if (after == Param::AfterOption::invalidateValues) {
 			this->onParamChange();
@@ -763,6 +802,12 @@ class ParamsDialog {
 			this->updateParamList();
 		} else if (after == Param::AfterOption::dismiss) {
 			SendMessage(this->dialog, WM_CLOSE, 0, 0);
+			return;
+		}
+		this->shouldAllowDeactivate = false;
+		if (GetFocus() != prevFocus) {
+			// Restore the focus whence it came.
+			SetFocus(origFocus);
 		}
 	}
 
@@ -805,6 +850,7 @@ class ParamsDialog {
 		this->valueLabel = GetDlgItem(this->dialog, ID_PARAM_VAL_LABEL);
 		this->moreButton = GetDlgItem(this->dialog, ID_PARAM_MORE);
 		CheckDlgButton(this->dialog, ID_PARAM_UNNAMED, BST_UNCHECKED);
+		CheckDlgButton(this->dialog, ID_PARAM_TRY_SET, BST_CHECKED);
 		this->updateParamList();
 		this->restoreWindowPos();
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
@@ -1272,8 +1318,15 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	}
 
 	Param::MoreOptions getMoreOptions() final {
+		Param::MoreOptions options;
+		if (this->getEnvelopeName()) {
+			options.push_back({
+				translate("Show/hide &envelope"),
+				[this] { return this->showHideEnvelope(); }
+			});
+		}
 		if (this->category == 0) {
-			return {
+			options.insert(options.end(), {
 				{
 					translate("Go to send destination track"),
 					[this] { return this->goToTargetTrack("P_DESTTRACK"); }
@@ -1282,10 +1335,9 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 					translate("Delete send"),
 					[this] { return this->remove(); }
 				},
-			};
-		}
-		if (this->category == -1) {
-			return {
+			});
+		} else if (this->category == -1) {
+			options.insert(options.end(), {
 				{
 					translate("Go to receive source track"),
 					[this] { return this->goToTargetTrack("P_SRCTRACK"); }
@@ -1294,14 +1346,16 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 					translate("Delete receive"),
 					[this] { return this->remove(); }
 				},
-			};
+			});
+		} else {
+			options.insert(options.end(), {
+				{
+					translate("Delete hardware output"),
+					[this] { return this->remove(); }
+				},
+			});
 		}
-		return {
-			{
-				translate("Delete hardware output"),
-				[this] { return this->remove(); }
-			},
-		};
+		return options;
 	}
 
 	private:
@@ -1315,6 +1369,27 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	Param::AfterOption remove() {
 		RemoveTrackSend(this->track, this->category, this->index);
 		return Param::AfterOption::invalidateParams;
+	}
+
+	const char* getEnvelopeName() {
+		if (this->name == "D_VOL") {
+			return "P_ENV:<VOLENV";
+		}
+		if (this->name == "D_PAN") {
+			return "P_ENV:<PANENV";
+		}
+		if (this->name == "B_MUTE") {
+			return "P_ENV:<MUTEENV";
+		}
+		return nullptr;
+	}
+
+	Param::AfterOption showHideEnvelope() {
+		auto* env = (TrackEnvelope*)this->getSetValue(this->getEnvelopeName(),
+			nullptr);
+		SetCursorContext(2, env);
+		Main_OnCommand(40884, 0); // Envelope: Toggle hide/display selected envelope
+		return Param::AfterOption::nothing;
 	}
 
 	MediaTrack* track;

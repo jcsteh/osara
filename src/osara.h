@@ -18,9 +18,15 @@
 # pragma clang diagnostic pop
 #endif
 #include <functional>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <sstream>
+#include <utility>
+#ifndef FMT_HEADER_ONLY
+#define FMT_HEADER_ONLY
+#endif
+#include <fmt/format.h>
 
 #define REAPERAPI_MINIMAL
 #define REAPERAPI_WANT_GetLastTouchedTrack
@@ -226,10 +232,6 @@
 #define REAPERAPI_WANT_TimeMap_GetTimeSigAtTime
 #define REAPERAPI_WANT_GetSetProjectGrid
 #define REAPERAPI_WANT_GetTrackMIDINoteNameEx
-#ifdef LOGGING
-#define REAPERAPI_WANT_ShowConsoleMsg
-#endif
-
 #include <reaper/reaper_plugin.h>
 #include <reaper/reaper_plugin_functions.h>
 
@@ -383,11 +385,29 @@ extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
 
-#ifdef LOGGING
-#define dbg(msg, ...) \
-	ShowConsoleMsg(fmt::format("osara " msg "\n", __VA_ARGS__).c_str())
+template<typename... Args>
+inline void dbg(fmt::format_string<Args...> format, Args&&... args) {
+	static const bool loggingEnabled = GetExtState("osara", "logging")[0] == '1';
+	if (!loggingEnabled) {
+		return;
+	}
+	static const std::string logFilePath = [] {
+		char tempPath[1024] = {};
+#ifdef _WIN32
+		// On Windows, ofstream will interpret a narrow string as ANSI, so use
+		// GetTempPathA.
+		GetTempPathA(sizeof(tempPath), tempPath);
 #else
-# define dbg(msg, ...)
+		GetTempPath(sizeof(tempPath), tempPath);
 #endif
+		std::string result(tempPath);
+		if (!result.empty() && result.back() != '/' && result.back() != '\\') {
+			result += '/';
+		}
+		return result + "osara.log";
+	}();
+	std::ofstream(logFilePath, std::ios::app)
+		<< fmt::format(format, std::forward<Args>(args)...) << '\n';
+}
 
 #endif

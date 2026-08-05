@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-07-15 19:43\n"
+"PO-Revision-Date: 2026-08-01 19:39\n"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -936,6 +936,11 @@ msgstr "{} 像素/節拍"
 msgid "{} pixels/second"
 msgstr "{} 像素/秒"
 
+#. Reported when zooming in or out vertically in the MIDI editor. {} will be
+#. replaced with the number of pixels per semitone; e.g. 12 pixels/semitone.
+msgid "{} pixels/semitone"
+msgstr "{} 像素/半音"
+
 #. Reported in Parameters dialogs for a toggle (such as mute)
 #. which is on.
 msgid "on"
@@ -1005,6 +1010,9 @@ msgstr "頻段 {} 型態"
 
 msgid "FX Parameters"
 msgstr "FX 參數"
+
+msgid "Show/hide &envelope"
+msgstr "顯示/隱藏包絡(&E)"
 
 msgid "Go to send destination track"
 msgstr "前往發送目標軌道(&g)"
@@ -3349,6 +3357,10 @@ msgstr "過濾器：(&F)"
 msgctxt "Parameters"
 msgid "Include &unnamed and potentially unusable parameters"
 msgstr "包含未命名的參數和可能無法使用的參數(&u)"
+
+msgctxt "Parameters"
+msgid "&Try setting value to detect steps"
+msgstr ""
 
 msgctxt "Parameters"
 msgid "&Close"
