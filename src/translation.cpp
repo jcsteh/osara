@@ -79,8 +79,13 @@ void initTranslation() {
 	}
 	// We can't use std::filesystem::path because it isn't supported until MacOS 10.15. Grrr!
 	string name(langpack);
+	// REAPER normally gives us a file name, but may return the full path.
+	const auto dirPos = name.find_last_of("\\/");
+	if (dirPos != string::npos) {
+		name.erase(0, dirPos + 1);
+	}
 	// Strip .ReaperLangPack extension.
-	auto extPos = name.rfind(".");
+	const auto extPos = name.rfind(".");
 	if (extPos == string::npos) {
 		return;
 	}
