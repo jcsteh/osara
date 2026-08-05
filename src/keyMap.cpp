@@ -51,6 +51,9 @@ bool readLines(const string& path, vector<string>& lines) {
 	}
 	string line;
 	while (getline(input, line)) {
+		if (!line.empty() && line.back() == '\r') {
+			line.pop_back();
+		}
 		lines.push_back(line);
 	}
 	return !input.bad();
@@ -58,9 +61,9 @@ bool readLines(const string& path, vector<string>& lines) {
 
 bool writeLines(const string& path, const vector<string>& lines) {
 #ifdef _WIN32
-	ofstream output(widen(path), ios::binary | ios::trunc);
+	ofstream output(widen(path), ios::trunc);
 #else
-	ofstream output(path, ios::binary | ios::trunc);
+	ofstream output(path, ios::trunc);
 #endif
 	if (!output) {
 		return false;
