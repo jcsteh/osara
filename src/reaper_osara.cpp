@@ -4671,6 +4671,10 @@ void cmdManageTempoTimeSigMarkers(int command) {
 }
 
 void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
+	if (!GetSelectedTrack2(nullptr, 0, false)) {
+		outputMessage(translate("no selected tracks"));
+			return;
+	}
 	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask & 1;
 	vector<MediaItem*> items;
@@ -4704,7 +4708,11 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
 			translate("OSARA: Select items under edit cursor on selected tracks"),
 			UNDO_STATE_ITEMS);
 	}
-	postSelectMultipleItems(command);
+	if (CountSelectedMediaItems(nullptr) > 0) {
+		postSelectMultipleItems(command);
+	} else {
+		outputMessage(translate("no item at cursor"));
+	}
 }
 
 void cmdSwitchProjectTab(int command) {
