@@ -8,7 +8,9 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <algorithm>
+#include <cstdint>
 #include <functional>
 #include <iomanip>
 #include <memory>
@@ -40,20 +42,33 @@ class Param {
 	double max;
 	double step;
 	double largeStep;
-	bool isEditable;
+	// True if the value should be editable via a text box. In this case,
+	// getValueForEditing and setValueFromEdited must be implemented.
+	bool isEditable = false;
+	// True to allow the editable value to be empty. If false, an empty text box
+	// will just be ignored.
+	bool allowsEmptyEdited = false;
+	// True if the value is a range that can be expressed numerically. In this
+	// case, a slider will be available to adjust the value. This applies to
+	// toggles and stepped values as well; i.e. the text values don't need to be
+	// numeric. min, max, step and largeStep must be set, and getValue
+	// and setValue must be implemented.
+	bool isRange = true;
 
-	Param(): isEditable(false) {
-	}
-
+	Param() = default;
 	virtual ~Param() = default;
 
-	virtual double getValue() = 0;
+	virtual double getValue() { return 0; }
+	// If isRange is false, the value argument can be ignored, but this must
+	// still return the value text for the current value.
 	virtual string getValueText(double value) = 0;
 	virtual string getValueForEditing() {
 		return "";
 	}
-	virtual void setValue(double value) = 0;
-	virtual void setValueFromEdited(const string& text) {
+	virtual void setValue(double value) {}
+	// Returns an error message if the value could not be set.
+	virtual string setValueFromEdited(const string& text) {
+		return {};
 	}
 
 	// Possible reactions after an option has been chosen from the context menu.
@@ -74,11 +89,20 @@ class Param {
 
 class ParamSource {
 	public:
+	struct Category {
+		string name;
+		int parent = -1;
+	};
+
 	virtual ~ParamSource() = default;
 	virtual string getTitle() = 0;
 	virtual int getParamCount() = 0;
 	virtual string getParamName(int param) = 0;
 	virtual unique_ptr<Param> getParam(int param) = 0;
+	// Return the category index for this parameter, -1 for no category.
+	virtual int getParamCategory(int param) { return -1; }
+	// Return the information for this category index.
+	virtual Category getCategory(int category) { return {}; }
 	virtual bool isProbablyUsefulParam(int param, const string& name) { return true; };
 
 	// Called to rebuild the parameter list because one or more parameters were
@@ -91,7 +115,8 @@ class ParamSource {
 // it. Used where the parameters are predefined; e.g. for tracks and items.
 class ParamProvider {
 	public:
-	ParamProvider(const string displayName): displayName(displayName) {
+	ParamProvider(const string displayName, int category = -1):
+		displayName(displayName), category(category) {
 	}
 
 	virtual ~ParamProvider() = default;
@@ -99,6 +124,7 @@ class ParamProvider {
 	virtual unique_ptr<Param> makeParam() = 0;
 
 	const string displayName;
+	const int category;
 };
 
 class ReaperObjParamProvider;
@@ -117,8 +143,8 @@ class ReaperObjParamProvider: public ParamProvider {
 
 	protected:
 	ReaperObjParamProvider(const string displayName, const string name,
-		MakeParamFromProviderFunc makeParamFromProvider):
-		ParamProvider(displayName), name(name),
+		MakeParamFromProviderFunc makeParamFromProvider, int category = -1):
+		ParamProvider(displayName, category), name(name),
 		makeParamFromProvider(makeParamFromProvider) {}
 
 	const string name;
@@ -143,6 +169,12 @@ class ReaperObjParam: public Param {
 class ReaperObjParamSource: public ParamSource {
 	protected:
 	vector<unique_ptr<ParamProvider>> params;
+	vector<Category> categories;
+
+	int addCategory(const string& name, int parent = -1) {
+		this->categories.push_back({name, parent});
+		return (int)this->categories.size() - 1;
+	}
 
 	public:
 	int getParamCount() final {
@@ -155,6 +187,14 @@ class ReaperObjParamSource: public ParamSource {
 
 	unique_ptr<Param> getParam(int param) final {
 		return this->params[param]->makeParam();
+	}
+
+	int getParamCategory(int param) final {
+		return this->params[param]->category;
+	}
+
+	Category getCategory(int category) final {
+		return this->categories[category];
 	}
 };
 
@@ -234,13 +274,14 @@ class ReaperObjVolParam: public ReaperObjParam {
 		}
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		if (text.compare(0, 4, "-inf") == 0) {
 			this->setValue(0);
-			return;
+			return {};
 		}
 		double db = atof(text.c_str());
 		this->setValue(DB2VAL(db));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
@@ -280,8 +321,9 @@ class ReaperObjPanParam: public ReaperObjParam {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		this->setValue(parsepanstr(text.c_str()));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
@@ -290,6 +332,7 @@ class ReaperObjPanParam: public ReaperObjParam {
 };
 
 const char CFGKEY_DIALOG_POS[] = "paramsDialogPos";
+const LPARAM CATEGORY_ITEM = -1;
 
 bool isParamsDialogOpen = false;
 
@@ -297,7 +340,7 @@ class ParamsDialog {
 	private:
 	unique_ptr<ParamSource> source;
 	HWND dialog;
-	HWND paramCombo;
+	HWND paramTree;
 	HWND slider;
 #ifdef _WIN32
 	CComPtr<TextSliderUiaProvider> sliderUiaProvider;
@@ -306,7 +349,8 @@ class ParamsDialog {
 	HWND valueLabel;
 	HWND moreButton;
 	string filter;
-	vector<int> visibleParams;
+	vector<HTREEITEM> paramTreeItems;
+	vector<HTREEITEM> categoryTreeItems;
 	int paramNum;
 	unique_ptr<Param> param;
 	double val;
@@ -348,13 +392,40 @@ class ParamsDialog {
 		}
 	}
 
+	int getParamNum(HTREEITEM item) {
+		TVITEM itemInfo{};
+		itemInfo.mask = TVIF_HANDLE | TVIF_PARAM;
+		itemInfo.hItem = item;
+		TreeView_GetItem(this->paramTree, &itemInfo);
+		return (int)itemInfo.lParam;
+	}
+
 	void onParamChange() {
-		this->paramNum = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
-		this->param = this->source->getParam(this->paramNum);
+		HTREEITEM item = TreeView_GetSelection(this->paramTree);
+		if (!item) {
+			return;
+		}
+		const int paramNum = this->getParamNum(item);
+		if (paramNum == CATEGORY_ITEM) {
+			this->disableParamControls();
+			return;
+		}
+		this->paramNum = paramNum;
+		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
+		EnableWindow(this->slider, this->param->isRange);
 		EnableWindow(this->valueEdit, this->param->isEditable);
 		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
+	}
+
+	void disableParamControls() {
+		this->param = nullptr;
+		EnableWindow(this->slider, FALSE);
+		EnableWindow(this->valueEdit, FALSE);
+		EnableWindow(this->moreButton, FALSE);
+		SetWindowText(this->valueEdit, "");
+		SetWindowText(this->valueLabel, "");
 	}
 
 	void onSliderChange(double newVal) {
@@ -483,14 +554,22 @@ class ParamsDialog {
 	}
 
 	void onValueEdited() {
-		char rawText[30];
-		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0)
+		char rawText[512];
+		if (GetDlgItemText(dialog, ID_PARAM_VAL_EDIT, rawText, sizeof(rawText)) == 0 &&
+				!this->param->allowsEmptyEdited)
 			return;
 		if (this->param->getValueForEditing().compare(rawText) == 0)
 			return;
-		this->param->setValueFromEdited(rawText);
+		const string error = this->param->setValueFromEdited(rawText);
 		this->val = this->param->getValue();
 		this->updateValue();
+		if (!error.empty()) {
+			// MessageBox activates itself, which would otherwise cause WM_ACTIVATE
+			// to close the Parameters dialog.
+			this->shouldAllowDeactivate = true;
+			MessageBox(this->dialog, error.c_str(), nullptr, MB_OK | MB_ICONERROR);
+			this->shouldAllowDeactivate = false;
+		}
 	}
 
 	void saveWindowPos() {
@@ -528,10 +607,7 @@ class ParamsDialog {
 		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
 			case WM_COMMAND:
-				if (LOWORD(wParam) == ID_PARAM && HIWORD(wParam) == CBN_SELCHANGE) {
-					dialog->onParamChange();
-					return TRUE;
-				} else if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
+				if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
 					dialog->onFilterChange();
 					return TRUE;
 				} else if (LOWORD(wParam) == ID_PARAM_VAL_EDIT && HIWORD(wParam) ==EN_KILLFOCUS) {
@@ -551,6 +627,14 @@ class ParamsDialog {
 					return TRUE;
 				}
 				break;
+			case WM_NOTIFY: {
+				auto* notify = (NMHDR*)lParam;
+				if (notify->idFrom == ID_PARAM && notify->code == TVN_SELCHANGED) {
+					dialog->onParamChange();
+					return TRUE;
+				}
+				break;
+			}
 			case WM_CLOSE:
 				dialog->saveWindowPos();
 				dialog->shouldAllowDeactivate = true;
@@ -634,20 +718,40 @@ class ParamsDialog {
 		if (msg->wParam == VK_TAB && control) {
 			// Control+tab switches to the next parameter, control+shift+tab to the
 			// previous.
-			int newParam = ComboBox_GetCurSel(dialog->paramCombo) +
-				(shift ? -1 : 1);
-			if (newParam < 0) {
-				newParam = dialog->visibleParams.size() - 1;
-			} else if (newParam == dialog->visibleParams.size()) {
-				newParam = 0;
+			if (dialog->paramTreeItems.empty()) {
+				return 1; // Eat the keystroke.
 			}
-			// newParam could be -1 if there are no visible parameters.
-			if (newParam >= 0) {
-				ComboBox_SetCurSel(dialog->paramCombo, newParam);
+			auto currentItem = find(dialog->paramTreeItems.begin(),
+				dialog->paramTreeItems.end(), TreeView_GetSelection(dialog->paramTree));
+			int newItemIndex = currentItem == dialog->paramTreeItems.end() ? 0 :
+				(int)(currentItem - dialog->paramTreeItems.begin()) +
+				(shift ? -1 : 1);
+			if (newItemIndex < 0) {
+				newItemIndex = dialog->paramTreeItems.size() - 1;
+			} else if (newItemIndex == dialog->paramTreeItems.size()) {
+				newItemIndex = 0;
+			}
+			if (newItemIndex >= 0) {
+				const int oldParam = currentItem == dialog->paramTreeItems.end() ? -1 :
+					dialog->paramNum;
 				dialog->suppressValueChangeReport = true;
+				TreeView_SelectItem(dialog->paramTree,
+					dialog->paramTreeItems[newItemIndex]);
 				dialog->onParamChange();
 				dialog->suppressValueChangeReport = false;
+				// Only announce categories newly entered by this navigation. Repeating
+				// shared ancestors would be noisy when moving between sibling parameters.
+				const vector<int> oldCategories = oldParam < 0 ? vector<int>() :
+					dialog->getParamCategoryPath(oldParam);
+				const vector<int> newCategories = dialog->getParamCategoryPath(
+					dialog->paramNum);
+				auto firstNewCategory = mismatch(oldCategories.begin(), oldCategories.end(),
+					newCategories.begin(), newCategories.end()).second;
 				ostringstream s;
+				for (auto category = firstNewCategory;
+						category != newCategories.end(); ++category) {
+					s << dialog->source->getCategory(*category).name << ", ";
+				}
 				s << dialog->source->getParamName(dialog->paramNum) << ", " <<
 					dialog->valText;
 				outputMessage(s);
@@ -660,9 +764,9 @@ class ParamsDialog {
 			return -1; // Pass to our window.
 		}
 		const bool alt = GetAsyncKeyState(VK_MENU) & 0x8000;
-		if (msg->hwnd == dialog->paramCombo ||
+		if (msg->hwnd == dialog->paramTree ||
 				isClassName(GetFocus(), "Edit")) {
-			// In text boxes and combo boxes, we only allow specific keys through to
+			// In text boxes and the parameter tree, we only allow specific keys through to
 			// the main section.
 			if (
 				// A function key.
@@ -676,17 +780,13 @@ class ParamsDialog {
 			) {
 				return -666; // Force to main window.
 			}
-			if (msg->hwnd == dialog->paramCombo && msg->wParam == VK_SPACE) {
-				// In the combo box, we also pass space to the main section.
-				return -666; // Force to main window.
-			}
 			// Anything else must go to our window so the user can interact with the
 			// control.
 			return -1; // Pass to our window.
 		}
 		if (alt && !shift && !control && 'A' <= msg->wParam && msg->wParam <= 'Z') {
 			// Alt+letter could be an access key in our dialog; e.g. alt+p to focus
-			// the Parameter combo box.
+			// the Parameter tree.
 			return -1; // Pass to our window.
 		}
 		switch (msg->wParam) {
@@ -723,33 +823,93 @@ class ParamsDialog {
 			return true;
 		// Convert param name to lower case for match.
 		transform(name.begin(), name.end(), name.begin(), ::tolower);
-		return name.find(filter) != string::npos;
+		if (name.find(filter) != string::npos) {
+			return true;
+		}
+		// If this parameter's category (or one of its ancestor categories) matches,
+		// include the parameter.
+		for (int category = this->source->getParamCategory(param); category >= 0;) {
+			ParamSource::Category info = this->source->getCategory(category);
+			transform(info.name.begin(), info.name.end(), info.name.begin(), ::tolower);
+			if (info.name.find(filter) != string::npos) {
+				return true;
+			}
+			category = info.parent;
+		}
+		return false;
+	}
+
+	vector<int> getParamCategoryPath(int param) {
+		vector<int> categories;
+		for (int category = this->source->getParamCategory(param); category >= 0;) {
+			categories.push_back(category);
+			category = this->source->getCategory(category).parent;
+		}
+		reverse(categories.begin(), categories.end());
+		return categories;
+	}
+
+	// Gets the tree item for a category. If it doesn't exist yet, it is created.
+	HTREEITEM getCategoryTreeItem(int category) {
+		if (category < 0) {
+			return TVI_ROOT;
+		}
+		// categoryTreeItems can contain null if we haven't added any parameters in
+		// that category yet.
+		if (category < (int)this->categoryTreeItems.size() &&
+				this->categoryTreeItems[category]) {
+			HTREEITEM item = this->categoryTreeItems[category];
+			return item;
+		}
+		if (category >= (int)this->categoryTreeItems.size()) {
+			this->categoryTreeItems.resize(category + 1);
+		}
+		const ParamSource::Category info = this->source->getCategory(category);
+		TVINSERTSTRUCT item{};
+		// This will create tree items for any ancestor categories that don't have
+		// tree items yet.
+		item.hParent = this->getCategoryTreeItem(info.parent);
+		item.hInsertAfter = TVI_LAST;
+		item.item.mask = TVIF_TEXT | TVIF_CHILDREN | TVIF_PARAM;
+		item.item.pszText = (char*)info.name.c_str();
+		item.item.cChildren = 1;
+		item.item.lParam = CATEGORY_ITEM;
+		return this->categoryTreeItems[category] = TreeView_InsertItem(
+			this->paramTree, &item);
 	}
 
 	void updateParamList() {
-		int prevSelParam;
-		if (this->visibleParams.empty())
-			prevSelParam = -1;
-		else
-			prevSelParam = this->visibleParams[ComboBox_GetCurSel(this->paramCombo)];
-		this->visibleParams.clear();
+		int prevSelParam = -1;
+		if (HTREEITEM item = TreeView_GetSelection(this->paramTree)) {
+			prevSelParam = this->getParamNum(item);
+		}
+		this->paramTreeItems.clear();
+		this->categoryTreeItems.clear();
 		// Use the first item if the previously selected param gets filtered out.
-		int newComboSel = 0;
-		ComboBox_ResetContent(this->paramCombo);
+		HTREEITEM newSelection = nullptr;
+		TreeView_DeleteAllItems(this->paramTree);
 		for (int p = 0; p < this->source->getParamCount(); ++p) {
 			const string name = source->getParamName(p);
 			if (!this->shouldIncludeParam(p, name))
 				continue;
-			this->visibleParams.push_back(p);
-			ComboBox_AddString(this->paramCombo, name.c_str());
-			if (p == prevSelParam)
-				newComboSel = (int)this->visibleParams.size() - 1;
+			TVINSERTSTRUCT item{};
+			item.hParent = this->getCategoryTreeItem(
+				this->source->getParamCategory(p));
+			item.hInsertAfter = TVI_LAST;
+			item.item.mask = TVIF_TEXT | TVIF_PARAM;
+			item.item.pszText = (char*)name.c_str();
+			item.item.lParam = p;
+			HTREEITEM insertedItem = TreeView_InsertItem(this->paramTree, &item);
+			this->paramTreeItems.push_back(insertedItem);
+			if (p == prevSelParam || !newSelection) {
+				newSelection = insertedItem;
+			}
 		}
-		ComboBox_SetCurSel(this->paramCombo, newComboSel);
-		if (this->visibleParams.empty()) {
-			EnableWindow(this->slider, FALSE);
+		if (!newSelection) {
+			this->disableParamControls();
 			return;
 		}
+		TreeView_SelectItem(this->paramTree, newSelection);
 		EnableWindow(this->slider, TRUE);
 		this->onParamChange();
 	}
@@ -767,6 +927,9 @@ class ParamsDialog {
 	}
 
 	void moreMenu() {
+		if (!this->param) {
+			return;
+		}
 		Param::MoreOptions options = this->param->getMoreOptions();
 		if (options.empty()) {
 			return;
@@ -822,11 +985,11 @@ class ParamsDialog {
 		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		SetWindowText(this->dialog, this->source->getTitle().c_str());
-		this->paramCombo = GetDlgItem(this->dialog, ID_PARAM);
-		WDL_UTF8_HookComboBox(this->paramCombo);
-		LONG_PTR origProc = SetWindowLongPtr(this->paramCombo, GWLP_WNDPROC,
+		this->paramTree = GetDlgItem(this->dialog, ID_PARAM);
+		WDL_UTF8_HookTreeView(this->paramTree);
+		LONG_PTR origProc = SetWindowLongPtr(this->paramTree, GWLP_WNDPROC,
 			(LONG_PTR)ParamsDialog::contextWndProc);
-		SetWindowLongPtr(this->paramCombo, GWLP_USERDATA, origProc);
+		SetWindowLongPtr(this->paramTree, GWLP_USERDATA, origProc);
 		this->slider = GetDlgItem(this->dialog, ID_PARAM_VAL_SLIDER);
 #ifdef _WIN32
 		this->sliderUiaProvider = TextSliderUiaProvider::create(this->slider);
@@ -867,11 +1030,14 @@ template<typename ReaperObj>
 class FxParam;
 template<typename ReaperObj>
 class FxNamedConfigParam;
+template<typename ReaperObj>
+class FxPinMappingParam;
 
 template<typename ReaperObj>
 class FxParams: public ParamSource {
 	friend class FxParam<ReaperObj>;
 	friend class FxNamedConfigParam<ReaperObj>;
+	friend class FxPinMappingParam<ReaperObj>;
 
 	private:
 	ReaperObj* obj;
@@ -880,6 +1046,15 @@ class FxParams: public ParamSource {
 	// these based on the effect and the known named parameters it supports. See
 	// initNamedConfigParams().
 	vector<FxNamedConfigParam<ReaperObj>> namedConfigParams;
+	struct Pin {
+		bool isOutput;
+		int index;
+		string name;
+		int category;
+	};
+	vector<Pin> pins;
+	vector<Category> categories;
+	map<string, int> categoryIndexes;
 	int (*_GetNumParams)(ReaperObj*, int);
 	bool (*_GetFXName)(ReaperObj*, int, char*, int);
 	bool (*_GetParamName)(ReaperObj*, int, int, char*, int);
@@ -891,8 +1066,29 @@ class FxParams: public ParamSource {
 	bool (*_GetNamedConfigParm)(ReaperObj*, int, const char*, char*, int);
 	bool (*_SetNamedConfigParm)(ReaperObj*, int, const char*, const char*);
 	void (*_GetParamSectionName)(ReaperObj*, int, int, char*, int);
+	int (*_GetIOSize)(ReaperObj*, int, int*, int*);
+	int (*_GetPinMappings)(ReaperObj*, int, int, int, int*);
+	bool (*_SetPinMappings)(ReaperObj*, int, int, int, int, int);
 
 	void initNamedConfigParams();
+	void initPins();
+
+	int getFxParamCategory(int fx, int param) {
+		if (!this->_GetParamSectionName) {
+			return -1;
+		}
+		char section[100] = "";
+		this->_GetParamSectionName(this->obj, fx, param, section, sizeof(section));
+		if (!section[0]) {
+			return -1;
+		}
+		auto [it, inserted] = this->categoryIndexes.emplace(section,
+			(int)this->categories.size());
+		if (inserted) {
+			this->categories.push_back({section});
+		}
+		return it->second;
+	}
 
 	public:
 	FxParams(ReaperObj* obj, const string& apiPrefix, int fx=-1):
@@ -913,17 +1109,23 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_SetNamedConfigParm").c_str());
 		*(void**)&this->_GetParamSectionName = plugin_getapi(
 			(apiPrefix + "_GetParamSectionName").c_str());
+		*(void**)&this->_GetIOSize = plugin_getapi((apiPrefix + "_GetIOSize").c_str());
+		*(void**)&this->_GetPinMappings = plugin_getapi(
+			(apiPrefix + "_GetPinMappings").c_str());
+		*(void**)&this->_SetPinMappings = plugin_getapi(
+			(apiPrefix + "_SetPinMappings").c_str());
 		if (fx >= 0) {
 			this->initNamedConfigParams();
+			this->initPins();
 		}
 	}
 
 	string getTitle() final;
 
 	int getParamCount() final {
-		// Any named config params come first, followed by normal params.
+		// Named config params come first, followed by normal params and pin mappings.
 		return (int)this->namedConfigParams.size() +
-			this->_GetNumParams(this->obj, this->fx);
+			this->_GetNumParams(this->obj, this->fx) + (int)this->pins.size();
 	}
 
 	string getParamName(int param) final {
@@ -931,11 +1133,13 @@ class FxParams: public ParamSource {
 		auto namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			ns << this->namedConfigParams[param].getDisplayName();
-		} else {
+		} else if (param < namedCount + this->_GetNumParams(this->obj, this->fx)) {
 			char name[256];
 			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
 				sizeof(name));
 			ns << name;
+		} else {
+			ns << this->pins[param - namedCount - this->_GetNumParams(this->obj, this->fx)].name;
 		}
 		// Append the parameter number to facilitate efficient navigation
 		// and to ensure reporting where two consecutive parameters have the same name (#32).
@@ -950,13 +1154,37 @@ class FxParams: public ParamSource {
 			return make_unique<FxNamedConfigParam<ReaperObj>>(
 				this->namedConfigParams[param]);
 		}
+		const int fxParamCount = this->_GetNumParams(this->obj, this->fx);
+		if (param >= namedCount + fxParamCount) {
+			return make_unique<FxPinMappingParam<ReaperObj>>(*this,
+				this->pins[param - namedCount - fxParamCount]);
+		}
 		return this->getParam(this->fx, param - namedCount);
+	}
+
+	int getParamCategory(int param) final {
+		const int namedCount = (int)this->namedConfigParams.size();
+		if (param < namedCount) {
+			return -1;
+		}
+		const int fxParamCount = this->_GetNumParams(this->obj, this->fx);
+		if (param >= namedCount + fxParamCount) {
+			return this->pins[param - namedCount - fxParamCount].category;
+		}
+		return this->getFxParamCategory(this->fx, param - namedCount);
+	}
+
+	Category getCategory(int category) final {
+		return this->categories[category];
 	}
 
 	bool isProbablyUsefulParam(int param, const string& name) final {
 		const int namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
 			// Named config params aren't FX params; keep them visible.
+			return true;
+		}
+		if (param >= namedCount + this->_GetNumParams(this->obj, this->fx)) {
 			return true;
 		}
 		if (this->_GetParamSectionName) {
@@ -1079,8 +1307,9 @@ class FxParam: public Param {
 		this->source._SetParam(this->source.obj, this->fx, this->param, value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		this->setValue(atof(text.c_str()));
+		return {};
 	}
 
 	Param::MoreOptions getMoreOptions() final {
@@ -1121,6 +1350,106 @@ class FxParam: public Param {
 			});
 		}
 		return options;
+	}
+};
+
+template<typename ReaperObj>
+class FxPinMappingParam: public Param {
+	private:
+	static constexpr int HIGH_MAPPINGS_PIN_OFFSET = 0x1000000;
+	FxParams<ReaperObj>& source;
+	const typename FxParams<ReaperObj>::Pin pin;
+
+	void getMappings(uint32_t& low, uint32_t& high, uint32_t& highLow,
+			uint32_t& highHigh) const {
+		int highOut = 0;
+		low = (uint32_t)this->source._GetPinMappings(this->source.obj,
+			this->source.fx, this->pin.isOutput, this->pin.index, &highOut);
+		high = (uint32_t)highOut;
+		highLow = (uint32_t)this->source._GetPinMappings(this->source.obj,
+			this->source.fx, this->pin.isOutput,
+			this->pin.index + HIGH_MAPPINGS_PIN_OFFSET, &highOut);
+		highHigh = (uint32_t)highOut;
+	}
+
+	string getMappingText() const {
+		uint32_t low, high, highLow, highHigh;
+		this->getMappings(low, high, highLow, highHigh);
+		ostringstream text;
+		for (int channel = 0; channel < 128; ++channel) {
+			const uint32_t mask = uint32_t{1} << (channel % 32);
+			const uint32_t mappings = channel < 32 ? low :
+				channel < 64 ? high : channel < 96 ? highLow : highHigh;
+			if (!(mappings & mask)) {
+				continue;
+			}
+			if (text.tellp() > 0) {
+				text << " ";
+			}
+			text << channel + 1;
+		}
+		return text.str();
+	}
+
+	public:
+	FxPinMappingParam(FxParams<ReaperObj>& source,
+			const typename FxParams<ReaperObj>::Pin& pin):
+			source(source), pin(pin) {
+		this->isEditable = true;
+		this->isRange = false;
+		this->allowsEmptyEdited = true;
+	}
+
+	string getValueText(double) final {
+		return this->getMappingText();
+	}
+
+	string getValueForEditing() final {
+		return this->getMappingText();
+	}
+
+	string setValueFromEdited(const string& text) final {
+		uint32_t low = 0, high = 0, highLow = 0, highHigh = 0;
+		istringstream channels(text);
+		for (;;) {
+			channels >> ws;
+			if (channels.eof()) {
+				break;
+			}
+			int channel;
+			if (!(channels >> channel)) {
+				return translate("Channel lists must contain positive numbers separated by spaces.");
+			}
+			if (channel < 1 || channel > 128) {
+				return translate("Channels must be from 1 through 128.");
+			}
+			const uint32_t mask = uint32_t{1} << ((channel - 1) % 32);
+			if (channel <= 32) {
+				low |= mask;
+			} else if (channel <= 64) {
+				high |= mask;
+			} else if (channel <= 96) {
+				highLow |= mask;
+			} else {
+				highHigh |= mask;
+			}
+		}
+		uint32_t oldLow, oldHigh, oldHighLow, oldHighHigh;
+		this->getMappings(oldLow, oldHigh, oldHighLow, oldHighHigh);
+		if (!this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index, (int)low, (int)high)) {
+			// Translators: An error reported when the channels mapped to an an FX
+			// input or output could not be set.
+			return translate("Could not set the channels.");
+		}
+		if (!this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index + HIGH_MAPPINGS_PIN_OFFSET,
+				(int)highLow, (int)highHigh)) {
+			this->source._SetPinMappings(this->source.obj, this->source.fx,
+				this->pin.isOutput, this->pin.index, (int)oldLow, (int)oldHigh);
+			return translate("Could not set the channels.");
+		}
+		return {};
 	}
 };
 
@@ -1237,6 +1566,56 @@ void FxParams<ReaperObj>::initNamedConfigParams() {
 }
 
 template<typename ReaperObj>
+void FxParams<ReaperObj>::initPins() {
+	int inputCount = 0;
+	int outputCount = 0;
+	if (!this->_GetIOSize || !this->_GetPinMappings || !this->_SetPinMappings ||
+			this->_GetIOSize(this->obj, this->fx, &inputCount, &outputCount) < 0 ||
+			inputCount < 0 || outputCount < 0) {
+		return;
+	}
+	const auto addPins = [this](bool isOutput, int count, const char* pinType,
+			const char* categoryName, const char* unnamedPinFormat,
+			const char* mappingFormat) {
+		if (count == 0) {
+			return;
+		}
+		const int category = (int)this->categories.size();
+		this->categories.push_back({categoryName});
+		for (int pin = 0; pin < count; ++pin) {
+			char pinName[256] = "";
+			this->_GetNamedConfigParm(this->obj, this->fx,
+				format("{}_pin_{}", pinType, pin).c_str(), pinName, sizeof(pinName));
+			string name = pinName;
+			if (name.empty()) {
+				name = format(unnamedPinFormat, pin + 1);
+			}
+			this->pins.push_back({isOutput, pin, format(mappingFormat, name), category});
+		}
+	};
+	addPins(false, inputCount, "in",
+		// Translators: A category in the FX Parameters dialog containing input pin
+		// mappings.
+		translate("Inputs"),
+		// Translators: The name of an unnamed input pin in the FX Parameters dialog.
+		// {} will be replaced with the pin number.
+		translate("Input {}"),
+		// Translators: A parameter in the FX Parameters dialog which configures the
+		// track channels from which an input pin receives. {} is the pin name.
+		translate("{} receives from track channels"));
+	addPins(true, outputCount, "out",
+		// Translators: A category in the FX Parameters dialog containing output pin
+		// mappings.
+		translate("Outputs"),
+		// Translators: The name of an unnamed output pin in the FX Parameters dialog.
+		// {} will be replaced with the pin number.
+		translate("Output {}"),
+		// Translators: A parameter in the FX Parameters dialog which configures the
+		// track channels to which an output pin is sent. {} is the pin name.
+		translate("{} sends to track channels"));
+}
+
+template<typename ReaperObj>
 unique_ptr<Param> FxParams<ReaperObj>::getParam(int fx, int param) {
 	return make_unique<FxParam<ReaperObj>>(*this, fx, param);
 }
@@ -1304,8 +1683,8 @@ class TrackSendParamProvider: public ReaperObjParamProvider {
 	public:
 	TrackSendParamProvider(const string displayName, MediaTrack* track,
 		int category, int index, const string name,
-		MakeParamFromProviderFunc makeParamFromProvider):
-		ReaperObjParamProvider(displayName, name, makeParamFromProvider),
+		MakeParamFromProviderFunc makeParamFromProvider, int paramCategory):
+		ReaperObjParamProvider(displayName, name, makeParamFromProvider, paramCategory),
 		track(track), category(category), index(index) {}
 
 	void* getSetValue(const char* name, void* newValue) {
@@ -1736,6 +2115,15 @@ class TrackParams: public ReaperObjParamSource {
 				count += hwCount;
 			}
 		}
+		const char* categoryName;
+		if constexpr (category == 0) {
+			categoryName = translate("sends");
+		} else if constexpr (category == -1) {
+			categoryName = translate("receives");
+		} else {
+			categoryName = translate("hardware outputs");
+		}
+		const int sendCategory = this->addCategory(categoryName);
 		string lastTarget;
 		int sameTargetCount = 1;
 		for (; i < count; ++i) {
@@ -1767,93 +2155,44 @@ class TrackParams: public ReaperObjParamSource {
 				sameTargetCount = 1;
 				lastTarget = target;
 			}
-			string dispTemplate;
-			if constexpr (category == 0) {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a track send in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {param} will be replaced with the parameter name.
-					// Example: "2 reverb send volume"
-					dispTemplate = translate("{target} send {param}");
-				} else {
-					// Translators: Indicates a parameter for a track send in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {targetNum} will be replaced with a number distinguishing this
-					// send from other sends to the same track. {param} will be replaced with
-					// the parameter name.
-					// Example: "2 reverb send 2 volume"
-					dispTemplate = translate("{target} send {targetNum} {param}");
-				}
-			} else if constexpr (category == -1) {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a track receive in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {param} will be replaced with the parameter name.
-					// Example: "1 vocal receive volume"
-					dispTemplate = translate("{target} receive {param}");
-				} else {
-					// Translators: Indicates a parameter for a track receive in the Track
-					// Parameters dialog. {target} will be replaced by the track number and/or
-					// name. {targetNum} will be replaced with a number distinguishing this
-					// receive from other receives from the same track. {param} will be
-					// replaced with the parameter name.
-					// Example: "1 vocal receive 2 volume"
-					dispTemplate = translate("{target} receive {targetNum} {param}");
-				}
-			} else {
-				if (sameTargetCount == 1) {
-					// Translators: Indicates a parameter for a hardware audio output in the
-					// track Parameters dialog. {target} will be replaced by the name of the
-					// audio output. {param} will be replaced with the parameter name.
-					// Example: "main hardware volume"
-					dispTemplate = translate("{target} hardware {param}");
-				} else {
-					// Translators: Indicates a parameter for a hardware audio output in the
-					// track Parameters dialog. {target} will be replaced by the name of the
-					// audio output. {targetNum} will be replaced with a number distinguishing
-					// this send from other sends to the same output. {param} will be replaced
-					// with the parameter name.
-					// Example: "main hardware 2 volume"
-					dispTemplate = translate("{target} hardware {targetNum} {param}");
-				}
+			string categoryName = target;
+			if (sameTargetCount > 1) {
+				categoryName = fmt::format("{} {}", target, sameTargetCount);
 			}
-			auto paramName = [&](const char* param) {
-				return format(dispTemplate, "target"_a=target, "param"_a=param,
-					"targetNum"_a=sameTargetCount);
-			};
+			const int targetCategory = this->addCategory(categoryName, sendCategory);
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("volume")), this->track, category, i, "D_VOL",
-				ReaperObjVolParam::make));
+				translate("volume"), this->track, category, i, "D_VOL",
+				ReaperObjVolParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("pan")), this->track, category, i, "D_PAN",
-				ReaperObjPanParam::make));
+				translate("pan"), this->track, category, i, "D_PAN",
+				ReaperObjPanParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("mute")), this->track, category, i, "B_MUTE",
-				ReaperObjToggleParam::make));
+				translate("mute"), this->track, category, i, "B_MUTE",
+				ReaperObjToggleParam::make, targetCategory));
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("mono")), this->track, category, i, "B_MONO",
-				ReaperObjToggleParam::make));
+				translate("mono"), this->track, category, i, "B_MONO",
+				ReaperObjToggleParam::make, targetCategory));
 			if (trackParam) {
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("source MIDI channel")),
+					translate("source MIDI channel"),
 					this->track, category, i, "I_MIDIFLAGS",
-					SourceMidiChannelParam::make));
+					SourceMidiChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("destination MIDI channel")),
+					translate("destination MIDI channel"),
 					this->track, category, i, "I_MIDIFLAGS",
-					DestMidiChannelParam::make));
+					DestMidiChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("source audio channel")),
+					translate("source audio channel"),
 					this->track, category, i, "I_SRCCHAN",
-					SourceAudioChannelParam::make));
+					SourceAudioChannelParam::make, targetCategory));
 				this->params.push_back(make_unique<TrackSendParamProvider>(
-					paramName(translate("destination audio channel")),
+					translate("destination audio channel"),
 					this->track, category, i, "I_DSTCHAN",
-					DestAudioChannelParam::make));
+					DestAudioChannelParam::make, targetCategory));
 			}
 			this->params.push_back(make_unique<TrackSendParamProvider>(
-				paramName(translate("send type")), this->track, category, i, "I_SENDMODE",
-				SendTypeParam::make));
+				translate("send type"), this->track, category, i, "I_SENDMODE",
+				SendTypeParam::make, targetCategory));
 		}
 	}
 
@@ -1864,6 +2203,7 @@ class TrackParams: public ReaperObjParamSource {
 
 	void rebuildParams() final {
 		this->params.clear();
+		this->categories.clear();
 		this->params.push_back(make_unique<TrackParamProvider>(translate("volume"),
 			this->track, "D_VOL", ReaperObjVolParam::make));
 		this->params.push_back(make_unique<TrackParamProvider>(translate("pan"),
@@ -1975,9 +2315,10 @@ class ItemLenParam: public ReaperObjParam {
 		this->provider.getSetValue((void*)&value);
 	}
 
-	void setValueFromEdited(const string& text) final {
+	string setValueFromEdited(const string& text) final {
 		double offset = this->getOffset();
 		this->setValue(parse_timestr_len(text.c_str(), offset, -1));
+		return {};
 	}
 
 	static unique_ptr<Param> make(ReaperObjParamProvider& provider) {
