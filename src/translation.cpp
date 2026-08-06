@@ -70,10 +70,20 @@ static istringstream filterPoAmpersands(istream& input) {
 void initTranslation() {
 	// Figure out which file name to load. We base it on the REAPER language
 	// pack.
-	char langpack[200];
-	GetPrivateProfileString("REAPER", "langpack", "", langpack, sizeof(langpack),
-		get_ini_file());
-	if (langpack[0] == '\0' || langpack[0] == '<') {
+	string langpack;
+	int langpackSize = 0;
+	const auto langpackFromApi = static_cast<const char*>(get_config_var(
+		"__langpack_filename", &langpackSize));
+	if (langpackFromApi && langpackFromApi[0] != '\0') {
+		langpack = langpackFromApi;
+	}
+	if (langpack.empty()) {
+		char langpackFromIni[200];
+		GetPrivateProfileString("REAPER", "langpack", "", langpackFromIni,
+			sizeof(langpackFromIni), get_ini_file());
+		langpack = langpackFromIni;
+	}
+	if (langpack.empty() || langpack[0] == '<') {
 		// No language pack.
 		return;
 	}
