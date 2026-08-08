@@ -873,6 +873,15 @@ string formatDouble(double d, int precision, bool plus) {
 	if(stripped == "+0" || stripped == "-0") {
 		return "0";
 	}
+	// Translators: The decimal point symbol.
+	const string decimal = translate_ctxt("decimal", ".");
+	if (decimal == ".") {
+		return stripped;
+	}
+	const auto decimalPos = stripped.find('.');
+	if (decimalPos != string::npos) {
+		stripped.replace(decimalPos, 1, decimal);
+	}
 	return stripped;
 }
 
