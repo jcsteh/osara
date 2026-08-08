@@ -267,16 +267,16 @@ string formatTimeMinsec(double time, bool useCache) {
 		s << format(translate("{} min"), minute) << " ";
 		oldMinute = minute;
 	}
-	// Translators: Used when reporting a time in seconds. {:.3f} will be
-	// replaced with the number of seconds; e.g. "2 sec".
-	s << format(translate("{:#.3f} sec"), time);
+	// Translators: Used when reporting a time in seconds. {} will be replaced
+	// with the number of seconds; e.g. "2 sec".
+	s << format(translate("{} sec"), formatDouble(time, 3));
 	return s.str();
 }
 
 string formatTimeSec (double time) {
-	// Translators: Used when reporting a time in seconds. {:.3f} will be
-	// replaced with the number of seconds; e.g. "2 sec".
-	return format(translate("{:.3f} sec"), time);
+	// Translators: Used when reporting a time in seconds. {} will be replaced
+	// with the number of seconds; e.g. "2 sec".
+	return format(translate("{} sec"), formatDouble(time, 3));
 }
 
 string formatTimeRoundSec (double time) {
@@ -1812,13 +1812,13 @@ void formatPan(double pan, ostringstream& output) {
 		// Translators: Panned to the center.
 		output << translate("center");
 	} else if (pan < 0) {
-		// Translators: Panned to the left. {:g} will be replaced with the amount;
+		// Translators: Panned to the left. {} will be replaced with the amount;
 		// e.g. "20% left".
-		output << format(translate("{:g}% left"), -pan);
+		output << format(translate("{}% left"), formatDouble(-pan, 2));
 	} else {
-		// Translators: Panned to the right. {:g} will be replaced with the amount;
+		// Translators: Panned to the right. {} will be replaced with the amount;
 		// e.g. "20% right".
-		output << format(translate("{:g}% right"), pan);
+		output << format(translate("{}% right"), formatDouble(pan, 2));
 	}
 }
 
@@ -2620,18 +2620,18 @@ void postToggleTrackSoloDefeat(int command) {
 void postChangeTransientDetectionSensitivity(int command) {
 	double sensitivity = *(double*)get_config_var("transientsensitivity",
 		nullptr) * 100;
-		// Translators: report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+		// Translators: report transient sensitivity. {} is replaced with the sensitivity percentage;
 		// E.g. "13% sensitivity"
 	outputMessage(format(
-		translate("{:g}% sensitivity"), sensitivity));
+		translate("{}% sensitivity"), formatDouble(sensitivity, 2)));
 }
 
 void postChangeTransientDetectionThreshold(int command) {
 	double threshold = *(double*)get_config_var("transientthreshold",
 		nullptr);
 	// Translators: Reported when changing the transient detection threshold.
-	// {:g} will be replaced with the threshold; e.g. "{} dB threshold".
-	outputMessage(format(translate("{:g} dB threshold"), threshold));
+	// {} will be replaced with the threshold; e.g. "{} dB threshold".
+	outputMessage(format(translate("{} dB threshold"), formatDouble(threshold, 2)));
 }
 
 void postToggleEnvelopePointsMoveWithMediaItems(int command) {
@@ -5395,10 +5395,7 @@ void cmdMoveStretch(int command) {
 }
 
 void reportPeak(MediaTrack* track, int channel) {
-	ostringstream s;
-	s << fixed << setprecision(1);
-	s << VAL2DB(Track_GetPeakInfo(track, channel));
-	outputMessage(s);
+	outputMessage(formatDouble(VAL2DB(Track_GetPeakInfo(track, channel)), 1));
 }
 
 void cmdReportPeakCurrentC1(int command) {

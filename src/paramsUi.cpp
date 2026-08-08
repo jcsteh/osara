@@ -321,9 +321,7 @@ class ParamsDialog {
 			// Fall back to a percentage.
 			double percent = (this->val - this->param->min)
 				/ (this->param->max - this->param->min) * 100;
-			ostringstream s;
-			s << fixed << setprecision(1) << percent << "%";
-			this->valText = s.str();
+			this->valText = formatDouble(percent, 1) + "%";
 		}
 #ifdef _WIN32
 		// Set the slider's accessible value to this text.
