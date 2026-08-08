@@ -877,6 +877,15 @@ string formatDouble(double d, int precision, bool plus, bool stripZeros) {
 			s = "0";
 		}
 	}
+	// Translators: The decimal point symbol.
+	const string decimal = translate_ctxt("decimal", ".");
+	if (decimal == ".") {
+		return s;
+	}
+	const auto decimalPos = s.find('.');
+	if (decimalPos != string::npos) {
+		s.replace(decimalPos, 1, decimal);
+	}
 	return s;
 }
 
