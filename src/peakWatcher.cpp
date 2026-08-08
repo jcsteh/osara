@@ -395,7 +395,6 @@ bool isWatchingMultipleValues() {
 
 void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	ostringstream s;
-	s << fixed << setprecision(1);
 	const bool multiple = isWatchingMultipleValues();
 	auto& projWatchers = watchers[currentProject()];
 	for (int w = 0; w < NUM_WATCHERS; ++w) {
@@ -451,7 +450,7 @@ void CALLBACK tick(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 					if (levelType.separateChannels) {
 						s << translate(CHANNEL_NAMES[c]) << " ";
 					}
-					s << newPeak;
+					s << formatDouble(newPeak, 1);
 					outputMessage(s);
 				}
 			}
@@ -718,8 +717,7 @@ void report(int watcherIndex, int channel) {
 		return;
 	}
 	ostringstream s;
-	s << fixed << setprecision(1);
-	s << watcher.channels[channel].peak;
+	s << formatDouble(watcher.channels[channel].peak, 1);
 	outputMessage(s);
 }
 

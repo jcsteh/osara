@@ -136,8 +136,7 @@ class Surface: public IReaperControlSurface {
 			s << translate("volume") << " ";
 			this->lastParam = PARAM_VOLUME;
 		}
-		s << fixed << setprecision(2);
-		s << VAL2DB(volume);
+		s << formatDouble(VAL2DB(volume), 2);
 		outputMessage(s);
 	}
 

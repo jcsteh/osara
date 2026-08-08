@@ -350,7 +350,13 @@ const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool ski
 
 bool isTrackSelected(MediaTrack* track);
 bool isTrackArmed(MediaTrack* track);
-std::string formatDouble(double d, int precision, bool plus=false);
+
+// Format a double d to precision decimal places.
+// If plus is true, a "+" prefix will be included for a positive number.
+// If stripZeros is true, trailing zeroes will be removed.
+std::string formatDouble(double d, int precision, bool plus=false,
+	bool stripZeros=true);
+
 MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
