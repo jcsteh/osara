@@ -413,6 +413,16 @@ class ParamsDialog {
 		return (int)itemInfo.lParam;
 	}
 
+	void enableParamControl(HWND control, bool enable) {
+		if (!enable && GetFocus() == control) {
+			// We're disabling the control that currently has focus. Disabling the
+			// focused control leaves focus in a broken state, so move focus to the
+			// Parameter tree before we disable this control.
+			SetFocus(this->paramTree);
+		}
+		EnableWindow(control, enable);
+	}
+
 	void onParamChange() {
 		HTREEITEM item = TreeView_GetSelection(this->paramTree);
 		if (!item) {
@@ -426,17 +436,18 @@ class ParamsDialog {
 		this->paramNum = paramNum;
 		this->param = this->source->getParam(paramNum);
 		this->val = this->param->getValue();
-		EnableWindow(this->slider, this->param->isRange);
-		EnableWindow(this->valueEdit, this->param->isEditable);
-		EnableWindow(this->moreButton, !this->param->getMoreOptions().empty());
+		this->enableParamControl(this->slider, this->param->isRange);
+		this->enableParamControl(this->valueEdit, this->param->isEditable);
+		this->enableParamControl(
+			this->moreButton, !this->param->getMoreOptions().empty());
 		this->updateValue();
 	}
 
 	void disableParamControls() {
 		this->param = nullptr;
-		EnableWindow(this->slider, FALSE);
-		EnableWindow(this->valueEdit, FALSE);
-		EnableWindow(this->moreButton, FALSE);
+		this->enableParamControl(this->slider, FALSE);
+		this->enableParamControl(this->valueEdit, FALSE);
+		this->enableParamControl(this->moreButton, FALSE);
 		SetWindowText(this->valueEdit, "");
 		SetWindowText(this->valueLabel, "");
 	}
