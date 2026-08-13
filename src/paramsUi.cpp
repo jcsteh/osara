@@ -1083,20 +1083,14 @@ class FxParams: public ParamSource {
 	}
 
 	string getParamName(int param) final {
-		ostringstream ns;
 		auto namedCount = (int)this->namedConfigParams.size();
 		if (param < namedCount) {
-			ns << this->namedConfigParams[param].getDisplayName();
-		} else {
-			char name[256];
-			this->_GetParamName(this->obj, this->fx, param - namedCount, name,
-				sizeof(name));
-			ns << name;
+			return this->namedConfigParams[param].getDisplayName();
 		}
-		// Append the parameter number to facilitate efficient navigation
-		// and to ensure reporting where two consecutive parameters have the same name (#32).
-		ns << " (" << param << ")";
-		return ns.str();
+		char name[256];
+		this->_GetParamName(this->obj, this->fx, param - namedCount, name,
+			sizeof(name));
+		return name;
 	}
 
 	unique_ptr<Param> getParam(int fx, int param);
@@ -1146,9 +1140,7 @@ class FxParams: public ParamSource {
 			R"(|[P#]?\d{1,4})"
 			// Example: "Spec 1000"
 			R"(|Spec \d+)"
-			// OSARA appends a number in parentheses to all parameter names. See the
-			// getParamName function above.
-			R"() \(\d+\))"
+			")"
 		};
 		smatch m;
 		regex_match(name, m, RE_UNNAMED_PARAM);
