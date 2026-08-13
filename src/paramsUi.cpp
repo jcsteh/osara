@@ -335,7 +335,7 @@ class ParamsDialog {
 	string filter;
 	vector<HTREEITEM> paramTreeItems;
 	vector<HTREEITEM> categoryTreeItems;
-	int paramNum;
+	int paramNum = -1;
 	unique_ptr<Param> param;
 	double val;
 	string valText;
@@ -343,6 +343,20 @@ class ParamsDialog {
 	bool shouldAllowDeactivate = false;
 	bool suppressValueChangeReport = false;
 	CallLater valChangeLater;
+
+	void updateSelectedParamTreeItemText() {
+		HTREEITEM item = TreeView_GetSelection(this->paramTree);
+		if (!item || this->paramNum < 0) {
+			return;
+		}
+		string text = fmt::format("{}, {}",
+			this->source->getParamName(this->paramNum), this->valText);
+		TVITEM itemInfo{};
+		itemInfo.mask = TVIF_HANDLE | TVIF_TEXT;
+		itemInfo.hItem = item;
+		itemInfo.pszText = (char*)text.c_str();
+		TreeView_SetItem(this->paramTree, &itemInfo);
+	}
 
 	void updateValueText() {
 		if (this->valText.empty()) {
@@ -364,6 +378,7 @@ class ParamsDialog {
 		}
 #endif // _WIN32
 		SetWindowText(this->valueLabel, this->valText.c_str());
+		this->updateSelectedParamTreeItemText();
 	}
 
 	void updateValue() {
