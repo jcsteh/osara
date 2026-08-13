@@ -1905,8 +1905,6 @@ class TrackParams: public ReaperObjParamSource {
 			categoryName = translate("hardware outputs");
 		}
 		const int sendCategory = this->addCategory(categoryName);
-		string lastTarget;
-		int sameTargetCount = 1;
 		for (; i < count; ++i) {
 			string target;
 			if (trackParam) {
@@ -1926,21 +1924,7 @@ class TrackParams: public ReaperObjParamSource {
 				GetTrackSendName(this->track, i, sendName, sizeof(sendName));
 				target = sendName;
 			}
-			if (target == lastTarget) {
-				// There are multiple sends to the same target. Number the second onwards
-				// to differentiate them. We don't number the first to avoid unnecessary
-				// verbosity for the majority of cases where there is only one send to a
-				// given target.
-				++sameTargetCount;
-			} else {
-				sameTargetCount = 1;
-				lastTarget = target;
-			}
-			string categoryName = target;
-			if (sameTargetCount > 1) {
-				categoryName = fmt::format("{} {}", target, sameTargetCount);
-			}
-			const int targetCategory = this->addCategory(categoryName, sendCategory);
+			const int targetCategory = this->addCategory(target, sendCategory);
 			this->params.push_back(make_unique<TrackSendParamProvider>(
 				translate("volume"), this->track, category, i, "D_VOL",
 				ReaperObjVolParam::make, targetCategory));
