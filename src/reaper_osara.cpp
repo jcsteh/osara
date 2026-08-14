@@ -2202,6 +2202,10 @@ bool isItemMuted(MediaItem* item) {
 	return *(bool*)GetSetMediaItemInfo(item, "B_MUTE", nullptr);
 }
 
+bool isItemSoloed(MediaItem* item) {
+	return *(char*)GetSetMediaItemInfo(item, "C_MUTE_SOLO", nullptr) == -1;
+}
+
 void postToggleItemMute(int command) {
 	int muteCount=0;
 	int unmuteCount=0;
@@ -2240,35 +2244,40 @@ void postToggleItemMute(int command) {
 }
 
 void postToggleItemSolo(int command) {
-	bool soloed=true;
-	int itemCount=CountMediaItems(0);
-	int selectedCount = CountSelectedMediaItems(0);
-	if(selectedCount==0)
+	int soloCount=0;
+	int unsoloCount=0;
+	int count = CountSelectedMediaItems(0);
+	if(count==0)
 		return;
-	for(int i=0; i<itemCount; ++i) {
-		MediaItem* item = GetMediaItem(0, i);
-		if((!isItemSelected(item)) && (!isItemMuted(item)))  {
-			soloed=false;
-			break;
-		}
-	}
-	if(selectedCount==1) {
-		outputMessage(soloed ? translate("soloed") : translate("unsoloed"));
+	if(count==1) {
+		outputMessage(isItemSoloed(GetSelectedMediaItem(0, 0)) ?
+			translate("soloed") : translate("unsoloed"));
 		return;
 	}
-	if (soloed) {
+	for (int i=0; i<count; ++i) {
+		if(isItemSoloed(GetSelectedMediaItem(0, i)))
+			++soloCount;
+		else
+			++unsoloCount;
+	}
+	ostringstream s;
+	if(soloCount>0) {
 		// Translators: Reported when multiple items are soloed. {} will be replaced
 		// with the number of items; e.g. "2 items soloed".
-		outputMessage(format(
-			translate_plural("{} item soloed", "{} items soloed", selectedCount),
-			selectedCount));
-	} else {
+		s << format(translate_plural("{} item soloed", "{} items soloed", soloCount),
+			soloCount);
+		if (unsoloCount > 0) {
+			s << ", ";
+		}
+	}
+	if(unsoloCount>0) {
 		// Translators: Reported when multiple items are unsoloed. {} will be
 		// replaced with the number of items; e.g. "2 items unsoloed".
-		outputMessage(format(
-			translate_plural("{} item unsoloed", "{} items unsoloed", selectedCount),
-			selectedCount));
+		s << format(
+			translate_plural("{} item unsoloed", "{} items unsoloed", unsoloCount),
+			unsoloCount);
 	}
+	outputMessage(s);
 }
 
 bool isItemLocked(MediaItem* item) {
@@ -3092,7 +3101,8 @@ PostCommand POST_COMMANDS[] = {
 	{40118, postMoveItemOrEnvelopePoint}, // Item edit: Move items/envelope points down one track/a bit
 	{40696, postRenameTrack}, // Track: Rename last touched track
 	{40175, postToggleItemMute}, // Item properties: Toggle mute
-	{41561, postToggleItemSolo}, // Item properties: Toggle solo
+	{41561, postToggleItemSolo}, // Item properties: Toggle solo exclusive
+	{41557, postToggleItemSolo}, // Item properties: Toggle solo
 	{40687, postToggleItemLock}, // Item properties: Toggle lock
 	{40636, postToggleItemLoopSource}, // Item properties: Loop item source
 	{40626, postSetSelectionEnd}, // Time selection: Set end point
@@ -4020,8 +4030,11 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 		} else {
 			s << " " << translate("unselected");
 		}
-		if (*(bool*)GetSetMediaItemInfo(item, "B_MUTE", nullptr)) {
+		if (isItemMuted(item)) {
 			s << " " << translate("muted");
+		}
+		if (isItemSoloed(item)) {
+			s << " " << translate("soloed");
 		}
 		if (isItemLocked(item)) {
 			// Translators: Used when navigating items to indicate that an item is
