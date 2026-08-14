@@ -165,6 +165,7 @@ Most of these are actions built into REAPER, but a few are useful actions from t
 - Custom: Select items on selected tracks in current time selection (clears prior item selection): Alt+Shift+A
 - Item properties: Toggle mute: Control+F5
 - Item properties: Toggle solo exclusive: Control+F6
+- Item properties: Toggle solo
 - Item properties: Toggle lock
 - Item properties: Loop item source
 - Item properties: Normalize items: Control+Shift+N
