@@ -346,6 +346,7 @@ std::string formatLength(double start, double end, TimeFormat format=TF_RULER,
 std::string formatNoteLength(double start, double end);
 std::string formatCursorPosition(TimeFormat format=TF_RULER,
 	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
+std::string formatTrackNameOrNumber(MediaTrack* track);
 const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
 
 bool isTrackSelected(MediaTrack* track);
