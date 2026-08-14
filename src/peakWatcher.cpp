@@ -38,7 +38,8 @@ const double NO_LEVEL = -150.0;
 // Peak Watcher can watch various types of targets; e.g. tracks, track FX.
 using NoTarget = monostate;
 using TrackFx = pair<MediaTrack*, int>;
-using Target = variant<NoTarget, MediaTrack*, TrackFx>;
+using TakeFx = pair<MediaItem_Take*, int>;
+using Target = variant<NoTarget, MediaTrack*, TrackFx, TakeFx>;
 
 // std::get isn't supported until MacOS 10.14. Grr.
 template<typename T, typename V>
@@ -107,6 +108,20 @@ void describeTarget(Target& target, ostringstream& s) {
 		s << ", ";
 		char name[256];
 		TrackFX_GetFXName(tfx->first, tfx->second, name, sizeof(name));
+		shortenFxName(name, s);
+	} else if (TakeFx* tfx = get_if<TakeFx>(&target)) {
+		auto* track = (MediaTrack*)GetSetMediaItemTakeInfo(tfx->first, "P_TRACK",
+			nullptr);
+		int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
+			nullptr);
+		auto* item = (MediaItem*)GetSetMediaItemTakeInfo(tfx->first, "P_ITEM",
+			nullptr);
+		int itemNum = (int)(size_t)GetSetMediaItemInfo(item, "IP_ITEMNUMBER",
+			nullptr);
+		s << "take " << trackNum << "." << itemNum + 1 << " " <<
+			GetTakeName(tfx->first) << ", ";
+		char name[256];
+		TakeFX_GetFXName(tfx->first, tfx->second, name, sizeof(name));
 		shortenFxName(name, s);
 	}
 }
@@ -320,25 +335,31 @@ const LevelType LEVEL_TYPES[] = {
 	},
 	{_t("gain reduction dB"),
 		/* isSupported */ [](const Target& target) {
-			const TrackFx* tfx = get_if<TrackFx>(&target);
-			if (!tfx) {
-				return false;
+			if (const TrackFx* tfx = get_if<TrackFx>(&target)) {
+				char text[1];
+				return TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
+					FXPARM_GAIN_REDUCTION, text, sizeof(text));
 			}
-			char text[1];
-			return TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
-				FXPARM_GAIN_REDUCTION, text, sizeof(text));
+			if (const TakeFx* tfx = get_if<TakeFx>(&target)) {
+				char text[1];
+				return TakeFX_GetNamedConfigParm(tfx->first, tfx->second,
+					FXPARM_GAIN_REDUCTION, text, sizeof(text));
+			}
+			return false;
 		},
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ true,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			const TrackFx* tfx = get_if<TrackFx>(&watcher.target);
-			assert(tfx);
 			char text[10];
-			if (!TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
-					FXPARM_GAIN_REDUCTION, text, sizeof(text))) {
-				return NO_LEVEL;
+			bool gotValue = false;
+			if (const TrackFx* tfx = get_if<TrackFx>(&watcher.target)) {
+				gotValue = TrackFX_GetNamedConfigParm(tfx->first, tfx->second,
+					FXPARM_GAIN_REDUCTION, text, sizeof(text));
+			} else if (const TakeFx* tfx = get_if<TakeFx>(&watcher.target)) {
+				gotValue = TakeFX_GetNamedConfigParm(tfx->first,
+					tfx->second, FXPARM_GAIN_REDUCTION, text, sizeof(text));
 			}
-			return stod(text);
+			return gotValue ? stod(text) : NO_LEVEL;
 		},
 		/* reset */ nullptr,
 	},
@@ -488,11 +509,13 @@ bool isWatchingAnything() {
 }
 
 Target getFocusedTarget() {
-	int trackNum, itemNum, fx;
-	int type = GetFocusedFX(&trackNum, &itemNum, &fx);
-	if (type == 1) { // Track
-		MediaTrack* track = trackNum == 0 ?
-			GetMasterTrack(nullptr) : GetTrack(nullptr, trackNum - 1);
+	MediaTrack* track;
+	MediaItem_Take* take;
+	int fx;
+	if (getFocusedFx(&track, &take, &fx)) {
+		if (take) {
+			return TakeFx(take, fx);
+		}
 		return TrackFx(track, fx);
 	}
 
@@ -755,6 +778,24 @@ string getTrackGuidStr(ReaProject* project, MediaTrack* track) {
 	return guid;
 }
 
+MediaItem_Take* getTakeFromGuidStr(ReaProject* project, const string& guid) {
+	for (int t = 0; t < CountTracks(project); ++t) {
+		MediaTrack* track = GetTrack(project, t);
+		for (int i = 0; i < CountTrackMediaItems(track); ++i) {
+			MediaItem* item = GetTrackMediaItem(track, i);
+			for (int k = 0; k < CountTakes(item); ++k) {
+				MediaItem_Take* take = GetTake(item, k);
+				char takeGuid[40];
+				GetSetMediaItemTakeInfo_String(take, "GUID", takeGuid, false);
+				if (guid == takeGuid) {
+					return take;
+				}
+			}
+		}
+	}
+	return nullptr;
+}
+
 /*
  * Example config block:
 <OSARA_PEAKWATCHER
@@ -804,6 +845,13 @@ bool processExtensionLine(const char* line, ProjectStateContext* ctx,
 			input >> fx;
 			if (MediaTrack* track = getTrackFromGuidStr(project, word)) {
 				watcher.target = TrackFx(track, fx);
+			}
+		} else if (word == "TAKEFX") {
+			input >> word;
+			int fx;
+			input >> fx;
+			if (MediaItem_Take* take = getTakeFromGuidStr(project, word)) {
+				watcher.target = TakeFx(take, fx);
 			}
 		}
 		input >> word;
@@ -855,6 +903,10 @@ void saveExtensionConfig(ProjectStateContext* ctx, bool isUndo,
 		} else if (TrackFx* tfx = get_if<TrackFx>(&watcher.target)) {
 			out << " TRACKFX " << getTrackGuidStr(project, tfx->first) <<
 				" " << tfx->second;
+		} else if (TakeFx* tfx = get_if<TakeFx>(&watcher.target)) {
+			char takeGuid[40];
+			GetSetMediaItemTakeInfo_String(tfx->first, "GUID", takeGuid, false);
+			out << " TAKEFX " << takeGuid << " " << tfx->second;
 		}
 		out << " TYPE " << watcher.levelType;
 		out << " FOLLOW " << (int)watcher.follow;

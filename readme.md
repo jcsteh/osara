@@ -606,13 +606,13 @@ You do this using the following actions:
 Peak Watcher allows you to be notified automatically when a level exceeds a specified value.
 It can also hold the level until it is manually reset or for a specified time, allowing you to catch peaks that might otherwise be missed when manually checking the current peak.
 Two "watchers" are provided, enabling you to watch two different levels and configure settings independently.
-Beyond simple peak levels, various types of levels are supported for tracks and track effects, including LUFS, RMS and gain reduction.
+Beyond simple peak levels, various types of levels are supported for tracks and effects, including LUFS, RMS and gain reduction.
 
 To use Peak Watcher:
 
-1. Navigate to the track or track effect you want to watch.
- To watch a track effect, open the FX chain for the track and select the desired effect.
-2. Press Alt+w (OSARA: Configure Peak Watcher for current track/track FX (depending on focus)).
+1. Navigate to the track or effect you want to watch.
+ To watch a effect, open the FX chain for the track or take and select the desired effect.
+2. Press Alt+w (OSARA: Configure Peak Watcher for current track/FX (depending on focus)).
 3. From the context menu, choose which of the two watchers you want to configure.
  If a watcher is already configured, information about the configuration will be included in the menu.
  Choosing a watcher which is already configured will reconfigure the watcher for the track or effect you focused in step 1.
@@ -621,7 +621,7 @@ To use Peak Watcher:
  - The LUFS, RMS and true peak options use the JS: Loudness Meter Peak/RMS/LUFS (Cockos) effect, which is included with REAPER.
   OSARA will add the effect to tracks automatically and remove it when it is no longer required.
   These levels are measured pre-fader due to the reliance on the JS effect.
- - Gain reduction is only supported for track effects which expose this information.
+ - Gain reduction is only supported for effects which expose this information.
 5. If you are watching a track, you can check the Follow when last touch track changes option to watch whatever track you move to in your project.
 6. If you want to be notified when the level of channels exceeds a certain level, in the "Notify automatically for channels:" grouping, check the options for the desired channels and enter the desired level.
 7. The Hold level grouping allows you to specify whether the highest level (or lowest level for some level types) remains as the reported level and for how long.

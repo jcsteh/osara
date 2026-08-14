@@ -6327,7 +6327,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View parameters for current track/item/FX (depending on focus)")}, "OSARA_PARAMS", cmdParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for current track/take (depending on focus)")}, "OSARA_FXPARAMS", cmdFxParamsFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: View FX parameters for master track")}, "OSARA_FXPARAMSMASTER", cmdFxParamsMaster},
-	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure Peak Watcher for current track/track FX (depending on focus)")}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Configure Peak Watcher for current track/FX (depending on focus)")}, "OSARA_PEAKWATCHER", cmdPeakWatcher},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher first channel")}, "OSARA_REPORTPEAKWATCHERT1C1", cmdReportPeakWatcherW1C1},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for first watcher second channel")}, "OSARA_REPORTPEAKWATCHERT1C2", cmdReportPeakWatcherW1C2},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report Peak Watcher value for second watcher first channel")}, "OSARA_REPORTPEAKWATCHERT2C1", cmdReportPeakWatcherW2C1},
