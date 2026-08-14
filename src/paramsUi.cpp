@@ -2146,14 +2146,7 @@ class TrackParams: public ReaperObjParamSource {
 			if (trackParam) {
 				// Send or receive.
 				MediaTrack* sendTrack = (MediaTrack*)GetSetTrackSendInfo(this->track, category, i, trackParam, nullptr);
-				auto trackNum = (int)(size_t)GetSetMediaTrackInfo(sendTrack,
-					"IP_TRACKNUMBER", nullptr);
-				char* trackName = (char*)GetSetMediaTrackInfo(sendTrack, "P_NAME", nullptr);
-				if (trackName && trackName[0]) {
-					target = fmt::format("{} {}", trackNum, trackName);
-				} else {
-					target = fmt::format("{}", trackNum);
-				}
+				target = formatTrackNameOrNumber(sendTrack);
 			} else {
 				// Hardware output.
 				char sendName[100] = "";
