@@ -137,9 +137,14 @@ void _outputMessage(const string& message, bool interrupt) {
 #endif // _WIN32
 
 bool muteNextMessage = false;
+bool shouldSuppressOsaraMessages = false;
+
 void outputMessage(const string& message, bool interrupt) {
 	if(muteNextMessage && isHandlingCommand){
 		muteNextMessage = false;
+		return;
+	}
+	if (shouldSuppressOsaraMessages) {
 		return;
 	}
 	_outputMessage(message, interrupt);
@@ -147,6 +152,30 @@ void outputMessage(const string& message, bool interrupt) {
 
 void outputMessage(ostringstream& message, bool interrupt) {
 	outputMessage(message.str(), interrupt);
+}
+
+void outputMessageFromApi(const string& message) {
+	if(muteNextMessage && isHandlingCommand){
+		muteNextMessage = false;
+		return;
+	}
+	_outputMessage(message, true);
+}
+
+void suppressOsaraMessages() {
+	shouldSuppressOsaraMessages = true;
+	// Disable suppression once this script finishes; i.e. when REAPER returns to
+	// its main loop.
+	static void (*disableSuppression)() = [] {
+		if (!IsWindowEnabled(mainHwnd)) {
+			// This CallLater ran within a blocking modal dialog; the script is still
+			// running. Reschedule the CallLater.
+			CallLater(disableSuppression, 50);
+			return;
+		}
+		shouldSuppressOsaraMessages = false;
+	};
+	CallLater(disableSuppression, 0);
 }
 
 bool CallLater::cancel() {
