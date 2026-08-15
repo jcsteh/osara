@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-08-01 19:39\n"
+"PO-Revision-Date: 2026-08-15 18:52\n"
 
 msgid "enabled"
 msgstr "以启用"
@@ -963,6 +963,17 @@ msgstr "取消最大值的限制"
 msgid "Restrict maximum to current value"
 msgstr "将最大值限制为当前值"
 
+msgid "Channel lists must contain positive numbers separated by spaces."
+msgstr "通道列表必须包含用空格分隔的正数."
+
+msgid "Channels must be from 1 through 128."
+msgstr "通道必须介于1到128之间."
+
+#. An error reported when the channels mapped to an an FX
+#. input or output could not be set.
+msgid "Could not set the channels."
+msgstr "无法设置通道"
+
 msgid "low shelf"
 msgstr "低搁架"
 
@@ -1007,6 +1018,36 @@ msgstr "频带 {} 启用"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "频带 {} 类型"
+
+#. A category in the FX Parameters dialog containing input pin
+#. mappings.
+msgid "Inputs"
+msgstr "输入"
+
+#. The name of an unnamed input pin in the FX Parameters dialog.
+#. {} will be replaced with the pin number.
+msgid "Input {}"
+msgstr "输入 {}"
+
+#. A parameter in the FX Parameters dialog which configures the
+#. track channels from which an input pin receives. {} is the pin name.
+msgid "{} receives from track channels"
+msgstr "{} 从轨道通道接收"
+
+#. A category in the FX Parameters dialog containing output pin
+#. mappings.
+msgid "Outputs"
+msgstr "输出"
+
+#. The name of an unnamed output pin in the FX Parameters dialog.
+#. {} will be replaced with the pin number.
+msgid "Output {}"
+msgstr "输出 {}"
+
+#. A parameter in the FX Parameters dialog which configures the
+#. track channels to which an output pin is sent. {} is the pin name.
+msgid "{} sends to track channels"
+msgstr "{} 发送到轨道"
 
 msgid "FX Parameters"
 msgstr "FX 参数"
@@ -1065,53 +1106,14 @@ msgstr "推子前 (FX 前)"
 msgid "post-fx"
 msgstr "推子前 (FX 后)"
 
-#. Indicates a parameter for a track send in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {param} will be replaced with the parameter name.
-#. Example: "2 reverb send volume"
-msgid "{target} send {param}"
-msgstr "{target} 发送 {param}"
+msgid "sends"
+msgstr "发送"
 
-#. Indicates a parameter for a track send in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {targetNum} will be replaced with a number distinguishing this
-#. send from other sends to the same track. {param} will be replaced with
-#. the parameter name.
-#. Example: "2 reverb send 2 volume"
-msgid "{target} send {targetNum} {param}"
-msgstr "{target} 发送 {targetNum} {param}"
+msgid "receives"
+msgstr "接收"
 
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {param} will be replaced with the parameter name.
-#. Example: "1 vocal receive volume"
-msgid "{target} receive {param}"
-msgstr "{target} 接收 {param}"
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {targetNum} will be replaced with a number distinguishing this
-#. receive from other receives from the same track. {param} will be
-#. replaced with the parameter name.
-#. Example: "1 vocal receive 2 volume"
-msgid "{target} receive {targetNum} {param}"
-msgstr "{target} 接收 {targetNum} {param}"
-
-#. Indicates a parameter for a hardware audio output in the
-#. track Parameters dialog. {target} will be replaced by the name of the
-#. audio output. {param} will be replaced with the parameter name.
-#. Example: "main hardware volume"
-msgid "{target} hardware {param}"
-msgstr "{target} 硬件 {param}"
-
-#. Indicates a parameter for a hardware audio output in the
-#. track Parameters dialog. {target} will be replaced by the name of the
-#. audio output. {targetNum} will be replaced with a number distinguishing
-#. this send from other sends to the same output. {param} will be replaced
-#. with the parameter name.
-#. Example: "main hardware 2 volume"
-msgid "{target} hardware {targetNum} {param}"
-msgstr "{target} 硬件 {targetNum} {param}"
+msgid "hardware outputs"
+msgstr "硬件输出"
 
 msgid "mute"
 msgstr "静音"
@@ -1293,16 +1295,10 @@ msgstr[0] "{} 滴答"
 msgid "{} min"
 msgstr "{} 分"
 
-#. Used when reporting a time in seconds. {:.3f} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{:#.3f} sec"
-msgstr "{:#.3f} 秒"
-
-#. Used when reporting a time in seconds. {:.3f} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{:.3f} sec"
-msgstr "{:.3f} 秒"
-
+#. Used when reporting a time in seconds. {} will be replaced
+#. with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be replaced
+#. with the number of seconds; e.g. "2 sec".
 #. Used when reporting a time in whole seconds. {} will be
 #. replaced with the number of seconds; e.g. "2 sec".
 #. Used when reporting a time in seconds. {} will be
@@ -1502,6 +1498,11 @@ msgstr "跟随时不引导"
 
 msgid "VCA pre-FX follow"
 msgstr "VCA FX-前跟随"
+
+#. The decimal point symbol.
+msgctxt "decimal"
+msgid "."
+msgstr "."
 
 msgid "grid whole"
 msgstr "整格"
@@ -1828,15 +1829,15 @@ msgstr[0] "{} 对象从光标淡出"
 msgid "center"
 msgstr "中心"
 
-#. Panned to the left. {:g} will be replaced with the amount;
+#. Panned to the left. {} will be replaced with the amount;
 #. e.g. "20% left".
-msgid "{:g}% left"
-msgstr "{:g}% 左"
+msgid "{}% left"
+msgstr "{}% 左"
 
-#. Panned to the right. {:g} will be replaced with the amount;
+#. Panned to the right. {} will be replaced with the amount;
 #. e.g. "20% right".
-msgid "{:g}% right"
-msgstr "{:g}% 右"
+msgid "{}% right"
+msgstr "{}% 右"
 
 msgid "ripple per-track"
 msgstr "单轨道波纹"
@@ -2200,15 +2201,15 @@ msgstr[0] "{} 轨道已选择"
 msgid "not defeating solo"
 msgstr "取消独奏失效"
 
-#. report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+#. report transient sensitivity. {} is replaced with the sensitivity percentage;
 #. E.g. "13% sensitivity"
-msgid "{:g}% sensitivity"
-msgstr "{:g}% 灵敏度"
+msgid "{}% sensitivity"
+msgstr "{}% 灵敏度"
 
 #. Reported when changing the transient detection threshold.
-#. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
-msgid "{:g} dB threshold"
-msgstr "{:g} 阈值 dB"
+#. {} will be replaced with the threshold; e.g. "{} dB threshold".
+msgid "{} dB threshold"
+msgstr "{} dB 阈值"
 
 msgid "enabled envelope points move with media items"
 msgstr "已启用包络点随媒体对象移动"
@@ -2555,6 +2556,14 @@ msgstr "{} 撤消"
 #. will be replaced with the name of the action; e.g. "redo Remove tracks".
 msgid "redo {}"
 msgstr "{} 重做"
+
+#. Reported when there is not an item under the edit cursor to be split.
+msgid "no item at cursor"
+msgstr "光标处无对象"
+
+#. Reported when an item cannot be split because the cursor is already on its edge.
+msgid "already split at cursor"
+msgstr "光标处已分割"
 
 #. Reported when items are added. {} will be replaced with the
 #. number of items; e.g. "2 items added".
@@ -3057,8 +3066,8 @@ msgstr "OSARA: 查看当前轨/片段的FX参数(取决于焦点)"
 msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: 查看主控轨道的 FX 参数"
 
-msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
-msgstr "OSARA: 为当前轨道/轨道 FX 配置峰值监视器(取决于焦点)"
+msgid "OSARA: Configure Peak Watcher for current track/FX (depending on focus)"
+msgstr "OSARA: 为当前轨道/FX 配置峰值监视器(取决于焦点)"
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
 msgstr "OSARA: 朗读第1监视器第1通道的峰值"
@@ -3360,7 +3369,7 @@ msgstr "包含未命名和可能不可用的参数(&U)"
 
 msgctxt "Parameters"
 msgid "&Try setting value to detect steps"
-msgstr ""
+msgstr "尝试设置值以检测步长(&T)"
 
 msgctxt "Parameters"
 msgid "&Close"

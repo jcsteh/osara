@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2026-08-01 19:39\n"
+"PO-Revision-Date: 2026-08-15 18:52\n"
 
 msgid "enabled"
 msgstr "habilitado"
@@ -1013,6 +1013,17 @@ msgstr ""
 msgid "Restrict maximum to current value"
 msgstr ""
 
+msgid "Channel lists must contain positive numbers separated by spaces."
+msgstr ""
+
+msgid "Channels must be from 1 through 128."
+msgstr ""
+
+#. An error reported when the channels mapped to an an FX
+#. input or output could not be set.
+msgid "Could not set the channels."
+msgstr ""
+
 msgid "low shelf"
 msgstr "Corte de graves"
 
@@ -1057,6 +1068,36 @@ msgstr "banda {} permitida"
 #. e.g. "band 2 type".
 msgid "Band {} type"
 msgstr "banda {} tipo"
+
+#. A category in the FX Parameters dialog containing input pin
+#. mappings.
+msgid "Inputs"
+msgstr ""
+
+#. The name of an unnamed input pin in the FX Parameters dialog.
+#. {} will be replaced with the pin number.
+msgid "Input {}"
+msgstr ""
+
+#. A parameter in the FX Parameters dialog which configures the
+#. track channels from which an input pin receives. {} is the pin name.
+msgid "{} receives from track channels"
+msgstr ""
+
+#. A category in the FX Parameters dialog containing output pin
+#. mappings.
+msgid "Outputs"
+msgstr ""
+
+#. The name of an unnamed output pin in the FX Parameters dialog.
+#. {} will be replaced with the pin number.
+msgid "Output {}"
+msgstr ""
+
+#. A parameter in the FX Parameters dialog which configures the
+#. track channels to which an output pin is sent. {} is the pin name.
+msgid "{} sends to track channels"
+msgstr ""
 
 msgid "FX Parameters"
 msgstr "Parâmetros do FX"
@@ -1115,52 +1156,13 @@ msgstr ""
 msgid "post-fx"
 msgstr ""
 
-#. Indicates a parameter for a track send in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {param} will be replaced with the parameter name.
-#. Example: "2 reverb send volume"
-msgid "{target} send {param}"
+msgid "sends"
 msgstr ""
 
-#. Indicates a parameter for a track send in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {targetNum} will be replaced with a number distinguishing this
-#. send from other sends to the same track. {param} will be replaced with
-#. the parameter name.
-#. Example: "2 reverb send 2 volume"
-msgid "{target} send {targetNum} {param}"
+msgid "receives"
 msgstr ""
 
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {param} will be replaced with the parameter name.
-#. Example: "1 vocal receive volume"
-msgid "{target} receive {param}"
-msgstr ""
-
-#. Indicates a parameter for a track receive in the Track
-#. Parameters dialog. {target} will be replaced by the track number and/or
-#. name. {targetNum} will be replaced with a number distinguishing this
-#. receive from other receives from the same track. {param} will be
-#. replaced with the parameter name.
-#. Example: "1 vocal receive 2 volume"
-msgid "{target} receive {targetNum} {param}"
-msgstr ""
-
-#. Indicates a parameter for a hardware audio output in the
-#. track Parameters dialog. {target} will be replaced by the name of the
-#. audio output. {param} will be replaced with the parameter name.
-#. Example: "main hardware volume"
-msgid "{target} hardware {param}"
-msgstr ""
-
-#. Indicates a parameter for a hardware audio output in the
-#. track Parameters dialog. {target} will be replaced by the name of the
-#. audio output. {targetNum} will be replaced with a number distinguishing
-#. this send from other sends to the same output. {param} will be replaced
-#. with the parameter name.
-#. Example: "main hardware 2 volume"
-msgid "{target} hardware {targetNum} {param}"
+msgid "hardware outputs"
 msgstr ""
 
 msgid "mute"
@@ -1346,16 +1348,10 @@ msgstr[1] ""
 msgid "{} min"
 msgstr "Min"
 
-#. Used when reporting a time in seconds. {:.3f} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{:#.3f} sec"
-msgstr "{:#.3f} seg"
-
-#. Used when reporting a time in seconds. {:.3f} will be
-#. replaced with the number of seconds; e.g. "2 sec".
-msgid "{:.3f} sec"
-msgstr "{:.3f} seg"
-
+#. Used when reporting a time in seconds. {} will be replaced
+#. with the number of seconds; e.g. "2 sec".
+#. Used when reporting a time in seconds. {} will be replaced
+#. with the number of seconds; e.g. "2 sec".
 #. Used when reporting a time in whole seconds. {} will be
 #. replaced with the number of seconds; e.g. "2 sec".
 #. Used when reporting a time in seconds. {} will be
@@ -1557,6 +1553,11 @@ msgstr "não liberar ao seguir"
 
 msgid "VCA pre-FX follow"
 msgstr "seguir VCA pré-FX "
+
+#. The decimal point symbol.
+msgctxt "decimal"
+msgid "."
+msgstr ""
 
 msgid "grid whole"
 msgstr "Grade > ajustar para 1"
@@ -1897,15 +1898,15 @@ msgstr[1] ""
 msgid "center"
 msgstr "Centro"
 
-#. Panned to the left. {:g} will be replaced with the amount;
+#. Panned to the left. {} will be replaced with the amount;
 #. e.g. "20% left".
-msgid "{:g}% left"
-msgstr "{:g}% para esquerda"
+msgid "{}% left"
+msgstr ""
 
-#. Panned to the right. {:g} will be replaced with the amount;
+#. Panned to the right. {} will be replaced with the amount;
 #. e.g. "20% right".
-msgid "{:g}% right"
-msgstr "{:g}%para direita"
+msgid "{}% right"
+msgstr ""
 
 msgid "ripple per-track"
 msgstr "Editar onda por pista"
@@ -2287,15 +2288,15 @@ msgstr[1] "{} pistas selecionadas"
 msgid "not defeating solo"
 msgstr "Solo não rejeitado"
 
-#. report transient sensitivity. {:g} is replaced with the sensitivity percentage;
+#. report transient sensitivity. {} is replaced with the sensitivity percentage;
 #. E.g. "13% sensitivity"
-msgid "{:g}% sensitivity"
+msgid "{}% sensitivity"
 msgstr ""
 
 #. Reported when changing the transient detection threshold.
-#. {:g} will be replaced with the threshold; e.g. "{} dB threshold".
-msgid "{:g} dB threshold"
-msgstr "{:g} DB de Treshold"
+#. {} will be replaced with the threshold; e.g. "{} dB threshold".
+msgid "{} dB threshold"
+msgstr ""
 
 msgid "enabled envelope points move with media items"
 msgstr "os pontos de envelope se movem com os itens de mídia (habilitado)"
@@ -2642,6 +2643,14 @@ msgstr "desfazer {}"
 #. will be replaced with the name of the action; e.g. "redo Remove tracks".
 msgid "redo {}"
 msgstr "refazer {}"
+
+#. Reported when there is not an item under the edit cursor to be split.
+msgid "no item at cursor"
+msgstr ""
+
+#. Reported when an item cannot be split because the cursor is already on its edge.
+msgid "already split at cursor"
+msgstr ""
 
 #. Reported when items are added. {} will be replaced with the
 #. number of items; e.g. "2 items added".
@@ -3162,7 +3171,7 @@ msgstr "OSARA: Ver os parâmetros FX para a pista / trecho atual (dependendo do 
 msgid "OSARA: View FX parameters for master track"
 msgstr "OSARA: Ver os parâmetros FX para a pista master"
 
-msgid "OSARA: Configure Peak Watcher for current track/track FX (depending on focus)"
+msgid "OSARA: Configure Peak Watcher for current track/FX (depending on focus)"
 msgstr ""
 
 msgid "OSARA: Report Peak Watcher value for first watcher first channel"
