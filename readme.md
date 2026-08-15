@@ -1063,6 +1063,7 @@ Xenakios/SWS: Move cursor right configured pixels, creating time selection
 - OSARA: Configure REAPER for optimal screen reader accessibility
 - OSARA: Check for update
 - OSARA: Open online documentation
+- OSARA: Close all windows and focus arrange view
 
 ### Muting OSARA Messages in Custom/Cycle Actions
 The action "OSARA: Mute next message from OSARA" can be used in custom/cycle actions to mute OSARA feedback for the next action.
