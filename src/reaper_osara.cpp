@@ -3555,7 +3555,14 @@ void cmdCloseAllWindowsFocusArrange(int) {
 	EnumWindows(enumReaperTopLevelWindows, reinterpret_cast<LPARAM>(&windows));
 	int closed = 0;
 	for (HWND window: windows) {
+#ifdef __APPLE__
+		// Mirror SWELL's native close-button handling for modeless windows.
+		if (!SendMessage(window, WM_CLOSE, 0, 0)) {
+			SendMessage(window, WM_COMMAND, IDCANCEL, 0);
+		}
+#else
 		SendMessage(window, WM_CLOSE, 0, 0);
+#endif
 	}
 
 	constexpr int CMD_SHOW_DOCKER = 40279;
