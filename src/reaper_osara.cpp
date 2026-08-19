@@ -26,6 +26,7 @@
 #include <cassert>
 #include <array>
 #include <ranges>
+#include <vector>
 #include <math.h>
 #include <optional>
 #include <set>
@@ -3531,6 +3532,67 @@ bool isClassName(HWND hwnd, string className) {
 	return className.compare(buffer) == 0;
 }
 
+BOOL CALLBACK enumReaperTopLevelWindows(HWND hwnd, LPARAM lParam) {
+#ifdef _WIN32
+	// EnumWindows includes windows belonging to every application. Limit this to
+	// the REAPER windows identified by SWS's EnumReaWindows.
+	if (GetAncestor(hwnd, GA_ROOTOWNER) != mainHwnd ||
+			(!isClassName(hwnd, WCS_DIALOG) &&
+				!isClassName(hwnd, "REAPERMediaExplorerMainwnd") &&
+				!isClassName(hwnd, "REAPERmidieditorwnd"))) {
+		return TRUE;
+	}
+#endif
+	auto* windows = reinterpret_cast<vector<HWND>*>(lParam);
+	if (hwnd != mainHwnd && IsWindow(hwnd) && IsWindowVisible(hwnd)) {
+		windows->push_back(hwnd);
+	}
+	return TRUE;
+}
+
+void cmdCloseAllWindowsFocusArrange(int) {
+	vector<HWND> windows;
+	EnumWindows(enumReaperTopLevelWindows, reinterpret_cast<LPARAM>(&windows));
+	int closed = 0;
+	for (HWND window: windows) {
+#ifdef __APPLE__
+		// Mirror SWELL's native close-button handling for modeless windows.
+		if (!SendMessage(window, WM_CLOSE, 0, 0)) {
+			SendMessage(window, WM_COMMAND, IDCANCEL, 0);
+		}
+#else
+		SendMessage(window, WM_CLOSE, 0, 0);
+#endif
+	}
+
+	constexpr int CMD_SHOW_DOCKER = 40279;
+	if (GetToggleCommandState(CMD_SHOW_DOCKER) > 0) {
+		Main_OnCommand(CMD_SHOW_DOCKER, 0);
+		++closed;
+	}
+
+	if (HWND arrange = GetDlgItem(mainHwnd, 1000)) {
+		SetFocus(arrange);
+	} else {
+		SetForegroundWindow(mainHwnd);
+	}
+
+	// Windows don't close synchronously, so check whether they closed async.
+	CallLater([windows, closed] {
+		int closedWindows = closed;
+		for (HWND window: windows) {
+			if (!IsWindow(window) || !IsWindowVisible(window)) {
+				++closedWindows;
+			}
+		}
+		// Translators: Reported after closing REAPER windows. {} will be replaced
+		// with the number of windows; e.g. "2 windows closed".
+		outputMessage(format(
+			translate_plural("{} window closed", "{} windows closed", closedWindows),
+			closedWindows));
+	}, 0);
+}
+
 #ifdef _WIN32
 
 HWND getSendContainer(HWND hwnd) {
@@ -6345,6 +6407,7 @@ Command OSARA_COMMANDS[] = {
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report track/item/time/MIDI selection (depending on focus)")}, "OSARA_REPORTSEL", cmdReportSelection},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Remove items/tracks/contents of time selection/markers/envelope points (depending on focus)")}, "OSARA_REMOVE", cmdRemoveFocus},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Toggle shortcut help")}, "OSARA_SHORTCUTHELP", cmdShortcutHelp},
+	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Close all windows and focus arrange view")}, "OSARA_CLOSEALLWINDOWSFOCUSARRANGE", cmdCloseAllWindowsFocusArrange},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report edit/play cursor position, transport state and nearest markers and regions")}, "OSARA_CURSORPOS", cmdReportCursorPosition},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report number of takes in last touched item")}, "OSARA_REPORTNUMTAKESINSELITEM", cmdReportNumberOfTakesInItem},
 	{MAIN_SECTION, {DEFACCEL, _t("OSARA: Report length of last touched item")}, "OSARA_REPORTLENGTHSELITEM", cmdReportItemLength},
