@@ -2846,6 +2846,14 @@ void postMidiResets(int command) {
 
 // The virtual MIDI keyboard dialog HWND.
 HWND vkbHwnd = nullptr;
+
+double getVkbProjectInfo(const char* desc) {
+	// We have to check the version here because GetSetProjectInfo returns 0 when
+	// not supported, but 0 could also be a valid value.
+	static const bool supported = stod(string(GetAppVersion(), 0, 4)) >= 7.79;
+	return supported ? GetSetProjectInfo(nullptr, desc, 0, false) : -1;
+}
+
 // This is called from translateAccel. This is necessary because REAPER
 // registers its own accelerator hook for the virtual MIDI keyboard when the
 // keyboard first opens and we need to be ahead of that hook in order to be
@@ -2893,20 +2901,30 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		case VK_LEFT:
 			// We need to wait until this executes before we can report the new value.
 			CallLater([] {
-				constexpr long WCID_CENTER_NOTE = 1239;
-				char note[10];
-				if (GetDlgItemText(vkbHwnd, WCID_CENTER_NOTE, note, sizeof(note)) != 0) {
-					outputMessage(note);
+				const double note = getVkbProjectInfo("VKB_NOTECENTER");
+				if (note >= 0) {
+					outputMessage(getMidiNoteName(static_cast<int>(note)));
+					return;
+				}
+				constexpr int WCID_CENTER_NOTE = 1239;
+				char noteText[10];
+				if (GetDlgItemText(vkbHwnd, WCID_CENTER_NOTE, noteText, sizeof(noteText)) != 0) {
+					outputMessage(noteText);
 				}
 			}, 0);
 			return 0;
 		case VK_UP:
 		case VK_DOWN:
 			CallLater([] {
-				constexpr long WCID_CHANNEL = 1377;
-				char channel[10];
-				if (GetDlgItemText(vkbHwnd, WCID_CHANNEL, channel, sizeof(channel)) != 0) {
-					outputMessage(channel);
+				const double channel = getVkbProjectInfo("VKB_CHANNEL");
+				if (channel >= 0) {
+					outputMessage(fmt::format("{}", channel + 1));
+					return;
+				}
+				constexpr int WCID_CHANNEL = 1377;
+				char channelText[10];
+				if (GetDlgItemText(vkbHwnd, WCID_CHANNEL, channelText, sizeof(channelText)) != 0) {
+					outputMessage(channelText);
 				}
 			}, 0);
 			return 0;

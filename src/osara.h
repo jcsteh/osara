@@ -204,6 +204,7 @@
 #define REAPERAPI_WANT_TrackFX_Delete
 #define REAPERAPI_WANT_GetSetTrackGroupMembership
 #define REAPERAPI_WANT_GetSetTrackGroupMembershipHigh
+#define REAPERAPI_WANT_GetSetProjectInfo
 #define REAPERAPI_WANT_GetSetProjectInfo_String
 #define REAPERAPI_WANT_SetOnlyTrackSelected
 #define REAPERAPI_WANT_MIDI_GetEvt
