@@ -574,7 +574,7 @@ class MidiEventIterator {
 
 using MidiNoteIterator = MidiEventIterator<MidiNote, MediaItem_Take*>;
 
-const string getMidiNoteName(MediaTrack* track, int pitch, int channel) {
+const string getMidiNoteName(int pitch) {
 	static const char* names[] = {
 		// Translators: The name of a musical note.
 		translate("c"),
@@ -601,22 +601,25 @@ const string getMidiNoteName(MediaTrack* track, int pitch, int channel) {
 		// Translators: The name of a musical note.
 		translate("b")
 	};
+	ostringstream s;
+	int octave = pitch / 12 - 1;
+	int szOut = 0;
+	int* octaveOffset = (int*)get_config_var("midioctoffs", &szOut);
+	if (octaveOffset && (szOut == sizeof(int))) {
+		octave += *octaveOffset - 1; // REAPER offset "0" is saved as "1" in the preferences file.
+	}
+	pitch %= 12;
+	s << names[pitch] << " " << octave;
+	return s.str();
+}
+
+const string getMidiNoteName(MediaTrack* track, int pitch, int channel) {
 	int tracknumber = static_cast<int> (GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")); // one based
 	const char* noteName = GetTrackMIDINoteName(tracknumber - 1, pitch, channel); // track number is zero based
-	ostringstream s;
-	if (noteName &&  GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40045)) { // View: Show note names
-		s << noteName;
-	} else {
-		int octave = pitch / 12 - 1;
-		int szOut = 0;
-		int* octaveOffset = (int*)get_config_var("midioctoffs", &szOut);
-		if (octaveOffset && (szOut == sizeof(int))) {
-			octave += *octaveOffset - 1; // REAPER offset "0" is saved as "1" in the preferences file.
-		}
-		pitch %= 12;
-		s << names[pitch] << " " << octave;
+	if (noteName && GetToggleCommandState2(SectionFromUniqueID(MIDI_EDITOR_SECTION), 40045)) { // View: Show note names
+		return noteName;
 	}
-	return s.str();
+	return getMidiNoteName(pitch);
 }
 
 const string getMidiNoteName(MediaItem_Take *take, int pitch, int channel) {
