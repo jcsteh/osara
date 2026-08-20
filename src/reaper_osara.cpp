@@ -2878,6 +2878,7 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		return 0;
 	}
 	if (isShortcutHelpEnabled) {
+		const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
 		switch (msg->wParam) {
 			case VK_RIGHT:
 				outputMessage(translate("Octave up"));
@@ -2886,10 +2887,12 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 				outputMessage(translate("Octave down"));
 				return 1;
 			case VK_UP:
-				outputMessage(translate("Increase MIDI channel"));
+				outputMessage(shift ? translate("Increase MIDI velocity") :
+					translate("Increase MIDI channel"));
 				return 1;
 			case VK_DOWN:
-				outputMessage(translate("Decrease MIDI channel"));
+				outputMessage(shift ? translate("Decrease MIDI velocity") :
+					translate("Decrease MIDI channel"));
 				return 1;
 		default:
 			break;
@@ -2914,8 +2917,16 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 			}, 0);
 			return 0;
 		case VK_UP:
-		case VK_DOWN:
-			CallLater([] {
+		case VK_DOWN: {
+			const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
+			CallLater([shift] {
+				if (shift) {
+					const double velocity = getVkbProjectInfo("VKB_LASTVEL");
+					if (velocity >= 0) {
+						outputMessage(fmt::format("{}", velocity));
+					}
+					return;
+				}
 				const double channel = getVkbProjectInfo("VKB_CHANNEL");
 				if (channel >= 0) {
 					outputMessage(fmt::format("{}", channel + 1));
@@ -2928,6 +2939,7 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 				}
 			}, 0);
 			return 0;
+		}
 		default:
 			break;
 	}
