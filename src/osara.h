@@ -9,13 +9,13 @@
 #define _OSARA_H
 
 #ifdef _WIN32
-# include <windows.h>
+#	include <windows.h>
 #else
 // Disable warnings for SWELL, since we don't have any control over those.
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Weverything"
-# include <windows.h>
-# pragma clang diagnostic pop
+#	pragma clang diagnostic push
+#	pragma clang diagnostic ignored "-Weverything"
+#	include <windows.h>
+#	pragma clang diagnostic pop
 #endif
 #include <functional>
 #include <fstream>
@@ -24,7 +24,7 @@
 #include <sstream>
 #include <utility>
 #ifndef FMT_HEADER_ONLY
-#define FMT_HEADER_ONLY
+#	define FMT_HEADER_ONLY
 #endif
 #include <fmt/format.h>
 
@@ -252,6 +252,7 @@ typedef struct Command {
 	const char* id;
 	void (*execute)(int);
 } Command;
+
 extern int lastCommandRepeatCount;
 extern DWORD lastCommandTime;
 extern bool isShortcutHelpEnabled;
@@ -281,7 +282,7 @@ extern bool isSelectionContiguous;
 extern bool shouldMoveToAutoItem;
 extern int lastCommand;
 
-bool shouldReportTimeMovement() ;
+bool shouldReportTimeMovement();
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
 
@@ -311,11 +312,13 @@ class CallLater {
 	private:
 	struct Holder {
 		Holder(auto func): func(func) {}
+
 		std::function<void()> func;
 		std::shared_ptr<Holder> self;
 	};
 
-	static void CALLBACK timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time);
+	static void CALLBACK
+	timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time);
 
 	std::weak_ptr<Holder> holder;
 };
@@ -332,23 +335,38 @@ typedef enum {
 	TF_MEASURETICK,
 	TF_MS
 } TimeFormat;
+
 const TimeFormat TF_RULER = TF_NONE;
+
 enum FormatTimeCacheRequest {
 	FT_NO_CACHE, // Don't use the cache.
 	FT_USE_CACHE, // Use the cache.
 	FT_CACHE_DEFAULT // Use the cache if the user wants full time reported.
 };
-std::string formatTime(double time, TimeFormat format=TF_RULER,
-	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT,
-	bool includeZeros=true, bool includeProjectStartOffset=true);
-void resetTimeCache(TimeFormat excludeFormat=TF_NONE);
-std::string formatLength(double start, double end, TimeFormat format=TF_RULER,
-	FormatTimeCacheRequest cache=FT_NO_CACHE, bool includeZeros=true);
+
+std::string formatTime(
+	double time,
+	TimeFormat format = TF_RULER,
+	FormatTimeCacheRequest cache = FT_CACHE_DEFAULT,
+	bool includeZeros = true,
+	bool includeProjectStartOffset = true
+);
+void resetTimeCache(TimeFormat excludeFormat = TF_NONE);
+std::string formatLength(
+	double start,
+	double end,
+	TimeFormat format = TF_RULER,
+	FormatTimeCacheRequest cache = FT_NO_CACHE,
+	bool includeZeros = true
+);
 std::string formatNoteLength(double start, double end);
-std::string formatCursorPosition(TimeFormat format=TF_RULER,
-	FormatTimeCacheRequest cache=FT_CACHE_DEFAULT);
+std::string formatCursorPosition(
+	TimeFormat format = TF_RULER, FormatTimeCacheRequest cache = FT_CACHE_DEFAULT
+);
 std::string formatTrackNameOrNumber(MediaTrack* track);
-const char* getActionName(int command, KbdSectionInfo* section=nullptr, bool skipCategory=true);
+const char* getActionName(
+	int command, KbdSectionInfo* section = nullptr, bool skipCategory = true
+);
 
 bool isTrackSelected(MediaTrack* track);
 bool isTrackArmed(MediaTrack* track);
@@ -356,15 +374,16 @@ bool isTrackArmed(MediaTrack* track);
 // Format a double d to precision decimal places.
 // If plus is true, a "+" prefix will be included for a positive number.
 // If stripZeros is true, trailing zeroes will be removed.
-std::string formatDouble(double d, int precision, bool plus=false,
-	bool stripZeros=true);
+std::string formatDouble(
+	double d, int precision, bool plus = false, bool stripZeros = true
+);
 
 MediaItem* getItemWithFocus();
 
 #ifdef _WIN32
-#include <string>
-#include <atlcomcli.h>
-#include <oleacc.h>
+#	include <string>
+#	include <atlcomcli.h>
+#	include <oleacc.h>
 
 std::wstring widen(const std::string& text);
 std::string narrow(const std::wstring& text);
@@ -373,10 +392,13 @@ extern CComPtr<IAccPropServices> accPropServices;
 
 #else
 // These macros exist on Windows but aren't defined by Swell for Mac.
-#define ComboBox_GetCurSel(hwnd) (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0)
-#define ComboBox_SetCurSel(hwnd, index) (int)SendMessage(hwnd, CB_SETCURSEL, (WPARAM)index, 0)
-#define ComboBox_AddString(hwnd, str) (int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
-#define ComboBox_ResetContent(hwnd) (int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
+#	define ComboBox_GetCurSel(hwnd) (int)SendMessage(hwnd, CB_GETCURSEL, 0, 0)
+#	define ComboBox_SetCurSel(hwnd, index) \
+		(int)SendMessage(hwnd, CB_SETCURSEL, (WPARAM)index, 0)
+#	define ComboBox_AddString(hwnd, str) \
+		(int)SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)str)
+#	define ComboBox_ResetContent(hwnd) \
+		(int)SendMessage(hwnd, CB_RESETCONTENT, 0, 0)
 #endif
 
 bool isClassName(HWND hwnd, std::string className);
@@ -415,7 +437,8 @@ inline void dbg(fmt::format_string<Args...> format, Args&&... args) {
 		return result + "osara.log";
 	}();
 	std::ofstream(logFilePath, std::ios::app)
-		<< fmt::format(format, std::forward<Args>(args)...) << '\n';
+		<< fmt::format(format, std::forward<Args>(args)...)
+		<< '\n';
 }
 
 #endif

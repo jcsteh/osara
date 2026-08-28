@@ -17,25 +17,30 @@ bool shouldUseUiaNotifications();
 bool sendUiaNotification(const std::string& message, bool interrupt = true);
 void resetUia();
 
-class UiaProvider : public IRawElementProviderSimple {
+class UiaProvider: public IRawElementProviderSimple {
 	public:
 	UiaProvider(_In_ HWND hwnd): controlHWnd(hwnd), refCount(0) {}
 
 	// IUnknown methods
 	ULONG STDMETHODCALLTYPE AddRef() override;
 	ULONG STDMETHODCALLTYPE Release() override;
-	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid,
-		_Outptr_ void** ppInterface) override;
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		_In_ REFIID riid, _Outptr_ void** ppInterface
+	) override;
 
 	// IRawElementProviderSimple methods
 	HRESULT STDMETHODCALLTYPE get_ProviderOptions(
-		_Out_ ProviderOptions* pRetVal) final;
-	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId,
-		_Outptr_result_maybenull_ IUnknown** pRetVal) override;
-	HRESULT STDMETHODCALLTYPE GetPropertyValue(PROPERTYID propertyId,
-		_Out_ VARIANT* pRetVal) override;
+		_Out_ ProviderOptions* pRetVal
+	) final;
+	HRESULT STDMETHODCALLTYPE GetPatternProvider(
+		PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
+	) override;
+	HRESULT STDMETHODCALLTYPE GetPropertyValue(
+		PROPERTYID propertyId, _Out_ VARIANT* pRetVal
+	) override;
 	HRESULT STDMETHODCALLTYPE get_HostRawElementProvider(
-		IRawElementProviderSimple** pRetVal) final;
+		IRawElementProviderSimple** pRetVal
+	) final;
 
 	protected:
 	virtual ~UiaProvider() = default;
@@ -59,7 +64,7 @@ class UiaProvider : public IRawElementProviderSimple {
 // controls are normally numeric and can't expose a text value. This provider
 // implements the Value pattern. It also provides MSAA support for backwards
 // compatibility.
-class TextSliderUiaProvider : public UiaProvider, public IValueProvider {
+class TextSliderUiaProvider: public UiaProvider, public IValueProvider {
 	public:
 	// Create an instance of this provider for a given slider control HWND and set
 	//it up so that it responds to UIA clients which query this control.
@@ -81,17 +86,20 @@ class TextSliderUiaProvider : public UiaProvider, public IValueProvider {
 		return UiaProvider::Release();
 	}
 
-	HRESULT STDMETHODCALLTYPE QueryInterface(_In_ REFIID riid,
-		_Outptr_ void** ppInterface) override;
+	HRESULT STDMETHODCALLTYPE QueryInterface(
+		_In_ REFIID riid, _Outptr_ void** ppInterface
+	) override;
 
 	// IRawElementProviderSimple methods
-	HRESULT STDMETHODCALLTYPE GetPatternProvider(PATTERNID patternId,
-		_Outptr_result_maybenull_ IUnknown** pRetVal) override;
+	HRESULT STDMETHODCALLTYPE GetPatternProvider(
+		PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
+	) override;
 
 	// IValueProvider methods
 	HRESULT STDMETHODCALLTYPE SetValue(__RPC__in LPCWSTR val) override;
 	HRESULT STDMETHODCALLTYPE get_Value(
-		__RPC__deref_out_opt BSTR* pRetVal) override;
+		__RPC__deref_out_opt BSTR* pRetVal
+	) override;
 	HRESULT STDMETHODCALLTYPE get_IsReadOnly(__RPC__out BOOL* pRetVal) override;
 
 	protected:
@@ -104,10 +112,16 @@ class TextSliderUiaProvider : public UiaProvider, public IValueProvider {
 	}
 
 	private:
-	TextSliderUiaProvider(HWND hwnd) : UiaProvider(hwnd) {}
+	TextSliderUiaProvider(HWND hwnd): UiaProvider(hwnd) {}
 
-	static LRESULT CALLBACK subclassProc(HWND hwnd, UINT msg, WPARAM wParam,
-		LPARAM lParam, UINT_PTR subclass, DWORD_PTR data);
+	static LRESULT CALLBACK subclassProc(
+		HWND hwnd,
+		UINT msg,
+		WPARAM wParam,
+		LPARAM lParam,
+		UINT_PTR subclass,
+		DWORD_PTR data
+	);
 
 	std::string sliderValue;
 };

@@ -38,7 +38,7 @@ class UiaCore {
 
 	decltype(UiaRaiseNotificationEvent)* RaiseNotificationEvent =
 		getFunc<decltype(UiaRaiseNotificationEvent)>("UiaRaiseNotificationEvent");
-	decltype(UiaDisconnectProvider)* DisconnectProvider = 
+	decltype(UiaDisconnectProvider)* DisconnectProvider =
 		getFunc<decltype(UiaDisconnectProvider)>("UiaDisconnectProvider");
 	decltype(UiaDisconnectAllProviders)* DisconnectAllProviders =
 		getFunc<decltype(UiaDisconnectAllProviders)>("UiaDisconnectAllProviders");
@@ -61,13 +61,15 @@ ULONG STDMETHODCALLTYPE UiaProvider::Release() {
 	return val;
 }
 
-HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
-	_Outptr_ void** ppInterface
+HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(
+	_In_ REFIID riid, _Outptr_ void** ppInterface
 ) {
 	if (!ppInterface) {
 		return E_INVALIDARG;
 	}
-	if (riid == __uuidof(IUnknown) || riid == __uuidof(IRawElementProviderSimple)) {
+	if (
+		riid == __uuidof(IUnknown) || riid == __uuidof(IRawElementProviderSimple)
+	) {
 		*ppInterface = CComPtr<IRawElementProviderSimple>(this).Detach();
 	} else {
 		*ppInterface = nullptr;
@@ -79,20 +81,21 @@ HRESULT STDMETHODCALLTYPE UiaProvider::QueryInterface(_In_ REFIID riid,
 HRESULT STDMETHODCALLTYPE UiaProvider::get_ProviderOptions(
 	_Out_ ProviderOptions* pRetVal
 ) {
-	*pRetVal = ProviderOptions_ServerSideProvider | ProviderOptions_UseComThreading;
+	*pRetVal = ProviderOptions_ServerSideProvider
+		| ProviderOptions_UseComThreading;
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE UiaProvider::GetPatternProvider(PATTERNID patternId,
-	_Outptr_result_maybenull_ IUnknown** pRetVal
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPatternProvider(
+	PATTERNID patternId, _Outptr_result_maybenull_ IUnknown** pRetVal
 ) {
 	// We do not support any pattern.
 	*pRetVal = nullptr;
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE UiaProvider::GetPropertyValue(PROPERTYID propertyId,
-	_Out_ VARIANT* pRetVal
+HRESULT STDMETHODCALLTYPE UiaProvider::GetPropertyValue(
+	PROPERTYID propertyId, _Out_ VARIANT* pRetVal
 ) {
 	switch (propertyId) {
 		case UIA_ControlTypePropertyId:
@@ -163,7 +166,9 @@ HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::GetPatternProvider(
 	return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::SetValue(__RPC__in LPCWSTR val) {
+HRESULT STDMETHODCALLTYPE TextSliderUiaProvider::SetValue(
+	__RPC__in LPCWSTR val
+) {
 	return S_OK;
 }
 
@@ -187,8 +192,13 @@ CComPtr<TextSliderUiaProvider> TextSliderUiaProvider::create(HWND hwnd) {
 	return provider;
 }
 
-LRESULT CALLBACK TextSliderUiaProvider::subclassProc(HWND hwnd, UINT msg,
-	WPARAM wParam, LPARAM lParam, UINT_PTR subclass, DWORD_PTR data
+LRESULT CALLBACK TextSliderUiaProvider::subclassProc(
+	HWND hwnd,
+	UINT msg,
+	WPARAM wParam,
+	LPARAM lParam,
+	UINT_PTR subclass,
+	DWORD_PTR data
 ) {
 	auto provider = (TextSliderUiaProvider*)data;
 	switch (msg) {
@@ -196,7 +206,10 @@ LRESULT CALLBACK TextSliderUiaProvider::subclassProc(HWND hwnd, UINT msg,
 			RemoveWindowSubclass(hwnd, subclassProc, subclass);
 			break;
 		case WM_GETOBJECT:
-			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId) && provider) {
+			if (
+				static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)
+				&& provider
+			) {
 				return UiaReturnRawElementProvider(hwnd, wParam, lParam, provider);
 			}
 			break;
@@ -210,15 +223,25 @@ LRESULT CALLBACK TextSliderUiaProvider::subclassProc(HWND hwnd, UINT msg,
 
 void TextSliderUiaProvider::setValue(string value) {
 	sliderValue = value;
-	accPropServices->SetHwndPropStr(controlHWnd, OBJID_CLIENT, CHILDID_SELF,
-		PROPID_ACC_VALUE, widen(value).c_str());
+	accPropServices->SetHwndPropStr(
+		controlHWnd,
+		OBJID_CLIENT,
+		CHILDID_SELF,
+		PROPID_ACC_VALUE,
+		widen(value).c_str()
+	);
 }
 
 void TextSliderUiaProvider::fireValueChange() {
-	UiaRaiseAutomationPropertyChangedEvent(this, UIA_ValueValuePropertyId,
-		CComVariant(), CComVariant(widen(sliderValue).c_str()));
-	NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, controlHWnd,
-		OBJID_CLIENT, CHILDID_SELF);
+	UiaRaiseAutomationPropertyChangedEvent(
+		this,
+		UIA_ValueValuePropertyId,
+		CComVariant(),
+		CComVariant(widen(sliderValue).c_str())
+	);
+	NotifyWinEvent(
+		EVENT_OBJECT_VALUECHANGE, controlHWnd, OBJID_CLIENT, CHILDID_SELF
+	);
 }
 
 CComPtr<IRawElementProviderSimple> uiaProvider;
@@ -226,7 +249,10 @@ CComPtr<IRawElementProviderSimple> uiaProvider;
 LRESULT CALLBACK uiaWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_GETOBJECT:
-			if (static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId) && uiaProvider) {
+			if (
+				static_cast<long>(lParam) == static_cast<long>(UiaRootObjectId)
+				&& uiaProvider
+			) {
 				return UiaReturnRawElementProvider(hwnd, wParam, lParam, uiaProvider);
 			}
 			return 0;
@@ -317,7 +343,9 @@ bool shouldUseUiaNotifications() {
 			// Not available (requires Windows 10 fall creators update or above).
 			return false;
 		}
-		const char setting = GetExtState(CONFIG_SECTION, "uiaNotificationEvents")[0];
+		const char setting = GetExtState(
+			CONFIG_SECTION, "uiaNotificationEvents"
+		)[0];
 		if (setting == '0') {
 			return false; // Force disable.
 		} else if (setting == '2') {
@@ -341,13 +369,18 @@ bool sendUiaNotification(const string& message, bool interrupt) {
 	if (!UiaClientsAreListening() || message.empty()) {
 		return true;
 	}
-	return (uiaCore->RaiseNotificationEvent(
-		uiaProvider,
-		NotificationKind_Other,
-		interrupt ? NotificationProcessing_MostRecent : NotificationProcessing_All,
-		SysAllocString(widen(message).c_str()),
-		SysAllocString(L"REAPER_OSARA")
-	) == S_OK);
+	return (
+		uiaCore->RaiseNotificationEvent(
+			uiaProvider,
+			NotificationKind_Other,
+			interrupt
+				? NotificationProcessing_MostRecent
+				: NotificationProcessing_All,
+			SysAllocString(widen(message).c_str()),
+			SysAllocString(L"REAPER_OSARA")
+		)
+		== S_OK
+	);
 }
 
 void resetUia() {

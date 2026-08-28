@@ -22,10 +22,12 @@ template<typename S>
 auto translate(S msg) {
 	return translationDict.translate(msg);
 }
+
 template<typename S>
 auto translate_ctxt(S context, S msg) {
 	return translationDict.translate_ctxt(context, msg);
 }
+
 template<typename S, typename N>
 auto translate_plural(S msg, S msgPlural, N num) {
 	return translationDict.translate_plural(msg, msgPlural, num);
@@ -43,9 +45,9 @@ template<typename FormatStr, typename... Args>
 std::string format(FormatStr&& formatStr, Args&&... args) {
 	try {
 		return fmt::format(
-            fmt::runtime(std::forward<FormatStr>(formatStr)),
-            std::forward<Args>(args)...
-        );
+			fmt::runtime(std::forward<FormatStr>(formatStr)),
+			std::forward<Args>(args)...
+		);
 	} catch (fmt::format_error) {
 		return fmt::format("error in format string: {}", formatStr);
 	}

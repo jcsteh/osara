@@ -73,15 +73,22 @@ void initTranslation() {
 	// pack.
 	string langpack;
 	int langpackSize = 0;
-	const auto langpackFromApi = static_cast<const char*>(get_config_var(
-		"__langpack_filename", &langpackSize));
+	const auto langpackFromApi = static_cast<const char*>(
+		get_config_var("__langpack_filename", &langpackSize)
+	);
 	if (langpackFromApi && langpackFromApi[0] != '\0') {
 		langpack = langpackFromApi;
 	}
 	if (langpack.empty()) {
 		char langpackFromIni[200];
-		GetPrivateProfileString("REAPER", "langpack", "", langpackFromIni,
-			sizeof(langpackFromIni), get_ini_file());
+		GetPrivateProfileString(
+			"REAPER",
+			"langpack",
+			"",
+			langpackFromIni,
+			sizeof(langpackFromIni),
+			get_ini_file()
+		);
 		langpack = langpackFromIni;
 	}
 	if (langpack.empty() || langpack[0] == '<') {

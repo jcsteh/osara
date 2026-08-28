@@ -18,7 +18,7 @@
 #include "midiEditorCommands.h"
 #include "translation.h"
 #ifdef _WIN32
-# include "uia.h"
+#	include "uia.h"
 #endif
 
 using namespace fmt::literals;
@@ -160,8 +160,11 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_MUTED, TC_UNMUTED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(mute)) {
+		if (
+			!isParamsDialogOpen
+			&& !this->wasCausedByCommand()
+			&& cache.hasChanged(mute)
+		) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (mute ? translate("muted") : translate("unmuted"));
@@ -180,8 +183,11 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_SOLOED, TC_UNSOLOED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(solo)) {
+		if (
+			!isParamsDialogOpen
+			&& !this->wasCausedByCommand()
+			&& cache.hasChanged(solo)
+		) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (solo ? translate("soloed") : translate("unsoloed"));
@@ -195,8 +201,11 @@ class Surface: public IReaperControlSurface {
 			return;
 		}
 		auto cache = this->cachedTrackState<TC_ARMED, TC_UNARMED>(track);
-		if (!isParamsDialogOpen && !this->wasCausedByCommand() &&
-				cache.hasChanged(arm)) {
+		if (
+			!isParamsDialogOpen
+			&& !this->wasCausedByCommand()
+			&& cache.hasChanged(arm)
+		) {
 			ostringstream s;
 			this->reportTrackIfDifferent(track, s);
 			s << (arm ? translate("armed") : translate("unarmed"));
@@ -209,7 +218,10 @@ class Surface: public IReaperControlSurface {
 	}
 
 	void SetSurfaceSelected(MediaTrack* track, bool selected) final {
-		if (!selected || !settings::reportSurfaceChanges ||
+		if (
+			!selected
+			|| !settings::reportSurfaceChanges
+			||
 			// REAPER calls this a *lot*, even if the track was already selected; e.g.
 			// for mute, arm, solo, etc. Ignore this if we were already told about
 			// this track being selected.
@@ -237,8 +249,10 @@ class Surface: public IReaperControlSurface {
 			int fx = *(int*)parm2 >> 16;
 			// Don't report parameter changes where they might already be reported by
 			// the UI.
-			if (isParamsDialogOpen ||
-					(TrackFX_GetChainVisible(track) == fx && !isFxListFocused())) {
+			if (
+				isParamsDialogOpen
+				|| (TrackFX_GetChainVisible(track) == fx && !isFxListFocused())
+			) {
 				return 0; // Unsupported.
 			}
 			int param = *(int*)parm2 & 0xFFFF;
@@ -258,8 +272,9 @@ class Surface: public IReaperControlSurface {
 				s << chunk << " ";
 			}
 			this->lastParam = param;
-			TrackFX_FormatParamValueNormalized(track, fx, param, normVal, chunk,
-				sizeof(chunk));
+			TrackFX_FormatParamValueNormalized(
+				track, fx, param, normVal, chunk, sizeof(chunk)
+			);
 			if (chunk[0]) {
 				s << chunk;
 			} else {
@@ -300,14 +315,16 @@ class Surface: public IReaperControlSurface {
 		// Only handle param changes if the last change was 100ms or more ago.
 		return now - prevChangeTime >= 100;
 	}
+
 	DWORD lastParamChangeTime = 0;
 
 	bool reportTrackIfDifferent(MediaTrack* track, ostringstream& output) {
 		bool different = track != this->lastChangedTrack;
 		if (different) {
 			this->lastChangedTrack = track;
-			int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER",
-				nullptr);
+			int trackNum = (int)(size_t)GetSetMediaTrackInfo(
+				track, "IP_TRACKNUMBER", nullptr
+			);
 			if (trackNum <= 0) {
 				output << translate("master");
 			} else {
@@ -375,17 +392,17 @@ class Surface: public IReaperControlSurface {
 		double startDiff = playPos - start;
 		double endDiff = playPos - end;
 		if (startDiff >= 0 && startDiff <= 0.1) {
-			if (this -> hasReportedTimeSelection)
+			if (this->hasReportedTimeSelection)
 				return;
 			outputMessage(translate("time selection start"));
-			this -> hasReportedTimeSelection = true;
+			this->hasReportedTimeSelection = true;
 		} else if (endDiff >= 0 && endDiff <= 0.1) {
-			if (this -> hasReportedTimeSelection)
+			if (this->hasReportedTimeSelection)
 				return;
 			outputMessage(translate("time selection end"));
-			this -> hasReportedTimeSelection = true;
+			this->hasReportedTimeSelection = true;
 		} else {
-			this -> hasReportedTimeSelection = false;
+			this->hasReportedTimeSelection = false;
 		}
 	}
 
@@ -401,8 +418,9 @@ class Surface: public IReaperControlSurface {
 		unsigned char event[3];
 		int eventSize = sizeof(event);
 		int device;
-		int index = MIDI_GetRecentInputEvent(0, (char*)event, &eventSize, nullptr,
-			&device, nullptr, nullptr);
+		int index = MIDI_GetRecentInputEvent(
+			0, (char*)event, &eventSize, nullptr, &device, nullptr, nullptr
+		);
 		if (index == lastIndex) {
 			// We already reported this note.
 			return;
@@ -410,8 +428,8 @@ class Surface: public IReaperControlSurface {
 		lastIndex = index;
 		unsigned char status = event[0];
 		// MIDI note on with velocity 0 is equivalent to note off.
-		const bool isNoteOn = status >= MIDI_NOTE_ON_C0 &&
-			status <= MIDI_NOTE_ON_C15 && event[2] != 0;
+		const bool isNoteOn =
+			status >= MIDI_NOTE_ON_C0 && status <= MIDI_NOTE_ON_C15 && event[2] != 0;
 		const bool isCc = status >= MIDI_CC_C0 && status <= MIDI_CC_C15;
 		if (!isNoteOn && !isCc) {
 			return;
@@ -430,16 +448,20 @@ class Surface: public IReaperControlSurface {
 		}
 		const int channel = status - MIDI_CC_C0;
 		const int cc = event[1];
-		const char* ccName = GetTrackMIDINoteNameEx(nullptr, track, cc + 128,
-			channel);
+		const char* ccName = GetTrackMIDINoteNameEx(
+			nullptr, track, cc + 128, channel
+		);
 		const int value = event[2];
 		ostringstream ccText;
 		ccText << cc;
 		if (ccName) {
 			ccText << " " << ccName;
 		}
-		outputMessage(format(translate("Control {control}, {value}"),
-			"control"_a=ccText.str(), "value"_a=value));
+		outputMessage(format(
+			translate("Control {control}, {value}"),
+			"control"_a = ccText.str(),
+			"value"_a = value
+		));
 	}
 
 	MediaTrack* lastSelectedTrack = nullptr;

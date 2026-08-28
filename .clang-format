@@ -1,0 +1,73 @@
+# OSARA: Open Source Accessibility for the REAPER Application
+# .clang-format
+# Author: James Teh <jamie@jantrid.net>
+# Copyright 2023-2026 Leonard de Ruijter, James Teh
+# License: GNU General Public License version 2.0
+
+# Requires clang-format 22.
+BasedOnStyle: LLVM
+AccessModifierOffset: 0
+AlignAfterOpenBracket: false
+AlignEscapedNewlines: DontAlign
+AlignOperands: DontAlign
+AlignTrailingComments:
+  Kind: Never
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+# COM calling-convention and SAL macros that precede a function name.
+AttributeMacros:
+  - STDMETHODCALLTYPE
+  - _In_
+  - _Out_
+  - _Outptr_
+  - _Outptr_result_maybenull_
+  - __RPC__in
+  - __RPC__out
+  - __RPC__deref_out_opt
+BinPackArguments: false
+BinPackParameters: OnePerLine
+BreakAfterOpenBracketBracedList: true
+BreakAfterOpenBracketFunction: true
+BreakAfterOpenBracketIf: true
+BreakAfterOpenBracketLoop: true
+BreakAfterOpenBracketSwitch: true
+BreakBeforeBinaryOperators: NonAssignment
+BreakBeforeCloseBracketBracedList: true
+BreakBeforeCloseBracketFunction: true
+BreakBeforeCloseBracketIf: true
+BreakBeforeCloseBracketLoop: true
+BreakBeforeCloseBracketSwitch: true
+BreakBeforeConceptDeclarations: Never
+BreakBinaryOperations: RespectPrecedence
+BreakConstructorInitializers: AfterColon
+BreakInheritanceList: AfterColon
+BreakStringLiterals: false
+BreakTemplateDeclarations: Yes
+ColumnLimit: 80
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+Cpp11BracedListStyle: FunctionCall
+IndentCaseLabels: true
+IndentPPDirectives: AfterHash
+InsertNewlineAtEOF: true
+KeepEmptyLines:
+  AtStartOfBlock: false
+  AtStartOfFile: false
+PackConstructorInitializers: NextLine
+PenaltyBreakAssignment: 100
+PenaltyIndentedWhitespace: 100
+PenaltyReturnTypeOnItsOwnLine: 1000
+PointerAlignment: Left
+ReflowComments: Never
+SeparateDefinitionBlocks: Always
+SortIncludes: Never
+SpaceAfterTemplateKeyword: false
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeInheritanceColon: false
+SpaceBeforeRangeBasedForLoopColon: false
+Standard: c++20
+# Macros used as statements without a trailing semicolon.
+StatementMacros:
+  - BoolSetting
+TabWidth: 2
+UseTab: ForContinuationAndIndentation

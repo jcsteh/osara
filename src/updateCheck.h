@@ -9,6 +9,6 @@
 
 #include "osara.h"
 
-void startUpdateCheck(bool manual=false);
+void startUpdateCheck(bool manual = false);
 void cancelUpdateCheck();
 void cmdCheckForUpdate(int command);

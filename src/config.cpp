@@ -18,7 +18,7 @@
 #include "translation.h"
 
 #ifdef _WIN32
-#include <commctrl.h>
+#	include <commctrl.h>
 #endif
 
 using namespace std;
@@ -28,7 +28,7 @@ namespace settings {
 #define BoolSetting(name, sectionId, displayName, default) bool name = default;
 #include "settings.h"
 #undef BoolSetting
-}
+} // namespace settings
 
 void loadConfig() {
 	// GetExtState returns an empty string (not null) if the key doesn't exist.
@@ -49,9 +49,8 @@ void config_onOk(HWND dialog) {
 #undef BoolSetting
 }
 
-INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
-	LPARAM lParam
-) {
+INT_PTR CALLBACK
+config_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDOK) {
@@ -71,13 +70,16 @@ INT_PTR CALLBACK config_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 }
 
 void cmdConfig(int command) {
-	HWND dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_DLG),
-		GetForegroundWindow(), config_dialogProc);
+	HWND dialog = CreateDialog(
+		pluginHInstance,
+		MAKEINTRESOURCE(ID_CONFIG_DLG),
+		GetForegroundWindow(),
+		config_dialogProc
+	);
 	translateDialog(dialog);
 	int id = ID_CONFIG_DLG;
 #define BoolSetting(name, sectionId, displayName, default) \
-	CheckDlgButton(dialog, ++id, \
-		settings::name ? BST_CHECKED : BST_UNCHECKED);
+	CheckDlgButton(dialog, ++id, settings::name ? BST_CHECKED : BST_UNCHECKED);
 #include "settings.h"
 #undef BoolSetting
 	ShowWindow(dialog, SW_SHOWNORMAL);
@@ -99,6 +101,7 @@ struct SettingCommand {
 	string settingName;
 	string settingDisp;
 };
+
 // We need to map the three action ids to a single SettingCommand. We use a
 // vector to store the SettingCommand structs. We then map ids to indexes
 // in the vector.
@@ -120,11 +123,14 @@ bool handleSettingCommand(int command) {
 		assert(command == sc.disableCommand);
 		*sc.setting = false;
 	}
-	SetExtState(CONFIG_SECTION, sc.settingName.c_str(), *sc.setting ? "1" : "0",
-		true);
+	SetExtState(
+		CONFIG_SECTION, sc.settingName.c_str(), *sc.setting ? "1" : "0", true
+	);
 	ostringstream s;
-	s << (*sc.setting ? translate("enabled") : translate("disabled")) <<
-		" " << sc.settingDisp;
+	s
+		<< (*sc.setting ? translate("enabled") : translate("disabled"))
+		<< " "
+		<< sc.settingDisp;
 	outputMessage(s);
 	isHandlingCommand = false;
 	return true;
@@ -154,8 +160,10 @@ void registerSettingCommands() {
 		string disableIdStr = toggleIdStr + "_DISABLE"; \
 		sc.settingDisp = translate_ctxt("OSARA Configuration", displayName); \
 		/* Strip the '&' character indicating the access key. */ \
-		sc.settingDisp.erase(remove(sc.settingDisp.begin(), sc.settingDisp.end(), \
-			'&'), sc.settingDisp.end()); \
+		sc.settingDisp.erase( \
+			remove(sc.settingDisp.begin(), sc.settingDisp.end(), '&'), \
+			sc.settingDisp.end() \
+		); \
 		s.str(""); \
 		s << translate("OSARA: Toggle") << " " << sc.settingDisp; \
 		sc.toggleDesc = s.str(); \
@@ -168,22 +176,25 @@ void registerSettingCommands() {
 		if (sectionId == MAIN_SECTION) { \
 			gaccel_register_t gaccel; \
 			gaccel.accel = {0}; \
-			sc.toggleCommand = plugin_register("command_id", \
-				(void*)toggleIdStr.c_str()); \
+			sc.toggleCommand = plugin_register( \
+				"command_id", (void*)toggleIdStr.c_str() \
+			); \
 			gaccel.accel.cmd = sc.toggleCommand; \
 			gaccel.desc = sc.toggleDesc.c_str(); \
 			plugin_register("gaccel", &gaccel); \
-			sc.enableCommand = plugin_register("command_id", \
-				(void*)enableIdStr.c_str()); \
+			sc.enableCommand = plugin_register( \
+				"command_id", (void*)enableIdStr.c_str() \
+			); \
 			gaccel.accel.cmd = sc.enableCommand; \
 			gaccel.desc = sc.enableDesc.c_str(); \
 			plugin_register("gaccel", &gaccel); \
-			sc.disableCommand = plugin_register("command_id", \
-				(void*)disableIdStr.c_str()); \
+			sc.disableCommand = plugin_register( \
+				"command_id", (void*)disableIdStr.c_str() \
+			); \
 			gaccel.accel.cmd = sc.disableCommand; \
 			gaccel.desc = sc.disableDesc.c_str(); \
 			plugin_register("gaccel", &gaccel); \
-		}  else { \
+		} else { \
 			custom_action_register_t action; \
 			action.uniqueSectionId = sectionId; \
 			action.idStr = toggleIdStr.c_str(); \
@@ -220,6 +231,7 @@ struct ReaperSetting {
 	// If addFlag and removeFlag are both 0, we will always use this value.
 	int value;
 };
+
 // If any settings are added, changed or removed below, this number should be
 // increased.
 constexpr int REAPER_OPTIMAL_CONFIG_VERSION = 6;
@@ -230,7 +242,11 @@ const char KEY_REAPER_OPTIMAL_CONFIG_VERSION[] = "reaperOptimalConfigVersion";
 // https://devblogs.microsoft.com/oldnewthing/20031114-00/?p=41823
 // Swell doesn't support this. Hopefully, it isn't needed there.
 LRESULT CALLBACK removeHasSetSelSubclassProc(
-	HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR subclass,
+	HWND hwnd,
+	UINT msg,
+	WPARAM wParam,
+	LPARAM lParam,
+	UINT_PTR subclass,
 	DWORD_PTR data
 ) {
 	switch (msg) {
@@ -244,28 +260,74 @@ LRESULT CALLBACK removeHasSetSelSubclassProc(
 }
 #endif // _WIN32
 
-INT_PTR CALLBACK configReaperOptimal_dialogProc(HWND dialog, UINT msg,
-	WPARAM wParam, LPARAM lParam
+INT_PTR CALLBACK configReaperOptimal_dialogProc(
+	HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam
 ) {
 	switch (msg) {
 		case WM_INITDIALOG: {
 			translateDialog(dialog);
 			ostringstream s;
 			const char nl[] = "\r\n";
-			s <<
-				translate_ctxt("optimal REAPER configuration", "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:")
-				<< nl << translate_ctxt("optimal REAPER configuration", "1. Undock the Media Explorer so that it gets focus when opened.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "2. Enable closing Media Explorer using the escape key.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "5. Show text labels to indicate parallel, offline and bypassed in the FX list.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "6. Use a standard, accessible edit control for the video code editor.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "7. Hide type prefixes in the FX browser so that browsing through FX is more efficient.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "10. Display the file name and then the full path in the Recent Projects menu.")
-				<< nl << translate_ctxt("optimal REAPER configuration", "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu.")
-				<< nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"1. Undock the Media Explorer so that it gets focus when opened."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"2. Enable closing Media Explorer using the escape key."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"5. Show text labels to indicate parallel, offline and bypassed in the FX list."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"6. Use a standard, accessible edit control for the video code editor."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"7. Hide type prefixes in the FX browser so that browsing through FX is more efficient."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"8. Disable snap to visible grid in the MIDI Editor so movement by grid is not dependent on the horizontal zoom setting."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"9. Make Control+Space play/stop when keyboard focus is in dialogs, needed with REAPER 7.41 or newer."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"10. Display the file name and then the full path in the Recent Projects menu."
+			);
+			s << nl;
+			s << translate_ctxt(
+				"optimal REAPER configuration",
+				"Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
+			);
+			s << nl;
 			HWND text = GetDlgItem(dialog, ID_CFGOPT_TEXT);
 			SetWindowText(text, s.str().c_str());
 #ifdef _WIN32
@@ -292,12 +354,18 @@ void cmdConfigReaperOptimal(int command) {
 	// Even if the user chooses not to apply the configuration, we don't want to
 	// ask them again at startup until the optimal settings are updated.
 	string version = fmt::format("{}", REAPER_OPTIMAL_CONFIG_VERSION);
-	SetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(),
-		true);
-	if (DialogBox(
-		pluginHInstance, MAKEINTRESOURCE(ID_CONFIG_REAPER_OPTIMAL_DLG),
-		GetForegroundWindow(), configReaperOptimal_dialogProc
-	) != IDYES) {
+	SetExtState(
+		CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION, version.c_str(), true
+	);
+	if (
+		DialogBox(
+			pluginHInstance,
+			MAKEINTRESOURCE(ID_CONFIG_REAPER_OPTIMAL_DLG),
+			GetForegroundWindow(),
+			configReaperOptimal_dialogProc
+		)
+		!= IDYES
+	) {
 		return;
 	}
 	const ReaperSetting settings[] = {
@@ -326,8 +394,14 @@ void cmdConfigReaperOptimal(int command) {
 		int newVal = setting.value;
 		if (setting.addFlag || setting.removeFlag) {
 			char existingVal[50];
-			GetPrivateProfileString(setting.section, setting.key, "", existingVal,
-				sizeof(existingVal), get_ini_file());
+			GetPrivateProfileString(
+				setting.section,
+				setting.key,
+				"",
+				existingVal,
+				sizeof(existingVal),
+				get_ini_file()
+			);
 			if (existingVal[0]) {
 				// There is an existing value. Tweak the flags rather than overwriting
 				// it completely.
@@ -337,8 +411,9 @@ void cmdConfigReaperOptimal(int command) {
 			}
 		}
 		string writeVal = fmt::format("{}", newVal);
-		if (!WritePrivateProfileString(setting.section, setting.key, writeVal.c_str(),
-				get_ini_file())) {
+		if (!WritePrivateProfileString(
+					setting.section, setting.key, writeVal.c_str(), get_ini_file()
+				)) {
 			MessageBox(
 				GetForegroundWindow(),
 				translate("Error writing configuration changes."),
@@ -350,7 +425,9 @@ void cmdConfigReaperOptimal(int command) {
 	}
 	MessageBox(
 		GetForegroundWindow(),
-		translate("REAPER will now exit. Please restart REAPER  to apply the changes."),
+		translate(
+			"REAPER will now exit. Please restart REAPER  to apply the changes."
+		),
 		translate("Restart REAPER"),
 		MB_ICONINFORMATION
 	);
@@ -358,7 +435,9 @@ void cmdConfigReaperOptimal(int command) {
 }
 
 void maybeAutoConfigReaperOptimal() {
-	const char* raw = GetExtState(CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION);
+	const char* raw = GetExtState(
+		CONFIG_SECTION, KEY_REAPER_OPTIMAL_CONFIG_VERSION
+	);
 	int value = atoi(raw);
 	if (value < REAPER_OPTIMAL_CONFIG_VERSION) {
 		cmdConfigReaperOptimal(0);

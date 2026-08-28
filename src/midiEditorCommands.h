@@ -14,7 +14,7 @@ const int MIDI_EDITOR_SECTION = 32060;
 // This is used to silence the preview.
 // If sendNoteOff is false, note off messages are queued but not yet sent.
 // This is used when stopping a note preview that is immediately followed by a new preview.
-void previewNotesOff(bool sendNoteOff=true);
+void previewNotesOff(bool sendNoteOff = true);
 
 // This must be called when playback starts, as otherwise, pending note off
 // messages for OSARA MIDI preview might interfere with MIDI playback.
@@ -43,15 +43,15 @@ void postMidiCopyEvents(int command);
 void postMidiSelectNotes(int command);
 void postMidiSelectCCs(int command);
 void postMidiSelectEvents(int command);
-void cmdMidiToggleSelCC (int command) ;
+void cmdMidiToggleSelCC(int command);
 void cmdMidiMoveToNextCC(int command);
 void cmdMidiMoveToPreviousCC(int command);
 void cmdMidiMoveToNextCCKeepSel(int command);
 void cmdMidiMoveToPreviousCCKeepSel(int command);
-void cmdMidiMoveToNextItem(int command) ;
-void cmdMidiMoveToPrevItem(int command) ;
+void cmdMidiMoveToNextItem(int command);
+void cmdMidiMoveToPrevItem(int command);
 void cmdMidiMoveToTrack(int command);
-void cmdMidiSelectSamePitchStartingInTimeSelection(int command) ;
+void cmdMidiSelectSamePitchStartingInTimeSelection(int command);
 void cmdMidiNoteSplitOrJoin(int command);
 #ifdef _WIN32
 void cmdFocusNearestMidiEvent(int command);

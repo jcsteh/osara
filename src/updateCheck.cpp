@@ -10,25 +10,26 @@
 #include <sstream>
 // simpleson uses sscanf. We don't have any control over that.
 #pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <simpleson/json.h>
 #pragma clang diagnostic pop
 // osara.h includes windows.h, which must be included before other Windows
 // headers.
 #include "osara.h"
 // Disable warnings for WDL, since we don't have any control over those.
-# pragma clang diagnostic push
-# pragma clang diagnostic ignored "-Weverything"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
 #include <WDL/jnetlib/httpGet.h>
 #include <WDL/jnetlib/util.h>
-# pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #include <WDL/win32_utf8.h>
 #include "buildVersion.h"
 #include "config.h"
 #include "resource.h"
 #include "translation.h"
 
-const char UPDATE_URL[] = "http://osara.reaperaccessibility.com/snapshots/update.json";
+const char UPDATE_URL[] =
+	"http://osara.reaperaccessibility.com/snapshots/update.json";
 const char DOWNLOAD_URL[] = "https://osara.reaperaccessibility.com/snapshots/";
 
 class UpdateChecker {
@@ -45,12 +46,13 @@ class UpdateChecker {
 		}
 	}
 
-	static void CALLBACK timerCb(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+	static void CALLBACK
+	timerCb(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 		UpdateChecker::instance->tick();
 	}
 
-	static INT_PTR CALLBACK dialogProc(HWND dialog, UINT msg,
-		WPARAM wParam, LPARAM lParam);
+	static INT_PTR CALLBACK
+	dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	bool manual;
 	JNL_HTTPGet connection;
@@ -78,8 +80,9 @@ void startUpdateCheck(bool manual) {
 	if (!manual) {
 		// If REAPER update checks are disabled, disable ours too.
 		char verCheck[2];
-		GetPrivateProfileString("REAPER", "verchk", "", verCheck,
-			sizeof(verCheck), get_ini_file());
+		GetPrivateProfileString(
+			"REAPER", "verchk", "", verCheck, sizeof(verCheck), get_ini_file()
+		);
 		if (verCheck[0] == '0') {
 			return;
 		}
@@ -94,8 +97,9 @@ void startUpdateCheck(bool manual) {
 	// Keep track of the last time we checked for an update. We do this even for
 	// a manual check because the user probably doesn't want auto update checks
 	// soon if they've just done a manual check.
-	SetExtState(CONFIG_SECTION, LAST_CHECK_KEY, fmt::format("{}", curTime).c_str(),
-		true);
+	SetExtState(
+		CONFIG_SECTION, LAST_CHECK_KEY, fmt::format("{}", curTime).c_str(), true
+	);
 	UpdateChecker::instance = new UpdateChecker(manual);
 }
 
@@ -105,8 +109,7 @@ void cancelUpdateCheck() {
 
 UpdateChecker::UpdateChecker(bool manual): manual(manual) {
 	JNL::open_socketlib();
-	this->connection.connect(
-		UPDATE_URL);
+	this->connection.connect(UPDATE_URL);
 	this->timer = SetTimer(nullptr, 0, 500, UpdateChecker::timerCb);
 }
 
@@ -144,16 +147,22 @@ void UpdateChecker::tick() {
 		if ((std::string)obj["version"] == curVersion) {
 			// We're running the latest version.
 			if (this->manual) {
-				MessageBox(GetForegroundWindow(), translate("No OSARA update available."),
+				MessageBox(
+					GetForegroundWindow(),
+					translate("No OSARA update available."),
 					translate_ctxt("OSARA Update", "OSARA Update"),
-					MB_ICONINFORMATION | MB_OK);
+					MB_ICONINFORMATION | MB_OK
+				);
 			}
 			cancelUpdateCheck();
 			return;
 		}
 		const char SEPARATOR[] = "\r\n\r\n";
-		s << format(translate("OSARA version {} is available. Changes:"),
-			(std::string)obj["version"]) << SEPARATOR;
+		s << format(
+			translate("OSARA version {} is available. Changes:"),
+			(std::string)obj["version"]
+		);
+		s << SEPARATOR;
 		auto pos = curVersion.find(",");
 		std::string curCommit = curVersion.substr(pos + 1);
 		auto commits = obj["commits"].as_object();
@@ -175,9 +184,12 @@ void UpdateChecker::tick() {
 		return;
 	}
 	// Tell the user about the update!
-	HWND dialog = CreateDialog(pluginHInstance, 
-		MAKEINTRESOURCE(ID_UPDATE_DLG), GetForegroundWindow(),
-		UpdateChecker::dialogProc);
+	HWND dialog = CreateDialog(
+		pluginHInstance,
+		MAKEINTRESOURCE(ID_UPDATE_DLG),
+		GetForegroundWindow(),
+		UpdateChecker::dialogProc
+	);
 	translateDialog(dialog);
 	SetDlgItemText(dialog, ID_UPDATE_TEXT, s.str().c_str());
 	ShowWindow(dialog, SW_SHOWNORMAL);
@@ -186,15 +198,17 @@ void UpdateChecker::tick() {
 
 void UpdateChecker::error() {
 	if (this->manual) {
-		MessageBox(GetForegroundWindow(),
+		MessageBox(
+			GetForegroundWindow(),
 			translate("Error checking for OSARA update."),
-			nullptr, MB_OK | MB_ICONERROR);
+			nullptr,
+			MB_OK | MB_ICONERROR
+		);
 	}
 }
 
-INT_PTR CALLBACK UpdateChecker::dialogProc(HWND dialog, UINT msg, WPARAM wParam,
-	LPARAM lParam
-) {
+INT_PTR CALLBACK
+UpdateChecker::dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDCANCEL) {
@@ -202,8 +216,9 @@ INT_PTR CALLBACK UpdateChecker::dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 				return TRUE;
 			}
 			if (LOWORD(wParam) == IDOK) {
-				ShellExecute(nullptr, "open", DOWNLOAD_URL, nullptr, nullptr,
-					SW_SHOWNORMAL);
+				ShellExecute(
+					nullptr, "open", DOWNLOAD_URL, nullptr, nullptr, SW_SHOWNORMAL
+				);
 				DestroyWindow(dialog);
 				return TRUE;
 			}

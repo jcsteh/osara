@@ -10,7 +10,7 @@
 namespace peakWatcher {
 void initialize();
 void onSwitchTab();
-}
+} // namespace peakWatcher
 
 void cmdPeakWatcher(int command);
 void cmdReportPeakWatcherW1C1(int command);
@@ -20,4 +20,3 @@ void cmdReportPeakWatcherW2C2(int command);
 void cmdResetPeakWatcherW1(int command);
 void cmdResetPeakWatcherW2(int command);
 void cmdPausePeakWatcher(int command);
-

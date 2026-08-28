@@ -1,0 +1,18 @@
+# Check that the C++ sources are formatted according to .clang-format.
+name: format
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+concurrency:
+  group: format-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  clang-format:
+    # clang-format 22 is preinstalled on ubuntu-26.04.
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+      - run: clang-format-22 --dry-run --Werror src/*.cpp src/*.h

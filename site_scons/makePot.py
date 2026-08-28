@@ -51,10 +51,13 @@ def error(msg):
 
 RE_TRANSLATORS_COMMENT = re.compile(r"^\s*// Translators: (.*)$")
 RE_COMMENT = re.compile(r"^\s*// (.*)$")
+RE_TRANSLATORS_COMMENT_AFTER_CODE = re.compile(r"\S.*// Translators:")
 inTranslatorsComment = False
 lastTranslatorsComment = []
 def handleTranslatorsComment(line):
 	global inTranslatorsComment, lastTranslatorsComment
+	if RE_TRANSLATORS_COMMENT_AFTER_CODE.search(line):
+		error("Translators comment must be on its own line")
 	m = RE_TRANSLATORS_COMMENT.match(line)
 	if m:
 		if lastTranslatorsComment:

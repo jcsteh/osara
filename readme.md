@@ -1163,6 +1163,16 @@ To build OSARA, you will need:
 To build OSARA, from a command prompt, simply change to the OSARA checkout directory and run `scons`.
 The resulting installer can be found in the installer directory.
 
+### Code Formatting
+The C++ sources are formatted with clang-format 22, using the `.clang-format` file in the root of the repository. Pull requests are checked against it.
+To format all sources, run this from the OSARA checkout directory:
+
+```
+clang-format -i src/*.cpp src/*.h
+```
+
+On Windows, clang-format is installed with the "C++ Clang tools for Windows" component of Visual Studio and can be found in the `VC\Tools\Llvm\x64\bin` directory of the Visual Studio installation. On Mac, install it with `brew install clang-format`.
+
 ## Contributors
 - NV Access Limited
 - James Teh

@@ -9,8 +9,8 @@
 // headers.
 #include "osara.h"
 #ifdef _WIN32
-# include <windowsx.h>
-# include <CommCtrl.h>
+#	include <windowsx.h>
+#	include <CommCtrl.h>
 #endif
 #include <string>
 #include <vector>
@@ -30,8 +30,17 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 	// transition, we don't use REAPERAPI_WANT for this and we use the older
 	// function if this is unavailable. This hack should be removed in a few
 	// months once we can reasonably bump our minimum REAPER version to 7+.
-	static bool (*GetTouchedOrFocusedFX)(int mode, int* trackidxOut, int* itemidxOut, int* takeidxOut, int* fxidxOut, int* parmOut) = [] {
-		return (decltype(GetTouchedOrFocusedFX))plugin_getapi("GetTouchedOrFocusedFX");
+	static bool (*GetTouchedOrFocusedFX)(
+		int mode,
+		int* trackidxOut,
+		int* itemidxOut,
+		int* takeidxOut,
+		int* fxidxOut,
+		int* parmOut
+	) = [] {
+		return (decltype(GetTouchedOrFocusedFX))plugin_getapi(
+			"GetTouchedOrFocusedFX"
+		);
 	}();
 	int trackIdx, itemIdx, takeIdx;
 	if (GetTouchedOrFocusedFX) {
@@ -59,8 +68,8 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 	if (!track) {
 		return true;
 	}
-	*track = trackIdx == -1 ?
-		GetMasterTrack(nullptr) : GetTrack(nullptr, trackIdx);
+	*track =
+		trackIdx == -1 ? GetMasterTrack(nullptr) : GetTrack(nullptr, trackIdx);
 	if (!take) {
 		return true;
 	}
@@ -74,9 +83,9 @@ bool getFocusedFx(MediaTrack** track, MediaItem_Take** take, int* fx) {
 }
 
 constexpr long WCID_FX_LIST = 1076;
+
 bool isFxListFocused() {
-	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST &&
-		getFocusedFx();
+	return GetWindowLong(GetFocus(), GWL_ID) == WCID_FX_LIST && getFocusedFx();
 }
 
 void shortenFxName(const char* name, ostringstream& s) {
@@ -140,7 +149,7 @@ bool maybeSwitchToFxPluginWindow() {
 		}
 		return true;
 	}
-	// Descend. Observed as the first or as the last. 
+	// Descend. Observed as the first or as the last.
 	// Can not just search, we do not know the class nor name.
 	if (!(window = GetWindow(window, GW_CHILD)))
 		return false;
@@ -197,9 +206,7 @@ bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle) {
 		// the message with the bypass state clobbers it.
 		static CallLater later;
 		later.cancel();
-		later = CallLater([] {
-			maybeReportFxChainBypass(false, false);
-		}, 1000);
+		later = CallLater([] { maybeReportFxChainBypass(false, false); }, 1000);
 		return true;
 	}
 	bool enabled;
@@ -211,8 +218,10 @@ bool maybeReportFxChainBypass(bool delayed, bool aboutToToggle) {
 	if (aboutToToggle) {
 		enabled = !enabled;
 	}
-	outputMessage(enabled ? translate("active") : translate("bypassed"),
-		/* interrupt */ false);
+	outputMessage(
+		enabled ? translate("active") : translate("bypassed"),
+		/* interrupt */ false
+	);
 	return true;
 }
 
@@ -225,7 +234,7 @@ class PresetDialog {
 	accelerator_register_t accelReg;
 
 	static int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
-		PresetDialog*dialog = (PresetDialog*)accelReg->user;
+		PresetDialog* dialog = (PresetDialog*)accelReg->user;
 		if (msg->hwnd == dialog->list && msg->wParam == VK_SPACE) {
 			return -666;
 		}
@@ -239,12 +248,14 @@ class PresetDialog {
 		delete this;
 	}
 
-	static INT_PTR CALLBACK dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	static INT_PTR CALLBACK
+	dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		auto dialog = (PresetDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
 			case WM_COMMAND:
-				if (LOWORD(wParam) == ID_FXPRE_FILTER &&
-						HIWORD(wParam) == EN_KILLFOCUS) {
+				if (
+					LOWORD(wParam) == ID_FXPRE_FILTER && HIWORD(wParam) == EN_KILLFOCUS
+				) {
 					dialog->onFilterChange();
 					return TRUE;
 				} else if (LOWORD(wParam) == IDOK) {
@@ -298,7 +309,7 @@ class PresetDialog {
 				break;
 			}
 			// len doesn't inclue null terminator.
-			auto text = make_unique<char[]>(len + 1); 
+			auto text = make_unique<char[]>(len + 1);
 			SendMessage(this->combo, CB_GETLBTEXT, comboIndex, (LPARAM)text.get());
 			if (!this->shouldIncludePreset(text.get())) {
 				continue;
@@ -334,16 +345,23 @@ class PresetDialog {
 		if (preset != -1) {
 			ComboBox_SetCurSel(this->combo, preset);
 			LONG controlId = GetWindowLong(this->combo, GWL_ID);
-			SendMessage(GetParent(this->combo), WM_COMMAND,
-				MAKEWPARAM(controlId, CBN_SELCHANGE), (LPARAM)this->combo);
+			SendMessage(
+				GetParent(this->combo),
+				WM_COMMAND,
+				MAKEWPARAM(controlId, CBN_SELCHANGE),
+				(LPARAM)this->combo
+			);
 		}
 	}
 
 	public:
-
 	PresetDialog(HWND presetCombo): combo(presetCombo) {
-		this->dialog = CreateDialog(pluginHInstance,
-			MAKEINTRESOURCE(ID_FX_PRESET_DLG), mainHwnd, PresetDialog::dialogProc);
+		this->dialog = CreateDialog(
+			pluginHInstance,
+			MAKEINTRESOURCE(ID_FX_PRESET_DLG),
+			mainHwnd,
+			PresetDialog::dialogProc
+		);
 		translateDialog(this->dialog);
 		SetWindowLongPtr(this->dialog, GWLP_USERDATA, (LONG_PTR)this);
 		this->list = GetDlgItem(this->dialog, ID_FXPRE_PRESET);
@@ -359,13 +377,15 @@ class PresetDialog {
 		plugin_register("accelerator", &this->accelReg);
 		ShowWindow(this->dialog, SW_SHOWNORMAL);
 	}
-
 };
 
 bool maybeOpenFxPresetDialog() {
 	HWND hwnd = GetFocus();
-	if (GetWindowLong(hwnd, GWL_ID) != 1000 || !isClassName(hwnd, "ComboBox") ||
-			!getFocusedFx()) {
+	if (
+		GetWindowLong(hwnd, GWL_ID) != 1000
+		|| !isClassName(hwnd, "ComboBox")
+		|| !getFocusedFx()
+	) {
 		// Not the FX preset combo box.
 		return false;
 	}
@@ -420,10 +440,14 @@ bool maybeSwitchFxTab(bool previous) {
 	// The focused control doesn't change and it may not fire its own value
 	// change event, so fire one ourselves. However, we have to delay this
 	// because these ComboBox controls take a while to update.
-	CallLater([] {
-		NotifyWinEvent(EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT,
-			CHILDID_SELF);
-	}, 30);
+	CallLater(
+		[] {
+			NotifyWinEvent(
+				EVENT_OBJECT_VALUECHANGE, GetFocus(), OBJID_CLIENT, CHILDID_SELF
+			);
+		},
+		30
+	);
 	return true;
 }
 

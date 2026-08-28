@@ -14,7 +14,9 @@ extern int currentAutomationItem;
 int getEnvelopePointAtCursor();
 void postMoveEnvelopePoint(int command);
 int countEnvelopePointsIncludingAutoItems(TrackEnvelope* envelope);
-void cmdhDeleteEnvelopePointsOrAutoItems(int command, bool checkPoints=true, bool checkItems=true);
+void cmdhDeleteEnvelopePointsOrAutoItems(
+	int command, bool checkPoints = true, bool checkItems = true
+);
 void cmdDeleteEnvelopePoints(int command);
 void cmdInsertEnvelopePoint(int command);
 void cmdSelectNextEnvelope(int command);
@@ -23,9 +25,11 @@ void cmdMoveToNextEnvelopePoint(int command);
 void cmdMoveToPrevEnvelopePoint(int command);
 void cmdMoveToNextEnvelopePointKeepSel(int command);
 void cmdMoveToPrevEnvelopePointKeepSel(int command);
-void moveToAutomationItem(int direction, bool clearSelection=true, bool select=true);
+void moveToAutomationItem(
+	int direction, bool clearSelection = true, bool select = true
+);
 bool toggleCurrentAutomationItemSelection();
-std::optional <bool> toggleCurrentEnvelopePointSelection();
+std::optional<bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void cmdToggleTrackEnvelope(int command);
 void cmdToggleTakeEnvelope(int command);

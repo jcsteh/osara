@@ -1,5 +1,6 @@
 .gitattributes text
 .gitignore text
+.clang-format text
 *.cpp text
 *.h text
 *.bat eol=crlf

@@ -6,18 +6,18 @@
  */
 
 #ifdef _WIN32
-#include <initguid.h>
-#include <coguid.h>
+#	include <initguid.h>
+#	include <coguid.h>
 // Must be defined before any C++ STL header is included.
-#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
-#include <oleacc.h>
-#include <Windowsx.h>
-#include <Commctrl.h>
+#	define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+#	include <oleacc.h>
+#	include <Windowsx.h>
+#	include <Commctrl.h>
 // We only need this on Windows and it apparently causes compilation issues on Mac.
-#include <codecvt>
-#include "uia.h"
+#	include <codecvt>
+#	include "uia.h"
 #else
-#include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
+#	include "osxa11y_wrapper.h" // NSA11y wrapper for OS X accessibility API
 #endif
 #include <string>
 #include <sstream>
@@ -76,6 +76,7 @@ MediaItem* currentItem = nullptr;
 #ifdef _WIN32
 
 wstring_convert<codecvt_utf8_utf16<WCHAR>, WCHAR> utf8Utf16;
+
 wstring widen(const string& text) {
 	try {
 		return utf8Utf16.from_bytes(text);
@@ -89,12 +90,14 @@ wstring widen(const string& text) {
 		return s.str();
 	}
 }
+
 string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
 }
 
 string lastMessage;
 HWND lastMessageHwnd = nullptr;
+
 void _outputMessage(const string& message, bool interrupt) {
 	if (!hasTriedToInitializeUia()) {
 		// #1173: This is very early in startup and we haven't called initializeUia()
@@ -118,10 +121,18 @@ void _outputMessage(const string& message, bool interrupt) {
 		// Append a space to make it different.
 		string procMessage = message;
 		procMessage += ' ';
-		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(procMessage).c_str());
+		accPropServices->SetHwndPropStr(
+			focus,
+			OBJID_CLIENT,
+			CHILDID_SELF,
+			PROPID_ACC_NAME,
+			widen(procMessage).c_str()
+		);
 		lastMessage = procMessage;
 	} else {
-		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str());
+		accPropServices->SetHwndPropStr(
+			focus, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, widen(message).c_str()
+		);
 		lastMessage = message;
 	}
 	// Fire a nameChange event so ATs will report this text.
@@ -138,8 +149,9 @@ void _outputMessage(const string& message, bool interrupt) {
 #endif // _WIN32
 
 bool muteNextMessage = false;
+
 void outputMessage(const string& message, bool interrupt) {
-	if(muteNextMessage && isHandlingCommand){
+	if (muteNextMessage && isHandlingCommand) {
 		muteNextMessage = false;
 		return;
 	}
@@ -162,7 +174,8 @@ bool CallLater::cancel() {
 	return false;
 }
 
-void CALLBACK CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
+void CALLBACK
+CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD time) {
 	KillTimer(hwnd, event);
 	auto* holder = (Holder*)event;
 	holder->func();
@@ -170,16 +183,23 @@ void CALLBACK CallLater::timerProc(HWND hwnd, UINT msg, UINT_PTR event, DWORD ti
 	holder->self = nullptr;
 }
 
-string formatTimeMeasure(int measure, double beat, int measureLength,
-	int timeDenom, bool useTicks, bool isLength, bool useCache,
-	bool includeZeros, bool includeProjectStartOffset
+string formatTimeMeasure(
+	int measure,
+	double beat,
+	int measureLength,
+	int timeDenom,
+	bool useTicks,
+	bool isLength,
+	bool useCache,
+	bool includeZeros,
+	bool includeProjectStartOffset
 ) {
 	int wholeBeat = (int)beat;
 	int beatFractionDenominator;
 	if (useTicks) {
 		HWND midiEditor = MIDIEditor_GetActive();
 		assert(midiEditor);
-		MediaItem_Take* take = MIDIEditor_GetTake (midiEditor);
+		MediaItem_Take* take = MIDIEditor_GetTake(midiEditor);
 		MediaItem* item = GetMediaItemTake_Item(take);
 		// PPQ is per quarter note, but a beat might not be a quarter note depending
 		// on the time signature denominator. For example, if the time signature is
@@ -189,11 +209,11 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 		beatFractionDenominator = 100;
 	}
 	int beatFraction = lround((beat - wholeBeat) * beatFractionDenominator);
-	if(beatFraction==beatFractionDenominator) {
+	if (beatFraction == beatFractionDenominator) {
 		beatFraction = 0;
 		++wholeBeat;
 	}
-	if(wholeBeat==measureLength) {
+	if (wholeBeat == measureLength) {
 		wholeBeat = 0;
 		++measure;
 	}
@@ -214,8 +234,8 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 				// Translators: Used when reporting a length of time in measures.
 				// {} will be replaced with the number of measures; e.g.
 				// "2 bars".
-				s << format(
-					translate_plural("{} bar", "{} bars", measure), measure)
+				s
+					<< format(translate_plural("{} bar", "{} bars", measure), measure)
 					<< " ";
 			}
 		} else {
@@ -231,8 +251,9 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 				// Translators: Used when reporting a length of time in beats.
 				// {} will be replaced with the number of beats; e.g. "2 beats".
 				s << format(
-					translate_plural("{} beat", "{} beats", wholeBeat),
-					wholeBeat) << " ";
+					translate_plural("{} beat", "{} beats", wholeBeat), wholeBeat
+				);
+				s << " ";
 			}
 		} else {
 			// Translators: Used when reporting the beat of a time position.
@@ -247,8 +268,8 @@ string formatTimeMeasure(int measure, double beat, int measureLength,
 				// Translators: used when reporting a time in ticks. {} will be replaced
 				// with the number of ticks; e.g. "2 ticks".
 				s << format(
-					translate_plural("{} tick", "{} ticks", beatFraction),
-					beatFraction);
+					translate_plural("{} tick", "{} ticks", beatFraction), beatFraction
+				);
 			} else {
 				s << beatFraction << "%";
 			}
@@ -274,16 +295,16 @@ string formatTimeMinsec(double time, bool useCache) {
 	return s.str();
 }
 
-string formatTimeSec (double time) {
+string formatTimeSec(double time) {
 	// Translators: Used when reporting a time in seconds. {} will be replaced
 	// with the number of seconds; e.g. "2 sec".
 	return format(translate("{} sec"), formatDouble(time, 3, false, false));
 }
 
-string formatTimeRoundSec (double time) {
+string formatTimeRoundSec(double time) {
 	// Translators: Used when reporting a time in whole seconds. {} will be
 	// replaced with the number of seconds; e.g. "2 sec".
-	return format(translate("{} sec"), static_cast<int> (round(time)));
+	return format(translate("{} sec"), static_cast<int>(round(time)));
 }
 
 string formatTimeFrame(double time, bool useCache) {
@@ -292,8 +313,7 @@ string formatTimeFrame(double time, bool useCache) {
 		oldFrame = frame;
 		// Translators: Used when reporting a time in frames. {} will be
 		// replaced with the number of frames; e.g. "2 frames".
-		return format(
-			translate_plural("{} frame", "{} frames", frame), frame);
+		return format(translate_plural("{} frame", "{} frames", frame), frame);
 	} else {
 		return "";
 	}
@@ -306,8 +326,7 @@ string formatTimeHMSF(double time, bool useCache) {
 	if (!useCache || oldHour != hour) {
 		// Translators: used when reporting a time in hours. {} will be replaced
 		// with the number of hours; e.g. "2 hours".
-		s << format(
-			translate_plural("{} hour", "{} hours", hour), hour) << " ";
+		s << format(translate_plural("{} hour", "{} hours", hour), hour) << " ";
 		oldHour = hour;
 	}
 	int minute = (int)(time / 60);
@@ -326,8 +345,7 @@ string formatTimeHMSF(double time, bool useCache) {
 	time = time - second;
 	int frame = (int)(time * TimeMap_curFrameRate(0, nullptr));
 	if (!useCache || oldFrame != frame) {
-		s << format(
-			translate_plural("{} frame", "{} frames", frame), frame);
+		s << format(translate_plural("{} frame", "{} frames", frame), frame);
 		oldFrame = frame;
 	}
 	return s.str();
@@ -341,10 +359,10 @@ string formatTimeSample(double time) {
 	return format(translate("{} samples"), buf);
 }
 
-string formatTimeMs (double time) {
+string formatTimeMs(double time) {
 	// Translators: Used when reporting a time in milliseconds. {} will be
 	// replaced with the number of ms; e.g. "2 ms".
-	return format(translate("{} ms"), static_cast<int> (round(time * 1000)));
+	return format(translate("{} ms"), static_cast<int>(round(time * 1000)));
 }
 
 TimeFormat getTimeFormat(TimeFormat timeFormat) {
@@ -377,15 +395,23 @@ TimeFormat getTimeFormat(TimeFormat timeFormat) {
 	return timeFormat;
 }
 
-string formatTime(double time, TimeFormat timeFormat,
-	FormatTimeCacheRequest cache, bool includeZeros, bool includeProjectStartOffset
+string formatTime(
+	double time,
+	TimeFormat timeFormat,
+	FormatTimeCacheRequest cache,
+	bool includeZeros,
+	bool includeProjectStartOffset
 ) {
-	const bool useCache = cache == FT_USE_CACHE ||
-		(cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
+	const bool useCache = cache == FT_USE_CACHE
+		|| (cache == FT_CACHE_DEFAULT && !settings::reportFullTimeMovement);
 	timeFormat = getTimeFormat(timeFormat);
 	string s;
-	if (includeProjectStartOffset && timeFormat != TF_MEASURE &&
-			timeFormat != TF_MEASURETICK && timeFormat != TF_SAMPLE) {
+	if (
+		includeProjectStartOffset
+		&& timeFormat != TF_MEASURE
+		&& timeFormat != TF_MEASURETICK
+		&& timeFormat != TF_SAMPLE
+	) {
 		time += GetProjectTimeOffset(nullptr, false);
 	}
 	switch (timeFormat) {
@@ -394,11 +420,20 @@ string formatTime(double time, TimeFormat timeFormat,
 			int measure;
 			int measureLength;
 			int timeDenom;
-			double beat = TimeMap2_timeToBeats(nullptr, time, &measure, &measureLength,
-				nullptr, &timeDenom);
-			s = formatTimeMeasure(measure, beat, measureLength, timeDenom,
-				timeFormat == TF_MEASURETICK, false, useCache,
-				includeZeros, includeProjectStartOffset);
+			double beat = TimeMap2_timeToBeats(
+				nullptr, time, &measure, &measureLength, nullptr, &timeDenom
+			);
+			s = formatTimeMeasure(
+				measure,
+				beat,
+				measureLength,
+				timeDenom,
+				timeFormat == TF_MEASURETICK,
+				false,
+				useCache,
+				includeZeros,
+				includeProjectStartOffset
+			);
 			break;
 		}
 		case TF_MINSEC: {
@@ -467,40 +502,51 @@ string formatNoteLength(double start, double end) {
 	int timeDenom;
 	double startBeats;
 	double endBeats;
-	TimeMap2_timeToBeats(nullptr, start, nullptr, &measureLength, &startBeats,
-		&timeDenom);
+	TimeMap2_timeToBeats(
+		nullptr, start, nullptr, &measureLength, &startBeats, &timeDenom
+	);
 	TimeMap2_timeToBeats(nullptr, end, nullptr, nullptr, &endBeats, nullptr);
-	double lengthBeats = endBeats-startBeats;
-	const int bars = int(lengthBeats)/measureLength;
+	double lengthBeats = endBeats - startBeats;
+	const int bars = int(lengthBeats) / measureLength;
 	const double beats = lengthBeats - measureLength * bars;
 	const bool useTicks = GetToggleCommandState2(
-		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737);
-	return formatTimeMeasure(bars, beats, measureLength, timeDenom, useTicks, true,
-		false, false, false );
+		SectionFromUniqueID(MIDI_EDITOR_SECTION), 40737
+	);
+	return formatTimeMeasure(
+		bars, beats, measureLength, timeDenom, useTicks, true, false, false, false
+	);
 }
 
-string formatLength(double start, double end, TimeFormat timeFormat,
-	FormatTimeCacheRequest cache, bool includeZeros) {
+string formatLength(
+	double start,
+	double end,
+	TimeFormat timeFormat,
+	FormatTimeCacheRequest cache,
+	bool includeZeros
+) {
 	timeFormat = getTimeFormat(timeFormat);
-	if(timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
+	if (timeFormat != TF_MEASURE && timeFormat != TF_MEASURETICK) {
 		// In all other cases, position and length reports are the same, so
 		// formatTime can handle them.
 		return formatTime(end - start, timeFormat, cache, includeZeros, false);
 	}
 	int startMeasure, startMeasureLength, timeDenom, endMeasure, endMeasureLength;
-	double startBeat = TimeMap2_timeToBeats(nullptr, start, &startMeasure,
-		&startMeasureLength, nullptr, &timeDenom);
-	double endBeat = TimeMap2_timeToBeats(nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr);
-	int measures = endMeasure - startMeasure ;
+	double startBeat = TimeMap2_timeToBeats(
+		nullptr, start, &startMeasure, &startMeasureLength, nullptr, &timeDenom
+	);
+	double endBeat = TimeMap2_timeToBeats(
+		nullptr, end, &endMeasure, &endMeasureLength, nullptr, nullptr
+	);
+	int measures = endMeasure - startMeasure;
 	double beats = 0;
 	constexpr double epsilon = 0.005; // half a percent
-	if(measures > 0) {
-		if(startBeat > epsilon) {
+	if (measures > 0) {
+		if (startBeat > epsilon) {
 			// don't count the first measure if it is not a complete measure
 			--measures;
 			beats += startMeasureLength - startBeat;
 		}
-		if(endBeat > endMeasureLength - epsilon) {
+		if (endBeat > endMeasureLength - epsilon) {
 			//last measure is complete
 			++measures;
 		} else {
@@ -510,14 +556,22 @@ string formatLength(double start, double end, TimeFormat timeFormat,
 		beats = endBeat - startBeat;
 	}
 	int measureLength = max(startMeasureLength, endMeasureLength);
-	if(beats >= measureLength) {
+	if (beats >= measureLength) {
 		++measures;
 		beats -= measureLength;
 	}
-	return formatTimeMeasure(measures, beats, measureLength, timeDenom,
-		timeFormat == TF_MEASURETICK, true, cache == FT_USE_CACHE, includeZeros,
-		false);
-} 
+	return formatTimeMeasure(
+		measures,
+		beats,
+		measureLength,
+		timeDenom,
+		timeFormat == TF_MEASURETICK,
+		true,
+		cache == FT_USE_CACHE,
+		includeZeros,
+		false
+	);
+}
 
 string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 	return formatTime(GetCursorPosition(), format, cache);
@@ -526,7 +580,9 @@ string formatCursorPosition(TimeFormat format, FormatTimeCacheRequest cache) {
 string formatTrackNameOrNumber(MediaTrack* track) {
 	char* const trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
 	ostringstream s;
-	const int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+	const int trackNum = (int)(size_t)GetSetMediaTrackInfo(
+		track, "IP_TRACKNUMBER", nullptr
+	);
 	if (settings::reportTrackNumbers || !trackName || !trackName[0]) {
 		s << trackNum;
 	}
@@ -556,10 +612,10 @@ string formatFolderState(MediaTrack* track) {
 		s << translate("end of folder");
 		// find the folder being ended by this track
 		MediaTrack* folderTrack = track;
-		for(int i = state; i<0; ++i) {
-			folderTrack = GetParentTrack(folderTrack); 
+		for (int i = state; i < 0; ++i) {
+			folderTrack = GetParentTrack(folderTrack);
 		}
-		if(!folderTrack) { // shouldn't happen
+		if (!folderTrack) { // shouldn't happen
 			return "";
 		}
 		s << " " << formatTrackNameOrNumber(folderTrack);
@@ -582,7 +638,9 @@ const char* getFolderCompacting(MediaTrack* track) {
 	return ""; // Should never happen.
 }
 
-const char* getActionName(int command, KbdSectionInfo* section, bool skipCategory) {
+const char* getActionName(
+	int command, KbdSectionInfo* section, bool skipCategory
+) {
 	const char* name = kbd_getTextFromCmd(command, section);
 	if (skipCategory) {
 		const char* start;
@@ -649,7 +707,8 @@ bool isItemSelected(MediaItem* item) {
 
 bool isPosInItem(double pos, MediaItem* item) {
 	double start = GetMediaItemInfo_Value(item, "D_POSITION");
-	double end = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
+	double end = GetMediaItemInfo_Value(item, "D_POSITION")
+		+ GetMediaItemInfo_Value(item, "D_LENGTH");
 	return (start <= pos && pos <= end);
 }
 
@@ -657,7 +716,7 @@ bool isFreeItemPositioningEnabled(MediaTrack* track) {
 	return *(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr);
 }
 
-bool doesAnySelectedTrackHaveItems () {
+bool doesAnySelectedTrackHaveItems() {
 	int trackCount = CountTracks(nullptr);
 	for (int i = 0; i < trackCount; ++i) {
 		MediaTrack* tr = GetTrack(nullptr, i);
@@ -671,7 +730,8 @@ bool isAnySelectedTrackAFolder() {
 	int selCount = CountSelectedTracks2(nullptr, true);
 	for (int i = 0; i < selCount; ++i) {
 		MediaTrack* track = GetSelectedTrack2(nullptr, i, false);
-		if (!track) continue;
+		if (!track)
+			continue;
 		if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") == 1)
 			return true;
 	}
@@ -712,7 +772,9 @@ const char* automationModeAsString(int mode) {
 }
 
 const char* recordingModeAsString(int mode) {
-	switch (mode) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
+	switch (
+		mode
+	) { //fixme: this list is incomplete, but the other modes are currently not used by Osara.
 		case 0:
 			// Translators: A recording mode.
 			return translate("input");
@@ -753,12 +815,14 @@ const char* recordingModeAsString(int mode) {
 }
 
 bool isTrackInClosedFolder(MediaTrack* track) {
-	MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(track, "P_PARTRACK",
-		nullptr);
+	MediaTrack* parent = (MediaTrack*)GetSetMediaTrackInfo(
+		track, "P_PARTRACK", nullptr
+	);
 	// Folders can be nested, so we need to check all ancestor tracks, not just
 	// the parent.
 	while (parent) {
-		if (*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", nullptr) == 1
+		if (
+			*(int*)GetSetMediaTrackInfo(parent, "I_FOLDERDEPTH", nullptr) == 1
 			&& *(int*)GetSetMediaTrackInfo(parent, "I_FOLDERCOMPACT", nullptr) == 2
 		) {
 			return true;
@@ -770,11 +834,13 @@ bool isTrackInClosedFolder(MediaTrack* track) {
 
 MediaItem* getItemWithFocus() {
 	// try to provide information based on the last item spoken by osara if it is selected
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
+	if (
+		currentItem
+		&& ValidatePtr((void*)currentItem, "MediaItem*")
 		&& IsMediaItemSelected(currentItem)
-	) 
-	return currentItem;
-	if(CountSelectedMediaItems(0)>0)
+	)
+		return currentItem;
+	if (CountSelectedMediaItems(0) > 0)
 		return GetSelectedMediaItem(0, 0);
 	return nullptr;
 }
@@ -787,9 +853,8 @@ bool shouldReportTimeMovement() {
 	return !(GetPlayState() & 1);
 }
 
-INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
-	LPARAM lParam
-) {
+INT_PTR CALLBACK
+reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam, LPARAM lParam) {
 	switch (msg) {
 		case WM_COMMAND:
 			if (LOWORD(wParam) == IDCANCEL) {
@@ -805,9 +870,12 @@ INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 }
 
 void reviewMessage(const char* title, const char* message) {
-	HWND dialog = CreateDialog(pluginHInstance,
-		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG), GetForegroundWindow(),
-		reviewMessage_dialogProc);
+	HWND dialog = CreateDialog(
+		pluginHInstance,
+		MAKEINTRESOURCE(ID_MESSAGE_REVIEW_DLG),
+		GetForegroundWindow(),
+		reviewMessage_dialogProc
+	);
 	translateDialog(dialog);
 	SetWindowText(dialog, title);
 	SetDlgItemText(dialog, ID_MSGREV_TEXT, message);
@@ -816,8 +884,10 @@ void reviewMessage(const char* title, const char* message) {
 
 unsigned int getConfigUndoMask() {
 	int size{0};
-	unsigned int* undomask = static_cast<unsigned int*>(get_config_var("undomask", &size));
-	if(!undomask || (size!=sizeof(unsigned int)))
+	unsigned int* undomask = static_cast<unsigned int*>(
+		get_config_var("undomask", &size)
+	);
+	if (!undomask || (size != sizeof(unsigned int)))
 		return 0;
 	return *undomask;
 }
@@ -852,9 +922,11 @@ struct {
 };
 
 bool isTrackGrouped(MediaTrack* track) {
-	for (auto& toggle : TRACK_GROUP_TOGGLES) {
-		if (GetSetTrackGroupMembership(track, toggle.name, 0, 0) ||
-				GetSetTrackGroupMembershipHigh(track, toggle.name, 0, 0)) {
+	for (auto& toggle: TRACK_GROUP_TOGGLES) {
+		if (
+			GetSetTrackGroupMembership(track, toggle.name, 0, 0)
+			|| GetSetTrackGroupMembershipHigh(track, toggle.name, 0, 0)
+		) {
 			return true;
 		}
 	}
@@ -894,37 +966,37 @@ string gridDivisionToFriendlyName(double division) {
 	if (division == 1.0) {
 		return translate("grid whole");
 	}
-	if (division == 1.0/2.0) {
+	if (division == 1.0 / 2.0) {
 		return translate("grid half");
 	}
-	if (division == 1.0/4.0) {
+	if (division == 1.0 / 4.0) {
 		return translate("grid quarter");
 	}
-	if (division == 1.0/6.0) {
+	if (division == 1.0 / 6.0) {
 		return translate("grid quarter triplet");
 	}
-	if (division == 1.0/8.0) {
+	if (division == 1.0 / 8.0) {
 		return translate("grid eighth");
 	}
-	if (division == 1.0/12.0) {
+	if (division == 1.0 / 12.0) {
 		return translate("grid eighth triplet");
 	}
-	if (division == 1.0/16.0) {
+	if (division == 1.0 / 16.0) {
 		return translate("grid sixteenth");
 	}
-	if (division == 1.0/24.0) {
+	if (division == 1.0 / 24.0) {
 		return translate("grid sixteenth triplet");
 	}
-	if (division == 1.0/32.0) {
+	if (division == 1.0 / 32.0) {
 		return translate("grid thirty second");
 	}
-	if (division == 1.0/48.0) {
+	if (division == 1.0 / 48.0) {
 		return translate("grid thirty second triplet");
 	}
-	if (division == 1.0/64.0) {
+	if (division == 1.0 / 64.0) {
 		return translate("grid sixty fourth");
 	}
-	if (division == 1.0/128.0) {
+	if (division == 1.0 / 128.0) {
 		return translate("grid one hundred twenty eighth");
 	}
 	return translate("grid  unknown");
@@ -964,7 +1036,7 @@ int countNonEmptyTakes(MediaItem* item) {
 			nonEmptyTakes++;
 		}
 	}
-    	return nonEmptyTakes;
+	return nonEmptyTakes;
 }
 
 // Return the play cursor position if playing, the edit cursor position if not.
@@ -990,7 +1062,9 @@ const char* getTrackFolderType(MediaTrack* track) {
 	if (GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH") != 1) {
 		return nullptr;
 	}
-	return GetParentTrack(track) ? translate("nested folder") : translate("folder");
+	return GetParentTrack(track)
+		? translate("nested folder")
+		: translate("folder");
 }
 
 string formatTrackReference(MediaTrack* track) {
@@ -999,8 +1073,11 @@ string formatTrackReference(MediaTrack* track) {
 		// Translators: Used when referring to a folder track in a movement message.
 		// {track} will be replaced with the name, number or both of the folder track.
 		// {folderType} will be replaced with "folder" or "nested folder".
-		return format(translate("{track} {folderType}"),
-			"track"_a=formatTrackNameOrNumber(track), "folderType"_a=folderType);
+		return format(
+			translate("{track} {folderType}"),
+			"track"_a = formatTrackNameOrNumber(track),
+			"folderType"_a = folderType
+		);
 	}
 	return formatTrackNameOrNumber(track);
 }
@@ -1009,9 +1086,11 @@ string formatInsideFolder(MediaTrack* track) {
 	// Translators: Used to report the folder containing a track after it has moved.
 	// {folder} will be replaced with the name, number or both of the folder.
 	// {folderType} will be replaced with "folder" or "nested folder".
-	return format(translate("inside {folder} {folderType}"),
-		"folder"_a=formatTrackNameOrNumber(track),
-		"folderType"_a=getTrackFolderType(track));
+	return format(
+		translate("inside {folder} {folderType}"),
+		"folder"_a = formatTrackNameOrNumber(track),
+		"folderType"_a = getTrackFolderType(track)
+	);
 }
 
 string formatTrackMoveRelative(bool up, MediaTrack* track) {
@@ -1019,35 +1098,43 @@ string formatTrackMoveRelative(bool up, MediaTrack* track) {
 		// Translators: Reported when moving a track upward.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
-		return format(translate("above {track}"),
-			"track"_a=formatTrackReference(track));
+		return format(
+			translate("above {track}"), "track"_a = formatTrackReference(track)
+		);
 	}
 	// Translators: Reported when moving a track downward.
 	// {track} will be replaced with a track reference; e.g. "vocal",
 	// "3", "3 vocal", "drums folder" or "3 drums nested folder".
-	return format(translate("below {track}"),
-		"track"_a=formatTrackReference(track));
+	return format(
+		translate("below {track}"), "track"_a = formatTrackReference(track)
+	);
 }
 
-string formatTrackMoveInsideFolder(bool up, MediaTrack* folder, MediaTrack* track) {
+string formatTrackMoveInsideFolder(
+	bool up, MediaTrack* folder, MediaTrack* track
+) {
 	if (up) {
 		// Translators: Reported when moving a track upward inside a folder.
 		// {folder} will be replaced with a folder reference; e.g.
 		// "drums folder" or "3 drums nested folder".
 		// {track} will be replaced with the name, number or both of the nearby track.
 		// e.g. "inside drums folder, below snare" or "inside 3 drums nested folder, below 5"
-		return format(translate("{folder}, below {track}"),
-			"folder"_a=formatInsideFolder(folder),
-			"track"_a=formatTrackNameOrNumber(track));
+		return format(
+			translate("{folder}, below {track}"),
+			"folder"_a = formatInsideFolder(folder),
+			"track"_a = formatTrackNameOrNumber(track)
+		);
 	}
 	// Translators: Reported when moving a track downward inside a folder.
 	// {folder} will be replaced with a folder reference; e.g.
 	// "drums folder" or "3 drums nested folder".
 	// {track} will be replaced with the name, number or both of the nearby track.
 	// e.g. "inside drums folder, above snare" or "inside 3 drums nested folder, above 5"
-	return format(translate("{folder}, above {track}"),
-		"folder"_a=formatInsideFolder(folder),
-		"track"_a=formatTrackNameOrNumber(track));
+	return format(
+		translate("{folder}, above {track}"),
+		"folder"_a = formatInsideFolder(folder),
+		"track"_a = formatTrackNameOrNumber(track)
+	);
 }
 
 void openClosedFolderAndParents(MediaTrack* folder) {
@@ -1064,7 +1151,8 @@ void openClosedFolderAndParents(MediaTrack* folder) {
 }
 
 void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
-	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")
+		- 1;
 	MediaTrack* const prevTrack = GetTrack(nullptr, trackIndex - 1);
 	if (!prevTrack) {
 		return;
@@ -1075,7 +1163,8 @@ void maybeOpenClosedFolderBeforeTrackMoveUp(MediaTrack* track) {
 }
 
 void maybeOpenClosedFolderBeforeTrackMoveDown(MediaTrack* track) {
-	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")
+		- 1;
 	MediaTrack* const nextTrack = GetTrack(nullptr, trackIndex + 1);
 	if (!nextTrack || GetMediaTrackInfo_Value(nextTrack, "I_FOLDERDEPTH") != 1) {
 		return;
@@ -1096,7 +1185,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 			s << " ";
 		}
 	};
-	int trackNum = (int)(size_t)GetSetMediaTrackInfo(track, "IP_TRACKNUMBER", nullptr);
+	int trackNum = (int)(size_t)GetSetMediaTrackInfo(
+		track, "IP_TRACKNUMBER", nullptr
+	);
 	if (trackNum <= 0) {
 		// Translators: Reported when navigating to the master track.
 		s << translate("master");
@@ -1114,8 +1205,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 		s << translate("unselected");
 	}
 	const bool armed = isTrackArmed(track);
-	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM",
-		nullptr);
+	auto pAutoArm = (bool*)GetSetMediaTrackInfo(track, "B_AUTO_RECARM", nullptr);
 	// This will be null in REAPER < 6.30.
 	const bool autoArm = pAutoArm ? *pAutoArm : false;
 	// If auto armed, don't report this before the track name.
@@ -1164,7 +1254,7 @@ void postGoToTrack(int command, MediaTrack* track) {
 			separate();
 			s << translate("frozen");
 		}
-		if (folderDepth <0){ //end of folder
+		if (folderDepth < 0) { //end of folder
 			separate();
 			s << formatFolderState(track);
 		}
@@ -1187,8 +1277,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 		// the track has. {} will be replaced by the number of items; e.g.
 		// "2 items".
 		if (itemCount > 0) {
-			s << " " << format(translate_plural("{} item", "{} items", itemCount),
-				itemCount);
+			s << " ";
+			s << format(
+				translate_plural("{} item", "{} items", itemCount), itemCount
+			);
 		}
 		if (isFreeItemPositioningEnabled(track)) {
 			s << " " << translate("free item positioning");
@@ -1209,8 +1301,10 @@ void postGoToTrack(int command, MediaTrack* track) {
 				s << " " << translate("bypassed");
 			}
 			int deltaParam = TrackFX_GetParamFromIdent(track, f, ":delta");
-			if (deltaParam != -1 &&
-					TrackFX_GetParam(track, f, deltaParam, nullptr, nullptr)) {
+			if (
+				deltaParam != -1
+				&& TrackFX_GetParam(track, f, deltaParam, nullptr, nullptr)
+			) {
 				s << " " << translate("delta");
 			}
 		}
@@ -1227,103 +1321,125 @@ void postGoToTrack(int command) {
 }
 
 void postToggleTrackMute(int command) {
-	int muteCount=0;
-	int unmuteCount=0;
+	int muteCount = 0;
+	int unmuteCount = 0;
 	int selCount = CountSelectedTracks2(nullptr, true);
 	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
-	if(selCount==1 && masterSelected) {
-		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("master muted") : translate("master unmuted"));
+	if (selCount == 1 && masterSelected) {
+		outputMessage(
+			isTrackMuted(GetSelectedTrack2(nullptr, 0, true))
+				? translate("master muted")
+				: translate("master unmuted")
+		);
 		return;
 	}
-	if(selCount== 0) {
+	if (selCount == 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	if(selCount==1) {
-		outputMessage(isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("muted") : translate("unmuted"));
+	if (selCount == 1) {
+		outputMessage(
+			isTrackMuted(GetSelectedTrack2(nullptr, 0, true))
+				? translate("muted")
+				: translate("unmuted")
+		);
 		return;
 	}
 	ostringstream s;
-	if(masterSelected) {
-		s << (isTrackMuted(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("master muted") : translate("master unmuted"));
+	if (masterSelected) {
+		auto masterState = isTrackMuted(GetSelectedTrack2(nullptr, 0, true))
+			? translate("master muted")
+			: translate("master unmuted");
+		s << masterState;
 		s << ", ";
 	}
-	for (int i=masterSelected; i<selCount; ++i) {
-		if(isTrackMuted(GetSelectedTrack2(nullptr, i, true))) {
+	for (int i = masterSelected; i < selCount; ++i) {
+		if (isTrackMuted(GetSelectedTrack2(nullptr, i, true))) {
 			++muteCount;
 		} else {
 			++unmuteCount;
 		}
 	}
-	if(muteCount>0) {
+	if (muteCount > 0) {
 		// Translators: Reported when multiple tracks are muted. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks muted".
-		s << format(translate_plural("{} track muted", "{} tracks muted", muteCount),
-			muteCount);
+		s << format(
+			translate_plural("{} track muted", "{} tracks muted", muteCount),
+			muteCount
+		);
 		if (unmuteCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unmuteCount>0) {
+	if (unmuteCount > 0) {
 		// Translators: Reported when multiple tracks are unmuted. {} will be
 		// replaced with the number of tracks; e.g. "2 tracks unmuted".
 		s << format(
 			translate_plural("{} track unmuted", "{} tracks unmuted", unmuteCount),
-			unmuteCount);
+			unmuteCount
+		);
 	}
 	outputMessage(s);
 }
 
 void postToggleTrackSolo(int command) {
-	int soloCount=0;
-	int unsoloCount=0;
+	int soloCount = 0;
+	int unsoloCount = 0;
 	int selCount = CountSelectedTracks2(nullptr, true);
 	const bool masterSelected = isTrackSelected(GetMasterTrack(nullptr));
-	if(selCount==1 && masterSelected) {
-		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("master soloed") : translate("master unsoloed"));
+	if (selCount == 1 && masterSelected) {
+		outputMessage(
+			isTrackSoloed(GetSelectedTrack2(nullptr, 0, true))
+				? translate("master soloed")
+				: translate("master unsoloed")
+		);
 		return;
 	}
-	if(selCount== 0) {
+	if (selCount == 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	if(selCount==1) {
-		outputMessage(isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("soloed") : translate("unsoloed"));
+	if (selCount == 1) {
+		outputMessage(
+			isTrackSoloed(GetSelectedTrack2(nullptr, 0, true))
+				? translate("soloed")
+				: translate("unsoloed")
+		);
 		return;
 	}
 	ostringstream s;
-	if(masterSelected) {
-		s << (isTrackSoloed(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("master soloed") : translate("master unsoloed"));
+	if (masterSelected) {
+		auto masterState = isTrackSoloed(GetSelectedTrack2(nullptr, 0, true))
+			? translate("master soloed")
+			: translate("master unsoloed");
+		s << masterState;
 		s << ", ";
 	}
-	for (int i=masterSelected; i<selCount; ++i) {
-		if(isTrackSoloed(GetSelectedTrack2(nullptr, i, true))) {
+	for (int i = masterSelected; i < selCount; ++i) {
+		if (isTrackSoloed(GetSelectedTrack2(nullptr, i, true))) {
 			++soloCount;
 		} else {
 			++unsoloCount;
 		}
 	}
-	if(soloCount>0) {
+	if (soloCount > 0) {
 		// Translators: Reported when multiple tracks are soloed. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks soloed".
-		s << format(translate_plural("{} track soloed", "{} tracks soloed", soloCount),
-			soloCount);
+		s << format(
+			translate_plural("{} track soloed", "{} tracks soloed", soloCount),
+			soloCount
+		);
 		if (unsoloCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unsoloCount>0) {
+	if (unsoloCount > 0) {
 		// Translators: Reported when multiple tracks are unsoloed. {} will be
 		// replaced with the number of tracks; e.g. "2 tracks unsoloed".
 		s << format(
 			translate_plural("{} track unsoloed", "{} tracks unsoloed", unsoloCount),
-			unsoloCount);
+			unsoloCount
+		);
 	}
 	outputMessage(s);
 }
@@ -1334,47 +1450,53 @@ void postToggleLastTouchedTrackArm(int command) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	outputMessage(isTrackArmed(track) ?
-		translate("armed") :
-		translate("unarmed"));
+	outputMessage(
+		isTrackArmed(track) ? translate("armed") : translate("unarmed")
+	);
 }
 
 void postToggleTrackArm(int command) {
-	int armedCount=0;
-	int unarmedCount=0;
+	int armedCount = 0;
+	int unarmedCount = 0;
 	int selCount = CountSelectedTracks2(nullptr, true);
-	if(selCount== 0) {
+	if (selCount == 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	if(selCount==1) {
-		outputMessage(isTrackArmed(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("armed") : translate("unarmed"));
+	if (selCount == 1) {
+		outputMessage(
+			isTrackArmed(GetSelectedTrack2(nullptr, 0, true))
+				? translate("armed")
+				: translate("unarmed")
+		);
 		return;
 	}
 	ostringstream s;
-	for (int i=0; i<selCount; ++i) {
-		if(isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
+	for (int i = 0; i < selCount; ++i) {
+		if (isTrackArmed(GetSelectedTrack2(nullptr, i, true))) {
 			++armedCount;
 		} else {
 			++unarmedCount;
 		}
 	}
-	if(armedCount>0) {
+	if (armedCount > 0) {
 		// Translators: Reported when multiple tracks are armed. {} will be replaced
 		// with the number of tracks; e.g. "2 tracks armed".
-		s << format(translate_plural("{} track armed", "{} tracks armed", armedCount),
-			armedCount);
+		s << format(
+			translate_plural("{} track armed", "{} tracks armed", armedCount),
+			armedCount
+		);
 		if (unarmedCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unarmedCount>0) {
+	if (unarmedCount > 0) {
 		// Translators: Reported when multiple tracks are unarmed. {} will be
 		// replaced with the number of tracks; e.g. "2 tracks unarmed".
 		s << format(
 			translate_plural("{} track unarmed", "{} tracks unarmed", unarmedCount),
-			unarmedCount);
+			unarmedCount
+		);
 	}
 	outputMessage(s);
 }
@@ -1400,49 +1522,59 @@ void postCycleTrackMonitor(int command) {
 }
 
 void postInvertTrackPhase(int command) {
-	int flipCount=0;
-	int normCount=0;
+	int flipCount = 0;
+	int normCount = 0;
 	int selCount = CountSelectedTracks(nullptr);
-	if(selCount==0) {
+	if (selCount == 0) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	if(selCount==1) {
-		outputMessage(isTrackPhaseInverted(GetSelectedTrack2(nullptr, 0, true)) ?
-			translate("phase inverted") : translate("phase normal"));
+	if (selCount == 1) {
+		outputMessage(
+			isTrackPhaseInverted(GetSelectedTrack2(nullptr, 0, true))
+				? translate("phase inverted")
+				: translate("phase normal")
+		);
 		return;
 	}
-	for (int i=0; i<selCount; ++i) {
-		if(isTrackPhaseInverted(GetSelectedTrack2(nullptr, i, true))) {
+	for (int i = 0; i < selCount; ++i) {
+		if (isTrackPhaseInverted(GetSelectedTrack2(nullptr, i, true))) {
 			++flipCount;
 		} else {
 			++normCount;
 		}
 	}
 	ostringstream s;
-	if(flipCount>0){
+	if (flipCount > 0) {
 		// Translators: Reported when multiple tracks have phase inverted. {} will be
 		// replaced with the number of tracks; e.g. "2 tracks phase inverted".
-		s << format(translate_plural("{} track phase inverted", "{} tracks phase inverted", flipCount),
-			flipCount);
+		s << format(
+			translate_plural(
+				"{} track phase inverted", "{} tracks phase inverted", flipCount
+			),
+			flipCount
+		);
 		if (normCount > 0) {
 			s << ", ";
 		}
 	}
-	if(normCount>0) {
+	if (normCount > 0) {
 		// Translators: Reported when multiple tracks have phase normal. {} will be
 		// replaced with the number of tracks; e.g. "2 tracks phase normal".
 		s << format(
-			translate_plural("{} track phase normal", "{} tracks phase normal", normCount),
-			normCount);
+			translate_plural(
+				"{} track phase normal", "{} tracks phase normal", normCount
+			),
+			normCount
+		);
 	}
 	outputMessage(s);
 }
 
 void postToggleTrackFxBypass(MediaTrack* track) {
-	outputMessage(isTrackFxBypassed(track) ?
-		translate("FX bypassed") :
-		translate("FX active"));
+	outputMessage(
+		isTrackFxBypassed(track) ? translate("FX bypassed") : translate("FX active")
+	);
 }
 
 void postToggleTrackFxBypass(int command) {
@@ -1473,15 +1605,19 @@ void postToggleAllTracksFxBypass(int command) {
 			break;
 		}
 	}
-	outputMessage(bypassed ?
-		translate("all tracks FX bypassed") :
-		translate("all tracks FX active"));
+	outputMessage(
+		bypassed
+			? translate("all tracks FX bypassed")
+			: translate("all tracks FX active")
+	);
 }
 
 void postToggleLastFocusedFxDeltaSolo(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled delta solo") :
-		translate("disabled delta solo"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("enabled delta solo")
+			: translate("disabled delta solo")
+	);
 }
 
 void postCursorMovement(int command) {
@@ -1501,10 +1637,9 @@ void postCursorMovementScrub(int command) {
 void postSegmentScrubRange(int) {
 	int sizeStart = 0;
 	int sizeEnd = 0;
-	int* start = (int*)get_config_var("scrubloopstart",&sizeStart);
-	int* end = (int*)get_config_var("scrubloopend",&sizeEnd);
-	if (!start || sizeStart != sizeof(int)
-			|| !end || sizeEnd != sizeof(int)) {
+	int* start = (int*)get_config_var("scrubloopstart", &sizeStart);
+	int* end = (int*)get_config_var("scrubloopend", &sizeEnd);
+	if (!start || sizeStart != sizeof(int) || !end || sizeEnd != sizeof(int)) {
 		// We didn't get an expected value from the API
 		return;
 	}
@@ -1540,22 +1675,32 @@ void postItemNormalize(int command) {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items normalized to common gain".
 		outputMessage(format(
-			translate_plural("{} item normalized to common gain", "{} items normalized to common gain", selectedItemsCount),
-			selectedItemsCount));
-	}
-	else if (command == 40938) {
+			translate_plural(
+				"{} item normalized to common gain",
+				"{} items normalized to common gain",
+				selectedItemsCount
+			),
+			selectedItemsCount
+		));
+	} else if (command == 40938) {
 		// Item properties: Reset item take gain to +0dB (un-normalize)
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items un-normalized".
 		outputMessage(format(
-			translate_plural("{} item un-normalized", "{} items un-normalized", selectedItemsCount),
-			selectedItemsCount));
+			translate_plural(
+				"{} item un-normalized", "{} items un-normalized", selectedItemsCount
+			),
+			selectedItemsCount
+		));
 	} else {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items normalized".
 		outputMessage(format(
-			translate_plural("{} item normalized", "{} items normalized", selectedItemsCount),
-			selectedItemsCount));
+			translate_plural(
+				"{} item normalized", "{} items normalized", selectedItemsCount
+			),
+			selectedItemsCount
+		));
 	}
 }
 
@@ -1579,7 +1724,7 @@ void postCycleTrackFolderCollapsed(int command) {
 
 int findRegionEndingAt(double wantedEndPos) {
 	double start = wantedEndPos;
-	for (; ;) {
+	for (;;) {
 		if (start == 0) {
 			return -1;
 		}
@@ -1730,12 +1875,12 @@ void postGoToSpecificMarker(int command) {
 				// replaced with the name of the marker; e.g. "v2 marker"
 				s << format(translate("{} marker"), name);
 			}
-		} else{ // unnamed
-			if(reg){
-				// Translators: used to report an unnamed region. {} is replaced with the region number.  
+		} else { // unnamed
+			if (reg) {
+				// Translators: used to report an unnamed region. {} is replaced with the region number.
 				s << format(translate("region {}"), num);
 			} else {
-				// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+				// Translators: used to report an unnamed marker. {} is replaced with the marker number.
 				s << format(translate("marker {}"), num);
 			}
 		}
@@ -1747,7 +1892,7 @@ void postGoToSpecificMarker(int command) {
 
 void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 	ostringstream s;
-	if(lastCommand != command) 
+	if (lastCommand != command)
 		s << commandMessage << " ";
 	s << formatDouble(VAL2DB(volume), 2, true);
 	outputMessage(s);
@@ -1756,7 +1901,7 @@ void postChangeVolumeH(double volume, int command, const char* commandMessage) {
 void postChangeTrackVolume(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, nullptr) )
+	if (!GetTrackUIVolPan(track, &volume, nullptr))
 		return;
 	postChangeVolumeH(volume, command, translate("Track"));
 }
@@ -1764,14 +1909,14 @@ void postChangeTrackVolume(int command) {
 void postChangeMasterTrackVolume(int command) {
 	MediaTrack* track = GetMasterTrack(0);
 	double volume = 0.0;
-	if ( !GetTrackUIVolPan(track, &volume, nullptr) )
+	if (!GetTrackUIVolPan(track, &volume, nullptr))
 		return;
 	postChangeVolumeH(volume, command, translate("Master"));
 }
 
 void postChangeItemVolume(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	double volume = GetMediaItemInfo_Value(item, "D_VOL");
 	postChangeVolumeH(volume, command, translate("Item"));
@@ -1779,14 +1924,14 @@ void postChangeItemVolume(int command) {
 
 void postChangeTakeVolume(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	MediaItem_Take* take = GetActiveTake(item);
 	if (!take) {
 		return;
 	}
 	double volume = GetMediaItemTakeInfo_Value(take, "D_VOL");
-	volume = fabs(volume);// volume is negative if take polarity is flipped
+	volume = fabs(volume); // volume is negative if take polarity is flipped
 	postChangeVolumeH(volume, command, translate("Take"));
 }
 
@@ -1801,15 +1946,25 @@ void postItemFades(int command) {
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items faded in to cursor".
 		outputMessage(format(
-			translate_plural("{} item faded in to cursor", "{} items faded in to cursor", selectedItemsCount),
-			selectedItemsCount));
+			translate_plural(
+				"{} item faded in to cursor",
+				"{} items faded in to cursor",
+				selectedItemsCount
+			),
+			selectedItemsCount
+		));
 	} else {
 		// Item: Fade items out from cursor
 		// Translators: {} will be replaced with the number of items; e.g.
 		// "2 items faded out from cursor".
 		outputMessage(format(
-			translate_plural("{} item faded out from cursor", "{} items faded out from cursor", selectedItemsCount),
-			selectedItemsCount));
+			translate_plural(
+				"{} item faded out from cursor",
+				"{} items faded out from cursor",
+				selectedItemsCount
+			),
+			selectedItemsCount
+		));
 	}
 }
 
@@ -1821,7 +1976,7 @@ void postChangeHorizontalZoom(int command) {
 }
 
 void formatPan(double pan, ostringstream& output) {
-	pan *=100.0;
+	pan *= 100.0;
 	if (pan == 0) {
 		// Translators: Panned to the center.
 		output << translate("center");
@@ -1840,8 +1995,8 @@ void postChangeTrackPan(int command) {
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
-	double pan =0.0;
-	if ( !GetTrackUIVolPan(track, nullptr, &pan) )
+	double pan = 0.0;
+	if (!GetTrackUIVolPan(track, nullptr, &pan))
 		return;
 	ostringstream s;
 	formatPan(pan, s);
@@ -1872,13 +2027,13 @@ void maybeAddRippleMessage(ostringstream& s, int command) {
 }
 
 void postCycleEditMode(int command) {
-	if (GetToggleCommandState(40041) && GetToggleCommandState (41117)) {
+	if (GetToggleCommandState(40041) && GetToggleCommandState(41117)) {
 		// Translators: Reported when auto crossfade and trim content behind media items are both enabled.
 		outputMessage(translate("enabled auto crossfades and trim"));
-	}else if (GetToggleCommandState(40041)) {
-		// Translators: Reported when auto crossfade is enabled, trim behind media items is disabled.  
+	} else if (GetToggleCommandState(40041)) {
+		// Translators: Reported when auto crossfade is enabled, trim behind media items is disabled.
 		outputMessage(translate("crossfading, not trimming"));
-	} else if (GetToggleCommandState (41117)) {
+	} else if (GetToggleCommandState(41117)) {
 		// Translators: Reported when trim content behind media items is enabled, auto crossfade is disabled.
 		outputMessage(translate("trimming, not crossfading"));
 	} else {
@@ -1888,16 +2043,14 @@ void postCycleEditMode(int command) {
 }
 
 void reportRepeat(bool repeat) {
-	outputMessage(repeat ?
-		translate("repeat on") :
-		translate("repeat off"));
+	outputMessage(repeat ? translate("repeat on") : translate("repeat off"));
 }
 
 void postToggleRepeat(int command) {
 	reportRepeat(GetToggleCommandState(1068)); // Transport: Toggle repeat
 }
 
-void addTakeFxNames(MediaItem_Take* take, ostringstream &s) {
+void addTakeFxNames(MediaItem_Take* take, ostringstream& s) {
 	if (!settings::reportFx)
 		return;
 	int count = TakeFX_GetCount(take);
@@ -1929,7 +2082,9 @@ void postSwitchToTake(int command) {
 		return;
 	}
 	ostringstream s;
-	s << (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1 << ", "
+	s
+		<< (int)(size_t)GetSetMediaItemTakeInfo(take, "IP_TAKENUMBER", nullptr) + 1
+		<< ", "
 		<< GetTakeName(take);
 	addTakeFxNames(take, s);
 	outputMessage(s);
@@ -1943,8 +2098,8 @@ void postCopy(int command) {
 				// Translators: Reported when copying tracks. {} will be replaced with
 				// the number of tracks; e.g. "2 tracks copied".
 				outputMessage(format(
-					translate_plural("{} track copied", "{} tracks copied", count),
-					count));
+					translate_plural("{} track copied", "{} tracks copied", count), count
+				));
 			}
 			return;
 		case 1: // Item
@@ -1952,8 +2107,8 @@ void postCopy(int command) {
 				// Translators: Reported when copying items. {} will be replaced with
 				// the number of items; e.g. "2 items copied".
 				outputMessage(format(
-					translate_plural("{} item copied", "{} items copied", count),
-					count));
+					translate_plural("{} item copied", "{} items copied", count), count
+				));
 			}
 			return;
 		case 2: // Envelope
@@ -1990,8 +2145,12 @@ void postMoveToTimeSig(int command) {
 	int marker = FindTempoTimeSigMarker(0, cursor + 0.0001);
 	double pos, bpm;
 	int sigNum, sigDenom;
-	if (!GetTempoTimeSigMarker(0, marker, &pos, nullptr, nullptr, &bpm, &sigNum,
-		&sigDenom, nullptr) || pos != cursor) {
+	if (
+		!GetTempoTimeSigMarker(
+			0, marker, &pos, nullptr, nullptr, &bpm, &sigNum, &sigDenom, nullptr
+		)
+		|| pos != cursor
+	) {
 		return;
 	}
 	fakeFocus = FOCUS_TIMESIG;
@@ -2003,20 +2162,25 @@ void postMoveToTimeSig(int command) {
 		// Translators: Reported when moving to a time signature change. {num} will
 		// be replaced with the time signature numerator. {denom} will be replaced
 		// with the time signature denominator. For example: "time sig 6/8".
-		s << " " << format(translate("time sig {num}/{denom}"),
-			"num"_a=sigNum, "denom"_a=sigDenom);
+		s << " ";
+		s << format(
+			translate("time sig {num}/{denom}"),
+			"num"_a = sigNum,
+			"denom"_a = sigDenom
+		);
 	}
 	s << " " << formatCursorPosition();
 	outputMessage(s);
 }
 
-int getStretchAtPos(MediaItem_Take* take, double pos, double itemStart,
-	double playRate
+int getStretchAtPos(
+	MediaItem_Take* take, double pos, double itemStart, double playRate
 ) {
 	// Stretch marker positions are relative to the start of the item and the
 	// take's play rate.
 	double posRel = (pos - itemStart) * playRate;
-	const double STRETCH_FUZZ_FACTOR = 0.00003; // approximately 1 sample at 48000.
+	const double STRETCH_FUZZ_FACTOR =
+		0.00003; // approximately 1 sample at 48000.
 	double posRelAdj = posRel - STRETCH_FUZZ_FACTOR;
 	if (posRelAdj < 0)
 		return -1;
@@ -2046,8 +2210,12 @@ void postGoToStretch(int command) {
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take)
 			continue;
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
+		double itemStart = *(double*)GetSetMediaItemInfo(
+			item, "D_POSITION", nullptr
+		);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(
+			take, "D_PLAYRATE", nullptr
+		);
 		if (getStretchAtPos(take, cursor, itemStart, playRate) != -1) {
 			found = true;
 			break;
@@ -2082,15 +2250,19 @@ void postTrackIo(int command) {
 }
 
 void postToggleMetronome(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("metronome on") :
-		translate("metronome off"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("metronome on")
+			: translate("metronome off")
+	);
 }
 
 void postToggleMasterTrackVisible(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("master track visible") :
-		translate("master track hidden"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("master track visible")
+			: translate("master track hidden")
+	);
 }
 
 void reportTransportState(int before, int after) {
@@ -2108,12 +2280,12 @@ void reportTransportState(int before, int after) {
 	// REAPER play state bits: 1 = playing, 2 = paused, 4 = recording.
 	if (after & 2) {
 		s << translate("pause");
-	// Recording also sets the playing bit, so handle record before play.
+		// Recording also sets the playing bit, so handle record before play.
 	} else if (after & 4 && repeat) {
 		s << translate("record") << ", " << translate("repeat on");
 	} else if (after & 4) {
 		s << translate("record");
-	// Only report play here if recording is not active.
+		// Only report play here if recording is not active.
 	} else if (after & 1 && repeat) {
 		s << translate("play") << ", " << translate("repeat on");
 	} else if (after & 1) {
@@ -2129,8 +2301,8 @@ void postSelectMultipleItems(int command) {
 	// Translators: Reported when items are selected. {} will be replaced with
 	// the number of items; e.g. "2 items selected".
 	outputMessage(format(
-		translate_plural("{} item selected", "{} items selected", count),
-		count));
+		translate_plural("{} item selected", "{} items selected", count), count
+	));
 	// Items have just been selected, so the user almost certainly wants to operate on items.
 	fakeFocus = FOCUS_ITEM;
 	selectedEnvelopeIsTake = true;
@@ -2152,8 +2324,10 @@ void postQuantize(int command) {
 	ostringstream s;
 	// Translators: {} will be replaced with the number of items; e.g.
 	// "2 items quantized".
-	s << format(translate_plural("{} item quantized", "{} items quantized",
-		selItems), selItems);
+	s << format(
+		translate_plural("{} item quantized", "{} items quantized", selItems),
+		selItems
+	);
 	s << ", " << friendlyGrid;
 	outputMessage(s);
 }
@@ -2162,17 +2336,18 @@ void postMoveItemOrEnvelopePoint(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
 		int count = CountSelectedMediaItems(0);
-		if(count==0) {
+		if (count == 0) {
 			outputMessage(translate("no items selected"));
 			return;
 		}
-		switch(command) {
+		switch (command) {
 			case 40117: { // Item edit: Move items/envelope points up one track/a bit
 				// Translators: Reported when moving items up. {} will be replaced by the
 				// number of items; e.g. "2 items moved up".
 				outputMessage(format(
 					translate_plural("{} item moved up", "{} items moved up", count),
-					count));
+					count
+				));
 				break;
 			}
 			case 40118: { // Item edit: Move items/envelope points down one track/a bit
@@ -2180,12 +2355,13 @@ void postMoveItemOrEnvelopePoint(int command) {
 				// number of items; e.g. "2 items moved".
 				outputMessage(format(
 					translate_plural("{} item moved down", "{} items moved down", count),
-					count));
+					count
+				));
 				break;
 			}
 			default:
 				assert(false);
-		} 
+		}
 	} else {
 		postMoveEnvelopePoint(command);
 	}
@@ -2208,75 +2384,86 @@ bool isItemSoloed(MediaItem* item) {
 }
 
 void postToggleItemMute(int command) {
-	int muteCount=0;
-	int unmuteCount=0;
+	int muteCount = 0;
+	int unmuteCount = 0;
 	int count = CountSelectedMediaItems(0);
-	if(count==0)
+	if (count == 0)
 		return;
-	if(count==1)  {
-		outputMessage(isItemMuted(GetSelectedMediaItem(0,0)) ?
-			translate("muted") : translate("unmuted"));
+	if (count == 1) {
+		outputMessage(
+			isItemMuted(GetSelectedMediaItem(0, 0))
+				? translate("muted")
+				: translate("unmuted")
+		);
 		return;
 	}
-	for (int i=0; i<count; ++i) {
-		if(isItemMuted(GetSelectedMediaItem(0, i)))
+	for (int i = 0; i < count; ++i) {
+		if (isItemMuted(GetSelectedMediaItem(0, i)))
 			++muteCount;
 		else
 			++unmuteCount;
 	}
 	ostringstream s;
-	if(muteCount>0){
+	if (muteCount > 0) {
 		// Translators: Reported when multiple items are muted. {} will be replaced
 		// with the number of items; e.g. "2 items muted".
-		s << format(translate_plural("{} item muted", "{} items muted", muteCount),
-			muteCount);
+		s << format(
+			translate_plural("{} item muted", "{} items muted", muteCount), muteCount
+		);
 		if (unmuteCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unmuteCount>0)  {
+	if (unmuteCount > 0) {
 		// Translators: Reported when multiple items are unmuted. {} will be
 		// replaced with the number of items; e.g. "2 items unmuted".
 		s << format(
 			translate_plural("{} item unmuted", "{} items unmuted", unmuteCount),
-			unmuteCount);
+			unmuteCount
+		);
 	}
 	outputMessage(s);
 }
 
 void postToggleItemSolo(int command) {
-	int soloCount=0;
-	int unsoloCount=0;
+	int soloCount = 0;
+	int unsoloCount = 0;
 	int count = CountSelectedMediaItems(0);
-	if(count==0)
+	if (count == 0)
 		return;
-	if(count==1) {
-		outputMessage(isItemSoloed(GetSelectedMediaItem(0, 0)) ?
-			translate("soloed") : translate("unsoloed"));
+	if (count == 1) {
+		outputMessage(
+			isItemSoloed(GetSelectedMediaItem(0, 0))
+				? translate("soloed")
+				: translate("unsoloed")
+		);
 		return;
 	}
-	for (int i=0; i<count; ++i) {
-		if(isItemSoloed(GetSelectedMediaItem(0, i)))
+	for (int i = 0; i < count; ++i) {
+		if (isItemSoloed(GetSelectedMediaItem(0, i)))
 			++soloCount;
 		else
 			++unsoloCount;
 	}
 	ostringstream s;
-	if(soloCount>0) {
+	if (soloCount > 0) {
 		// Translators: Reported when multiple items are soloed. {} will be replaced
 		// with the number of items; e.g. "2 items soloed".
-		s << format(translate_plural("{} item soloed", "{} items soloed", soloCount),
-			soloCount);
+		s << format(
+			translate_plural("{} item soloed", "{} items soloed", soloCount),
+			soloCount
+		);
 		if (unsoloCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unsoloCount>0) {
+	if (unsoloCount > 0) {
 		// Translators: Reported when multiple items are unsoloed. {} will be
 		// replaced with the number of items; e.g. "2 items unsoloed".
 		s << format(
 			translate_plural("{} item unsoloed", "{} items unsoloed", unsoloCount),
-			unsoloCount);
+			unsoloCount
+		);
 	}
 	outputMessage(s);
 }
@@ -2287,43 +2474,49 @@ bool isItemLocked(MediaItem* item) {
 
 void postToggleItemLock(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
-	if(count==1)  {
-		outputMessage(isItemLocked(GetSelectedMediaItem(0,0)) ?
-			// Translators: Reported when an action is used to lock an item.
-			translate("locked")
-			// Translators: Reported when an action is used to unlock an item.
-			: translate("unlocked"));
+	if (count == 1) {
+		outputMessage(
+			isItemLocked(GetSelectedMediaItem(0, 0))
+				?
+				// Translators: Reported when an action is used to lock an item.
+				translate("locked")
+				// Translators: Reported when an action is used to unlock an item.
+				: translate("unlocked")
+		);
 		return;
 	}
-	int lockCount=0;
-	int unlockCount=0;
-	for (int i=0; i<count; ++i) {
-		if(isItemLocked(GetSelectedMediaItem(0, i))) {
+	int lockCount = 0;
+	int unlockCount = 0;
+	for (int i = 0; i < count; ++i) {
+		if (isItemLocked(GetSelectedMediaItem(0, i))) {
 			++lockCount;
 		} else {
 			++unlockCount;
 		}
 	}
 	ostringstream s;
-	if(lockCount>0){
+	if (lockCount > 0) {
 		// Translators: Reported when multiple items are locked. {} will be replaced
 		// with the number of items; e.g. "2 items locked".
-		s << format(translate_plural("{} item locked", "{} items locked", lockCount),
-			lockCount);
+		s << format(
+			translate_plural("{} item locked", "{} items locked", lockCount),
+			lockCount
+		);
 		if (unlockCount > 0) {
 			s << ", ";
 		}
 	}
-	if(unlockCount>0)  {
+	if (unlockCount > 0) {
 		// Translators: Reported when multiple items are unlocked. {} will be
 		// replaced with the number of items; e.g. "2 items unlocked".
 		s << format(
 			translate_plural("{} item unlocked", "{} items unlocked", unlockCount),
-			unlockCount);
+			unlockCount
+		);
 	}
 	outputMessage(s);
 }
@@ -2334,43 +2527,57 @@ bool isItemLoopedSource(MediaItem* item) {
 
 void postToggleItemLoopSource(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
-	if(count==1)  {
-		outputMessage(isItemLoopedSource(GetSelectedMediaItem(0,0)) ?
-			// Translators: Reported when an action is used to enable loop source for an item.
-			translate("enabled loop source")
-			// Translators: Reported when an action is used to disable loopp source for an item.
-			: translate("disabled loop source"));
+	if (count == 1) {
+		outputMessage(
+			isItemLoopedSource(GetSelectedMediaItem(0, 0))
+				?
+				// Translators: Reported when an action is used to enable loop source for an item.
+				translate("enabled loop source")
+				// Translators: Reported when an action is used to disable loopp source for an item.
+				: translate("disabled loop source")
+		);
 		return;
 	}
-	int loopingCount=0;
-	int notLoopingCount=0;
-	for (int i=0; i<count; ++i) {
-		if(isItemLoopedSource(GetSelectedMediaItem(0, i))) {
+	int loopingCount = 0;
+	int notLoopingCount = 0;
+	for (int i = 0; i < count; ++i) {
+		if (isItemLoopedSource(GetSelectedMediaItem(0, i))) {
 			++loopingCount;
 		} else {
 			++notLoopingCount;
 		}
 	}
 	ostringstream s;
-	if(loopingCount>0){
+	if (loopingCount > 0) {
 		// Translators: Reported when loop source is enabled for multiple items. {} will be replaced
 		// with the number of items; e.g. "2 items enabled lloop source".
-		s << format(translate_plural("{} item enabled loop source", "{} items enabled loop source", loopingCount),
-			loopingCount);
+		s << format(
+			translate_plural(
+				"{} item enabled loop source",
+				"{} items enabled loop source",
+				loopingCount
+			),
+			loopingCount
+		);
 		if (notLoopingCount > 0) {
 			s << ", ";
 		}
 	}
-	if(notLoopingCount>0)  {
+	if (notLoopingCount > 0) {
 		// Translators: Reported when loop source is disabled for multiple items. {} will be
 		// replaced with the number of items; e.g. "2 items disabled loop source".
 		s << format(
-			translate_plural("{} item disabled loop source", "{} items disabled loop source", notLoopingCount),
-			notLoopingCount);
+			translate_plural(
+				"{} item disabled loop source",
+				"{} items disabled loop source",
+				notLoopingCount
+			),
+			notLoopingCount
+		);
 	}
 	outputMessage(s);
 }
@@ -2378,8 +2585,8 @@ void postToggleItemLoopSource(int command) {
 void postSetSelectionEnd(int command) {
 	double start;
 	GetSet_LoopTimeRange(false, false, &start, nullptr, false);
-	if(start == 0)
-	// Translators: This is reported when users or REAPER automatically selects from the start of project to the cursor.
+	if (start == 0)
+		// Translators: This is reported when users or REAPER automatically selects from the start of project to the cursor.
 		outputMessage(translate("selected from start of project to cursor"));
 	else
 		outputMessage(translate("set selection end"));
@@ -2387,30 +2594,45 @@ void postSetSelectionEnd(int command) {
 }
 
 void postToggleMasterMono(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("master mono") : translate("master stereo"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("master mono")
+			: translate("master stereo")
+	);
 }
 
 void postToggleAutoCrossfade(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("crossfade on") : translate("crossfade off"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("crossfade on")
+			: translate("crossfade off")
+	);
 }
 
 void postToggleTrimContentBehindItems(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("trim behind items on") : translate("trim behind items off"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("trim behind items on")
+			: translate("trim behind items off")
+	);
 }
 
 void postToggleLocking(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("locking on") : translate("locking off"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("locking on")
+			: translate("locking off")
+	);
 }
 
 void postToggleSoloInFront(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("solo in front") :
-		// Translators: Solo in front was turned off.
-		translate("normal solo"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("solo in front")
+			:
+			// Translators: Solo in front was turned off.
+			translate("normal solo")
+	);
 }
 
 void postAdjustPlayRate(int command) {
@@ -2421,8 +2643,11 @@ void postAdjustPlayRate(int command) {
 }
 
 void postToggleMonitoringFxBypass(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("FX bypassed") : translate("fx active"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("FX bypassed")
+			: translate("fx active")
+	);
 }
 
 void postCycleRecordMode(int command) {
@@ -2447,35 +2672,41 @@ void postChangeGlobalAutomationOverride(int command) {
 
 void postReverseTake(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
 	// Translators: Reported when reversing takes. {} will be replaced by the
 	// number of takes; e.g. "2 takes reversed".
 	outputMessage(format(
-		translate_plural("{} take reversed", "{} takes reversed", count),
-		count));
+		translate_plural("{} take reversed", "{} takes reversed", count), count
+	));
 }
 
 void postTogglePreRoll(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled pre roll before recording") : translate("disabled pre roll before recording"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("enabled pre roll before recording")
+			: translate("disabled pre roll before recording")
+	);
 }
 
 void postToggleCountIn(int command) {
-	outputMessage(GetToggleCommandState(command) ? 
-		translate("enabled count in before recording") : translate("disabled count in before recording"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("enabled count in before recording")
+			: translate("disabled count in before recording")
+	);
 }
 
 void postTakeChannelMode(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
 	const char* mode;
-	switch(command) {
+	switch (command) {
 		case 40176: {
 			// Translators: A take channel mode.
 			mode = translate_ctxt("take channel mode", "normal");
@@ -2506,8 +2737,12 @@ void postTakeChannelMode(int command) {
 	// {mode} will be replaced with the mode being set.
 	// For example: "set 2 takes to mono (left)"
 	outputMessage(format(
-		translate_plural("set {count} take to {mode}", "set {count} takes to {mode}", count),
-		"count"_a=count, "mode"_a=mode));
+		translate_plural(
+			"set {count} take to {mode}", "set {count} takes to {mode}", count
+		),
+		"count"_a = count,
+		"mode"_a = mode
+	));
 }
 
 void postChangeTempo(int command) {
@@ -2518,49 +2753,61 @@ void postChangeTempo(int command) {
 }
 
 void postTogglePlaybackPositionFollowsTimebase(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled playback position follows project timebase when changing tempo") :
-		translate("disabled playback position follows project timebase when changing tempo"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate(
+					"enabled playback position follows project timebase when changing tempo"
+				)
+			: translate(
+					"disabled playback position follows project timebase when changing tempo"
+				)
+	);
 }
 
 void postTogglePreservePitchWhenPlayRateChanged(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("preserving pitch when changing play rate") :
-		translate("not preserving pitch when changing play rate"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("preserving pitch when changing play rate")
+			: translate("not preserving pitch when changing play rate")
+	);
 }
 
 void postSetItemEnd(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item)
+	if (!item)
 		return;
 	int selCount = CountSelectedMediaItems(0);
-	if(selCount > 1){
+	if (selCount > 1) {
 		// Translators: Reported when setting the ends of multiple items to the end
 		// of their source media. {} will be replaced with the number of items; e.g.
 		// "2 item ends set to source media end"
-		outputMessage(format(translate("{} item ends set to source media end"),
-			selCount));
+		outputMessage(
+			format(translate("{} item ends set to source media end"), selCount)
+		);
 	} else {
-		double endPos = GetMediaItemInfo_Value(item, "D_POSITION") + GetMediaItemInfo_Value(item, "D_LENGTH");
+		double endPos = GetMediaItemInfo_Value(item, "D_POSITION")
+			+ GetMediaItemInfo_Value(item, "D_LENGTH");
 		// Translators: Reported when setting the end of a single item to its source
 		// media end. {} will be replaced with the end time; e.g.
 		// "item end set to source media end: bar 3 beat 1 25%"
-		outputMessage(format(translate("item end set to source media end: {}"),
-			formatTime(endPos, TF_RULER, FT_NO_CACHE, true)));
+		outputMessage(format(
+			translate("item end set to source media end: {}"),
+			formatTime(endPos, TF_RULER, FT_NO_CACHE, true)
+		));
 	}
 }
 
 void postTrimItemToSelection(int command) {
 	int count = CountSelectedMediaItems(0);
-	if(count==0) {
+	if (count == 0) {
 		outputMessage(translate("no items selected"));
 		return;
 	}
 	// Translators: Reported when trimming items to selected area. {} will be replaced by the
 	// number of items; e.g. "2 items trimmed".
 	outputMessage(format(
-		translate_plural("{} item trimmed", "{} items trimmed", count),
-		count));
+		translate_plural("{} item trimmed", "{} items trimmed", count), count
+	));
 }
 
 void postGoToTakeMarker(int command) {
@@ -2576,8 +2823,12 @@ void postGoToTakeMarker(int command) {
 		if (!take) {
 			continue;
 		}
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
+		double itemStart = *(double*)GetSetMediaItemInfo(
+			item, "D_POSITION", nullptr
+		);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(
+			take, "D_PLAYRATE", nullptr
+		);
 		// Take marker positions are relative to the start of the item and the
 		// take's play rate.
 		double cursorRel = (cursor - itemStart) * playRate;
@@ -2605,7 +2856,8 @@ void postSelectMultipleTracks(int command) {
 	// Translators: Reported when an action selects tracks. {} will be replaced
 	// with the number of tracks; e.g. "2 tracks selected".
 	outputMessage(format(
-		translate_plural("{} track selected", "{} tracks selected", count), count));
+		translate_plural("{} track selected", "{} tracks selected", count), count
+	));
 }
 
 void postSelectAll(int command) {
@@ -2636,31 +2888,36 @@ void postToggleTrackSoloDefeat(int command) {
 	if (!defeat) {
 		return;
 	}
-	outputMessage(*defeat ?
-		translate("defeating solo") : translate("not defeating solo"));
+	outputMessage(
+		*defeat ? translate("defeating solo") : translate("not defeating solo")
+	);
 }
 
 void postChangeTransientDetectionSensitivity(int command) {
-	double sensitivity = *(double*)get_config_var("transientsensitivity",
-		nullptr) * 100;
-		// Translators: report transient sensitivity. {} is replaced with the sensitivity percentage;
-		// E.g. "13% sensitivity"
-	outputMessage(format(
-		translate("{}% sensitivity"), formatDouble(sensitivity, 2)));
+	double sensitivity = *(double*)get_config_var("transientsensitivity", nullptr)
+		* 100;
+	// Translators: report transient sensitivity. {} is replaced with the sensitivity percentage;
+	// E.g. "13% sensitivity"
+	outputMessage(
+		format(translate("{}% sensitivity"), formatDouble(sensitivity, 2))
+	);
 }
 
 void postChangeTransientDetectionThreshold(int command) {
-	double threshold = *(double*)get_config_var("transientthreshold",
-		nullptr);
+	double threshold = *(double*)get_config_var("transientthreshold", nullptr);
 	// Translators: Reported when changing the transient detection threshold.
 	// {} will be replaced with the threshold; e.g. "{} dB threshold".
-	outputMessage(format(translate("{} dB threshold"), formatDouble(threshold, 2)));
+	outputMessage(
+		format(translate("{} dB threshold"), formatDouble(threshold, 2))
+	);
 }
 
 void postToggleEnvelopePointsMoveWithMediaItems(int command) {
-	outputMessage(GetToggleCommandState(command) ?
-		translate("enabled envelope points move with media items") :
-		translate("disabled envelope points move with media items"));
+	outputMessage(
+		GetToggleCommandState(command)
+			? translate("enabled envelope points move with media items")
+			: translate("disabled envelope points move with media items")
+	);
 }
 
 void postToggleFreeItemPositioning(int command) {
@@ -2668,18 +2925,20 @@ void postToggleFreeItemPositioning(int command) {
 	if (!track) {
 		return;
 	}
-	outputMessage(*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr) ?
-		translate("enabled free item positioning") :
-		translate("disabled free item positioning"));
+	outputMessage(
+		*(bool*)GetSetMediaTrackInfo(track, "B_FREEMODE", nullptr)
+			? translate("enabled free item positioning")
+			: translate("disabled free item positioning")
+	);
 }
 
 void postChangeItemRate(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
 	double rate = GetMediaItemTakeInfo_Value(take, "D_PLAYRATE");
@@ -2689,31 +2948,37 @@ void postChangeItemRate(int command) {
 
 void postChangeItemPitch(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
 	double pitch = GetMediaItemTakeInfo_Value(take, "D_PITCH");
 	// Translators: Used when changing item PITCH. {} is replaced by the new PITCH. E.G. "-1.0 SEMITONES"
-	outputMessage(format(translate("{} semitones"), formatDouble(pitch, 6, true)));
+	outputMessage(
+		format(translate("{} semitones"), formatDouble(pitch, 6, true))
+	);
 }
 
 void postToggleTakePreservePitch(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		return;
 	}
 	MediaItem_Take* take = GetActiveTake(item);
-	if(!take) {
+	if (!take) {
 		return;
 	}
-	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(take, "B_PPITCH", nullptr);
-	outputMessage(isPreserving ?
-		translate("enabled preserve pitch when changing item rate"):
-		translate("disabled preserve pitch when changing item rate"));
+	bool isPreserving = *(bool*)GetSetMediaItemTakeInfo(
+		take, "B_PPITCH", nullptr
+	);
+	outputMessage(
+		isPreserving
+			? translate("enabled preserve pitch when changing item rate")
+			: translate("disabled preserve pitch when changing item rate")
+	);
 }
 
 void postChangeVerticalZoom(int command) {
@@ -2783,14 +3048,15 @@ void reportCurrentKeyMapOverride(bool interrupt) {
 		outputMessage(translate("recording key map"), interrupt);
 		return;
 	}
-	for (int command = CMD_TOGGLE_OVERRIDE_TO_ALT1;
-			command < CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT16_SECTION;
-			++command) {
+	for (
+		int command = CMD_TOGGLE_OVERRIDE_TO_ALT1;
+		command < CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT16_SECTION;
+		++command
+	) {
 		if (GetToggleCommandState2(section, command) != 1) {
 			continue;
 		}
-		int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1
-			+ MAIN_ALT1_SECTION;
+		int sectionId = command - CMD_TOGGLE_OVERRIDE_TO_ALT1 + MAIN_ALT1_SECTION;
 		outputMessage(getShortenedAltSectionName(sectionId), interrupt);
 		return;
 	}
@@ -2803,8 +3069,9 @@ void postToggleOverride(int) {
 }
 
 int getMomentaryOverrideTimeout() {
-	int timeout = GetPrivateProfileInt("REAPER", "kbd_override_len", 1000,
-		get_ini_file());
+	int timeout = GetPrivateProfileInt(
+		"REAPER", "kbd_override_len", 1000, get_ini_file()
+	);
 	return timeout >= 0 ? timeout : 1000;
 }
 
@@ -2814,13 +3081,14 @@ void postMomentarilySetOverride(int command) {
 	} else if (command == CMD_MOMENTARILY_SET_OVERRIDE_TO_RECORDING) {
 		outputMessage(translate("recording key map momentary"));
 	} else {
-		int sectionId = command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1
-			+ MAIN_ALT1_SECTION;
+		int sectionId =
+			command - CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT1 + MAIN_ALT1_SECTION;
 		// Translators: Reported when using "Main action section: Momentarily
 		// set override to alt-1", etc. {} is replaced with the shortened
 		// section name; e.g. "alt-1 momentary".
-		outputMessage(format(translate("{} momentary"),
-			getShortenedAltSectionName(sectionId)));
+		outputMessage(
+			format(translate("{} momentary"), getShortenedAltSectionName(sectionId))
+		);
 	}
 	momentaryOverrideReport.cancel();
 	// reportCurrentKeyMapOverride must not interrupt speech here, as we might
@@ -2828,7 +3096,8 @@ void postMomentarilySetOverride(int command) {
 	// action name in shortcut help.
 	momentaryOverrideReport = CallLater(
 		[] { reportCurrentKeyMapOverride(false); },
-		getMomentaryOverrideTimeout() + 50);
+		getMomentaryOverrideTimeout() + 50
+	);
 }
 
 void postMidiResets(int command) {
@@ -2868,8 +3137,10 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		vkbHwnd = nullptr;
 		return 0;
 	}
-	if (msg->message != WM_KEYDOWN ||
-			(msg->hwnd != vkbHwnd && GetParent(msg->hwnd) != vkbHwnd)) {
+	if (
+		msg->message != WM_KEYDOWN
+		|| (msg->hwnd != vkbHwnd && GetParent(msg->hwnd) != vkbHwnd)
+	) {
 		// This key isn't for us.
 		return 0;
 	}
@@ -2887,15 +3158,19 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 				outputMessage(translate("Octave down"));
 				return 1;
 			case VK_UP:
-				outputMessage(shift ? translate("Increase MIDI velocity") :
-					translate("Increase MIDI channel"));
+				outputMessage(
+					shift ? translate("Increase MIDI velocity")
+								: translate("Increase MIDI channel")
+				);
 				return 1;
 			case VK_DOWN:
-				outputMessage(shift ? translate("Decrease MIDI velocity") :
-					translate("Decrease MIDI channel"));
+				outputMessage(
+					shift ? translate("Decrease MIDI velocity")
+								: translate("Decrease MIDI channel")
+				);
 				return 1;
-		default:
-			break;
+			default:
+				break;
 		}
 		return 0;
 	}
@@ -2903,41 +3178,57 @@ int vkbTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
 		case VK_RIGHT:
 		case VK_LEFT:
 			// We need to wait until this executes before we can report the new value.
-			CallLater([] {
-				const double note = getVkbProjectInfo("VKB_NOTECENTER");
-				if (note >= 0) {
-					outputMessage(getMidiNoteName(static_cast<int>(note)));
-					return;
-				}
-				constexpr int WCID_CENTER_NOTE = 1239;
-				char noteText[10];
-				if (GetDlgItemText(vkbHwnd, WCID_CENTER_NOTE, noteText, sizeof(noteText)) != 0) {
-					outputMessage(noteText);
-				}
-			}, 0);
+			CallLater(
+				[] {
+					const double note = getVkbProjectInfo("VKB_NOTECENTER");
+					if (note >= 0) {
+						outputMessage(getMidiNoteName(static_cast<int>(note)));
+						return;
+					}
+					constexpr int WCID_CENTER_NOTE = 1239;
+					char noteText[10];
+					if (
+						GetDlgItemText(
+							vkbHwnd, WCID_CENTER_NOTE, noteText, sizeof(noteText)
+						)
+						!= 0
+					) {
+						outputMessage(noteText);
+					}
+				},
+				0
+			);
 			return 0;
 		case VK_UP:
 		case VK_DOWN: {
 			const bool shift = GetAsyncKeyState(VK_SHIFT) & 0x8000;
-			CallLater([shift] {
-				if (shift) {
-					const double velocity = getVkbProjectInfo("VKB_LASTVEL");
-					if (velocity >= 0) {
-						outputMessage(fmt::format("{}", velocity));
+			CallLater(
+				[shift] {
+					if (shift) {
+						const double velocity = getVkbProjectInfo("VKB_LASTVEL");
+						if (velocity >= 0) {
+							outputMessage(fmt::format("{}", velocity));
+						}
+						return;
 					}
-					return;
-				}
-				const double channel = getVkbProjectInfo("VKB_CHANNEL");
-				if (channel >= 0) {
-					outputMessage(fmt::format("{}", channel + 1));
-					return;
-				}
-				constexpr int WCID_CHANNEL = 1377;
-				char channelText[10];
-				if (GetDlgItemText(vkbHwnd, WCID_CHANNEL, channelText, sizeof(channelText)) != 0) {
-					outputMessage(channelText);
-				}
-			}, 0);
+					const double channel = getVkbProjectInfo("VKB_CHANNEL");
+					if (channel >= 0) {
+						outputMessage(fmt::format("{}", channel + 1));
+						return;
+					}
+					constexpr int WCID_CHANNEL = 1377;
+					char channelText[10];
+					if (
+						GetDlgItemText(
+							vkbHwnd, WCID_CHANNEL, channelText, sizeof(channelText)
+						)
+						!= 0
+					) {
+						outputMessage(channelText);
+					}
+				},
+				0
+			);
 			return 0;
 		}
 		default:
@@ -2960,8 +3251,11 @@ void postVirtualMidiKeyboard(int command) {
 // to the dialog.
 // The HWND of a dialog which needs dialog keys restored.
 HWND restoreDialogKeysHwnd = nullptr;
+
 // Called from translateAccel.
-int restoreDialogKeysTranslateAccel(MSG* msg, accelerator_register_t* accelReg) {
+int restoreDialogKeysTranslateAccel(
+	MSG* msg, accelerator_register_t* accelReg
+) {
 	if (!restoreDialogKeysHwnd) {
 		return 0; // Normal handling.
 	}
@@ -2970,8 +3264,9 @@ int restoreDialogKeysTranslateAccel(MSG* msg, accelerator_register_t* accelReg) 
 		restoreDialogKeysHwnd = nullptr;
 		return 0; // Normal handling.
 	}
-	if (msg->message != WM_KEYDOWN ||
-			GetParent(msg->hwnd) != restoreDialogKeysHwnd) {
+	if (
+		msg->message != WM_KEYDOWN || GetParent(msg->hwnd) != restoreDialogKeysHwnd
+	) {
 		return 0; // Normal handling.
 	}
 	switch (msg->wParam) {
@@ -3002,24 +3297,25 @@ void postDialogThatNeedsKeysRestored(int command) {
 
 void postMExplorerChangeVolume(int cmd, HWND hwnd) {
 	HWND w = GetDlgItem(hwnd, 997);
-	if(!w) {// support Reaper versions before 6.65
+	if (!w) { // support Reaper versions before 6.65
 		w = GetDlgItem(hwnd, 1047);
 	}
 	const int sz = 10;
 	char text[sz];
-	if(!GetWindowText(w, text ,sz)) {
+	if (!GetWindowText(w, text, sz)) {
 		return;
 	}
 	outputMessage(text);
 }
 
 typedef void (*PostCommandExecute)(int);
+
 typedef struct PostCommand {
 	int cmd;
 	PostCommandExecute execute;
 } PostCommand;
 
-typedef struct MidiPostCommand : PostCommand {
+typedef struct MidiPostCommand: PostCommand {
 	bool supportedInMidiEventList = false;
 	bool changesValueInMidiEventList = false;
 } MidiPostCommand;
@@ -3030,6 +3326,7 @@ typedef struct {
 	PostCommandExecute execute;
 } PostCustomCommand;
 
+// clang-format off
 PostCommand POST_COMMANDS[] = {
 	{40001, postGoToTrack}, // Track: Insert new track
 	{6, postToggleTrackMute}, // Track: Toggle mute for selected tracks
@@ -3164,13 +3461,13 @@ PostCommand POST_COMMANDS[] = {
 	{40180, postTakeChannelMode}, // Item properties: Set take channel mode to mono (right)
 	{41130, postChangeTempo}, // Tempo: Decrease current project tempo 01 BPM
 	{41129, postChangeTempo}, // Tempo: Increase current project tempo 01 BPM
-	{41138, postChangeTempo}, // Tempo: Decrease current project tempo 0.1 BPM 
-	{41136, postChangeTempo}, // Tempo: Decrease current project tempo 10 BPM 
-	{41132, postChangeTempo}, // Tempo: Decrease current project tempo 10 percent 
-	{41134, postChangeTempo}, // Tempo: Decrease current project tempo 50 percent (half) 
-	{41137, postChangeTempo}, // Tempo: Increase current project tempo 0.1 BPM 
-	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM 
-	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent 
+	{41138, postChangeTempo}, // Tempo: Decrease current project tempo 0.1 BPM
+	{41136, postChangeTempo}, // Tempo: Decrease current project tempo 10 BPM
+	{41132, postChangeTempo}, // Tempo: Decrease current project tempo 10 percent
+	{41134, postChangeTempo}, // Tempo: Decrease current project tempo 50 percent (half)
+	{41137, postChangeTempo}, // Tempo: Increase current project tempo 0.1 BPM
+	{41135, postChangeTempo}, // Tempo: Increase current project tempo 10 BPM
+	{41131, postChangeTempo}, // Tempo: Increase current project tempo 10 percent
 	{41133, postChangeTempo}, // Tempo: Increase current project tempo 100 percent (double)
 	{40671, postTogglePreservePitchWhenPlayRateChanged}, // Transport: Toggle preserve pitch in audio items when changing master playrate
 	{41925, postChangeItemVolume}, // Item: Nudge items volume +1dB
@@ -3366,10 +3663,11 @@ PostCustomCommand POST_CUSTOM_COMMANDS[] = {
 	{"_XENAKIOS_MOVECURRRIGHTCONFCTS", postCursorMovementScrub}, // Xenakios/SWS: Move cursor right configured pixels, creating time selection
 	{nullptr},
 };
+// clang-format on
 
 using MExplorerPostExecute = void (*)(int, HWND);
 map<int, MExplorerPostExecute> mExplorerPostCommands{
-	{42178, postMExplorerChangeVolume }, // Preview: decrease volume by 1 dB
+	{42178, postMExplorerChangeVolume}, // Preview: decrease volume by 1 dB
 	{42177, postMExplorerChangeVolume}, // Preview: increase volume by 1 dB
 };
 
@@ -3393,7 +3691,8 @@ map<int, string> POST_COMMAND_MESSAGES = {
 	{40339, _t("all tracks unmuted")}, // Track: Unmute all tracks
 	{40340, _t("all tracks unsoloed")}, // Track: Unsolo all tracks
 	{40491, _t("all tracks unarmed")}, // Track: Unarm all tracks for recording
-	{42467, _t("all delta solos reset")}, // FX: Clear delta solo for all project FX
+	{42467,
+		_t("all delta solos reset")}, // FX: Clear delta solo for all project FX
 };
 // Not const: the SWS/Xenakios actions in MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS
 // below are added to this set at init once their numeric IDs are known.
@@ -3423,6 +3722,7 @@ const char* MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS[] = {
 
 map<int, PostCommandExecute> midiPostCommandsMap;
 map<int, pair<PostCommandExecute, bool>> midiEventListPostCommandsMap;
+// clang-format off
 map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{40204, _t("grid whole")}, // Grid: Set to 1
 	{40203, _t("grid half")}, // Grid: Set to 1/2
@@ -3455,6 +3755,7 @@ map<int, string> MIDI_POST_COMMAND_MESSAGES = {
 	{41712, _t("length dotted")}, // Set length for next inserted note: dotted preserving division length
 	{41713, _t("length triplet")}, // Set length for next inserted note: triplet preserving division length
 };
+// clang-format on
 
 struct ToggleCommandMessage {
 	const char* onMsg;
@@ -3464,6 +3765,7 @@ struct ToggleCommandMessage {
 // Messages for toggle actions. Specify null messages to report nothing. If a
 // toggle action isn't included here or in another of OSARA's action maps,
 // OSARA will fall back to reporting the toggle state and the action name.
+// clang-format off
 map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	// {{sectionId, actionId}, {onMsg, offMsg}}, // actionName
 	// Specify nullptr to report nothing for a particular message.
@@ -3506,6 +3808,7 @@ map<pair<int, int>, ToggleCommandMessage> TOGGLE_COMMAND_MESSAGES = {
 	{{MIDI_EDITOR_SECTION, 40045}, {_t("showed note names"), _t("hid note names")}}, // View: Show note names
 	{{MIDI_EDITOR_SECTION, 41295}, {_t("length matching grid"), nullptr}}, // Set length for next inserted note: grid
 };
+// clang-format on
 
 /*** Code related to context menus and other UI that isn't just actions.
  * This includes code to access REAPER context menus, but also code to display
@@ -3538,13 +3841,21 @@ bool showReaperContextMenu(const int menu) {
 			return true;
 		case FOCUS_ENVELOPE: {
 			int point = getEnvelopePointAtCursor();
-			ShowPopupMenu("envelope_point", 0, 0, nullptr, nullptr,
-				point, currentAutomationItem + 1);
+			ShowPopupMenu(
+				"envelope_point",
+				0,
+				0,
+				nullptr,
+				nullptr,
+				point,
+				currentAutomationItem + 1
+			);
 			return true;
 		}
 		case FOCUS_AUTOMATIONITEM:
-			ShowPopupMenu("envelope_item", 0, 0, nullptr, nullptr,
-				currentAutomationItem + 1, 0);
+			ShowPopupMenu(
+				"envelope_item", 0, 0, nullptr, nullptr, currentAutomationItem + 1, 0
+			);
 			return true;
 		default:
 			break;
@@ -3566,10 +3877,10 @@ BOOL CALLBACK enumReaperTopLevelWindows(HWND hwnd, LPARAM lParam) {
 #ifdef _WIN32
 	// EnumWindows includes windows belonging to every application. Limit this to
 	// the REAPER windows identified by SWS's EnumReaWindows.
-	if (GetAncestor(hwnd, GA_ROOTOWNER) != mainHwnd ||
-			(!isClassName(hwnd, WCS_DIALOG) &&
-				!isClassName(hwnd, "REAPERMediaExplorerMainwnd") &&
-				!isClassName(hwnd, "REAPERmidieditorwnd"))) {
+	if (
+		GetAncestor(hwnd, GA_ROOTOWNER) != mainHwnd
+		|| (!isClassName(hwnd, WCS_DIALOG) && !isClassName(hwnd, "REAPERMediaExplorerMainwnd") && !isClassName(hwnd, "REAPERmidieditorwnd"))
+	) {
 		return TRUE;
 	}
 #endif
@@ -3608,19 +3919,25 @@ void cmdCloseAllWindowsFocusArrange(int) {
 	}
 
 	// Windows don't close synchronously, so check whether they closed async.
-	CallLater([windows, closed] {
-		int closedWindows = closed;
-		for (HWND window: windows) {
-			if (!IsWindow(window) || !IsWindowVisible(window)) {
-				++closedWindows;
+	CallLater(
+		[windows, closed] {
+			int closedWindows = closed;
+			for (HWND window: windows) {
+				if (!IsWindow(window) || !IsWindowVisible(window)) {
+					++closedWindows;
+				}
 			}
-		}
-		// Translators: Reported after closing REAPER windows. {} will be replaced
-		// with the number of windows; e.g. "2 windows closed".
-		outputMessage(format(
-			translate_plural("{} window closed", "{} windows closed", closedWindows),
-			closedWindows));
-	}, 0);
+			// Translators: Reported after closing REAPER windows. {} will be replaced
+			// with the number of windows; e.g. "2 windows closed".
+			outputMessage(format(
+				translate_plural(
+					"{} window closed", "{} windows closed", closedWindows
+				),
+				closedWindows
+			));
+		},
+		0
+	);
 }
 
 #ifdef _WIN32
@@ -3646,7 +3963,12 @@ void sendMenu(HWND sendWindow) {
 	// Present them in a menu.
 	CComPtr<IAccessible> acc;
 	VARIANT child;
-	if (AccessibleObjectFromEvent(sendWindow, OBJID_CLIENT, CHILDID_SELF, &acc, &child) != S_OK)
+	if (
+		AccessibleObjectFromEvent(
+			sendWindow, OBJID_CLIENT, CHILDID_SELF, &acc, &child
+		)
+		!= S_OK
+	)
 		return;
 	long count = 0;
 	if (acc->get_accChildCount(&count) != S_OK || count == 0) {
@@ -3668,14 +3990,18 @@ void sendMenu(HWND sendWindow) {
 		if (role.lVal == ROLE_SYSTEM_CHECKBUTTON) {
 			itemInfo.fMask |= MIIM_STATE;
 			VARIANT state;
-			if (acc->get_accState(child, &state) == S_OK && state.vt == VT_I4 &&
-					state.lVal & STATE_SYSTEM_CHECKED) {
+			if (
+				acc->get_accState(child, &state) == S_OK
+				&& state.vt == VT_I4
+				&& state.lVal & STATE_SYSTEM_CHECKED
+			) {
 				itemInfo.fState = MFS_CHECKED;
 			} else {
 				itemInfo.fState = MFS_UNCHECKED;
 			}
-		} else if (role.lVal != ROLE_SYSTEM_PUSHBUTTON &&
-				role.lVal != ROLE_SYSTEM_COMBOBOX) {
+		} else if (
+			role.lVal != ROLE_SYSTEM_PUSHBUTTON && role.lVal != ROLE_SYSTEM_COMBOBOX
+		) {
 			continue;
 		}
 		CComBSTR name;
@@ -3688,7 +4014,9 @@ void sendMenu(HWND sendWindow) {
 		itemInfo.cch = SysStringLen(name);
 		InsertMenuItem(menu, item, true, &itemInfo);
 	}
-	child.lVal = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
+	child.lVal = TrackPopupMenu(
+		menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr
+	);
 	DestroyMenu(menu);
 	if (child.lVal == -1) {
 		return;
@@ -3701,7 +4029,9 @@ void sendMenu(HWND sendWindow) {
 	}
 	POINT point = {l, t};
 	ScreenToClient(sendWindow, &point);
-	SendMessage(sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y));
+	SendMessage(
+		sendWindow, WM_LBUTTONDOWN, MK_LBUTTON, MAKELPARAM(point.x, point.y)
+	);
 	SendMessage(sendWindow, WM_LBUTTONUP, 0, MAKELPARAM(point.x, point.y));
 }
 
@@ -3727,8 +4057,7 @@ void sendNameChangeEventToMidiEditorEventListItem(HWND hwnd) {
 	if (child == -1) {
 		return;
 	}
-	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT,
-		child + 1);
+	NotifyWinEvent(EVENT_OBJECT_NAMECHANGE, hwnd, OBJID_CLIENT, child + 1);
 }
 
 HWND getPreferenceDescHwnd(HWND pref) {
@@ -3744,8 +4073,10 @@ HWND getPreferenceDescHwnd(HWND pref) {
 		return nullptr;
 	}
 	// Group boxes aren't preference controls.
-	if (isClassName(pref, "Button")
-			&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX) {
+	if (
+		isClassName(pref, "Button")
+		&& (GetWindowLong(pref, GWL_STYLE) & BS_GROUPBOX) == BS_GROUPBOX
+	) {
 		return nullptr;
 	}
 	// if the control id for the description isn't in this root window, it's not
@@ -3768,17 +4099,26 @@ bool maybeAnnotatePreferenceDescription() {
 	GetWindowRect(focus, &rect);
 	SetCursorPos(rect.left, rect.top);
 	// The description takes some time to appear, so we must delay it.
-	later = CallLater([focus, desc] {
-		char text[1000];
-		if (GetWindowText(desc, text, sizeof(text)) == 0) {
-			return;
-		}
-		// Set the accDescription on the control.
-		accPropServices->SetHwndPropStr(focus, OBJID_CLIENT, CHILDID_SELF,
-			PROPID_ACC_DESCRIPTION, widen(string(text)).c_str());
-		NotifyWinEvent(EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT,
-			CHILDID_SELF);
-	}, 300);
+	later = CallLater(
+		[focus, desc] {
+			char text[1000];
+			if (GetWindowText(desc, text, sizeof(text)) == 0) {
+				return;
+			}
+			// Set the accDescription on the control.
+			accPropServices->SetHwndPropStr(
+				focus,
+				OBJID_CLIENT,
+				CHILDID_SELF,
+				PROPID_ACC_DESCRIPTION,
+				widen(string(text)).c_str()
+			);
+			NotifyWinEvent(
+				EVENT_OBJECT_DESCRIPTIONCHANGE, focus, OBJID_CLIENT, CHILDID_SELF
+			);
+		},
+		300
+	);
 	return true;
 }
 
@@ -3786,12 +4126,11 @@ bool maybeAnnotatePreferenceDescription() {
 // REAPER's "accelerator" hook isn't enough because it doesn't get called in some windows.
 LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 	const bool isKeyDown = !(lParam & 0x80000000);
-	if (!isKeyDown || code != HC_ACTION || (
-		wParam != VK_APPS && wParam != VK_CONTROL &&
-				wParam != VK_F10 && wParam != VK_RETURN &&
-				wParam != VK_F6 && wParam != 'B' &&
-				wParam != VK_TAB && wParam != VK_DOWN &&
-				wParam != VK_UP && wParam != VK_SPACE)) {
+	if (
+		!isKeyDown
+		|| code != HC_ACTION
+		|| (wParam != VK_APPS && wParam != VK_CONTROL && wParam != VK_F10 && wParam != VK_RETURN && wParam != VK_F6 && wParam != 'B' && wParam != VK_TAB && wParam != VK_DOWN && wParam != VK_UP && wParam != VK_SPACE)
+	) {
 		// Return early if we're not interested in the key.
 		return CallNextHookEx(nullptr, code, wParam, lParam);
 	}
@@ -3835,9 +4174,7 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		return 1;
 	}
 	if (
-		(isContextMenu ||
-			(wParam == VK_RETURN && control)) &&
-		isListView(focus)
+		(isContextMenu || (wParam == VK_RETURN && control)) && isListView(focus)
 	) {
 		// REAPER doesn't allow you to do the equivalent of double click or right click in several ListViews.
 		int item = ListView_GetNextItem(focus, -1, LVNI_FOCUSED);
@@ -3848,8 +4185,10 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 			if (GetWindowLong(focus, GWL_ID) == 1071) {
 				// In the Project Render Metadata list, we need to click in the centre of
 				// the item.
-				point = {rect.left + (rect.right - rect.left) / 2,
-					rect.top + (rect.bottom - rect.top) / 2};
+				point = {
+					rect.left + (rect.right - rect.left) / 2,
+					rect.top + (rect.bottom - rect.top) / 2
+				};
 			} else {
 				// #478: Clicking in the centre of the Media Explorer list misbehaves for
 				// some users, so use the top left for most lists.
@@ -3885,8 +4224,10 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		if (maybeOpenFxPresetDialog()) {
 			return 1;
 		}
-	} else if(control && !shift &&
-		(wParam == VK_DOWN || wParam == VK_UP || wParam == VK_SPACE)
+	} else if (
+		control
+		&& !shift
+		&& (wParam == VK_DOWN || wParam == VK_UP || wParam == VK_SPACE)
 		&& isListView(focus)
 		// exclude the second list in the Edit custom action dialog because Ctrl+up/down reorder items.
 		&& GetWindowLong(focus, GWL_ID) != 1322
@@ -3899,14 +4240,20 @@ LRESULT CALLBACK keyboardHookProc(int code, WPARAM wParam, LPARAM lParam) {
 		SendMessage(focus, WM_KEYDOWN, wParam, lParam);
 		return 1;
 	}
-	if (shift && !control && !alt && wParam == VK_SPACE &&
-			isMidiEditorEventListView(focus)) {
+	if (
+		shift
+		&& !control
+		&& !alt
+		&& wParam == VK_SPACE
+		&& isMidiEditorEventListView(focus)
+	) {
 		// In the MIDI Editor Event List, make shift+space toggle selection.
 		toggleListViewItemSelection(focus);
 		return 1;
 	}
 	return CallNextHookEx(nullptr, code, wParam, lParam);
 }
+
 HHOOK keyboardHook = nullptr;
 
 #endif // _WIN32
@@ -3918,9 +4265,11 @@ HHOOK keyboardHook = nullptr;
 int int0 = 0;
 int int1 = 1;
 
-void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
+void moveToTrack(
+	int direction, bool clearSelection = true, bool select = true
+) {
 	unsigned int undoMask = getConfigUndoMask();
-	bool makeUndoPoint = undoMask&1<<4;
+	bool makeUndoPoint = undoMask & 1 << 4;
 	int count = CountTracks(0);
 	if (count == 0) {
 		// Translators: Reported when there are no tracks to navigate to.
@@ -3930,7 +4279,9 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 	int num;
 	MediaTrack* origTrack = GetLastTouchedTrack();
 	if (origTrack) {
-		num = (int)(size_t)GetSetMediaTrackInfo(origTrack, "IP_TRACKNUMBER", nullptr);
+		num = (int)(size_t)GetSetMediaTrackInfo(
+			origTrack, "IP_TRACKNUMBER", nullptr
+		);
 		if (num >= 0) // Not master
 			--num; // We need 0-based.
 		num += direction;
@@ -3987,7 +4338,9 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		// so we must first unselected.
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
 		GetSetMediaTrackInfo(track, "I_SELECTED", &int1);
-		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		Main_OnCommand(
+			40913, 0
+		); // Track: Vertical scroll selected tracks into view (TCP)
 		SetMixerScroll(track); // MCP
 		if (!wasSelected && !select)
 			GetSetMediaTrackInfo(track, "I_SELECTED", &int0);
@@ -4013,38 +4366,44 @@ void cmdGoToPrevTrackKeepSel(int command) {
 	moveToTrack(-1, false, isSelectionContiguous);
 }
 
-void cmdGoToFirstTrack(int command){
+void cmdGoToFirstTrack(int command) {
 	MediaTrack* track = GetTrack(nullptr, 0);
-	if(!track) {
+	if (!track) {
 		return;
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
-	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	Main_OnCommand(
+		40913, 0
+	); // Track: Vertical scroll selected tracks into view (TCP)
 	SetMixerScroll(track); // MCP
 }
 
-void cmdGoToLastTrack(int command){
+void cmdGoToLastTrack(int command) {
 	int trackNo = CountTracks(nullptr) - 1;
 	if (trackNo < 0) {
 		return;
 	}
 	MediaTrack* track = GetTrack(nullptr, trackNo);
-	if(!track) {
+	if (!track) {
 		return;
 	}
 	SetOnlyTrackSelected(track);
 	postGoToTrack(0);
-	Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+	Main_OnCommand(
+		40913, 0
+	); // Track: Vertical scroll selected tracks into view (TCP)
 	SetMixerScroll(track); // MCP
 }
 
-void cmdGoToMasterTrack(int command){
+void cmdGoToMasterTrack(int command) {
 	if (MediaTrack* track1 = GetTrack(nullptr, 0)) {
 		// We can't scroll directly to the master track. Instead, scroll to track 1,
 		// which also scrolls the master track into view.
 		SetOnlyTrackSelected(track1);
-		Main_OnCommand(40913, 0); // Track: Vertical scroll selected tracks into view (TCP)
+		Main_OnCommand(
+			40913, 0
+		); // Track: Vertical scroll selected tracks into view (TCP)
 		SetMixerScroll(track1); // MCP
 		GetSetMediaTrackInfo(track1, "I_SELECTED", &int0);
 	}
@@ -4059,9 +4418,9 @@ void cmdGoToMasterTrack(int command){
 	postGoToTrack(0);
 }
 
-void moveToItem(int direction, bool clearSelection=true, bool select=true) {
+void moveToItem(int direction, bool clearSelection = true, bool select = true) {
 	unsigned int undoMask = getConfigUndoMask();
-	bool makeUndoPoint = undoMask&1;
+	bool makeUndoPoint = undoMask & 1;
 	MediaTrack* track = GetLastTouchedTrack();
 	if (!track)
 		return;
@@ -4069,15 +4428,20 @@ void moveToItem(int direction, bool clearSelection=true, bool select=true) {
 	int count = CountTrackMediaItems(track);
 	double pos;
 	int start = direction == 1 ? 0 : count - 1;
-	if (currentItem && ValidatePtr((void*)currentItem, "MediaItem*")
-		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", nullptr) == track
+	if (
+		currentItem
+		&& ValidatePtr((void*)currentItem, "MediaItem*")
+		&& (MediaTrack*)GetSetMediaItemInfo(currentItem, "P_TRACK", nullptr)
+			== track
 	) {
 		pos = *(double*)GetSetMediaItemInfo(currentItem, "D_POSITION", nullptr);
 		if (direction == 1 ? pos <= cursor : pos >= cursor) {
 			// The cursor is right at or has moved past the item to which the user last moved.
 			// Therefore, start at the adjacent item.
 			// This is faster and also allows the user to move to items which start at the same position.
-			start = (int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", nullptr) + direction;
+			start =
+				(int)(size_t)GetSetMediaItemInfo(currentItem, "IP_ITEMNUMBER", nullptr)
+				+ direction;
 			if (start < 0 || start >= count) {
 				// There's no adjacent item in this direction,
 				// so move to the current one again.
@@ -4198,7 +4562,8 @@ void cmdMoveToZeroCrossing(int command) {
 // We provide stepped zoom settings and report expected behaviour in time per keypress instead. It's easier to understand non-visually.
 void reportZoomStepsAsTime(double time) {
 	TimeFormat tf = TF_MS;
-	if (time >= 1.0) tf = TF_ROUNDSEC;
+	if (time >= 1.0)
+		tf = TF_ROUNDSEC;
 	// TRANSLATORS: Reported when users change horizontal zoom in steps.
 	// {} will be replaced with a formatted time increment (e.g. "1 ms", "2 sec").
 	outputMessage(format(translate("{} per keypress"), formatTime(time, tf)));
@@ -4206,9 +4571,24 @@ void reportZoomStepsAsTime(double time) {
 
 void adjustZoomByStep(bool zoomOut) {
 	static constexpr std::array STEPPED_ZOOM_SETTINGS = {
-		0.001, 0.003, 0.005, 0.007, 0.01,
-		0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75,
-		1.0, 5.0, 10.0, 30.0, 60.0};
+		0.001,
+		0.003,
+		0.005,
+		0.007,
+		0.01,
+		0.025,
+		0.05,
+		0.075,
+		0.1,
+		0.25,
+		0.5,
+		0.75,
+		1.0,
+		5.0,
+		10.0,
+		30.0,
+		60.0
+	};
 	double currentPPS = GetHZoomLevel();
 	// currentPPS should always be positive
 	assert(currentPPS > 0.0);
@@ -4216,7 +4596,7 @@ void adjustZoomByStep(bool zoomOut) {
 	double nextZoomStep = currentZoomStep;
 	if (zoomOut) {
 		// Find next step zooming out
-		for (double value : STEPPED_ZOOM_SETTINGS) {
+		for (double value: STEPPED_ZOOM_SETTINGS) {
 			if (currentZoomStep < value) {
 				nextZoomStep = value;
 				break;
@@ -4224,7 +4604,7 @@ void adjustZoomByStep(bool zoomOut) {
 		}
 	} else {
 		// Find next step zooming in
-		for (double value : std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
+		for (double value: std::views::reverse(STEPPED_ZOOM_SETTINGS)) {
 			if (currentZoomStep > value) {
 				nextZoomStep = value;
 				break;
@@ -4233,7 +4613,7 @@ void adjustZoomByStep(bool zoomOut) {
 	}
 	if (nextZoomStep != currentZoomStep) {
 		double newPPS = 1.0 / nextZoomStep;
-	adjustZoom(newPPS, 1, true, -1);
+		adjustZoom(newPPS, 1, true, -1);
 	}
 	reportZoomStepsAsTime(nextZoomStep);
 }
@@ -4286,8 +4666,7 @@ void cmdSplitItems(int command) {
 				double length = GetMediaItemInfo_Value(item, "D_LENGTH");
 				if (curPos > position && curPos < (position + length)) {
 					canSplit = true;
-				}
-				else if (position == curPos || curPos == (position + length)) {
+				} else if (position == curPos || curPos == (position + length)) {
 					alreadyOnSplit = true;
 				}
 			}
@@ -4305,8 +4684,9 @@ void cmdSplitItems(int command) {
 	}
 	// Translators: Reported when items are added. {} will be replaced with the
 	// number of items; e.g. "2 items added".
-	outputMessage(format(
-		translate_plural("{} item added", "{} items added", added), added));
+	outputMessage(
+		format(translate_plural("{} item added", "{} items added", added), added)
+	);
 	if (added >= 1) {
 		// Only set fakeFocus if a split was successful.
 		fakeFocus = FOCUS_ITEM;
@@ -4357,7 +4737,9 @@ void cmdPaste(int command) {
 	if ((added = CountTracks(0) - oldTracks) > 0) {
 		// Translators: Reported when tracks are added. {} will be replaced with
 		// the number of tracks; e.g. "2 tracks added".
-		s << format(translate_plural("{} track added", "{} tracks added", added), added);
+		s << format(
+			translate_plural("{} track added", "{} tracks added", added), added
+		);
 	}
 	if ((added = CountMediaItems(0) - oldItems) > 0) {
 		if (s.tellp() > 0) {
@@ -4365,40 +4747,51 @@ void cmdPaste(int command) {
 		}
 		// Translators: Reported when items are added. {} will be replaced with
 		// the number of items; e.g. "2 items added".
-		s << format(translate_plural("{} item added", "{} items added", added), added);
+		s << format(
+			translate_plural("{} item added", "{} items added", added), added
+		);
 	}
 	if (s.tellp() > 0) {
 		maybeAddRippleMessage(s, command);
 		outputMessage(s);
 		return;
 	}
-	if (envelope &&
-			(added = CountAutomationItems(envelope) - oldAutoItems)
-			> 0) {
+	if (envelope && (added = CountAutomationItems(envelope) - oldAutoItems) > 0) {
 		// Translators: Reported when automation items are added. {} will be
 		// replaced with the number of items; e.g. "2 automation items added".
 		outputMessage(format(
-			translate_plural("{} automation item added", "{} automation items added", added), added));
-	} else if (envelope &&
-			(added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints)
-			> 0) {
+			translate_plural(
+				"{} automation item added", "{} automation items added", added
+			),
+			added
+		));
+	} else if (
+		envelope
+		&& (added = countEnvelopePointsIncludingAutoItems(envelope) - oldPoints) > 0
+	) {
 		// Translators: Reported when envelope points are added. {} will be replaced
 		// with the number of points; e.g. "2 points added".
 		outputMessage(format(
-			translate_plural("{} point added", "{} points added", added), added));
-	} else if (item && 
-			(added = CountTakes(item) - oldTakes)
-			> 0) {
-		if(CountSelectedMediaItems(0)>1){
+			translate_plural("{} point added", "{} points added", added), added
+		));
+	} else if (item && (added = CountTakes(item) - oldTakes) > 0) {
+		if (CountSelectedMediaItems(0) > 1) {
 			// Translators: Reported when takes are added to multiple items. {} will be replaced with the
 			// number of takes; e.g. "2 takes added to selected items".
 			outputMessage(format(
-				translate_plural("{} take added to selected items", "{} takes added to selected items", added), added));
+				translate_plural(
+					"{} take added to selected items",
+					"{} takes added to selected items",
+					added
+				),
+				added
+			));
 		} else {
 			// Translators: Reported when takes are added. {} will be replaced with the
 			// number of takes; e.g. "2 takes added".
 			outputMessage(format(
-				translate_plural("{} take added", "{} takes added", added), added));
+				translate_plural("{} take added", "{} takes added", added), added
+			));
 		}
 	} else {
 		outputMessage(translate("nothing pasted"));
@@ -4412,8 +4805,8 @@ void cmdhRemoveTracks(int command) {
 	// Translators: Reported when tracks are removed. {} will be replaced with the
 	// number of tracks; e.g. "2 tracks removed".
 	outputMessage(format(
-		translate_plural("{} track removed", "{} tracks removed", removed),
-		removed));
+		translate_plural("{} track removed", "{} tracks removed", removed), removed
+	));
 }
 
 void cmdRemoveTracks(int command) {
@@ -4426,15 +4819,16 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 	int selItems = CountSelectedMediaItems(nullptr);
 	auto countAffected = [start, end](auto getFunc, int totalCount) {
 		int count = 0;
-		for(int i = 0; i < totalCount; ++i) {
+		for (int i = 0; i < totalCount; ++i) {
 			MediaItem* item = getFunc(nullptr, i);
 			double itemStart = GetMediaItemInfo_Value(item, "D_POSITION");
 			double itemEnd = itemStart + GetMediaItemInfo_Value(item, "D_LENGTH");
-			if((start < itemStart && itemStart < end) ||
-				(start < itemEnd && itemEnd < end) ||
-				(itemStart < start && start < itemEnd) ||
-				(itemStart < end && end < itemEnd) ||
-				(start == itemStart && end == itemEnd)
+			if (
+				(start < itemStart && itemStart < end)
+				|| (start < itemEnd && itemEnd < end)
+				|| (itemStart < start && start < itemEnd)
+				|| (itemStart < end && end < itemEnd)
+				|| (start == itemStart && end == itemEnd)
 			) {
 				++count;
 			}
@@ -4442,12 +4836,12 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 		return count;
 	};
 	ostringstream s;
-	if(start == end) {
+	if (start == end) {
 		s << translate("no time selection");
 	} else {
 		switch (command) {
-			case 40060:{ // Item: Copy selected area of items
-				if(selItems == 0) {
+			case 40060: { // Item: Copy selected area of items
+				if (selItems == 0) {
 					s << translate("no items selected");
 					break;
 				}
@@ -4455,11 +4849,17 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 				// Translators: used for  "Item: Copy selected area of items".
 				// {} is replaced by the number of items affected.
 				s << format(
-					translate_plural("selected area of {} item copied", "selected area of {} items copied", count), count);
+					translate_plural(
+						"selected area of {} item copied",
+						"selected area of {} items copied",
+						count
+					),
+					count
+				);
 				break;
 			}
 			case 40014: { // Item: Copy loop of selected area of audio items
-				if(selItems == 0) {
+				if (selItems == 0) {
 					s << translate("no items selected");
 					break;
 				}
@@ -4467,11 +4867,17 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 				// Translators: used for  "Item: Copy loop of selected area of audio items".
 				// {} is replaced by the number of items affected.
 				s << format(
-					translate_plural("loop of selected area of {} item copied", "loop of selected area of {} items copied", count), count);
+					translate_plural(
+						"loop of selected area of {} item copied",
+						"loop of selected area of {} items copied",
+						count
+					),
+					count
+				);
 				break;
 			}
 			case 41296: { // Item: Duplicate selected area of items
-				if(selItems == 0) {
+				if (selItems == 0) {
 					s << translate("no items selected");
 					break;
 				}
@@ -4479,12 +4885,20 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 				// Translators: used for  "Item: Duplicate selected area of items".
 				// {} is replaced by the number of items affected.
 				s << format(
-					translate_plural("selected area of {} item duplicated", "selected area of {} items duplicated", count), count);
+					translate_plural(
+						"selected area of {} item duplicated",
+						"selected area of {} items duplicated",
+						count
+					),
+					count
+				);
 				break;
 			}
 			default: {
 				int count = 0;
-				if(selItems == 0) { // these commands treat no item selection as if all items are selected
+				if (
+					selItems == 0
+				) { // these commands treat no item selection as if all items are selected
 					count = countAffected(GetMediaItem, CountMediaItems(nullptr));
 				} else {
 					count = countAffected(GetSelectedMediaItem, selItems);
@@ -4493,7 +4907,13 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 				// Remove selected area of items".  {} is replaced by the number of items
 				// affected.
 				s << format(
-					translate_plural("selected area of {} item removed", "selected area of {} items removed", count), count);
+					translate_plural(
+						"selected area of {} item removed",
+						"selected area of {} items removed",
+						count
+					),
+					count
+				);
 				maybeAddRippleMessage(s, command);
 			}
 		}
@@ -4501,13 +4921,16 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 	// the command might show an error, so we need to avoid speaking if the focus changes
 	HWND oldFocus = GetFocus();
 	bool focusChanged = false;
-	auto later = CallLater([&focusChanged, &oldFocus] {
-		if(GetFocus() != oldFocus) {
-			focusChanged = true;
-		}
-	}, 100);
+	auto later = CallLater(
+		[&focusChanged, &oldFocus] {
+			if (GetFocus() != oldFocus) {
+				focusChanged = true;
+			}
+		},
+		100
+	);
 	Main_OnCommand(command, 0);
-	if(!focusChanged) {
+	if (!focusChanged) {
 		outputMessage(s);
 	}
 	later.cancel();
@@ -4521,8 +4944,8 @@ void cmdhRemoveItems(int command) {
 	// Translators: Reported when items are removed. {} will be replaced with the
 	// number of items; e.g. "2 items removed".
 	s << format(
-		translate_plural("{} item removed", "{} items removed", removed),
-		removed);
+		translate_plural("{} item removed", "{} items removed", removed), removed
+	);
 	maybeAddRippleMessage(s, command);
 	outputMessage(s);
 }
@@ -4549,12 +4972,18 @@ void cmdCropTakes(int command) {
 		}
 	}
 	const int cropped = preCrop - postCrop;
-	if (cropped > 0){
+	if (cropped > 0) {
 		// Translators: Reported when cropped to active take on  multiple items. {} will be replaced with the
 		// number of items; e.g. "2 items cropped to active take".
 		outputMessage(format(
-			translate_plural("{} item cropped to active take", "{} items cropped to active take", cropped), cropped));
-	}else {
+			translate_plural(
+				"{} item cropped to active take",
+				"{} items cropped to active take",
+				cropped
+			),
+			cropped
+		));
+	} else {
 		outputMessage(translate("no takes removed"));
 	}
 }
@@ -4573,11 +5002,15 @@ void cmdHealSplitsInItems(int command) {
 	// Translators: Reported when splits in items are healed. {} will be replaced with the
 	// number of splits that have been successfully healed; e.g. "2 splits healed".
 	s << format(
-		translate_plural("{} split healed", "{} splits healed",healed),healed) << ", ";
+		translate_plural("{} split healed", "{} splits healed", healed), healed
+	);
+	s << ", ";
 	// Translators: This reports selected items after healing. {} will be replaced with the
 	// number of selected items; e.g. "2 items selected".
 	s << format(
-		translate_plural("{} item selected", "{} items selected",postHealed),postHealed);
+		translate_plural("{} item selected", "{} items selected", postHealed),
+		postHealed
+	);
 	outputMessage(s);
 }
 
@@ -4598,7 +5031,9 @@ void cmdCut(int command) {
 void cmdRemoveTimeSelection(int command) {
 	double start, end;
 	GetSet_LoopTimeRange(false, false, &start, &end, false);
-	Main_OnCommand(40201, 0); // Time selection: Remove contents of time selection (moving later items)
+	Main_OnCommand(
+		40201, 0
+	); // Time selection: Remove contents of time selection (moving later items)
 	if (start != end) {
 		outputMessage(translate("contents of time selection removed"));
 	}
@@ -4612,37 +5047,46 @@ void cmdMoveItemEdgeOrSource(int command) {
 	}
 	ostringstream s;
 	auto cache = FT_USE_CACHE;
-	if (lastCommand != command) { 
+	if (lastCommand != command) {
 		s << getActionName(command) << " ";
 		cache = FT_NO_CACHE;
 	}
-	double oldStart =GetMediaItemInfo_Value(item,"D_POSITION");
-	double oldEnd = oldStart+GetMediaItemInfo_Value(item, "D_LENGTH");
-	double oldSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
+	double oldStart = GetMediaItemInfo_Value(item, "D_POSITION");
+	double oldEnd = oldStart + GetMediaItemInfo_Value(item, "D_LENGTH");
+	double oldSourceOffset = GetMediaItemTakeInfo_Value(
+		GetActiveTake(item), "D_STARTOFFS"
+	);
 	Main_OnCommand(command, 0);
-	double newStart =GetMediaItemInfo_Value(item,"D_POSITION");
+	double newStart = GetMediaItemInfo_Value(item, "D_POSITION");
 	double newEnd = newStart + GetMediaItemInfo_Value(item, "D_LENGTH");
-	double newSourceOffset = GetMediaItemTakeInfo_Value(GetActiveTake(item), "D_STARTOFFS");
-	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
+	double newSourceOffset = GetMediaItemTakeInfo_Value(
+		GetActiveTake(item), "D_STARTOFFS"
+	);
+	if (
+		settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)
+	) {
 		double cursorPos = GetCursorPosition();
-		double cursorDiff = (newStart != oldStart)
-				? newStart - oldStart : newEnd - oldEnd;
+		double cursorDiff =
+			(newStart != oldStart) ? newStart - oldStart : newEnd - oldEnd;
 		SetEditCurPos(cursorPos + cursorDiff, true, true);
 	}
 	if (!shouldReportTimeMovement()) {
 		return;
 	}
 	if (newStart != oldStart && newEnd != oldEnd) {
-		s << translate("start") << " " 
+		s
+			<< translate("start")
+			<< " "
 			<< formatTime(newStart, TF_RULER, cache)
-			<<", " <<
-			translate("end") << " " 
+			<< ", "
+			<< translate("end")
+			<< " "
 			<< formatTime(newEnd, TF_RULER, cache);
 	} else if (newStart != oldStart) {
 		s << formatTime(newStart, TF_RULER, cache);
-	} else if(newEnd!=oldEnd) {
+	} else if (newEnd != oldEnd) {
 		s << formatTime(newEnd, TF_RULER, cache);
-	} else if(newSourceOffset!=oldSourceOffset) {
+	} else if (newSourceOffset != oldSourceOffset) {
 		s << formatTime(newSourceOffset, TF_RULER, cache);
 	} else {
 		s.str("");
@@ -4654,8 +5098,8 @@ void cmdMoveItemEdgeOrSource(int command) {
 }
 
 void cmdMoveItemsOrEnvPoint(int command) {
-	if(GetCursorContext2(true) == 2 ) {// Envelope
-	cmdMoveSelEnvelopePoints(command);
+	if (GetCursorContext2(true) == 2) { // Envelope
+		cmdMoveSelEnvelopePoints(command);
 	} else {
 		cmdMoveItemEdgeOrSource(command);
 	}
@@ -4678,7 +5122,8 @@ void cmdInsertOrMoveSpecificMarker(int command) {
 		bool reg;
 		int num;
 		EnumProjectMarkers(i, &reg, &pos, nullptr, nullptr, &num);
-		if (reg || wantNum != num) continue;
+		if (reg || wantNum != num)
+			continue;
 		beforePos = pos;
 		break;
 	}
@@ -4689,18 +5134,19 @@ void cmdInsertOrMoveSpecificMarker(int command) {
 		int num;
 		const char* name;
 		EnumProjectMarkers(i, &reg, nullptr, nullptr, &name, &num);
-		if (num != wantNum || reg) continue;
-		fakeFocus =FOCUS_MARKER;
+		if (num != wantNum || reg)
+			continue;
+		fakeFocus = FOCUS_MARKER;
 		if (name[0]) {
 			// Translators: used when reporting a named marker has been moved. {} will be
 			// replaced with the name of the marker; e.g. "v2 marker moved"
 			outputMessage(format(translate("{} marker moved"), name));
-		} else{
+		} else {
 			if (beforePos == -1) {
 				// Translators: Reports an unnamed marker has been inserted. {} is replaced with the marker number.
 				outputMessage(format(translate("marker {} inserted"), num));
 			} else {
-				// Translators: used to report an unnamed marker has been moved. {} is replaced with the marker number.  
+				// Translators: used to report an unnamed marker has been moved. {} is replaced with the marker number.
 				outputMessage(format(translate("marker {} moved"), num));
 			}
 		}
@@ -4758,40 +5204,48 @@ void cmdClearTimeLoopSel(int command) {
 }
 
 void cmdUnselAllTracksItemsPoints(int command) {
-	int old = CountSelectedTracks(0) + CountSelectedMediaItems(0)
+	int old = CountSelectedTracks(0)
+		+ CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
 	Main_OnCommand(command, 0);
-	int cur = CountSelectedTracks(0) + CountSelectedMediaItems(0)
+	int cur = CountSelectedTracks(0)
+		+ CountSelectedMediaItems(0)
 		+ (GetSelectedEnvelope(0) ? 1 : 0);
 	if (old != cur)
 		outputMessage(translate("unselected tracks/items/envelope points"));
 }
 
 void reportTempoTimeSig() {
-	ReaProject* proj=EnumProjects(-1, nullptr, 0);
+	ReaProject* proj = EnumProjects(-1, nullptr, 0);
 	if (!proj) {
 		return;
 	}
-	double tempo=0;
+	double tempo = 0;
 	double pos = getPlayOrEditCursorPosition();
-	int timesig_num=0;
-	int timesig_denom=0;
+	int timesig_num = 0;
+	int timesig_denom = 0;
 	TimeMap_GetTimeSigAtTime(proj, pos, &timesig_num, &timesig_denom, &tempo);
-	outputMessage(fmt::format("{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom));
+	outputMessage(
+		fmt::format(
+			"{}, {}/{}", formatDouble(tempo, 1, false), timesig_num, timesig_denom
+		)
+	);
 }
 
 void cmdManageTempoTimeSigMarkers(int command) {
-	if(lastCommandRepeatCount==0) {
+	if (lastCommandRepeatCount == 0) {
 		reportTempoTimeSig();
 		return;
 	}
-	Main_OnCommand(40256, 0); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
+	Main_OnCommand(
+		40256, 0
+	); // Tempo envelope: Insert tempo/time signature change marker at edit cursor...
 }
 
 void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
 	if (!GetSelectedTrack2(nullptr, 0, false)) {
 		outputMessage(translate("no selected tracks"));
-			return;
+		return;
 	}
 	unsigned int undoMask = getConfigUndoMask();
 	bool makeUndoPoint = undoMask & 1;
@@ -4809,8 +5263,8 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
 	// We might select multiple items. To improve performance, only refresh the UI
 	// after the entire operation is complete.
 	PreventUIRefresh(1);
-	Main_OnCommand(40289,0); // unselect all items
-	double cursorPosition=GetCursorPosition();
+	Main_OnCommand(40289, 0); // unselect all items
+	double cursorPosition = GetCursorPosition();
 	for (MediaItem* item: items) {
 		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", 0);
 		double itemLength = *(double*)GetSetMediaItemInfo(item, "D_LENGTH", 0);
@@ -4824,7 +5278,8 @@ void cmdSelectItemsUnderEditCursorOnSelectedTracks(int command) {
 	if (makeUndoPoint) {
 		Undo_EndBlock(
 			translate("OSARA: Select items under edit cursor on selected tracks"),
-			UNDO_STATE_ITEMS);
+			UNDO_STATE_ITEMS
+		);
 	}
 	if (CountSelectedMediaItems(nullptr) > 0) {
 		postSelectMultipleItems(command);
@@ -4873,7 +5328,9 @@ void cmdPropertiesFocus(int command) {
 	if (shouldMoveToAutoItem && currentAutomationItem != -1) {
 		Main_OnCommand(42090, 0); // Envelope: Automation item properties...
 	} else {
-		Main_OnCommand(40009, 0); // Item properties: Show media item/take properties
+		Main_OnCommand(
+			40009, 0
+		); // Item properties: Show media item/take properties
 	}
 }
 
@@ -4881,8 +5338,12 @@ void cmdReportRippleMode(int command) {
 	postCycleRippleMode(command);
 }
 
-string formatTrackRange(int start, const char* startName,
-	int end, const char* endName, const char* separator
+string formatTrackRange(
+	int start,
+	const char* startName,
+	int end,
+	const char* endName,
+	const char* separator
 ) {
 	ostringstream s;
 	s << start;
@@ -4910,13 +5371,18 @@ string formatTrackRange(int start, const char* startName,
 	// Translators: Used when reporting a range of tracks. {start} will be
 	// replaced with the first track. {end} will be replaced with the last track
 	// in the range. For example: "1 drums through 5 piano"
-	return format(translate("{start} through {end}"),
-		"start"_a=startText, "end"_a=endText);
+	return format(
+		translate("{start} through {end}"), "start"_a = startText, "end"_a = endText
+	);
 }
 
-template <typename Func>
-string formatTracksWithState(const char* prefix, Func checkState,
-	bool includeMaster, bool multiLine, bool outputIfNone = true
+template<typename Func>
+string formatTracksWithState(
+	const char* prefix,
+	Func checkState,
+	bool includeMaster,
+	bool multiLine,
+	bool outputIfNone = true
 ) {
 	const char* separator = multiLine ? "\r\n" : ", ";
 	int rangeStart = 0;
@@ -4926,12 +5392,11 @@ string formatTracksWithState(const char* prefix, Func checkState,
 	ostringstream s;
 
 	if (prefix) {
-		s << prefix << ":" <<
-			(multiLine ? separator : " ");
+		s << prefix << ":" << (multiLine ? separator : " ");
 	}
 
 	int count = 0;
-	if(includeMaster) {
+	if (includeMaster) {
 		MediaTrack* master = GetMasterTrack(nullptr);
 		if (checkState(master)) {
 			++count;
@@ -4964,8 +5429,13 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				s << formatTrackRange(inActiveRange ? rangeStart : trackCount,
-					inActiveRange ? startingTrackName : name, trackCount, name, separator);
+				s << formatTrackRange(
+					inActiveRange ? rangeStart : trackCount,
+					inActiveRange ? startingTrackName : name,
+					trackCount,
+					name,
+					separator
+				);
 				break;
 			}
 			if (inActiveRange) {
@@ -4982,8 +5452,9 @@ string formatTracksWithState(const char* prefix, Func checkState,
 				if (count > 1) {
 					s << separator;
 				}
-				s << formatTrackRange(rangeStart, startingTrackName, i, prevTrackName,
-					separator);
+				s << formatTrackRange(
+					rangeStart, startingTrackName, i, prevTrackName, separator
+				);
 				startingTrackName = nullptr;
 				rangeStart = 0;
 				inActiveRange = false;
@@ -5002,13 +5473,14 @@ string formatTracksWithState(const char* prefix, Func checkState,
 	return s.str();
 }
 
-template <typename Func>
-void reportTracksWithState(const char* prefix, Func checkState,
-	bool includeMaster
+template<typename Func>
+void reportTracksWithState(
+	const char* prefix, Func checkState, bool includeMaster
 ) {
 	bool multiLine = lastCommandRepeatCount == 1;
-	string s = formatTracksWithState(multiLine ? nullptr : prefix, checkState,
-		includeMaster, multiLine);
+	string s = formatTracksWithState(
+		multiLine ? nullptr : prefix, checkState, includeMaster, multiLine
+	);
 	if (multiLine) {
 		reviewMessage(prefix, s.c_str());
 	} else {
@@ -5017,17 +5489,24 @@ void reportTracksWithState(const char* prefix, Func checkState,
 }
 
 void cmdReportMutedTracks(int command) {
-	reportTracksWithState(translate("Muted"), isTrackMuted, /* includeMaster */ true);
+	reportTracksWithState(
+		translate("Muted"), isTrackMuted, /* includeMaster */ true
+	);
 }
 
 void cmdReportSoloedTracks(int command) {
 	bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
-	s << formatTracksWithState(translate("soloed"), isTrackSoloed, /* includeMaster */ true,
-		multiLine);
-	string defeat = formatTracksWithState(translate("defeating solo"),
-		isTrackDefeatingSolo, /* includeMaster */ false, multiLine,
-		/* outputIfNone */ false);
+	s << formatTracksWithState(
+		translate("soloed"), isTrackSoloed, /* includeMaster */ true, multiLine
+	);
+	string defeat = formatTracksWithState(
+		translate("defeating solo"),
+		isTrackDefeatingSolo,
+		/* includeMaster */ false,
+		multiLine,
+		/* outputIfNone */ false
+	);
 	if (!defeat.empty()) {
 		s << (multiLine ? "\r\n\r\n" : "; ") << defeat;
 	}
@@ -5039,25 +5518,36 @@ void cmdReportSoloedTracks(int command) {
 }
 
 void cmdReportArmedTracks(int command) {
-	reportTracksWithState(translate("Armed"), isTrackArmed, /* includeMaster */ false);
+	reportTracksWithState(
+		translate("Armed"), isTrackArmed, /* includeMaster */ false
+	);
 }
 
 void cmdReportMonitoredTracks(int command) {
-	reportTracksWithState(translate("Monitored"), isTrackMonitored,
-		/* includeMaster */ false);
+	reportTracksWithState(
+		translate("Monitored"),
+		isTrackMonitored,
+		/* includeMaster */ false
+	);
 }
 
 void cmdReportPhaseInvertedTracks(int command) {
-	reportTracksWithState(translate("Phase inverted"), isTrackPhaseInverted,
-		/* includeMaster */ false);
+	reportTracksWithState(
+		translate("Phase inverted"),
+		isTrackPhaseInverted,
+		/* includeMaster */ false
+	);
 }
 
 void cmdReportFrozenTracks(int command) {
-	reportTracksWithState(translate("Frozen"), isTrackFrozen,
-		/* includeMaster */ false);
+	reportTracksWithState(
+		translate("Frozen"),
+		isTrackFrozen,
+		/* includeMaster */ false
+	);
 }
 
-template <typename Func>
+template<typename Func>
 string formatItemsWithState(Func stateCheck, bool multiLine) {
 	const char* separator = multiLine ? "\r\n" : ", ";
 	ostringstream s;
@@ -5094,19 +5584,24 @@ void cmdReportSelection(int command) {
 		double start, end;
 		GetSet_LoopTimeRange(false, false, &start, &end, false);
 		if (start != end) {
-			s <<
+			s
+				<<
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the start time; e.g. "start bar 2 beat 1 0%".
-				format(translate("start {}"),
-					formatTime(start, TF_RULER, FT_NO_CACHE)) << separator <<
+				format(translate("start {}"), formatTime(start, TF_RULER, FT_NO_CACHE))
+				<< separator
+				<<
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the end time; e.g. "end bar 4 beat 1 0%".
-				format(translate("end {}"),
-					formatTime(end, TF_RULER, FT_NO_CACHE)) << separator <<
+				format(translate("end {}"), formatTime(end, TF_RULER, FT_NO_CACHE))
+				<< separator
+				<<
 				// Translators: Used when reporting the time selection. {} will be
 				// replaced with the length; e.g. "length 2 bars 0 beats 0%".
-				format(translate("length {}"),
-					formatLength(start, end, TF_RULER, FT_NO_CACHE, false));
+				format(
+					translate("length {}"),
+					formatLength(start, end, TF_RULER, FT_NO_CACHE, false)
+				);
 			resetTimeCache();
 		} else if (multiLine) {
 			s << translate_ctxt("time selection", "none");
@@ -5115,21 +5610,26 @@ void cmdReportSelection(int command) {
 		}
 	}
 
-	if (fakeFocus ==  FOCUS_TRACK || multiLine) {
+	if (fakeFocus == FOCUS_TRACK || multiLine) {
 		if (multiLine) {
 			if (s.tellp() > 0) {
 				s << separator << separator;
 			}
 			s << translate("Selected tracks:") << separator;
 		}
-		s << formatTracksWithState(nullptr, isTrackSelected,
-			/* includeMaster */ true, multiLine, /* outputIfNone */ multiLine);
+		s << formatTracksWithState(
+			nullptr,
+			isTrackSelected,
+			/* includeMaster */ true,
+			multiLine,
+			/* outputIfNone */ multiLine
+		);
 		if (!multiLine && s.tellp() == 0) {
 			s << translate("no selected tracks");
 		}
 	}
 
-	if (fakeFocus ==  FOCUS_ITEM || multiLine) {
+	if (fakeFocus == FOCUS_ITEM || multiLine) {
 		if (multiLine) {
 			if (s.tellp() > 0) {
 				s << separator << separator;
@@ -5138,14 +5638,15 @@ void cmdReportSelection(int command) {
 		}
 		string items = formatItemsWithState(isItemSelected, multiLine);
 		if (items.empty()) {
-			s << (multiLine ? translate_ctxt("item selection", "none") :
-				translate("no selected items"));
+			s
+				<< (multiLine ? translate_ctxt("item selection", "none")
+											: translate("no selected items"));
 		} else {
 			s << items;
 		}
 	}
 
-	if (fakeFocus ==  FOCUS_NOTE || fakeFocus == FOCUS_CC || multiLine) {
+	if (fakeFocus == FOCUS_NOTE || fakeFocus == FOCUS_CC || multiLine) {
 		HWND editor = MIDIEditor_GetActive();
 		MediaItem_Take* take = editor ? MIDIEditor_GetTake(editor) : nullptr;
 		if (take) {
@@ -5168,7 +5669,8 @@ void cmdReportSelection(int command) {
 			} else {
 				s << format(
 					translate_plural("{} event selected", "{} events selected", count),
-					count);
+					count
+				);
 			}
 		}
 	}
@@ -5211,7 +5713,8 @@ void cmdhDeleteTakeMarkers(int command) {
 	// the number of markers; e.g. "2 take markers deleted".
 	outputMessage(format(
 		translate_plural("take marker deleted", "{} take markers deleted", removed),
-		removed));
+		removed
+	));
 }
 
 void cmdDeleteTakeMarkers(int command) {
@@ -5239,10 +5742,14 @@ void cmdRemoveFocus(int command) {
 			cmdRemoveStretch(0);
 			break;
 		case FOCUS_ENVELOPE:
-			cmdhDeleteEnvelopePointsOrAutoItems(40333, true, false); // Envelope: Delete all selected points
+			cmdhDeleteEnvelopePointsOrAutoItems(
+				40333, true, false
+			); // Envelope: Delete all selected points
 			break;
 		case FOCUS_AUTOMATIONITEM:
-			cmdhDeleteEnvelopePointsOrAutoItems(42086, false, true); // Envelope: Delete automation items
+			cmdhDeleteEnvelopePointsOrAutoItems(
+				42086, false, true
+			); // Envelope: Delete automation items
 			break;
 		case FOCUS_TAKEMARKER:
 			cmdhDeleteTakeMarkers(42386); // Item: Delete take marker at cursor);
@@ -5270,8 +5777,10 @@ void cmdShortcutHelp(int command) {
 	} else {
 		isShortcutHelpEnabled = true;
 		s << translate("shortcut help on");
-		wasMidiStepInputEnabled = MIDIEditor_GetActive() && GetToggleCommandState2(
-			SectionFromUniqueID(MIDI_EDITOR_SECTION), 40481);
+		wasMidiStepInputEnabled = MIDIEditor_GetActive()
+			&& GetToggleCommandState2(
+				SectionFromUniqueID(MIDI_EDITOR_SECTION), 40481
+			);
 		if (wasMidiStepInputEnabled) {
 			// Don't add MIDI input to the take during shortcut help.
 			toggleMidiStepInput();
@@ -5344,8 +5853,12 @@ void cmdReportCursorPosition(int command) {
 				// will be replaced with the name or number of the marker before the
 				// cursor. {after} will be replaced with the name or number of the marker
 				// after the cursor. For example: "between markers intro, verse 1".
-				s << " " << format(translate("between markers {before}, {after}"),
-					"before"_a=beforeDisplay, "after"_a=afterDisplay);
+				s << " ";
+				s << format(
+					translate("between markers {before}, {after}"),
+					"before"_a = beforeDisplay,
+					"after"_a = afterDisplay
+				);
 				break;
 			}
 			if (!foundAfter) {
@@ -5397,8 +5910,11 @@ void cmdReportCursorPosition(int command) {
 			// will be replaced with the name or number of the region before the
 			// cursor. {after} will be replaced with the name or number of the region
 			// after the cursor. For example: "between regions intro, verse 1".
-			s << format(translate("between regions {before}, {after}"),
-				"before"_a=beforeDisplay, "after"_a=afterDisplay);
+			s << format(
+				translate("between regions {before}, {after}"),
+				"before"_a = beforeDisplay,
+				"after"_a = afterDisplay
+			);
 		}
 	}
 
@@ -5420,8 +5936,9 @@ void cmdReportNumberOfTakesInItem(int command) {
 	int nonEmptyTakes = countNonEmptyTakes(item);
 	// Translators: Reports the number of takes contained within the last touched item.
 	// {} will be replaced with the number; e.g. "1 take", or "2 takes".
-	outputMessage(format(translate_plural("{} take", "{} takes", nonEmptyTakes),
-		nonEmptyTakes));
+	outputMessage(format(
+		translate_plural("{} take", "{} takes", nonEmptyTakes), nonEmptyTakes
+	));
 }
 
 void cmdReportItemLength(int command) {
@@ -5467,10 +5984,9 @@ void cmdToggleSelection(int command) {
 		case FOCUS_AUTOMATIONITEM:
 			select = toggleCurrentAutomationItemSelection();
 			break;
-		case FOCUS_ENVELOPE:
-		{
+		case FOCUS_ENVELOPE: {
 			optional<bool> selectOpt = toggleCurrentEnvelopePointSelection();
-			if(!selectOpt)
+			if (!selectOpt)
 				return;
 			select = *selectOpt;
 			break;
@@ -5495,8 +6011,12 @@ void cmdMoveStretch(int command) {
 		MediaItem_Take* take = GetActiveTake(item);
 		if (!take)
 			continue;
-		double itemStart = *(double*)GetSetMediaItemInfo(item, "D_POSITION", nullptr);
-		double playRate = *(double*)GetSetMediaItemTakeInfo(take, "D_PLAYRATE", nullptr);
+		double itemStart = *(double*)GetSetMediaItemInfo(
+			item, "D_POSITION", nullptr
+		);
+		double playRate = *(double*)GetSetMediaItemTakeInfo(
+			take, "D_PLAYRATE", nullptr
+		);
 		int index = getStretchAtPos(take, lastStretchPos, itemStart, playRate);
 		if (index == -1)
 			continue;
@@ -5550,7 +6070,7 @@ void cmdDeleteAllTimeSigs(int command) {
 }
 
 void moveToTransient(bool previous) {
-double cursorPos = GetCursorPosition();
+	double cursorPos = GetCursorPosition();
 	bool wasPlaying = GetPlayState() & 1;
 	if (wasPlaying) {
 		// Moving to transients can be slow, so pause/stop playback so it doesn't drift
@@ -5567,13 +6087,17 @@ double cursorPos = GetCursorPosition();
 		}
 	}
 	if (previous)
-		Main_OnCommand(40376, 0); // Item navigation: Move cursor to previous transient in items
+		Main_OnCommand(
+			40376, 0
+		); // Item navigation: Move cursor to previous transient in items
 	else
-		Main_OnCommand(40375, 0); // Item navigation: Move cursor to next transient in items
+		Main_OnCommand(
+			40375, 0
+		); // Item navigation: Move cursor to next transient in items
 	if (wasPlaying)
 		OnPlayButton();
 	double newCursorPos = GetCursorPosition();
-if(cursorPos == newCursorPos)
+	if (cursorPos == newCursorPos)
 		return;
 	reportCursorPositionPrimaryFormat();
 }
@@ -5601,26 +6125,28 @@ void cmdShowContextMenu3(int command) {
 void cmdReportAutomationMode(int command) {
 	// This reports the global automation override if set, otherwise the current track automation mode.
 	MediaTrack* track = GetLastTouchedTrack();
-	const int globalMode = GetGlobalAutomationOverride() ;
+	const int globalMode = GetGlobalAutomationOverride();
 	if (globalMode >= 0) {
 		// Translators: Used to report global automation override mode.  {} is
 		// replaced with the mode; e.g. "Global automation override latch
 		// preview"
 		outputMessage(format(
 			translate("global automation override {}"),
-			automationModeAsString(globalMode)));
+			automationModeAsString(globalMode)
+		));
 	} else {
 		// Translators: Used to report track automation override mode.  {} is
 		// replaced with the mode; e.g. "track automation override latch
 		// preview"
 		outputMessage(format(
 			translate("track automation mode {}"),
-			automationModeAsString(GetTrackAutomationMode(track))));
+			automationModeAsString(GetTrackAutomationMode(track))
+		));
 	}
 }
 
 void cmdToggleGlobalAutomationLatchPreview(int command) {
-	if (GetGlobalAutomationOverride() == 5) {  // in latch preview mode
+	if (GetGlobalAutomationOverride() == 5) { // in latch preview mode
 		SetGlobalAutomationOverride(-1);
 		outputMessage(translate("global automation override off"));
 	} else { //not in latch preview.
@@ -5646,7 +6172,8 @@ void cmdCycleTrackAutomation(int command) {
 	// automation mode; e.g. "automation mode trim/read for selected tracks"
 	outputMessage(format(
 		translate("{} automation mode for selected tracks"),
-		automationModeAsString(newmode)));
+		automationModeAsString(newmode)
+	));
 }
 
 void cmdCycleMidiRecordingMode(int command) {
@@ -5655,7 +6182,9 @@ void cmdCycleMidiRecordingMode(int command) {
 		outputMessage(translate("no selected tracks"));
 		return;
 	}
-	int oldmode = (int)GetMediaTrackInfo_Value(GetLastTouchedTrack(), "I_RECMODE");
+	int oldmode = (int)GetMediaTrackInfo_Value(
+		GetLastTouchedTrack(), "I_RECMODE"
+	);
 	int newmode = 0;
 	switch (oldmode) {
 		case 0: // input (audio or MIDI)
@@ -5687,15 +6216,17 @@ void cmdCycleMidiRecordingMode(int command) {
 }
 
 void cmdNudgeTimeSelection(int command) {
-	bool first= (lastCommand!=command);
+	bool first = (lastCommand != command);
 	double oldStart, oldEnd, newStart, newEnd;
 	GetSet_LoopTimeRange(false, false, &oldStart, &oldEnd, false);
 	double cursorPos = GetCursorPosition();
 	Main_OnCommand(command, 0);
 	GetSet_LoopTimeRange(false, false, &newStart, &newEnd, false);
-	if (settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)) {
-		double cursorDiff = (newStart != oldStart)
-				? newStart - oldStart : newEnd - oldEnd;
+	if (
+		settings::moveCursorWithEdges && (oldStart != newStart || oldEnd != newEnd)
+	) {
+		double cursorDiff =
+			(newStart != oldStart) ? newStart - oldStart : newEnd - oldEnd;
 		SetEditCurPos(cursorPos + cursorDiff, true, true);
 	}
 	if (!shouldReportTimeMovement()) {
@@ -5703,16 +6234,16 @@ void cmdNudgeTimeSelection(int command) {
 	}
 	auto cache = first ? FT_NO_CACHE : FT_USE_CACHE;
 	ostringstream s;
-	if(newStart!=oldStart) {
-		if(first) {
+	if (newStart != oldStart) {
+		if (first) {
 			s << translate("time selection start") << " ";
 		}
-		s<<formatTime(newStart, TF_RULER, cache, false);
-	} else if(newEnd!=oldEnd) {
-		if(first) {
+		s << formatTime(newStart, TF_RULER, cache, false);
+	} else if (newEnd != oldEnd) {
+		if (first) {
 			s << translate("time selection end") << " ";
 		}
-		s<<formatTime(newEnd, TF_RULER, cache, false);
+		s << formatTime(newEnd, TF_RULER, cache, false);
 	}
 	outputMessage(s);
 }
@@ -5720,11 +6251,15 @@ void cmdNudgeTimeSelection(int command) {
 void cmdAbout(int command) {
 	ostringstream s;
 	// Translators: OSARA's full name presented in the About dialog.
-	s << translate("OSARA: Open Source Accessibility for the REAPER Application") << "\r\n" <<
-	// Translators: osara version. {} is replaced with the version; e.g.
-	// "Version: 2021.1pre-588,0531135a"
-		format(translate("Version: {}"), OSARA_VERSION) << "\r\n" <<
-		OSARA_COPYRIGHT;
+	s
+		<< translate("OSARA: Open Source Accessibility for the REAPER Application")
+		<< "\r\n"
+		<<
+		// Translators: osara version. {} is replaced with the version; e.g.
+		// "Version: 2021.1pre-588,0531135a"
+		format(translate("Version: {}"), OSARA_VERSION)
+		<< "\r\n"
+		<< OSARA_COPYRIGHT;
 	reviewMessage(translate("About OSARA"), s.str().c_str());
 }
 
@@ -5739,7 +6274,9 @@ void cmdInsertMarker(int command) {
 		return; // Not inserted.
 	}
 	int marker;
-	GetLastMarkerAndCurRegion(nullptr, getPlayOrEditCursorPosition(), &marker, nullptr);
+	GetLastMarkerAndCurRegion(
+		nullptr, getPlayOrEditCursorPosition(), &marker, nullptr
+	);
 	if (marker < 0) {
 		return;
 	}
@@ -5792,7 +6329,7 @@ void cmdInsertRegion(int command) {
 
 void cmdChangeItemGroup(int command) {
 	MediaItem* item = getItemWithFocus();
-	if(!item) {
+	if (!item) {
 		Main_OnCommand(command, 0);
 		return;
 	}
@@ -5805,15 +6342,27 @@ void cmdChangeItemGroup(int command) {
 		// replaced with the number of items. {group} will be replaced with the
 		// group number. For example: "2 items added to group 1".
 		outputMessage(format(
-			translate_plural("item added to group {group}", "{count} items added to group {group}", selCount),
-			"count"_a=selCount, "group"_a=newGroupId));
+			translate_plural(
+				"item added to group {group}",
+				"{count} items added to group {group}",
+				selCount
+			),
+			"count"_a = selCount,
+			"group"_a = newGroupId
+		));
 	} else if (oldGroupId) {
 		// Translators: Reported when removing items from a group. {count} will be
 		// replaced with the number of items. {group} will be replaced with the group
 		// number. For example: "2 items removed from group 1".
 		outputMessage(format(
-			translate_plural("item removed from group {group}", "{count} items removed from group {group}", selCount),
-			"count"_a=selCount, "group"_a=oldGroupId));
+			translate_plural(
+				"item removed from group {group}",
+				"{count} items removed from group {group}",
+				selCount
+			),
+			"count"_a = selCount,
+			"group"_a = oldGroupId
+		));
 	}
 }
 
@@ -5823,7 +6372,7 @@ void cmdReportTrackGroups(int command) {
 		return;
 	}
 	map<int, vector<const char*>> groups;
-	for (auto& toggle : TRACK_GROUP_TOGGLES) {
+	for (auto& toggle: TRACK_GROUP_TOGGLES) {
 		int mask = GetSetTrackGroupMembership(track, toggle.name, 0, 0);
 		for (int g = 0; g < 32; ++g) {
 			if (mask & (1 << g)) {
@@ -5832,7 +6381,7 @@ void cmdReportTrackGroups(int command) {
 		}
 	}
 	ostringstream s;
-	for (auto [group, toggles] : groups) {
+	for (auto [group, toggles]: groups) {
 		if (s.tellp() > 0) {
 			s << "; ";
 		}
@@ -5847,7 +6396,7 @@ void cmdReportTrackGroups(int command) {
 		}
 		s << ": ";
 		bool first = true;
-		for (auto* toggle : toggles) {
+		for (auto* toggle: toggles) {
 			if (first) {
 				first = false;
 			} else {
@@ -5863,7 +6412,7 @@ void cmdReportTrackGroups(int command) {
 	outputMessage(s);
 }
 
-void cmdMuteNextMessage(int command){
+void cmdMuteNextMessage(int command) {
 	muteNextMessage = true;
 }
 
@@ -5872,8 +6421,10 @@ void cmdReportScrubStyle(int command) {
 		SetEditCurPos(GetPlayPosition(), false, false);
 	}
 	Main_OnCommand(command, 0);
-	int loopedSegmentState = GetToggleCommandState(41187); // Toggle looped-segment scrub
-	int oneShotState = GetToggleCommandState(43593);       // Toggle one-shot scrub
+	int loopedSegmentState = GetToggleCommandState(
+		41187
+	); // Toggle looped-segment scrub
+	int oneShotState = GetToggleCommandState(43593); // Toggle one-shot scrub
 	if (loopedSegmentState == 1) {
 		// Translators: Reported when switching to looped segment scrub style.
 		outputMessage(translate("looped segment"));
@@ -5890,49 +6441,52 @@ void cmdReportRegionMarkerItems(int command) {
 	const bool multiLine = lastCommandRepeatCount == 1;
 	ostringstream s;
 	auto separate = [&s, multiLine]() {
-		if(s.tellp()) {
+		if (s.tellp()) {
 			s << (multiLine ? "\r\n" : ", ");
 		}
 	};
 	double pos = getPlayOrEditCursorPosition();
-	double start,end;
+	double start, end;
 	bool isrgn;
 	int number;
 	const char* name{nullptr};
 	int idx = 0;
-	while(EnumProjectMarkers(idx++, &isrgn, &start, &end, &name, &number)>0) {
-		if(!(isrgn && start <= pos && pos <= end)) {
+	while (EnumProjectMarkers(idx++, &isrgn, &start, &end, &name, &number) > 0) {
+		if (!(isrgn && start <= pos && pos <= end)) {
 			continue;
-		} 
+		}
 		separate();
-		if(name[0]) {
-			s << name ;
+		if (name[0]) {
+			s << name;
 		} else {
-			// Translators: used to report an unnamed region. {} is replaced with the region number.  
+			// Translators: used to report an unnamed region. {} is replaced with the region number.
 			s << format(translate("region {}"), number);
 		}
 	}
 	int markerIdx;
 	GetLastMarkerAndCurRegion(nullptr, pos, &markerIdx, nullptr);
-	if(markerIdx >=0) {
+	if (markerIdx >= 0) {
 		EnumProjectMarkers(markerIdx, nullptr, nullptr, nullptr, &name, &number);
 		separate();
 		if (name[0]) {
 			s << name;
 		} else {
-			// Translators: used to report an unnamed marker. {} is replaced with the marker number.  
+			// Translators: used to report an unnamed marker. {} is replaced with the marker number.
 			s << format(translate("marker {}"), number);
 		}
 	}
 	separate();
-	s << formatItemsWithState([pos](MediaItem* item) -> bool{
-		MediaTrack* track = GetMediaItem_Track(item);
-		return (isTrackSelected(track) && isPosInItem(pos, item));
-	}, multiLine);
-	if(multiLine) {
+	s << formatItemsWithState(
+		[pos](MediaItem* item) -> bool {
+			MediaTrack* track = GetMediaItem_Track(item);
+			return (isTrackSelected(track) && isPosInItem(pos, item));
+		},
+		multiLine
+	);
+	if (multiLine) {
 		// Translators: The title of the review message for the action "OSARA: Report regions, last project marker and items on selected tracks at current position".
 		reviewMessage(translate("At Current Position"), s.str().c_str());
-	} else{
+	} else {
 		outputMessage(s);
 	}
 }
@@ -5987,17 +6541,16 @@ void cmdUnmonitorAllTracks(int command) {
 
 void cmdOpenDoc(int command) {
 	const char DOC_URL[] = "https://osara.reaperaccessibility.com/";
-	ShellExecute(nullptr, "open", DOC_URL, nullptr, nullptr,
-		SW_SHOWNORMAL);
+	ShellExecute(nullptr, "open", DOC_URL, nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 void cmdJumpToTime(int command) {
 	Main_OnCommand(command, 0);
 	// Delay the message slightly to avoid it being clobbered by other VoiceOver
 	// speech when the Jump dialog closes.
-	CallLater([] {
-		outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE));
-	}, 50);
+	CallLater(
+		[] { outputMessage(formatCursorPosition(TF_RULER, FT_NO_CACHE)); }, 50
+	);
 }
 
 void cmdMoveAndFitItemsToTimeSelection(int command) {
@@ -6036,20 +6589,28 @@ void cmdMoveAndFitItemsToTimeSelection(int command) {
 	// Translators: {} will be replaced with the number of items; e.g.
 	// "2 items fit to time selection".
 	outputMessage(format(
-		translate_plural("{} item fit to time selection", "{} items fit to time selection", itemsChanged),
-		itemsChanged));
+		translate_plural(
+			"{} item fit to time selection",
+			"{} items fit to time selection",
+			itemsChanged
+		),
+		itemsChanged
+	));
 }
 
 void cmdVideoWindowVisibility(int command) {
 	Main_OnCommand(command, 0);
 	// Delay the report to avoid it being clobbered when GUI updates.
-	CallLater([]() {
-		if (GetToggleCommandState(50125)) { // Show/hide video window
-			outputMessage(translate("showed video window"));
-		} else {
-			outputMessage(translate("hid video window"));
-		}
-	}, 50);
+	CallLater(
+		[]() {
+			if (GetToggleCommandState(50125)) { // Show/hide video window
+				outputMessage(translate("showed video window"));
+			} else {
+				outputMessage(translate("hid video window"));
+			}
+		},
+		50
+	);
 }
 
 void cmdMoveTracks(int command) {
@@ -6070,10 +6631,12 @@ void cmdMoveTracks(int command) {
 	} else {
 		maybeOpenClosedFolderBeforeTrackMoveDown(track);
 	}
-	const int origTrackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const int origTrackIndex =
+		(int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
 	Main_OnCommand(command, 0);
 	MediaTrack* const newParent = GetParentTrack(track);
-	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
+	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER")
+		- 1;
 	const bool atTopOfTrackList = trackIndex == 0;
 	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
 	if (origTrackIndex == trackIndex) {
@@ -6089,24 +6652,32 @@ void cmdMoveTracks(int command) {
 		return;
 	}
 	// After the move, this is the track that now occupies the moved track's old position.
-	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	MediaTrack* const adjacentTrack = GetTrack(
+		nullptr, trackIndex + (up ? 1 : -1)
+	);
 	// Context is one track further in the direction we're moving, used when entering folders.
-	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
+	MediaTrack* const contextTrack = GetTrack(
+		nullptr, trackIndex + (up ? -1 : 1)
+	);
 	ostringstream s;
 	if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
 		// For example: "top of track list, above 3 drums nested folder".
-		s << format(translate("top of track list, above {track}"),
-			"track"_a=formatTrackReference(adjacentTrack));
+		s << format(
+			translate("top of track list, above {track}"),
+			"track"_a = formatTrackReference(adjacentTrack)
+		);
 	} else if (atBottomOfTrackList) {
 		// Translators: Reported when moving a track to the bottom of the track list.
 		// {track} will be replaced with a track reference; e.g. "vocal",
 		// "3", "3 vocal", "drums folder" or "3 drums nested folder".
 		// For example: "bottom of track list, below 3 drums nested folder".
-		s << format(translate("bottom of track list, below {track}"),
-			"track"_a=formatTrackReference(adjacentTrack));
+		s << format(
+			translate("bottom of track list, below {track}"),
+			"track"_a = formatTrackReference(adjacentTrack)
+		);
 	} else if (adjacentTrack == newParent) {
 		outputMessage(formatTrackMoveInsideFolder(up, newParent, contextTrack));
 		return;
@@ -6132,7 +6703,9 @@ void cmdReportAndEditScrubSegmentOffsets(int command) {
 }
 
 // Helper for adding a menu item
-static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bool enabled = true) {
+static void addMenuItem(
+	HMENU menu, int position, const char* label, UINT id, bool enabled = true
+) {
 	MENUITEMINFO info = {};
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_ID | MIIM_STATE;
@@ -6145,7 +6718,9 @@ static void addMenuItem(HMENU menu, int position, const char* label, UINT id, bo
 }
 
 // Helper for creating a submenu (returns the submenu handle)
-static HMENU addSubMenu(HMENU parent, int position, const char* label, bool enabled = true) {
+static HMENU addSubMenu(
+	HMENU parent, int position, const char* label, bool enabled = true
+) {
 	MENUITEMINFO info = {};
 	info.cbSize = sizeof(MENUITEMINFO);
 	info.fMask = MIIM_TYPE | MIIM_SUBMENU | MIIM_STATE;
@@ -6169,28 +6744,51 @@ void cmdShowPeakAndLoudnessMenu(int command) {
 	const bool selTracksIncludeFolder = isAnySelectedTrackAFolder();
 	HMENU menu = CreatePopupMenu();
 	// Master submenu
-	const bool nothingToDryRun = (startTS == endTS) && (countTracks == 0 || itemCount == 0);
+	const bool nothingToDryRun = (startTS == endTS)
+		&& (countTracks == 0 || itemCount == 0);
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 	HMENU masterSub = addSubMenu(menu, 0, translate("Master"), !nothingToDryRun);
 	if (!nothingToDryRun) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 		addMenuItem(masterSub, 0, translate("Master mix"), 1, itemCount != 0);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(masterSub, 1, translate("Time &selection"), 2, startTS != endTS);
+		addMenuItem(
+			masterSub, 1, translate("Time &selection"), 2, startTS != endTS
+		);
 	}
 	// Tracks submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	HMENU tracksSub = addSubMenu(menu, 1, translate("Tracks"), selTracks > 0
-		&& (selTracksHaveItems || selTracksIncludeFolder));
+	HMENU tracksSub = addSubMenu(
+		menu,
+		1,
+		translate("Tracks"),
+		selTracks > 0 && (selTracksHaveItems || selTracksIncludeFolder)
+	);
 	if (selTracks > 0) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 0, translate("Selected &tracks"), 3, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(
+			tracksSub,
+			0,
+			translate("Selected &tracks"),
+			3,
+			selTracksHaveItems || selTracksIncludeFolder
+		);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 1, translate("Time &selection"), 4, startTS != endTS);
+		addMenuItem(
+			tracksSub, 1, translate("Time &selection"), 4, startTS != endTS
+		);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 2, translate("&Mono summed selected tracks"), 5, selTracksHaveItems || selTracksIncludeFolder);
+		addMenuItem(
+			tracksSub,
+			2,
+			translate("&Mono summed selected tracks"),
+			5,
+			selTracksHaveItems || selTracksIncludeFolder
+		);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(tracksSub, 3, translate("Mono summed time selection"), 6, startTS != endTS);
+		addMenuItem(
+			tracksSub, 3, translate("Mono summed time selection"), 6, startTS != endTS
+		);
 	}
 	// Items submenu
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
@@ -6199,23 +6797,51 @@ void cmdShowPeakAndLoudnessMenu(int command) {
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
 		addMenuItem(itemsSub, 0, translate("Selected &items"), 7);
 		// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-		addMenuItem(itemsSub, 1, translate("Include track/take &FX and settings"), 8);
+		addMenuItem(
+			itemsSub, 1, translate("Include track/take &FX and settings"), 8
+		);
 	}
 	// Translators: An entry in OSARA's context menu for analyzing loudness statistics.
-	addMenuItem(menu, 3, translate("Dry run project using the most recent render settings"), 9);
+	addMenuItem(
+		menu,
+		3,
+		translate("Dry run project using the most recent render settings"),
+		9
+	);
 	// Displaying and handling result
-	int id = TrackPopupMenu(menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr);
+	int id = TrackPopupMenu(
+		menu, TPM_NONOTIFY | TPM_RETURNCMD, 0, 0, 0, mainHwnd, nullptr
+	);
 	switch (id) {
-		case 0: return; // canceled
-		case 1: Main_OnCommand(42440, 0); break; // Master mix
-		case 2: Main_OnCommand(42441, 0); break; // Master mix within time selection
-		case 3: Main_OnCommand(42438, 0); break; // Selected tracks
-		case 4: Main_OnCommand(42439, 0); break; // Selected tracks within time selection
-		case 5: Main_OnCommand(42447, 0); break; // Mono selected tracks
-		case 6: Main_OnCommand(42448, 0); break; // Mono selected tracks within time selection
-		case 7: Main_OnCommand(42468, 0); break; // Selected items
-		case 8: Main_OnCommand(42437, 0); break; // Selected items with FX
-		case 9: Main_OnCommand(43349, 0); break; // Dry run project using the most recent render settings
+		case 0:
+			return; // canceled
+		case 1:
+			Main_OnCommand(42440, 0);
+			break; // Master mix
+		case 2:
+			Main_OnCommand(42441, 0);
+			break; // Master mix within time selection
+		case 3:
+			Main_OnCommand(42438, 0);
+			break; // Selected tracks
+		case 4:
+			Main_OnCommand(42439, 0);
+			break; // Selected tracks within time selection
+		case 5:
+			Main_OnCommand(42447, 0);
+			break; // Mono selected tracks
+		case 6:
+			Main_OnCommand(42448, 0);
+			break; // Mono selected tracks within time selection
+		case 7:
+			Main_OnCommand(42468, 0);
+			break; // Selected items
+		case 8:
+			Main_OnCommand(42437, 0);
+			break; // Selected items with FX
+		case 9:
+			Main_OnCommand(43349, 0);
+			break; // Dry run project using the most recent render settings
 	}
 }
 
@@ -6229,6 +6855,7 @@ void cmdChangeTransportState(int command) {
 #define DEFACCEL {0, 0, 0}
 
 // REAPER or extension commands that we want to intercept.
+// clang-format off
 Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40285}, nullptr}, nullptr, cmdGoToNextTrack}, // Track: Go to next track
 	{MAIN_SECTION, {{0, 0, 40286}, nullptr}, nullptr, cmdGoToPrevTrack}, // Track: Go to previous track
@@ -6259,8 +6886,8 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40337}, nullptr}, nullptr, cmdRemoveTracks}, // Track: Cut tracks
 	{MAIN_SECTION, {{0, 0, 40006}, nullptr}, nullptr, cmdRemoveItems}, // Item: Remove items
 	{MAIN_SECTION, {{0, 0, 40699}, nullptr}, nullptr, cmdRemoveItems}, // Edit: Cut items
-	{MAIN_SECTION, {{0, 0, 40131}, nullptr}, nullptr, cmdCropTakes}, //Take: Crop to active take in items 
-	{MAIN_SECTION, {{0, 0, 40548}, nullptr}, nullptr, cmdHealSplitsInItems}, //Item: Heal splits in items 
+	{MAIN_SECTION, {{0, 0, 40131}, nullptr}, nullptr, cmdCropTakes}, //Take: Crop to active take in items
+	{MAIN_SECTION, {{0, 0, 40548}, nullptr}, nullptr, cmdHealSplitsInItems}, //Item: Heal splits in items
 	{MAIN_SECTION, {{0, 0, 40333}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all selected points
 	{MAIN_SECTION, {{0, 0, 40089}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Delete all points in time selection
 	{MAIN_SECTION, {{0, 0, 40336}, nullptr}, nullptr, cmdDeleteEnvelopePoints}, // Envelope: Cut selected points
@@ -6372,7 +6999,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 1016}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Stop
 	{MAIN_SECTION, {{0, 0, 1013}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Record
 	{MAIN_SECTION, {{0, 0, 1007}, nullptr}, nullptr, cmdChangeTransportState}, // Transport: Play
-	{MAIN_SECTION, {DEFACCEL, nullptr}, "_XENAKIOS_TIMERTEST1", cmdChangeTransportState}, // Xenakios/SWS: Play selected items once                                                                                
+	{MAIN_SECTION, {DEFACCEL, nullptr}, "_XENAKIOS_TIMERTEST1", cmdChangeTransportState}, // Xenakios/SWS: Play selected items once
 	{MIDI_EDITOR_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EVENT_LIST_SECTION, {{0, 0, 40036}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to start of file
 	{MIDI_EDITOR_SECTION, {{0, 0, 40037}, nullptr}, nullptr, cmdMidiMoveCursor}, // View: Go to end of file
@@ -6513,6 +7140,7 @@ Command OSARA_COMMANDS[] = {
 	{ MIDI_EVENT_LIST_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_ML_MUTENEXTMESSAGE", cmdMuteNextMessage},
 	{ MEDIA_EXPLORER_SECTION, {DEFACCEL, _t("OSARA: Mute next message from OSARA")}, "OSARA_MX_MUTENEXTMESSAGE", cmdMuteNextMessage},
 };
+// clang-format on
 
 map<pair<int, int>, Command*> commandsMap;
 
@@ -6520,10 +7148,10 @@ map<pair<int, int>, Command*> commandsMap;
 
 bool isHandlingCommand = false;
 
-bool handlePostCommand(int section, int command, int val, int valHw,
-	int relMode, HWND hwnd
+bool handlePostCommand(
+	int section, int command, int val, int valHw, int relMode, HWND hwnd
 ) {
-	if (section==MAIN_SECTION) {
+	if (section == MAIN_SECTION) {
 		const auto postIt = postCommandsMap.find(command);
 		if (postIt != postCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -6539,7 +7167,7 @@ bool handlePostCommand(int section, int command, int val, int valHw,
 			// executing the command so that toggles, etc. work as expected.
 			KBD_OnMainActionEx(command, val, valHw, relMode, hwnd, nullptr);
 			postIt->second(command);
-			lastCommand=command;
+			lastCommand = command;
 			lastCommandTime = GetTickCount();
 			isHandlingCommand = false;
 			return true;
@@ -6553,7 +7181,7 @@ bool handlePostCommand(int section, int command, int val, int valHw,
 			isHandlingCommand = false;
 			return true;
 		}
-	}else if (section==MIDI_EDITOR_SECTION) {
+	} else if (section == MIDI_EDITOR_SECTION) {
 		const auto it = midiPostCommandsMap.find(command);
 		if (it != midiPostCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -6574,7 +7202,7 @@ bool handlePostCommand(int section, int command, int val, int valHw,
 			isHandlingCommand = false;
 			return true;
 		}
-	}else if (section==MIDI_EVENT_LIST_SECTION) {
+	} else if (section == MIDI_EVENT_LIST_SECTION) {
 		const auto it = midiEventListPostCommandsMap.find(command);
 		if (it != midiEventListPostCommandsMap.end()) {
 			isHandlingCommand = true;
@@ -6582,20 +7210,20 @@ bool handlePostCommand(int section, int command, int val, int valHw,
 			HWND editor = MIDIEditor_GetActive();
 			MIDIEditor_OnCommand(editor, command);
 			it->second.first(command);
-			#ifdef _WIN32
+#ifdef _WIN32
 			if (it->second.second) { // changesValueInMidiEventList
 				HWND focus = GetFocus();
 				if (focus && isMidiEditorEventListView(focus)) {
 					sendNameChangeEventToMidiEditorEventListItem(focus);
 				}
 			}
-			#endif
+#endif
 			isHandlingCommand = false;
 			return true;
 		}
-	} else if(section == MEDIA_EXPLORER_SECTION) {
+	} else if (section == MEDIA_EXPLORER_SECTION) {
 		const auto it = mExplorerPostCommands.find(command);
-		if(it != mExplorerPostCommands.end()){
+		if (it != mExplorerPostCommands.end()) {
 			isHandlingCommand = true;
 			SendMessage(hwnd, WM_COMMAND, command, 0);
 			it->second(command, hwnd);
@@ -6607,10 +7235,20 @@ bool handlePostCommand(int section, int command, int val, int valHw,
 	return false;
 }
 
-bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
+bool handleToggleCommand(
+	KbdSectionInfo* section,
+	int command,
+	int val,
+	int valHw,
+	int relMode,
+	HWND hwnd
+) {
 	const auto entry = TOGGLE_COMMAND_MESSAGES.find({section->uniqueID, command});
-	if (entry != TOGGLE_COMMAND_MESSAGES.end() && !entry->second.onMsg &&
-			!entry->second.offMsg) {
+	if (
+		entry != TOGGLE_COMMAND_MESSAGES.end()
+		&& !entry->second.onMsg
+		&& !entry->second.offMsg
+	) {
 		return false; // Ignore.
 	}
 	int oldState = GetToggleCommandState2(section, command);
@@ -6650,20 +7288,31 @@ bool handleToggleCommand(KbdSectionInfo* section, int command, int val, int valH
 	}
 	// Generic feedback.
 	ostringstream s;
-	s << (newState ? translate("enabled") : translate("disabled")) <<
-		" " << getActionName(command, section, /* skipCategory */ false);
+	s
+		<< (newState ? translate("enabled") : translate("disabled"))
+		<< " "
+		<< getActionName(command, section, /* skipCategory */ false);
 	outputMessage(s);
 	isHandlingCommand = false;
 	return true;
 }
 
-bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int relMode, HWND hwnd) {
+bool handleCommand(
+	KbdSectionInfo* section,
+	int command,
+	int val,
+	int valHw,
+	int relMode,
+	HWND hwnd
+) {
 	if (isHandlingCommand)
 		return false; // Prevent re-entrance.
 	constexpr int MAIN_ALT_REC_SECTION = 100;
-	if ((MAIN_ALT1_SECTION <= section->uniqueID &&
-				section->uniqueID <= MAIN_ALT16_SECTION) ||
-			section->uniqueID == MAIN_ALT_REC_SECTION) {
+	if (
+		(MAIN_ALT1_SECTION <= section->uniqueID
+			&& section->uniqueID <= MAIN_ALT16_SECTION)
+		|| section->uniqueID == MAIN_ALT_REC_SECTION
+	) {
 		// This is a main alt-1 through alt-16 section or the main (alt recording)
 		// section. Map this to the main section. Otherwise, some REAPER functions
 		// won't behave correctly. This also makes things easier for our own code,
@@ -6671,13 +7320,16 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		section = SectionFromUniqueID(MAIN_SECTION);
 	}
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
-	if (it != commandsMap.end()
+	if (
+		it != commandsMap.end()
 		// Allow shortcut help to be disabled.
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
 	) {
 		isHandlingCommand = true;
-		if (it->second->gaccel.accel.cmd == lastCommand &&
-				GetTickCount() - lastCommandTime < 500) {
+		if (
+			it->second->gaccel.accel.cmd == lastCommand
+			&& GetTickCount() - lastCommandTime < 500
+		) {
 			++lastCommandRepeatCount;
 		} else {
 			lastCommandRepeatCount = 0;
@@ -6691,14 +7343,16 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 	// Allow "Main action section: Momentarily set override" actions to pass
 	// through shortcut help so that users can learn about shortcuts in those
 	// alternative sections.
-	if (isShortcutHelpEnabled &&
-			(command < CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT ||
-				command > CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT16)) {
+	if (
+		isShortcutHelpEnabled
+		&& (command < CMD_MOMENTARILY_SET_OVERRIDE_TO_DEFAULT || command > CMD_MOMENTARILY_SET_OVERRIDE_TO_ALT16)
+	) {
 		outputMessage(getActionName(command, section, false));
 		return true;
 	}
-	if (handlePostCommand(section->uniqueID, command, val, valHw, relMode,
-			hwnd)) {
+	if (
+		handlePostCommand(section->uniqueID, command, val, valHw, relMode, hwnd)
+	) {
 		return true;
 	}
 	if (handleSettingCommand(command)) {
@@ -6711,8 +7365,9 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 }
 
 bool handleMainCommandFallback(int command, int flag) {
-	return handleCommand(SectionFromUniqueID(MAIN_SECTION), command, 63, -1, 0,
-		nullptr);
+	return handleCommand(
+		SectionFromUniqueID(MAIN_SECTION), command, 63, -1, 0, nullptr
+	);
 }
 
 IReaperControlSurface* surface = nullptr;
@@ -6726,7 +7381,8 @@ void delayedInit() {
 	surface = createSurface();
 	plugin_register("csurf_inst", (void*)surface);
 	NF_GetSWSTrackNotes = (decltype(NF_GetSWSTrackNotes))plugin_getapi(
-		"NF_GetSWSTrackNotes");
+		"NF_GetSWSTrackNotes"
+	);
 
 	for (Command& command: COMMANDS) {
 		if (command.id) {
@@ -6739,8 +7395,9 @@ void delayedInit() {
 				continue;
 			}
 		}
-		commandsMap.insert(make_pair(make_pair(command.section,
-			command.gaccel.accel.cmd), &command));
+		commandsMap.insert(
+			make_pair(make_pair(command.section, command.gaccel.accel.cmd), &command)
+		);
 	}
 
 	KbdSectionInfo* section = SectionFromUniqueID(MAIN_SECTION);
@@ -6754,7 +7411,7 @@ void delayedInit() {
 		postCommandsMap.insert(make_pair(cmd, POST_CUSTOM_COMMANDS[i].execute));
 	}
 
-	for (const char* command : MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS) {
+	for (const char* command: MOVE_FROM_PLAY_CURSOR_CUSTOM_COMMANDS) {
 		int cmd = NamedCommandLookup(command);
 		if (cmd) {
 			MOVE_FROM_PLAY_CURSOR_COMMANDS.insert(cmd);
@@ -6784,7 +7441,7 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 	// Now add items to the OSARA sub-menu.
 	itemInfo.fMask = MIIM_TYPE | MIIM_ID;
 	int index = 0;
-	auto addItem = [&] (const char* itemName, const char* idStr) {
+	auto addItem = [&](const char* itemName, const char* idStr) {
 		itemInfo.dwTypeData = (char*)itemName;
 		itemInfo.cch = strlen(itemName);
 		itemInfo.wID = NamedCommandLookup(idStr);
@@ -6794,7 +7451,10 @@ void handleCustomMenu(const char* menuId, HMENU menu, int flag) {
 	addItem(translate("Configuration..."), "_OSARA_CONFIG");
 	addItem(translate("Online &documentation"), "_OSARA_OPENDOC");
 	addItem(translate("Check for &update"), "_OSARA_UPDATE");
-	addItem(translate("Configure REAPER for &optimal screen reader accessibility"), "_OSARA_CONFIGREAPEROPTIMAL");
+	addItem(
+		translate("Configure REAPER for &optimal screen reader accessibility"),
+		"_OSARA_CONFIGREAPEROPTIMAL"
+	);
 	addItem(translate("About OSARA"), "_OSARA_ABOUT");
 }
 
@@ -6804,27 +7464,34 @@ void annotateAccRole(HWND hwnd, long role) {
 	VARIANT var;
 	var.vt = VT_I4;
 	var.lVal = role;
-	accPropServices->SetHwndProp(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE,
-		var);
+	accPropServices->SetHwndProp(
+		hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_ROLE, var
+	);
 }
 
 // Several windows in REAPER report as dialogs/property pages, but they aren't really.
 // This includes the main window.
 // Annotate these to prevent screen readers from potentially reading a spurious caption.
 void annotateSpuriousDialog(HWND hwnd) {
-	annotateAccRole(hwnd,
-		hwnd == mainHwnd || hwnd == GetForegroundWindow() ? ROLE_SYSTEM_CLIENT :
-		ROLE_SYSTEM_GROUPING);
+	annotateAccRole(
+		hwnd,
+		hwnd == mainHwnd || hwnd == GetForegroundWindow()
+			? ROLE_SYSTEM_CLIENT
+			: ROLE_SYSTEM_GROUPING
+	);
 	// If the previous hwnd is static text, oleacc will use this as the name.
 	// This is never correct for these windows, so override it.
 	if (GetWindowTextLength(hwnd) == 0) {
-		accPropServices->SetHwndPropStr(hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L"");
+		accPropServices->SetHwndPropStr(
+			hwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L""
+		);
 	}
 }
 
 void annotateSpuriousDialogs(HWND hwnd) {
 	annotateSpuriousDialog(hwnd);
-	for (HWND child = FindWindowExW(hwnd, nullptr, L"#32770", nullptr); child;
+	for (
+		HWND child = FindWindowExW(hwnd, nullptr, L"#32770", nullptr); child;
 		child = FindWindowExW(hwnd, child, L"#32770", nullptr)
 	)
 		annotateSpuriousDialogs(child);
@@ -6841,7 +7508,15 @@ HWND prevForegroundHwnd = nullptr;
 DWORD prevForegroundTime = 0;
 HWND prevPrevForegroundHwnd = nullptr;
 
-void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG objId, long childId, DWORD thread, DWORD time) {
+void CALLBACK handleWinEvent(
+	HWINEVENTHOOK hook,
+	DWORD event,
+	HWND hwnd,
+	LONG objId,
+	long childId,
+	DWORD thread,
+	DWORD time
+) {
 	if (event == EVENT_OBJECT_FOCUS) {
 		HWND foreground = GetForegroundWindow();
 		if (foreground != prevForegroundHwnd) {
@@ -6851,12 +7526,13 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			// this.
 			resetUia();
 			if (
-					// #747: When opening the Render to file name dialog, REAPER very briefly
-					// opens and then closes the full Render to File dialog first. Use a
-					// short timeout to prevent this code from running in that case.
-					time - prevForegroundTime > 50 &&
-					IsWindowVisible(prevPrevForegroundHwnd) &&
-					!IsWindowVisible(prevForegroundHwnd)) {
+				// #747: When opening the Render to file name dialog, REAPER very briefly
+				// opens and then closes the full Render to File dialog first. Use a
+				// short timeout to prevent this code from running in that case.
+				time - prevForegroundTime > 50
+				&& IsWindowVisible(prevPrevForegroundHwnd)
+				&& !IsWindowVisible(prevForegroundHwnd)
+			) {
 				// The previous foreground window has closed. For example, this happens
 				// when you open the FX chain for a track with no FX and dismiss the Add
 				// FX dialog. It also happens in the Menu Editor when you add an
@@ -6887,11 +7563,13 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			if (lastWasTrackView) {
 				// These objects can get a bogus name from oleacc, so set an empty name
 				// instead of clearing it.
-				accPropServices->SetHwndPropStr(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
-					PROPID_ACC_NAME, L" ");
+				accPropServices->SetHwndPropStr(
+					lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, PROPID_ACC_NAME, L" "
+				);
 			} else {
-				accPropServices->ClearHwndProps(lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF,
-					&PROPID_ACC_NAME, 1);
+				accPropServices->ClearHwndProps(
+					lastMessageHwnd, OBJID_CLIENT, CHILDID_SELF, &PROPID_ACC_NAME, 1
+				);
 			}
 			if (lastWasTrackView && focusIsTrackView) {
 				// REAPER 6.0 moves focus between two track view windows in some cases.
@@ -6920,7 +7598,9 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			if (GetWindowTextW(hwnd, name, ARRAYSIZE(name)) == 0)
 				return;
 			focusName << L": " << name;
-			accPropServices->SetHwndPropStr(hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str());
+			accPropServices->SetHwndPropStr(
+				hwnd, objId, childId, PROPID_ACC_NAME, focusName.str().c_str()
+			);
 		} else if (childId > CHILDID_SELF) {
 			maybeReportFxChainBypass(true);
 		} else {
@@ -6940,6 +7620,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 		}
 	}
 }
+
 HWINEVENTHOOK winEventHook = nullptr;
 
 #endif // _WIN32
@@ -6960,12 +7641,16 @@ int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
 
 extern "C" {
 
-REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec) {
+REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(
+	REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t* rec
+) {
 	if (rec) {
 		// Load.
 #if defined(_WIN32) && defined(_M_X64) && !defined(_M_ARM64EC)
-		using IsWow64Process2Fn = BOOL (WINAPI*)(HANDLE, USHORT*, USHORT*);
-		auto fn = reinterpret_cast<IsWow64Process2Fn>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "IsWow64Process2"));
+		using IsWow64Process2Fn = BOOL(WINAPI*)(HANDLE, USHORT*, USHORT*);
+		auto fn = reinterpret_cast<IsWow64Process2Fn>(
+			GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "IsWow64Process2")
+		);
 		if (fn) {
 			USHORT processMachine = 0;
 			USHORT nativeMachine = 0;
@@ -6975,7 +7660,11 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			}
 		}
 #endif
-		if (rec->caller_version != REAPER_PLUGIN_VERSION || !rec->GetFunc || REAPERAPI_LoadAPI(rec->GetFunc) != 0) {
+		if (
+			rec->caller_version != REAPER_PLUGIN_VERSION
+			|| !rec->GetFunc
+			|| REAPERAPI_LoadAPI(rec->GetFunc) != 0
+		) {
 			return 0; // Incompatible.
 		}
 		pluginHInstance = hInstance;
@@ -6990,26 +7679,44 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 			return 0;
 		}
 		guiThread = GetWindowThreadProcessId(mainHwnd, nullptr);
-		winEventHook = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_FOCUS,
-			hInstance, handleWinEvent, 0, guiThread, WINEVENT_INCONTEXT);
+		winEventHook = SetWinEventHook(
+			EVENT_OBJECT_SHOW,
+			EVENT_OBJECT_FOCUS,
+			hInstance,
+			handleWinEvent,
+			0,
+			guiThread,
+			WINEVENT_INCONTEXT
+		);
 		annotateSpuriousDialogs(mainHwnd);
 #else
 		NSA11yWrapper::init();
 #endif
 
 		for (int i = 0; POST_COMMANDS[i].cmd; ++i)
-			postCommandsMap.insert(make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute));
+			postCommandsMap.insert(
+				make_pair(POST_COMMANDS[i].cmd, POST_COMMANDS[i].execute)
+			);
 
-		for (auto &midiPostCommand: MIDI_POST_COMMANDS) {
-			midiPostCommandsMap.insert(make_pair(midiPostCommand.cmd, midiPostCommand.execute));
+		for (auto& midiPostCommand: MIDI_POST_COMMANDS) {
+			midiPostCommandsMap.insert(
+				make_pair(midiPostCommand.cmd, midiPostCommand.execute)
+			);
 			if (midiPostCommand.supportedInMidiEventList) {
-				midiEventListPostCommandsMap.insert(make_pair(midiPostCommand.cmd, make_pair(midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList)));
+				midiEventListPostCommandsMap.insert(make_pair(
+					midiPostCommand.cmd,
+					make_pair(
+						midiPostCommand.execute, midiPostCommand.changesValueInMidiEventList
+					)
+				));
 			}
 		}
 
 		for (Command& command: OSARA_COMMANDS) {
 			if (command.section == MAIN_SECTION) {
-				command.gaccel.accel.cmd = rec->Register("command_id", (void*)command.id);
+				command.gaccel.accel.cmd = rec->Register(
+					"command_id", (void*)command.id
+				);
 				command.gaccel.desc = translate(command.gaccel.desc);
 				rec->Register("gaccel", &command.gaccel);
 			} else {
@@ -7019,8 +7726,9 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 				action.name = translate(command.gaccel.desc);
 				command.gaccel.accel.cmd = rec->Register("custom_action", &action);
 			}
-			commandsMap.insert(make_pair(make_pair(command.section,
-				command.gaccel.accel.cmd), &command));
+			commandsMap.insert(make_pair(
+				make_pair(command.section, command.gaccel.accel.cmd), &command
+			));
 		}
 
 		registerSettingCommands();
@@ -7037,7 +7745,9 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		rec->Register("hookcustommenu", (void*)handleCustomMenu);
 		AddExtensionsMainMenu();
 #ifdef _WIN32
-		keyboardHook = SetWindowsHookEx(WH_KEYBOARD, keyboardHookProc, nullptr, guiThread);
+		keyboardHook = SetWindowsHookEx(
+			WH_KEYBOARD, keyboardHookProc, nullptr, guiThread
+		);
 #endif
 
 		static accelerator_register_t accelReg;
@@ -7063,15 +7773,14 @@ REAPER_PLUGIN_DLL_EXPORT int REAPER_PLUGIN_ENTRYPOINT(REAPER_PLUGIN_HINSTANCE hI
 		return 0;
 	}
 }
-
 }
 
 #ifndef _WIN32
 // Mac resources
-#include <swell-dlggen.h>
-#include "reaper_osara.rc_mac_dlg"
-#include "config.rc_mac_dlg"
-#include <swell-menugen.h>
-#include "reaper_osara.rc_mac_menu"
-#include "config.rc_mac_menu"
+#	include <swell-dlggen.h>
+#	include "reaper_osara.rc_mac_dlg"
+#	include "config.rc_mac_dlg"
+#	include <swell-menugen.h>
+#	include "reaper_osara.rc_mac_menu"
+#	include "config.rc_mac_menu"
 #endif
