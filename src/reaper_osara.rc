@@ -26,7 +26,6 @@ BEGIN
 	LTEXT "&Filter:", IDC_STATIC, 10, 87, 23, 10
 	EDITTEXT ID_PARAM_FILTER, 40, 86, 40, 10
 	CONTROL "Include &unnamed and potentially unusable parameters", ID_PARAM_UNNAMED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 101, 210, 14
-	CONTROL "&Try setting value to detect steps", ID_PARAM_TRY_SET, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 10, 117, 190, 14
 	DEFPUSHBUTTON "&Close", IDCANCEL, 204, 133, 26, 14
 END
 
