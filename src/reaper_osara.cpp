@@ -787,6 +787,14 @@ bool shouldReportTimeMovement() {
 	return !(GetPlayState() & 1);
 }
 
+bool shouldReportMarkers() {
+	if (settings::reportMarkersWhilePlaying) {
+		return true;
+	}
+	// Don't report if playing.
+	return !(GetPlayState() & 1);
+}
+
 INT_PTR CALLBACK reviewMessage_dialogProc(HWND dialog, UINT msg, WPARAM wParam,
 	LPARAM lParam
 ) {
@@ -4729,17 +4737,47 @@ void cmdDeleteTimeSig(int command) {
 		outputMessage(translate("time signature deleted"));
 }
 
-void cmdRemoveStretch(int command) {
-	MediaItem* item = GetSelectedMediaItem(0, 0);
-	if (!item)
+void cmdAddOrRemoveStretch(int command) {
+	const int itemCount = CountSelectedMediaItems(nullptr);
+	if (itemCount == 0) {
+		outputMessage(translate("no selected items"));
 		return;
-	MediaItem_Take* take = GetActiveTake(item);
-	if (!take)
-		return;
-	int count = GetTakeNumStretchMarkers(take);
-	Main_OnCommand(41859, 0); // Item: remove stretch marker at current position
-	if (GetTakeNumStretchMarkers(take) != count)
-		outputMessage(translate("stretch marker deleted"));
+	}
+	int oldCount = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take)
+			continue;
+		oldCount += GetTakeNumStretchMarkers(take);
+	}
+	Main_OnCommand(command, 0);
+	int newCount = 0;
+	for (int i = 0; i < itemCount; ++i) {
+		MediaItem* item = GetSelectedMediaItem(nullptr, i);
+		MediaItem_Take* take = GetActiveTake(item);
+		if (!take)
+			continue;
+		newCount += GetTakeNumStretchMarkers(take);
+	}
+	int difference = newCount - oldCount;
+	if (newCount >= oldCount) {
+		// Markers are often added during playback, so only report this while
+		// playing if the user wants markers reported. Removal isn't gated this
+		// way because it requires navigating to the marker first, so it's far
+		// less likely to occur repeatedly during playback.
+		if (shouldReportMarkers()) {
+			// Translators: Reported when one or more stretch markers are added. {} will be replaced by the number of stretch markers, EG "2 stretch markers added".
+			outputMessage(format(
+				translate_plural("{} stretch marker added", "{} stretch markers added", difference),
+				difference));
+		}
+	} else {
+		// Translators: Reported when one or more stretch markers are removed. {} will be replaced by the number of stretch markers, EG "2 stretch markers removed".
+		outputMessage(format(
+			translate_plural("{} stretch marker removed", "{} stretch markers removed", -difference),
+			-difference));
+	}
 }
 
 void cmdClearTimeLoopSel(int command) {
@@ -5236,7 +5274,7 @@ void cmdRemoveFocus(int command) {
 			cmdDeleteTimeSig(0);
 			break;
 		case FOCUS_STRETCH:
-			cmdRemoveStretch(0);
+			cmdAddOrRemoveStretch(41859); // Item: Remove stretch marker at current position
 			break;
 		case FOCUS_ENVELOPE:
 			cmdhDeleteEnvelopePointsOrAutoItems(40333, true, false); // Envelope: Delete all selected points
@@ -5729,7 +5767,7 @@ void cmdAbout(int command) {
 }
 
 void cmdInsertMarker(int command) {
-	if (!shouldReportTimeMovement()) {
+	if (!shouldReportMarkers()) {
 		Main_OnCommand(command, 0);
 		return;
 	}
@@ -5751,7 +5789,7 @@ void cmdInsertMarker(int command) {
 }
 
 void cmdInsertRegion(int command) {
-	if (!shouldReportTimeMovement()) {
+	if (!shouldReportMarkers()) {
 		Main_OnCommand(command, 0);
 		return;
 	}
@@ -6306,7 +6344,10 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40613}, nullptr}, nullptr, cmdDeleteMarker}, // Markers: Delete marker near cursor
 	{MAIN_SECTION, {{0, 0, 40615}, nullptr}, nullptr, cmdDeleteRegion}, // Markers: Delete region near cursor
 	{MAIN_SECTION, {{0, 0, 40617}, nullptr}, nullptr, cmdDeleteTimeSig}, // Markers: Delete time signature marker near cursor
-	{MAIN_SECTION, {{0, 0, 41859}, nullptr}, nullptr, cmdRemoveStretch}, // Item: remove stretch marker at current position
+	{MAIN_SECTION, {{0, 0, 41842}, nullptr}, nullptr, cmdAddOrRemoveStretch}, // Item: Add stretch marker at cursor
+	{MAIN_SECTION, {{0, 0, 41859}, nullptr}, nullptr, cmdAddOrRemoveStretch}, // Item: Remove stretch marker at current position
+	{MAIN_SECTION, {{0, 0, 41844}, nullptr}, nullptr, cmdAddOrRemoveStretch}, // Item: Remove all stretch markers
+	{MAIN_SECTION, {{0, 0, 41845}, nullptr}, nullptr, cmdAddOrRemoveStretch}, // Item: Remove all stretch markers in time selection
 	{MAIN_SECTION, {{0, 0, 40020}, nullptr}, nullptr, cmdClearTimeLoopSel}, // Time selection: Remove time selection and loop point selection
 	{MAIN_SECTION, {{0, 0, 40769}, nullptr}, nullptr, cmdUnselAllTracksItemsPoints}, // Unselect all tracks/items/envelope points
 	{MAIN_SECTION, {{0, 0, 40915}, nullptr}, nullptr, cmdInsertEnvelopePoint}, // Envelope: Insert new point at current position (remove nearby points)

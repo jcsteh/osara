@@ -282,6 +282,7 @@ extern bool shouldMoveToAutoItem;
 extern int lastCommand;
 
 bool shouldReportTimeMovement() ;
+bool shouldReportMarkers();
 void outputMessage(const std::string& message, bool interrupt = true);
 void outputMessage(std::ostringstream& message, bool interrupt = true);
 
