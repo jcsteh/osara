@@ -19,7 +19,7 @@
 // Disable warnings for WDL, since we don't have any control over those.
 # pragma clang diagnostic push
 # pragma clang diagnostic ignored "-Weverything"
-#include <WDL/jnetlib/httpGet.h>
+#include <WDL/jnetlib/httpget.h>
 #include <WDL/jnetlib/util.h>
 # pragma clang diagnostic pop
 #include <WDL/win32_utf8.h>
