@@ -482,6 +482,11 @@ class ParamsDialog {
 		}
 		this->param->setValue(this->val);
 		this->updateValue();
+		// updateValue() has just filled the edit box from a read of the host, and
+		// that read can be too early -- see onValueEdited(). The box would then
+		// hold the PREVIOUS value, and leaving it would commit that as an edit,
+		// undoing this change. Refresh once the value has settled.
+		SetTimer(this->dialog, SETTLE_TIMER, SETTLE_MS, nullptr);
 	}
 
 	void onValueEdited() {
@@ -494,12 +499,50 @@ class ParamsDialog {
 		const string error = this->param->setValueFromEdited(rawText);
 		this->val = this->param->getValue();
 		this->updateValue();
+		// Some hosts don't apply a parameter value synchronously; with a CLAP
+		// plug-in in REAPER, the value reaches the plug-in on the audio thread a
+		// few milliseconds later. The read above then returns the PREVIOUS value,
+		// which leaves this->val and the display one behind, and the next
+		// kill-focus commits that stale text as a fresh edit. Check again shortly
+		// so the dialog catches up.
+		SetTimer(this->dialog, SETTLE_TIMER, SETTLE_MS, nullptr);
 		if (!error.empty()) {
 			// MessageBox activates itself, which would otherwise cause WM_ACTIVATE
 			// to close the Parameters dialog.
 			this->shouldAllowDeactivate = true;
 			MessageBox(this->dialog, error.c_str(), nullptr, MB_OK | MB_ICONERROR);
 			this->shouldAllowDeactivate = false;
+		}
+	}
+
+	// Re-read the value shortly after an edit, for hosts that apply it
+	// asynchronously. See onValueEdited().
+	static const UINT_PTR SETTLE_TIMER = 1;
+	// Long enough for a host that applies the value on another thread to have
+	// done so, short enough not to be noticed. Measured on REAPER 7.80 with a
+	// CLAP plug-in: the value arrives within a few milliseconds. Raise this if
+	// a host is found that takes longer.
+	static const UINT SETTLE_MS = 50;
+
+	// Both the value and the edit box may have been filled from a read that
+	// arrived before the host applied the change. Correct whichever is actually
+	// stale; when the host was synchronous, both comparisons match and nothing
+	// is touched at all.
+	void onSettleTimer() {
+		KillTimer(this->dialog, SETTLE_TIMER);
+		const double settled = this->param->getValue();
+		if (settled != this->val) {
+			this->val = settled;
+			this->valText = this->param->getValueText(this->val);
+			this->updateValueText();
+		}
+		if (this->param->isEditable && GetFocus() != this->valueEdit) {
+			const string settledText = this->param->getValueForEditing();
+			char shown[512];
+			GetDlgItemText(this->dialog, ID_PARAM_VAL_EDIT, shown, sizeof(shown));
+			if (settledText.compare(shown) != 0) {
+				SetWindowText(this->valueEdit, settledText.c_str());
+			}
 		}
 	}
 
@@ -537,6 +580,12 @@ class ParamsDialog {
 	static INT_PTR CALLBACK dialogProc(HWND dialogHwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		ParamsDialog* dialog = (ParamsDialog*)GetWindowLongPtr(dialogHwnd, GWLP_USERDATA);
 		switch (msg) {
+			case WM_TIMER:
+				if (dialog && wParam == SETTLE_TIMER) {
+					dialog->onSettleTimer();
+					return TRUE;
+				}
+				break;
 			case WM_COMMAND:
 				if (LOWORD(wParam) == ID_PARAM_FILTER && HIWORD(wParam) == EN_KILLFOCUS) {
 					dialog->onFilterChange();
