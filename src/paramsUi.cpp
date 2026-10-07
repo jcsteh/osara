@@ -82,6 +82,12 @@ class Param {
 	// option is a pair {displayName, func}, where func is a function to run if the
 	// option is chosen. func should return a value from AfterOption.
 	using MoreOptions = vector<pair<string, function<AfterOption()>>>;
+	// True if the parameter is controlled by an active automation envelope, in
+	// which case changing it might not have a lasting effect.
+	virtual bool isAutomated() {
+		return false;
+	}
+
 	virtual MoreOptions getMoreOptions() {
 		return {};
 	}
@@ -359,13 +365,25 @@ class ParamsDialog {
 	bool shouldAllowDeactivate = false;
 	bool suppressValueChangeReport = false;
 
+	// Get the name and value of the current parameter, as well as whether it is
+	// automated.
+	string getParamNameAndValue() {
+		string text = fmt::format("{}, {}",
+			this->source->getParamName(this->paramNum), this->valText);
+		if (this->param && this->param->isAutomated()) {
+			// Translators: Reported in the Parameters dialog after the value of a
+			// parameter which is controlled by an automation envelope.
+			text += fmt::format(", {}", translate("automated"));
+		}
+		return text;
+	}
+
 	void updateSelectedParamTreeItemText() {
 		HTREEITEM item = TreeView_GetSelection(this->paramTree);
 		if (!item || this->paramNum < 0) {
 			return;
 		}
-		string text = fmt::format("{}, {}",
-			this->source->getParamName(this->paramNum), this->valText);
+		const string text = this->getParamNameAndValue();
 		TVITEM itemInfo{};
 		itemInfo.mask = TVIF_HANDLE | TVIF_TEXT;
 		itemInfo.hItem = item;
@@ -683,8 +701,7 @@ class ParamsDialog {
 						category != newCategories.end(); ++category) {
 					s << dialog->source->getCategory(*category).name << ", ";
 				}
-				s << dialog->source->getParamName(dialog->paramNum) << ", " <<
-					dialog->valText;
+				s << dialog->getParamNameAndValue();
 				outputMessage(s);
 			}
 			return 1; // Eat the keystroke.
@@ -998,6 +1015,7 @@ class FxParams: public ParamSource {
 	int (*_GetIOSize)(ReaperObj*, int, int*, int*);
 	int (*_GetPinMappings)(ReaperObj*, int, int, int, int*);
 	bool (*_SetPinMappings)(ReaperObj*, int, int, int, int, int);
+	TrackEnvelope* (*_GetEnvelope)(ReaperObj*, int, int, bool);
 
 	void initNamedConfigParams();
 	void initPins();
@@ -1043,6 +1061,9 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_GetPinMappings").c_str());
 		*(void**)&this->_SetPinMappings = plugin_getapi(
 			(apiPrefix + "_SetPinMappings").c_str());
+		// This one doesn't follow the naming pattern for tracks.
+		*(void**)&this->_GetEnvelope = plugin_getapi(
+			apiPrefix == "TrackFX" ? "GetFXEnvelope" : "TakeFX_GetEnvelope");
 		if (fx >= 0) {
 			this->initNamedConfigParams();
 			this->initPins();
@@ -1215,6 +1236,22 @@ class FxParam: public Param {
 				text, sizeof(text)))
 			return text;
 		return "";
+	}
+
+	bool isAutomated() final {
+		if (!this->source._GetEnvelope) {
+			return false;
+		}
+		TrackEnvelope* envelope = this->source._GetEnvelope(this->source.obj,
+			this->fx, this->param, false);
+		if (!envelope) {
+			return false;
+		}
+		// The envelope might be inactive, in which case it doesn't control the
+		// parameter.
+		char state[200];
+		GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
+		return !strstr(state, "\nACT 0");
 	}
 
 	string getValueForEditing() final {

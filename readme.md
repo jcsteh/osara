@@ -570,6 +570,7 @@ Note that some effects expose easily readable values, while others expose only p
 
 #### Using Parameter Lists
 Once you have opened a parameter list dialog, you can select a parameter from the Parameter tree and check or adjust its value using the Value slider.
+If an FX parameter is controlled by an active automation envelope, "automated" is reported after its value, since changing it might not have a lasting effect.
 For parameters which support it, there is also an editable text field which allows you to edit the value textually.
 
 For a few parameters, there is a context menu with additional options related to the parameter.
