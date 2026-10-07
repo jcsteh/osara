@@ -729,6 +729,10 @@ class ParamsDialog {
 			// the dialog. This is an easy mistake to make, so prevent it.
 			case VK_UP:
 			case VK_DOWN:
+			// Delete and insert would delete tracks/items or insert media. REAPER's own
+			// property dialogs don't pass these through, so we don't either.
+			case VK_DELETE:
+			case VK_INSERT:
 				return -1; // Pass to our window.
 		}
 		return -666; // Force to main window.
