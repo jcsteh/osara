@@ -1530,6 +1530,52 @@ void postSegmentScrubRange(int) {
 	outputMessage(s);
 }
 
+const char* getFadeShapeName(int shape) {
+	static const char* names[] = {
+		// Translators: A shape for an item fade.
+		translate("linear"),
+		// Translators: A shape for an item fade.
+		translate("slight convex"),
+		// Translators: A shape for an item fade.
+		translate("slight concave"),
+		// Translators: A shape for an item fade.
+		translate("sharp convex"),
+		// Translators: A shape for an item fade.
+		translate("sharp concave"),
+		// Translators: A shape for an item fade.
+		translate("slight S-curve"),
+		// Translators: A shape for an item fade.
+		translate("sharp S-curve"),
+	};
+	if (shape < 0 || shape >= (int)size(names)) {
+		return "";
+	}
+	return names[shape];
+}
+
+void postCycleFadeShape(int command) {
+	MediaItem* item = GetSelectedMediaItem(0, 0);
+	if (!item) {
+		return;
+	}
+	if (command == 41534) { // Item: Cycle through crossfade shapes
+		// The crossfade is between this item and the next item on its track. Both
+		// sides of the crossfade get the same shape, so we report the fade-out.
+		MediaTrack* track = GetMediaItem_Track(item);
+		const int index = (int)GetMediaItemInfo_Value(item, "IP_ITEMNUMBER");
+		MediaItem* next = GetTrackMediaItem(track, index + 1);
+		const double end = GetMediaItemInfo_Value(item, "D_POSITION") +
+			GetMediaItemInfo_Value(item, "D_LENGTH");
+		if (!next || GetMediaItemInfo_Value(next, "D_POSITION") >= end) {
+			return; // No crossfade.
+		}
+	}
+	// 41520 is Item: Cycle through fade-in shapes.
+	const int shape = (int)GetMediaItemInfo_Value(item,
+		command == 41520 ? "C_FADEINSHAPE" : "C_FADEOUTSHAPE");
+	outputMessage(getFadeShapeName(shape));
+}
+
 void postItemNormalize(int command) {
 	int selectedItemsCount = CountSelectedMediaItems(0);
 	if (selectedItemsCount == 0) {
@@ -3055,6 +3101,9 @@ PostCommand POST_COMMANDS[] = {
 	{40042, postCursorMovement}, // Transport: Go to start of project
 	{40043, postCursorMovement}, // Transport: Go to end of project
 	{40108, postItemNormalize}, // Item properties: Normalize items
+	{41520, postCycleFadeShape}, // Item: Cycle through fade-in shapes
+	{41527, postCycleFadeShape}, // Item: Cycle through fade-out shapes
+	{41534, postCycleFadeShape}, // Item: Cycle through crossfade shapes
 	{40938, postItemNormalize}, // Item properties: Reset item take gain to +0dB (un-normalize)
 	{40254, postItemNormalize}, // Item properties: Normalize items together (common gain) to +0dB peak
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item

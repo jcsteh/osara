@@ -1028,7 +1028,10 @@ This list is worth referencing when making your own key map additions, assigning
 - Xenakios/SWS: Move cursor left configured pixels
 - Xenakios/SWS: Move cursor right configured pixels
 - Xenakios/SWS: Move cursor left configured pixels, creating time selection
-Xenakios/SWS: Move cursor right configured pixels, creating time selection
+- Xenakios/SWS: Move cursor right configured pixels, creating time selection
+- Item: Cycle through fade-in shapes
+- Item: Cycle through fade-out shapes
+- Item: Cycle through crossfade shapes
 
 #### Unmapped in MIDI Editor section
 - Edit: Select all events in time selection (even if CC lane is hidden)
