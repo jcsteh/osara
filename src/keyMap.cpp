@@ -291,7 +291,7 @@ class KeyMapMerge {
 			return false;
 		}
 #ifdef _WIN32
-		if (!CopyFileW(widen(userPath).c_str(), widen(backupPath).c_str(), TRUE) ||
+		if (!CopyFileW(widen(userPath).c_str(), widen(backupPath).c_str(), FALSE) ||
 			!MoveFileExW(widen(tempPath).c_str(), widen(userPath).c_str(),
 				MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
 			DeleteFileW(widen(tempPath).c_str());
