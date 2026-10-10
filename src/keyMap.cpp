@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <map>
 #include <regex>
+#include <sys/stat.h>
 #include <vector>
 #include <WDL/win32_utf8.h>
 #include <WDL/wdltypes.h>
@@ -74,6 +75,15 @@ bool writeLines(const string& path, const vector<string>& lines) {
 	return static_cast<bool>(output);
 }
 
+bool fileExists(const string& path) {
+#ifdef _WIN32
+	return GetFileAttributesW(widen(path).c_str()) != INVALID_FILE_ATTRIBUTES;
+#else
+	struct stat info;
+	return stat(path.c_str(), &info) == 0;
+#endif
+}
+
 #ifndef _WIN32
 bool copyFile(const string& source, const string& destination) {
 	ifstream input(source, ios::binary);
@@ -115,6 +125,9 @@ struct Conflict {
 };
 
 class KeyMapMerge {
+	const string userPath;
+	const string osaraPath;
+	bool userMapMissing = false;
 	vector<string> userLines;
 	vector<string> osaraLines;
 	map<string, KeyRecord> userKeys;
@@ -197,11 +210,13 @@ class KeyMapMerge {
 	}
 
 	public:
+	KeyMapMerge():
+		userPath(joinPath(GetResourcePath(), "reaper-kb.ini")),
+		osaraPath(joinPath(GetResourcePath(), "KeyMaps/OSARA.ReaperKeyMap")) {}
+
 	bool load() {
-		const string resourcePath = GetResourcePath();
-		const string userPath = joinPath(resourcePath, "reaper-kb.ini");
-		const string osaraPath = joinPath(resourcePath, "KeyMaps/OSARA.ReaperKeyMap");
-		if (!readLines(userPath, userLines)) {
+		userMapMissing = !fileExists(userPath);
+		if (!userMapMissing && !readLines(userPath, userLines)) {
 			error = translate("Unable to read your REAPER key map.");
 			return false;
 		}
@@ -216,6 +231,20 @@ class KeyMapMerge {
 	}
 
 	const string& getError() const { return error; }
+	bool isUserMapMissing() const { return userMapMissing; }
+
+	bool install() {
+#ifdef _WIN32
+		if (!CopyFileW(widen(osaraPath).c_str(), widen(userPath).c_str(), FALSE)) {
+#else
+		if (!copyFile(osaraPath, userPath)) {
+#endif
+			error = translate("Unable to install the OSARA key map.");
+			return false;
+		}
+		return true;
+	}
+
 	const vector<Conflict>& getConflicts() const { return conflicts; }
 	void setConflictAccepted(size_t index, bool accepted) {
 		conflicts[index].accepted = accepted;
@@ -283,7 +312,6 @@ class KeyMapMerge {
 			output.push_back(record.line);
 		}
 
-		const string userPath = joinPath(GetResourcePath(), "reaper-kb.ini");
 		const string tempPath = userPath + ".osara-merge.tmp";
 		const string backupPath = userPath + ".osara-merge-backup";
 		if (!writeLines(tempPath, output)) {
@@ -530,12 +558,38 @@ bool confirmAutomaticMerge(const KeyMapMerge& merge) {
 		translate("Merge OSARA Key Map"), MB_YESNO | MB_ICONQUESTION) == IDYES;
 }
 
+bool confirmInstall() {
+	// Translators: Shown when REAPER does not have a key map file yet. This asks
+	// whether the user wants to install OSARA's key map as a new key map.
+	return MessageBox(GetForegroundWindow(),
+		translate("Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"),
+		translate("Install OSARA Key Map"), MB_YESNO | MB_ICONQUESTION) == IDYES;
+}
+
+void showInstallCompleteAndExit() {
+	MessageBox(GetForegroundWindow(),
+		translate("The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."),
+		translate("Restart REAPER"), MB_OK | MB_ICONINFORMATION);
+	Main_OnCommand(40004, 0); // File: Quit REAPER
+}
+
 } // namespace
 
 void cmdMergeOsaraKeyMap(int command) {
 	auto merge = make_unique<KeyMapMerge>();
 	if (!merge->load()) {
 		MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
+		return;
+	}
+	if (merge->isUserMapMissing()) {
+		if (!confirmInstall()) {
+			return;
+		}
+		if (!merge->install()) {
+			MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
+			return;
+		}
+		showInstallCompleteAndExit();
 		return;
 	}
 	if (merge->getConflicts().empty()) {
