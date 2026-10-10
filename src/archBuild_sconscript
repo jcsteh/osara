@@ -99,7 +99,7 @@ else: # Mac
 	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
 		"-arch x86_64 -arch arm64 "
 		"-isysroot $xcodeDevDir/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-	cxxFlags = coreFlags + " -std=c++20 -Werror"
+	cxxFlags = coreFlags + " -std=c++20 -Werror -Wno-error=#warnings"
 	env.Append(CXXFLAGS=cxxFlags)
 	env.Append(LINKFLAGS=coreFlags)
 	env.Append(CPPDEFINES="SWELL_PROVIDED_BY_APP")
