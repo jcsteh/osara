@@ -755,6 +755,14 @@ When the MIDI Editor is set to Event List mode, REAPER presents a list with all 
 When a note gets focus in the list, OSARA will play a preview of the focused note.
 To cancel a note preview, press the Control key.
 
+### Moving Between Fields in the MIDI Event List (Windows Only)
+In the MIDI Event List, the screen reader normally reports all fields of an event, such as its position, length, channel, type, note and velocity.
+To hear just one field, press RightArrow or LeftArrow to move to the next or previous field.
+OSARA reports the name and value of that field.
+When you then move between events, OSARA reports just that field.
+To hear all fields again, press LeftArrow until OSARA reports "all fields".
+Home and End move to the first and last event.
+
 ### Searching and Navigating FX Presets Without Activating Them (Windows Only)
 REAPER's FX preset combo box doesn't allow keyboard users to move through presets without activating them.
 Sometimes, you need to be able to examine or search the available presets without activating each one.
