@@ -744,7 +744,7 @@ class ParamsDialog {
 		// Try to restore focus back to where it was when the dialog was opened.
 		// This is particularly useful in the FX chain dialog because this doesn't
 		// regain focus by itself if something else (like us) steals the focus.
-		if (this->prevFocus) {
+		if (this->prevFocus && IsWindow(this->prevFocus)) {
 			SetFocus(this->prevFocus);
 		}
 	}
@@ -902,7 +902,7 @@ class ParamsDialog {
 			return;
 		}
 		this->shouldAllowDeactivate = false;
-		if (GetFocus() != prevFocus) {
+		if (GetFocus() != origFocus) {
 			// Restore the focus whence it came.
 			SetFocus(origFocus);
 		}
