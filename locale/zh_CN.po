@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-09-01 21:10\n"
+"PO-Revision-Date: 2026-10-15 21:33\n"
 
 msgid "enabled"
 msgstr "以启用"
@@ -71,7 +71,7 @@ msgstr "9.  当键盘焦点在对话框中时,使 Control+Space 执行播放/停
 
 msgctxt "optimal REAPER configuration"
 msgid "10. Display the file name and then the full path in the Recent Projects menu."
-msgstr "\t10. 在最近使用的工程菜单中显示文件名和完整路径"
+msgstr "10. 在最近使用的工程菜单中显示文件名和完整路径"
 
 msgctxt "optimal REAPER configuration"
 msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjustments later by going to the Extensions menu in the menu bar and then the OSARA submenu."
@@ -81,7 +81,7 @@ msgid "Error writing configuration changes."
 msgstr "写入配置更改时出错"
 
 msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER 现在将退出.请重启 REAPER 以应用更改"
+msgstr "REAPER 现在将退出.请重启 REAPER 以应用更改."
 
 msgid "Restart REAPER"
 msgstr "重启 REAPER"
@@ -165,6 +165,7 @@ msgid_plural "{} points removed"
 msgstr[0] "{} 点移除"
 
 #. A shape for an envelope point.
+#. A shape for an item fade.
 msgid "linear"
 msgstr "线性"
 
@@ -288,6 +289,93 @@ msgstr "活动"
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
 msgstr "{} 选项卡"
+
+msgid "Unable to read your REAPER key map."
+msgstr "无法读取你的 REAPER 案件映射."
+
+msgid "Unable to read the OSARA key map"
+msgstr "无法读取 OSARA 案件映射"
+
+msgid "Unable to install the OSARA key map."
+msgstr "无法安装 OSARA 案件映射."
+
+#. Shown for a key in the Merge OSARA Key map dialog when
+#. REAPER's default mapping for that key has been disabled.
+msgid "Disabled default"
+msgstr "已禁用默认"
+
+msgid "Unable to write the merged key map."
+msgstr "无法写入合并后的案件映射."
+
+msgid "Unable to replace your REAPER key map."
+msgstr "无法替换你的 REAPER 案件映射."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. new key bindings. For example: "3 key bindings added."
+msgid "{} key binding added."
+msgid_plural "{} key bindings added."
+msgstr[0] "已添加 {} 个按键绑定."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. conflicting bindings overridden with OSARA's bindings. For example: 
+#. "1 conflicting binding overridden."
+msgid "{} conflicting binding overridden."
+msgid_plural "{} conflicting bindings overridden."
+msgstr[0] "已覆盖 {} 个冲突绑定."
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER 现在将退出。请重启 REAPER 以应用更改。"
+
+msgid "No changes were selected."
+msgstr "未选择任何更改."
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the keyboard shortcut for a conflicting binding.
+msgid "Key"
+msgstr "按键"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the OSARA key map.
+msgid "OSARA"
+msgstr "OSARA"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the user's current key map.
+msgid "Yours"
+msgstr "你的"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating whether the OSARA binding will replace the user's binding.
+msgid "Use OSARA"
+msgstr "使用 OSARA"
+
+msgid "No"
+msgstr "否"
+
+#. Shown before merging the OSARA key map when there are no key
+#. binding conflicts. {} is the number of new key bindings. For example: "No
+#. key binding conflicts were found. 3 key bindings will be added. Do you want
+#. to merge the OSARA key map?"
+msgid "No key binding conflicts were found. {} key binding will be added. Do you want to merge the OSARA key map?"
+msgid_plural "No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?"
+msgstr[0] "未发现按键绑定冲突。将添加 {} 个按键绑定.是否要合并 OSARA 案件映射?"
+
+msgid "Merge OSARA Key Map"
+msgstr "合并 OSARA 案件映射"
+
+#. Shown when REAPER does not have a key map file yet. This asks
+#. whether the user wants to install OSARA's key map as a new key map.
+msgid "Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"
+msgstr "你的 REAPER 案件映射尚不存在.是否要安装 OSARA 案件映射?"
+
+msgid "Install OSARA Key Map"
+msgstr "安装 OSARA 案件映射"
+
+msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "OSARA 键位映射已安装.REAPER 现在将退出。请重启 REAPER 以应用更改."
+
+msgid "Your key map already includes all OSARA key map changes."
+msgstr "你的案件映射已包含所有 OSARA 的案件更改."
 
 #. The name of a musical note.
 msgid "c"
@@ -972,7 +1060,7 @@ msgstr "通道必须介于1到128之间."
 #. An error reported when the channels mapped to an an FX
 #. input or output could not be set.
 msgid "Could not set the channels."
-msgstr "无法设置通道"
+msgstr "无法设置通道."
 
 msgid "low shelf"
 msgstr "低搁架"
@@ -1733,6 +1821,30 @@ msgstr "到光标结束"
 #. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 msgid "end offset {} MS"
 msgstr "结束偏移 {}毫秒"
+
+#. A shape for an item fade.
+msgid "slight convex"
+msgstr "轻微凸形"
+
+#. A shape for an item fade.
+msgid "slight concave"
+msgstr "轻微凹形"
+
+#. A shape for an item fade.
+msgid "sharp convex"
+msgstr "陡峭凸形"
+
+#. A shape for an item fade.
+msgid "sharp concave"
+msgstr "陡峭凹形"
+
+#. A shape for an item fade.
+msgid "slight S-curve"
+msgstr "轻微 S 形曲线"
+
+#. A shape for an item fade.
+msgid "sharp S-curve"
+msgstr "陡峭 S 形曲线"
 
 msgid "no selected items"
 msgstr "未选择对象"
@@ -3267,6 +3379,9 @@ msgstr "OSARA: 取消监听所有轨道"
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr "OSARA：优化 REAPER 的读屏辅助功能"
 
+msgid "OSARA: Merge OSARA key map"
+msgstr "OSARA: 合并 OSARA 案件映射"
+
 msgid "OSARA: Check for update"
 msgstr "OSARA: 检查更新"
 
@@ -3344,6 +3459,9 @@ msgstr "检查更新(&u)"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
 msgstr "优化 REAPER 的读屏辅助功能(&O)"
+
+msgid "Merge OSARA key map"
+msgstr "合并 OSARA 案件映射"
 
 msgid "No OSARA update available."
 msgstr "无可用的 OSARA 更新."
@@ -3489,6 +3607,30 @@ msgstr "是(&y)"
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
 msgstr "否(&N)"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Merge OSARA Key Map"
+msgstr "合并 OSARA 案件映射"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Select the conflicting bindings to replace with OSARA's bindings:"
+msgstr "选择冲突的绑定以替换为 OSARA 的绑定:"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &all"
+msgstr "接受所有(&A)"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &none"
+msgstr "接受无(&N)"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Merge"
+msgstr "合并(&M)"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Cancel"
+msgstr "取消(&C)"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

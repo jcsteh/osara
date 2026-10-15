@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish, Mexico\n"
 "Language: es_MX\n"
-"PO-Revision-Date: 2026-09-01 21:10\n"
+"PO-Revision-Date: 2026-10-15 21:33\n"
 
 msgid "enabled"
 msgstr "activando"
@@ -31,7 +31,7 @@ msgstr "OSARA: Desactiva el"
 
 msgctxt "optimal REAPER configuration"
 msgid "Would you like to adjust REAPER preferences for optimal compatibility with screen readers? Choosing yes will make the following changes:"
-msgstr "Te gustaría optimizar REAPER para su uso con lectores de pantalla? Al elegir sí, se realizarán los siguientes cambios:"
+msgstr "¿Deseas optimizar REAPER para su uso con lectores de pantalla? Al elegir Sí, se realizarán los siguientes cambios:"
 
 msgctxt "optimal REAPER configuration"
 msgid "1. Undock the Media Explorer so that it gets focus when opened."
@@ -43,15 +43,15 @@ msgstr "2. Se activará el cierre del Explorador de Medios con la tecla Escape."
 
 msgctxt "optimal REAPER configuration"
 msgid "3. Enable legacy file browse dialogs, so that REAPER specific options in the Open and Save As dialogs can be reached with the tab key."
-msgstr "3. Se activará la compatibilidad con los cuadros de diálogo antiguos de archivos, para que la tecla tab permita navegar las funciones de REAPER en los cuadros de diálogo de abrir y guardar."
+msgstr "3. Se activará la compatibilidad con los cuadros de diálogo antiguos de archivos, para que la tecla Tab permita navegar las funciones de REAPER en los cuadros de diálogo \"Abrir\" y \"Guardar como\"."
 
 msgctxt "optimal REAPER configuration"
 msgid "4. Enable the space key to be used for check boxes and buttons in various windows, wherever that's more convenient than space playing the project."
-msgstr "4. Se permitirá usar la barra espaciadora para casillas de verificación y botones en diversas ventanas, siempre que sea más práctico que utilizarla para reproducir el proyecto."
+msgstr "4. Se activará el uso de la barra espaciadora para casillas de verificación y botones en diversas ventanas, siempre que sea más práctico que utilizarla para reproducir el proyecto."
 
 msgctxt "optimal REAPER configuration"
 msgid "5. Show text labels to indicate parallel, offline and bypassed in the FX list."
-msgstr "5. En la lista de efectos (FX), se mostrarán etiquetas de texto para señalar los estados de paralelo, fuera de línea y omitido."
+msgstr "5. En la lista de efectos (FX), se mostrarán etiquetas de texto para señalar los estados de paralelo, fuera de línea y desactivado."
 
 msgctxt "optimal REAPER configuration"
 msgid "6. Use a standard, accessible edit control for the video code editor."
@@ -78,10 +78,10 @@ msgid "Note: if now isn't a good time to tweak REAPER, you can apply these adjus
 msgstr "Nota: Si por el momento no quieres modificar el comportamiento de REAPER, puedes hacerlo más tarde mediante la barra de menú, Extensiones, e ingresando al submenú de OSARA."
 
 msgid "Error writing configuration changes."
-msgstr "Ha ocurrido un error en la optimización. Ningún cambio fue aplicado."
+msgstr "Ocurrió un error en la optimización. No se aplicó ningún cambio."
 
 msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "La optimización se ha aplicado correctamente para su uso con lectores de pantalla. Por favor, reinicia REAPER ahora para terminar."
+msgstr "La optimización para lectores de pantalla se aplicó correctamente. REAPER se cerrará ahora; vuelve a abrirlo para terminar."
 
 msgid "Restart REAPER"
 msgstr "Reiniciar REAPER"
@@ -167,6 +167,7 @@ msgstr[0] "{} punto eliminado"
 msgstr[1] "{} puntos eliminados"
 
 #. A shape for an envelope point.
+#. A shape for an item fade.
 msgid "linear"
 msgstr "lineal"
 
@@ -294,6 +295,96 @@ msgstr "activo"
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
 msgstr "{} pestaña"
+
+msgid "Unable to read your REAPER key map."
+msgstr "No fue posible leer tu mapa de teclas de REAPER."
+
+msgid "Unable to read the OSARA key map"
+msgstr "No fue posible leer el mapa de teclas de OSARA"
+
+msgid "Unable to install the OSARA key map."
+msgstr "No fue posible instalar el mapa de teclas de OSARA."
+
+#. Shown for a key in the Merge OSARA Key map dialog when
+#. REAPER's default mapping for that key has been disabled.
+msgid "Disabled default"
+msgstr "Asignación predeterminada desactivada"
+
+msgid "Unable to write the merged key map."
+msgstr "No fue posible escribir el mapa de teclas fusionado."
+
+msgid "Unable to replace your REAPER key map."
+msgstr "No fue posible reemplazar tu mapa de teclas de REAPER."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. new key bindings. For example: "3 key bindings added."
+msgid "{} key binding added."
+msgid_plural "{} key bindings added."
+msgstr[0] "{} asignación de tecla agregada."
+msgstr[1] "{} asignaciones de teclas agregadas."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. conflicting bindings overridden with OSARA's bindings. For example: 
+#. "1 conflicting binding overridden."
+msgid "{} conflicting binding overridden."
+msgid_plural "{} conflicting bindings overridden."
+msgstr[0] "{} asignación conflictiva reemplazada."
+msgstr[1] "{} asignaciones conflictivas reemplazadas."
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER se cerrará ahora. Vuelve a abrirlo para aplicar los cambios."
+
+msgid "No changes were selected."
+msgstr "No se seleccionó ningún cambio."
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the keyboard shortcut for a conflicting binding.
+msgid "Key"
+msgstr "Tecla"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the OSARA key map.
+msgid "OSARA"
+msgstr "OSARA"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the user's current key map.
+msgid "Yours"
+msgstr "Tu asignación"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating whether the OSARA binding will replace the user's binding.
+msgid "Use OSARA"
+msgstr "Usar OSARA"
+
+msgid "No"
+msgstr "No"
+
+#. Shown before merging the OSARA key map when there are no key
+#. binding conflicts. {} is the number of new key bindings. For example: "No
+#. key binding conflicts were found. 3 key bindings will be added. Do you want
+#. to merge the OSARA key map?"
+msgid "No key binding conflicts were found. {} key binding will be added. Do you want to merge the OSARA key map?"
+msgid_plural "No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?"
+msgstr[0] "No se encontraron conflictos de asignación. Se agregará {} asignación de tecla. ¿Deseas fusionar el mapa de teclas de OSARA?"
+msgstr[1] "No se encontraron conflictos de asignación. Se agregarán {} asignaciones de teclas. ¿Deseas fusionar el mapa de teclas de OSARA?"
+
+msgid "Merge OSARA Key Map"
+msgstr "Fusionar mapa de teclas de OSARA"
+
+#. Shown when REAPER does not have a key map file yet. This asks
+#. whether the user wants to install OSARA's key map as a new key map.
+msgid "Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"
+msgstr "Tu mapa de teclas de REAPER aún no existe. ¿Deseas instalar el mapa de teclas de OSARA?"
+
+msgid "Install OSARA Key Map"
+msgstr "Instalar mapa de teclas de OSARA"
+
+msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "El mapa de teclas de OSARA fue instalado. REAPER se cerrará ahora; vuelve a abrirlo para aplicar los cambios."
+
+msgid "Your key map already includes all OSARA key map changes."
+msgstr "Tu mapa de teclas ya incluye todos los cambios del mapa de teclas de OSARA."
 
 #. The name of a musical note.
 msgid "c"
@@ -1797,6 +1888,30 @@ msgstr "finalizando en el cursor"
 #. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 msgid "end offset {} MS"
 msgstr "desplazamiento de fin {} ms"
+
+#. A shape for an item fade.
+msgid "slight convex"
+msgstr "convexo leve"
+
+#. A shape for an item fade.
+msgid "slight concave"
+msgstr "cóncavo leve"
+
+#. A shape for an item fade.
+msgid "sharp convex"
+msgstr "convexo pronunciado"
+
+#. A shape for an item fade.
+msgid "sharp concave"
+msgstr "cóncavo pronunciado"
+
+#. A shape for an item fade.
+msgid "slight S-curve"
+msgstr "curva en S leve"
+
+#. A shape for an item fade.
+msgid "sharp S-curve"
+msgstr "curva en S pronunciada"
 
 msgid "no selected items"
 msgstr "no hay ítems seleccionados"
@@ -3373,6 +3488,9 @@ msgstr "OSARA: Desmonitorea todas las pistas"
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr "OSARA: Optimiza REAPER para el uso con lectores de pantalla"
 
+msgid "OSARA: Merge OSARA key map"
+msgstr "OSARA: Fusionar mapa de teclas de OSARA"
+
 msgid "OSARA: Check for update"
 msgstr "OSARA: Busca la última actualización"
 
@@ -3450,6 +3568,9 @@ msgstr "Buscar act&ualización"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
 msgstr "&Optimizar REAPER para el uso con lectores de pantalla"
+
+msgid "Merge OSARA key map"
+msgstr "Fusionar mapa de teclas de OSARA"
 
 msgid "No OSARA update available."
 msgstr "Ya estás usando la última versión de OSARA disponible."
@@ -3595,6 +3716,30 @@ msgstr "&Sí"
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
 msgstr "&No"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Merge OSARA Key Map"
+msgstr "Fusionar Mapa de Teclas de OSARA"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Select the conflicting bindings to replace with OSARA's bindings:"
+msgstr "Selecciona las asignaciones conflictivas a reemplazar por las de OSARA:"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &all"
+msgstr "Aceptar t&odas"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &none"
+msgstr "Aceptar nin&guna"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Merge"
+msgstr "&Fusionar"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Cancel"
+msgstr "&Cancelar"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

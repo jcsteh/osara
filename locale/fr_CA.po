@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-09-01 21:10\n"
+"PO-Revision-Date: 2026-10-15 21:33\n"
 
 msgid "enabled"
 msgstr "activé"
@@ -167,6 +167,7 @@ msgstr[0] "{} point supprimé"
 msgstr[1] "{} Points supprimés"
 
 #. A shape for an envelope point.
+#. A shape for an item fade.
 msgid "linear"
 msgstr "linéaire"
 
@@ -294,6 +295,96 @@ msgstr "active"
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
 msgstr "{} onglet"
+
+msgid "Unable to read your REAPER key map."
+msgstr ""
+
+msgid "Unable to read the OSARA key map"
+msgstr ""
+
+msgid "Unable to install the OSARA key map."
+msgstr ""
+
+#. Shown for a key in the Merge OSARA Key map dialog when
+#. REAPER's default mapping for that key has been disabled.
+msgid "Disabled default"
+msgstr ""
+
+msgid "Unable to write the merged key map."
+msgstr ""
+
+msgid "Unable to replace your REAPER key map."
+msgstr ""
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. new key bindings. For example: "3 key bindings added."
+msgid "{} key binding added."
+msgid_plural "{} key bindings added."
+msgstr[0] ""
+msgstr[1] ""
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. conflicting bindings overridden with OSARA's bindings. For example: 
+#. "1 conflicting binding overridden."
+msgid "{} conflicting binding overridden."
+msgid_plural "{} conflicting bindings overridden."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr ""
+
+msgid "No changes were selected."
+msgstr ""
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the keyboard shortcut for a conflicting binding.
+msgid "Key"
+msgstr ""
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the OSARA key map.
+msgid "OSARA"
+msgstr ""
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the user's current key map.
+msgid "Yours"
+msgstr ""
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating whether the OSARA binding will replace the user's binding.
+msgid "Use OSARA"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+#. Shown before merging the OSARA key map when there are no key
+#. binding conflicts. {} is the number of new key bindings. For example: "No
+#. key binding conflicts were found. 3 key bindings will be added. Do you want
+#. to merge the OSARA key map?"
+msgid "No key binding conflicts were found. {} key binding will be added. Do you want to merge the OSARA key map?"
+msgid_plural "No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Merge OSARA Key Map"
+msgstr ""
+
+#. Shown when REAPER does not have a key map file yet. This asks
+#. whether the user wants to install OSARA's key map as a new key map.
+msgid "Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"
+msgstr ""
+
+msgid "Install OSARA Key Map"
+msgstr ""
+
+msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr ""
+
+msgid "Your key map already includes all OSARA key map changes."
+msgstr ""
 
 #. The name of a musical note.
 msgid "c"
@@ -1797,6 +1888,30 @@ msgstr "se termine au curseur"
 #. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 msgid "end offset {} MS"
 msgstr "décalage de fin {} MS"
+
+#. A shape for an item fade.
+msgid "slight convex"
+msgstr ""
+
+#. A shape for an item fade.
+msgid "slight concave"
+msgstr ""
+
+#. A shape for an item fade.
+msgid "sharp convex"
+msgstr ""
+
+#. A shape for an item fade.
+msgid "sharp concave"
+msgstr ""
+
+#. A shape for an item fade.
+msgid "slight S-curve"
+msgstr ""
+
+#. A shape for an item fade.
+msgid "sharp S-curve"
+msgstr ""
 
 msgid "no selected items"
 msgstr "aucun objets n'est sélectionné"
@@ -3373,6 +3488,9 @@ msgstr "OSARA: Désactiver tous les moniteurs de toutes les pistes"
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr "OSARA: Configurer REAPER pour une accessibilité optimale pour les lecteurs d'écran"
 
+msgid "OSARA: Merge OSARA key map"
+msgstr ""
+
 msgid "OSARA: Check for update"
 msgstr "OSARA: Rechercher une mise à jour"
 
@@ -3450,6 +3568,9 @@ msgstr "Vérifier pour une &mise à jour"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
 msgstr "Configurez REAPER pour une accessibilité optimale avec les lecteurs d'écran"
+
+msgid "Merge OSARA key map"
+msgstr ""
 
 msgid "No OSARA update available."
 msgstr "Aucune mise à jour d'OSARA disponible."
@@ -3595,6 +3716,30 @@ msgstr "&Oui"
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
 msgstr "&Non"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Merge OSARA Key Map"
+msgstr ""
+
+msgctxt "Merge OSARA Key Map"
+msgid "Select the conflicting bindings to replace with OSARA's bindings:"
+msgstr ""
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &all"
+msgstr ""
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &none"
+msgstr ""
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Merge"
+msgstr ""
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Cancel"
+msgstr ""
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"

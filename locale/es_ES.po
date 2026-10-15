@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2026-09-01 21:10\n"
+"PO-Revision-Date: 2026-10-15 21:33\n"
 
 msgid "enabled"
 msgstr "activado"
@@ -167,6 +167,7 @@ msgstr[0] "{} punto eliminado"
 msgstr[1] "{} puntos eliminados"
 
 #. A shape for an envelope point.
+#. A shape for an item fade.
 msgid "linear"
 msgstr "lineal"
 
@@ -294,6 +295,96 @@ msgstr "activo"
 #. {} will be replaced with the name of the tab; e.g. "1 tab".
 msgid "{} tab"
 msgstr "{} pestaña"
+
+msgid "Unable to read your REAPER key map."
+msgstr "Imposible leer su mapa de teclado de Reaper."
+
+msgid "Unable to read the OSARA key map"
+msgstr "Imposible leer el mapa de teclado de Osara"
+
+msgid "Unable to install the OSARA key map."
+msgstr "Imposible instalar el mapa de teclado de Osara."
+
+#. Shown for a key in the Merge OSARA Key map dialog when
+#. REAPER's default mapping for that key has been disabled.
+msgid "Disabled default"
+msgstr "Desactivado por defecto"
+
+msgid "Unable to write the merged key map."
+msgstr "Imposible escribir el mapa de teclado combinado."
+
+msgid "Unable to replace your REAPER key map."
+msgstr "Imposible reemplazar su mapa de teclado de Reaper."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. new key bindings. For example: "3 key bindings added."
+msgid "{} key binding added."
+msgid_plural "{} key bindings added."
+msgstr[0] "{} atajo de teclado añadido."
+msgstr[1] "{} atajos de teclado añadidos."
+
+#. Shown after merging the OSARA key map. {} is the number of
+#. conflicting bindings overridden with OSARA's bindings. For example: 
+#. "1 conflicting binding overridden."
+msgid "{} conflicting binding overridden."
+msgid_plural "{} conflicting bindings overridden."
+msgstr[0] "{} atajo en conflicto sobreescrito."
+msgstr[1] "{} atajos en conflicto sobreescritos."
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER se cerrará. por favor reinicie REAPER para aplicar cambios."
+
+msgid "No changes were selected."
+msgstr "ningún cambio seleccionado."
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the keyboard shortcut for a conflicting binding.
+msgid "Key"
+msgstr "Tecla"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the OSARA key map.
+msgid "OSARA"
+msgstr "OSARA"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating the action assigned to a key in the user's current key map.
+msgid "Yours"
+msgstr "Suyas"
+
+#. A column header in the Merge OSARA Key Map dialog
+#. indicating whether the OSARA binding will replace the user's binding.
+msgid "Use OSARA"
+msgstr "Use OSARA"
+
+msgid "No"
+msgstr "No"
+
+#. Shown before merging the OSARA key map when there are no key
+#. binding conflicts. {} is the number of new key bindings. For example: "No
+#. key binding conflicts were found. 3 key bindings will be added. Do you want
+#. to merge the OSARA key map?"
+msgid "No key binding conflicts were found. {} key binding will be added. Do you want to merge the OSARA key map?"
+msgid_plural "No key binding conflicts were found. {} key bindings will be added. Do you want to merge the OSARA key map?"
+msgstr[0] "No se encontraron conflictos de asignación de teclas. Se añadirá {} asignación de teclas. ¿Quieres combinar el mapa de teclas de OSARA?"
+msgstr[1] "No se encontraron conflictos de asignación de teclas. Se añadirán {} asignaciones de teclas. ¿Quieres combinar el mapa de teclas de OSARA?"
+
+msgid "Merge OSARA Key Map"
+msgstr "Combinado mapa de teclado"
+
+#. Shown when REAPER does not have a key map file yet. This asks
+#. whether the user wants to install OSARA's key map as a new key map.
+msgid "Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"
+msgstr "Tu mapa de teclas de REAPER aún no existe. ¿Quieres instalar el mapa de teclas de OSARA?"
+
+msgid "Install OSARA Key Map"
+msgstr "Instalar mapa de teclado de Osara"
+
+msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "El mapa de teclas de OSARA se ha instalado. REAPER se cerrará ahora. Por favor, reinicia REAPER para aplicar los cambios."
+
+msgid "Your key map already includes all OSARA key map changes."
+msgstr "Tu mapa de teclas ya incluye todos los cambios del mapa de teclas de OSARA."
 
 #. The name of a musical note.
 msgid "c"
@@ -1797,6 +1888,30 @@ msgstr "final en cursor"
 #. {} will be replaced with a number of milliseconds. E.g., "end offset 100 MS".
 msgid "end offset {} MS"
 msgstr "desplazamiento final {} MS"
+
+#. A shape for an item fade.
+msgid "slight convex"
+msgstr "ligeramente convexa"
+
+#. A shape for an item fade.
+msgid "slight concave"
+msgstr "ligeramente cóncavo"
+
+#. A shape for an item fade.
+msgid "sharp convex"
+msgstr "altamente convexo"
+
+#. A shape for an item fade.
+msgid "sharp concave"
+msgstr "altamente cóncavo"
+
+#. A shape for an item fade.
+msgid "slight S-curve"
+msgstr "curva ligera"
+
+#. A shape for an item fade.
+msgid "sharp S-curve"
+msgstr "curva. s pronunciada"
 
 msgid "no selected items"
 msgstr "no hay ítems seleccionados"
@@ -3373,6 +3488,9 @@ msgstr "OSARA: desactivar monitor en todas las pistas"
 msgid "OSARA: Configure REAPER for optimal screen reader accessibility"
 msgstr "OSARA: Configurar Reaper para optimizar la accesibilidad con lectores de pantalla"
 
+msgid "OSARA: Merge OSARA key map"
+msgstr "OSARA: combinado mapa de teclado de OSARA"
+
 msgid "OSARA: Check for update"
 msgstr "OSARA: Comprobar actualización"
 
@@ -3450,6 +3568,9 @@ msgstr "Comprobar actualización"
 
 msgid "Configure REAPER for &optimal screen reader accessibility"
 msgstr "Configurar Reaper para una óptima accesibilidad con lectores de pantalla"
+
+msgid "Merge OSARA key map"
+msgstr "Combinado mapa de teclado de OSARA"
 
 msgid "No OSARA update available."
 msgstr "No hay actualizaciones disponibles de Osara."
@@ -3595,6 +3716,30 @@ msgstr "&Sí"
 msgctxt "Configure REAPER for Optimal Screen Reader Accessibility"
 msgid "&No"
 msgstr "&No"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Merge OSARA Key Map"
+msgstr "Combinado mapa de teclado de OSARA"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Select the conflicting bindings to replace with OSARA's bindings:"
+msgstr "Selecciona las asignaciones en conflicto para reemplazarlas por las de OSARA:"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &all"
+msgstr "Acceptar &todo"
+
+msgctxt "Merge OSARA Key Map"
+msgid "Accept &none"
+msgstr "No aceptar ninguno"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Merge"
+msgstr "&Combinar"
+
+msgctxt "Merge OSARA Key Map"
+msgid "&Cancel"
+msgstr "&Cancelar"
 
 msgctxt "OSARA Configuration"
 msgid "OSARA Configuration"
