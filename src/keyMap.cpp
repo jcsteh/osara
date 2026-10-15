@@ -14,6 +14,7 @@
 #include <vector>
 #include <WDL/win32_utf8.h>
 #include <WDL/wdltypes.h>
+#include "config.h"
 #include "keyMap.h"
 #include "resource.h"
 #include "translation.h"
@@ -337,7 +338,7 @@ class KeyMapMerge {
 	}
 };
 
-void showMergeCompleteAndExit(int added, int overridden) {
+void requestMergeRestart(int added, int overridden) {
 	// Translators: Shown after merging the OSARA key map. {} is the number of
 	// new key bindings. For example: "3 key bindings added."
 	string message = format(translate_plural("{} key binding added.",
@@ -347,12 +348,7 @@ void showMergeCompleteAndExit(int added, int overridden) {
 	// "1 conflicting binding overridden."
 	message += " " + format(translate_plural("{} conflicting binding overridden.",
 		"{} conflicting bindings overridden.", overridden), overridden);
-	message += " ";
-	message += translate("REAPER will now exit. Please restart REAPER to apply the changes.");
-	MessageBox(GetForegroundWindow(),
-		message.c_str(),
-		translate("Restart REAPER"), MB_OK | MB_ICONINFORMATION);
-	Main_OnCommand(40004, 0); // File: Quit REAPER
+	requestRestart(message);
 }
 
 class KeyMapMergeDialog {
@@ -417,7 +413,7 @@ class KeyMapMergeDialog {
 		const int added = merge->getAddedKeyCount();
 		const int overridden = merge->getAcceptedConflictCount();
 		close();
-		showMergeCompleteAndExit(added, overridden);
+		requestMergeRestart(added, overridden);
 	}
 
 #ifndef _WIN32
@@ -566,11 +562,8 @@ bool confirmInstall() {
 		translate("Install OSARA Key Map"), MB_YESNO | MB_ICONQUESTION) == IDYES;
 }
 
-void showInstallCompleteAndExit() {
-	MessageBox(GetForegroundWindow(),
-		translate("The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."),
-		translate("Restart REAPER"), MB_OK | MB_ICONINFORMATION);
-	Main_OnCommand(40004, 0); // File: Quit REAPER
+void requestInstallRestart() {
+	requestRestart(translate("The OSARA key map was installed."));
 }
 
 } // namespace
@@ -589,7 +582,7 @@ void cmdMergeOsaraKeyMap(int command) {
 			MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
 			return;
 		}
-		showInstallCompleteAndExit();
+		requestInstallRestart();
 		return;
 	}
 	if (merge->getConflicts().empty()) {
@@ -606,7 +599,7 @@ void cmdMergeOsaraKeyMap(int command) {
 			MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
 			return;
 		}
-		showMergeCompleteAndExit(merge->getAddedKeyCount(), merge->getAcceptedConflictCount());
+		requestMergeRestart(merge->getAddedKeyCount(), merge->getAcceptedConflictCount());
 		return;
 	}
 	new KeyMapMergeDialog(std::move(merge));
