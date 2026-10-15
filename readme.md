@@ -39,23 +39,16 @@ Once you have downloaded the installer, simply run it and follow the instruction
 Note that if you previously copied the OSARA extension into REAPER's program directory manually (before the installer became available), you must remove this first.
 The installer installs the extension into your user configuration, not the program directory.
 
-If you wish to completely replace your existing key map with the OSARA key map (recommended to make sure you have the most recent mappings), answer yes when prompted.
-If the installer does replace the key map, a safety backup of your existing key map will be made in Reaper's KeyMaps folder.
-
 ### Mac
 1. Open the OSARA zip file you downloaded. Finder will extract a new file called OSARAInstaller.app.
 As its name suggests, this file is an installer, IE you can open it right there in your downloads folder, you do not need to copy it to your Applications folder.
 2. Open OSARAInstaller.app, follow the instructions.
- If you wish to replace the existing key map with the OSARA key map (which is recommended), answer yes when prompted.
-  A backup of your existing key map will be made in Reaper's KeyMaps folder. 
 3. Once installed, you can remove the zip and app files from your downloads folder.
 
 ### Key Map
-Even if you chose not to replace your existing key map with the OSARA key map, the OSARA key map will be copied into your REAPER "KeyMaps" folder so you can import it manually from the Actions dialog later if you wish.
-This is particularly useful if you wish to merge new additions with your existing key map, rather than replacing it.
+The OSARA key map is copied into your REAPER "KeyMaps" folder.
+OSARA can merge its latest key bindings with your existing key map automatically, or you can run the "OSARA: Merge OSARA key map" action from the Actions dialog.
 Note that all keyboard commands described in this document assume you are using the OSARA key map.
-
-For users who previously used ReaAccess, the OSARA key map is similar to that provided by ReaAccess, though there are some differences.
 You can see the full key map by selecting Key bindings and mouse modifiers from the Help menu.
 
 ## Additional Documentation
