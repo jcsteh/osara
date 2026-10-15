@@ -27,6 +27,9 @@ using namespace std;
 
 namespace {
 
+constexpr int KEY_MAP_VERSION = 1;
+const char KEY_KEY_MAP_VERSION[] = "keyMapVersion";
+
 string joinPath(const string& directory, const string& file) {
 	if (directory.empty()) {
 		return file;
@@ -355,6 +358,7 @@ class KeyMapMergeDialog {
 	unique_ptr<KeyMapMerge> merge;
 	HWND dialog;
 	HWND list;
+	bool restartDeferred;
 #ifndef _WIN32
 	accelerator_register_t accelReg = {};
 #endif
@@ -364,7 +368,12 @@ class KeyMapMergeDialog {
 		plugin_register("-accelerator", &accelReg);
 #endif
 		DestroyWindow(dialog);
+		const bool endDeferredRestart = restartDeferred;
+		restartDeferred = false;
 		delete this;
+		if (endDeferredRestart) {
+			endRestartDeferral();
+		}
 	}
 
 	void updateChoices() {
@@ -402,8 +411,8 @@ class KeyMapMergeDialog {
 	void mergeAndExit() {
 		updateChoices();
 		if (!merge->hasChanges()) {
-			MessageBox(dialog, translate("No changes were selected."), nullptr,
-				MB_OK | MB_ICONINFORMATION);
+			// There is nothing to write or restart for.
+			close();
 			return;
 		}
 		if (!merge->write()) {
@@ -412,8 +421,17 @@ class KeyMapMergeDialog {
 		}
 		const int added = merge->getAddedKeyCount();
 		const int overridden = merge->getAcceptedConflictCount();
-		close();
-		requestMergeRestart(added, overridden);
+		if (restartDeferred) {
+			// close() may finish the restart, so we must call close() after requesting
+			// a restart.
+			requestMergeRestart(added, overridden);
+			close();
+		} else {
+			// Restart will happen immediately when we call requestRestart, so we must
+			// close the dialog first.
+			close();
+			requestMergeRestart(added, overridden);
+		}
 	}
 
 #ifndef _WIN32
@@ -473,7 +491,8 @@ class KeyMapMergeDialog {
 	}
 
 	public:
-	KeyMapMergeDialog(unique_ptr<KeyMapMerge> merge): merge(std::move(merge)) {
+	KeyMapMergeDialog(unique_ptr<KeyMapMerge> merge, bool restartDeferred = false):
+		merge(std::move(merge)), restartDeferred(restartDeferred) {
 		dialog = CreateDialog(pluginHInstance, MAKEINTRESOURCE(ID_KEYMAP_DLG),
 			mainHwnd, dialogProc);
 		translateDialog(dialog);
@@ -566,23 +585,33 @@ void requestInstallRestart() {
 	requestRestart(translate("The OSARA key map was installed."));
 }
 
-} // namespace
-
-void cmdMergeOsaraKeyMap(int command) {
+void cmdhMergeOsaraKeyMap(bool shouldDeferRestart) {
+	if (shouldDeferRestart) {
+		deferRestart();
+	}
+	auto finishDeferredRestart = [&]() {
+		if (shouldDeferRestart) {
+			endRestartDeferral();
+		}
+	};
 	auto merge = make_unique<KeyMapMerge>();
 	if (!merge->load()) {
 		MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
+		finishDeferredRestart();
 		return;
 	}
 	if (merge->isUserMapMissing()) {
 		if (!confirmInstall()) {
+			finishDeferredRestart();
 			return;
 		}
 		if (!merge->install()) {
 			MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
+			finishDeferredRestart();
 			return;
 		}
 		requestInstallRestart();
+		finishDeferredRestart();
 		return;
 	}
 	if (merge->getConflicts().empty()) {
@@ -590,17 +619,39 @@ void cmdMergeOsaraKeyMap(int command) {
 			MessageBox(GetForegroundWindow(),
 				translate("Your key map already includes all OSARA key map changes."),
 				translate("Merge OSARA Key Map"), MB_OK | MB_ICONINFORMATION);
+			finishDeferredRestart();
 			return;
 		}
 		if (!confirmAutomaticMerge(*merge)) {
+			finishDeferredRestart();
 			return;
 		}
 		if (!merge->write()) {
 			MessageBox(GetForegroundWindow(), merge->getError().c_str(), nullptr, MB_OK | MB_ICONERROR);
+			finishDeferredRestart();
 			return;
 		}
 		requestMergeRestart(merge->getAddedKeyCount(), merge->getAcceptedConflictCount());
+		finishDeferredRestart();
 		return;
 	}
-	new KeyMapMergeDialog(std::move(merge));
+	new KeyMapMergeDialog(std::move(merge), shouldDeferRestart);
+}
+
+} // namespace
+
+void cmdMergeOsaraKeyMap(int command) {
+	cmdhMergeOsaraKeyMap(false);
+}
+
+void maybeMergeOsaraKeyMap() {
+	const char* raw = GetExtState(CONFIG_SECTION, KEY_KEY_MAP_VERSION);
+	int value = atoi(raw);
+	if (value < KEY_MAP_VERSION) {
+		// Even if the user chooses not to merge the key map, we don't want to ask
+		// them again at startup until the key map is updated.
+		string version = fmt::format("{}", KEY_MAP_VERSION);
+		SetExtState(CONFIG_SECTION, KEY_KEY_MAP_VERSION, version.c_str(), true);
+		cmdhMergeOsaraKeyMap(true);
+	}
 }
