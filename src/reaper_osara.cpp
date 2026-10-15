@@ -6812,7 +6812,9 @@ void delayedInit() {
 		}
 	}
 
+	deferRestart();
 	maybeAutoConfigReaperOptimal();
+	endRestartDeferral();
 	startUpdateCheck();
 }
 

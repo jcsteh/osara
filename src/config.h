@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <string>
 #include "osara.h"
 
 namespace settings {
@@ -25,3 +26,11 @@ void registerSettingCommands();
 bool handleSettingCommand(int command);
 void cmdConfigReaperOptimal(int command);
 void maybeAutoConfigReaperOptimal();
+
+// These functions allow restart requests to be deferred while changing REAPER
+// configuration at startup. This is necessary so that multiple types of changes
+// can be applied with a single restart. This also allows all of the changes to
+// be reported in a single message.
+void deferRestart();
+void requestRestart(const std::string& summary = {});
+void endRestartDeferral();

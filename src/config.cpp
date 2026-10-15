@@ -30,6 +30,54 @@ namespace settings {
 #undef BoolSetting
 }
 
+namespace {
+
+int restartDeferralCount = 0;
+vector<string> restartSummaries;
+bool restartPending = false;
+
+void maybeFinishRestart() {
+	if (!restartPending || restartDeferralCount != 0) {
+		return;
+	}
+	string message;
+	for (const string& summary: restartSummaries) {
+		if (!message.empty()) {
+			message += "\n";
+		}
+		message += summary;
+	}
+	if (!message.empty()) {
+		message += "\n";
+	}
+	message += translate("REAPER will now exit. Please restart REAPER to apply the changes.");
+	MessageBox(GetForegroundWindow(), message.c_str(), translate("Restart REAPER"),
+		MB_OK | MB_ICONINFORMATION);
+	Main_OnCommand(40004, 0); // File: Quit REAPER
+}
+
+} // namespace
+
+void deferRestart() {
+	++restartDeferralCount;
+}
+
+void requestRestart(const string& summary) {
+	restartPending = true;
+	if (!summary.empty()) {
+		restartSummaries.push_back(summary);
+	}
+	maybeFinishRestart();
+}
+
+void endRestartDeferral() {
+	if (restartDeferralCount == 0) {
+		return;
+	}
+	--restartDeferralCount;
+	maybeFinishRestart();
+}
+
 void loadConfig() {
 	// GetExtState returns an empty string (not null) if the key doesn't exist.
 	char v = '\0';
@@ -322,6 +370,7 @@ void cmdConfigReaperOptimal(int command) {
 		// Prefs -> General -> Recent project list display: Display file name and full path.
 		{"REAPER", "actionmenu", 1 << 1, 1 << 3, 3},
 	};
+	bool success = true;
 	for (const auto& setting: settings) {
 		int newVal = setting.value;
 		if (setting.addFlag || setting.removeFlag) {
@@ -345,16 +394,13 @@ void cmdConfigReaperOptimal(int command) {
 				nullptr,
 				MB_OK | MB_ICONERROR
 			);
+			success = false;
 			break;
 		}
 	}
-	MessageBox(
-		GetForegroundWindow(),
-		translate("REAPER will now exit. Please restart REAPER  to apply the changes."),
-		translate("Restart REAPER"),
-		MB_ICONINFORMATION
-	);
-	Main_OnCommand(40004, 0); // File: Quit REAPER
+	if (success) {
+		requestRestart(translate("REAPER preferences adjusted."));
+	}
 }
 
 void maybeAutoConfigReaperOptimal() {
