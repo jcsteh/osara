@@ -650,7 +650,7 @@ void cmdMergeOsaraKeyMap(int command) {
 	cmdhMergeOsaraKeyMap(false);
 }
 
-void maybeMergeOsaraKeyMap() {
+void maybeAutoMergeOsaraKeyMap() {
 	const char* raw = GetExtState(CONFIG_SECTION, KEY_KEY_MAP_VERSION);
 	int value = atoi(raw);
 	if (value < KEY_MAP_VERSION) {

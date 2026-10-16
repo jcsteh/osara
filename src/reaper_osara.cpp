@@ -6814,7 +6814,7 @@ void delayedInit() {
 
 	deferRestart();
 	maybeAutoConfigReaperOptimal();
-	maybeMergeOsaraKeyMap();
+	maybeAutoMergeOsaraKeyMap();
 	endRestartDeferral();
 	startUpdateCheck();
 }

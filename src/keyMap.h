@@ -8,4 +8,4 @@
 #pragma once
 
 void cmdMergeOsaraKeyMap(int command);
-void maybeMergeOsaraKeyMap();
+void maybeAutoMergeOsaraKeyMap();
