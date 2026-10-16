@@ -620,9 +620,11 @@ void cmdhMergeOsaraKeyMap(bool shouldDeferRestart) {
 	}
 	if (merge->getConflicts().empty()) {
 		if (!merge->hasChanges()) {
-			MessageBox(GetForegroundWindow(),
-				translate("Your key map already includes all OSARA key map changes."),
-				translate("Merge OSARA Key Map"), MB_OK | MB_ICONINFORMATION);
+			if (!shouldDeferRestart) {
+				MessageBox(GetForegroundWindow(),
+					translate("Your key map already includes all OSARA key map changes."),
+					translate("Merge OSARA Key Map"), MB_OK | MB_ICONINFORMATION);
+			}
 			finishDeferredRestart();
 			return;
 		}
