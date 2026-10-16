@@ -1061,9 +1061,11 @@ class FxParams: public ParamSource {
 			(apiPrefix + "_GetPinMappings").c_str());
 		*(void**)&this->_SetPinMappings = plugin_getapi(
 			(apiPrefix + "_SetPinMappings").c_str());
-		// This one doesn't follow the naming pattern for tracks.
-		*(void**)&this->_GetEnvelope = plugin_getapi(
-			apiPrefix == "TrackFX" ? "GetFXEnvelope" : "TakeFX_GetEnvelope");
+		if constexpr (is_same_v<ReaperObj, MediaTrack>) {
+			*(void**)&this->_GetEnvelope = plugin_getapi("GetFXEnvelope");
+		} else {
+			*(void**)&this->_GetEnvelope = plugin_getapi("TakeFX_GetEnvelope");
+		}
 		if (fx >= 0) {
 			this->initNamedConfigParams();
 			this->initPins();
@@ -1239,9 +1241,6 @@ class FxParam: public Param {
 	}
 
 	bool isAutomated() final {
-		if (!this->source._GetEnvelope) {
-			return false;
-		}
 		TrackEnvelope* envelope = this->source._GetEnvelope(this->source.obj,
 			this->fx, this->param, false);
 		if (!envelope) {
