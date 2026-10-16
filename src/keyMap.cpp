@@ -196,6 +196,10 @@ class KeyMapMerge {
 			if (user == userKeys.end()) {
 				// This key is new in the OSARA map and isn't bound in the user's map.
 				keysToAdd.push_back(osara);
+			} else if (osara.command == "0") {
+				// OSARA disables REAPER's default for this key, but an explicit user
+				// binding should take precedence and must not be treated as a conflict.
+				continue;
 			} else if (user->second.command != osara.command) {
 				// This key exists in both maps and is bound to different actions.
 				conflicts.push_back({osara, user->second});
