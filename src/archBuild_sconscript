@@ -96,7 +96,12 @@ else: # Mac
 	env["xcodeDevDir"] = (
 		subprocess.check_output(("xcode-select", "-p"))
 		.decode().strip())
-	coreFlags = ("-mmacosx-version-min=10.7 -stdlib=libc++ "
+	# Newer Xcode SDKs (macOS 15+ / Xcode 16+) drop libc++ support for macOS < 11.0,
+	# causing a fatal warning under -Werror if we target 10.7.
+	sdkVersion = subprocess.check_output(("xcrun", "--show-sdk-version")).decode().strip()
+	sdkMajor = int(sdkVersion.split(".")[0]) if sdkVersion else 0
+	minVersion = "11.0" if sdkMajor >= 15 else "10.7"
+	coreFlags = (f"-mmacosx-version-min={minVersion} -stdlib=libc++ "
 		"-arch x86_64 -arch arm64 "
 		"-isysroot $xcodeDevDir/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
 	cxxFlags = coreFlags + " -std=c++20 -Werror"
