@@ -94,6 +94,73 @@ string narrow(const wstring& text) {
 	return utf8Utf16.to_bytes(text);
 }
 
+bool isTrackViewWindow(HWND hwnd);
+extern HWND vkbHwnd;
+
+// Whether this is the virtual MIDI keyboard or one of its controls which don't
+// have their own caret.
+static bool isVkbWindow(HWND hwnd) {
+	return vkbHwnd && (hwnd == vkbHwnd || GetParent(hwnd) == vkbHwnd) &&
+		!isClassName(hwnd, "Edit") && !isClassName(hwnd, "ComboBox");
+}
+
+// Whether this is a window in which we move an invisible caret for JAWS. See
+// moveCaretForJaws.
+static bool isJawsCaretWindow(HWND hwnd) {
+	return isTrackViewWindow(hwnd) || isClassName(hwnd, "REAPERMCPDisplay") ||
+		isClassName(hwnd, "MIDIWindow") ||
+		isClassName(hwnd, "REAPERmidieditorwnd") || isVkbWindow(hwnd);
+}
+
+// After keys such as the arrow keys, JAWS waits for the caret to move before
+// it reports anything else. The track view, the mixer, the MIDI editor and the
+// virtual MIDI keyboard have no caret, so JAWS was slow to report OSARA's
+// messages there.
+// Therefore, when JAWS is running, we move an invisible caret whenever we
+// report a message there after a key press; to the current track in the track
+// view and the mixer.
+void moveCaretForJaws(HWND focus) {
+	if (!GetModuleHandleA("jhook.dll") || !isJawsCaretWindow(focus)) {
+		return;
+	}
+	// JAWS only waits after a key press. Moving the caret for other reports, such
+	// as during playback, would just make JAWS do extra work.
+	LASTINPUTINFO input{sizeof(LASTINPUTINFO)};
+	if (!GetLastInputInfo(&input) || GetTickCount() - input.dwTime > 500) {
+		return;
+	}
+	const bool isMixer = isClassName(focus, "REAPERMCPDisplay");
+	int x = 0;
+	int y = 0;
+	int height = 1;
+	MediaTrack* track = isMixer || isTrackViewWindow(focus) ?
+		GetLastTouchedTrack() : nullptr;
+	if (track) {
+		x = isMixer ? (int)GetMediaTrackInfo_Value(track, "I_MCPX") : 0;
+		y = (int)GetMediaTrackInfo_Value(track, isMixer ? "I_MCPY" : "I_TCPY");
+		height = max((int)GetMediaTrackInfo_Value(track,
+			isMixer ? "I_MCPH" : "I_TCPH"), 1);
+	}
+	// Move the caret even if the track hasn't changed.
+	static int nudge = 0;
+	nudge = nudge ? 0 : 1;
+	GUITHREADINFO info{sizeof(GUITHREADINFO)};
+	if (!GetGUIThreadInfo(GetCurrentThreadId(), &info) ||
+			info.hwndCaret != focus ||
+			info.rcCaret.bottom - info.rcCaret.top != height) {
+		CreateCaret(focus, nullptr, 1, height);
+	}
+	SetCaretPos(x + nudge, y);
+}
+
+// Remove our invisible caret if focus has moved to another window.
+void removeCaretForJaws(HWND focus) {
+	GUITHREADINFO info{sizeof(GUITHREADINFO)};
+	if (GetGUIThreadInfo(GetCurrentThreadId(), &info) && info.hwndCaret &&
+			info.hwndCaret != focus && isJawsCaretWindow(info.hwndCaret)) {
+		DestroyCaret();
+	}
+}
 string lastMessage;
 HWND lastMessageHwnd = nullptr;
 void _outputMessage(const string& message, bool interrupt) {
@@ -103,6 +170,7 @@ void _outputMessage(const string& message, bool interrupt) {
 		// A message this early isn't useful anyway, so just ignore it.
 		return;
 	}
+	moveCaretForJaws(GetFocus());
 	if (shouldUseUiaNotifications()) {
 		if (sendUiaNotification(message, interrupt)) {
 			return;
@@ -6925,6 +6993,7 @@ void CALLBACK handleWinEvent(HWINEVENTHOOK hook, DWORD event, HWND hwnd, LONG ob
 			prevForegroundHwnd = foreground;
 			prevForegroundTime = time;
 		}
+		removeCaretForJaws(hwnd);
 		bool focusIsTrackView = isTrackViewWindow(hwnd);
 		if (focusIsTrackView) {
 			// Give these objects a non-generic role so NVDA doesn't fall back to
