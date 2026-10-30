@@ -803,6 +803,30 @@ void cmdCycleEnvelopePointShape(int command) {
 	outputMessage(getEnvelopeShapeName(shape));
 }
 
+void postChangeBezierTension(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		return;
+	}
+	optional<double> tension;
+	forEachSelectedEnvelopePoint(envelope,
+		[envelope, &tension](int item, int point) {
+			// Report the tension of the first selected point.
+			double value;
+			GetEnvelopePointEx(envelope, item, point, nullptr, nullptr, nullptr,
+				&value, nullptr);
+			tension = value;
+			return false;
+		}
+	);
+	if (!tension) {
+		return; // No selected points.
+	}
+	// Translators: Reported when changing the bezier tension of envelope points.
+	// {} will be replaced with the tension as a percentage; e.g. "tension 25%".
+	outputMessage(format(translate("tension {}%"), (int)round(*tension * 100)));
+}
+
 void cmdToggleVolumeEnvelope(int command) {
 	if (fakeFocus == FOCUS_ITEM) {
 		cmdhToggleTakeEnvelope(40693); // Take: Toggle take volume envelope

@@ -3240,6 +3240,10 @@ PostCommand POST_COMMANDS[] = {
 	{40296, postSelectMultipleTracks}, // Track: Select all tracks
 	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
 	{40334, postSelectMultipleEnvelopePoints}, // Envelope: Invert selected points
+	{41122, postChangeBezierTension}, // Envelope: Increase bezier tension for selected points by 5%
+	{41123, postChangeBezierTension}, // Envelope: Decrease bezier tension for selected points by 5%
+	{41124, postChangeBezierTension}, // Envelope: Increase bezier tension for selected points by 25%
+	{41125, postChangeBezierTension}, // Envelope: Decrease bezier tension for selected points by 25%
 	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
 	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
 	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
