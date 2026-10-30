@@ -96,6 +96,8 @@ string narrow(const wstring& text) {
 
 bool isTrackViewWindow(HWND hwnd);
 extern HWND vkbHwnd;
+// The time of the last key press in REAPER. Set in translateAccel.
+DWORD lastKeyDownTime = 0;
 
 // Whether this is the virtual MIDI keyboard or one of its controls which don't
 // have their own caret.
@@ -124,9 +126,9 @@ void moveCaretForJaws(HWND focus) {
 		return;
 	}
 	// JAWS only waits after a key press. Moving the caret for other reports, such
-	// as during playback, would just make JAWS do extra work.
-	LASTINPUTINFO input{sizeof(LASTINPUTINFO)};
-	if (!GetLastInputInfo(&input) || GetTickCount() - input.dwTime > 500) {
+	// as during playback or after mouse movement, would just make JAWS do extra
+	// work.
+	if (GetTickCount() - lastKeyDownTime > 500) {
 		return;
 	}
 	const bool isMixer = isClassName(focus, "REAPERMCPDisplay");
@@ -135,6 +137,11 @@ void moveCaretForJaws(HWND focus) {
 	int height = 1;
 	MediaTrack* track = isMixer || isTrackViewWindow(focus) ?
 		GetLastTouchedTrack() : nullptr;
+	if (track == GetMasterTrack(nullptr) && isMixer) {
+		// The master track can be shown in a separate pane of the mixer, so its
+		// coordinates don't relate to this window.
+		track = nullptr;
+	}
 	if (track) {
 		x = isMixer ? (int)GetMediaTrackInfo_Value(track, "I_MCPX") : 0;
 		y = (int)GetMediaTrackInfo_Value(track, isMixer ? "I_MCPY" : "I_TCPY");
@@ -7071,6 +7078,11 @@ HWINEVENTHOOK winEventHook = nullptr;
 // This accelerator hook is registered at startup and remains registered until
 // REAPER exits.
 int translateAccel(MSG* msg, accelerator_register_t* accelReg) {
+#ifdef _WIN32
+	if (msg->message == WM_KEYDOWN || msg->message == WM_SYSKEYDOWN) {
+		lastKeyDownTime = GetTickCount();
+	}
+#endif
 	int res = vkbTranslateAccel(msg, accelReg);
 	if (res != 0) {
 		return res;
