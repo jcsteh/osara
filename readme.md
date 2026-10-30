@@ -263,6 +263,7 @@ SWS/FNG: Time stretch selected items (fine): Control+Alt+=
 - Envelope: Delete all points in time selection: Alt+Shift+Delete
 - Envelope: Insert new point at current position (remove nearby points): Shift+E
 - Envelope: Insert automation item: Control+Shift+I
+- Envelopes: View envelopes for last touched track/item: Shift+L
 
 #### Zoom
 - View: Zoom out horizontal: NumPad-
