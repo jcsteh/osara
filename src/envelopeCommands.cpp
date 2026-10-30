@@ -734,6 +734,51 @@ void cmdToggleTakeEnvelope(int command) {
 	cmdhToggleTakeEnvelope(command);
 }
 
+void cmdToggleShowAllTrackEnvelopes(int command) {
+	auto countVisible = []() {
+		size_t count = 0;
+		for (int t = 0; t < CountSelectedTracks2(nullptr, false); ++t) {
+			count += getVisibleEnvelopes(GetSelectedTrack2(nullptr, t, false),
+				CountTrackEnvelopes, GetTrackEnvelope).size();
+		}
+		return count;
+	};
+	size_t before = countVisible();
+	Main_OnCommand(command, 0);
+	size_t after = countVisible();
+	if (after > before) {
+		// Translators: Reported when showing all envelopes for the selected tracks.
+		outputMessage(translate("showed all envelopes"));
+	} else if (after < before) {
+		// Translators: Reported when hiding all envelopes for the selected tracks.
+		outputMessage(translate("hid all envelopes"));
+	} else {
+		outputMessage(translate("no envelopes toggled"));
+	}
+}
+
+void postToggleEnvelopeBypass(int command) {
+	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+	if (!envelope) {
+		outputMessage(translate("no envelope selected"));
+		return;
+	}
+	char state[200];
+	GetEnvelopeStateChunk(envelope, state, sizeof(state), false);
+	cmatch m;
+	regex_search(state, m, RE_ENVELOPE_STATE);
+	char name[50];
+	GetEnvelopeName(envelope, name, sizeof(name));
+	ostringstream s;
+	s << format(translate("{} envelope"), name) << " ";
+	if (!m.empty() && m.str(3)[0] == '0') {
+		s << translate("bypassed");
+	} else {
+		s << translate("active");
+	}
+	outputMessage(s);
+}
+
 void postSelectMultipleEnvelopePoints(int command) {
 	TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
 	if (!envelope) {
