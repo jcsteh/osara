@@ -203,8 +203,28 @@ UINT_PTR timer = 0;
 
 const char FX_LOUDNESS_METER[] = "loudness_meter";
 
+// Get the index of the first output parameter of the loudness meter. REAPER
+// 7.79 added a Reset parameter before the outputs, so we can't use a fixed
+// index. We find it by name instead.
+int getLoudnessMeterFirstOutputParam(MediaTrack* track, int fx) {
+	static int firstOutput = -1;
+	if (firstOutput != -1) {
+		return firstOutput;
+	}
+	char name[64];
+	for (int param = 0;
+			TrackFX_GetParamName(track, fx, param, name, sizeof(name)); ++param) {
+		if (strstr(name, "(output)")) {
+			firstOutput = param;
+			return firstOutput;
+		}
+	}
+	// This is the index used by REAPER versions before 7.79.
+	return 15;
+}
+
 double getLoudnessMeterParam(Watcher& watcher,
-	int configParam, double configValue, int queryParam
+	int configParam, double configValue, int outputParam
 ) {
 	assert(holds_alternative<MediaTrack*>(watcher.target));
 	MediaTrack* track = varGet<MediaTrack*>(watcher.target);
@@ -232,7 +252,9 @@ double getLoudnessMeterParam(Watcher& watcher,
 	// another value earlier if two different values are being watched on the same
 	// track.
 	TrackFX_SetParam(track, fx, configParam, configValue);
-	return TrackFX_GetParam(track, fx, queryParam, nullptr, nullptr);
+	return TrackFX_GetParam(track, fx,
+		getLoudnessMeterFirstOutputParam(track, fx) + outputParam, nullptr,
+		nullptr);
 }
 
 void deleteLoudnessMeter(Watcher& watcher) {
@@ -275,7 +297,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 6, 1.0, 20);
+			return getLoudnessMeterParam(watcher, 6, 1.0, 5);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -284,7 +306,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 3, 1.0, 18);
+			return getLoudnessMeterParam(watcher, 3, 1.0, 3);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -293,7 +315,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 4, 1.0, 19);
+			return getLoudnessMeterParam(watcher, 4, 1.0, 4);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -302,7 +324,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 5, 1.0, 21);
+			return getLoudnessMeterParam(watcher, 5, 1.0, 6);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -311,7 +333,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 2, 1.0, 17);
+			return getLoudnessMeterParam(watcher, 2, 1.0, 2);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -320,7 +342,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 1, 1.0, 16);
+			return getLoudnessMeterParam(watcher, 1, 1.0, 1);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
@@ -329,7 +351,7 @@ const LevelType LEVEL_TYPES[] = {
 		/* separateChannels */ false,
 		/* isSmallerSignificant */ false,
 		/* getValue */ [](Watcher& watcher, int channel) {
-			return getLoudnessMeterParam(watcher, 0, 1.0, 15);
+			return getLoudnessMeterParam(watcher, 0, 1.0, 0);
 		},
 		/* reset */ deleteLoudnessMeter,
 	},
