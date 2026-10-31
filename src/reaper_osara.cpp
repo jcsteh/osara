@@ -6299,6 +6299,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40061}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at time selection or razor edit
 	{MAIN_SECTION, {{0, 0, 40932}, nullptr}, nullptr, cmdSplitItems}, // Item: Split items at timeline grid
 	{MAIN_SECTION, {{0, 0, 40792}, nullptr}, nullptr, cmdSplitItems}, // Item: Split at previous zero crossing
+	{MAIN_SECTION, {DEFACCEL, nullptr}, "_SWS_AWSPLITXFADELEFT", cmdSplitItems}, // SWS/AW: Split selected items at edit cursor w/crossfade on left
 	{MAIN_SECTION, {{0, 0, 40058}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks (old-style handling of hidden tracks)
 	{MAIN_SECTION, {{0, 0, 42398}, nullptr}, nullptr, cmdPaste}, // Item: Paste items/tracks
 	{MAIN_SECTION, {{0, 0, 40603}, nullptr}, nullptr, cmdPaste}, // Take: Paste as takes in items

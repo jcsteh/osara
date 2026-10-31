@@ -972,6 +972,7 @@ This list is worth referencing when making your own key map additions, assigning
 - Track: Remove tracks
 - Track: Cut tracks
 - Track: Copy tracks
+- SWS/AW: Split selected items at edit cursor w/crossfade on left
 - SWS/S&M: Cut selected tracks (with routing)
 - SWS/S&M: Copy selected tracks (with routing)
 - SWS/S&M: Paste tracks (with routing) or items
