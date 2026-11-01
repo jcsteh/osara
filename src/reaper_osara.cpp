@@ -1492,6 +1492,30 @@ void postCursorMovement(int command) {
 	}
 }
 
+void postMoveCursorToItemEdge(int command) {
+	if (fakeFocus == FOCUS_AUTOMATIONITEM && currentAutomationItem != -1) {
+		// REAPER's actions only handle media items. Move to the start or end of the
+		// automation item instead.
+		TrackEnvelope* envelope = GetSelectedEnvelope(nullptr);
+		if (envelope) {
+			double pos = GetSetAutomationItemInfo(envelope, currentAutomationItem,
+				"D_POSITION", 0, false);
+			if (command == 41174) { // Move cursor to end of items
+				pos += GetSetAutomationItemInfo(envelope, currentAutomationItem,
+					"D_LENGTH", 0, false);
+			}
+			SetEditCurPos(pos, true, false);
+			// Don't change the focus, so these actions keep working for the
+			// automation item.
+			if (shouldReportTimeMovement()) {
+				outputMessage(formatCursorPosition().c_str());
+			}
+			return;
+		}
+	}
+	postCursorMovement(command);
+}
+
 void postCursorMovementScrub(int command) {
 	if (settings::reportScrub)
 		postCursorMovement(command);
@@ -3108,8 +3132,8 @@ PostCommand POST_COMMANDS[] = {
 	{40254, postItemNormalize}, // Item properties: Normalize items together (common gain) to +0dB peak
 	{40318, postCursorMovement}, // Item navigation: Move cursor left to edge of item
 	{40319, postCursorMovement}, // Item navigation: Move cursor right to edge of item
-	{41173, postCursorMovement}, // Item navigation: Move cursor to start of items
-	{41174, postCursorMovement}, // Item navigation: Move cursor to end of items
+	{41173, postMoveCursorToItemEdge}, // Item navigation: Move cursor to start of items
+	{41174, postMoveCursorToItemEdge}, // Item navigation: Move cursor to end of items
 	{40646, postCursorMovement}, // View: Move cursor left to grid division
 	{40647, postCursorMovement}, // View: Move cursor right to grid division
 	{43614, postCursorMovement}, // View: Move cursor left by grid division
