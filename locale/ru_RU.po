@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr ""
+
+msgid "Restart REAPER"
+msgstr "Перезапуск REAPER"
 
 msgid "enabled"
 msgstr "включено"
@@ -80,11 +86,8 @@ msgstr "Примечание: если сейчас не самое подход
 msgid "Error writing configuration changes."
 msgstr "Ошибка при записи изменений параметров."
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER завершит работу. Пожалуйста, перезапустите REAPER, чтобы применить изменения."
-
-msgid "Restart REAPER"
-msgstr "Перезапуск REAPER"
+msgid "REAPER preferences adjusted."
+msgstr ""
 
 msgid "volume"
 msgstr "громкость"
@@ -347,12 +350,6 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr ""
-
-msgid "No changes were selected."
-msgstr ""
-
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
@@ -398,7 +395,7 @@ msgstr ""
 msgid "Install OSARA Key Map"
 msgstr ""
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgid "The OSARA key map was installed."
 msgstr ""
 
 msgid "Your key map already includes all OSARA key map changes."
@@ -1197,6 +1194,11 @@ msgstr "включено"
 #. which is off.
 msgid "off"
 msgstr "выключено"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr ""
 
 msgid "Unrestrict minimum"
 msgstr "Снять ограничение с минимального значения"

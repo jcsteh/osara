@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER se cerrará. por favor reinicie REAPER para aplicar cambios."
+
+msgid "Restart REAPER"
+msgstr "Reiniciar Reaper"
 
 msgid "enabled"
 msgstr "activado"
@@ -80,11 +86,8 @@ msgstr "Nota: Si prefieres no hacerlo ahora, Puedes aplicar los cambios más tar
 msgid "Error writing configuration changes."
 msgstr "Error escribiendo cambios en la configuración."
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER se cerrará. Por favor reinícielo para que los cambios sean aplicados."
-
-msgid "Restart REAPER"
-msgstr "Reiniciar Reaper"
+msgid "REAPER preferences adjusted."
+msgstr "Preferencias de Reaper Configuradas."
 
 msgid "volume"
 msgstr "volumen"
@@ -331,12 +334,6 @@ msgid_plural "{} conflicting bindings overridden."
 msgstr[0] "{} atajo en conflicto sobreescrito."
 msgstr[1] "{} atajos en conflicto sobreescritos."
 
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "REAPER se cerrará. por favor reinicie REAPER para aplicar cambios."
-
-msgid "No changes were selected."
-msgstr "ningún cambio seleccionado."
-
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
@@ -380,8 +377,8 @@ msgstr "Tu mapa de teclas de REAPER aún no existe. ¿Quieres instalar el mapa d
 msgid "Install OSARA Key Map"
 msgstr "Instalar mapa de teclado de Osara"
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "El mapa de teclas de OSARA se ha instalado. REAPER se cerrará ahora. Por favor, reinicia REAPER para aplicar los cambios."
+msgid "The OSARA key map was installed."
+msgstr "El mapa de teclado de Osara ha sido instalado."
 
 msgid "Your key map already includes all OSARA key map changes."
 msgstr "Tu mapa de teclas ya incluye todos los cambios del mapa de teclas de OSARA."
@@ -1091,6 +1088,11 @@ msgstr "activado"
 #. which is off.
 msgid "off"
 msgstr "desactivado"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr "automatizado"
 
 msgid "Unrestrict minimum"
 msgstr "Sin restricción mínima"

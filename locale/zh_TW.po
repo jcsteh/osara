@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER 現在將退出。請重新啟動 REAPER 以套用變更。"
+
+msgid "Restart REAPER"
+msgstr "重啟 REAPER"
 
 msgid "enabled"
 msgstr "已啟用"
@@ -80,11 +86,8 @@ msgstr "注意：如果現在不是調整 REAPER 的好時機，您可以稍後�
 msgid "Error writing configuration changes."
 msgstr "寫入配置變更時發生錯誤。"
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER 現在將退出。請重新啟動 REAPER 以套用變更。"
-
-msgid "Restart REAPER"
-msgstr "重啟 REAPER"
+msgid "REAPER preferences adjusted."
+msgstr "REAPER 偏好設定已調整。"
 
 msgid "volume"
 msgstr "音量"
@@ -323,12 +326,6 @@ msgid "{} conflicting binding overridden."
 msgid_plural "{} conflicting bindings overridden."
 msgstr[0] "{} 個衝突鍵的綁定已覆寫。"
 
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "REAPER 現在將退出。請重新啟動 REAPER 以套用變更。"
-
-msgid "No changes were selected."
-msgstr "未選擇任何變更。"
-
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
@@ -371,8 +368,8 @@ msgstr "您的 REAPER 鍵映射尚不存在。您想安裝 OSARA 鍵映射嗎？
 msgid "Install OSARA Key Map"
 msgstr "安裝 OSARA 鍵映射"
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "OSARA 鍵映射已安裝。 REAPER 現在將退出。請重新啟動 REAPER 以套用變更。"
+msgid "The OSARA key map was installed."
+msgstr "OSARA 鍵映射已安裝。"
 
 msgid "Your key map already includes all OSARA key map changes."
 msgstr "您的鍵盤映射已包含所有 OSARA 鍵盤映射變更。"
@@ -1038,6 +1035,11 @@ msgstr "開"
 #. which is off.
 msgid "off"
 msgstr "關"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr "自動化"
 
 msgid "Unrestrict minimum"
 msgstr "取消最小值限制"

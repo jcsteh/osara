@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: French, Canada\n"
 "Language: fr_CA\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER va maintenant se fermer. Veuillez redémarrer REAPER pour appliquer les modifications."
+
+msgid "Restart REAPER"
+msgstr "Redémarrer REAPPER"
 
 msgid "enabled"
 msgstr "activé"
@@ -80,11 +86,8 @@ msgstr "Remarque : si ce n'est pas le bon moment pour peaufiner REAPER, vous pou
 msgid "Error writing configuration changes."
 msgstr "Erreur lors de l'écriture des changements de configuration."
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER va maintenant se fermer. Veuillez redémarrer REAPER pour appliquer les modifications."
-
-msgid "Restart REAPER"
-msgstr "Redémarrer REAPPER"
+msgid "REAPER preferences adjusted."
+msgstr "Préférences de REAPER ajustées."
 
 msgid "volume"
 msgstr "volume"
@@ -297,68 +300,62 @@ msgid "{} tab"
 msgstr "{} onglet"
 
 msgid "Unable to read your REAPER key map."
-msgstr ""
+msgstr "Impossible de lire votre KeyMap REAPER."
 
 msgid "Unable to read the OSARA key map"
-msgstr ""
+msgstr "Impossible de lire le KeyMap OSARA."
 
 msgid "Unable to install the OSARA key map."
-msgstr ""
+msgstr "Impossible d'installer le KeyMap d'OSARA."
 
 #. Shown for a key in the Merge OSARA Key map dialog when
 #. REAPER's default mapping for that key has been disabled.
 msgid "Disabled default"
-msgstr ""
+msgstr "Désactivé par défaut"
 
 msgid "Unable to write the merged key map."
-msgstr ""
+msgstr "Impossible d'écrire le KeyMap fusionnée."
 
 msgid "Unable to replace your REAPER key map."
-msgstr ""
+msgstr "Impossible de remplacer votre KeyMap REAPER."
 
 #. Shown after merging the OSARA key map. {} is the number of
 #. new key bindings. For example: "3 key bindings added."
 msgid "{} key binding added."
 msgid_plural "{} key bindings added."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{} Raccourci clavier ajouté."
+msgstr[1] "{} {} Raccourcis clavier ajoutés."
 
 #. Shown after merging the OSARA key map. {} is the number of
 #. conflicting bindings overridden with OSARA's bindings. For example: 
 #. "1 conflicting binding overridden."
 msgid "{} conflicting binding overridden."
 msgid_plural "{} conflicting bindings overridden."
-msgstr[0] ""
-msgstr[1] ""
-
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr ""
-
-msgid "No changes were selected."
-msgstr ""
+msgstr[0] "{} Raccourci en conflit remplacé."
+msgstr[1] "{} Raccourcis en conflit remplacés."
 
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
-msgstr ""
+msgstr "Touche"
 
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the action assigned to a key in the OSARA key map.
 msgid "OSARA"
-msgstr ""
+msgstr "OSARA"
 
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the action assigned to a key in the user's current key map.
 msgid "Yours"
-msgstr ""
+msgstr "Le vôtre"
 
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating whether the OSARA binding will replace the user's binding.
 msgid "Use OSARA"
-msgstr ""
+msgstr "Utiliser celui d'OSARA"
 
 msgid "No"
-msgstr ""
+msgstr "Non"
 
 #. Shown before merging the OSARA key map when there are no key
 #. binding conflicts. {} is the number of new key bindings. For example: "No
@@ -375,13 +372,13 @@ msgstr ""
 #. Shown when REAPER does not have a key map file yet. This asks
 #. whether the user wants to install OSARA's key map as a new key map.
 msgid "Your REAPER key map does not exist yet. Do you want to install the OSARA key map?"
-msgstr ""
+msgstr "Votre KeyMap REAPER n'existe pas encore. Voulez-vous installer le KeyMap OSARA ?"
 
 msgid "Install OSARA Key Map"
-msgstr ""
+msgstr "Installer le KeyMap d'OSARA"
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr ""
+msgid "The OSARA key map was installed."
+msgstr "Le KeyMap OSARA a été installée."
 
 msgid "Your key map already includes all OSARA key map changes."
 msgstr ""
@@ -1091,6 +1088,11 @@ msgstr "actif"
 #. which is off.
 msgid "off"
 msgstr "inactif"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr "automatisé"
 
 msgid "Unrestrict minimum"
 msgstr "Sans restriction minimal"
@@ -1891,27 +1893,27 @@ msgstr "décalage de fin {} MS"
 
 #. A shape for an item fade.
 msgid "slight convex"
-msgstr ""
+msgstr "Légèrement convexe"
 
 #. A shape for an item fade.
 msgid "slight concave"
-msgstr ""
+msgstr "Légèrement concave"
 
 #. A shape for an item fade.
 msgid "sharp convex"
-msgstr ""
+msgstr "Convexe accentué"
 
 #. A shape for an item fade.
 msgid "sharp concave"
-msgstr ""
+msgstr "Concave accentué"
 
 #. A shape for an item fade.
 msgid "slight S-curve"
-msgstr ""
+msgstr "Courbe en S légère"
 
 #. A shape for an item fade.
 msgid "sharp S-curve"
-msgstr ""
+msgstr "Courbe en S accentuée"
 
 msgid "no selected items"
 msgstr "aucun objets n'est sélectionné"

@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr "REAPER 现在将退出。请重启 REAPER 以应用更改。"
+
+msgid "Restart REAPER"
+msgstr "重启 REAPER"
 
 msgid "enabled"
 msgstr "以启用"
@@ -80,11 +86,8 @@ msgstr "注: 若当前不想调整 REAPER 设置,后续仍可通过菜单栏\"�
 msgid "Error writing configuration changes."
 msgstr "写入配置更改时出错"
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr "REAPER 现在将退出.请重启 REAPER 以应用更改."
-
-msgid "Restart REAPER"
-msgstr "重启 REAPER"
+msgid "REAPER preferences adjusted."
+msgstr ""
 
 msgid "volume"
 msgstr "音量"
@@ -323,12 +326,6 @@ msgid "{} conflicting binding overridden."
 msgid_plural "{} conflicting bindings overridden."
 msgstr[0] "已覆盖 {} 个冲突绑定."
 
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "REAPER 现在将退出。请重启 REAPER 以应用更改。"
-
-msgid "No changes were selected."
-msgstr "未选择任何更改."
-
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
@@ -371,8 +368,8 @@ msgstr "你的 REAPER 案件映射尚不存在.是否要安装 OSARA 案件映�
 msgid "Install OSARA Key Map"
 msgstr "安装 OSARA 案件映射"
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr "OSARA 键位映射已安装.REAPER 现在将退出。请重启 REAPER 以应用更改."
+msgid "The OSARA key map was installed."
+msgstr ""
 
 msgid "Your key map already includes all OSARA key map changes."
 msgstr "你的案件映射已包含所有 OSARA 的案件更改."
@@ -1038,6 +1035,11 @@ msgstr "开"
 #. which is off.
 msgid "off"
 msgstr "关"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr ""
 
 msgid "Unrestrict minimum"
 msgstr "取消最小值的限制"

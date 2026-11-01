@@ -11,7 +11,13 @@ msgstr ""
 "Project-Id-Version: osara\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
-"PO-Revision-Date: 2026-10-15 21:33\n"
+"PO-Revision-Date: 2026-11-01 22:13\n"
+
+msgid "REAPER will now exit. Please restart REAPER to apply the changes."
+msgstr ""
+
+msgid "Restart REAPER"
+msgstr ""
 
 msgid "enabled"
 msgstr "habilitado"
@@ -80,10 +86,7 @@ msgstr ""
 msgid "Error writing configuration changes."
 msgstr ""
 
-msgid "REAPER will now exit. Please restart REAPER  to apply the changes."
-msgstr ""
-
-msgid "Restart REAPER"
+msgid "REAPER preferences adjusted."
 msgstr ""
 
 msgid "volume"
@@ -331,12 +334,6 @@ msgid_plural "{} conflicting bindings overridden."
 msgstr[0] ""
 msgstr[1] ""
 
-msgid "REAPER will now exit. Please restart REAPER to apply the changes."
-msgstr ""
-
-msgid "No changes were selected."
-msgstr ""
-
 #. A column header in the Merge OSARA Key Map dialog
 #. indicating the keyboard shortcut for a conflicting binding.
 msgid "Key"
@@ -380,7 +377,7 @@ msgstr ""
 msgid "Install OSARA Key Map"
 msgstr ""
 
-msgid "The OSARA key map was installed. REAPER will now exit. Please restart REAPER to apply the changes."
+msgid "The OSARA key map was installed."
 msgstr ""
 
 msgid "Your key map already includes all OSARA key map changes."
@@ -1091,6 +1088,11 @@ msgstr "Ligado"
 #. which is off.
 msgid "off"
 msgstr "Desligado"
+
+#. Reported in the Parameters dialog after the value of a
+#. parameter which is controlled by an automation envelope.
+msgid "automated"
+msgstr ""
 
 msgid "Unrestrict minimum"
 msgstr ""
