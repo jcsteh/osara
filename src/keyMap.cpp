@@ -27,7 +27,7 @@ using namespace std;
 
 namespace {
 
-constexpr int KEY_MAP_VERSION = 1;
+constexpr int KEY_MAP_VERSION = 2;
 const char KEY_KEY_MAP_VERSION[] = "keyMapVersion";
 
 string joinPath(const string& directory, const string& file) {
