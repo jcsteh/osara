@@ -29,6 +29,8 @@ std::optional <bool> toggleCurrentEnvelopePointSelection();
 void reportCopiedEnvelopePointsOrAutoItems();
 void cmdToggleTrackEnvelope(int command);
 void cmdToggleTakeEnvelope(int command);
+void cmdToggleShowAllTrackEnvelopes(int command);
+void postToggleEnvelopeBypass(int command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(int command);
 void cmdCycleEnvelopePointShape(int command);

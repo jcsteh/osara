@@ -3240,6 +3240,7 @@ PostCommand POST_COMMANDS[] = {
 	{40296, postSelectMultipleTracks}, // Track: Select all tracks
 	{40332, postSelectMultipleEnvelopePoints}, // Envelope: Select all points
 	{40334, postSelectMultipleEnvelopePoints}, // Envelope: Invert selected points
+	{40883, postToggleEnvelopeBypass}, // Envelope: Toggle bypass for selected envelope
 	{40035, postSelectAll}, // Select all items/tracks/envelope points (depending on focus)
 	{41199, postToggleTrackSoloDefeat}, // Track: Toggle track solo defeat
 	{41536, postChangeTransientDetectionSensitivity}, // Transient detection sensitivity: Increase
@@ -6385,6 +6386,7 @@ Command COMMANDS[] = {
 	{MAIN_SECTION, {{0, 0, 40867}, nullptr}, nullptr, cmdToggleTrackEnvelope}, // Track: Toggle track mute envelope visible
 	{MAIN_SECTION, {{0, 0, 40693}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take volume envelope
 	{MAIN_SECTION, {{0, 0, 40694}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pan envelope
+	{MAIN_SECTION, {{0, 0, 41151}, nullptr}, nullptr, cmdToggleShowAllTrackEnvelopes}, // Envelope: Toggle show all envelopes for tracks
 	{MAIN_SECTION, {{0, 0, 41612}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take pitch envelope
 	{MAIN_SECTION, {{0, 0, 40695}, nullptr}, nullptr, cmdToggleTakeEnvelope}, // Take: Toggle take mute envelope
 	{MAIN_SECTION, {{0, 0, 42386}, nullptr}, nullptr, cmdDeleteTakeMarkers}, // Item: Delete take marker at cursor
