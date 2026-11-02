@@ -6124,8 +6124,6 @@ void cmdMoveTracks(int command) {
 	Main_OnCommand(command, 0);
 	MediaTrack* const newParent = GetParentTrack(track);
 	const int trackIndex = (int)GetMediaTrackInfo_Value(track, "IP_TRACKNUMBER") - 1;
-	const bool atTopOfTrackList = trackIndex == 0;
-	const bool atBottomOfTrackList = trackIndex == CountTracks(nullptr) - 1;
 	if (origTrackIndex == trackIndex) {
 		if (up) {
 			// Translators: Reported when trying to move a track up when it is
@@ -6138,10 +6136,35 @@ void cmdMoveTracks(int command) {
 		}
 		return;
 	}
-	// After the move, this is the track that now occupies the moved track's old position.
-	MediaTrack* const adjacentTrack = GetTrack(nullptr, trackIndex + (up ? 1 : -1));
+	// Other selected tracks and the children of a folder move along with this track,
+	// so they can't be used to say where it has moved to.
+	const auto findUnselectedTrack = [trackIndex](int step) -> MediaTrack* {
+		int index = trackIndex;
+		for (;;) {
+			if (step > 0) {
+				int depth = (int)GetMediaTrackInfo_Value(GetTrack(nullptr, index),
+					"I_FOLDERDEPTH");
+				while (depth > 0) {
+					MediaTrack* child = GetTrack(nullptr, ++index);
+					if (!child) {
+						return nullptr;
+					}
+					depth += (int)GetMediaTrackInfo_Value(child, "I_FOLDERDEPTH");
+				}
+			}
+			index += step;
+			MediaTrack* other = GetTrack(nullptr, index);
+			if (!other || !isTrackSelected(other)) {
+				return other;
+			}
+		}
+	};
+	// After the move, this is the track that now occupies the moved tracks' old position.
+	MediaTrack* const adjacentTrack = findUnselectedTrack(up ? 1 : -1);
 	// Context is one track further in the direction we're moving, used when entering folders.
-	MediaTrack* const contextTrack = GetTrack(nullptr, trackIndex + (up ? -1 : 1));
+	MediaTrack* const contextTrack = findUnselectedTrack(up ? -1 : 1);
+	const bool atTopOfTrackList = up && !contextTrack;
+	const bool atBottomOfTrackList = !up && !contextTrack;
 	ostringstream s;
 	if (atTopOfTrackList) {
 		// Translators: Reported when moving a track to the top of the track list.
