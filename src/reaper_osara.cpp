@@ -4564,9 +4564,18 @@ void cmdRemoveOrCopyAreaOfItems(int command) {
 }
 
 void cmdhRemoveItems(int command) {
-	int oldCount = CountMediaItems(0);
+	// We can't just compare the number of items before and after, since removing
+	// an item with ripple editing can split items on other tracks (#1019).
+	// Instead, check which of the selected items no longer exist afterward.
+	vector<MediaItem*> items;
+	const int selCount = CountSelectedMediaItems(nullptr);
+	items.reserve(selCount);
+	for (int i = 0; i < selCount; ++i) {
+		items.push_back(GetSelectedMediaItem(nullptr, i));
+	}
 	Main_OnCommand(command, 0);
-	int removed = oldCount - CountMediaItems(0);
+	const int removed = (int)count_if(items.begin(), items.end(),
+		[](MediaItem* item) { return !ValidatePtr((void*)item, "MediaItem*"); });
 	ostringstream s;
 	// Translators: Reported when items are removed. {} will be replaced with the
 	// number of items; e.g. "2 items removed".
