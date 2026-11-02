@@ -4021,9 +4021,12 @@ void moveToTrack(int direction, bool clearSelection=true, bool select=true) {
 		break;
 	}
 	bool wasSelected = isTrackSelected(track);
-	if (!select || track != origTrack || !wasSelected) {
+	if (!select || track != origTrack || !wasSelected ||
+			!GetLastTouchedTrack()) {
 		// We're moving to a different track
-		// or we're on the same track but it's unselected.
+		// or we're on the same track but it's unselected
+		// or there's no last touched track; e.g. after inserting a multi-track MIDI
+		// file from the Media Explorer.
 		if ((clearSelection || select) && makeUndoPoint)
 			Undo_BeginBlock();
 		if (clearSelection) {
