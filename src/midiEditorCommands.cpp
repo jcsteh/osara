@@ -1797,7 +1797,197 @@ void cmdMidiFilterWindow(int command) {
 	}
 }
 
+// The field (column) of the event list chosen with the next and previous field
+// commands, or -1 if no field is chosen, in which case the screen reader
+// reports the whole event.
+int eventListField = -1;
+// True while the event list is painting or OSARA is fetching text itself, in
+// which case the text of all fields must be provided.
+bool eventListNeedsAllFields = false;
+
+// The text reported when the chosen field of the focused event is empty. Some
+// screen readers read the screen if the event has no name.
+const char* getEventListBlankText() {
+	// Translators: Reported in the MIDI Event List when the chosen field of an
+	// event is empty.
+	return translate("blank");
+}
+// REAPER adds "<<" to the index of the event at the edit cursor. Remove it so
+// that screen readers don't report it as symbols.
+void removeEventListCursorMarker(char* text) {
+	string s = text;
+	for (size_t pos; (pos = s.find("<<")) != string::npos;) {
+		s.erase(pos, 2);
+	}
+	s.erase(s.find_last_not_of(' ') + 1);
+	// The text only gets shorter, so it still fits.
+	memmove(text, s.c_str(), s.size() + 1);
+}
+
+void removeEventListCursorMarker(wchar_t* text) {
+	wstring s = text;
+	for (size_t pos; (pos = s.find(L"<<")) != wstring::npos;) {
+		s.erase(pos, 2);
+	}
+	s.erase(s.find_last_not_of(L' ') + 1);
+	memmove(text, s.c_str(), (s.size() + 1) * sizeof(wchar_t));
+}
+// Get the name and value of a field of the focused event in the event list;
+// e.g. "Velocity 85".
+string getEventListFieldText(HWND list, int field) {
+	const int item = ListView_GetNextItem(list, -1, LVNI_FOCUSED);
+	if (item == -1) {
+		return "";
+	}
+	char value[256] = "";
+	eventListNeedsAllFields = true;
+	ListView_GetItemText(list, item, field, value, sizeof(value));
+	eventListNeedsAllFields = false;
+	removeEventListCursorMarker(value);
+	char name[256] = "";
+	HDITEM column{};
+	column.mask = HDI_TEXT;
+	column.pszText = name;
+	column.cchTextMax = sizeof(name);
+	Header_GetItem(ListView_GetHeader(list), field, &column);
+	const string valueText = value[0] ? value : getEventListBlankText();
+	if (!name[0]) {
+		return valueText;
+	}
+	return fmt::format("{} {}", name, valueText);
+}
+
+
+void eventListMoveField(bool next);
+
+LRESULT CALLBACK eventListSubclassProc(HWND hwnd, UINT msg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR id, DWORD_PTR data
+) {
+	if (msg == WM_PAINT || msg == WM_PRINTCLIENT) {
+		const bool prev = eventListNeedsAllFields;
+		eventListNeedsAllFields = true;
+		const LRESULT result = DefSubclassProc(hwnd, msg, wParam, lParam);
+		eventListNeedsAllFields = prev;
+		return result;
+	}
+	if (msg == WM_KEYDOWN && (wParam == VK_LEFT || wParam == VK_RIGHT) &&
+			!(GetKeyState(VK_CONTROL) & 0x8000) && !(GetKeyState(VK_MENU) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000)) {
+		// LeftArrow and RightArrow move between the fields of the focused event.
+		eventListMoveField(wParam == VK_RIGHT);
+		return 0;
+	}
+	if (msg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, eventListSubclassProc, id);
+	}
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
+}
+
+// When a field has been chosen, the screen reader should report only that
+// field when moving between events. Screen readers fetch the text of each field
+// from the list, which in turn asks its parent for the text. Therefore, for the
+// focused event, provide the chosen field as the first field and empty text
+// for the other fields, except when painting. Screen readers use the first
+// field as the name of the event; JAWS reads the screen if that is empty.
+LRESULT CALLBACK eventListParentSubclassProc(HWND hwnd, UINT msg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR id, DWORD_PTR data
+) {
+	const LRESULT result = DefSubclassProc(hwnd, msg, wParam, lParam);
+	if (msg == WM_NCDESTROY) {
+		RemoveWindowSubclass(hwnd, eventListParentSubclassProc, id);
+		return result;
+	}
+	if (msg != WM_NOTIFY || eventListField == -1 || eventListNeedsAllFields) {
+		return result;
+	}
+	auto* info = (NMLVDISPINFOW*)lParam;
+	if ((info->hdr.code != LVN_GETDISPINFOW &&
+			info->hdr.code != LVN_GETDISPINFOA) ||
+			!(info->item.mask & LVIF_TEXT) ||
+			info->item.iItem != ListView_GetNextItem(info->hdr.hwndFrom, -1,
+				LVNI_FOCUSED)) {
+		return result;
+	}
+	const bool isFirstField = info->item.iSubItem == 0;
+	eventListNeedsAllFields = true;
+	if (info->hdr.code == LVN_GETDISPINFOW) {
+		static wchar_t text[256];
+		text[0] = L'\0';
+		if (isFirstField) {
+			LVITEMW item{};
+			item.iSubItem = eventListField;
+			item.pszText = text;
+			item.cchTextMax = ARRAYSIZE(text);
+			SendMessageW(info->hdr.hwndFrom, LVM_GETITEMTEXTW, info->item.iItem,
+				(LPARAM)&item);
+			removeEventListCursorMarker(text);
+			if (!text[0]) {
+				wcsncpy_s(text, widen(getEventListBlankText()).c_str(), _TRUNCATE);
+			}
+		}
+		info->item.pszText = text;
+	} else {
+		static char text[256];
+		text[0] = '\0';
+		if (isFirstField) {
+			LVITEMA item{};
+			item.iSubItem = eventListField;
+			item.pszText = text;
+			item.cchTextMax = sizeof(text);
+			SendMessageA(info->hdr.hwndFrom, LVM_GETITEMTEXTA, info->item.iItem,
+				(LPARAM)&item);
+			removeEventListCursorMarker(text);
+			if (!text[0]) {
+				strncpy_s(text, getEventListBlankText(), _TRUNCATE);
+			}
+		}
+		((NMLVDISPINFOA*)lParam)->item.pszText = text;
+	}
+	eventListNeedsAllFields = false;
+	return result;
+}
+
+void eventListMoveField(bool next) {
+	HWND list = GetFocus();
+	if (!list) {
+		return;
+	}
+	const int count = Header_GetItemCount(ListView_GetHeader(list));
+	if (next) {
+		if (eventListField < count - 1) {
+			++eventListField;
+		}
+	} else if (eventListField >= 0) {
+		--eventListField;
+	}
+	if (eventListField == -1) {
+		ostringstream s;
+		// Translators: Reported in the MIDI Event List when moving back from the
+		// first field, after which moving between events reports all fields again.
+		s << translate("all fields");
+		// Also report the values of all fields of the focused event.
+		const int item = ListView_GetNextItem(list, -1, LVNI_FOCUSED);
+		for (int field = 0; item != -1 && field < count; ++field) {
+			char value[256] = "";
+			eventListNeedsAllFields = true;
+			ListView_GetItemText(list, item, field, value, sizeof(value));
+			eventListNeedsAllFields = false;
+			removeEventListCursorMarker(value);
+			if (value[0]) {
+				s << ", " << value;
+			}
+		}
+		outputMessage(s);
+		return;
+	}
+	outputMessage(getEventListFieldText(list, eventListField));
+}
+
 void maybeHandleEventListItemFocus(HWND hwnd, long childId) {
+	// Handle LeftArrow and RightArrow and the text screen readers fetch. See
+	// eventListSubclassProc and eventListParentSubclassProc.
+	SetWindowSubclass(hwnd, eventListSubclassProc, 0, 0);
+	SetWindowSubclass(GetParent(hwnd), eventListParentSubclassProc, 0, 0);
 	if (childId == CHILDID_SELF) {
 		// Focus is set to the list, not to an item within the list.
 		// By default, REAPER doesn't focus any event in the event list when coming from outside.
