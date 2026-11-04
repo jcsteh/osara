@@ -43,8 +43,18 @@ int getEnvelopePointByProjectTime(double time) {
 	}
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
-	return GetEnvelopePointByTimeEx(envelope, currentAutomationItem,
-		(time + 0.0001 - offset) * rate);
+	double envTime = (time + 0.0001 - offset) * rate;
+	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem, envTime);
+	int count = CountEnvelopePointsEx(envelope, currentAutomationItem);
+	if (point < count) {
+		return point;
+	}
+	// When the time is outside an automation item, GetEnvelopePointByTime returns
+	// the number of points, which isn't a valid point.
+	double firstTime = 0.0;
+	GetEnvelopePointEx(envelope, currentAutomationItem, 0, &firstTime, nullptr,
+		nullptr, nullptr, nullptr);
+	return envTime < firstTime ? -1 : count - 1;
 }
 
 int getEnvelopePointAtCursor() {
