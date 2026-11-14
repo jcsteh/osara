@@ -1146,11 +1146,16 @@ void postGoToTrack(int command, MediaTrack* track) {
 	}
 	if (trackNum > 0) { // Not master
 		int folderDepth = (int)GetMediaTrackInfo_Value(track, "I_FOLDERDEPTH");
-		if (folderDepth == 1) { // Folder
-			separate();
-			s << getFolderCompacting(track);
-			separate();
-			s << formatFolderState(track);
+		auto reportFolder = [&] {
+			if (folderDepth == 1) { // Folder
+				separate();
+				s << getFolderCompacting(track);
+				separate();
+				s << formatFolderState(track);
+			}
+		};
+		if (!settings::reportFolderStateAfterName) {
+			reportFolder();
 		}
 		separate();
 		char* trackName = (char*)GetSetMediaTrackInfo(track, "P_NAME", nullptr);
@@ -1160,6 +1165,9 @@ void postGoToTrack(int command, MediaTrack* track) {
 			// There's no name and track number reporting is disabled. We report the
 			// number in lieu of the name.
 			s << trackNum;
+		}
+		if (settings::reportFolderStateAfterName) {
+			reportFolder();
 		}
 		if (isTrackFrozen(track)) {
 			separate();

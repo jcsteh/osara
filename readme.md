@@ -782,6 +782,8 @@ The dialog contains the following options:
 - Report recording state: When enabled, OSARA will report recording starting and stopping. This can be toggled separately from other transport reports if you want to cut down verbosity.
 - Report track numbers: When enabled, OSARA will report track numbers as well as track names.
  When disabled, track numbers will not be reported except for unnamed tracks.
+- Report folder state after track name: When enabled, OSARA will report the folder state of a folder track (e.g. "closed folder") after the track name instead of before it.
+ For example, "3 drums closed folder" instead of "3 closed folder drums".
 - Report FX when moving to tracks/takes: When enabled, OSARA will report the names of any effects on a track or take when you move to it.
 - Report position when navigating chords in MIDI editor: When enabled, OSARA will report the cursor position as you move through chords in the piano roll.
 - Report MIDI notes in MIDI editor: When enabled, OSARA will report the names of individual MIDI notes and the number of notes in a chord.
@@ -1056,6 +1058,7 @@ This list is worth referencing when making your own key map additions, assigning
 - OSARA: Toggle Report position when scrubbing
 - OSARA: Toggle Report time movement during playback/recording
 - OSARA: Toggle Report track numbers
+- OSARA: Toggle Report folder state after track name
 - OSARA: Toggle Report time selection start and end while playing
 - OSARA: Toggle Report transport state (play, record, etc.)
 - OSARA: Configure REAPER for optimal screen reader accessibility

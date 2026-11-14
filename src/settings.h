@@ -41,6 +41,9 @@ BoolSetting(reportRecord, MAIN_SECTION,
 BoolSetting(reportTrackNumbers, MAIN_SECTION,
 	"Report tr&ack numbers",
 	true)
+BoolSetting(reportFolderStateAfterName, MAIN_SECTION,
+	"Report f&older state after track name",
+	false)
 BoolSetting(reportFx, MAIN_SECTION,
 	"Report &FX when moving to tracks/takes",
 	false)
