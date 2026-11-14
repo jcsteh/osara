@@ -220,7 +220,8 @@ int getLoudnessMeterFirstOutputParam(MediaTrack* track, int fx) {
 		}
 	}
 	// This is the index used by REAPER versions before 7.79.
-	return 15;
+	firstOutput = 15;
+	return firstOutput;
 }
 
 double getLoudnessMeterParam(Watcher& watcher,
