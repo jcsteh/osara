@@ -43,7 +43,7 @@ int getEnvelopePointByProjectTime(double time) {
 	}
 	// GetEnvelopePointByTime often returns the point before instead of right at the position.
 	// Increment the cursor position a bit to work around this.
-	double envTime = (time + 0.0001 - offset) * rate;
+	const double envTime = (time + 0.0001 - offset) * rate;
 	int point = GetEnvelopePointByTimeEx(envelope, currentAutomationItem, envTime);
 	int count = CountEnvelopePointsEx(envelope, currentAutomationItem);
 	if (point < count) {
