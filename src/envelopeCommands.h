@@ -32,6 +32,7 @@ void cmdToggleTakeEnvelope(int command);
 void postSelectMultipleEnvelopePoints(int command);
 void cmdMoveSelEnvelopePoints(int command);
 void cmdCycleEnvelopePointShape(int command);
+void postChangeBezierTension(int command);
 void cmdToggleVolumeEnvelope(int command);
 void cmdTogglePanEnvelope(int command);
 void cmdToggleMuteEnvelope(int command);
