@@ -48,6 +48,8 @@ jobs:
                 result.windows = artifact.id;
               } else if (artifact.name.startsWith("osara_mac")) {
                 result.mac = artifact.id;
+              } else if (artifact.name.startsWith("osara_package")) {
+                result.package = artifact.id;
               }
             }
             return result;
@@ -59,6 +61,7 @@ jobs:
             [Build ${{ github.event.workflow_run.run_number }} succeeded!](${{ env.runUrl }})
             - [Download for Windows](${{ env.nightlyUrl }}/${{ fromJSON(steps.getArtifactIds.outputs.result).windows }}.zip)
             - [Download for Mac](${{ env.nightlyUrl }}/${{ fromJSON(steps.getArtifactIds.outputs.result).mac }}.zip)
+            - [Download REAPER package for Windows and Mac](${{ env.nightlyUrl }}/${{ fromJSON(steps.getArtifactIds.outputs.result).package }}.zip)
   failure:
     if: ${{ github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
