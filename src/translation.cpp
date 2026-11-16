@@ -107,21 +107,31 @@ void initTranslation() {
 		name = nameIt->second;
 	}
 	name += ".po";
-	// OSARA translations are stored in osara/locale in the REAPER resource
-	// directory.
-	string path(GetResourcePath());
-	path += "/osara/locale/";
-	path += name;
+	// OSARA translations are stored in Data/osara/locale or osara/locale in the
+	// REAPER resource directory, tried in that order.
+	string path;
+	ifstream input;
+	for (const char* dir : {"/Data/osara/locale/", "/osara/locale/"}) {
+		path = GetResourcePath();
+		path += dir;
+		path += name;
 #ifdef _WIN32
-	// REAPER provides UTF-8 strings. However, on Windows, ifstream will
-	// interpret a narrow (8 bit) string as an ANSI string. The easiest way to
-	// deal with this is to convert the string to UTF-16, which Windows will
-	// interpret correctly.
-	ifstream input(widen(path));
+		// REAPER provides UTF-8 strings. However, on Windows, ifstream will
+		// interpret a narrow (8 bit) string as an ANSI string. The easiest way to
+		// deal with this is to convert the string to UTF-16, which Windows will
+		// interpret correctly.
+		input.open(widen(path));
+#else
+		input.open(path);
+#endif
+		if (input.is_open()) {
+			break;
+		}
+	}
+#ifdef _WIN32
 	tinygettext::POParser::parse(path, input, translationDict);
 #else
 	// SWELL doesn't support mnemonics, so strip ampersands inside PO strings on macOS.
-	ifstream input(path);
 	istringstream filteredInput = filterPoAmpersands(input);
 	tinygettext::POParser::parse(path, filteredInput, translationDict);
 #endif
