@@ -13,6 +13,7 @@ vars.Add("publisher", "The publisher of this build", "unknown")
 env = DefaultEnvironment(tools=[],
 	variables=vars,
 	copyright="Copyright (C) 2014-2025 NV Access Limited, James Teh & other contributors",
+	url="https://osara.reaperaccessibility.com/",
 )
 
 # Make sure to run the build on multiple threads so it runs faster
@@ -58,6 +59,36 @@ else: # Mac
 
 env.Alias("installer", installer)
 env.Default(installer)
+
+# REAPER package (.ReaperPkg) for the current OS.
+pkgEnv = Environment(tools=["textfile", "zip"],
+	version=env["version"], publisher=env["publisher"], url=env["url"])
+if env["PLATFORM"] == "win32":
+	pkgOs = "windows"
+	pkgFiles = [
+		("os_win_32/UserPlugins/reaper_osara32.dll", "build/x86/reaper_osara32.dll"),
+		("os_win_x64/UserPlugins/reaper_osara64.dll", "build/x86_64/reaper_osara64.dll"),
+		("os_win_arm64ec/UserPlugins/reaper_osara_arm64ec.dll", "build/arm64/reaper_osara_arm64ec.dll"),
+		("os_win/KeyMaps/OSARA.ReaperKeyMap", "config/windows/reaper-kb.ini"),
+	]
+else:
+	pkgOs = "mac"
+	pkgFiles = [
+		("os_mac/UserPlugins/reaper_osara.dylib", "build/reaper_osara.dylib"),
+		("os_mac/KeyMaps/OSARA.ReaperKeyMap", "config/mac/reaper-kb.ini"),
+	]
+pkgFiles += [("Data/osara/locale/%s" % po.name, po) for po in env.Glob("locale/*.po")]
+pkgStage = "pkg/stage"
+pkgSources = [pkgEnv.InstallAs("%s/%s" % (pkgStage, dest), src) for dest, src in pkgFiles]
+pkgSources.append(pkgEnv.Textfile("%s/reaper-package-info.txt" % pkgStage, [
+	'NAME "OSARA"',
+	'AUTHOR "$publisher"',
+	'VERSION "$version"',
+	'URL "$url"',
+]))
+package = pkgEnv.Zip("pkg/osara_${version}_%s.ReaperPkg" % pkgOs, pkgSources,
+	ZIPROOT=pkgStage)
+env.Alias("package", package)
 
 pot = env.Command("locale/osara_${version}.pot",
 	[env.Glob("src/*.cpp"), env.Glob("src/*.rc"), configRc],
