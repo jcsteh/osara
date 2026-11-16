@@ -36,6 +36,7 @@ def writeSnapshotIndex(data):
 			'<li>Version {data[version]}, {data[date]}</li>\n'
 			'<li><a href="{data[winUrl]}">Download for Windows</a></li>\n'
 			'<li><a href="{data[macUrl]}">Download for Mac</a></li>\n'
+			'<li><a href="{data[pkgUrl]}">Download REAPER package for Windows and Mac (REAPER 7.86 or later)</a></li>\n'
 			'<li><a href="https://github.com/jcsteh/osara/commits/{data[commit]}">Change log</a></li>\n'
 			"</ul>\n"
 			"</body>\n"
@@ -86,6 +87,7 @@ def main():
 		"version": os.getenv("version"),
 		"winUrl": os.getenv("winUrl"),
 		"macUrl": os.getenv("macUrl"),
+		"pkgUrl": os.getenv("pkgUrl"),
 		"date": datetime.datetime.now(datetime.UTC).ctime(),
 	}
 	print("Publishing snapshots for {data[version]}".format(data=data))

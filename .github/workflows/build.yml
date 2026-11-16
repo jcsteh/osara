@@ -42,7 +42,7 @@ jobs:
           else
             echo os=mac >> "$GITHUB_ENV"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - name: Fetch pull request base
@@ -257,11 +257,23 @@ jobs:
           zip -r ../osara_${{ env.version }}.zip $APP_BUNDLE
           cd ../..
 
+          # Sign the plug-in for the REAPER package.
+          codesign --force --options runtime --timestamp --sign "$IDENTITY" build/reaper_osara.dylib
+          codesign --verify --verbose=4 build/reaper_osara.dylib
+
           # Cleanup
           rm installer/mac/osara_temp.zip certificate.p12
           security delete-keychain build.keychain
 
           echo "Mac app signed and notarized successfully!"
+      - name: package
+        run: scons package "publisher=${{ env.publisher }}" version=${{ env.version }}
+      - name: upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: package_${{ env.os }}
+          path: pkg/*.ReaperPkg
+          compression-level: 0
       # We only need to upload the pot on one OS. We arbitrarily pick Windows.
       - name: pot
         if: ${{ github.event_name == 'push' && runner.os == 'Windows' }}
@@ -290,7 +302,7 @@ jobs:
       # We upload pull request builds as normal artifacts.
       - name: upload PR build Win
         if: ${{ github.event_name == 'pull_request' && runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: osara_windows_${{ env.version }}
           path: installer/osara_*.exe
@@ -298,7 +310,7 @@ jobs:
           compression-level: 0
       - name: upload PR build Mac
         if: ${{ github.event_name == 'pull_request' && matrix.os == 'macos-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: osara_mac_${{ env.version }}
           # This wildcard is necessary to make the upload-artifact action
@@ -312,7 +324,7 @@ jobs:
           path: installer/mac/*.app
       - name: upload debug symbols Win
         if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: windows_debug_symbols
           path: build/*/*.pdb
@@ -323,10 +335,48 @@ jobs:
       # outputs won't be set if the value is empty.
       winInstallerUrl: ${{ steps.getBuildUrl.outputs.windowsUrl }}
       macInstallerUrl: ${{ steps.getBuildUrl.outputs.macUrl }}
+  package:
+    # This job merges the Windows and Mac packages into one REAPER package.
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: package_*
+          path: pkgIntermediates
+          merge-multiple: true
+      - name: merge
+        run: |
+          mkdir -p pkg
+          python ci/mergePackages.py "pkg/osara_${version}.ReaperPkg" pkgIntermediates/*_mac.ReaperPkg pkgIntermediates/*_windows.ReaperPkg
+      - name: upload PR package
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: osara_package_${{ env.version }}
+          path: pkg/*.ReaperPkg
+          compression-level: 0
+      - id: uploadPackage
+        name: upload package
+        if: ${{ github.event_name == 'push' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: pkg/*.ReaperPkg
+          tag_name: snapshots
+      - id: getPackageUrl
+        name: get package URL
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo pkgUrl=${{ fromJSON(steps.uploadPackage.outputs.assets)[0].browser_download_url }} >> "$GITHUB_OUTPUT"
+    outputs:
+      pkgUrl: ${{ steps.getPackageUrl.outputs.pkgUrl }}
   publish:
     # This job updates the website with the new readme and snapshots.
     if: ${{ github.event_name == 'push' }}
-    needs: build
+    needs: [build, package]
     runs-on: ubuntu-latest
     permissions:
       pages: write
@@ -334,12 +384,13 @@ jobs:
     steps:
       - name: setup
         run: pip install markdown
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: build
         env:
           version: ${{ needs.build.outputs.version }}
           winUrl: ${{ needs.build.outputs.winInstallerUrl }}
           macUrl: ${{ needs.build.outputs.macInstallerUrl }}
+          pkgUrl: ${{ needs.package.outputs.pkgUrl }}
         run: python ci/buildSite
       - name: upload
         uses: actions/upload-pages-artifact@v3
