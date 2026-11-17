@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <cassert>
+#include <algorithm>
 #include <variant>
 #include <vector>
 #include<map>
