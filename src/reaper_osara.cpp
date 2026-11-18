@@ -72,6 +72,88 @@ DWORD lastCommandTime = 0;
 int lastCommandRepeatCount;
 MediaItem* currentItem = nullptr;
 
+struct ExternalMarkerRegionTarget {
+	ReaProject* project;
+	int enumerationIndex;
+	bool isRegion;
+	double start;
+	double end;
+};
+
+// A one-shot target supplied by another REAPER extension for _OSARA_REMOVE.
+static optional<ExternalMarkerRegionTarget> externalMarkerRegionTarget;
+
+static bool positionsMatch(double left, double right) {
+	return fabs(left - right) <= 0.0000001;
+}
+
+static bool validateExternalMarkerRegionTarget(
+	const ExternalMarkerRegionTarget& target
+) {
+	if (target.project != EnumProjects(-1, nullptr, 0) ||
+			target.enumerationIndex < 0) {
+		return false;
+	}
+	bool isRegion = false;
+	double start = 0.0;
+	double end = 0.0;
+	if (!EnumProjectMarkers3(target.project, target.enumerationIndex, &isRegion,
+			&start, &end, nullptr, nullptr, nullptr)) {
+		return false;
+	}
+	return isRegion == target.isRegion &&
+		positionsMatch(start, target.start) &&
+		(!isRegion || positionsMatch(end, target.end));
+}
+
+bool osara_setExternalMarkerRegionTarget(ReaProject* project,
+	int enumerationIndex, bool isRegion, double start, double end
+) {
+	if (!project) {
+		project = EnumProjects(-1, nullptr, 0);
+	}
+	ExternalMarkerRegionTarget target{
+		project, enumerationIndex, isRegion, start, end};
+	if (!validateExternalMarkerRegionTarget(target) ||
+			!positionsMatch(GetCursorPosition(), start)) {
+		return false;
+	}
+	externalMarkerRegionTarget = target;
+	return true;
+}
+
+static void clearExternalMarkerRegionTarget() {
+	externalMarkerRegionTarget.reset();
+}
+
+static bool removeExternalMarkerRegionTarget() {
+	if (!externalMarkerRegionTarget) {
+		return false;
+	}
+	const ExternalMarkerRegionTarget target = *externalMarkerRegionTarget;
+	clearExternalMarkerRegionTarget();
+	if (!validateExternalMarkerRegionTarget(target) ||
+			!positionsMatch(GetCursorPosition(), target.start)) {
+		outputMessage(translate(target.isRegion ?
+			"region no longer exists" : "marker no longer exists"));
+		return true;
+	}
+	Undo_BeginBlock();
+	const bool removed = DeleteProjectMarkerByIndex(
+		target.project, target.enumerationIndex);
+	Undo_EndBlock(translate(target.isRegion ?
+		"Delete region" : "Delete marker"), UNDO_STATE_MISCCFG);
+	if (!removed) {
+		outputMessage(translate(target.isRegion ?
+			"region no longer exists" : "marker no longer exists"));
+		return true;
+	}
+	UpdateArrange();
+	outputMessage(translate(target.isRegion ?
+		"region deleted" : "marker deleted"));
+	return true;
+}
+
 /*** Utilities */
 
 #ifdef _WIN32
@@ -5269,6 +5351,9 @@ void cmdDeleteTakeMarkers(int command) {
 }
 
 void cmdRemoveFocus(int command) {
+	if (removeExternalMarkerRegionTarget()) {
+		return;
+	}
 	switch (fakeFocus) {
 		case FOCUS_TRACK:
 			cmdhRemoveTracks(40005); // Track: Remove tracks
@@ -6722,6 +6807,10 @@ bool handleCommand(KbdSectionInfo* section, int command, int val, int valHw, int
 		section = SectionFromUniqueID(MAIN_SECTION);
 	}
 	const auto it = commandsMap.find(make_pair(section->uniqueID, command));
+	if (externalMarkerRegionTarget &&
+			(it == commandsMap.end() || it->second->execute != cmdRemoveFocus)) {
+		clearExternalMarkerRegionTarget();
+	}
 	if (it != commandsMap.end()
 		// Allow shortcut help to be disabled.
 		&& (!isShortcutHelpEnabled || it->second->execute == cmdShortcutHelp)
