@@ -50,6 +50,8 @@
 #define REAPERAPI_WANT_TrackFX_FormatParamValue
 #define REAPERAPI_WANT_GetLastMarkerAndCurRegion
 #define REAPERAPI_WANT_EnumProjectMarkers
+#define REAPERAPI_WANT_EnumProjectMarkers3
+#define REAPERAPI_WANT_DeleteProjectMarkerByIndex
 #define REAPERAPI_WANT_GetSelectedEnvelope
 #define REAPERAPI_WANT_GetEnvelopeName
 #define REAPERAPI_WANT_NamedCommandLookup
@@ -392,6 +394,8 @@ IReaperControlSurface* createSurface();
 extern bool selectedEnvelopeIsTake;
 // exports.cpp
 void registerExports(reaper_plugin_info_t* rec);
+bool osara_setExternalMarkerRegionTarget(ReaProject* project,
+	int enumerationIndex, bool isRegion, double start, double end);
 
 template<typename... Args>
 inline void dbg(fmt::format_string<Args...> format, Args&&... args) {

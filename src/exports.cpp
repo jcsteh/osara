@@ -53,4 +53,6 @@ void registerExports(reaper_plugin_info_t* rec) {
 		"Get the version of OSARA.\n"
 		"This will be in the form: year.month.day.build,commit\n"
 		"For example: 2024.3.6.1332,13560ef7");
+	rec->Register("API_osara_setExternalMarkerRegionTarget",
+		(void*)osara_setExternalMarkerRegionTarget);
 }
